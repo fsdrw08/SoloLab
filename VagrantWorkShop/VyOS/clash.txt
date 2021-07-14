@@ -1,0 +1,10 @@
+sudo su
+bash -c "$(cat /tmp/install.sh)"  && source /etc/profile &> /dev/null
+
+#or
+
+mkdir ~/.local/share -p
+bash -c "$(cat /tmp/install.sh)"  && source /etc/profile &> /dev/null
+source ~/.bashrc
+
+bash /tmp/finalConfig.sh
