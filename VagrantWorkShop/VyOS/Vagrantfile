@@ -22,8 +22,9 @@ Vagrant.configure("2") do |config|
     hv.memory = 1024
     config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
       trigger.info = "Add new network addapter"
-      trigger.run = {inline: "./Add-VMNetworkAdapter.ps1"}
-      trigger.run = {inline: "./Run-Dos2Unix.ps1"}
+      trigger.run = {inline: "./Add-VMNetworkAdapter.ps1;
+                              Start-BitsTransfer 'https://raw.githubusercontent.com/juewuy/ShellClash/master/install.sh';
+                              ./Run-Dos2Unix.ps1"}
     end
   end
   config.vm.provision "shell", path: "./provisionConfig.sh"

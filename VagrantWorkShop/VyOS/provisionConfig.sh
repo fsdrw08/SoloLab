@@ -5,7 +5,7 @@ if [ "$(id -g -n)" != 'vyattacfg' ] ; then
 fi
 
 source /opt/vyatta/etc/functions/script-template
-config
+configure
 # set service ssh port 22
 
 # set system login user vagrant authentication plaintext-password vagrant
