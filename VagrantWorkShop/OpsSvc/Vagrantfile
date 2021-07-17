@@ -18,13 +18,14 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "OpsSvc"
-    hv.memory = 7168
+    hv.memory = 6144
+    hv.cpus = 4
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
     #   trigger.info = "Run-Dos2Unix"
     #   trigger.run = {inline: "./Run-Dos2Unix.ps1"}
     # end
   end
-  config.vm.provision "shell", inline: "sudo dnf install git -y"
+  # config.vm.provision "shell", inline: "sudo dnf install git -y"
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
