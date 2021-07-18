@@ -3,6 +3,7 @@ iso_url="../ISO/vyos-1.3.0-rc5-amd64.iso"
 iso_checksum_type="sha256"
 iso_checksum="245B99C2EE92A0446CC5A24F5E169B06A6A0B1DD255BADFB4A8771B2BFD4C9DD"
 vm_name="packer-vyos130-g2"
+configuration_version="8.0"
 disk_size="128000"
 disk_additional_size=["150000"]
 cd_files=[".\\extra\\files\\gen2-vyos130\\initialConfig.sh"]
