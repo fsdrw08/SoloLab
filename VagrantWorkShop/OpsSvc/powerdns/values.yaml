@@ -71,6 +71,7 @@ powerdns:
     database: pdns
   dnssec: true
   config: {}
+  api_key: EakZu2FgevlAmNWZ9gc8yMeu
 
 # Enabled mariadb
 # ... for more options see https://github.com/bitnami/charts/tree/master/bitnami/mariadb
