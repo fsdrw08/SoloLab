@@ -1,4 +1,5 @@
 # https://github.com/k8s-at-home/charts/tree/master/charts/stable/powerdns
+# https://artifacthub.io/packages/helm/halkeye/powerdnsadmin
 # Default values for powerdns.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -97,8 +98,8 @@ postgresql:
   postgresqlPostgresPassword: pdnsadminpass
   postgresqlDatabase: pdns
   persistence:
-    enabled: false
-    # storageClass: ""
+    enabled: true
+    storageClass: "pdns"
 
 
 # Probes configuration
