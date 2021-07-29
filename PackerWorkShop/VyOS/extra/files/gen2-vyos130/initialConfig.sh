@@ -22,7 +22,7 @@ set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop 192.168.255.250
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.1
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 default-router 192.168.255.1
-set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name vyos
+set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name lab
 
 # set service dns forwarding listen-address '192.168.255.1'
 # set service dns forwarding allow-from '192.168.255.0/24'
