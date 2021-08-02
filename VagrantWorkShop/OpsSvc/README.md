@@ -3,6 +3,7 @@ https://github.com/k8s-at-home/charts/tree/master/charts/stable/powerdns
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+sudo snap install helm --classic
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
 helm repo add halkeye https://halkeye.github.io/helm-charts/
 helm repo add bitnami https://charts.bitnami.com/bitnami
