@@ -25,6 +25,23 @@ Vagrant.configure("2") do |config|
     #   trigger.run = {inline: "./Run-Dos2Unix.ps1"}
     # end
   end
+
+  # https://github.com/kurokobo/awx-on-k3s
+  # for china
+  config.vm.provision "shell", inline: "curl -sfL http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644\" sh -"
+  # for other country
+  # config.vm.provision "shell", inline: "curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644"
+  # add k3s config env
+  config.vm.provision "shell", inline: "echo \"export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\" >> ~/.bashrc"
+  # install helm
+  config.vm.provision "shell", inline: "sudo snap install helm --classic"
+  # upload helm values
+  # config.vm.provision "file", source: "./powerdns", destination: "/tmp/powerdns"
+  # config.vm.provision "file", source: "./powerdns-admin", destination: "/tmp/powerdns-admin"
+  
+  # move uploads to /home/vagrant
+  # config.vm.provision "shell", inline: "mv /tmp/powerdns ~/powerdns"
+  # config.vm.provision "shell", inline: "mv /tmp/powerdns-admin ~/powerdns-admin"
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
