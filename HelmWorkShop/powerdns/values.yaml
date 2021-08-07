@@ -84,14 +84,15 @@ mariadb:
     username: pdns
     password: pdns-pass
     rootPassword: pdnsrootpass
-  primary:
-    persistence:
+  primary: 
+    persistence: 
       enabled: true
-      storageClass: "pdns"
+      storageClass: "longhorn"
       mountPath: /bitnami/mariadb
-      subPath: "powerdns"
-      accessModes:
-      - ReadWriteOnce"
+      subPath: ""
+      accessModes: 
+      - ReadWriteOnce
+      size: 8Gi
 
 # Enabled postgres
 # ... for more options see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
@@ -101,13 +102,13 @@ postgresql:
   postgresqlPassword: pdnspass
   postgresqlPostgresPassword: pdnsadminpass
   postgresqlDatabase: pdns
-  persistence:
+  persistence: 
     enabled: false
-    storageClass: "pdns"
+    storageClass: "longhorn"
     mountPath: /bitnami/postgresql
-      subPath: "powerdns"
-      accessModes:
-      - ReadWriteOnce"
+    subPath: ""
+    accessModes: 
+    - ReadWriteOnce
 
 
 # Probes configuration

@@ -19,7 +19,7 @@ helm repo update
 `sudo rc-service iscsid start`
 
 # https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount
-`sudo cat << EOF >/etc/local.d/make-shared.start`
+`sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF`
 `#!/bin/ash`
 `mount --make-shared /`
 `exit`
@@ -31,15 +31,19 @@ helm repo update
 `sudo rc-service local start`
 
 kubectl create namespace longhorn-system
-helm install longhorn longhorn/longhorn --namespace longhorn-system
+helm install longhorn longhorn/longhorn --namespace longhorn-system -f /vagrant/HelmWorkShop/longhorn/values.yaml
 kubectl get pods --namespace longhorn-system
-kubectl describe pod longhorn-manager-gvj6g --namespace longhorn-system
+kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
 
 helm repo update
 
-helm install <powerdns> k8s-at-home/powerdns -f /vagrant/HelmWorkShop/powerdns/values.yaml
+kubectl create namespace powerdns
+helm install <powerdns> k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values.yaml
+
+
 helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.yaml
 helm install <powerdnsadmin> halkeye/powerdnsadmin -f ./powerdns-admin/values.yamlx
+kubectl get pods --namespace powerdns
 
 kubectl describe pod -A
 kubectl get pods
