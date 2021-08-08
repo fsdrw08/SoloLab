@@ -26,8 +26,9 @@ helm repo update
 `EOF`
 
 # https://blog.csdn.net/ctwy291314/article/details/104634667
+# https://lists.alpinelinux.org/~alpine/devel/%3CCAF-%2BOzABh_NPrTZ2oMFUKrsYmSE5obOadKTAth1HU5_OEZUxPQ%40mail.gmail.com%3E
 `sudo chmod +x /etc/local.d/make-shared.start`
-`sudo rc-update add local`
+`sudo rc-update add local boot`
 `sudo rc-service local start`
 
 kubectl create namespace longhorn-system

@@ -1,0 +1,1 @@
+coredns.exe -conf "%~dp0\Corefile"
