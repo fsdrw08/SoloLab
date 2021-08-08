@@ -1,1 +1,0 @@
-Get-NetIPInterface | Where-Object {$_.interfacealias -match "Internal Switch"} | Set-NetIPInterface -InterfaceMetric 9999

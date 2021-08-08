@@ -1,0 +1,2 @@
+Get-NetIPInterface | Where-Object {$_.interfacealias -match "Internal Switch"} | Set-NetIPInterface -InterfaceMetric 9999
+Get-NetAdapter -Name "*internal switch*" | Set-NetAdapter -MacAddress "00-00-ba-be-fa-ce"
