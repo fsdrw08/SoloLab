@@ -9,7 +9,7 @@
   hosts {
     # there is not much domian name needs to resolve, so we put the dns record here (use host plugins to resolve)
     # if we need to resolve many domain name, we should use file plugins to resolve (with text file match with RFC 1035)
-    192.168.255.88 longhorn.lab
+    192.168.255.102 InfraSvc-Mst.lab
     # ttl
     ttl 3600
     # the time gap to reload the dns record file
