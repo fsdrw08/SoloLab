@@ -53,7 +53,7 @@ service:
 
 persistence:
   defaultClass: true
-  defaultClassReplicaCount: 3
+  defaultClassReplicaCount: 1
   reclaimPolicy: Delete
   recurringJobs:
     enable: false
