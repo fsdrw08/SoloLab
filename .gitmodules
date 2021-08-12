@@ -2,3 +2,7 @@
 	path = PackerWorkShop/hv-packer
 	url = https://github.com/fsdrw08/hv-packer.git
 	branch = SoloLab
+[submodule "HelmWorkShop/local-path-provisioner"]
+	path = HelmWorkShop/local-path-provisioner
+	url = https://github.com/fsdrw08/local-path-provisioner.git
+	branch = SoloLab
