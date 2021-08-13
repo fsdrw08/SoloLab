@@ -77,7 +77,7 @@ powerdns:
 # Enabled mariadb
 # ... for more options see https://github.com/bitnami/charts/tree/master/bitnami/mariadb
 mariadb:
-  enabled: true
+  enabled: false
   architecture: standalone
   auth:
     database: pdns
@@ -97,13 +97,13 @@ mariadb:
 # Enabled postgres
 # ... for more options see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
 postgresql:
-  enabled: false
+  enabled: true
   postgresqlUsername: pdns
   postgresqlPassword: pdnspass
   postgresqlPostgresPassword: pdnsadminpass
   postgresqlDatabase: pdns
   persistence: 
-    enabled: false
+    enabled: trues
     storageClass: "longhorn"
     mountPath: /bitnami/postgresql
     subPath: ""

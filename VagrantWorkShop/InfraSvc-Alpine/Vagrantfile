@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
   # for others
   # config.vm.provision "shell", inline: "echo \"export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\" >> ~/.bashrc"
   
-  config.vm.provision "shell", inline: "swapoff -a && sudo rc-update add cgroups default"
+  config.vm.provision "shell", inline: "sudo swapoff -a && sudo rc-update add cgroups default"
   # install helm
   # for alpine
   config.vm.provision "shell", inline: "sudo apk add helm"

@@ -6,10 +6,49 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 sudo snap install helm --classic
 
+# add rancher helm repo
+helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+
+# Create a Namespace for Rancher
+kubectl create namespace cattle-system
+
+# Install cert-manager
+# install the cert-manager CustomResourceDefinition resources (change the version refer from https://cert-manager.io/docs/installation/supported-releases/)
+# kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml
+# Create the namespace for cert-manager
+kubectl create namespace cert-manager
+# Add the Jetstack Helm repository
+helm repo add jetstack https://charts.jetstack.io
+# Install the cert-manager Helm chart
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --set installCRDs=true \
+  # --version v1.5.0 
+# have a check
+kubectl get pods --namespace cert-manager
+
+# Install Rancher with Helm and rancher-generated cert
+helm install rancher rancher-stable/rancher \
+  --namespace cattle-system \
+  --set hostname=rancher.lab \
+  --set replicas=1
+# Verify that the Rancher Server is Successfully Deployed
+kubectl -n cattle-system rollout status deploy/rancher
+
+# add bitnami helm repo 
+helm repo add bitnami https://charts.bitnami.com/bitnami
+# create pgsql namespace
+kubectl create namespace pgsql
+# install postgresql
+helm install postgresql bitnami/postgresql --namespace pgsql -f /vagrant/HelmWorkShop/postgresql/values.yaml
+
+
+
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
 helm repo add halkeye https://halkeye.github.io/helm-charts/
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo add longhorn https://charts.longhorn.io
+
+# helm repo add longhorn https://charts.longhorn.io
 
 helm repo update
 
@@ -41,10 +80,23 @@ helm repo update
 kubectl create namespace powerdns
 helm install <powerdns> k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values.yaml
 
+kubectl exec --stdin --tty powerdns-postgresql-0 -n powerdns -- /bin/bash
+createdb -h localhost -p 5432 -U pdns pdns_admin
+psql -U pdns
+\l
+
+helm install <powerdnsadmin> halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
+kubectl get pods --namespace powerdns
+
+browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
+create new user account
+..
+PDNS API URL: http://<the ip address shows in kubectl get services -n powerdns | grep powerdns-webserver>:<the port number shows in >
+PDNS API KEY: <the string which show in ./powerdns/values .powerdns.API_KEY>
+
+kubectl describe pods powerdns-postgresql-0 --namespace powerdns
 
 helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.yaml
-helm install <powerdnsadmin> halkeye/powerdnsadmin -f ./powerdns-admin/values.yamlx
-kubectl get pods --namespace powerdns
 
 kubectl describe pod -A
 kubectl get pods
