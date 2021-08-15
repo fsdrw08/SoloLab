@@ -1,0 +1,1 @@
+vagrant box add DEBIAN11.0.0-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-debian11-base-hv-g2.box

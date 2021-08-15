@@ -5,7 +5,7 @@ C:\Users\drw_0\Downloads\ISO\ubuntu-20.04.2-live-server-amd64.iso
 C:\Users\drw_0\Downloads\ISO\alpine-virt-3.14.1-x86_64.iso
 C:\Users\drw_0\Downloads\ISO\debian-10.10.0-amd64-DVD-1.iso
 C:\Users\drw_0\Downloads\ISO\openSUSE-Tumbleweed-DVD-x86_64-Snapshot20210810-Media.iso
-C:\Users\drw_0\Downloads\ISO\debian-live-11.0.0-amd64-standard.iso
+C:\Users\drw_0\Downloads\ISO\debian-11.0.0-amd64-netinst.iso
 "@ -split "`r`n" | ForEach-Object {
     # $_.lastindexof("\")
     if (Test-Path $_) {
