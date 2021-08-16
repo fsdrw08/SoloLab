@@ -34,6 +34,7 @@ helm install rancher rancher-stable/rancher \
   --set replicas=1
 # Verify that the Rancher Server is Successfully Deployed
 kubectl -n cattle-system rollout status deploy/rancher
+kubectl get pods --namespace cattle-system
 
 # add bitnami helm repo 
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -41,7 +42,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 kubectl create namespace pgsql
 # install postgresql
 helm install postgresql bitnami/postgresql --namespace pgsql -f /vagrant/HelmWorkShop/postgresql/values.yaml
-
+kubectl get pods --namespace pgsql
 
 
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
