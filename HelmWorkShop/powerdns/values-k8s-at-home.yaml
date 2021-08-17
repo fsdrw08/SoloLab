@@ -87,7 +87,7 @@ mariadb:
   primary: 
     persistence: 
       enabled: true
-      storageClass: "longhorn"
+      storageClass: "local-path"
       mountPath: /bitnami/mariadb
       subPath: ""
       accessModes: 
@@ -103,13 +103,16 @@ postgresql:
   postgresqlPostgresPassword: pdnsadminpass
   postgresqlDatabase: pdns
   persistence: 
-    enabled: trues
-    storageClass: "longhorn"
+    enabled: true
+    storageClass: "local-path"
     mountPath: /bitnami/postgresql
     subPath: ""
     accessModes: 
     - ReadWriteOnce
-
+  volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes volume permissions in the data directory (for cases where the default k8s `runAsUser` and `fsUser` values do not work)
+  ##
+    enabled: true
 
 # Probes configuration
 probes:

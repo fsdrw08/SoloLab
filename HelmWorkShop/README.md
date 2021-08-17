@@ -95,8 +95,12 @@ kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
 
 helm repo update
 
+
+# add k8s at home helm repo
+helm repo add k8s-at-home https://k8s-at-home.com/charts/
+
 kubectl create namespace powerdns
-helm install <powerdns> k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values.yaml
+helm install powerdns k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-k8s-at-home.yaml.yaml
 
 kubectl exec --stdin --tty powerdns-postgresql-0 -n powerdns -- /bin/bash
 createdb -h localhost -p 5432 -U pdns pdns_admin
