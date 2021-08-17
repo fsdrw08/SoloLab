@@ -12,6 +12,7 @@
     192.168.255.106 longhorn.lab
     192.168.255.106 powerdns-admin.lab
     192.168.255.50 rancher.lab
+    192.168.255.111 pgadmin.lab
     # ttl
     ttl 3600
     # the time gap to reload the dns record file

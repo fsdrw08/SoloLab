@@ -44,9 +44,26 @@ kubectl create namespace pgsql
 helm install postgresql bitnami/postgresql --namespace pgsql -f /vagrant/HelmWorkShop/postgresql/values.yaml
 kubectl get pods --namespace pgsql
 
+<!-- # add runix helm repo 
+helm repo add runix https://helm.runix.net
+# install pgadmin
+helm install pgadmin runix/pgadmin4 --namespace pgsql -f /vagrant/HelmWorkShop/pgadmin/values.yaml
+kubectl describe pgadmin-pgadmin4-bf884f4c8-n59c2  --namespace pgsql -->
+
+# create powerdns namespace
+kubectl create namespace powerdns
+# add halkeye helm repo
+helm repo add halkeye https://halkeye.github.io/helm-charts/
+# install powerdns 
+helm install powerdns halkeye/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-halkeye.yaml
+kubectl get pods --namespace powerdns
+kubectl describe pod powerdns-598454f648-kgr5v -n powerdns
+
+# install powerdns-admin
+helm install powerdnsadmin halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
+kubectl logs powerdnsadmin-86b467cf97-84p24  -n powerdns
 
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
-helm repo add halkeye https://halkeye.github.io/helm-charts/
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # helm repo add longhorn https://charts.longhorn.io
