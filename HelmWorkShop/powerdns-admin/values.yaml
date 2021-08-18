@@ -86,10 +86,10 @@ affinity: {}
 
 db:
   type: postgres
-  host: postgresql
+  host: powerdns-postgresql
   port: 5432
-  username: admin
-  password: admin
+  username: pdns
+  password: pdnspass
   database: pdns_admin
 
 podAnnotations: {}

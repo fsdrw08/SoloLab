@@ -36,13 +36,13 @@ helm install rancher rancher-stable/rancher \
 kubectl -n cattle-system rollout status deploy/rancher
 kubectl get pods --namespace cattle-system
 
-# add bitnami helm repo 
+<!-- # add bitnami helm repo 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 # create pgsql namespace
 kubectl create namespace pgsql
 # install postgresql
 helm install postgresql bitnami/postgresql --namespace pgsql -f /vagrant/HelmWorkShop/postgresql/values.yaml
-kubectl get pods --namespace pgsql
+kubectl get pods --namespace pgsql -->
 
 <!-- # add runix helm repo 
 helm repo add runix https://helm.runix.net
@@ -52,13 +52,29 @@ kubectl describe pgadmin-pgadmin4-bf884f4c8-n59c2  --namespace pgsql -->
 
 # create powerdns namespace
 kubectl create namespace powerdns
-# add halkeye helm repo
+<!-- ## add halkeye helm repo
 helm repo add halkeye https://halkeye.github.io/helm-charts/
 # install powerdns 
-helm install powerdns halkeye/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-halkeye.yaml
+helm install powerdns halkeye/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-halkeye.yaml -->
+
+# add k8s at home helm repo
+helm repo add k8s-at-home https://k8s-at-home.com/charts/
+# install powerdns 
+helm install powerdns k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-k8s-at-home.yaml
+
+
 kubectl get pods --namespace powerdns
 kubectl describe pod powerdns-598454f648-kgr5v -n powerdns
 
+
+kubectl exec --stdin --tty powerdns-postgresql-0 -n powerdns -- /bin/bash
+createdb -h localhost -p 5432 -U pdns pdns_admin
+psql -U pdns
+\l
+
+
+# add halkeye helm repo
+helm repo add halkeye https://halkeye.github.io/helm-charts/
 # install powerdns-admin
 helm install powerdnsadmin halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
 kubectl logs powerdnsadmin-86b467cf97-84p24  -n powerdns
@@ -96,16 +112,7 @@ kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
 helm repo update
 
 
-# add k8s at home helm repo
-helm repo add k8s-at-home https://k8s-at-home.com/charts/
 
-kubectl create namespace powerdns
-helm install powerdns k8s-at-home/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-k8s-at-home.yaml.yaml
-
-kubectl exec --stdin --tty powerdns-postgresql-0 -n powerdns -- /bin/bash
-createdb -h localhost -p 5432 -U pdns pdns_admin
-psql -U pdns
-\l
 
 helm install <powerdnsadmin> halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
 kubectl get pods --namespace powerdns

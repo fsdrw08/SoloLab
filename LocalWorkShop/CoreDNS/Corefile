@@ -10,10 +10,9 @@
     # if we need to resolve many domain name, we should use file plugins to resolve (with text file match with RFC 1035)
     192.168.255.102 InfraSvc-Mst.lab
     192.168.255.106 longhorn.lab
-    192.168.255.106 powerdns-admin.lab
-    192.168.255.50 rancher.lab
-    192.168.255.111 pgadmin.lab
-    # ttl
+    192.168.255.113 powerdns-admin.lab
+    192.168.255.113 rancher.lab
+        # ttl
     ttl 3600
     # the time gap to reload the dns record file
     reload 1m
