@@ -30,5 +30,10 @@ set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-m
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS ip-address '192.168.255.2'
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.2
 
+set service dhcp-server dynamic-dns-update
+set service dhcp-server shared-network-name LAN shared-network-parameters "key rndc-key { algorithm hmac-md5; secret FYhvwsW1ZtFZqWzsMpqhbg==; };"
+set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;lab.&quot;;"
+set service dhcp-server shared-network-name LAN shared-network-parameters "zone lab. { primary 192.168.255.2; key rndc-key; }"
+
 commit
 save

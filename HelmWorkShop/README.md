@@ -72,6 +72,7 @@ createdb -h localhost -p 5432 -U pdns pdns_admin
 psql -U pdns
 \l
 
+https://doc.powerdns.com/authoritative/dnsupdate.html
 
 # add halkeye helm repo
 helm repo add halkeye https://halkeye.github.io/helm-charts/
