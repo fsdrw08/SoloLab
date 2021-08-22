@@ -26,14 +26,21 @@ set nat destination rule 20 protocol 'tcp_udp'
 set nat destination rule 20 translation address 192.168.255.1
 set nat destination rule 20 translation port 7892
 
+set nat destination rule 30 description 'DHCP Redirect'
+set nat destination rule 30 destination port 67
+set nat destination rule 30 inbound-interface 'eth0'
+set nat destination rule 30 protocol 'udp'
+set nat destination rule 30 translation address 0.0.0.0
+set nat destination rule 30 translation port 67
+
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS mac-address '00:00:BA:BE:FA:CE'
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS ip-address '192.168.255.2'
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.2
 
-set service dhcp-server dynamic-dns-update
-set service dhcp-server shared-network-name LAN shared-network-parameters "key rndc-key { algorithm hmac-md5; secret FYhvwsW1ZtFZqWzsMpqhbg==; };"
-set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;lab.&quot;;"
-set service dhcp-server shared-network-name LAN shared-network-parameters "zone lab. { primary 192.168.255.2; key rndc-key; }"
+# set service dhcp-server dynamic-dns-update
+# set service dhcp-server shared-network-name LAN shared-network-parameters "key rndc-key { algorithm hmac-md5; secret FYhvwsW1ZtFZqWzsMpqhbg==; };"
+# set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;lab.&quot;;"
+# set service dhcp-server shared-network-name LAN shared-network-parameters "zone lab. { primary 192.168.255.2; key rndc-key; }"
 
 commit
 save
