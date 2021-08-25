@@ -36,6 +36,10 @@ helm install rancher rancher-stable/rancher \
 kubectl -n cattle-system rollout status deploy/rancher
 kubectl get pods --namespace cattle-system
 
+# add mojo2600 helm repo
+helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/
+helm install pihole mojo2600/pihole -f /vagrant/HelmWorkShop/pihole/values.yaml
+
 <!-- # add bitnami helm repo 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 # create pgsql namespace
@@ -50,12 +54,8 @@ helm repo add runix https://helm.runix.net
 helm install pgadmin runix/pgadmin4 --namespace pgsql -f /vagrant/HelmWorkShop/pgadmin/values.yaml
 kubectl describe pgadmin-pgadmin4-bf884f4c8-n59c2  --namespace pgsql -->
 
-# create powerdns namespace
+<!-- # create powerdns namespace
 kubectl create namespace powerdns
-<!-- ## add halkeye helm repo
-helm repo add halkeye https://halkeye.github.io/helm-charts/
-# install powerdns 
-helm install powerdns halkeye/powerdns --namespace powerdns -f /vagrant/HelmWorkShop/powerdns/values-halkeye.yaml -->
 
 # add k8s at home helm repo
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
@@ -81,7 +81,7 @@ helm install powerdnsadmin halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWor
 kubectl logs powerdnsadmin-86b467cf97-84p24  -n powerdns
 
 helm repo add k8s-at-home https://k8s-at-home.com/charts/
-helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add bitnami https://charts.bitnami.com/bitnami -->
 
 # helm repo add longhorn https://charts.longhorn.io
 
