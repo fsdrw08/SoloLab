@@ -89,7 +89,7 @@ serviceWeb:
     port: 443
 
   # -- `spec.type` for the web interface Service
-  type: NodePort
+  type: ClusterIP
 
   # -- `spec.externalTrafficPolicy` for the web interface Service
   externalTrafficPolicy: Local
@@ -108,7 +108,7 @@ virtualHost: pihole.lab
 # -- Configuration for the Ingress
 ingress:
   # -- Generate a Ingress resource
-  enabled: false
+  enabled: true
 
   # -- Annotations for the ingress
   annotations: {}
@@ -370,4 +370,5 @@ podDnsConfig:
   enabled: true
   policy: "None"
   nameservers:
-  - 192.168.255.1
+  - 127.0.0.1
+  - 8.8.8.8
