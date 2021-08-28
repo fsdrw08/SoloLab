@@ -133,3 +133,4 @@ kubectl get pods
 kubectl logs <podname>
 kubectl exec -it <podname> -- /bin/bash
 
+kubectl get deploy -A

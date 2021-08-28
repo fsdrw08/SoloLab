@@ -21,3 +21,10 @@ set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-n
 
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS mac-address '00:00:BA:BE:FA:CE'
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS ip-address '192.168.255.2'
+
+
+set service dhcp-relay interface eth0
+set service dhcp-relay server 192.168.255.2
+set service dhcp-relay relay-options relay-agents-packets discard
+
+del service dhcp-server

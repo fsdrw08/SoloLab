@@ -329,7 +329,7 @@ webHttps: "443"
 # hostNetwork: "false"
 
 # # -- should container run in privileged mode
-# privileged: "false"
+privileged: "true"
 
 # customVolumes:
 #   # -- set this to true to enable custom volumes
@@ -371,4 +371,4 @@ podDnsConfig:
   policy: "None"
   nameservers:
   - 127.0.0.1
-  - 8.8.8.8
+  - 223.5.5.5
