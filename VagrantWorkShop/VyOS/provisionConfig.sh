@@ -24,6 +24,10 @@ set interfaces ethernet eth1 description WAN
 # set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 default-router 192.168.255.1
 # set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name vyos.local
 
+set service dhcp-relay interface eth0
+set service dhcp-relay server 192.168.255.2
+set service dhcp-relay relay-options relay-agents-packets discard
+
 set service dns forwarding cache-size '0'
 set service dns forwarding listen-address '192.168.255.1'
 set service dns forwarding allow-from '192.168.255.0/24'

@@ -1,7 +1,7 @@
-#iso_url=https://s3.amazonaws.com/s3-us.vyos.io/snapshot/vyos-1.3.0-rc5/vyos-1.3.0-rc5-amd64.iso
-iso_url="../ISO/vyos-1.3.0-rc5-amd64.iso"
+#iso_url=https://s3.amazonaws.com/s3-us.vyos.io/snapshot/vyos-1.3.0-rc6/vyos-1.3.0-rc6-amd64.iso
+iso_url="../ISO/vyos-1.3.0-rc6-amd64.iso"
 iso_checksum_type="sha256"
-iso_checksum="245B99C2EE92A0446CC5A24F5E169B06A6A0B1DD255BADFB4A8771B2BFD4C9DD"
+iso_checksum="44947C67B0AF34A2E589EBC106B92691DD4E611B141900C38C6C3B3AE6D4865D"
 vm_name="packer-vyos130-g2"
 configuration_version="8.0"
 disk_size="128000"

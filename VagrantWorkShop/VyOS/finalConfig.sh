@@ -33,8 +33,8 @@ set nat destination rule 20 translation port 7892
 # set nat destination rule 30 translation address 0.0.0.0
 # set nat destination rule 30 translation port 67
 
-set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS mac-address '00:00:BA:BE:FA:CE'
-set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS ip-address '192.168.255.2'
+# set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS mac-address '00:00:BA:BE:FA:CE'
+# set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 static-mapping DNS ip-address '192.168.255.2'
 # set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.2
 
 # set service dhcp-server dynamic-dns-update
