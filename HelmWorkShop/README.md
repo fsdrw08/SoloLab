@@ -6,6 +6,12 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 sudo snap install helm --classic
 
+# add kubernete-dashboard repo
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# install
+helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
+
+
 # add rancher helm repo
 helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
 
