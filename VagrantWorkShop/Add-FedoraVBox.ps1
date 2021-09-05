@@ -1,0 +1,1 @@
+vagrant box add FEDORA34-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-fedora34-base-hv-g2.box
