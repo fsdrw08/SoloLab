@@ -1,0 +1,21 @@
+# https://github.com/k3s-io/k3s/issues/3766
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    # Activate Pilot integration
+    pilot: 
+      enabled: true
+      token: ""
+      # Toggle Pilot Dashboard
+      dashboard: true
+    ingressRoute:
+      dashboard:
+        enabled: true
+        # Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class)
+        annotations: {}
+        # Additional ingressRoute labels (e.g. for filtering IngressRoute by custom labels)
+        labels: {}
