@@ -1,0 +1,1 @@
+vagrant box add K3os0211-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-k3os0211-base-hv-g2.box

@@ -8,6 +8,7 @@ $env:USERPROFILE\Downloads\ISO\openSUSE-Tumbleweed-DVD-x86_64-Snapshot20210810-M
 $env:USERPROFILE\Downloads\ISO\debian-11.0.0-amd64-netinst.iso
 $env:USERPROFILE\Downloads\ISO\fedora-coreos-34.20210808.3.0-live.x86_64.iso
 $env:USERPROFILE\Downloads\ISO\Fedora-Server-dvd-x86_64-34-1.2.iso
+$env:USERPROFILE\Downloads\ISO\k3os-amd64-v0.21.1-k3s1r0.iso
 "@ -split "`r`n" | ForEach-Object {
     # $_.lastindexof("\")
     if (Test-Path $_) {

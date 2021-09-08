@@ -274,7 +274,7 @@ serviceAccount:
   create: true
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: admin
+  name: k8s-dashboard
 
 livenessProbe:
   # Number of seconds to wait before sending first probe
