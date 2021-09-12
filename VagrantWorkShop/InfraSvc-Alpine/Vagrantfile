@@ -48,7 +48,7 @@ Vagrant.configure("2") do |config|
   # config.vm.provision "shell", inline: "sudo swapoff -a && sudo rc-update add cgroups default"
   # install helm
   # for alpine
-  config.vm.provision "shell", inline: "sudo apk add helm"
+  config.vm.provision "shell", inline: "sudo apk add helm curl"
   # for others
   # config.vm.provision "shell", inline: "sudo snap install helm --classic"
 
