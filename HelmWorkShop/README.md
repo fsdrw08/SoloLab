@@ -6,8 +6,12 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 sudo snap install helm --classic
 
+# create name space
+kubectl create namespace kube-dashboard
 # add kubernete-dashboard repo
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# create cert
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab"
 # install
 helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
 

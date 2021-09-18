@@ -1,0 +1,12 @@
+# https://cloud.tencent.com/developer/article/1326543
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: example@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    http01: {}
