@@ -17,7 +17,8 @@ metadata:
   namespace: kube-system
 
 data:
-  #  test/test and test2/test2
+  #  admin admin
   # https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/#general
-  users: |2
-    dGVzdDokYXByMSRINnVza2trVyRJZ1hMUDZld1RyU3VCa1RycUU4d2ovCnRlc3QyOiRhcHIxJGQ5aHI5SEJCJDRIeHdnVWlyM0hQNEVzZ2dQL1FObzAK
+  # https://yaml-multiline.info/
+  users: |
+    YWRtaW46JGFwcjEkazI3dHg0OHkkZzRMRnBHRUoxMUdvbEw3dFRTc0ZnLw==
