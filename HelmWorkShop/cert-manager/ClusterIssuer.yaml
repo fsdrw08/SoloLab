@@ -1,0 +1,7 @@
+# https://cloud.tencent.com/developer/article/1326543
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned
+spec:
+  selfSigned: {}
