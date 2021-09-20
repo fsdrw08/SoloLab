@@ -1,0 +1,11 @@
+# https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    providers:
+      kubernetesIngress:
+        ingressClass: "traefik"

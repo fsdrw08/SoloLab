@@ -9,6 +9,10 @@ helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --set installCRDs=true \
+  --create-namespace
   # --version v1.5.0 
 # have a check
 kubectl get pods --namespace cert-manager
+
+# create issuer
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer.yaml

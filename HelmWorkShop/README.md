@@ -16,13 +16,19 @@ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tl
 helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
 
 
-# add rancher helm repo
-helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+# config traefik dashboard
+# according to traefik's installation guide (https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)
+kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
 
-# Create a Namespace for Rancher
-kubectl create namespace cattle-system
+# https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist
+kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
 
-# Install cert-manager
+# add traefik providers.kubernetesingress.ingressclass
+# https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
+# https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass
+cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+
+# install cert-manager
 # install the cert-manager CustomResourceDefinition resources (change the version refer from https://cert-manager.io/docs/installation/supported-releases/)
 # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml
 # Create the namespace for cert-manager
@@ -33,9 +39,28 @@ helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --set installCRDs=true \
-  # --version v1.5.0 
+  --create-namespace
 # have a check
 kubectl get pods --namespace cert-manager
+# create issuer
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer.yaml
+
+https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist
+https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes
+
+
+
+
+
+# add rancher helm repo
+helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+
+# Create a Namespace for Rancher
+kubectl create namespace cattle-system
+
+# Install cert-manager
+
+
 
 # Install Rancher with Helm and rancher-generated cert
 helm install rancher rancher-stable/rancher \
