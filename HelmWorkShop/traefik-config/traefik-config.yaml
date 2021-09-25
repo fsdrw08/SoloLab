@@ -9,3 +9,15 @@ spec:
     providers:
       kubernetesIngress:
         ingressClass: "traefik"
+    # Enable HTTPS redirection on web entrypoint
+    additionalArguments:
+      - --entryPoints.web.http.redirections.entryPoint.to: websecure
+      - --entryPoints.web.http.redirections.entryPoint.scheme: https
+    securityContext:
+      capabilities:
+        drop: [ALL]
+        add: [NET_BIND_SERVICE]
+      readOnlyRootFilesystem: true
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
