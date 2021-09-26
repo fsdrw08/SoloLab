@@ -43,7 +43,7 @@ helm install cert-manager jetstack/cert-manager \
 # have a check
 kubectl get pods --namespace cert-manager
 # create issuer
-kubectl apply -f /vagrant/HelmWorkShop/cert-manager/ClusterIssuer.yaml
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
 
 https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist
 https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes

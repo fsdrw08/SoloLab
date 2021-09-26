@@ -1,4 +1,5 @@
 # https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
+# https://www.leonpahole.com/2020/05/traefik-basic-setup.html
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
@@ -6,13 +7,15 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
-    providers:
-      kubernetesIngress:
-        ingressClass: "traefik"
-    # Enable HTTPS redirection on web entrypoint
+    ports:
+      web:
+        port: 80
+      websecure:
+        port: 443
     additionalArguments:
-      - --entryPoints.web.http.redirections.entryPoint.to: websecure
-      - --entryPoints.web.http.redirections.entryPoint.scheme: https
+      - "--providers.kubernetesingress.ingressclass=traefik"
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
     securityContext:
       capabilities:
         drop: [ALL]
