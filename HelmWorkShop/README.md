@@ -26,7 +26,7 @@ kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
 # add traefik providers.kubernetesingress.ingressclass
 # https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
 # https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass
-cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
 # install cert-manager
 # install the cert-manager CustomResourceDefinition resources (change the version refer from https://cert-manager.io/docs/installation/supported-releases/)
@@ -50,10 +50,12 @@ https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberr
 
 # create traefik-cert
 kubectl apply -f /vagrant/HelmWorkShop/cert-manager/traefik-cert.yaml
+# create https redirect resource
+kubectl apply -f /vagrant/HelmWorkShop/default/redirectScheme.yaml
 # update traefik ingressroute
 kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute_update.yaml
 # update traefik helmchart config
-cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config_update.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
 
 # add rancher helm repo

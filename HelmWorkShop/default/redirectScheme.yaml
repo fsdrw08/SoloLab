@@ -1,0 +1,10 @@
+# https://it-obey.com/index.php/redirect-http-to-https-traefik-middleware-kubernetes/
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: kube-system
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
