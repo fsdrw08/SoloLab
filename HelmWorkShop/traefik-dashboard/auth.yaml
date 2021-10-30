@@ -15,7 +15,6 @@ kind: Secret
 metadata:
   name: traefik-auth
   namespace: kube-system
-
 data:
   #  admin admin
   # https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/#general

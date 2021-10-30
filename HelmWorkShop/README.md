@@ -49,13 +49,13 @@ https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_my
 https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes
 
 # create traefik-cert
-kubectl apply -f /vagrant/HelmWorkShop/cert-manager/traefik-cert.yaml
-# create https redirect resource
-kubectl apply -f /vagrant/HelmWorkShop/default/redirectScheme.yaml
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/traefik-cert-self.yaml
+<!-- # create https redirect resource
+kubectl apply -f /vagrant/HelmWorkShop/default/redirectScheme.yaml -->
 # update traefik ingressroute
-kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute_update.yaml
+kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml
 # update traefik helmchart config
-sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config_update.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
 
 # add rancher helm repo
