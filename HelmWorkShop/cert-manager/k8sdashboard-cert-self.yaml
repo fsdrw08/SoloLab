@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dashboard.lab
+  namespace: kube-dashboard
+spec:
+  dnsNames:
+    - dashboard.lab
+  secretName: dashboard.lab
+  issuerRef:
+    name: selfsigned
+    kind: ClusterIssuer

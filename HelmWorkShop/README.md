@@ -1,3 +1,8 @@
+to upgrade k3s:
+ref: https://github.com/k3s-io/k3s/issues/389
+ref: https://rancher.com/docs/k3s/latest/en/upgrades/basic/
+curl -sfL https://get.k3s.io | INSTALL_K3S_CHANNEL=latest INSTALL_K3S_EXEC="--write-kubeconfig-mode 644" sh -
+
 https://github.com/kurokobo/awx-on-k3s
 https://github.com/k8s-at-home/charts/tree/master/charts/stable/powerdns
 
@@ -6,14 +11,6 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 sudo snap install helm --classic
 
-# create name space
-kubectl create namespace kube-dashboard
-# add kubernete-dashboard repo
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-# create cert
-openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab"
-# install
-helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
 
 
 # config traefik dashboard
@@ -57,6 +54,15 @@ kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yam
 # update traefik helmchart config
 sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
+# create name space
+kubectl create namespace kube-dashboard
+# add kubernete-dashboard repo
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# create k8s dashboard self sign cert
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
+<!-- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab" -->
+# install
+helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
 
 # add rancher helm repo
 helm repo add rancher-stable https://releases.rancher.com/server-charts/stable

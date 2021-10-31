@@ -17,4 +17,4 @@ spec:
       services:
         # Special service created by Traefik pod
         - name: api@internal
-          kind: TraefikService[]
+          kind: TraefikService

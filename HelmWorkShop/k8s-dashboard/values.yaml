@@ -184,7 +184,7 @@ ingress:
   ## Secrets must be manually created in the namespace
   ##
   tls:
-    - secretName: kubernetes-dashboard-tls
+    - secretName: dashboard.lab
       hosts:
         - dashboard.lab
 

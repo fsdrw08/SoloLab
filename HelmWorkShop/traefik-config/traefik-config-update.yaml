@@ -13,7 +13,7 @@ spec:
       websecure:
         port: 443
     additionalArguments:
-      - "--providers.kubernetesingress.ingressclass=traefik"
+      # - "--providers.kubernetesingress.ingressclass=traefik"
       - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
       - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
     securityContext:
