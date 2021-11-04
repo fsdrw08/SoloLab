@@ -138,8 +138,8 @@ ingress:
   #   key: value
 
   ## Kubernetes Dashboard Ingress annotations
-  # annotations:
-  #   kubernetes.io/ingress.class: nginx
+  annotations:
+    kubernetes.io/ingress.class: traefik
   #   kubernetes.io/tls-acme: 'true'
 
   ## If you plan to use TLS backend with enableInsecureLogin set to false
