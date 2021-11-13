@@ -65,6 +65,11 @@ kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
 helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
 # or update the values
 helm upgrade  k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml --namespace kube-dashboard
+# update traefik helmchart config
+ref: https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786
+sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update2.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+##### get service account token
+kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
 
 # add rancher helm repo
 helm repo add rancher-stable https://releases.rancher.com/server-charts/stable

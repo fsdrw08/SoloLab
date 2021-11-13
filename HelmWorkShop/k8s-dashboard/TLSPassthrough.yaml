@@ -1,0 +1,18 @@
+# https://devops.stackexchange.com/questions/14179/ssl-issue-while-reaching-kubernetes-dashboard?utm_source=pocket_mylist
+# no need?
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: k8s-dashboard
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`dashboard.lab`)
+      services:
+      - name: k8s-dashboard-kubernetes-dashboard
+        namespace: kube-dashboard
+        port: 443
+  tls:
+    passthrough: true

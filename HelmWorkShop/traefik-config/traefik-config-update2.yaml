@@ -1,0 +1,29 @@
+# https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
+# https://www.leonpahole.com/2020/05/traefik-basic-setup.html
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      web:
+        port: 80
+      websecure:
+        port: 443
+    additionalArguments:
+      # - "--providers.kubernetesingress.ingressclass=traefik"
+      - "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+    # https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786
+    # https://stackoverflow.com/questions/59798395/for-traefik-ingress-controller-in-k3s-disable-tls-verification
+      - "--serversTransport.insecureSkipVerify=true"
+    securityContext:
+      capabilities:
+        drop: [ALL]
+        add: [NET_BIND_SERVICE]
+      readOnlyRootFilesystem: true
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
