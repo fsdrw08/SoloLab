@@ -14,33 +14,56 @@ sudo snap install helm --classic
 
 
 # config traefik dashboard
-# according to traefik's installation guide (https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)
+ref: [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
+enable traefik dashboard, by defining and applying an IngressRoute CRD  
+```
 kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
+```
 
-# https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist
+ref: [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
+Secure access to Traefik using basic auth  
+```
 kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
+```
 
-# add traefik providers.kubernetesingress.ingressclass
-# https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig
-# https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass
+add traefik providers.kubernetesingress.ingressclass  
+ref: [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
+[ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
+```
 sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+```
 
-# install cert-manager
-# install the cert-manager CustomResourceDefinition resources (change the version refer from https://cert-manager.io/docs/installation/supported-releases/)
-# kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml
-# Create the namespace for cert-manager
+## Use Cert-manager to manage certificates in your cluster
+### install cert-manager
+<!-- install the cert-manager CustomResourceDefinition resources (change the version refer from [Supported Releases](https://cert-manager.io/docs/installation/supported-releases/))
+# kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml -->
+Create the namespace for cert-manager:  
+```
 kubectl create namespace cert-manager
-# Add the Jetstack Helm repository
+```
+
+Add the Jetstack Helm repository:  
+```
 helm repo add jetstack https://charts.jetstack.io
-# Install the cert-manager Helm chart
+```
+
+Install the cert-manager Helm chart
+```
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --set installCRDs=true \
   --create-namespace
-# have a check
+```
+
+have a check
+```
 kubectl get pods --namespace cert-manager
-# create issuer
+```
+
+create issuer
+```
 kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
+```
 
 https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist
 https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes
