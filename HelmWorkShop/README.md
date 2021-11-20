@@ -1,52 +1,27 @@
-to upgrade k3s:
-ref: https://github.com/k3s-io/k3s/issues/389
-ref: https://rancher.com/docs/k3s/latest/en/upgrades/basic/
+## Upgrade k3s:
+Ref: 
+- https://github.com/k3s-io/k3s/issues/389
+- https://rancher.com/docs/k3s/latest/en/upgrades/basic/
+```
 curl -sfL https://get.k3s.io | INSTALL_K3S_CHANNEL=latest INSTALL_K3S_EXEC="--write-kubeconfig-mode 644" sh -
+```
 
-https://github.com/kurokobo/awx-on-k3s
+https://github.com/kurokobo/awx-on-k3s  
 https://github.com/k8s-at-home/charts/tree/master/charts/stable/powerdns
 
+```
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-
-
 sudo snap install helm --classic
-
-
-
-## config traefik dashboard
-- Enable traefik dashboard, by defining and applying an IngressRoute CRD  
-Ref: 
-  - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
-  - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
-  ```
-
-- Secure access to Traefik using basic auth  
-Ref: 
-  - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
-  - [/HelmWorkShop/traefik-dashboard/auth.yaml](traefik-dashboard/auth.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
-  ```
-
-- add traefik providers.kubernetesingress.ingressclass  
-Ref:  
-  - [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
-  - [traefik ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
-  - [/HelmWorkShop/traefik-config/traefik-config.yaml](traefik-config/traefik-config.yaml)
-  ```
-  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/  rancher/k3s/server/manifests/traefik-config.yaml
-  ```
+```
 
 ## Use Cert-manager to manage certificates in your cluster
 <!-- - install cert-manager -->
 <!-- install the cert-manager CustomResourceDefinition resources (change the version refer from [Supported Releases](https://cert-manager.io/docs/installation/supported-releases/))
 # kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml -->
-- Create the namespace for cert-manager:  
+<!-- - Create the namespace for cert-manager:  
   ```
   kubectl create namespace cert-manager
-  ```
+  ``` -->
 
 - Add the Jetstack Helm repository:  
   ```
@@ -54,6 +29,8 @@ Ref:
   ```
 
 - Install the cert-manager Helm chart
+  Ref: 
+  - [Install cert-manager](https://cert-manager.io/docs/installation/helm/#4-install-cert-manager)
   ```
   helm install cert-manager jetstack/cert-manager \
     --namespace cert-manager \
@@ -75,38 +52,93 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
-- Issue traefik-cert  
-Ref:
+
+## Config traefik dashboard
+- Enable traefik dashboard, by defining and applying an IngressRoute CRD  
+  Ref: 
+  - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
+  - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
+  ```
+
+- Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
+  Ref: 
+  - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
+  - [/HelmWorkShop/traefik-dashboard/auth.yaml](traefik-dashboard/auth.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
+  ```
+
+- Add traefik providers.kubernetesingress.ingressclass  
+  Ref:  
+  - [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
+  - [traefik ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
+  - [/HelmWorkShop/traefik-config/traefik-config.yaml](traefik-config/traefik-config.yaml)
+  ```
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml /var/lib/  rancher/k3s/server/manifests/traefik-config.yaml
+  ```
+
+
+- Issue traefik-cert (by cert-manager self sign issuer)  
+  Ref:
   - [/HelmWorkShop/cert-manager/traefik-cert-self.yaml](cert-manager/traefik-cert-self.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/traefik-cert-self.yaml
   ```
 
-- Update traefik ingressroute (add auth middle ware and tls cert for https)  
+- Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
 Ref:  
   - [/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml](traefik-dashboard/IngressRoute-update.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml
   ```
-## update traefik helmchart config
-sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
 
-## create name space
-kubectl create namespace kube-dashboard
-## add kubernete-dashboard repo
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-## create k8s dashboard self sign cert
-kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
+- Update traefik helmchart config (for https for redirect)  
+Ref: 
+  - [HelmWorkShop/traefik-config/traefik-config-update.yaml](traefik-config/traefik-config-update.yaml)
+
+  ```
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml /var/lib/rancher/k3s/server/  manifests/traefik-config.yaml
+  ```
+
+## Install Kubernetes Dashboard
+- Create name space
+  ```
+  kubectl create namespace kube-dashboard
+  ```
+- Add kubernete-dashboard repo
+  ```
+  helm repo add kubernetes-dashboard https://kubernetes.  github.io/dashboard/
+  ```
+- Create k8s dashboard self sign cert
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
+  ```
 <!-- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab" -->
-# install k8s dashboard by helm
-helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml
-# or update the values
-helm upgrade  k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml --namespace kube-dashboard
-# update traefik helmchart config
-ref: https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786
-sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update2.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-##### get service account token
-kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
+- Istall k8s dashboard by helm
+  ```
+  helm install k8s-dashboard kubernetes-dashboardkubernetes-dashboard -f /vagrant/HelmWorkShopk8s-dashboard/values.yaml
+  ```
+- Or update the values
+  ```
+  helm upgrade  k8s-dashboard kubernetes-dashboard/kubernetes-dashboard -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml --namespace kube-dashboard
+  ```
+
+- Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  
+Ref:  
+  - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
+  - [For Traefik Ingress Controller in k3s disable TLS Verification](https://stackoverflow.com/questions/59798395/for-traefik-ingress-controller-in-k3s-disable-tls-verification)
+  - [https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786](Updating Traefik Ingress Configuration)
+  - [/HelmWorkShop/traefik-config/traefik-config-update2.yaml](traefik-config/traefik-config-update2.yaml)
+  ```
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update2.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  ```
+
+- Get service account token
+  ```
+  kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
+  ```
 
 # add rancher helm repo
 helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
