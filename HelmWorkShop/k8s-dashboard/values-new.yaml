@@ -1,0 +1,37 @@
+extraArgs:
+  - --enable-skip-login
+  - --system-banner="Welcome to K3S"
+
+ingress:
+  ## If true, Kubernetes Dashboard Ingress will be created.
+  ##
+  enabled: true
+  ## Kubernetes Dashboard Ingress annotations
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  hosts:
+    - dashboard.lab
+  ## Kubernetes Dashboard Ingress TLS configuration
+  ## Secrets must be manually created in the namespace
+  ##
+  tls:
+    - secretName: dashboard.lab
+      hosts:
+        - dashboard.lab
+rbac:
+  # The basic idea of the clusterReadOnlyRole
+  # is not to hide all the secrets and sensitive data but more
+  # to avoid accidental changes in the cluster outside the standard CI/CD.
+  #
+  # It is NOT RECOMMENDED to use this version in production.
+  # Instead you should review the role and remove all potentially sensitive parts such as
+  # access to persistentvolumes, pods/log etc.
+  #
+  # Independent from rbac.create parameter.
+  clusterReadOnlyRole: true
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: k8s-dashboard
