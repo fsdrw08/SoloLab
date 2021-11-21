@@ -1,4 +1,7 @@
+# https://github.com/kubernetes/dashboard/blob/master/aio/deploy/helm-chart/kubernetes-dashboard/values.yaml
+# Additional container arguments
 extraArgs:
+# https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md#login-view
   - --enable-skip-login
   - --system-banner="Welcome to K3S"
 
@@ -18,6 +21,10 @@ ingress:
     - secretName: dashboard.lab
       hosts:
         - dashboard.lab
+
+metricsScraper:                
+  enabled: true
+
 rbac:
   # The basic idea of the clusterReadOnlyRole
   # is not to hide all the secrets and sensitive data but more
@@ -29,6 +36,7 @@ rbac:
   #
   # Independent from rbac.create parameter.
   clusterReadOnlyRole: true
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
