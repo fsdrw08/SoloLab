@@ -1,0 +1,64 @@
+# https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks/?utm_source=pocket_mylist
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+  # create cert when the helm install run
+  # https://cert-manager.io/docs/usage/ingress/
+    cert-manager.io/cluster-issuer: selfsigned
+  hosts:
+    - host: dex.lab
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: dex-tls
+      hosts:
+        - dex.lab
+
+# -- Application configuration.
+# See the [official documentation](https://dexidp.io/docs/).
+config:
+  issuer: https://dex.lab
+
+  storage:
+    type: kubernetes
+    config:
+      inCluster: true
+
+  oauth2:
+    responseTypes: ["code", "token", "id_token"]
+    skipApprovalScreen: true
+
+  # connectors:
+  #   - type: github
+  #     id: github
+  #     name: GitHub
+  #     config:
+  #       clientID: "{{ .Env.GITHUB_CLIENT_ID }}"
+  #       clientSecret: "{{ .Env.GITHUB_CLIENT_SECRET }}"
+  #       redirectURI: https://dex.lab/callback
+  #       orgs:4
+  #         - name: your-github-org-name
+  #           teams:
+  #             - your-github-team-name
+
+  staticClients:
+    - id: your-cluster-client-id
+      secret: your-cluster-client-secret
+      name: "SoloLab Cluster"
+      redirectURIs:
+        - https://login.lab/callback
+
+  # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
+  enablePasswordDB: true
+  staticPasswords:
+  - email: "drw_08@hotmail.com"
+  # echo $(echo password | htpasswd -BinC 10 admin | cut -d: -f2
+    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    username: "admin"
+    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+# Note: this will inject the environment variables directly to the pods.# In a production environment you should mount these keys from a secret using envFrom.# See https://artifacthub.io/packages/helm/dex/dex#values
+# env:
+#   GITHUB_CLIENT_ID: "your-github-client-id"
+#   GITHUB_CLIENT_SECRET: "your-github-client-secret"

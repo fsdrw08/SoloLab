@@ -70,6 +70,21 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
+## Install dex
+- Add dex helm repo and update helm chart
+```
+helm repo add dex https://charts.dexidp.io
+helm repo update
+```
+- Create dex namespace
+```
+kubectl create namespace dex
+```
+
+- Create self sign tls cert for dex
+```
+kubectl apply -f /vagrant/HelmWorkShop/cert-manager/dex-cert-self.yaml
+```
 
 ## Config traefik dashboard
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD  
@@ -160,6 +175,7 @@ Ref:
 - Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  
 Ref:  
   - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
+  - [Internal Server Error with Traefik HTTPS backend on port 443](https://stackoverflow.com/questions/49412376/internal-server-error-with-traefik-https-backend-on-port-443)
   - [For Traefik Ingress Controller in k3s disable TLS Verification](https://stackoverflow.com/questions/59798395/for-traefik-ingress-controller-in-k3s-disable-tls-verification)
   - [Updating Traefik Ingress Configuration](https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786)
   - [/HelmWorkShop/traefik-config/traefik-config-update2.yaml](traefik-config/traefik-config-update2.yaml)
