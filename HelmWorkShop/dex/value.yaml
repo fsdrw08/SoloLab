@@ -1,4 +1,5 @@
-# https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks/?utm_source=pocket_mylist
+# https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
+# https://zhuanlan.zhihu.com/p/381755603
 ingress:
   enabled: true
   className: traefik
@@ -27,7 +28,7 @@ config:
       inCluster: true
 
   oauth2:
-    responseTypes: ["code", "token", "id_token"]
+    # responseTypes: ["code", "token", "id_token"]
     skipApprovalScreen: true
 
   # connectors:

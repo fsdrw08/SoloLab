@@ -16,9 +16,10 @@ metadata:
   name: traefik-auth
   namespace: kube-system
 data:
-  #  admin admin
-  # echo $(htpasswd -nb admin admin) | base64
+  #  admin password
+  # echo $(htpasswd -nb admin password) | base64
   # https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/#general
   # https://yaml-multiline.info/
+    # YWRtaW46JGFwcjEkazI3dHg0OHkkZzRMRnBHRUoxMUdvbEw3dFRTc0ZnLw==
   users: |
-    YWRtaW46JGFwcjEkazI3dHg0OHkkZzRMRnBHRUoxMUdvbEw3dFRTc0ZnLw==
+    YWRtaW46JGFwcjEkM1pVOFhWZnckU0guUFdSV2JHd2ZnMmtoQWJWLkMwMQo=

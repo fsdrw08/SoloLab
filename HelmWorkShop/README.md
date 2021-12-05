@@ -28,25 +28,17 @@ Ref:
 - https://github.com/kurokobo/awx-on-k3s  
 - https://github.com/k8s-at-home/charts/tree/master/charts/stable/powerdns <- use pihole or Technitium DNS instead
 
-## Enable podpreset
+<!-- ## Enable podpreset
 Ref:  
-- https://lemonlzy.cn/2020/07/21/Pod-Preset/
+- https://lemonlzy.cn/2020/07/21/Pod-Preset/ -->
 
 ## Use Cert-manager to manage certificates in cluster
-<!-- - install cert-manager -->
-<!-- install the cert-manager CustomResourceDefinition resources (change the version refer from [Supported Releases](https://cert-manager.io/docs/installation/supported-releases/))
-# kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.0/cert-manager.crds.yaml -->
-<!-- - Create the namespace for cert-manager:  
-  ```
-  kubectl create namespace cert-manager
-  ``` -->
-
 - Add the Jetstack Helm repository:  
   ```
   helm repo add jetstack https://charts.jetstack.io
   ```
 
-- Install the cert-manager Helm chart  
+- Install cert-manager and create related namespace via Helm chart  
   Ref: 
   - [Install cert-manager](https://cert-manager.io/docs/installation/helm/#4-install-cert-manager)
   ```
@@ -70,21 +62,34 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
-## Install dex
-- Add dex helm repo and update helm chart
-```
-helm repo add dex https://charts.dexidp.io
-helm repo update
-```
-- Create dex namespace
-```
-kubectl create namespace dex
-```
+## Install and config dex
+- Add dex helm repo and update helm chart  
+  ```
+  helm repo add dex https://charts.dexidp.io
+  helm repo update
+  ```
+<!-- - Create dex namespace
+  ```
+  kubectl create namespace dex
+  ``` -->
 
-- Create self sign tls cert for dex
-```
-kubectl apply -f /vagrant/HelmWorkShop/cert-manager/dex-cert-self.yaml
-```
+<!-- - Create self sign tls cert for dex
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/dex-cert-self.yaml
+  ``` -->
+
+- Install dex via Helm chart (include self sign cert create, namespace create)  
+  ```
+  helm install dex dex/dex \
+    --namespace dex \
+    --create-namespace \
+    --values /vagrant/HelmWorkShop/dex/value.yaml
+  ```
+
+- Export Dex certificate  
+Ref: https://little-stuff.com/2020/06/23/how-to-configure-dex-and-gangway-for-active-directory-authentication-in-tkg/
+  ```
+  ```
 
 ## Config traefik dashboard
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD  
