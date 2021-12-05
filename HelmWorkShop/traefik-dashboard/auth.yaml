@@ -17,6 +17,7 @@ metadata:
   namespace: kube-system
 data:
   #  admin admin
+  # echo $(htpasswd -nb admin admin) | base64
   # https://doc.traefik.io/traefik/v2.0/middlewares/basicauth/#general
   # https://yaml-multiline.info/
   users: |
