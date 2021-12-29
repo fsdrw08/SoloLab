@@ -6,7 +6,7 @@ metadata:
   namespace: kube-system
 spec:
   basicAuth:
-    namespace: kube-system
+    # namespace: kube-system
     secret: traefik-auth
 
 ---
