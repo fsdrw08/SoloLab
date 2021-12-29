@@ -8,5 +8,5 @@ spec:
     - traefik.lab
   secretName: traefik.lab
   issuerRef:
-    name: selfsigned
+    name: issuer-selfsigned
     kind: ClusterIssuer
