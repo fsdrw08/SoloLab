@@ -83,10 +83,10 @@ Ref:
   ```
 
 - Create self sign issuer  
-Ref:  
-  - https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes  
-  - [Use Cert-manager to manage certificates in your cluster](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager#use)  
-  - [/HelmWorkShop/cert-manager/issuer-selfsigned.yaml](./cert-manager/issuer-selfsigned.yaml)
+  - Ref:  
+    - https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes  
+    - [Use Cert-manager to manage certificates in your cluster](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager#use)  
+    - [/HelmWorkShop/cert-manager/issuer-selfsigned.yaml](./cert-manager/issuer-selfsigned.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
@@ -97,15 +97,17 @@ Ref:
   helm repo add dex https://charts.dexidp.io
   helm repo update
   ```
-<!-- - Create dex namespace
+- Create dex namespace
   ```
   kubectl create namespace dex
-  ``` -->
+  ```
 
-<!-- - Create self sign tls cert for dex
+- Create self sign tls cert for dex
+  - Ref:
+    - [dex-cert-self.yaml](./HelmWorkShop/cert-manager/dex-cert-self.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/dex-cert-self.yaml
-  ``` -->
+  ```
 
 - Install dex via Helm chart (include self sign cert create, namespace create)  
   - Ref:
@@ -116,13 +118,26 @@ Ref:
     --create-namespace \
     --values /vagrant/HelmWorkShop/dex/value.yaml
   ```
+  - Or update the values
+  ```
+  helm upgrade dex dex/dex \
+    -f /vagrant/HelmWorkShop/dex/value.yaml \
+    --namespace dex
+  ```
 
+- Add ingress route for dex
+  - Ref:
+    - [还不会Traefik？看完这篇文章，你就彻底搞懂了~](https://z.itpub.net/article/detail/B4F2CC264BEB02610B23F8D0E9BA91FB)
+    - [Unable to run dex serve command](https://github.com/dexidp/dex/issues/1257#issuecomment-413523548)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/dex/dex-ingressRoute.yaml
+  ```
 - Export Dex certificate  
   - Ref:  
     - [Decode Secrets](https://phoenixnap.com/kb/kubernetes-secrets#ftoc-heading-6)  
     - [How to Configure Dex and Gangway for Active Directory Authentication in TKG](https://little-stuff.com/2020/06/23/how-to-configure-dex-and-gangway-for-active-directory-authentication-in-tkg/)
   ```
-  kubectl get secret dex-tls -n dex -o jsonpath='{.data}'
+  kubectl get secret dex.lab -n dex -o jsonpath='{.data}'
   ```
 
 - Modify api server arg config to make dex as oidc provider  
@@ -137,13 +152,20 @@ Ref:
   '--kube-apiserver-arg' \
   'oidc-client-id=your-cluster-client-id' \
   '--kube-apiserver-arg' \
-  'oidc-ca-file=' \
+  'oidc-ca-file=/etc/ssl/ca.crt' \
   '--kube-apiserver-arg' \
   'oidc-username-claim=email' \
   '--kube-apiserver-arg' \
   'oidc-groups-claim=groups' \
   ```
    
+- Config kubectl with kubelogin
+  ```
+  kubelogin setup --insecure-skip-tls-verify `
+  --oidc-issuer-url=https://dex.lab `
+  --oidc-client-id=your-cluster-client-id `
+  --oidc-client-secret=your-cluster-client-secret
+  ```
 
 ## Config traefik dashboard
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD  

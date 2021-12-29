@@ -1,9 +1,11 @@
+# https://github.com/dexidp/helm-charts/blob/master/charts/dex/values.yaml
 # https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
 # https://zhuanlan.zhihu.com/p/381755603
 ingress:
   enabled: true
   className: traefik
   annotations:
+    kubernetes.io/ingress.class: traefik
   # create cert when the helm install run
   # https://cert-manager.io/docs/usage/ingress/
     cert-manager.io/cluster-issuer: selfsigned
@@ -13,23 +15,33 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls:
-    - secretName: dex-tls
+    - secretName: dex.lab
       hosts:
         - dex.lab
 
 # -- Application configuration.
 # See the [official documentation](https://dexidp.io/docs/).
+# https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
 config:
-  issuer: https://dex.lab
+  issuer: http://dex.lab
 
   storage:
     type: kubernetes
     config:
       inCluster: true
 
-  oauth2:
-    # responseTypes: ["code", "token", "id_token"]
-    skipApprovalScreen: true
+  web:
+      http: 0.0.0.0:5556
+      # tlsCert: /etc/dex/tls/tls.crt
+      # tlsKey: /etc/dex/tls/tls.key
+      
+  frontend:
+    theme: "coreos"
+    issuer: "kube-dtln"
+    issuerUrl: "https://login.ash.dtln.cloud"
+  # oauth2:
+  #   # responseTypes: ["code", "token", "id_token"]
+  #   skipApprovalScreen: true
 
   # connectors:
   #   - type: github
@@ -45,8 +57,8 @@ config:
   #             - your-github-team-name
 
   staticClients:
-    - id: your-cluster-client-id
-      secret: your-cluster-client-secret
+    - id: kubernetes
+      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       name: "SoloLab Cluster"
       redirectURIs:
         - https://login.lab/callback

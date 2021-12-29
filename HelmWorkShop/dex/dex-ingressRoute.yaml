@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dex-ingressroute
+  namespace: dex
+spec:
+  entryPoints:
+  - web
+  - websecure
+  routes:
+  - match: Host(`dex.lab`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+      - name: dex
+        port: 5556 
+  tls:
+    secretName: dex.lab

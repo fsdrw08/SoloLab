@@ -8,5 +8,5 @@ spec:
     - dex.lab
   secretName: dex.lab
   issuerRef:
-    name: selfsigned
+    name: issuer-selfsigned
     kind: ClusterIssuer
