@@ -5,7 +5,7 @@ ingress:
   enabled: true
   className: traefik
   annotations:
-    kubernetes.io/ingress.class: traefik
+    # kubernetes.io/ingress.class: traefik
   # create cert when the helm install run
   # https://cert-manager.io/docs/usage/ingress/
     cert-manager.io/cluster-issuer: selfsigned
@@ -23,7 +23,7 @@ ingress:
 # See the [official documentation](https://dexidp.io/docs/).
 # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
 config:
-  issuer: http://dex.lab
+  issuer: https://dex.lab
 
   storage:
     type: kubernetes
@@ -61,7 +61,7 @@ config:
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       name: "SoloLab Cluster"
       redirectURIs:
-        - https://login.lab/callback
+        - http://localhost:8000
 
   # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
   enablePasswordDB: true

@@ -145,14 +145,13 @@ Ref:
     - [K3s customized flags](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#customized-flags)
     - [How to Secure Your Kubernetes Cluster with OpenID Connect  and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#k3d)
     - [Set the time zone of your Kubernetes Pod together](https://qiita.com/ussvgr/items/0190bab3cc7d16c0116c) 
+    - [How to Secure Your Kubernetes Cluster with OpenID Connect and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#kubeadm)
   - add following arg in /etc/init.d/k3s (for k3s in apline linux)  
   ```
   '--kube-apiserver-arg' \
   'oidc-issuer-url=https://dex.lab' \
   '--kube-apiserver-arg' \
-  'oidc-client-id=your-cluster-client-id' \
-  '--kube-apiserver-arg' \
-  'oidc-ca-file=/etc/ssl/ca.crt' \
+  'oidc-client-id=kubernetes' \
   '--kube-apiserver-arg' \
   'oidc-username-claim=email' \
   '--kube-apiserver-arg' \
@@ -163,8 +162,14 @@ Ref:
   ```
   kubelogin setup --insecure-skip-tls-verify `
   --oidc-issuer-url=https://dex.lab `
-  --oidc-client-id=your-cluster-client-id `
-  --oidc-client-secret=your-cluster-client-secret
+  --oidc-client-id=kubernetes `
+  --oidc-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0
+
+  # or
+  kubelogin setup --insecure-skip-tls-verify \
+  --oidc-issuer-url=https://dex.lab \
+  --oidc-client-id=kubernetes \
+  --oidc-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0
   ```
 
 ## Config traefik dashboard
