@@ -3,12 +3,12 @@
 # https://zhuanlan.zhihu.com/p/381755603
 ingress:
   enabled: true
-  className: traefik
+  # className: traefik
   annotations:
-    # kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: traefik
   # create cert when the helm install run
   # https://cert-manager.io/docs/usage/ingress/
-    cert-manager.io/cluster-issuer: selfsigned
+    cert-manager.io/cluster-issuer: issuer-ca
   hosts:
     - host: dex.lab
       paths:
@@ -35,10 +35,10 @@ config:
       # tlsCert: /etc/dex/tls/tls.crt
       # tlsKey: /etc/dex/tls/tls.key
       
-  frontend:
-    theme: "coreos"
-    issuer: "kube-dtln"
-    issuerUrl: "https://login.ash.dtln.cloud"
+  # frontend:
+  #   theme: "coreos"
+  #   issuer: "kube-dtln"
+  #   issuerUrl: "https://login.ash.dtln.cloud"
   # oauth2:
   #   # responseTypes: ["code", "token", "id_token"]
   #   skipApprovalScreen: true
@@ -60,8 +60,14 @@ config:
     - id: kubernetes
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       name: "SoloLab Cluster"
+      # https://github.com/int128/kubelogin/blob/master/docs/setup.md#dex-with-github
       redirectURIs:
         - http://localhost:8000
+    - id: loginapp
+      secret: OIDCAPPSECRET123
+      name: 'loginapp'
+      redirectURIs:
+      - 'https://loginapp.lab/callback'
 
   # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
   enablePasswordDB: true

@@ -91,6 +91,23 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
+- Create k3s ca key pair
+  - Ref:
+    - [Manipulating text at the command line with sed](https://www.redhat.com/sysadmin/manipulating-text-sed)
+    - [sed conditionally append to line after matching pattern](https://stackoverflow.com/questions/55633885/sed-conditionally-append-to-line-after-matching-pattern)
+    - [How to configure my own CA for k3s](https://github.com/k3s-io/k3s/issues/1868#issuecomment-639690634)
+    - [Cert-manager CA](https://cert-manager.io/docs/configuration/ca/)
+  ```
+  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  cat /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  ```
+
+- Create k3s ca issuer
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-ca.yaml
+  ```
+
 ## Install and config dex
 - Add dex helm repo and update helm chart  
   ```
@@ -123,6 +140,11 @@ Ref:
   helm upgrade dex dex/dex \
     -f /vagrant/HelmWorkShop/dex/value.yaml \
     --namespace dex
+  ```
+  - Or uninstall the dex helm chart and delete dex namespace, then recreate again
+  ```
+  helm uninstall dex -n dex
+  kubectl delete namespace dex
   ```
 
 - Add ingress route for dex
