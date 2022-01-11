@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca
+  namespace: dex
+data:
+  ca.pem: |
+    

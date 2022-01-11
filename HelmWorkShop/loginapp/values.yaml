@@ -4,15 +4,16 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: selfsigned
+    cert-manager.io/cluster-issuer: issuer-ca
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: loginapp.lab
-      paths: /
+      paths: 
+        - path: /
   tls:
    - secretName: loginapp.lab
      hosts:
-       - chart-example.local
+       - loginapp.lab
 
 config:
   # Application name, defaults to Release name
@@ -25,29 +26,29 @@ config:
   # a new secret at each deployment
   secret: LOGINAPPSECRET123
   # OIDC Client ID
-  clientID: "loginapp"
+  clientID: loginapp
   # OIDC Client secret
-  clientSecret: ""
+  clientSecret: OIDCAPPSECRET123
   # OIDC Client redirect URL
   # This must end with /callback
   # if empty, defaults to:
   #
   # 1. '{{ .Values.ingress.hosts[0].host }}/callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
   # 2. '{{ .Release.Name }}.{{ .Release.Namespace }}.svc:5555/callback'
-  clientRedirectURL:
+  clientRedirectURL: loginapp.lab/callback
   # Issuer root CA configMap
   # ConfigMap containing the root CA
   # and key to use inside the configMap.
   # This configMap must exist
   issuerRootCA: # +doc-gen:break
-    configMap:
+    configMap: kube-root-ca.crt
     key: ca.crt
   # Skip issuer certificate validation
   # This is usefull for testing purpose, but
   # not recommended in production
-  issuerInsecureSkipVerify: false
+  issuerInsecureSkipVerify: true
   # Issuer url
-  issuerURL: "https://dex.example.org:32000"
+  issuerURL: "https://dex.lab"
   # Include refresh token in request
   refreshToken: false
   tls:
@@ -56,7 +57,7 @@ config:
     # Secret name where certificates are stored
     # if empty and 'tls.enabled: true', generate self signed certificates
     # if not empty, use the kubernetes secret 'secretName' (type: kubernetes.io/tls)
-    secretName:
+    secretName: loginapp.lab
     # Self singed certificat DNS names
     # Example:
     #

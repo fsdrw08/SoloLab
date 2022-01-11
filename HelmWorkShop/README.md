@@ -147,20 +147,41 @@ Ref:
   kubectl delete namespace dex
   ```
 
-- Add ingress route for dex
+- (no need?) Add ingress route for dex
   - Ref:
     - [还不会Traefik？看完这篇文章，你就彻底搞懂了~](https://z.itpub.net/article/detail/B4F2CC264BEB02610B23F8D0E9BA91FB)
     - [Unable to run dex serve command](https://github.com/dexidp/dex/issues/1257#issuecomment-413523548)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/dex/dex-ingressRoute.yaml
   ```
-- Export Dex certificate  
+
+- (no need?) Export Dex certificate  
   - Ref:  
     - [Decode Secrets](https://phoenixnap.com/kb/kubernetes-secrets#ftoc-heading-6)  
     - [How to Configure Dex and Gangway for Active Directory Authentication in TKG](https://little-stuff.com/2020/06/23/how-to-configure-dex-and-gangway-for-active-directory-authentication-in-tkg/)
   ```
   kubectl get secret dex.lab -n dex -o jsonpath='{.data}'
   ```
+
+- (no need?) Create ConfigMap for loginapp
+  - Ref:
+    - https://github.com/fydrah/loginapp/tree/master/helm/loginapp#prerequisites
+  ```
+  sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt
+  vi /vagrant/HelmWorkShop/loginapp/ca-cm.yaml
+  kubectl create -f /vagrant/HelmWorkShop/loginapp/ca-cm.yaml
+  ```
+
+- Install fydrah loginapp
+  - Ref:
+    - [loginapp](https://github.com/fydrah/loginapp/tree/master/helm/loginapp#loginapp)
+  ```
+  helm repo add fydrah-stable https://charts.fydrah.com
+  helm install loginapp fydrah-stable/loginapp \
+    --namespace dex \
+    --values /vagrant/HelmWorkShop/loginapp/values.yaml
+  ```
+
 
 - Modify api server arg config to make dex as oidc provider  
   - Ref:
