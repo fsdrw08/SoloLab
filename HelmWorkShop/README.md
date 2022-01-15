@@ -177,9 +177,16 @@ Ref:
     - [loginapp](https://github.com/fydrah/loginapp/tree/master/helm/loginapp#loginapp)
   ```
   helm repo add fydrah-stable https://charts.fydrah.com
+  helm repo update
   helm install loginapp fydrah-stable/loginapp \
     --namespace dex \
     --values /vagrant/HelmWorkShop/loginapp/values.yaml
+  ```
+  or upgrade 
+  ```
+  helm upgrade loginapp fydrah-stable/loginapp \
+  --namespace dex \
+  --values /vagrant/HelmWorkShop/loginapp/values.yaml
   ```
 
 

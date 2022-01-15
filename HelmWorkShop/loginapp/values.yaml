@@ -10,6 +10,7 @@ ingress:
     - host: loginapp.lab
       paths: 
         - path: /
+          pathType: ImplementationSpecific
   tls:
    - secretName: loginapp.lab
      hosts:
@@ -35,7 +36,7 @@ config:
   #
   # 1. '{{ .Values.ingress.hosts[0].host }}/callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
   # 2. '{{ .Release.Name }}.{{ .Release.Namespace }}.svc:5555/callback'
-  clientRedirectURL: loginapp.lab/callback
+  clientRedirectURL: https://loginapp.lab/callback
   # Issuer root CA configMap
   # ConfigMap containing the root CA
   # and key to use inside the configMap.
@@ -52,8 +53,10 @@ config:
   # Include refresh token in request
   refreshToken: false
   tls:
-    # Enable TLS for deployment
-    enabled: true
+    # Enable TLS for deployment, 
+    # If using ingress with ssl offload, should set this value to false, 
+    # otherwise, web site will pop up error with "client send http request to https server"
+    enabled: false
     # Secret name where certificates are stored
     # if empty and 'tls.enabled: true', generate self signed certificates
     # if not empty, use the kubernetes secret 'secretName' (type: kubernetes.io/tls)
