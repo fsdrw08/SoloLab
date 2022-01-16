@@ -94,6 +94,7 @@ Ref:
 - Create k3s ca key pair
   - Ref:
     - [Manipulating text at the command line with sed](https://www.redhat.com/sysadmin/manipulating-text-sed)
+    - [Appending to end of a line using 'sed'](https://askubuntu.com/questions/537967/appending-to-end-of-a-line-using-sed)
     - [sed conditionally append to line after matching pattern](https://stackoverflow.com/questions/55633885/sed-conditionally-append-to-line-after-matching-pattern)
     - [How to configure my own CA for k3s](https://github.com/k3s-io/k3s/issues/1868#issuecomment-639690634)
     - [Cert-manager CA](https://cert-manager.io/docs/configuration/ca/)
@@ -163,7 +164,7 @@ Ref:
   kubectl get secret dex.lab -n dex -o jsonpath='{.data}'
   ```
 
-- (no need?) Create ConfigMap for loginapp
+- (no need? dex had already add "kube-root-ca.crt" cm in it's own ns) Create ConfigMap (root ca and key) for loginapp
   - Ref:
     - https://github.com/fydrah/loginapp/tree/master/helm/loginapp#prerequisites
   ```
@@ -172,9 +173,16 @@ Ref:
   kubectl create -f /vagrant/HelmWorkShop/loginapp/ca-cm.yaml
   ```
 
-- Install fydrah loginapp
+- Config and install fydrah loginapp
   - Ref:
     - [loginapp](https://github.com/fydrah/loginapp/tree/master/helm/loginapp#loginapp)
+  
+  - Config loginapp value, add certificate-authority data
+  ```
+  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
+  ```
+
+  - add helm repo and install loginapp
   ```
   helm repo add fydrah-stable https://charts.fydrah.com
   helm repo update
@@ -189,6 +197,10 @@ Ref:
   --values /vagrant/HelmWorkShop/loginapp/values.yaml
   ```
 
+- add rbac for dex local staticPasswords account
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/dex/RBAC.yaml
+  ```
 
 - Modify api server arg config to make dex as oidc provider  
   - Ref:
@@ -203,25 +215,23 @@ Ref:
   '--kube-apiserver-arg' \
   'oidc-client-id=kubernetes' \
   '--kube-apiserver-arg' \
+  'oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt' \
+  '--kube-apiserver-arg' \
   'oidc-username-claim=email' \
   '--kube-apiserver-arg' \
   'oidc-groups-claim=groups' \
   ```
    
-- Config kubectl with kubelogin
+- unset kubectl config
+  - Ref: 
+    - [Kubernetes: How do I delete clusters and contexts from kubectl config?](https://stackoverflow.com/questions/37016546/kubernetes-how-do-i-delete-clusters-and-contexts-from-kubectl-config)
   ```
-  kubelogin setup --insecure-skip-tls-verify `
-  --oidc-issuer-url=https://dex.lab `
-  --oidc-client-id=kubernetes `
-  --oidc-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0
-
-  # or
-  kubelogin setup --insecure-skip-tls-verify \
-  --oidc-issuer-url=https://dex.lab \
-  --oidc-client-id=kubernetes \
-  --oidc-client-secret=ZXhhbXBsZS1hcHAtc2VjcmV0
+  kubectl config unset users.gke_project_zone_name
+  kubectl config unset contexts.aws_cluster1-kubernetes
+  kubectl config unset clusters.foobar-baz
   ```
 
+- login to https://loginapp.lab and set with new config
 ## Config traefik dashboard
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD  
   - Ref: 
