@@ -148,7 +148,7 @@ Ref:
   kubectl delete namespace dex
   ```
 
-- (no need?) Add ingress route for dex
+- (no need? use ingress annotation to create ingress instead) Add ingress route for dex
   - Ref:
     - [还不会Traefik？看完这篇文章，你就彻底搞懂了~](https://z.itpub.net/article/detail/B4F2CC264BEB02610B23F8D0E9BA91FB)
     - [Unable to run dex serve command](https://github.com/dexidp/dex/issues/1257#issuecomment-413523548)
@@ -176,6 +176,7 @@ Ref:
 - Config and install fydrah loginapp
   - Ref:
     - [loginapp](https://github.com/fydrah/loginapp/tree/master/helm/loginapp#loginapp)
+    - [yq - add a multiline string](https://stackoverflow.com/questions/57761285/yq-add-a-multiline-string?utm_source=pocket_mylist)
   
   - Config loginapp value, add certificate-authority data
   ```

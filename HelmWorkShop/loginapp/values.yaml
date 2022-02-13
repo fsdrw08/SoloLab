@@ -41,6 +41,7 @@ config:
   # ConfigMap containing the root CA
   # and key to use inside the configMap.
   # This configMap must exist
+  # dex had already add "kube-root-ca.crt" cm in it's own ns
   issuerRootCA: # +doc-gen:break
     configMap: kube-root-ca.crt
     key: ca.crt
@@ -72,6 +73,7 @@ config:
   clusters: 
    - name: sololab
      server: https://solo.lab:6443
+     # ca information will replaced by yq command
      certificate-authority: |
        -----BEGIN CERTIFICATE-----
        MIIC/zCCAeegAwIBAgIULkYvGJPRl50tMoVE4BNM0laRQncwDQYJKoZIhvcNAQEL
