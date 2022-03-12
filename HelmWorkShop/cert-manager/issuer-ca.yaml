@@ -6,3 +6,4 @@ metadata:
 spec:
   ca:
     secretName: ca-key-pair
+    # secretName: k3s-serving

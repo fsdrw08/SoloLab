@@ -4,17 +4,20 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: issuer-ca
     # kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: issuer-ca
+    # https://www.ziji.work/ingress/traefik-route-traefik-middlewares-configure.html
+    # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
   hosts:
-    - host: loginapp.lab
+    - host: solo.lab
       paths: 
-        - path: /
+        - path: /sub-loginapp/
           pathType: ImplementationSpecific
   tls:
-   - secretName: loginapp.lab
+   - secretName: solo.lab
      hosts:
-       - loginapp.lab
+       - solo.lab
 
 config:
   # Application name, defaults to Release name
@@ -36,7 +39,7 @@ config:
   #
   # 1. '{{ .Values.ingress.hosts[0].host }}/callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
   # 2. '{{ .Release.Name }}.{{ .Release.Namespace }}.svc:5555/callback'
-  clientRedirectURL: https://loginapp.lab/callback
+  clientRedirectURL: https://solo.lab/sub-loginapp/callback
   # Issuer root CA configMap
   # ConfigMap containing the root CA
   # and key to use inside the configMap.
@@ -49,8 +52,8 @@ config:
   # This is usefull for testing purpose, but
   # not recommended in production
   issuerInsecureSkipVerify: true
-  # Issuer url
-  issuerURL: "https://dex.lab"
+  # Issuer url, should be same with config.issuer in dex values
+  issuerURL: "https://solo.lab/dex"
   # Include refresh token in request
   refreshToken: false
   tls:
@@ -61,7 +64,7 @@ config:
     # Secret name where certificates are stored
     # if empty and 'tls.enabled: true', generate self signed certificates
     # if not empty, use the kubernetes secret 'secretName' (type: kubernetes.io/tls)
-    secretName: loginapp.lab
+    secretName: solo.lab
     # Self singed certificat DNS names
     # Example:
     #

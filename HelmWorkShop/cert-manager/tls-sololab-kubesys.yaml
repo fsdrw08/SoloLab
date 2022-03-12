@@ -1,12 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: traefik.lab
+  name: solo.lab
   namespace: kube-system
 spec:
   dnsNames:
-    - traefik.lab
-  secretName: traefik.lab
+    - solo.lab
+  secretName: solo.lab
   issuerRef:
-    name: issuer-selfsigned
+    name: issuer-ca
     kind: ClusterIssuer

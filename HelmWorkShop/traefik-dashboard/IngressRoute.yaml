@@ -11,7 +11,7 @@ spec:
     - websecure
   routes:
     # Hostname to match
-    - match: Host(`traefik.lab`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+    - match: Host(`solo.lab`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       kind: Rule
       # Service to redirect requests to
       services:

@@ -1,10 +1,10 @@
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: dex-local-admin
+  name: k8s-dashboard-admin
 subjects:
 - kind: User
-  name: dexadmin@solo.lab
+  name: k8s-dashboard
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole

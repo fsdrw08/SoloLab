@@ -6,24 +6,24 @@ ingress:
   # className: traefik
   annotations:
     kubernetes.io/ingress.class: traefik
-  # create cert when the helm install run
-  # https://cert-manager.io/docs/usage/ingress/
+    # create cert when the helm install run
+    # https://cert-manager.io/docs/usage/ingress/
     cert-manager.io/cluster-issuer: issuer-ca
   hosts:
-    - host: dex.lab
+    - host: solo.lab
       paths:
-        - path: /
+        - path: /dex/
           pathType: ImplementationSpecific
   tls:
-    - secretName: dex.lab
+    - secretName: solo.lab
       hosts:
-        - dex.lab
+        - solo.lab
 
 # -- Application configuration.
 # See the [official documentation](https://dexidp.io/docs/).
 # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
 config:
-  issuer: https://dex.lab
+  issuer: https://solo.lab/dex
 
   storage:
     type: kubernetes
@@ -61,16 +61,20 @@ config:
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       name: "SoloLab Cluster"
       redirectURIs:
-      - https://loginapp.lab/callback
+      - https://solo.lab/sub-loginapp/callback
+      - https://core.harbor.lab/c/oidc/callback
       # - http://localhost:8000
 
   # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
   enablePasswordDB: true
   staticPasswords:
-  - email: "lab@solo.lab"
-  # echo $(echo password | htpasswd -BinC 10 admin | cut -d: -f2)
-    hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
-    username: "admin"
+  - email: "dexadmin@solo.lab"
+  # echo $(echo password | htpasswd -BinC 10 dexadmin | cut -d: -f2)
+  # https://httpd.apache.org/docs/current/programs/htpasswd.html
+  # echo $(echo password | htpasswd -n -i -BC 10 dexadmin | cut -d: -f2)
+    # hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2y$10$.V6EcNlkVPqzx21QIh7HA.QL.Fqi91FTaMsEGqstQnxm.5JyGpBOW"
+    username: "dexadmin"
     userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
 # Note: this will inject the environment variables directly to the pods.# In a production environment you should mount these keys from a secret using envFrom.# See https://artifacthub.io/packages/helm/dex/dex#values
 # env:

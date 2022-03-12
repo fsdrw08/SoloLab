@@ -82,7 +82,7 @@ Ref:
   kubectl get pods --namespace cert-manager
   ```
 
-- Create self sign issuer  
+- Create self sign issuer (optional)  
   - Ref:  
     - https://crt.the-mori.com/2020-11-20-traefik-v2-letsencrypt-cert-manager-raspberry-pi-4-kubernetes  
     - [Use Cert-manager to manage certificates in your cluster](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager#use)  
@@ -91,7 +91,7 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
-- Create k3s ca key pair
+- Create k3s ca key pair (no need? there is already a ca key pair secret "k3s-serving" under kube-system namespace)
   - Ref:
     - [Manipulating text at the command line with sed](https://www.redhat.com/sysadmin/manipulating-text-sed)
     - [Appending to end of a line using 'sed'](https://askubuntu.com/questions/537967/appending-to-end-of-a-line-using-sed)
@@ -99,30 +99,43 @@ Ref:
     - [How to configure my own CA for k3s](https://github.com/k3s-io/k3s/issues/1868#issuecomment-639690634)
     - [Cert-manager CA](https://cert-manager.io/docs/configuration/ca/)
   ```
+  # switch to root first
+  sudo su
+  # prase the key info
   sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  # have a check
   cat /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  # apply it
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
   ```
 
-- Create k3s ca issuer
+- Create k3s ca cluster issuer
+  - Ref: 
+    - [issuer-ca.yaml](cert-manager/issuer-ca.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-ca.yaml
   ```
 
+- Create ca sign tls cert (solo.lab) in cert-manager namespace
+  - Ref:
+    - [tls-sololab-certman.yaml](./cert-manager/tls-sololab-certman.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-certman.yaml
+  ```
 ## Install and config dex
 - Add dex helm repo and update helm chart  
   ```
   helm repo add dex https://charts.dexidp.io
   helm repo update
   ```
-- Create dex namespace
+- (no need? this step prepare for next step) Create dex namespace
   ```
   kubectl create namespace dex
   ```
 
-- Create self sign tls cert for dex
+- (no need? use tls cert above instead) Create self sign tls cert for dex 
   - Ref:
-    - [dex-cert-self.yaml](./HelmWorkShop/cert-manager/dex-cert-self.yaml)
+    - [dex-cert-self.yaml](./cert-manager/dex-cert-self.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/dex-cert-self.yaml
   ```
@@ -130,16 +143,21 @@ Ref:
 - Install dex via Helm chart (include self sign cert create, namespace create)  
   - Ref:
     - [Setting secrets for Dex in Jenkins-X and Kubernetes](https://blog.lysender.com/2021/09/setting-secrets-for-dex-in-jenkins-x-and-kubernetes/)
+    - [dex/values.yaml](dex/values.yaml)
   ```
   helm install dex dex/dex \
     --namespace dex \
     --create-namespace \
-    --values /vagrant/HelmWorkShop/dex/value.yaml
+    --values /vagrant/HelmWorkShop/dex/values.yaml
   ```
   - Or update the values
   ```
   helm upgrade dex dex/dex \
-    -f /vagrant/HelmWorkShop/dex/value.yaml \
+    -f /vagrant/HelmWorkShop/dex/values.yaml \
+    --namespace dex
+  # or
+  helm upgrade dex dex/dex `
+    -f .\HelmWorkShop\dex\values.yaml `
     --namespace dex
   ```
   - Or uninstall the dex helm chart and delete dex namespace, then recreate again
@@ -176,7 +194,7 @@ Ref:
 - Config and install fydrah loginapp
   - Ref:
     - [loginapp](https://github.com/fydrah/loginapp/tree/master/helm/loginapp#loginapp)
-    - [yq - add a multiline string](https://stackoverflow.com/questions/57761285/yq-add-a-multiline-string?utm_source=pocket_mylist)
+    - [yq - add a multiline string](https://stackoverflow.com/questions/57761285/yq-add-a-multiline-string)
   
   - Config loginapp value, add certificate-authority data
   ```
@@ -184,15 +202,23 @@ Ref:
   ```
 
   - add helm repo and install loginapp
+    - Ref:
+      - [./loginapp/values.yaml](loginapp/values.yaml)
   ```
   helm repo add fydrah-stable https://charts.fydrah.com
   helm repo update
+  # update cert in values before apply it
+  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
+  # helm install
   helm install loginapp fydrah-stable/loginapp \
     --namespace dex \
     --values /vagrant/HelmWorkShop/loginapp/values.yaml
   ```
   or upgrade 
   ```
+  # update cert in values before apply it
+  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
+  # helm upgrade
   helm upgrade loginapp fydrah-stable/loginapp \
   --namespace dex \
   --values /vagrant/HelmWorkShop/loginapp/values.yaml
@@ -212,7 +238,7 @@ Ref:
   - add following arg in /etc/init.d/k3s (for k3s in apline linux)  
   ```
   '--kube-apiserver-arg' \
-  'oidc-issuer-url=https://dex.lab' \
+  'oidc-issuer-url=https://solo.lab/dex' \
   '--kube-apiserver-arg' \
   'oidc-client-id=kubernetes' \
   '--kube-apiserver-arg' \
@@ -232,14 +258,37 @@ Ref:
   kubectl config unset clusters.foobar-baz
   ```
 
-- login to https://loginapp.lab and set with new config
+- login to https://loginapp.lab and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
+  ```
+  kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
+
+## Install Harbor
+- Add harbor helm repo
+  ```
+  helm repo add harbor https://helm.goharbor.io
+  ```
+- Install harbor via helm and values.yaml
+  ```
+  helm install harbor harbor/harbor `
+  --values .\HelmWorkShop\harbor\values.yaml `
+  --namespace harbor `
+  --create-namespace --wait
+  ```
+- Or upgrade harbor helm values
+  ```
+  helm upgrade harbor harbor/harbor `
+  --values .\HelmWorkShop\harbor\values.yaml `
+  --namespace harbor
+  ```
 ## Config traefik dashboard
-- Enable traefik dashboard, by defining and applying an IngressRoute CRD  
+- Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
   - Ref: 
     - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
     - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
+  # or
+  kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
   ```
 
 - Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
@@ -261,11 +310,11 @@ Ref:
   ```
 
 
-- Issue traefik-cert (by cert-manager self sign issuer)  
+- Issue sololab tls cert in kube-system namespace (by cert-manager ca issuer)  
   - Ref:
-    - [/HelmWorkShop/cert-manager/traefik-cert-self.yaml](cert-manager/traefik-cert-self.yaml)
+    - [/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml](cert-manager/tls-sololab-kubesys.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/traefik-cert-self.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml
   ```
 
 - Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  

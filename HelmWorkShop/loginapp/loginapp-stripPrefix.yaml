@@ -1,0 +1,9 @@
+# https://doc.traefik.io/traefik/middlewares/http/stripprefix/
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: loginapp-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /loginapp

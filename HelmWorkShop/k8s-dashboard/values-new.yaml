@@ -12,15 +12,24 @@ ingress:
   ## Kubernetes Dashboard Ingress annotations
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: issuer-ca
+    # https://www.ziji.work/ingress/traefik-route-traefik-middlewares-configure.html
+    # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
+  ## Kubernetes Dashboard Ingress paths
+  ## Both `/` and `/*` are required to work on gce ingress.
+  paths:
+    - /sub-k8sdashboard/
+      # pathType: ImplementationSpecific
   hosts:
-    - dashboard.lab
+    - solo.lab
   ## Kubernetes Dashboard Ingress TLS configuration
   ## Secrets must be manually created in the namespace
   ##
   tls:
-    - secretName: dashboard.lab
+    - secretName: solo.lab
       hosts:
-        - dashboard.lab
+        - solo.lab
 
 metricsScraper:                
   enabled: true

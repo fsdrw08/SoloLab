@@ -1,0 +1,23 @@
+# https://github.com/jp-gouin/helm-openldap/blob/master/values.yaml
+replicaCount: 1
+env:
+ LDAP_ORGANISATION: "Solo Lab"
+ LDAP_DOMAIN: "Solo.lab"
+adminPassword: password
+configPassword: password
+ltb-passwd:
+  enabled : true
+  ingress:
+    enabled: true
+    annotations: {}
+    path: /
+    pathType: Prefix
+    ## Ingress Host
+    hosts:
+    - "ldap.lab"
+  ldap:
+    server: ldap://openldap-openldap-stack-ha
+    searchBase: dc=example,dc=org
+    # existingSecret: openldaptest
+    bindDN: cn=admin,dc=example,dc=org
+    bindPWKey: LDAP_ADMIN_PASSWORD

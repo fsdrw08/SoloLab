@@ -8,12 +8,14 @@ metadata:
 spec:
   valuesContent: |-
     ports:
+      # traefik:
+      #   expose: true
       web:
         port: 80
       websecure:
         port: 443
-    # additionalArguments:
-    #   - "--providers.kubernetesingress.ingressclass=traefik"
+    additionalArguments:
+      - "--providers.kubernetesingress.ingressclass=traefik"
     securityContext:
       capabilities:
         drop: [ALL]
