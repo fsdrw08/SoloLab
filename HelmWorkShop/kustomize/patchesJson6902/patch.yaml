@@ -1,0 +1,6 @@
+# https://github.com/kubernetes-sigs/kustomize/blob/e86fd7f009004dfbd1e5c434ffc36dac8850ec39/examples/jsonpatch.md
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: JAVA_TOOL_OPTIONS
+    value: -Spring.test1=$POD_NAME

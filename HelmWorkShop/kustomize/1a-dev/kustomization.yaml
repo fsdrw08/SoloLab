@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# metadata:
+#   namespace: dex
+# These labels are added to all configmaps and secrets.
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- name: baas-edge-creditcheck
+  # https://kubectl.docs.kubernetes.io/references/kustomize/builtins/#field-name-configmapgenerator
+  behavior: create
+  files:
+  - application=application-1a-dev.yaml
+  - JAVA_TOOL_OPTIONS=JAVA_TOOL_OPTIONS.env
+  # envs:
+  # - JAVA_TOOL_OPTIONS.env

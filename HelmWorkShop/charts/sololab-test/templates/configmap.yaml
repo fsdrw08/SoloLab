@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sololab-test.fullname" . }}
+  labels:
+    {{- include "sololab-test.labels" . | nindent 4 }}
+data: 
+  application: |
+{{ .Values.configmap.application | indent 4 }}

@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../base
+# https://skryvets.com/blog/2019/05/15/kubernetes-kustomize-json-patches-6902/?msclkid=ebc7a70ba76211ec9d5876f8079b6244
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: my-nginx
+  # path: patch.yaml
+  # https://github.com/kubernetes-sigs/kustomize/blob/e86fd7f009004dfbd1e5c434ffc36dac8850ec39/examples/inlinePatch.md
+  patch: |-
+    - op: add
+      path: "/spec/template/spec/containers/0/env/-"
+      value:
+        name: JAVA_TOOL_OPTIONS
+        value: -Spring.test1=$POD_NAME
