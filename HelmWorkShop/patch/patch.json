@@ -1,0 +1,18 @@
+[
+    {
+        "op": "add",
+        "path": "/spec/rules/0/http/paths/-",
+        "value": {
+            "backend": {
+                "service": {
+                    "name": "loginapp",
+                    "port": {
+                        "number": 1234
+                    }
+                }
+            },
+            "path": "/sub-loginapptest/",
+            "pathType": "ImplementationSpecific"
+        }
+    }
+]
