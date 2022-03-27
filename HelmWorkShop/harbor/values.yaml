@@ -4,7 +4,8 @@ expose:
       core: core.harbor.lab
       notary: notary.harbor.lab
     annotations:
-      kubernetes.io/ingress.class: "traefik"
+      cert-manager.io/cluster-issuer: issuer-ca
+      kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
 externalURL: https://core.harbor.lab

@@ -262,6 +262,21 @@ Ref:
   ```
   kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
 
+## Install open ldap
+- Add helm repo
+  ```powershell
+  # config proxy for helm
+  # https://github.com/helm/helm/issues/9576
+  $env:HTTP_PROXY="127.0.0.1:7890"
+  $env:HTTPS_PROXY="127.0.0.1:7890"
+
+  helm repo add helm-openldap https://jp-gouin.github.io/helm-openldap/
+
+  helm install openldap helm-openldap/openldap-stack-ha `
+    --create-namespace `
+    --namespace openldap `
+    --values .\HelmWorkShop\helm-openldap\values.yaml
+  ```
 ## Install Harbor
 - Add harbor helm repo
   ```
