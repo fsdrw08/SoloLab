@@ -9,15 +9,26 @@ ltb-passwd:
   enabled : true
   ingress:
     enabled: true
-    annotations: {}
-    path: /
-    pathType: Prefix
+    annotations: 
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
+      cert-manager.io/cluster-issuer: issuer-ca
+    path: /sub-ltbpassword/
+    pathType: ImplementationSpecific
     ## Ingress Host
     hosts:
-    - "ldap.lab"
-  ldap:
-    server: ldap://openldap-openldap-stack-ha
-    searchBase: dc=example,dc=org
-    # existingSecret: openldaptest
-    bindDN: cn=admin,dc=example,dc=org
-    bindPWKey: LDAP_ADMIN_PASSWORD
+    - "solo.lab"
+
+phpldapadmin:
+  enabled: true
+  ingress:
+    enabled: true
+    annotations: 
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
+      cert-manager.io/cluster-issuer: issuer-ca
+    path: /sub-phpldapadmin/
+    pathType: ImplementationSpecific
+    ## Ingress Host
+    hosts:
+    - "solo.lab"
