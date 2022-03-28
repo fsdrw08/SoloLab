@@ -91,13 +91,14 @@ Ref:
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-selfsigned.yaml
   ```
 
-- Create k3s ca key pair (no need? there is already a ca key pair secret "k3s-serving" under kube-system namespace)
+- Create k3s ca key pair (there is already a ca key pair secret "k3s-serving" under kube-system namespace, but secret object cannot invoke across namespace https://stackoverflow.com/questions/46297949/sharing-secret-across-namespaces )
   - Ref:
     - [Manipulating text at the command line with sed](https://www.redhat.com/sysadmin/manipulating-text-sed)
     - [Appending to end of a line using 'sed'](https://askubuntu.com/questions/537967/appending-to-end-of-a-line-using-sed)
     - [sed conditionally append to line after matching pattern](https://stackoverflow.com/questions/55633885/sed-conditionally-append-to-line-after-matching-pattern)
     - [How to configure my own CA for k3s](https://github.com/k3s-io/k3s/issues/1868#issuecomment-639690634)
     - [Cert-manager CA](https://cert-manager.io/docs/configuration/ca/)
+    - [/HelmWorkShop/cert-manager/ca-key-pair.yaml](./cert-manager/ca-key-pair.yaml)
   ```
   # switch to root first
   sudo su
@@ -258,12 +259,12 @@ Ref:
   kubectl config unset clusters.foobar-baz
   ```
 
-- login to https://loginapp.lab and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
+- login to https://solo.lab/sub-loginapp/ and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
   ```
   kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
 
 ## Install open ldap
-- Add helm repo
+- Install helm-openldap helm repo
   ```powershell
   # config proxy for helm
   # https://github.com/helm/helm/issues/9576
@@ -276,7 +277,13 @@ Ref:
     --create-namespace `
     --namespace openldap `
     --values .\HelmWorkShop\helm-openldap\values.yaml
+
+  # or
+  helm upgrade openldap helm-openldap/openldap-stack-ha `
+    --namespace openldap `
+    --values .\HelmWorkShop\helm-openldap\values.yaml
   ```
+- Login to https://login
 ## Install Harbor
 - Add harbor helm repo
   ```
