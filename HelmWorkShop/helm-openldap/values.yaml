@@ -1,10 +1,28 @@
 # https://github.com/jp-gouin/helm-openldap/blob/master/values.yaml
 replicaCount: 1
+
+# Settings for enabling TLS with custom certificate
+# need a secret with tls.crt, tls.key and ca.crt keys with associated files
+# Ref: https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/#create-a-secret
+customTLS:
+  enabled: false
+  secret: ""  # The name of a kubernetes.io/tls type secret to use for TLS
+  CA:
+    enabled: false
+
+# Default configuration for openldap as environment variables. These get injected directly in the container.
+# Use the env variables from https://github.com/osixia/docker-openldap#beginner-guide
 env:
  LDAP_ORGANISATION: "Solo Lab"
  LDAP_DOMAIN: "Solo.lab"
+
+# Default Passwords to use, stored as a secret. Not used if existingSecret is set.
+# You can override these at install time with
+# helm install openldap --set openldap.adminPassword=<passwd>,openldap.configPassword=<passwd>
 adminPassword: password
 configPassword: password
+
+# ltb-passwd for self service password
 ltb-passwd:
   enabled : true
   ingress:
@@ -18,6 +36,12 @@ ltb-passwd:
     ## Ingress Host
     hosts:
     - "solo.lab"
+  ldap:
+    server: ldap://openldap-openldap-stack-ha
+    searchBase: dc=Solo,dc=lab
+    # existingSecret: openldaptest
+    bindDN: cn=admin,dc=Solo,dc=lab
+    bindPWKey: LDAP_ADMIN_PASSWORD
 
 phpldapadmin:
   enabled: true
@@ -32,3 +56,5 @@ phpldapadmin:
     ## Ingress Host
     hosts:
     - "solo.lab"
+  env:
+    PHPLDAPADMIN_LDAP_HOSTS: openldap-openldap-stack-ha
