@@ -1,0 +1,1 @@
+New-VMSwitch -Name "Internal Switch" -SwitchType Internal

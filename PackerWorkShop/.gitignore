@@ -1,4 +1,6 @@
 vbox/*
 ISO/*
 
-!ISO/Create-HardLink.ps1
+!ISO/New-HardLink.ps1
+!ISO/New-HardLink.bat
+!ISO/README.md
