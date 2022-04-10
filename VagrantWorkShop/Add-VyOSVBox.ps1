@@ -1,1 +1,1 @@
-vagrant box add VYOS130-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-vyos130-hv-g2.box
+vagrant box add VYOS130-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-vyos130-hv-g2.box --force

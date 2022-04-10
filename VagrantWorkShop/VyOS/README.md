@@ -12,7 +12,7 @@ to install clash and config as transparnt proxy into the VYOS box, run following
 `bash ~/finalConfig.sh`
 
 settings for reuse
-
+```
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start 192.168.255.10
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop 192.168.255.250
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.1
@@ -28,3 +28,4 @@ set service dhcp-relay server 192.168.255.2
 set service dhcp-relay relay-options relay-agents-packets discard
 
 del service dhcp-server
+```
