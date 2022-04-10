@@ -15,6 +15,7 @@ vagrantfile_template="./vagrant/hv_vyos130_g2.rb"
 ssh_username="vyos"
 ssh_password="vyos"
 provision_script_options="-z false"
+// https://wiki.debian.org/CDDVD
 boot_command=["<wait3><enter><wait2><enter><wait2><enter>",
 "<wait20>vyos<enter>",
 "<wait3>vyos<enter>",

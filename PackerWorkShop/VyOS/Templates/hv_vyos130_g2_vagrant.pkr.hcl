@@ -115,6 +115,8 @@ source "hyperv-iso" "vm" {
   guest_additions_mode  = "disable"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
+  // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
+  // https://wiki.debian.org/CDDVD
   cd_files              = "${var.cd_files}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
