@@ -123,6 +123,69 @@ Ref:
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-certman.yaml
   ```
+
+
+## Config traefik dashboard
+- Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
+  - Ref: 
+    - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
+    - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
+  # or
+  kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
+  ```
+
+- Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
+  - Ref: 
+    - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
+    - [/HelmWorkShop/traefik-dashboard/auth.yaml](traefik-dashboard/auth.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
+  # or
+  kubectl apply -f .\HelmWorkShop\traefik-dashboard\auth.yaml
+  ```
+
+- Add traefik providers.kubernetesingress.ingressclass  
+  - Ref:  
+    - [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
+    - [traefik ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
+    - [/HelmWorkShop/traefik-config/traefik-config.yaml](traefik-config/traefik-config.yaml)
+  ```
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml \
+    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  ```
+
+- Issue sololab tls cert in kube-system namespace (by cert-manager ca issuer)  
+  - Ref:
+    - [/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml](cert-manager/tls-sololab-kubesys.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml
+  ```
+
+- Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
+  - Ref:  
+    - [/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml](traefik-dashboard/IngressRoute-update.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml
+  ```
+
+- Update traefik helmchart config (for https redirect)  
+  - Ref: 
+    - [Enable automatics HTTPS redirection](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager#enable)
+    - [Traefik HTTP to HTTPS global redirection](https://www.leonpahole.com/2020/05/traefik-basic-setup.html)
+    - [/HelmWorkShop/traefik-config/traefik-config-update.yaml](traefik-config/traefik-config-update.yaml)
+
+  ```Bash
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml \
+    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  ```
+
+- Add traefik stripperfix middleware
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik-middleware/traefik-stripprefixregex.yaml
+  ```
+
 ## Install and config dex
 - Add dex helm repo and update helm chart  
   ```
@@ -236,7 +299,7 @@ Ref:
     - [How to Secure Your Kubernetes Cluster with OpenID Connect  and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#k3d)
     - [Set the time zone of your Kubernetes Pod together](https://qiita.com/ussvgr/items/0190bab3cc7d16c0116c) 
     - [How to Secure Your Kubernetes Cluster with OpenID Connect and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#kubeadm)
-  - add following arg in /etc/init.d/k3s (for k3s in apline linux)  
+  - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux), then restart the node  
   ```
   '--kube-apiserver-arg' \
   'oidc-issuer-url=https://solo.lab/dex' \
@@ -250,7 +313,7 @@ Ref:
   'oidc-groups-claim=groups' \
   ```
    
-- unset kubectl config
+- ???unset kubectl config
   - Ref: 
     - [Kubernetes: How do I delete clusters and contexts from kubectl config?](https://stackoverflow.com/questions/37016546/kubernetes-how-do-i-delete-clusters-and-contexts-from-kubectl-config)
   ```
@@ -262,6 +325,60 @@ Ref:
 - login to https://solo.lab/sub-loginapp/ and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
   ```
   kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
+
+## Install Kubernetes Dashboard
+<!-- - Create name space
+  ```
+  kubectl create namespace kube-dashboard
+  ``` -->
+- Add kubernete-dashboard repo
+  ```
+  helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+  ```
+- (no need, use ingress annotation to create cert in helm values)Create k8s dashboard self sign cert
+  - Ref: 
+    - [HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml](cert-manager/k8sdashboard-cert-self.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
+  ```
+<!-- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab" -->
+- Isntall k8s dashboard under namespace "kube-dashboard" by helm  
+  - Ref: 
+    - [How to create a namespace if it doesn't exists from HELM templates](https://stackoverflow.com/a/65751410/10833894)
+    - [dashboard的chart包配置](https://lemonlzy.cn/2020/10/14/Helm%E9%83%A8%E7%BD%B2Dashboard-UI/#2-2-dashboard%E7%9A%84chart%E5%8C%85%E9%85%8D%E7%BD%AE)
+    - [HelmWorkShop/k8s-dashboard/values-new.yaml](k8s-dashboard/values-new.yaml)
+  ```
+  helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
+    --namespace kube-dashboard --create-namespace --wait
+  #or
+  helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
+    -f .\HelmWorkShop\k8s-dashboard\values-new.yaml `
+    --namespace kube-dashboard --create-namespace --wait
+  ```
+- Or update the values
+  ```
+  helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
+    --namespace kube-dashboard
+  ```
+
+- Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  
+  - Ref:  
+    - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
+    - [Internal Server Error with Traefik HTTPS backend on port 443](https://stackoverflow.com/questions/49412376/internal-server-error-with-traefik-https-backend-on-port-443)
+    - [For Traefik Ingress Controller in k3s disable TLS Verification](https://stackoverflow.com/questions/59798395/for-traefik-ingress-controller-in-k3s-disable-tls-verification)
+    - [Updating Traefik Ingress Configuration](https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786)
+    - [/HelmWorkShop/traefik-config/traefik-config-update2.yaml](traefik-config/traefik-config-update2.yaml)
+  ```
+  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update2.yaml \
+    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+  ```
+
+- Get service account token
+  ```
+  kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
+  ```
 
 ## Install open ldap
 - Install helm-openldap helm repo
@@ -302,110 +419,8 @@ Ref:
   --values .\HelmWorkShop\harbor\values.yaml `
   --namespace harbor
   ```
-## Config traefik dashboard
-- Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
-  - Ref: 
-    - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
-    - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
-  # or
-  kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
-  ```
-
-- Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
-  - Ref: 
-    - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
-    - [/HelmWorkShop/traefik-dashboard/auth.yaml](traefik-dashboard/auth.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
-  ```
-
-- Add traefik providers.kubernetesingress.ingressclass  
-  - Ref:  
-    - [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
-    - [traefik ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
-    - [/HelmWorkShop/traefik-config/traefik-config.yaml](traefik-config/traefik-config.yaml)
-  ```
-  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config.yaml \
-    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-  ```
 
 
-- Issue sololab tls cert in kube-system namespace (by cert-manager ca issuer)  
-  - Ref:
-    - [/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml](cert-manager/tls-sololab-kubesys.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml
-  ```
-
-- Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
-  - Ref:  
-    - [/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml](traefik-dashboard/IngressRoute-update.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml
-  ```
-
-- Update traefik helmchart config (for https redirect)  
-  - Ref: 
-    - [Enable automatics HTTPS redirection](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager#enable)
-    - [Traefik HTTP to HTTPS global redirection](https://www.leonpahole.com/2020/05/traefik-basic-setup.html)
-    - [/HelmWorkShop/traefik-config/traefik-config-update.yaml](traefik-config/traefik-config-update.yaml)
-
-  ```Bash
-  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update.yaml \
-    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-  ```
-
-## Install Kubernetes Dashboard
-<!-- - Create name space
-  ```
-  kubectl create namespace kube-dashboard
-  ``` -->
-- Add kubernete-dashboard repo
-  ```
-  helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-  ```
-- Create k8s dashboard self sign cert
-  - Ref: 
-    - [HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml](cert-manager/k8sdashboard-cert-self.yaml)
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/k8sdashboard-cert-self.yaml
-  ```
-<!-- openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ./tls.key -out ./tls.crt -subj "/CN=dashboard.lab" -->
-- Istall k8s dashboard under namespace "kube-dashboard" by helm  
-  - Ref: 
-    - [How to create a namespace if it doesn't exists from HELM templates](https://stackoverflow.com/a/65751410/10833894)
-    - [dashboard的chart包配置](https://lemonlzy.cn/2020/10/14/Helm%E9%83%A8%E7%BD%B2Dashboard-UI/#2-2-dashboard%E7%9A%84chart%E5%8C%85%E9%85%8D%E7%BD%AE)
-    - [HelmWorkShop/k8s-dashboard/values-new.yaml](k8s-dashboard/values-new.yaml)
-  ```
-  helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
-    --namespace kube-dashboard --create-namespace --wait
-  ```
-- Or update the values
-  ```
-  helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
-    --namespace kube-dashboard
-  ```
-
-- Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  
-  - Ref:  
-    - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
-    - [Internal Server Error with Traefik HTTPS backend on port 443](https://stackoverflow.com/questions/49412376/internal-server-error-with-traefik-https-backend-on-port-443)
-    - [For Traefik Ingress Controller in k3s disable TLS Verification](https://stackoverflow.com/questions/59798395/for-traefik-ingress-controller-in-k3s-disable-tls-verification)
-    - [Updating Traefik Ingress Configuration](https://github.com/k3s-io/k3s/issues/1313#issuecomment-918113786)
-    - [/HelmWorkShop/traefik-config/traefik-config-update2.yaml](traefik-config/traefik-config-update2.yaml)
-  ```
-  sudo cp /vagrant/HelmWorkShop/traefik-config/traefik-config-update2.yaml \
-    /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-  ```
-
-- Get service account token
-  ```
-  kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
-  ```
 
 ## Install Rancher
 - Add rancher helm repo  
