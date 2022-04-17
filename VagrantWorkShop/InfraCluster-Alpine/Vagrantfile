@@ -25,14 +25,18 @@ Vagrant.configure("2") do |config|
       end
       box.vm.box = "alpinelinux315-g2"
       box.vm.hostname = "InfraCluster-Alpine#{i}"
-      box.vm.provision "shell", inline: "sudo apk add helm curl"
       box.vm.network "private_network", bridge: "Internal Switch"
+      # https://www.rehiy.com/post/295
+      # https://github.com/alpinelinux/docker-alpine/issues/222
+      # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
+      box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
+      box.vm.provision "shell", inline: "sudo reboot"
     end
   end
   # config.vm.network "private_network", bridge: "Internal Switch"
 
   config.vm.synced_folder "../../HelmWorkShop", "/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
-
+  config.ssh.insert_key = false
   # config.vm.provider "hyperv" do |hv, config|
     # hv.mac = "0000BABEFACE"
     # hv.vmname = "InfraCluster-Alpine"
