@@ -2,3 +2,6 @@
 	path = PackerWorkShop/hv-packer
 	url = https://github.com/fsdrw08/hv-packer.git
 	branch = SoloLab
+[submodule "HelmWorkShop/keepalived/kubelived"]
+	path = HelmWorkShop/keepalived/kubelived
+	url = https://github.com/clastix/kubelived.git
