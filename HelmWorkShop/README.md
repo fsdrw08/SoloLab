@@ -380,6 +380,34 @@ Ref:
   kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
   ```
 
+## Install kubelived
+- Install from helm, the kubelived helm chart had not public as a tar pack to the internet yet, we had to 
+  ```
+  # add helm repo
+  helm repo add keepalived-operator https://redhat-cop.github.io/keepalived-operator
+
+  # install helm chart
+  helm install keepalived-operator keepalived-operator/keepalived-operator `
+    --create-namespace `
+    --namespace keepalived-operator `
+    -f .\HelmWorkShop\keepalived-operator\values.yaml
+  ```
+- Prepare secret for certs (copy secret solo.lab from other ns to this ns)
+  - Ref: 
+    - [/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml](keepalived-operator/keepalived-operator-certs.yaml)
+  ```
+  # fill out the keepalived-operator-certs.yaml
+  sed -i -e "/tls.crt:/s/$/$(kubectl get secret solo.lab -n dex -o jsonpath='{.data.tls\.crt}')/" \
+    -e "/tls.key:/s/$/$(kubectl get secret solo.lab -n dex -o jsonpath="{.data.tls\.key}")/" \
+    /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
+  
+  # have a check
+  cat /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
+
+  # apply the secret
+  kubectl apply -f /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
+  ```
+
 ## Install open ldap
 - Install helm-openldap helm repo
   ```powershell
