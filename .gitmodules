@@ -5,3 +5,4 @@
 [submodule "HelmWorkShop/keepalived/kubelived"]
 	path = HelmWorkShop/keepalived/kubelived
 	url = https://github.com/clastix/kubelived.git
+	branch = tags/v0.3.0

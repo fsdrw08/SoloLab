@@ -1,6 +1,0 @@
-apiVersion: v1
-data:
-  application: "1a: sit\n1atest: \n- test1a: 1a\n- test2a: 2a"
-kind: ConfigMap
-metadata:
-  name: test
