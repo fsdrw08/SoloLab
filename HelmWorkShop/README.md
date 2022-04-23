@@ -381,7 +381,14 @@ Ref:
   ```
 
 ## Install kubelived
-- Install from helm, the kubelived helm chart had not public as a tar pack to the internet yet, we had to 
+- Install from helm, the clastix/kubelived helm chart had not public as a tar pack to the internet yet, after clone this submodule [.\HelmWorkSHop\keepalived\kubelived](keepalived/kubelived/), need to checkout to the related release tag first
+  ```
+  cd .\HelmWorkSHop\keepalived\kubelived
+  git checkout v0.3.0
+  helm install kubelived .\charts\kubelived `
+    --namespace kube-system
+  ```
+
   ```
   # add helm repo
   helm repo add keepalived-operator https://redhat-cop.github.io/keepalived-operator
