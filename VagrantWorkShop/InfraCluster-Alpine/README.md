@@ -1,29 +1,62 @@
-1. boot up 3 vms
+### 1. boot up 3 vms
    ```
    vagrant up
    ```
-2. Put vagrant private key into `$ENV:USERPROFILE\.ssh\`  
+### 2. Put vagrant private key into `$ENV:USERPROFILE\.ssh\`  
    ```powershell
-   $cnUri = "https://gitee.com/mirrors/vagrant/raw/main/keys/vagrant"
+   $giteeUri = "https://gitee.com/mirrors/vagrant/raw/main/keys/vagrant"
+   Invoke-WebRequest -Uri $giteeUri -OutFile "$ENV:USERPROFILE\.ssh\vagrant"
+   # or
    $githubUri = "https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant"
-   Invoke-WebRequest -Uri $cnUri -OutFile "$ENV:USERPROFILE\.ssh\vagrant"
+   Invoke-WebRequest -Uri $githubUri -OutFile "$ENV:USERPROFILE\.ssh\vagrant"
    ```
    
-3. use `k3sup` to deploy k3s cluster  
-   ref: [Kubernetes K3s Cluster Using K3sup Multi Master](https://blog.internetz.me/posts/kubernetes-k3s-cluster-using-k3sup-multi-master/)
+### 3. deploy k3s server cluster  
+   - use `k3sup`  
+     - ref: 
+     - [Kubernetes K3s Cluster Using K3sup Multi Master](https://blog.internetz.me/posts/kubernetes-k3s-cluster-using-k3sup-multi-master/)
    ```powershell
-   $NODE01IP="192.168.255.10"
-   $NODE01HOST="InfraCluster-Alpine1"
-   $NODE02IP="192.168.255.11"
-   $NODE03IP="192.168.255.12"
-   k3sup install --ip $NODE01IP --cluster --k3s-extra-args '--write-kubeconfig-mode 644' --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
-   k3sup join --ip $NODE02IP --server-ip $NODE01IP --server --k3s-extra-args '--write-kubeconfig-mode 644' --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
-   k3sup join --ip $NODE03IP --server-ip $NODE01IP --server --k3s-extra-args '--write-kubeconfig-mode 644' --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
+   $SVR01IP="192.168.255.10"
+   $SVR02IP="192.168.255.11"
+   $SVR03IP="192.168.255.12"
+   $extraArgs='--write-kubeconfig-mode 644 --disable traefik'
+
+   k3sup install --ip $SVR01IP --cluster --k3s-extra-args $extraArgs --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
+
+   k3sup join --ip $SVR02IP --server-ip $SVR01IP --server --k3s-extra-args $extraArgs --tls-san "solo.lab" --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
+
+   k3sup join --ip $SVR03IP --server-ip $SVR01IP --server --k3s-extra-args $extraArgs --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
+
    # or
-   k3sup join --ip $NODE02IP --server-host $NODE01HOST --server --k3s-extra-args '--write-kubeconfig-mode 644' --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
-   k3sup join --ip $NODE03IP --server-host $NODE01HOST --server --k3s-extra-args '--write-kubeconfig-mode 644' --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" 
+   $SVR01HOST="Svr-Alpine01"
+   $SVR02HOST="Svr-Alpine02"
+   $SVR03HOST="Svr-Alpine03"
+   $extraArgs='--write-kubeconfig-mode 644 --disable traefik --write-kubeconfig ~/.kube/config'
+
+   k3sup install --host $SVR01HOST --cluster --k3s-extra-args $extraArgs --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" --print-command
+
+   k3sup join --host $SVR02HOST --server-host $SVR01HOST --server --k3s-extra-args $extraArgs --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant" --print-command
+
+   k3sup join --host $SVR03HOST --server-host $SVR01HOST --server --k3s-extra-args $extraArgs --user vagrant --ssh-key "$ENV:USERPROFILE\.ssh\vagrant"  --print-command
    ```
-4. add KUBECONFIG env var to cluster nodes
+
+   - use shell
+   ```powershell
+   $SVR01HOST="Svr-Alpine01"
+   $SVR02HOST="Svr-Alpine02"
+   $SVR03HOST="Svr-Alpine03"
+   $extraArgs='--write-kubeconfig-mode 644 --disable traefik --write-kubeconfig ~/.kube/config --node-taint CriticalAddonsOnly=true:NoExecute'
+
+   ssh k3ssvr01 "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC='server --cluster-init --tls-san $($SVR01HOST) $($extraArgs)' INSTALL_K3S_CHANNEL='stable' sh -"
+
+   $token = ssh k3ssvr01 "sudo cat /var/lib/rancher/k3s/server/token"
+
+   ssh k3ssvr02 "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL='https://$($SVR01HOST):6443' K3S_TOKEN=$($token) INSTALL_K3S_CHANNEL='stable' INSTALL_K3S_EXEC='server --server https://$($SVR01HOST):6443' sh -s - $($extraArgs)"
+
+   ssh k3ssvr03 "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL='https://$($SVR01HOST):6443' K3S_TOKEN=$($token) INSTALL_K3S_CHANNEL='stable' INSTALL_K3S_EXEC='server --server https://$($SVR01HOST):6443' sh -s - $($extraArgs)"
+
+   ```
+<!-- 1. add KUBECONFIG env var to cluster nodes
    ```powershell
    @"
    k3snode01
@@ -33,4 +66,4 @@
       ssh $_ "cat /home/vagrant/.profile"
       # ssh $_ "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
    }
-   ```
+   ``` -->

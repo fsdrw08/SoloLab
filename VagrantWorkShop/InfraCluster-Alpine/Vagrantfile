@@ -17,19 +17,36 @@ Vagrant.configure("2") do |config|
   # config.vm.hostname = "InfraSvc-Alpine"
 
   (1..3).each do |i|
-    config.vm.define "InfraCluster-#{i}" do |box|
+    config.vm.define "Svr-Alpine0#{i}" do |box|
       box.vm.provider "hyperv" do |hv, config|
-        hv.vmname = "InfraCluster-Alpine#{i}"
-        hv.memory = 2048
+        hv.vmname = "Svr-Alpine0#{i}"
+        hv.memory = 1024
         hv.cpus = 2
       end
       box.vm.box = "alpinelinux315-g2"
-      box.vm.hostname = "InfraCluster-Alpine#{i}"
+      box.vm.hostname = "Svr-Alpine0#{i}"
       box.vm.network "private_network", bridge: "Internal Switch"
       # https://www.rehiy.com/post/295
       # https://github.com/alpinelinux/docker-alpine/issues/222
       # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
       box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
+      # box.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
+      box.vm.provision "shell", inline: "sudo reboot"
+    end
+    config.vm.define "Agent-Alpine0#{i}" do |box|
+      box.vm.provider "hyperv" do |hv, config|
+        hv.vmname = "Agent-Alpine0#{i}"
+        hv.memory = 1024
+        hv.cpus = 2
+      end
+      box.vm.box = "alpinelinux315-g2"
+      box.vm.hostname = "Agent-Alpine0#{i}"
+      box.vm.network "private_network", bridge: "Internal Switch"
+      # https://www.rehiy.com/post/295
+      # https://github.com/alpinelinux/docker-alpine/issues/222
+      # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
+      box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
+      # box.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
       box.vm.provision "shell", inline: "sudo reboot"
     end
   end
@@ -39,7 +56,7 @@ Vagrant.configure("2") do |config|
   config.ssh.insert_key = false
   # config.vm.provider "hyperv" do |hv, config|
     # hv.mac = "0000BABEFACE"
-    # hv.vmname = "InfraCluster-Alpine"
+    # hv.vmname = "Svr-Alpine"
     # hv.memory = 4096
     # hv.cpus = 4
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|

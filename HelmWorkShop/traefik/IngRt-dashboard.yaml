@@ -9,7 +9,7 @@ metadata:
 spec:
   entryPoints:
     - web
-    # - websecure
+    - websecure
   routes:
     # Hostname to match
     - match: Host(`solo.lab`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))

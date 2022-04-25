@@ -1,5 +1,7 @@
 # https://github.com/hellstrikes13/k8s-dex-ldap
 # https://github.com/fydrah/loginapp/blob/master/helm/loginapp/values.yaml
+# replicas: 3
+
 ingress:
   enabled: true
   annotations:

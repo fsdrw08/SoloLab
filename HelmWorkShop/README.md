@@ -72,9 +72,20 @@ Ref:
   - [Install cert-manager](https://cert-manager.io/docs/installation/helm/#4-install-cert-manager)
   ```
   helm install cert-manager jetstack/cert-manager \
-    --namespace cert-manager \
+    --namespace cert-manager --create-namespace \
     --set installCRDs=true \
-    --create-namespace
+    --set replicaCount=3 \
+    --set webhook.replicaCount=3 \
+    --set cainjector.replicaCount=3
+  ```
+  or update helm chart
+  ```
+  helm upgrade cert-manager jetstack/cert-manager `
+    --namespace cert-manager `
+    --set replicaCount=3 `
+    --set webhook.replicaCount=3 `
+    --set cainjector.replicaCount=3 `
+    --reuse-values
   ```
 
 - have a check  
@@ -119,19 +130,38 @@ Ref:
 
 - Create ca sign tls cert (solo.lab) in cert-manager namespace
   - Ref:
-    - [tls-sololab-certman.yaml](./cert-manager/tls-sololab-certman.yaml)
+    - [tls-sololab-certman.yaml](cert-manager/tls-sololab-certman.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-certman.yaml
   ```
 
 
-## Config traefik dashboard
+## Install traefik and config dashboard
+- Install traefik by helm
+  - Ref:
+    - [HelmWorkShop\traefik\values.yaml](traefik/values.yaml)
+  ```
+  # add traefik helm repo
+  helm repo add traefik https://helm.traefik.io/traefik
+  # Install traefik
+  helm install traefik traefik/traefik \
+    --namespace traefik --create-namespace \
+    -f /vagrant/HelmWorkShop/traefik/values.yaml \
+    --set deployment.replicas=3
+  ```
+  or upgrade traefik
+  ```
+  helm upgrade traefik traefik/traefik \
+    --namespace traefik \
+    -f /vagrant/HelmWorkShop/traefik/values.yaml
+  ```
+
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
   - Ref: 
     - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
-    - [/HelmWorkShop/traefik-dashboard/IngressRoute.yaml](traefik-dashboard/IngressRoute.yaml)
+    - [/HelmWorkShop/traefik/dashboard.yaml](traefik/dashboard.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/dashboard.yaml
   # or
   kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
   ```
@@ -139,14 +169,14 @@ Ref:
 - Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
   - Ref: 
     - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
-    - [/HelmWorkShop/traefik-dashboard/auth.yaml](traefik-dashboard/auth.yaml)
+    - [/HelmWorkShop/traefik/basicauth.yaml](traefik/basicauth.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/auth.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/basicauth.yaml
   # or
-  kubectl apply -f .\HelmWorkShop\traefik-dashboard\auth.yaml
+  kubectl apply -f .\HelmWorkShop\traefik\basicAuth.yaml
   ```
 
-- Add traefik providers.kubernetesingress.ingressclass  
+- (no need, already config in values.yaml)Add traefik providers.kubernetesingress.ingressclass  
   - Ref:  
     - [Customizing Packaged Components with HelmChartConfig](https://rancher.com/docs/k3s/latest/en/helm/#customizing-packaged-components-with-helmchartconfig)
     - [traefik ingressClass](https://doc.traefik.io/traefik/providers/kubernetes-ingress/#ingressclass)  
@@ -156,7 +186,7 @@ Ref:
     /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
   ```
 
-- Issue sololab tls cert in kube-system namespace (by cert-manager ca issuer)  
+- Issue sololab tls cert in traefik namespace (by cert-manager ca issuer)  
   - Ref:
     - [/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml](cert-manager/tls-sololab-kubesys.yaml)
   ```
@@ -165,9 +195,9 @@ Ref:
 
 - Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
   - Ref:  
-    - [/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml](traefik-dashboard/IngressRoute-update.yaml)
+    - [/HelmWorkShop/traefik/dashboardUpdate.yaml](traefik/dashboardUpdate.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/IngressRoute-update.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/dashboardUpdate.yaml
   ```
 
 - Update traefik helmchart config (for https redirect)  
@@ -182,6 +212,8 @@ Ref:
   ```
 
 - Add traefik stripperfix middleware
+  - Ref:
+    - []
   ```
   kubectl apply -f /vagrant/HelmWorkShop/traefik-middleware/traefik-stripprefixregex.yaml
   ```
@@ -210,19 +242,19 @@ Ref:
     - [dex/values.yaml](dex/values.yaml)
   ```
   helm install dex dex/dex \
-    --namespace dex \
-    --create-namespace \
-    --values /vagrant/HelmWorkShop/dex/values.yaml
+    --namespace dex --create-namespace \
+    --values /vagrant/HelmWorkShop/dex/values.yaml \
+    --set replicaCount=3
   ```
   - Or update the values
   ```
   helm upgrade dex dex/dex \
-    -f /vagrant/HelmWorkShop/dex/values.yaml \
-    --namespace dex
+    --namespace dex \
+    -f /vagrant/HelmWorkShop/dex/values.yaml
   # or
   helm upgrade dex dex/dex `
-    -f .\HelmWorkShop\dex\values.yaml `
-    --namespace dex
+    --namespace dex `
+    --set replicaCount=3 --reuse-values
   ```
   - Or uninstall the dex helm chart and delete dex namespace, then recreate again
   ```
@@ -276,16 +308,23 @@ Ref:
   # helm install
   helm install loginapp fydrah-stable/loginapp \
     --namespace dex \
-    --values /vagrant/HelmWorkShop/loginapp/values.yaml
+    --values /vagrant/HelmWorkShop/loginapp/values.yaml \
+    --set replicas=3
   ```
   or upgrade 
+  - ref: 
+    - [Understand helm upgrade flags — reset-values & reuse-values](https://medium.com/@kcatstack/understand-helm-upgrade-flags-reset-values-reuse-values-6e58ac8f127e)
   ```
   # update cert in values before apply it
   yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
   # helm upgrade
   helm upgrade loginapp fydrah-stable/loginapp \
   --namespace dex \
-  --values /vagrant/HelmWorkShop/loginapp/values.yaml
+  --values /vagrant/HelmWorkShop/loginapp/values.yaml 
+  # or 
+  helm upgrade loginapp fydrah-stable/loginapp \
+  --namespace dex \
+  --set replicas=3 --reuse-values 
   ```
 
 - add rbac for dex local staticPasswords account
@@ -349,8 +388,9 @@ Ref:
     - [HelmWorkShop/k8s-dashboard/values-new.yaml](k8s-dashboard/values-new.yaml)
   ```
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+    --namespace kube-dashboard --create-namespace --wait \
     -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
-    --namespace kube-dashboard --create-namespace --wait
+    --set replicaCount=3
   #or
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
     -f .\HelmWorkShop\k8s-dashboard\values-new.yaml `
@@ -359,8 +399,12 @@ Ref:
 - Or update the values
   ```
   helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
-    --namespace kube-dashboard
+    --namespace kube-dashboard \
+    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml
+  # or
+  helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
+    --namespace kube-dashboard `
+    --set replicaCount=3 --reuse-values 
   ```
 
 - Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  

@@ -1,6 +1,8 @@
 # https://github.com/dexidp/helm-charts/blob/master/charts/dex/values.yaml
 # https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
 # https://zhuanlan.zhihu.com/p/381755603
+# replicaCount: 3
+
 ingress:
   enabled: true
   # className: traefik

@@ -4,7 +4,8 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: dashboard
-  namespace: kube-system
+  namespace: traefik
+  # namespace: kube-system
 spec:
   entryPoints:
     - web

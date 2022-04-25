@@ -2,7 +2,8 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: solo.lab
-  namespace: kube-system
+  namespace: traefik
+  # namespace: kube-system
 spec:
   dnsNames:
     - solo.lab
