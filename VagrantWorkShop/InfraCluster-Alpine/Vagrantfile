@@ -17,38 +17,41 @@ Vagrant.configure("2") do |config|
   # config.vm.hostname = "InfraSvc-Alpine"
 
   (1..3).each do |i|
-    config.vm.define "Svr-Alpine0#{i}" do |box|
+    config.vm.define "Inf-Alpine0#{i}" do |box|
       box.vm.provider "hyperv" do |hv, config|
-        hv.vmname = "Svr-Alpine0#{i}"
-        hv.memory = 1024
+        hv.vmname = "Inf-Alpine0#{i}"
+        hv.memory = 768
         hv.cpus = 2
       end
       box.vm.box = "alpinelinux315-g2"
-      box.vm.hostname = "Svr-Alpine0#{i}"
+      box.vm.hostname = "Inf-Alpine0#{i}"
       box.vm.network "private_network", bridge: "Internal Switch"
       # https://www.rehiy.com/post/295
       # https://github.com/alpinelinux/docker-alpine/issues/222
       # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
       box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
+      box.vm.provision "file", source: "./0#{i}interfaces.conf", destination: "/home/vagrant/0#{i}interfaces"
       # box.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
+      box.vm.provision "shell", inline: "sudo cp /home/vagrant/0#{i}interfaces /etc/network/interfaces"
       box.vm.provision "shell", inline: "sudo reboot"
     end
-    config.vm.define "Agent-Alpine0#{i}" do |box|
-      box.vm.provider "hyperv" do |hv, config|
-        hv.vmname = "Agent-Alpine0#{i}"
-        hv.memory = 1024
-        hv.cpus = 2
-      end
-      box.vm.box = "alpinelinux315-g2"
-      box.vm.hostname = "Agent-Alpine0#{i}"
-      box.vm.network "private_network", bridge: "Internal Switch"
-      # https://www.rehiy.com/post/295
-      # https://github.com/alpinelinux/docker-alpine/issues/222
-      # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
-      box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
-      # box.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
-      box.vm.provision "shell", inline: "sudo reboot"
-    end
+    # config.vm.define "Agent-Alpine0#{i}" do |box|
+    #   box.vm.provider "hyperv" do |hv, config|
+    #     hv.vmname = "Agent-Alpine0#{i}"
+    #     hv.memory = 1024
+    #     hv.cpus = 2
+    #   end
+    #   box.vm.box = "alpinelinux315-g2"
+    #   box.vm.hostname = "Agent-Alpine0#{i}"
+    #   box.vm.network "private_network", bridge: "Internal Switch"
+    #   box.vm.network "private_network", ip: "192.168.225.2#{i}"
+    #   # https://www.rehiy.com/post/295
+    #   # https://github.com/alpinelinux/docker-alpine/issues/222
+    #   # https://dev.to/cloudx/why-openssh-8-8-cannot-find-a-host-key-type-if-ssh-rsa-is-provided-49i
+    #   box.vm.provision "shell", inline: "echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' >>/etc/ssh/sshd_config"
+    #   # box.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
+    #   box.vm.provision "shell", inline: "sudo reboot"
+    # end
   end
   # config.vm.network "private_network", bridge: "Internal Switch"
 

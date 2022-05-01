@@ -159,9 +159,9 @@ Ref:
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
   - Ref: 
     - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
-    - [/HelmWorkShop/traefik/dashboard.yaml](traefik/dashboard.yaml)
+    - [/HelmWorkShop/traefik/IngRt-dashboard.yaml](traefik/IngRt-dashboard.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/dashboard.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/IngRt-dashboard.yaml
   # or
   kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
   ```
@@ -169,9 +169,9 @@ Ref:
 - Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
   - Ref: 
     - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
-    - [/HelmWorkShop/traefik/basicauth.yaml](traefik/basicauth.yaml)
+    - [/HelmWorkShop/traefik/MW-basicauth.yaml](traefik/MW-basicauth.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/basicauth.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/MW-basicauth.yaml
   # or
   kubectl apply -f .\HelmWorkShop\traefik\basicAuth.yaml
   ```
@@ -195,9 +195,9 @@ Ref:
 
 - Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
   - Ref:  
-    - [/HelmWorkShop/traefik/dashboardUpdate.yaml](traefik/dashboardUpdate.yaml)
+    - [/HelmWorkShop/traefik/IngRt-dashboardUpdate.yaml](traefik/IngRt-dashboardUpdate.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/dashboardUpdate.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/IngRt-dashboardUpdate.yaml
   ```
 
 - Update traefik helmchart config (for https redirect)  
@@ -213,9 +213,9 @@ Ref:
 
 - Add traefik stripperfix middleware
   - Ref:
-    - []
+    - [/HelmWorkShop/traefik/MW-stripPrefixRegex.yaml](traefik/MW-stripPrefixRegex.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik-middleware/traefik-stripprefixregex.yaml
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/MW-stripPrefixRegex.yaml
   ```
 
 ## Install and config dex
@@ -338,7 +338,7 @@ Ref:
     - [How to Secure Your Kubernetes Cluster with OpenID Connect  and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#k3d)
     - [Set the time zone of your Kubernetes Pod together](https://qiita.com/ussvgr/items/0190bab3cc7d16c0116c) 
     - [How to Secure Your Kubernetes Cluster with OpenID Connect and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#kubeadm)
-  - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux), then restart the node  
+  - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux)  
   ```
   '--kube-apiserver-arg' \
   'oidc-issuer-url=https://solo.lab/dex' \
@@ -350,6 +350,10 @@ Ref:
   'oidc-username-claim=email' \
   '--kube-apiserver-arg' \
   'oidc-groups-claim=groups' \
+  ```
+  then restart the k3s service by
+  ```
+  /etc/init.d/k3s restart
   ```
    
 - ???unset kubectl config
@@ -521,9 +525,15 @@ Ref:
 
 ## Install pihole
 - Add mojo2600 helm repo
+  - Ref:
+    - [.\HelmWorkShop\pihole\values.yaml](pihole/values.yaml)
   ```
+  # add helm repo
   helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/
-  helm install pihole mojo2600/pihole -f /vagrant/HelmWorkShop/pihole/values.yaml
+  # install pihole
+  helm install pihole mojo2600/pihole \
+    --namespace pihole --create-namespace --wait \
+    -f /vagrant/HelmWorkShop/pihole/values.yaml
   ```
 
 

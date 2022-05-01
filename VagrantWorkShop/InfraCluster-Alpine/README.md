@@ -42,14 +42,15 @@
 
    - use shell
    ```powershell
-   $SVR01HOST="Svr-Alpine01"
-   $SVR02HOST="Svr-Alpine02"
-   $SVR03HOST="Svr-Alpine03"
-   $extraArgs='--write-kubeconfig-mode 644 --disable traefik --write-kubeconfig ~/.kube/config --node-taint CriticalAddonsOnly=true:NoExecute'
+   $SVR01HOST="Inf-Alpine01"
+   $SVR02HOST="Inf-Alpine02"
+   $SVR03HOST="Inf-Alpine03"
+   $TLSSAN="infra.solo.lab"
+   $extraArgs='--write-kubeconfig-mode 644 --disable traefik --write-kubeconfig ~/.kube/config'
 
-   ssh k3ssvr01 "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC='server --cluster-init --tls-san $($SVR01HOST) $($extraArgs)' INSTALL_K3S_CHANNEL='stable' sh -"
+   ssh $SVR01HOST "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC='server --cluster-init --tls-san $($TLSSAN) $($extraArgs)' INSTALL_K3S_CHANNEL='stable' sh -"
 
-   $token = ssh k3ssvr01 "sudo cat /var/lib/rancher/k3s/server/token"
+   $token = ssh $SVR01HOST "sudo cat /var/lib/rancher/k3s/server/token"
 
    ssh k3ssvr02 "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn K3S_URL='https://$($SVR01HOST):6443' K3S_TOKEN=$($token) INSTALL_K3S_CHANNEL='stable' INSTALL_K3S_EXEC='server --server https://$($SVR01HOST):6443' sh -s - $($extraArgs)"
 
