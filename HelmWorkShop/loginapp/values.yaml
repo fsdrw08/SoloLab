@@ -10,7 +10,7 @@ ingress:
     cert-manager.io/cluster-issuer: issuer-ca
     # https://www.ziji.work/ingress/traefik-route-traefik-middlewares-configure.html
     # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
   hosts:
     - host: solo.lab
       paths: 

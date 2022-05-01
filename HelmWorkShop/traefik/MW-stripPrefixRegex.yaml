@@ -2,7 +2,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: subpath-stripprefixregex
-  namespace: kube-system
+  namespace: traefik
 spec:
   stripPrefixRegex:
     regex:
