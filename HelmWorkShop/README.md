@@ -328,6 +328,8 @@ Ref:
   ```
 
 - add rbac for dex local staticPasswords account
+  - Ref:
+    - [.\HelmWorkShop\dex\RBAC.yaml](dex/RBAC.yaml)
   ```
   kubectl apply -f /vagrant/HelmWorkShop/dex/RBAC.yaml
   ```
@@ -524,7 +526,7 @@ Ref:
   ```
 
 ## Install pihole
-- Add mojo2600 helm repo
+- Install pihole by helm
   - Ref:
     - [.\HelmWorkShop\pihole\values.yaml](pihole/values.yaml)
   ```
@@ -533,6 +535,12 @@ Ref:
   # install pihole
   helm install pihole mojo2600/pihole \
     --namespace pihole --create-namespace --wait \
+    -f /vagrant/HelmWorkShop/pihole/values.yaml
+  ```
+- or upgrade upgrade
+  ```
+  helm upgrade pihole mojo2600/pihole \
+    --namespace pihole \
     -f /vagrant/HelmWorkShop/pihole/values.yaml
   ```
 
