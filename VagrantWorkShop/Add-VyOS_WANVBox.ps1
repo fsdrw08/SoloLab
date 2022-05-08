@@ -1,0 +1,1 @@
+vagrant box add VYOS130-WAN-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-vyos130_wan-hv-g2.box --force

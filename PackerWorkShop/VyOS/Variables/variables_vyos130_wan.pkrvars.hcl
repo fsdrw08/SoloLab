@@ -9,9 +9,9 @@ disk_additional_size=["150000"]
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
 // cd_files=[".\\extra\\files\\gen2-vyos130\\initialConfig.sh"]
 cd_files=[".\\extra\\files\\gen2-vyos130\\*"]
-switch_name="Internal Switch"
+switch_name="Default Switch"
 output_directory="output-vyos130"
-output_vagrant="../vbox/packer-vyos130-hv-g2.box"
+output_vagrant="../vbox/packer-vyos130_wan-hv-g2.box"
 vlan_id=""
 vagrantfile_template="./vagrant/hv_vyos130_g2.rb"
 ssh_username="vyos"
@@ -37,6 +37,6 @@ boot_command=["<wait3><enter><wait2><enter><wait2><enter>",
 "<wait30>vyos<enter>",
 "<wait3>vyos<enter>",
 "<wait3>sudo mount /dev/sr1 /mnt<enter>",
-"<wait3>sudo /mnt/initialConfig-full.sh<enter>",
+"<wait3>sudo /mnt/initialConfig-lite_wan.sh<enter>",
 "<wait5>sudo umount /mnt<enter>",
 ]
