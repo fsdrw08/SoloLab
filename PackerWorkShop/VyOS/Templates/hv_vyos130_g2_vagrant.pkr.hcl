@@ -126,6 +126,11 @@ source "hyperv-iso" "vm" {
   ssh_password          = "${var.ssh_password}"
   ssh_timeout           = "4h"
   switch_name           = "${var.switch_name}"
+  // Vyos identify the nic by mac address
+  // In oder fix the relationship between NIC and switch (e.g. eth0 for WAN, forever), 
+  // we need to bind MAC address to the NIC (eth0 by default), 
+  // if we dont bind the mac address to NIC, the vyos Hyper-V VM (vagrant) instance will have different MAC address each time (when run `vagrant up`)
+  // which means the WAN switch will connect to eth1 after the instance get created
   // if you want to change this mac address, also change in ../Vagrant/hv_vyos130_g2.tpl line 20
   mac_address           = "0000deadbeef"
   temp_path             = "."
