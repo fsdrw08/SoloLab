@@ -1,0 +1,25 @@
+# https://github.com/kube-vip/helm-charts/blob/main/charts/kube-vip/values.yaml
+image:
+  tag: "v0.4.4"
+
+config:
+  address: "192.168.255.10"
+
+# https://github.com/kube-vip/kube-vip/blob/main/docs/flags/index.md
+# https://thebsdbox.co.uk/2020/11/22/Kube-Vip-and-BGP-loadbalancers-with-Unifi/index.html
+# https://github.com/kube-vip/kube-vip/blob/092eb5423a3d630a3aca20d5582fe4ad551a9bb9/docs/hybrid/daemonset/index.md#bgp-example
+env:
+  vip_arp: "false"
+  vip_interface: "lo"
+  lb_port: "6443"
+  vip_cidr: "32"
+  cp_enable: "true"
+  cp_namespace: "kube-vip"
+  svc_enable: "true"
+
+  bgp_enable: "true"
+  bgp_as: "64513"
+  bgp_peeras: "64512"
+  bgp_peers: "192.168.255.1:64512::false"
+  # https://github.com/kube-vip/kube-vip/issues/163
+  bgp_routerinterface: "eth0"

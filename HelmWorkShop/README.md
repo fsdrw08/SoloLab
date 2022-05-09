@@ -52,6 +52,27 @@ Ref: [bash auto-completion on Linux
     sudo mkdir -p /etc/bash_completion.d
     kubectl completion bash >/etc/bash_completion.d/kubectl
     ```
+
+## Install kube-vip for control panel HA
+- Install kube-vip from helm
+  - Ref:
+    - [.\HelmWorkShop\kube-vip\values.yaml](kube-vip/values.yaml)
+  ```
+  helm repo add kube-vip https://kube-vip.io/helm-charts
+  helm install kube-vip kube-vip/kube-vip \
+    --namespace kube-system \
+    -f  /vagrant/HelmWorkShop/kube-vip/values.yaml
+  ```
+  - or upgrade
+  ```
+  helm upgrade kube-vip kube-vip/kube-vip \
+    --namespace kube-system \
+    -f  /vagrant/HelmWorkShop/kube-vip/values.yaml
+  ```
+  - have a check in router (vyos)
+  ```
+  show ip bgp
+  ```
 ## Install ansible awx on k3s
 Ref:  
 - https://github.com/kurokobo/awx-on-k3s  

@@ -152,7 +152,7 @@ gettar(){
 	rm -rf $clashdir/clash.service
 }
 #下载及安装
-installclash(){
+install(){
 echo -----------------------------------------------
 echo 开始从服务器获取安装文件！
 echo -----------------------------------------------
@@ -228,22 +228,22 @@ if [ -n "$clashdir" ];then
 	$echo "\033[32m覆盖安装时不会移除配置文件！\033[0m"
 	read -p "覆盖安装/卸载旧版本？(1/0) > " res
 	if [ "$res" = "1" ];then
-		installclash
+		install
 	elif [ "$res" = "0" ];then
 		rm -rf $clashdir
 		echo -----------------------------------------------
 		$echo "\033[31m 旧版本文件已卸载！\033[0m"
 		setdir
-		installclash
+		install
 	elif [ "$res" = "9" ];then
 		echo 测试模式，变更安装位置
 		setdir
-		installclash
+		install
 	else
 		$echo "\033[31m输入错误！已取消安装！\033[0m"
 		exit 1;
 	fi
 else
 	setdir
-	installclash
+	install
 fi
