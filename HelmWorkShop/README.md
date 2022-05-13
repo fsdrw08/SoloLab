@@ -60,18 +60,34 @@ Ref: [bash auto-completion on Linux
   ```
   helm repo add kube-vip https://kube-vip.io/helm-charts
   helm install kube-vip kube-vip/kube-vip \
-    --namespace kube-system \
+    --namespace kube-vip --create-namespace \
     -f  /vagrant/HelmWorkShop/kube-vip/values.yaml
   ```
   - or upgrade
   ```
   helm upgrade kube-vip kube-vip/kube-vip \
-    --namespace kube-system \
+    --namespace kube-vip \
     -f  /vagrant/HelmWorkShop/kube-vip/values.yaml
   ```
   - have a check in router (vyos)
   ```
   show ip bgp
+  ```
+
+## Install kube-vip-cloud-provider for service loadbalancer
+- Apply related config map first
+  - Ref:
+    - [.\HelmWorkShop\kube-vip-cloud-provider\CM-kubevip.yaml](kube-vip-cloud-provider/CM-kubevip.yaml) 
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/kube-vip-cloud-provider/CM-kubevip.yaml
+  ```
+- Install kube-vip-cloud-provider from helm
+  - Ref:
+    - [.\HelmWorkShop\kube-vip-cloud-provider\values.yaml](kube-vip-cloud-provider/values.yaml)
+  ```
+  helm install kube-vip-cloud-provider kube-vip/kube-vip-cloud-provider \
+    --namespace kube-vip \
+    -f /vagrant/HelmWorkShop/kube-vip-cloud-provider/values.yaml
   ```
 ## Install ansible awx on k3s
 Ref:  

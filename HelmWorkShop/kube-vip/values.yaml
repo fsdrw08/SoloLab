@@ -14,12 +14,15 @@ env:
   lb_port: "6443"
   vip_cidr: "32"
   cp_enable: "true"
-  cp_namespace: "kube-vip"
   svc_enable: "true"
 
   bgp_enable: "true"
+  # cluster side
   bgp_as: "64513"
+  # https://github.com/kube-vip/kube-vip/issues/163
+  # https://kube-vip.io/install_daemonset/#managing-a-routerid-as-a-daemonset
+  bgp_routerinterface: "eth0"
+
+  # router side
   bgp_peeras: "64512"
   bgp_peers: "192.168.255.1:64512::false"
-  # https://github.com/kube-vip/kube-vip/issues/163
-  bgp_routerinterface: "eth0"
