@@ -60,8 +60,8 @@ Ref: [bash auto-completion on Linux
   ```
   helm repo add kube-vip https://kube-vip.io/helm-charts
   helm install kube-vip kube-vip/kube-vip \
-    --namespace kube-vip --create-namespace \
-    -f  /vagrant/HelmWorkShop/kube-vip/values.yaml
+    -f  /vagrant/HelmWorkShop/kube-vip/values.yaml \
+    --namespace kube-vip --create-namespace
   ```
   - or upgrade
   ```
@@ -182,8 +182,8 @@ Ref:
   helm repo add traefik https://helm.traefik.io/traefik
   # Install traefik
   helm install traefik traefik/traefik \
-    --namespace traefik --create-namespace \
     -f /vagrant/HelmWorkShop/traefik/values.yaml \
+    --namespace traefik --create-namespace \
     --set deployment.replicas=3
   ```
   or upgrade traefik
