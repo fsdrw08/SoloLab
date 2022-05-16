@@ -12,21 +12,22 @@ ingress:
     # https://cert-manager.io/docs/usage/ingress/
     cert-manager.io/cluster-issuer: issuer-ca
   hosts:
-    - host: solo.lab
+    - host: infra.sololab
       paths:
         - path: /dex/
           pathType: ImplementationSpecific
   tls:
-    - secretName: solo.lab
+    - secretName: infra.sololab
       hosts:
-        - solo.lab
+        - infra.sololab
 
 # -- Application configuration.
 # See the [official documentation](https://dexidp.io/docs/).
 # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
 config:
-  issuer: https://solo.lab/dex
+  issuer: https://infra.sololab/dex
 
+  # https://dexidp.io/docs/storage/#configuration
   storage:
     type: kubernetes
     config:
@@ -63,14 +64,14 @@ config:
       secret: ZXhhbXBsZS1hcHAtc2VjcmV0
       name: "SoloLab Cluster"
       redirectURIs:
-      - https://solo.lab/sub-loginapp/callback
+      - https://infra.sololab/sub-loginapp/callback
       - https://core.harbor.lab/c/oidc/callback
       # - http://localhost:8000
 
   # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
   enablePasswordDB: true
   staticPasswords:
-  - email: "dexadmin@solo.lab"
+  - email: "dexadmin@infra.sololab"
   # echo $(echo password | htpasswd -BinC 10 dexadmin | cut -d: -f2)
   # https://httpd.apache.org/docs/current/programs/htpasswd.html
   # echo $(echo password | htpasswd -n -i -BC 10 dexadmin | cut -d: -f2)

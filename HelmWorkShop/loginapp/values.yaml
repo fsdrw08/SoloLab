@@ -12,14 +12,14 @@ ingress:
     # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
     traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
   hosts:
-    - host: solo.lab
+    - host: infra.sololab
       paths: 
         - path: /sub-loginapp/
           pathType: ImplementationSpecific
   tls:
-   - secretName: solo.lab
+   - secretName: infra.sololab
      hosts:
-       - solo.lab
+       - infra.sololab
 
 config:
   # Application name, defaults to Release name
@@ -41,7 +41,7 @@ config:
   #
   # 1. '{{ .Values.ingress.hosts[0].host }}/callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
   # 2. '{{ .Release.Name }}.{{ .Release.Namespace }}.svc:5555/callback'
-  clientRedirectURL: https://solo.lab/sub-loginapp/callback
+  clientRedirectURL: https://infra.sololab/sub-loginapp/callback
   # Issuer root CA configMap
   # ConfigMap containing the root CA
   # and key to use inside the configMap.
@@ -55,7 +55,7 @@ config:
   # not recommended in production
   issuerInsecureSkipVerify: true
   # Issuer url, should be same with config.issuer in dex values
-  issuerURL: "https://solo.lab/dex"
+  issuerURL: "https://infra.sololab/dex"
   # Include refresh token in request
   refreshToken: false
   tls:
@@ -66,7 +66,7 @@ config:
     # Secret name where certificates are stored
     # if empty and 'tls.enabled: true', generate self signed certificates
     # if not empty, use the kubernetes secret 'secretName' (type: kubernetes.io/tls)
-    secretName: solo.lab
+    secretName: infra.sololab
     # Self singed certificat DNS names
     # Example:
     #
@@ -76,8 +76,8 @@ config:
     altIPs: []
   # List of kubernetes clusters to add on web frontend
   clusters: 
-   - name: sololab
-     server: https://solo.lab:6443
+   - name: infra.sololab
+     server: https://infra.sololab:6443
      # ca information will replaced by yq command
      certificate-authority: |
        -----BEGIN CERTIFICATE-----

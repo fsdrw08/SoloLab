@@ -5,7 +5,7 @@
 extraArgs:
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md#login-view
   - --enable-skip-login
-  - --system-banner="Welcome to SoloLab"
+  - --system-banner="Welcome to Infra.SoloLab"
 
 ingress:
   ## If true, Kubernetes Dashboard Ingress will be created.
@@ -24,14 +24,14 @@ ingress:
     - /sub-k8sdashboard/
       # pathType: ImplementationSpecific
   hosts:
-    - solo.lab
+    - infra.sololab
   ## Kubernetes Dashboard Ingress TLS configuration
   ## Secrets must be manually created in the namespace
   ##
   tls:
-    - secretName: solo.lab
+    - secretName: infra.sololab
       hosts:
-        - solo.lab
+        - infra.sololab
 
 metricsScraper:                
   enabled: true

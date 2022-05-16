@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: infra.sololab
+  namespace: traefik
+  # namespace: kube-system
+spec:
+  dnsNames:
+    - infra.sololab
+  secretName: infra.sololab
+  issuerRef:
+    name: issuer-ca
+    kind: ClusterIssuer
