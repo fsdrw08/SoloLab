@@ -4,14 +4,16 @@ to install clash and config as transparnt proxy into the VYOS box, run following
 `bash -c "$(cat /tmp/install.sh)"  && source /etc/profile &> /dev/null`
 
 #or
-
-`mkdir ~/.local/share -p`
-`bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null`
-`source ~/.bashrc`
-`clash`
-`主路由`
-`bash ~/finalConfig.sh`
-
+```
+mkdir ~/.local/share -p
+bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
+# select 当前用户目录
+source ~/.bashrc
+clash
+# select 主路由
+bash ~/finalConfig.sh
+```
+then re-config the host ip
 settings for reuse
 ```
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start 192.168.255.10
