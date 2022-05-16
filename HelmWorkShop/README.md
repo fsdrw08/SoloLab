@@ -75,12 +75,6 @@ Ref: [bash auto-completion on Linux
   ```
 
 ## Install kube-vip-cloud-provider for service loadbalancer
-- Apply related config map first
-  - Ref:
-    - [.\HelmWorkShop\kube-vip-cloud-provider\CM-kubevip.yaml](kube-vip-cloud-provider/CM-kubevip.yaml) 
-  ```
-  kubectl apply -f /vagrant/HelmWorkShop/kube-vip-cloud-provider/CM-kubevip.yaml
-  ```
 - Install kube-vip-cloud-provider from helm
   - Ref:
     - [.\HelmWorkShop\kube-vip-cloud-provider\values.yaml](kube-vip-cloud-provider/values.yaml)
@@ -88,6 +82,13 @@ Ref: [bash auto-completion on Linux
   helm install kube-vip-cloud-provider kube-vip/kube-vip-cloud-provider \
     --namespace kube-vip \
     -f /vagrant/HelmWorkShop/kube-vip-cloud-provider/values.yaml
+  ```
+- Apply related config map
+  - Ref:
+    - [.\HelmWorkShop\kube-vip-cloud-provider\CM-kubevip.yaml](kube-vip-cloud-provider/CM-kubevip.yaml) 
+    - [statefulset config of env var KUBEVIP_NAMESPACE cannot take effect in the pod](https://github.com/kube-vip/kube-vip-cloud-provider/issues/35)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/kube-vip-cloud-provider/CM-kubevip.yaml -n kube-system
   ```
 ## Install ansible awx on k3s
 Ref:  
@@ -223,11 +224,11 @@ Ref:
     /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
   ```
 
-- Issue sololab tls cert in traefik namespace (by cert-manager ca issuer)  
+- Issue infra.sololab tls cert in traefik namespace (by cert-manager ca issuer)  
   - Ref:
-    - [/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml](cert-manager/tls-sololab-kubesys.yaml)
+    - [/HelmWorkShop/cert-manager/tls-infra.sololab-traefik.yaml](cert-manager/tls-infra.sololab-traefik.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-kubesys.yaml
+  kubectl apply -f /vagrant//HelmWorkShop/cert-manager/tls-infra.sololab-traefik.yaml
   ```
 
 - Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
@@ -380,7 +381,7 @@ Ref:
   - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux)  
   ```
   '--kube-apiserver-arg' \
-  'oidc-issuer-url=https://solo.lab/dex' \
+  'oidc-issuer-url=https://infra.sololab/dex' \
   '--kube-apiserver-arg' \
   'oidc-client-id=kubernetes' \
   '--kube-apiserver-arg' \
@@ -467,41 +468,6 @@ Ref:
   kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
   ```
 
-## Install kubelived
-- Install from helm, the clastix/kubelived helm chart had not public as a tar pack to the internet yet, after clone this submodule [.\HelmWorkSHop\keepalived\kubelived](keepalived/kubelived/), need to checkout to the related release tag first
-  ```
-  cd .\HelmWorkSHop\keepalived\kubelived
-  git checkout v0.3.0
-  helm install kubelived .\charts\kubelived `
-    --namespace kube-system
-  ```
-
-  ```
-  # add helm repo
-  helm repo add keepalived-operator https://redhat-cop.github.io/keepalived-operator
-
-  # install helm chart
-  helm install keepalived-operator keepalived-operator/keepalived-operator `
-    --create-namespace `
-    --namespace keepalived-operator `
-    -f .\HelmWorkShop\keepalived-operator\values.yaml
-  ```
-- Prepare secret for certs (copy secret solo.lab from other ns to this ns)
-  - Ref: 
-    - [/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml](keepalived-operator/keepalived-operator-certs.yaml)
-  ```
-  # fill out the keepalived-operator-certs.yaml
-  sed -i -e "/tls.crt:/s/$/$(kubectl get secret solo.lab -n dex -o jsonpath='{.data.tls\.crt}')/" \
-    -e "/tls.key:/s/$/$(kubectl get secret solo.lab -n dex -o jsonpath="{.data.tls\.key}")/" \
-    /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
-  
-  # have a check
-  cat /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
-
-  # apply the secret
-  kubectl apply -f /vagrant/HelmWorkShop/keepalived-operator/keepalived-operator-certs.yaml
-  ```
-
 ## Install open ldap
 - Install helm-openldap helm repo
   ```powershell
@@ -562,26 +528,6 @@ Ref:
   kubectl get pods --namespace cattle-system
   ```
 
-## Install pihole
-- Install pihole by helm
-  - Ref:
-    - [.\HelmWorkShop\pihole\values.yaml](pihole/values.yaml)
-  ```
-  # add helm repo
-  helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/
-  # install pihole
-  helm install pihole mojo2600/pihole \
-    --namespace pihole --create-namespace --wait \
-    -f /vagrant/HelmWorkShop/pihole/values.yaml
-  ```
-- or upgrade upgrade
-  ```
-  helm upgrade pihole mojo2600/pihole \
-    --namespace pihole \
-    -f /vagrant/HelmWorkShop/pihole/values.yaml
-  ```
-
-
 ## Install Longhorn
 - Add longhorn helm repo
   ```
@@ -590,10 +536,10 @@ Ref:
  
 - Install pre-request package  
   Ref:
-  - [Installation Requirements](https://longhorn.io/docs/latest/deploy/install/#installation-requirements)  
+  - [Installation Requirements](https://longhorn.io/docs/1.2.4/deploy/install/#installation-requirements)  
   - [AlpineLinux 3.8: Install open-iscsi for iSCSI initiator](https://www.hiroom2.com/2018/08/29/alpinelinux-3-8-open-iscsi-en/)
-  ```
-  sudo apk add bash curl findmnt blkid util-linux open-iscsi nfs-utils
+  ```shell
+  sudo apk add bash curl findmnt blkid util-linux open-iscsi nfs-utils jq
   sudo rc-update add iscsid
   sudo rc-service iscsid start
   ```
@@ -601,7 +547,7 @@ Ref:
 - Prepare mount root parition script  
   Ref:  
   - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
-  ```
+  ```shell
   sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
   #!/bin/ash
   mount --make-shared /
@@ -624,10 +570,18 @@ Ref:
 - Install Longhorn under namespace "longhorn-system"  
   Ref:
   - [Install with Helm](https://longhorn.io/docs/1.2.2/deploy/install/install-with-helm/)
+  - [.\HelmWorkShop\longhorn\values.yaml](longhorn/values.yaml)
   ```
+  helm repo add longhorn https://charts.longhorn.io
   helm install longhorn longhorn/longhorn \
     -f /vagrant/HelmWorkShop/longhorn/values.yaml \
     --namespace longhorn-system --create-namespace --wait
+  ```
+- or upgrade
+  ```
+  helm upgrade longhorn longhorn/longhorn \
+    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
+    --namespace longhorn-system 
   ```
 - Have a check
   ```
@@ -635,9 +589,12 @@ Ref:
   kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
   ```
 
+## Install powerdns
+
+```
 helm install <powerdnsadmin> halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
 kubectl get pods --namespace powerdns
-
+```
 browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
 create new user account
 ..
@@ -647,6 +604,28 @@ PDNS API KEY: <the string which show in ./powerdns/values .powerdns.API_KEY>
 kubectl describe pods powerdns-postgresql-0 --namespace powerdns
 
 helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.yaml
+
+
+## Install pihole
+- Install pihole by helm
+  - Ref:
+    - [.\HelmWorkShop\pihole\values.yaml](pihole/values.yaml)
+  ```
+  # add helm repo
+  helm repo add mojo2600 https://mojo2600.github.io/pihole-kubernetes/
+  # install pihole
+  helm install pihole mojo2600/pihole \
+    --namespace pihole --create-namespace --wait \
+    -f /vagrant/HelmWorkShop/pihole/values.yaml
+  ```
+- or upgrade upgrade
+  ```
+  helm upgrade pihole mojo2600/pihole \
+    --namespace pihole \
+    -f /vagrant/HelmWorkShop/pihole/values.yaml
+  ```
+
+
 
 kubectl describe pod -A
 kubectl get pods
