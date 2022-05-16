@@ -4,6 +4,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kubevip
-  namespace: kube-vip
+  # namespace: kube-vip
 data:
   cidr-global: 192.168.255.10/32
