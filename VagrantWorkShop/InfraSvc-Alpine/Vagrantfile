@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "alpinelinux314-g2"
+  config.vm.box = "alpinelinux315-g2"
 
   config.vm.hostname = "InfraSvc-Alpine"
 
@@ -20,11 +20,13 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "../../HelmWorkShop", "/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
 
+  config.ssh.insert_key = false
+
   config.vm.provider "hyperv" do |hv, config|
     # hv.mac = "0000BABEFACE"
     hv.vmname = "InfraSvc-Alpine"
-    hv.memory = 4096
-    hv.cpus = 4
+    hv.memory = 1024
+    hv.cpus = 2
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
     #   trigger.info = "Run-Dos2Unix"
     #   trigger.run = {inline: "./Run-Dos2Unix.ps1"}
@@ -35,13 +37,13 @@ Vagrant.configure("2") do |config|
   # for china
   # https://serverok.in/wget-print-content-to-screen#:~:text=wget%20print%20content%20to%20screen%20wget%20is%20used,this%2C%20you%20can%20replace%20wget%20command%20with%20curl.
   # config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | K3S_TOKEN=SECRET INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--cluster-init --write-kubeconfig-mode 644\" sh -"
-  config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644 --write-kubeconfig ~/.kube/config\" sh -"
+  config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644 --write-kubeconfig /home/vagrant/.kube/config\" sh -"
   # for other country
   # config.vm.provision "shell", inline: "wget -q -O /dev/stdout https://get.k3s.io | sh -s - --write-kubeconfig-mode 644"
   
   # add k3s config env
   # for alpine
-  config.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
+  # config.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
   # for others
   # config.vm.provision "shell", inline: "echo \"export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\" >> ~/.bashrc"
   
@@ -53,7 +55,7 @@ Vagrant.configure("2") do |config|
   # config.vm.provision "shell", inline: "sudo snap install helm --classic"
 
   # reboot for alpine
-  config.vm.provision "shell", inline: "sudo reboot"
+  # config.vm.provision "shell", inline: "sudo reboot"
   
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
