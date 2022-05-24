@@ -7,6 +7,8 @@ to install clash and config as transparnt proxy into the VYOS box, run following
 ```
 mkdir ~/.local/share -p
 bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
+# or 
+export url='http://shellclash.ga/' && wget -q -O /tmp/install.sh $url/install.sh  && bash -c "$(cat /tmp/install.sh)" && source /etc/profile &> /dev/null
 # select 当前用户目录
 source ~/.bashrc
 clash
