@@ -1,0 +1,19 @@
+# https://traefik.io/blog/traefik-proxy-kubernetes-101/
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik-dashboard
+spec:
+  type: ClusterIP
+  ports:
+  - name: traefik
+    port: 9000
+    targetPort: traefik
+    protocol: TCP
+  selector:
+    app.kubernetes.io/instance: traefik
+    app.kubernetes.io/name: traefik
