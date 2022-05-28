@@ -1,0 +1,14 @@
+# https://github.com/kingdonb/github-actions-demo/blob/main/scripts/patch-coredns.sh
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  sololab.server: |
+    infra.sololab {
+      hosts {
+        192.168.255.10  infra.sololab
+        fallthrough
+      }
+    }
