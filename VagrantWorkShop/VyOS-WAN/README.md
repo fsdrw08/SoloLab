@@ -3,8 +3,9 @@ to install clash and config as transparnt proxy into the VYOS box, run following
 `sudo su`
 `bash -c "$(cat /tmp/install.sh)"  && source /etc/profile &> /dev/null`
 
-#or
-```
+or
+
+```shell
 mkdir ~/.local/share -p
 bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
 # or 
@@ -15,9 +16,15 @@ clash
 # select 主路由
 bash ~/finalConfig.sh
 ```
+to config bgp, run below command in git-bash
+```shell
+ssh vyos < <location_of_this_repo>/VagrantWorkShop/VyOS-WAN/provisionConfig-BGP.sh
+```
+
+
 then re-config the host ip
 settings for reuse
-```
+```shell
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start 192.168.255.10
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop 192.168.255.250
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 dns-server 192.168.255.1
