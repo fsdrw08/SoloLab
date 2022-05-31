@@ -54,6 +54,8 @@ Ref: [bash auto-completion on Linux
     ```
 
 ## Install kube-vip for control panel HA
+- Before install kube-vip, confirm that the router(vyos in this case) had already configed related bgp peering  
+<br>
 - Install kube-vip from helm
   - Ref:
     - [.\HelmWorkShop\kube-vip\values.yaml](kube-vip/values.yaml)
@@ -405,10 +407,18 @@ Ref:
   kubectl config unset clusters.foobar-baz
   ```
 
-- login to https://solo.lab/sub-loginapp/ and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
+- login to https://infra.sololab/sub-loginapp/ and set with new config, put server CA cert under ~\.kube\sololab.crt, config kubectl:
   ```
   kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
+  ```
+- to switch kubectl context
+  ```
+  # list context
+  kubectl config get-contexts
 
+  # switch context (xxx means the name of the context)
+  kubectl config set-context xxx
+  ```
 ## Install Kubernetes Dashboard
 <!-- - Create name space
   ```
@@ -468,6 +478,22 @@ Ref:
   kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
   ```
 
+## Install kubeview
+- Install kubeview via helm
+  - Ref:
+    - [.\kubeview\values.yaml](kubeview/values.yaml)
+  ```
+  helm repo add kubeview https://benc-uk.github.io/kubeview/charts
+  helm install kubeview kubeview/kubeview \
+    --create-namespace --namespace kubeview \
+    --values /vagrant/HelmWorkShop/kubeview/values.yaml
+  ```
+  or upgrade
+  ```
+  helm upgrade kubeview kubeview/kubeview \
+    --namespace kubeview \
+    --values /vagrant/HelmWorkShop/kubeview/values.yaml
+  ```
 ## Install open ldap
 - Install helm-openldap helm repo
   ```powershell
