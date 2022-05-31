@@ -1,0 +1,20 @@
+# https://github.com/benc-uk/kubeview/blob/master/charts/kubeview/values.yaml
+
+ingress:
+  enabled: true
+  # className: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  #  kubernetes.io/tls-acme: true
+    # cert-manager.io/cluster-issuer: issuer-ca
+    # traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+  hosts:
+    # - host: kubeview.infra.sololab
+    - host: kubeview.solo.lab
+      paths: 
+        - path: /sub-kubeview/
+          pathType: ImplementationSpecific
+  # tls:
+  #  - secretName: kubeview.infra.sololab
+  #    hosts:
+  #      - kubeview.infra.sololab
