@@ -37,7 +37,8 @@ SSHDOPTS="-c openssh"
 NTPOPTS="-c chrony"
 
 # Use /dev/sda as a system disk
-DISKOPTS="-m sys /dev/sda"
+# https://wiki.alpinelinux.org/wiki/Alpine_setup_scripts#setup-disk
+DISKOPTS="-v -s 0 -m sys /dev/sda "
 
 # Do not setup in /media/sdb1
 # LBUOPTS="/media/sdb1"
