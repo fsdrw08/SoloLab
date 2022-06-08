@@ -1,0 +1,9 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: serverstransport-webui
+  namespace: powerdns
+
+spec:
+  serverName: "localhost.jrcs.net"
+  insecureSkipVerify: true

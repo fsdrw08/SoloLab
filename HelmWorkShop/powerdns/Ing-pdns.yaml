@@ -1,0 +1,23 @@
+# https://traefik.io/blog/traefik-proxy-kubernetes-101/
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: powerdns
+  namespace: powerdns
+  # namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: issuer-ca
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+spec:
+  rules:
+    - host: infra.sololab
+      http:
+        paths:
+          - path: /sub-powerdns
+            pathType: Prefix
+            backend:
+              service: 
+                name: powerdns-api
+                port:
+                  number: 8081

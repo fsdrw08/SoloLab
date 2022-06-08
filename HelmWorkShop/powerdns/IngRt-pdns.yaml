@@ -1,0 +1,19 @@
+# dashboard.yaml
+# https://github.com/traefik/traefik-helm-chart/tree/master/traefik
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingrt-pdns
+  namespace: powerdns
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    # Hostname to match
+    - match: Host(`infra.sololab`) && (PathPrefix(`/sub-powerdns`))
+      kind: Rule
+      # Service to redirect requests to
+      services:
+        - name: powerdns-powerdns-api@kubernetes
+          port: 8081

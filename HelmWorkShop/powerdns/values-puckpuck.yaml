@@ -1,5 +1,10 @@
 # https://github.com/puckpuck/helm-charts/blob/main/charts/powerdns/values.yaml
 
+# powerdns:
+#   api:
+#     key: PowerDNSAPI
+#   initDomains: []
+
 service:
   type: LoadBalancer
 
