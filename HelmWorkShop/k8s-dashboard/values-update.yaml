@@ -7,6 +7,10 @@ extraArgs:
   - --enable-skip-login
   - --system-banner="Welcome to Infra.SoloLab"
 
+service:
+  annotations:
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-dashboard-insecure-transport@kubernetescrd
+
 ingress:
   ## If true, Kubernetes Dashboard Ingress will be created.
   ##
@@ -32,6 +36,17 @@ ingress:
     - secretName: infra.sololab
       hosts:
         - infra.sololab
+
+# Global dashboard settings
+settings:
+  # Max number of items that can be displayed on each list page
+  itemsPerPage: 20
+  # Number of seconds between every auto-refresh of logs
+  logsAutoRefreshTimeInterval: 5
+  # Number of seconds between every auto-refresh of every resource. Set 0 to disable
+  resourceAutoRefreshTimeInterval: 5
+  # Hide all access denied warnings in the notification panel
+  disableAccessDeniedNotifications: false
 
 metricsScraper:                
   enabled: true
