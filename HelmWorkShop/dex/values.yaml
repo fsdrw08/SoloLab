@@ -2,6 +2,8 @@
 # https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
 # https://zhuanlan.zhihu.com/p/381755603
 # replicaCount: 3
+image:  
+  repository: dexidp/dex
 
 ingress:
   enabled: true
