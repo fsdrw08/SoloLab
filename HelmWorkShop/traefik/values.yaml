@@ -32,8 +32,8 @@ providers:
       enabled: true
     ingressClass: traefik
 
-additionalArguments:
-  - "--serversTransport.insecureSkipVerify=true"
+# additionalArguments:
+#   - "--serversTransport.insecureSkipVerify=true"
 
 # Logs
 # https://docs.traefik.io/observability/logs/

@@ -1,9 +1,0 @@
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: subpath-stripprefixregex
-  namespace: kube-system
-spec:
-  stripPrefixRegex:
-    regex:
-      - "/sub-[a-zA-Z0-9]{1,30}"

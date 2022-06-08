@@ -1,0 +1,48 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    rbac:
+      enabled: true
+
+    ports:
+      websecure:
+        tls:
+          enabled: true
+
+    podAnnotations:
+      prometheus.io/port: "8082"
+      prometheus.io/scrape: "true"
+
+    # Use ingressClass. Ignored if Traefik version < 2.3 / kubernetes < 1.18.x
+    ingressClass:
+      # true is not unit-testable yet, pending https://github.com/rancher/helm-unittest/pull/12
+      enabled: true
+      isDefaultClass: true
+      fallbackApiVersion: "v1"
+
+    providers:
+      kubernetesIngress:
+        publishedService:
+          enabled: true
+        # https://github.com/himynameisjonas/evil-exes/blob/9d9a30ca1881cef49eb0b4de7c222694670a59ae/cluster/apps/networking/traefik/helm-release.yaml#L51
+        ingressClass: traefik
+
+    priorityClassName: "system-cluster-critical"
+
+    image:
+      name: "rancher/mirrored-library-traefik"
+      tag: "2.6.2"
+
+    tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
