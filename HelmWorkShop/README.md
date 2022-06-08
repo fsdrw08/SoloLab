@@ -195,15 +195,22 @@ Ref:
     --namespace traefik \
     -f /vagrant/HelmWorkShop/traefik/values.yaml
   ```
+  for k3s build-in traefik upgrade
+  - Ref: https://phoenixnap.com/kb/helm-install-command#ftoc-heading-3
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/traefik/HelmChart-values.yaml
+  ```
 
 - Enable traefik dashboard, by defining and applying an IngressRoute CRD, must access with "/" at the end of url!  
   - Ref: 
     - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
     - [/HelmWorkShop/traefik/IngRt-dashboard.yaml](traefik/IngRt-dashboard.yaml)
-  ```
+  ```shell
   kubectl apply -f /vagrant/HelmWorkShop/traefik/IngRt-dashboard.yaml
-  # or
-  kubectl apply -f .\HelmWorkShop\traefik-dashboard\IngressRoute.yaml
+
+  # kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/Svc-traefik-dashboard.yaml
+
+  # kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/Ing-traefik-dashboard.yaml
   ```
 
 - Secure access to Traefik using basic auth (add secret and add traefik basic auth middleware point to that secret)  
@@ -302,6 +309,8 @@ Ref:
   kubectl delete namespace dex
   ```
 
+- After install dex, check will https://infra.sololab/dex/.well-known/openid-configuration
+
 - (no need? use ingress annotation to create ingress instead) Add ingress route for dex
   - Ref:
     - [还不会Traefik？看完这篇文章，你就彻底搞懂了~](https://z.itpub.net/article/detail/B4F2CC264BEB02610B23F8D0E9BA91FB)
@@ -366,6 +375,11 @@ Ref:
   --namespace dex \
   --set replicas=3 --reuse-values 
   ```
+- add coreDNS A record of issuer fqdn, "infra.sololab" in this case
+  - Ref: [.\coreDNS\CM-coredns-custom.yaml](coreDNS/CM-coredns-custom.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
+  ```
 
 - add rbac for dex local staticPasswords account
   - Ref:
@@ -380,7 +394,7 @@ Ref:
     - [How to Secure Your Kubernetes Cluster with OpenID Connect  and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#k3d)
     - [Set the time zone of your Kubernetes Pod together](https://qiita.com/ussvgr/items/0190bab3cc7d16c0116c) 
     - [How to Secure Your Kubernetes Cluster with OpenID Connect and RBAC](https://developer.okta.com/blog/2021/11/08/k8s-api-server-oidc#kubeadm)
-  - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux)  
+  - add following arg in /etc/init.d/k3s of all nodes(for k3s in apline linux):  `sudo vi /etc/init.d/k3s`  
   ```
   '--kube-apiserver-arg' \
   'oidc-issuer-url=https://infra.sololab/dex' \
@@ -395,7 +409,7 @@ Ref:
   ```
   then restart the k3s service by
   ```
-  /etc/init.d/k3s restart
+  sudo /etc/init.d/k3s restart
   ```
    
 - ???unset kubectl config
@@ -411,7 +425,10 @@ Ref:
   ```
   kubectl config set-cluster sololab --certificate-authority=~\.kube\sololab.crt --server=https://solo.lab:6443 --insecure-skip-tls-verify=false --embed-certs
   ```
+
 - to switch kubectl context
+  - ref: 
+    - [Kubectl List and Switch Context](https://linuxhint.com/kubectl-list-switch-context/)
   ```
   # list context
   kubectl config get-contexts
@@ -443,25 +460,43 @@ Ref:
   ```
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --namespace kube-dashboard --create-namespace --wait \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml \
+    -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml \
     --set replicaCount=3
   #or
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
-    -f .\HelmWorkShop\k8s-dashboard\values-new.yaml `
+    -f .\HelmWorkShop\k8s-dashboard\values.yaml `
     --namespace kube-dashboard --create-namespace --wait
   ```
-- Or update the values
+
+- Then visit [infra.sololab/sub-k8sdashboard/](https://infra.sololab/sub-k8sdashboard/) will found that `Internal Server Error`, check logs in kubernetes dashboard
+  ```
+  kubectl logs <pod name of kubernetes-dashboard> kubernetes-dashboard -n kube-dashboard
+  ```
+  found that there is a error  
+  ```
+  http: TLS handshake error from 10.42.0.27:58142: remote error: tls: bad certificate
+  ```
+  Which means traefik cannot pass http request package to kubernetes dashboard because traefik did not trust kubernetes dashboard's auto-gen cert, we have to bypass cert verify in traefik side, apply a traefik CRD object `ServersTransport`
+  - Ref:
+    - [traefik2-configure-dashboard.md](https://github.com/zeromake/zeromake.github.io/blob/9bef67eec4087c88491046880e88a01461d6349b/content/post/traefik2-configure-dashboard.md)
+    - [.\k8s-dashboard\ST-insecureSkipVerify.yaml](k8s-dashboard/ST-insecureSkipVerify.yaml)
+  ```
+  kubectl apply -f /vagrant/HelmWorkShop/k8s-dashboard/ST-insecureSkipVerify.yaml
+  ```
+
+- Update the helm chart values (add service annotations)
+  - Ref:
+    - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
+    - [Serverstransport not working with kubernetes ingress](https://community.traefik.io/t/serverstransport-not-working-with-kubernetes-ingress/12211)
+    - [kustomization.yaml](https://github.com/jtcressy/homelab/blob/11b9e43a8cb3e5aed3075049392f155440b095ad/nested-clusters/clusters/edge/kustomization.yaml#L46)
+    - [.\k8s-dashboard\values-update.yaml](k8s-dashboard/values-update.yaml)
   ```
   helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --namespace kube-dashboard \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-new.yaml
-  # or
-  helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
-    --namespace kube-dashboard `
-    --set replicaCount=3 --reuse-values 
+    -f /vagrant/HelmWorkShop/k8s-dashboard/values-update.yaml
   ```
-
-- Update traefik helmchart config (to disable TLS verification in Traefik by setting the "insecureSkipVerify" setting to "true".)  
+  
+- Or update traefik helmchart config (to disable TLS verification in Traefik(globally) by setting the "insecureSkipVerify" setting to "true".)  
   - Ref:  
     - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
     - [Internal Server Error with Traefik HTTPS backend on port 443](https://stackoverflow.com/questions/49412376/internal-server-error-with-traefik-https-backend-on-port-443)
@@ -478,7 +513,89 @@ Ref:
   kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
   ```
 
-## Install kubeview
+## Install Longhorn
+- Perpare the pre-request config
+  1. Install pre-request package  
+    - Ref:
+         - [Installation Requirements](https://longhorn.io/docs/1.2.4/deploy/install/#installation-requirements)  
+         - [AlpineLinux 3.8: Install open-iscsi for iSCSI initiator](https://www.hiroom2.com/2018/08/29/alpinelinux-3-8-open-iscsi-en/)
+  ```shell
+  sudo apk add bash curl findmnt blkid util-linux open-iscsi nfs-utils jq
+  sudo rc-update add iscsid
+  sudo rc-service iscsid start
+  ```
+
+  2. Prepare mount root parition script  
+    - Ref:  
+      - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
+  ```shell
+  sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
+  #!/bin/ash
+  mount --make-shared /
+  exit
+  EOF
+  ```
+
+  3.  Let the script run at startup (alpine linux / openrc)  
+    - Ref: 
+      - [Alpine Linux 常用命令](https://blog.csdn.net/ctwy291314/article/details/104634667)
+      - [How to run script at startup](https://lists.alpinelinux.org/~alpine/devel/%3CCAF-%2BOzABh_NPrTZ2oMFUKrsYmSE5obOadKTAth1HU5_OEZUxPQ%40mail.gmail.com%3E)
+      - [How to enable and start services on Alpine Linux](https://www.cyberciti.biz/faq/how-to-enable-and-start-services-on-alpine-linux/)
+  ```
+  sudo chmod +x /etc/local.d/make-shared.start
+  sudo rc-update add local boot
+  sudo rc-service local start
+  ```
+
+<!-- kubectl create namespace longhorn-system -->
+- Install Longhorn under namespace "longhorn-system"  
+  Ref:
+  - [Install with Helm](https://longhorn.io/docs/1.2.2/deploy/install/install-with-helm/)
+  - [.\HelmWorkShop\longhorn\values.yaml](longhorn/values.yaml)
+  ```
+  helm repo add longhorn https://charts.longhorn.io
+  helm install longhorn longhorn/longhorn \
+    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
+    --namespace longhorn-system --create-namespace --wait
+  ```
+- or upgrade
+  ```
+  helm upgrade longhorn longhorn/longhorn \
+    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
+    --namespace longhorn-system 
+  ```
+- Have a check
+  ```
+  kubectl get pods --namespace longhorn-system
+  kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
+  ```
+
+## Install powerdns
+- Install PowerDNS helm chart (puckpuck version)
+  - Ref:
+    - [.\powerdns\values-puckpuck.yaml](powerdns/values-puckpuck.yaml)
+  ```
+  helm repo add puckpuck https://puckpuck.github.io/helm-charts
+
+  helm install powerdns puckpuck/powerdns \
+    -f /vagrant/HelmWorkShop/powerdns/values-puckpuck.yaml \
+    --namespace powerdns --create-namespace --wait
+  
+  kubectl get pods --namespace powerdns
+  ```
+<!-- 
+browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
+create new user account
+..
+PDNS API URL: http://<the ip address shows in kubectl get services -n powerdns | grep powerdns-webserver>:<the port number shows in >
+PDNS API KEY: <the string which show in ./powerdns/values .powerdns.API_KEY>
+
+kubectl describe pods powerdns-postgresql-0 --namespace powerdns
+
+helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.yaml
+ -->
+
+## (optional) Install kubeview
 - Install kubeview via helm
   - Ref:
     - [.\kubeview\values.yaml](kubeview/values.yaml)
@@ -534,8 +651,6 @@ Ref:
   --namespace harbor
   ```
 
-
-
 ## Install Rancher
 - Add rancher helm repo  
   ```
@@ -553,83 +668,6 @@ Ref:
   kubectl -n cattle-system rollout status deploy/rancher
   kubectl get pods --namespace cattle-system
   ```
-
-## Install Longhorn
-- Add longhorn helm repo
-  ```
-  helm repo add longhorn https://charts.longhorn.io
-  ```
- 
-- Install pre-request package  
-  Ref:
-  - [Installation Requirements](https://longhorn.io/docs/1.2.4/deploy/install/#installation-requirements)  
-  - [AlpineLinux 3.8: Install open-iscsi for iSCSI initiator](https://www.hiroom2.com/2018/08/29/alpinelinux-3-8-open-iscsi-en/)
-  ```shell
-  sudo apk add bash curl findmnt blkid util-linux open-iscsi nfs-utils jq
-  sudo rc-update add iscsid
-  sudo rc-service iscsid start
-  ```
-
-- Prepare mount root parition script  
-  Ref:  
-  - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
-  ```shell
-  sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
-  #!/bin/ash
-  mount --make-shared /
-  exit
-  EOF
-  ```
-
-- Let the script run at startup (alpine linux / openrc)  
-  Ref: 
-  - [Alpine Linux 常用命令](https://blog.csdn.net/ctwy291314/article/details/104634667)
-  - [How to run script at startup](https://lists.alpinelinux.org/~alpine/devel/%3CCAF-%2BOzABh_NPrTZ2oMFUKrsYmSE5obOadKTAth1HU5_OEZUxPQ%40mail.gmail.com%3E)
-  - [How to enable and start services on Alpine Linux](https://www.cyberciti.biz/faq/how-to-enable-and-start-services-on-alpine-linux/)
-  ```
-  sudo chmod +x /etc/local.d/make-shared.start
-  sudo rc-update add local boot
-  sudo rc-service local start
-  ```
-
-<!-- kubectl create namespace longhorn-system -->
-- Install Longhorn under namespace "longhorn-system"  
-  Ref:
-  - [Install with Helm](https://longhorn.io/docs/1.2.2/deploy/install/install-with-helm/)
-  - [.\HelmWorkShop\longhorn\values.yaml](longhorn/values.yaml)
-  ```
-  helm repo add longhorn https://charts.longhorn.io
-  helm install longhorn longhorn/longhorn \
-    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
-    --namespace longhorn-system --create-namespace --wait
-  ```
-- or upgrade
-  ```
-  helm upgrade longhorn longhorn/longhorn \
-    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
-    --namespace longhorn-system 
-  ```
-- Have a check
-  ```
-  kubectl get pods --namespace longhorn-system
-  kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
-  ```
-
-## Install powerdns
-
-```
-helm install <powerdnsadmin> halkeye/powerdnsadmin -n powerdns -f /vagrant/HelmWorkShop/powerdns-admin/values.yaml
-kubectl get pods --namespace powerdns
-```
-browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
-create new user account
-..
-PDNS API URL: http://<the ip address shows in kubectl get services -n powerdns | grep powerdns-webserver>:<the port number shows in >
-PDNS API KEY: <the string which show in ./powerdns/values .powerdns.API_KEY>
-
-kubectl describe pods powerdns-postgresql-0 --namespace powerdns
-
-helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.yaml
 
 
 ## Install pihole
@@ -651,13 +689,13 @@ helm install <pgsql-pdnsadmin> bitnami/postgresql -f ./pgsql-pdnsadmin/values.ya
     -f /vagrant/HelmWorkShop/pihole/values.yaml
   ```
 
-
-
+```
 kubectl describe pod -A
 kubectl get pods
 kubectl logs <podname>
 kubectl exec -it <podname> -- /bin/bash
 kubectl get deploy -A
+```
 
 <!-- # add bitnami helm repo 
 helm repo add bitnami https://charts.bitnami.com/bitnami
