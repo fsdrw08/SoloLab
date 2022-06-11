@@ -1,1 +1,1 @@
-vagrant box add AlpineLinux315-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-alpine315-base-hv-g2.box
+vagrant box add AlpineLinux316-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-alpine316-base-hv-g2.box
