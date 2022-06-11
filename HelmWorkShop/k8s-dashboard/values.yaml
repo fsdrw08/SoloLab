@@ -43,8 +43,8 @@ settings:
   # Hide all access denied warnings in the notification panel
   disableAccessDeniedNotifications: false
 
-metricsScraper:                
-  enabled: true
+# metricsScraper:                
+#   enabled: true
 
 rbac:
   # The basic idea of the clusterReadOnlyRole
