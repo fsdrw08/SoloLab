@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns"
+    xmlns:config="http://www.suse.com/1.0/configns">
+    <general>
+        <mode>
+            <!-- Always confirm detected installation settings on svr -->
+            <confirm config:type="boolean">true</confirm>
+        </mode>
+    </general>
+    <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Partitioning -->
+    <!-- https://github.com/pief/yast-libvirt-import/blob/59e2bfea2f79333c5920fcfa49d6bb4a1240ea1f/test/autoinst.xml -->
+    <!-- https://github.com/thkukuk/demos/blob/172409e96182ec0119aad320027822eb1bb0f5b8/packer/http/autoyast-microos.xml -->
+    <!-- Locale settings -->
+    <keyboard>
+        <keymap>english-us</keymap>
+    </keyboard>
+    <language>
+        <language>en_US</language>
+        <languages/>
+    </language>
+    <timezone>
+        <hwclock>UTC</hwclock>
+        <timezone>Asia/Shanghai</timezone>
+    </timezone>
+
+    <!-- Partitioning and filesystems -->
+    <!-- <partitioning config:type="list">
+    <drive>
+      <use>all</use>
+      <partitions config:type="list">
+        <partition>
+          <partition_nr config:type="integer">1</partition_nr>
+          <partition_id config:type="integer">259</partition_id>
+          <create config:type="boolean">false</create>
+          <size>200MB</size>
+          <format config:type="boolean">true</format>
+          <filesystem config:type="symbol">vfat</filesystem>
+          <mount>/boot/efi</mount>
+        </partition>
+        <partition>
+          <mount>/</mount>
+          <size>8gb</size>
+        </partition>
+        <partition>
+          <filesystem config:type="symbol">btrfs</filesystem>
+          <mount>/var</mount>
+          <size>max</size>
+        </partition>
+      </partitions>
+    </drive>
+  </partitioning> -->
+
+    <!-- Software to install -->
+    <software>
+        <install_recommended config:type="boolean">false</install_recommended>
+        <kernel>kernel-default-base</kernel>
+        <patterns config:type="list">
+            <!-- <pattern>microos_base</pattern> -->
+            <pattern>container_runtime</pattern>
+        </patterns>
+    </software>
+
+    <!-- Bootloader configuration -->
+    <!-- <bootloader>
+    <global>
+      <activate>true</activate>
+      <secure_boot>true</secure_boot>
+    </global>
+    <loader_type>grub2-efi</loader_type>
+  </bootloader> -->
+
+    <!-- Networking configuration -->
+    <!-- <networking>
+    <dns>
+      <hostname>test</hostname>
+      <domain>domain</domain>
+      <dhcp_hostname config:type="boolean">false</dhcp_hostname>
+    </dns>
+    <net-udev config:type="list">
+      <rule>
+        <name>eth0</name>
+        <rule>KERNELS</rule>
+        <value>0000:00:03.0</value>
+      </rule>
+    </net-udev>
+  </networking> -->
+
+    <services-manager>
+        <default_target>multi-user</default_target>
+        <services>
+            <disable config:type="list">
+                <service>purge-kernels</service>
+            </disable>
+            <enable config:type="list">
+                <service>sshd</service>
+            </enable>
+        </services>
+    </services-manager>
+
+    <!-- Root user configuration -->
+    <users config:type="list">
+        <user>
+            <username>root</username>
+            <user_password>root</user_password>
+            <encrypted config:type="boolean">false</encrypted>
+        </user>
+        <user>
+            <username>vagrant</username>
+            <user_password>vagrant</user_password>
+            <authorized_keys config:type="list">
+                <authorized_key>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key</authorized_key>
+            </authorized_keys>
+        </user>
+    </users>
+</profile>
