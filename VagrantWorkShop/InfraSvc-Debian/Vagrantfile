@@ -12,29 +12,39 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "DEBIAN1100-G2"
-
-  config.vm.hostname = "InfraSvc-Debian"
-
-  config.vm.network "private_network", bridge: "Internal Switch"
-
-  config.vm.synced_folder "../../HelmWorkShop", "/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+  config.vm.box = "DEBIAN1130-G2"
 
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "InfraSvc-Debian"
-    hv.memory = 3072
-    hv.cpus = 4
+    hv.memory = 1024
+    hv.cpus = 2
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
     #   trigger.info = "Run-Dos2Unix"
     #   trigger.run = {inline: "./Run-Dos2Unix.ps1"}
     # end
   end
 
+  config.vm.network "private_network", bridge: "Internal Switch"
+
+  config.ssh.insert_key = false
+
+  config.vm.hostname = "InfraSvc-Debian"
+
+  config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+
+  # set static ip for this VM
+  # https://www.cyberciti.biz/faq/add-configure-set-up-static-ip-address-on-debianlinux/
+  config.vm.provision "file", source: "./interfaces.conf", destination: "/home/vagrant/interfaces"
+  config.vm.provision "shell", inline: "sudo cp /home/vagrant/interfaces /etc/network/interfaces"
+  
+  # set dns record for the cluster fqdn
+  config.vm.provision "shell", path: "Add-HostsResolve.sh"
+
   # https://github.com/kurokobo/awx-on-k3s
   # for china
   # https://serverok.in/wget-print-content-to-screen#:~:text=wget%20print%20content%20to%20screen%20wget%20is%20used,this%2C%20you%20can%20replace%20wget%20command%20with%20curl.
   # config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | K3S_TOKEN=SECRET INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--cluster-init --write-kubeconfig-mode 644\" sh -"
-  config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644\" sh -"
+  # config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644\" sh -"
   # for other country
   # config.vm.provision "shell", inline: "wget -q -O /dev/stdout https://get.k3s.io | sh -s - --write-kubeconfig-mode 644"
   
@@ -45,15 +55,15 @@ Vagrant.configure("2") do |config|
   # config.vm.provision "shell", inline: "echo \"export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\" >> ~/.bashrc"
   
   #config.vm.provision "shell", inline: "sudo swapoff -a && sudo rc-update add cgroups default"
+  
   # install helm
   # for alpine
   #config.vm.provision "shell", inline: "sudo apk add helm"
-  # for others
-  config.vm.provision "shell", inline: "sudo snap install helm --classic"
-  # config.vm.provision "shell", inline: "sudo apt install helm -y"
+  # for debian/ubuntu use nix
+  config.vm.provision "file", source: "./.config", destination: "/home/vagrant/"
 
-  # reboot for alpine
-  # config.vm.provision "shell", inline: "sudo reboot"
+  # reboot
+  config.vm.provision "shell", reboot: true
   
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
