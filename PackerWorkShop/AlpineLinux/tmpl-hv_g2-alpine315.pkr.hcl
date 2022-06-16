@@ -137,7 +137,7 @@ source "hyperv-iso" "vm" {
   ]
   generation            = 2
   guest_additions_mode  = "disable"
-  http_directory        = "./extra/files/gen2-alpine315"
+  http_directory        = "./http/alpine315"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
   memory                = "${var.memory}"

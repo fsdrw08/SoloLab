@@ -126,7 +126,7 @@ source "hyperv-iso" "vm" {
   ]
   generation            = 2
   guest_additions_mode  = "disable"
-  http_directory        = "./extra/files/gen2-alpine316"
+  http_directory        = "./http/alpine316"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
   memory                = "${var.memory}"
@@ -146,19 +146,19 @@ build {
   sources = ["source.hyperv-iso.vm"]
 
   provisioner "shell" {
-    script          = "./extra/files/gen2-alpine316/provision.sh"
+    script          = "./http/alpine316/provision.sh"
   }
 
   post-processors {
     post-processor "vagrant" {
-      keep_input_artifact  = true
+      keep_input_artifact  = false
       output               = "${var.output_vagrant}"
       vagrantfile_template = "${var.vagrantfile_template}"
     }
 
-    post-processor "checksum" {
-      checksum_types = [ "md5", "sha512" ]
-      keep_input_artifact = true
+    // post-processor "checksum" {
+    //   checksum_types = [ "md5", "sha512" ]
+    //   keep_input_artifact = true
     }
   }
 }

@@ -1,3 +1,11 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [ValidateSet('315','316')]
+    [int16]
+    $AlpineVersion
+)
+
 #Verify the pre-request
 @"
 packer
@@ -15,9 +23,9 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\templates\hv_alpine316_base_g2_vagrant.pkr.hcl"
-  $var_file="$PSScriptRoot\variables\variables_alpine316_base.pkrvars.hcl"
-  $machine="Alpine 3.16"
+  $template_file="$PSScriptRoot\tmpl-hv_g2-alpine$AlpineVersion.pkr.hcl"
+  $var_file="$PSScriptRoot\vars-alpine$AlpineVersion.pkrvars.hcl"
+  $machine="Alpine $AlpineVersion"
   $packer_log=0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
