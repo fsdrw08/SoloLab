@@ -17,11 +17,6 @@ variable "disk_size" {
   default = "70000"
 }
 
-variable "disk_additional_size" {
-  type    = list(number)
-  default = ["1024"]
-}
-
 variable "memory" {
   type    = string
   default = "1024"
@@ -105,7 +100,7 @@ source "hyperv-iso" "vm" {
   iso_url               = "${var.iso_url}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
-  shutdown_command      = "shutdown -h now"
+  shutdown_command      = "sudo shutdown -h now"
   shutdown_timeout      = "30m"
   ssh_password          = "vagrant"
   ssh_timeout           = "4h"
@@ -127,8 +122,8 @@ build {
   // }
 
   post-processor "vagrant" {
-    keep_input_artifact  = true
+    keep_input_artifact  = false
     output               = "${var.output_vagrant}"
-    // vagrantfile_template = "${var.vagrantfile_template}"
+    vagrantfile_template = "${var.vagrantfile_template}"
   }
 }

@@ -1,3 +1,11 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [ValidateSet('leap','leap_micro')]
+    [string]
+    $Distro
+)
+
 #Verify the pre-request
 @"
 packer
@@ -25,9 +33,9 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\OpenSUSE-leap-micro_base_g2_vagrant.pkr.hcl"
-  $var_file="$PSScriptRoot\variables_opensuse-tumbleweed.pkrvars.hcl"
-  $machine="opensuse-leap-micro"
+  $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
+  $var_file="$PSScriptRoot\vars-openSUSE_$Distro.pkrvars.hcl"
+  $machine="openSUSE_$Distro-g2"
   $packer_log=0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {

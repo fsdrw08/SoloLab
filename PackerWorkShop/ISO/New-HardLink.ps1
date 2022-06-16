@@ -1,15 +1,11 @@
 @"
 $env:USERPROFILE\Downloads\ISO\vyos-1.3.0-rc6-amd64.iso
 $env:USERPROFILE\Downloads\ISO\vyos-1.3.0-epa3-amd64.iso
-$env:USERPROFILE\Downloads\ISO\AlmaLinux-8.4-x86_64-dvd.iso
-$env:USERPROFILE\Downloads\ISO\ubuntu-20.04.2-live-server-amd64.iso
-$env:USERPROFILE\Downloads\ISO\alpine-virt-3.16.0-x86_64.iso
-$env:USERPROFILE\Downloads\ISO\debian-10.10.0-amd64-DVD-1.iso
 $env:USERPROFILE\Downloads\ISO\openSUSE-Tumbleweed-DVD-x86_64-Snapshot20210810-Media.iso
-$env:USERPROFILE\Downloads\ISO\debian-11.0.0-amd64-netinst.iso
-$env:USERPROFILE\Downloads\ISO\fedora-coreos-34.20210808.3.0-live.x86_64.iso
-$env:USERPROFILE\Downloads\ISO\Fedora-Server-dvd-x86_64-34-1.2.iso
+$env:USERPROFILE\Downloads\ISO\debian-11.3.0-amd64-netinst.iso
+$env:USERPROFILE\Downloads\ISO\debian-11.3.0-amd64-DVD-1.iso
 $env:USERPROFILE\Downloads\ISO\openSUSE-Leap-Micro-5.2-DVD-x86_64-Build38.1-Media.iso
+$env:USERPROFILE\Downloads\ISO\openSUSE-Leap-15.4-DVD-x86_64-Build243.2-Media.iso
 "@ -split "`r`n" | ForEach-Object {
     # $_.lastindexof("\")
     if (Test-Path $_) {

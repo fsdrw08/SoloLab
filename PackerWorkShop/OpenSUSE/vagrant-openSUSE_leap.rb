@@ -4,10 +4,10 @@
 Vagrant.require_version ">= 1.6.2"
 
 Vagrant.configure("2") do |config|
-    config.vm.define "vagrant-opensuse-leap-micro"
-    config.vm.box = "opensuse-leap-micro"
+    config.vm.define "vagrant-opensuse-leap"
+    config.vm.box = "opensuse-leap"
     config.vm.communicator = "ssh"
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: "true"
+    config.vm.synced_folder ".", "/var/vagrant", type: "rsync", disabled: "true"
 
     # Admin user name and password
      config.ssh.username = "vagrant"

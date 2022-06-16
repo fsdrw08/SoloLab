@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns"
+  xmlns:config="http://www.suse.com/1.0/configns">
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Partitioning -->
+  <!-- https://github.com/pief/yast-libvirt-import/blob/59e2bfea2f79333c5920fcfa49d6bb4a1240ea1f/test/autoinst.xml -->
+  <!-- https://github.com/thkukuk/demos/blob/172409e96182ec0119aad320027822eb1bb0f5b8/packer/http/autoyast-microos.xml -->
+  <!-- https://github.com/microsoft/lis-test/blob/022946b67c2d9000fcedbd1195af961caf6470d7/WS2012R2/lisa/Infrastructure/PXE/autoinstGen2.xml -->
+  <bootloader>
+    <global>
+      <generic_mbr>true</generic_mbr>
+      <gfxmode>auto</gfxmode>
+      <hiddenmenu>false</hiddenmenu>
+      <os_prober>false</os_prober>
+      <terminal>gfxterm</terminal>
+      <timeout config:type="integer">5</timeout>
+    </global>
+    <loader_type>grub2-efi</loader_type>
+  </bootloader>
+  <general>
+    <mode>
+      <!-- Always confirm detected installation settings on svr -->
+      <confirm config:type="boolean">false</confirm>
+    </mode>
+  </general>
+
+  <!-- Locale settings -->
+  <keyboard>
+    <keymap>english-us</keymap>
+  </keyboard>
+  <language>
+    <language>en_US</language>
+    <languages/>
+  </language>
+  <timezone>
+    <hwclock>UTC</hwclock>
+    <timezone>Asia/Shanghai</timezone>
+  </timezone>
+
+  <!-- Partitioning and filesystems -->
+  <partitioning config:type="list">
+    <drive>
+      <use>all</use>
+      <partitions config:type="list">
+        <partition>
+          <mount>/boot/efi</mount>
+          <size>200mb</size>
+          <partition_id config:type="integer">1</partition_id>
+          <filesystem config:type="symbol">vfat</filesystem>
+        </partition>
+        <partition>
+          <mount>/</mount>
+          <size>8gb</size>
+        </partition>
+        <partition>
+          <filesystem config:type="symbol">btrfs</filesystem>
+          <mount>/var</mount>
+          <size>max</size>
+        </partition>
+      </partitions>
+    </drive>
+  </partitioning>
+
+  <!-- repo config? -->
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <alias>repo-main</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap-micro/5.2/product/repo/Leap-Micro-5.2-x86_64-Media/</media_url>
+        <name>Leap Micro Main Repository tuna</name>
+      </listentry>
+      <!-- <listentry>
+        <alias>openSUSE-Leap-Micro-5.2-1</alias>
+        <media_url>cd:/?devices=/dev/sr0</media_url>
+        <name>Leap Micro Main Repository tuna</name>
+      </listentry> -->
+      <!-- <listentry>
+        <name>repo-oss</name>
+        <alias>tumbleweed-tuna-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/</media_url>
+      </listentry>
+      <listentry>
+        <name>repo-non-oss</name>
+        <alias>tumbleweed-tuna-non-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/</media_url>
+      </listentry> -->
+    </add_on_products>
+  </add-on>
+
+  <!-- Software to install -->
+  <software>
+    <products config:type="list">
+      <product>Leap-Micro</product>
+    </products>
+    <install_recommended config:type="boolean">true</install_recommended>
+    <kernel>kernel-default-base</kernel>
+    <packages config:type="list">
+      <package>rsync</package>
+      <package>open-iscsi</package>
+    </packages>
+    <patterns config:type="list">
+      <pattern>microos-base</pattern>
+      <pattern>microos-container_runtime</pattern>
+      <pattern>microos-selinux</pattern>
+      <pattern>microos-cockpit</pattern>
+    </patterns>
+  </software>
+
+  <!-- Networking configuration -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Network -->
+  <networking>
+    <dhcp_options>
+      <dhclient_client_id/>
+      <dhclient_hostname_option>AUTO</dhclient_hostname_option>
+    </dhcp_options>
+    <dns>
+      <hostname>openSUSE-Leap-Micro</hostname>
+      <dhcp_hostname config:type="boolean">true</dhcp_hostname>
+      <resolv_conf_policy>auto</resolv_conf_policy>
+      <write_hostname config:type="boolean">false</write_hostname>
+    </dns>
+    <interfaces config:type="list">
+      <interface>
+        <bootproto>dhcp</bootproto>
+        <device>eth0</device>
+        <dhclient_set_default_route>yes</dhclient_set_default_route>
+        <startmode>auto</startmode>
+      </interface>
+      <interface>
+        <bootproto>static</bootproto>
+        <device>lo</device>
+        <firewall>no</firewall>
+        <ipaddr>127.0.0.1</ipaddr>
+        <netmask>255.0.0.0</netmask>
+        <network>127.0.0.0</network>
+        <prefixlen>8</prefixlen>
+        <startmode>nfsroot</startmode>
+        <usercontrol>no</usercontrol>
+      </interface>
+    </interfaces>
+    <ipv6 config:type="boolean">true</ipv6>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+    <setup_before_proposal config:type="boolean">true</setup_before_proposal>
+    <managed config:type="boolean">false</managed>
+    <routing>
+      <ipv4_forward config:type="boolean">false</ipv4_forward>
+      <ipv6_forward config:type="boolean">false</ipv6_forward>
+    </routing>
+  </networking>
+
+  <!-- firewall -->
+  <firewall>
+    <enable_firewall config:type="boolean">false</enable_firewall>
+    <start_firewall config:type="boolean">false</start_firewall>
+  </firewall>
+
+  <!-- service -->
+  <services-manager>
+    <default_target>multi-user</default_target>
+    <services>
+      <!-- <disable config:type="list">
+        <service>purge-kernels</service>
+      </disable> -->
+      <enable config:type="list">
+        <service>sshd</service>
+      </enable>
+    </services>
+  </services-manager>
+
+  <!-- Root user configuration -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#Configuration-Security-users-and-groups -->
+  <users config:type="list">
+    <user>
+      <username>root</username>
+      <user_password>root</user_password>
+      <encrypted config:type="boolean">false</encrypted>
+    </user>
+    <user>
+      <username>vagrant</username>
+      <user_password>vagrant</user_password>
+      <uid>1000</uid>
+      <authorized_keys config:type="list">
+        <authorized_key>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key</authorized_key>
+      </authorized_keys>
+    </user>
+  </users>
+
+  <!-- create vagrant user group, add user vagrant into this group, for vagrant rsync -->
+  <groups config:type="list">
+    <group>
+      <gid>1000</gid>
+      <groupname>vagrant</groupname>
+      <userlist>vagrant</userlist>
+    </group>
+  </groups>
+
+  <!-- config vagrant user root permission -->
+  <!-- https://github.com/dweomer/vagrantry/blob/40bc6353995034d624c2ea2b0b42ddcf506aafbc/distro/tumbleweed/microos/http/libvirt/autoinst.xml#L270 -->
+  <files config:type="list">
+    <file>
+      <file_path>/etc/sudoers.d/vagrant</file_path>
+      <file_contents>
+<![CDATA[vagrant ALL=(ALL) NOPASSWD: ALL
+]]>
+      </file_contents>
+      <file_owner>root.root</file_owner>
+      <file_permissions>440</file_permissions>
+    </file>
+  </files>
+    
+  <!-- https://www.suse.com/support/kb/doc/?id=000018830 -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#id-1.3.5.2.21.10 -->
+  <kdump>
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+  </kdump>
+
+
+  <scripts>
+    <chroot-scripts config:type="list">
+      <script>
+        <chrooted config:type="boolean">true</chrooted>
+        <filename>sshd_config.sh</filename>
+        <interpreter>shell</interpreter>
+        <source><![CDATA[
+sed -i -e 's|*.UseDNS.*|UseDNS no|g' /etc/ssh/sshd_config
+sed -i -e 's|*.PermitRootLogin.*|PermitRootLogin no|g' /etc/ssh/sshd_config
+]]>
+        </source>
+      </script>
+    </chroot-scripts>
+  </scripts>
+</profile>
