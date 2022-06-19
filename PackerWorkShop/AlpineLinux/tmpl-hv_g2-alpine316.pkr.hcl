@@ -7,9 +7,9 @@ variable "alpine_version" {
   type    = string
 }
 
-// variable "boot_command" {
-//   type    = list(string)
-// }
+variable "boot_command" {
+  type    = list(string)
+}
 
 variable "configuration_version" {
   type    = string
@@ -100,18 +100,7 @@ variable "vm_name" {
 }
 
 source "hyperv-iso" "vm" {
-  boot_command          = ["root<enter><wait5>",
-    "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
-    "wget -qO- http://{{ .HTTPIP }}:{{ .HTTPPort }}/install.sh | ash<enter><wait180>",
-    "root<enter><wait5>",
-    "root<enter><wait5>",
-    "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
-    "apk add hvtools dhclient<enter><wait10>",
-    "rc-update add hv_fcopy_daemon && rc-service hv_fcopy_daemon start<enter><wait>",
-    "rc-update add hv_kvp_daemon && rc-service hv_kvp_daemon start<enter><wait>",
-    "rc-update add hv_vss_daemon && rc-service hv_vss_daemon start<enter><wait>",
-    "exit<enter>"
-  ]
+  boot_command          = "${var.boot_command}"
   boot_wait             = "10s"
   communicator          = "ssh"
   configuration_version = "${var.configuration_version}"
@@ -159,6 +148,6 @@ build {
     // post-processor "checksum" {
     //   checksum_types = [ "md5", "sha512" ]
     //   keep_input_artifact = true
-    }
+    // }
   }
 }

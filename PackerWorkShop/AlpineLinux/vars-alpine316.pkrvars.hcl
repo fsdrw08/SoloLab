@@ -10,6 +10,19 @@ switch_name="Internal Switch"
 output_directory="output-alpine316-base"
 output_vagrant="../vbox/packer-alpine316-base-hv-g2.box"
 vlan_id=""
-vagrantfile_template="./vagrant/hv_alpine316_g2.rb"
+vagrantfile_template="./vagrant-alpine316.rb"
 alpine_version="3.16"
 mirror="https://mirrors.tuna.tsinghua.edu.cn/alpine/"
+boot_command=[
+    "root<enter><wait5>",
+    "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
+    "wget -qO- http://{{ .HTTPIP }}:{{ .HTTPPort }}/install.sh | ash<enter><wait120>",
+    "root<enter><wait5>",
+    "root<enter><wait5>",
+    "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
+    "apk add hvtools dhclient<enter><wait10>",
+    "rc-update add hv_fcopy_daemon && rc-service hv_fcopy_daemon start<enter><wait>",
+    "rc-update add hv_kvp_daemon && rc-service hv_kvp_daemon start<enter><wait>",
+    "rc-update add hv_vss_daemon && rc-service hv_vss_daemon start<enter><wait>",
+    "exit<enter>"
+]

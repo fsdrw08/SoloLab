@@ -27,7 +27,7 @@ DISKOPTS="-s 0 -m sys $boot_device"
 EOF
 ERASE_DISKS="$boot_device" setup-alpine -e -f $PWD/answers
 
-# force the firmware to boot from disk.
+# force the firmware to boot from disk. no need for hyper-v
 # if [ "$firmware" == 'uefi' ]; then
 #     echo "apk add efibootmgr"
 #     apk add efibootmgr

@@ -59,7 +59,7 @@ apk add nfs-utils
 # install vim.
 apk add vim
 
-# install vim.
+# install rsync.
 apk add rsync
 
 # disable the DNS reverse lookup on the SSH server. this stops it from
