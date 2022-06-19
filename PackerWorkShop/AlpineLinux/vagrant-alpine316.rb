@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "vagrant-alpinelinux316"
     config.vm.box = "alpinelinux316"
     config.vm.communicator = "ssh"
-    config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: "true"
+    config.vm.synced_folder ".", "/var/vagrant", type: "rsync", disabled: "true"
     config.ssh.shell = 'ash'
     
     # Admin user name and password

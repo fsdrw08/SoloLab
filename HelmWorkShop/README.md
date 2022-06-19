@@ -110,13 +110,19 @@ Ref:
 - Install cert-manager and create related namespace via Helm chart  
   Ref: 
   - [Install cert-manager](https://cert-manager.io/docs/installation/helm/#4-install-cert-manager)
-  ```
+  ```shell
   helm install cert-manager jetstack/cert-manager \
     --namespace cert-manager --create-namespace \
     --set installCRDs=true \
     --set replicaCount=3 \
     --set webhook.replicaCount=3 \
     --set cainjector.replicaCount=3
+
+  # or
+  helm pull jetstack/cert-manager 
+  helm install cert-manager /var/vagrant/HelmWorkShop/charts/Artifacts/cert-manager-v1.8.1.tgz \
+    --namespace cert-manager --create-namespace \
+    --set installCRDs=true 
   ```
   or update helm chart
   ```
@@ -154,25 +160,25 @@ Ref:
   # switch to root first
   sudo su
   # prase the key info
-  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
   # have a check
-  cat /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  cat /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
   # apply it
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
   ```
 
 - Create k3s ca cluster issuer
   - Ref: 
     - [issuer-ca.yaml](cert-manager/issuer-ca.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/issuer-ca.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/cert-manager/issuer-ca.yaml
   ```
 
-- Create ca sign tls cert (solo.lab) in cert-manager namespace
+- Create ca sign tls cert (infra.sololab) in cert-manager namespace
   - Ref:
     - [tls-sololab-certman.yaml](cert-manager/tls-sololab-certman.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/cert-manager/tls-sololab-certman.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/cert-manager/tls-sololab-certman.yaml
   ```
 
 
@@ -185,15 +191,15 @@ Ref:
   helm repo add traefik https://helm.traefik.io/traefik
   # Install traefik
   helm install traefik traefik/traefik \
-    -f /vagrant/HelmWorkShop/traefik/values.yaml \
     --namespace traefik --create-namespace \
+    -f /var/vagrant/HelmWorkShop/traefik/values.yaml  \
     --set deployment.replicas=3
   ```
   or upgrade traefik
   ```
   helm upgrade traefik traefik/traefik \
     --namespace traefik \
-    -f /vagrant/HelmWorkShop/traefik/values.yaml
+    -f /var/vagrant/HelmWorkShop/traefik/values.yaml
   ```
   for k3s build-in traefik upgrade
   - Ref: https://phoenixnap.com/kb/helm-install-command#ftoc-heading-3
@@ -206,7 +212,7 @@ Ref:
     - [Exposing the Traefik dashboard](https://doc.traefik.io/traefik/getting-started/install-traefik/#exposing-the-traefik-dashboard)  
     - [/HelmWorkShop/traefik/IngRt-dashboard.yaml](traefik/IngRt-dashboard.yaml)
   ```shell
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/IngRt-dashboard.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/traefik/IngRt-dashboard.yaml
 
   # kubectl apply -f /vagrant/HelmWorkShop/traefik-dashboard/Svc-traefik-dashboard.yaml
 
@@ -218,7 +224,7 @@ Ref:
     - [How to configure Traefik on Kubernetes with Cert-manager?](https://www.padok.fr/en/blog/traefik-kubernetes-certmanager?utm_source=pocket_mylist)  
     - [/HelmWorkShop/traefik/MW-basicauth.yaml](traefik/MW-basicauth.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/MW-basicauth.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/traefik/MW-basicauth.yaml
   # or
   kubectl apply -f .\HelmWorkShop\traefik\basicAuth.yaml
   ```
@@ -237,14 +243,14 @@ Ref:
   - Ref:
     - [/HelmWorkShop/cert-manager/tls-infra.sololab-traefik.yaml](cert-manager/tls-infra.sololab-traefik.yaml)
   ```
-  kubectl apply -f /vagrant//HelmWorkShop/cert-manager/tls-infra.sololab-traefik.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/cert-manager/tls-infra.sololab-traefik.yaml
   ```
 
 - Update traefik ingressroute (with the traefik auth middleware create in previous step and tls cert for https into)  
   - Ref:  
     - [/HelmWorkShop/traefik/IngRt-dashboardUpdate.yaml](traefik/IngRt-dashboardUpdate.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/IngRt-dashboardUpdate.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/traefik/IngRt-dashboardUpdate.yaml
   ```
 
 - Update traefik helmchart config (for https redirect)  
@@ -262,7 +268,7 @@ Ref:
   - Ref:
     - [/HelmWorkShop/traefik/MW-stripPrefixRegex.yaml](traefik/MW-stripPrefixRegex.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/traefik/MW-stripPrefixRegex.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/traefik/MW-stripPrefixRegex.yaml
   ```
 
 ## Install and config dex
@@ -290,7 +296,7 @@ Ref:
   ```
   helm install dex dex/dex \
     --namespace dex --create-namespace \
-    --values /vagrant/HelmWorkShop/dex/values.yaml \
+    --values /var/vagrant/HelmWorkShop/dex/values.yaml \
     --set replicaCount=3
   ```
   - Or update the values
@@ -343,7 +349,7 @@ Ref:
   
   - Config loginapp value, add certificate-authority data
   ```
-  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
+  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /var/vagrant/HelmWorkShop/loginapp/values.yaml
   ```
 
   - add helm repo and install loginapp
@@ -353,11 +359,11 @@ Ref:
   helm repo add fydrah-stable https://charts.fydrah.com
   helm repo update
   # update cert in values before apply it
-  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /vagrant/HelmWorkShop/loginapp/values.yaml
+  yq -i e '.config.clusters[0].certificate-authority = "'"$(sudo cat /var/lib/rancher/k3s/server/tls/server-ca.crt)"'"' /var/vagrant/HelmWorkShop/loginapp/values.yaml
   # helm install
   helm install loginapp fydrah-stable/loginapp \
     --namespace dex \
-    --values /vagrant/HelmWorkShop/loginapp/values.yaml \
+    --values /var/vagrant/HelmWorkShop/loginapp/values.yaml \
     --set replicas=3
   ```
   or upgrade 
@@ -378,14 +384,14 @@ Ref:
 - add coreDNS A record of issuer fqdn, "infra.sololab" in this case
   - Ref: [.\coreDNS\CM-coredns-custom.yaml](coreDNS/CM-coredns-custom.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
   ```
 
 - add rbac for dex local staticPasswords account
   - Ref:
     - [.\HelmWorkShop\dex\RBAC.yaml](dex/RBAC.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/dex/RBAC.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/dex/RBAC.yaml
   ```
 
 - Modify api server arg config to make dex as oidc provider  
@@ -456,11 +462,11 @@ Ref:
   - Ref: 
     - [How to create a namespace if it doesn't exists from HELM templates](https://stackoverflow.com/a/65751410/10833894)
     - [dashboard的chart包配置](https://lemonlzy.cn/2020/10/14/Helm%E9%83%A8%E7%BD%B2Dashboard-UI/#2-2-dashboard%E7%9A%84chart%E5%8C%85%E9%85%8D%E7%BD%AE)
-    - [HelmWorkShop/k8s-dashboard/values-new.yaml](k8s-dashboard/values-new.yaml)
+    - [HelmWorkShop/k8s-dashboard/values.yaml](k8s-dashboard/values.yaml)
   ```
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
-    --namespace kube-dashboard --create-namespace --wait \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values.yaml \
+    --namespace kube-dashboard --create-namespace \
+    -f /var/vagrant/HelmWorkShop/k8s-dashboard/values.yaml \
     --set replicaCount=3
   #or
   helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
@@ -481,7 +487,7 @@ Ref:
     - [traefik2-configure-dashboard.md](https://github.com/zeromake/zeromake.github.io/blob/9bef67eec4087c88491046880e88a01461d6349b/content/post/traefik2-configure-dashboard.md)
     - [.\k8s-dashboard\ST-insecureSkipVerify.yaml](k8s-dashboard/ST-insecureSkipVerify.yaml)
   ```
-  kubectl apply -f /vagrant/HelmWorkShop/k8s-dashboard/ST-insecureSkipVerify.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/k8s-dashboard/ST-insecureSkipVerify.yaml
   ```
 
 - Update the helm chart values (add service annotations)
@@ -493,7 +499,7 @@ Ref:
   ```
   helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --namespace kube-dashboard \
-    -f /vagrant/HelmWorkShop/k8s-dashboard/values-update.yaml
+    -f /var/vagrant/HelmWorkShop/k8s-dashboard/values-update.yaml
   ```
   
 - Or update traefik helmchart config (to disable TLS verification in Traefik(globally) by setting the "insecureSkipVerify" setting to "true".)  
@@ -521,22 +527,26 @@ Ref:
          - [AlpineLinux 3.8: Install open-iscsi for iSCSI initiator](https://www.hiroom2.com/2018/08/29/alpinelinux-3-8-open-iscsi-en/)
   ```shell
   sudo apk add bash curl findmnt blkid util-linux open-iscsi nfs-utils jq
-  sudo rc-update add iscsid
-  sudo rc-service iscsid start
+  # sudo rc-update add iscsid
+  # sudo rc-service iscsid start
   ```
 
   2. Prepare mount root parition script  
     - Ref:  
       - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
   ```shell
-  sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
-  #!/bin/ash
-  mount --make-shared /
-  exit
-  EOF
+  mount --make-rshared
+  if [ -x /etc/init.d/k3s ]; then
+    sed -i 's#start_pre() {#start_pre() {\n    mount --make-rshared /#' /etc/init.d/k3s
+  fi
+  # sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
+  # #!/bin/ash
+  # mount --make-shared /
+  # exit
+  # EOF
   ```
 
-  3.  Let the script run at startup (alpine linux / openrc)  
+  3.  (no need?) Let the script run at startup (alpine linux / openrc)  
     - Ref: 
       - [Alpine Linux 常用命令](https://blog.csdn.net/ctwy291314/article/details/104634667)
       - [How to run script at startup](https://lists.alpinelinux.org/~alpine/devel/%3CCAF-%2BOzABh_NPrTZ2oMFUKrsYmSE5obOadKTAth1HU5_OEZUxPQ%40mail.gmail.com%3E)
@@ -551,12 +561,13 @@ Ref:
 - Install Longhorn under namespace "longhorn-system"  
   Ref:
   - [Install with Helm](https://longhorn.io/docs/1.2.2/deploy/install/install-with-helm/)
+  - [Longhorn on k3s](https://www.publish0x.com/awesome-self-hosted/longhorn-on-k3s-xwqdjyj)
   - [.\HelmWorkShop\longhorn\values.yaml](longhorn/values.yaml)
   ```
   helm repo add longhorn https://charts.longhorn.io
   helm install longhorn longhorn/longhorn \
-    -f /vagrant/HelmWorkShop/longhorn/values.yaml \
-    --namespace longhorn-system --create-namespace --wait
+    --namespace longhorn-system --create-namespace \
+    -f /var/vagrant/HelmWorkShop/longhorn/values.yaml
   ```
 - or upgrade
   ```
