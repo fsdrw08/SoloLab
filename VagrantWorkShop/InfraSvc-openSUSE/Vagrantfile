@@ -1,0 +1,139 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "openSUSE-g2"
+
+  config.vm.provider "hyperv" do |hv, config|
+    # hv.mac = "0000BABEFACE"
+    hv.vmname = "InfraSvc-openSUSE"
+    hv.memory = 2048
+    hv.cpus = 2
+    # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
+    #   trigger.info = "Run-Dos2Unix"
+    #   trigger.run = {inline: "./Run-Dos2Unix.ps1"}
+    # end
+  end
+
+  config.vm.network "private_network", bridge: "Internal Switch"
+  
+  config.ssh.insert_key = false
+  
+  config.vm.hostname = "InfraSvc-openSUSE"
+
+  config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+
+  # # set static ip for this VM
+  config.vm.provision "file", source: "./ifcfg-eth0", destination: "/home/vagrant/ifcfg-eth0"
+  config.vm.provision "shell", inline: "sudo cp /home/vagrant/ifcfg-eth0 /etc/sysconfig/network/ifcfg-eth0"
+
+  config.vm.provision "file", source: "./routes", destination: "/home/vagrant/routes"
+  config.vm.provision "shell", inline: "sudo cp /home/vagrant/routes /etc/sysconfig/network/routes"
+  
+  config.vm.provision "shell", path: "Set-StaticDNSServer.sh"
+
+  # install k8s related tools
+  # for suse
+  config.vm.provision "shell", inline: "sudo zypper ar -cfg 'https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/' tuna-Tumbleweed-oss"
+  config.vm.provision "shell", inline: "sudo zypper mr -d 'repo-backports-update' 'repo-sle-update'"
+  config.vm.provision "shell", inline: "sudo zypper ref"
+  # for opensuse leap micro
+  # # https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/article-administration-slemicro.html#id-1.6.2.4.8.7
+  # config.vm.provision "shell", inline: "sudo transactional-update --non-interactive -c pkg in helm"
+  # config.vm.provision "shell", inline: "sudo transactional-update --non-interactive -c pkg in apparmor-parser"
+  # for opensuse leap
+  config.vm.provision "shell", inline: "sudo zypper --non-interactive in helm"
+
+
+
+  # # for others
+  # # config.vm.provision "shell", inline: "sudo snap install helm --classic"
+
+  # # set dns record for the cluster fqdn
+  # config.vm.provision "shell", path: "Add-HostsResolve.sh"
+
+  
+  # reboot
+  config.vm.provision "shell", reboot: true
+
+  # https://github.com/kurokobo/awx-on-k3s
+  # for china
+  # https://serverok.in/wget-print-content-to-screen#:~:text=wget%20print%20content%20to%20screen%20wget%20is%20used,this%2C%20you%20can%20replace%20wget%20command%20with%20curl.
+  # config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | K3S_TOKEN=SECRET INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--cluster-init --write-kubeconfig-mode 644\" sh -"
+  # config.vm.provision "shell", inline: "wget -q -O /dev/stdout http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC=\"--write-kubeconfig-mode 644 --write-kubeconfig /home/vagrant/.kube/config\" sh -"
+  
+  # for other country
+  # config.vm.provision "shell", inline: "wget -q -O /dev/stdout https://get.k3s.io | sh -s - --write-kubeconfig-mode 644"
+  
+  # add k3s config env
+  # for alpine
+  # config.vm.provision "shell", inline: "echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> /home/vagrant/.profile"
+  # for others
+  # config.vm.provision "shell", inline: "echo \"export KUBECONFIG=/etc/rancher/k3s/k3s.yaml\" >> ~/.bashrc"
+  
+  # config.vm.provision "shell", inline: "sudo swapoff -a && sudo rc-update add cgroups default"
+  
+  # config.vm.provision "shell", inline: "sudo swapoff -a"
+  
+  # reboot for alpine
+  # config.vm.provision "shell", reboot: true
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network "private_network", ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network "public_network"
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder "../data", "/vagrant_data"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  # Example for VirtualBox:
+  #
+  # config.vm.provider "virtualbox" do |vb|
+  #   # Display the VirtualBox GUI when booting the machine
+  #   vb.gui = true
+  #
+  #   # Customize the amount of memory on the VM:
+  #   vb.memory = "1024"
+  # end
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
+end

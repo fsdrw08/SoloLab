@@ -92,7 +92,8 @@ source "hyperv-iso" "vm" {
   disk_block_size       = "1"
   disk_size             = "${var.disk_size}"
   enable_dynamic_memory = "true"
-  enable_secure_boot    = false
+  enable_secure_boot    = "true"
+  secure_boot_template  = "MicrosoftUEFICertificateAuthority"
   generation            = 2
   guest_additions_mode  = "disable"
   http_directory        = "./http"
@@ -114,12 +115,11 @@ source "hyperv-iso" "vm" {
 build {
   sources = ["source.hyperv-iso.vm"]
 
-  // provisioner "shell" {
-  //   execute_command = "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'"
-  //   scripts         = [
-  //     "./extra/files/gen2-opensuse-tumbleweed/wait.sh"
-  //   ]
-  // }
+  provisioner "shell" {
+    scripts         = [
+      "./http/provision.sh"
+    ]
+  }
 
   post-processor "vagrant" {
     keep_input_artifact  = false

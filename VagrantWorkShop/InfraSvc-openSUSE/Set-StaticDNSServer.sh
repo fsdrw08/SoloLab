@@ -1,0 +1,1 @@
+sed -i "s/NETCONFIG_DNS_STATIC_SERVERS=.*/NETCONFIG_DNS_STATIC_SERVERS=\"192.168.255.1\"/" /etc/sysconfig/network/config

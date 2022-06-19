@@ -1,0 +1,1 @@
+sed -i '/^127.0.0.1/ s/$/ infra.sololab/' /etc/hosts

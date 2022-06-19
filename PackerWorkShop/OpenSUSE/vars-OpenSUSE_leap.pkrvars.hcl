@@ -4,6 +4,7 @@ iso_checksum_type="sha256"
 iso_checksum="4683345f242397c7fd7d89a50731a120ffd60a24460e21d2634e783b3c169695"
 vm_name="packer-opensuse-leap-g2"
 configuration_version="8.0"
+cpus="2"
 disk_size="70000"
 switch_name="Internal Switch"
 output_directory="output-opensuse-leap-base"
@@ -17,7 +18,7 @@ boot_command=[
   "<wait>c<wait>linuxefi /boot/x86_64/loader/linux ",
   "netsetup=dhcp lang=en_US textmode=1 autoyast=http://{{ .HTTPIP }}:{{ .HTTPPort }}/autoyast-leap.xml<enter><wait>",
   "initrdefi /boot/x86_64/loader/initrd<enter><wait3>",
-  "boot<enter><wait240>"
+  "boot<enter><wait>"
 ]
 //   "initrdefi /boot/x86_64/loader/initrd<enter><wait10>boot<enter><wait10>"
 // boot_command=[
