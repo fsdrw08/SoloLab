@@ -9,7 +9,6 @@ vagrant up
    $TLSSAN="infra.sololab"
    # https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#kubernetes-components
    $extraArgs='--write-kubeconfig-mode 644 --disable local-storage --disable traefik --write-kubeconfig ~/.kube/config'
-   # $extraArgs='--write-kubeconfig-mode 644 --disable local-storage --write-kubeconfig ~/.kube/config'
 
    # ssh $SVRHOST "curl -sfL http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC='server --cluster-init --tls-san $($TLSSAN) $($extraArgs)' INSTALL_K3S_CHANNEL='stable' sh - && sudo reboot"
    ssh $SVRHOST "curl -sfL http://rancher-mirror.cnrancher.com/k3s/k3s-install.sh | INSTALL_K3S_MIRROR=cn INSTALL_K3S_EXEC='$($extraArgs)' INSTALL_K3S_CHANNEL='stable' sh - && sudo reboot"
