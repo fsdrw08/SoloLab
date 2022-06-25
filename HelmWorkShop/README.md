@@ -153,6 +153,7 @@ Ref:
     - [Manipulating text at the command line with sed](https://www.redhat.com/sysadmin/manipulating-text-sed)
     - [Appending to end of a line using 'sed'](https://askubuntu.com/questions/537967/appending-to-end-of-a-line-using-sed)
     - [sed conditionally append to line after matching pattern](https://stackoverflow.com/questions/55633885/sed-conditionally-append-to-line-after-matching-pattern)
+    - [sed "$" not acting as end of line character](https://askubuntu.com/questions/1171030/sed-not-acting-as-end-of-line-character)
     - [How to configure my own CA for k3s](https://github.com/k3s-io/k3s/issues/1868#issuecomment-639690634)
     - [Cert-manager CA](https://cert-manager.io/docs/configuration/ca/)
     - [/HelmWorkShop/cert-manager/ca-key-pair.yaml](./cert-manager/ca-key-pair.yaml)
@@ -160,9 +161,16 @@ Ref:
   # switch to root first
   sudo su
   # prase the key info
-  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" \
+  -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" \
+  /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  # or
+  sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" \
+  -e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" \
+  /var/vagrant/HelmWorkShop/cert-manager/extra-raw-values.yaml
   # have a check
   cat /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
+  cat /var/vagrant/HelmWorkShop/cert-manager/extra-raw-values.yaml
   # apply it
   kubectl apply -f /var/vagrant/HelmWorkShop/cert-manager/ca-key-pair.yaml
   ```
@@ -534,6 +542,7 @@ Ref:
   2. Prepare mount root parition script  
     - Ref:  
       - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
+      - [k3s 安装 longhorn 持久存储](https://cloud.tencent.com/developer/article/1982067)
   ```shell
   mount --make-rshared
   if [ -x /etc/init.d/k3s ]; then
