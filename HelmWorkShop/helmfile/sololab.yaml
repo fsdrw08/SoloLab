@@ -1,0 +1,70 @@
+repositories:
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: incubator
+    url: https://charts.helm.sh/incubator
+  - name: traefik
+    url: https://helm.traefik.io/traefik
+  - name: dex
+    url: https://charts.dexidp.io
+  - name: fydrah-stable
+    url: https://charts.fydrah.com
+  # - name: kubernetes-dashboard
+  #   url: https://kubernetes.github.io/dashboard/
+  # - name: longhorn
+  #   url: https://charts.longhorn.io
+  # - name: puckpuck
+  #   url: https://puckpuck.github.io/helm-charts
+  # - name: bitnami
+  #   url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: cert-manager
+    chart: jetstack/cert-manager
+    namespace: cert-manager
+    wait: true
+    values:
+      - ../cert-manager/values.yaml
+  # https://gist.github.com/zloeber/e280030aa819be22653809bb1d353c0d
+  - name: cert-manager-issuer
+    chart: incubator/raw
+    namespace: cert-manager
+    # https://github.com/helmfile/helmfile#dag-aware-installationdeletion-ordering-with-needs
+    needs:
+    - cert-manager/cert-manager
+    values:
+      - ../cert-manager/extra-raw-values.yaml
+  - name: traefik
+    chart: traefik/traefik
+    namespace: traefik
+    needs:
+    - cert-manager/cert-manager
+    values:
+      - ../traefik/values.yaml
+  - name: traefik-addition-resources
+    chart: incubator/raw
+    namespace: traefik
+    needs: 
+    - traefik/traefik
+    values:
+      - ../traefik/extra-raw-values.yaml
+  - name: dex
+    chart: dex/dex
+    namespace: dex
+    needs: 
+    - traefik/traefik
+    - traefik/traefik-addition-resources
+    values:
+      - ../dex/values.yaml
+  - name: coreDNS-custom
+    chart: incubator/raw
+    namespace: kube-system
+    values:
+      - ../coreDNS/extra-raw-values.yaml
+  - name: loginapp
+    chart: fydrah-stable/loginapp
+    namespace: dex
+    needs: 
+    - kube-system/coreDNS-custom
+    values:
+      - ../loginapp/values.yaml
