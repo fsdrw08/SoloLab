@@ -19,6 +19,7 @@ ports:
       enabled: true
 
 ingressRoute:
+  # install traefik dashboard later
   dashboard:
     enabled: false
 
