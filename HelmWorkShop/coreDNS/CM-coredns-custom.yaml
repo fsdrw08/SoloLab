@@ -3,12 +3,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: coredns-custom
-  namespace: kube-system
 data:
   sololab.server: |
     infra.sololab {
       hosts {
-        192.168.255.21  infra.sololab
+        192.168.255.11  infra.sololab
         fallthrough
       }
     }

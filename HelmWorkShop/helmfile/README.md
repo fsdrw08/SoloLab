@@ -12,5 +12,5 @@ cat /var/vagrant/HelmWorkShop/cert-manager/extra-raw-values.yaml
 
 then install
 ```
-helmfile -f /var/vagrant/HelmWorkShop/helmfile/sololab.yaml sync
+helmfile -f /var/vagrant/HelmWorkShop/helmfile/helmfile.yaml sync
 ```

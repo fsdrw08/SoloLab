@@ -30,7 +30,7 @@ ingress:
   # -- Annotations for the ingress
   annotations:
     kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: issuer-ca
+    cert-manager.io/cluster-issuer: ca-issuer
     # https://www.ziji.work/ingress/traefik-route-traefik-middlewares-configure.html
     # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
     traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd

@@ -12,7 +12,7 @@ ingress:
     kubernetes.io/ingress.class: traefik
     # create cert when the helm install run
     # https://cert-manager.io/docs/usage/ingress/
-    cert-manager.io/cluster-issuer: issuer-ca
+    cert-manager.io/cluster-issuer: ca-issuer
   hosts:
     - host: infra.sololab
       paths:

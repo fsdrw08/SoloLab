@@ -1,8 +1,8 @@
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io
-  - name: incubator
-    url: https://charts.helm.sh/incubator
+  # - name: incubator
+  #   url: https://charts.helm.sh/incubator
   - name: traefik
     url: https://helm.traefik.io/traefik
   - name: dex
@@ -25,46 +25,61 @@ releases:
     wait: true
     values:
       - ../cert-manager/values.yaml
-  # https://gist.github.com/zloeber/e280030aa819be22653809bb1d353c0d
+
+  # https://github.com/roboll/helmfile/issues/1337
+  # https://github.com/roboll/helmfile/issues/1682
   - name: cert-manager-issuer
-    chart: incubator/raw
+    chart: ../cert-manager/ca-issuer
     namespace: cert-manager
-    # https://github.com/helmfile/helmfile#dag-aware-installationdeletion-ordering-with-needs
     needs:
     - cert-manager/cert-manager
-    values:
-      - ../cert-manager/extra-raw-values.yaml
+    hooks:
+      - events:
+          - presync
+        showlogs: true
+        command: "sh"
+        args: ["../cert-manager/Set-CAKeyPair.sh"]
+
   - name: traefik
     chart: traefik/traefik
     namespace: traefik
-    needs:
-    - cert-manager/cert-manager
     values:
       - ../traefik/values.yaml
+
   - name: traefik-addition-resources
-    chart: incubator/raw
+    chart: ../traefik/traefik-addition-resources
     namespace: traefik
     needs: 
     - traefik/traefik
-    values:
-      - ../traefik/extra-raw-values.yaml
+    - cert-manager/cert-manager-issuer
+
   - name: dex
     chart: dex/dex
     namespace: dex
     needs: 
+    - cert-manager/cert-manager
+    - cert-manager/cert-manager-issuer
     - traefik/traefik
-    - traefik/traefik-addition-resources
     values:
       - ../dex/values.yaml
-  - name: coreDNS-custom
-    chart: incubator/raw
+
+  - name: coredns-custom
+    chart: ../coreDNS
     namespace: kube-system
-    values:
-      - ../coreDNS/extra-raw-values.yaml
+
   - name: loginapp
     chart: fydrah-stable/loginapp
     namespace: dex
     needs: 
-    - kube-system/coreDNS-custom
+    - dex/dex
+    - traefik/traefik
+    - traefik/traefik-addition-resources
+    - kube-system/coredns-custom
+    hooks:
+      - events:
+          - presync
+        showlogs: true
+        command: "sh"
+        args: ["../loginapp/Set-CACert.sh"]
     values:
       - ../loginapp/values.yaml

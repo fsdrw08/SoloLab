@@ -9,5 +9,5 @@ spec:
     - solo.lab
   secretName: solo.lab
   issuerRef:
-    name: issuer-ca
+    name: ca-issuer
     kind: ClusterIssuer

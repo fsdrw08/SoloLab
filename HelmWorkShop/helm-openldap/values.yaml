@@ -30,7 +30,7 @@ ltb-passwd:
     annotations: 
       kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
-      cert-manager.io/cluster-issuer: issuer-ca
+      cert-manager.io/cluster-issuer: ca-issuer
     path: /sub-ltbpassword/
     pathType: ImplementationSpecific
     ## Ingress Host
@@ -50,7 +50,7 @@ phpldapadmin:
     annotations: 
       kubernetes.io/ingress.class: traefik
       traefik.ingress.kubernetes.io/router.middlewares: kube-system-subpath-stripprefixregex@kubernetescrd
-      cert-manager.io/cluster-issuer: issuer-ca
+      cert-manager.io/cluster-issuer: ca-issuer
     path: /sub-phpldapadmin/
     pathType: ImplementationSpecific
     ## Ingress Host
