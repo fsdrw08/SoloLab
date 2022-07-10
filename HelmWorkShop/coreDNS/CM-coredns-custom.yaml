@@ -7,7 +7,7 @@ data:
   sololab.server: |
     infra.sololab {
       hosts {
-        192.168.255.11  infra.sololab
+        IPADDRESS  infra.sololab
         fallthrough
       }
     }
