@@ -17,8 +17,11 @@ setconfig(){
 	[ -n "$(grep ${1} $configpath)" ] && sed -i "s#${1}=.*#${1}=${2}#g" $configpath || echo "${1}=${2}" >> $configpath
 }
 [ -f "/etc/storage/started_script.sh" ] && systype=Padavan && initdir='/etc/storage/started_script.sh'
-[ -d "/jffs/scripts" ] && systype=asusrouter && initdir='/jffs/scripts/net-start'
-[ -f "/jffs/.asusrouter" ] && systype=asusrouter && initdir='/jffs/.asusrouter'
+[ -d "/jffs" ] && systype=asusrouter && { 
+	[ -f "/jffs/.asusrouter" ] && initdir='/jffs/.asusrouter'
+	[ -d "/jffs/scripts" ] && initdir='/jffs/scripts/nat-start' 
+	[ -z "$initdir" ] && initdir='/jffs/scripts/nat-start' && mkdir -p '/jffs/scripts'
+	}
 [ -f "/data/etc/crontabs/root" -a "$(dir_avail /etc)" = 0 ] && systype=mi_snapshot
 #检查root权限
 if [ "$USER" != "root" -a -z "$systype" ];then
@@ -51,7 +54,7 @@ webget(){
 	fi
 }
 #检查更新
-url_cdn="https://cdn.jsdelivr.net/gh/juewuy/ShellClash"
+url_cdn="https://raw.githubusercontents.com/juewuy/ShellClash"
 [ -z "$url" ] && url=$url_cdn
 echo -----------------------------------------------
 $echo "\033[33m请选择想要安装的版本：\033[0m"	
@@ -62,10 +65,10 @@ read -p "请输入相应数字 > " num
 if [ -z $num ];then
 	echo 安装已取消！ && exit 1;
 elif [ "$num" = "1" ];then
-	webget /tmp/clashrelease $url_cdn@master/bin/release_version echoon rediroff 2>/tmp/clashrelease
+	webget /tmp/clashrelease $url_cdn/master/bin/release_version echoon rediroff 2>/tmp/clashrelease
 	if [ "$result" = "200" ];then
 		release_new=$(cat /tmp/clashrelease | head -1)
-		url_dl="$url_cdn@$release_new"
+		url_dl="$url_cdn/$release_new"
 	else
 		echo "无法切换版本，尝试安装测试版！"
 	fi
@@ -218,7 +221,7 @@ fi
 #输出
 $echo "最新版本：\033[32m$release_new\033[0m"
 echo -----------------------------------------------
-$echo "\033[44m如遇问题请加TG群反馈：\033[42;30m t.me/clashfm \033[0m"
+$echo "\033[44m如遇问题请加TG群反馈：\033[42;30m t.me/ShellClash \033[0m"
 $echo "\033[37m支持各种基于openwrt的路由器设备"
 $echo "\033[33m支持Debian、Centos等标准Linux系统\033[0m"
 
