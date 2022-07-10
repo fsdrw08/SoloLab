@@ -422,9 +422,9 @@ Ref:
   'oidc-groups-claim=groups' \
   ```
   then restart the k3s service by
-  ```
-  sudo /etc/init.d/k3s restart
-  ```
+  `sudo /etc/init.d/k3s restart`
+  
+  - or add above arg in `/etc/systemd/system/k3s.service` of all nodes (for systemd managed linux, e.g. debian,rhel,sle)
    
 - ???unset kubectl config
   - Ref: 
@@ -470,15 +470,15 @@ Ref:
   - Ref: 
     - [How to create a namespace if it doesn't exists from HELM templates](https://stackoverflow.com/a/65751410/10833894)
     - [dashboard的chart包配置](https://lemonlzy.cn/2020/10/14/Helm%E9%83%A8%E7%BD%B2Dashboard-UI/#2-2-dashboard%E7%9A%84chart%E5%8C%85%E9%85%8D%E7%BD%AE)
-    - [HelmWorkShop/k8s-dashboard/values.yaml](k8s-dashboard/values.yaml)
+    - [HelmWorkShop/kube-dashboard/values.yaml](kube-dashboard/values.yaml)
   ```
-  helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  helm install kube-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --namespace kube-dashboard --create-namespace \
-    -f /var/vagrant/HelmWorkShop/k8s-dashboard/values.yaml \
+    -f /var/vagrant/HelmWorkShop/kube-dashboard/values.yaml \
     --set replicaCount=3
   #or
-  helm install k8s-dashboard kubernetes-dashboard/kubernetes-dashboard `
-    -f .\HelmWorkShop\k8s-dashboard\values.yaml `
+  helm install kube-dashboard kubernetes-dashboard/kubernetes-dashboard `
+    -f .\HelmWorkShop\kube-dashboard\values.yaml `
     --namespace kube-dashboard --create-namespace --wait
   ```
 
@@ -493,9 +493,9 @@ Ref:
   Which means traefik cannot pass http request package to kubernetes dashboard because traefik did not trust kubernetes dashboard's auto-gen cert, we have to bypass cert verify in traefik side, apply a traefik CRD object `ServersTransport`
   - Ref:
     - [traefik2-configure-dashboard.md](https://github.com/zeromake/zeromake.github.io/blob/9bef67eec4087c88491046880e88a01461d6349b/content/post/traefik2-configure-dashboard.md)
-    - [.\k8s-dashboard\ST-insecureSkipVerify.yaml](k8s-dashboard/ST-insecureSkipVerify.yaml)
+    - [.\kube-dashboard\ST-insecureSkipVerify.yaml](kube-dashboard/ST-insecureSkipVerify.yaml)
   ```
-  kubectl apply -f /var/vagrant/HelmWorkShop/k8s-dashboard/ST-insecureSkipVerify.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/kube-dashboard/ST-insecureSkipVerify.yaml
   ```
 
 - Update the helm chart values (add service annotations)
@@ -503,11 +503,11 @@ Ref:
     - [Kubernetes dashboard through Ingress](https://stackoverflow.com/questions/52312464/kubernetes-dashboard-through-ingress)
     - [Serverstransport not working with kubernetes ingress](https://community.traefik.io/t/serverstransport-not-working-with-kubernetes-ingress/12211)
     - [kustomization.yaml](https://github.com/jtcressy/homelab/blob/11b9e43a8cb3e5aed3075049392f155440b095ad/nested-clusters/clusters/edge/kustomization.yaml#L46)
-    - [.\k8s-dashboard\values-update.yaml](k8s-dashboard/values-update.yaml)
+    - [.\kube-dashboard\values-update.yaml](kube-dashboard/values-update.yaml)
   ```
-  helm upgrade k8s-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  helm upgrade kube-dashboard kubernetes-dashboard/kubernetes-dashboard \
     --namespace kube-dashboard \
-    -f /var/vagrant/HelmWorkShop/k8s-dashboard/values-update.yaml
+    -f /var/vagrant/HelmWorkShop/kube-dashboard/values-update.yaml
   ```
   
 - Or update traefik helmchart config (to disable TLS verification in Traefik(globally) by setting the "insecureSkipVerify" setting to "true".)  
@@ -524,7 +524,7 @@ Ref:
 
 - Get service account token
   ```
-  kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep k8s-dashboard | awk '{print $1}')
+  kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep kube-dashboard | awk '{print $1}')
   ```
 
 ## Install Longhorn
