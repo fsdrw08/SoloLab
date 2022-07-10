@@ -8,9 +8,9 @@ repositories:
   - name: dex
     url: https://charts.dexidp.io
   - name: fydrah-stable
-    url: https://charts.fydrah.com
-  # - name: kubernetes-dashboard
-  #   url: https://kubernetes.github.io/dashboard/
+    url: https://storage.googleapis.com/loginapp-releases/charts/
+  - name: kubernetes-dashboard
+    url: https://kubernetes.github.io/dashboard/
   # - name: longhorn
   #   url: https://charts.longhorn.io
   # - name: puckpuck
@@ -24,7 +24,7 @@ releases:
     namespace: cert-manager
     wait: true
     values:
-      - ../cert-manager/values.yaml
+    - ../cert-manager/values.yaml
 
   # https://github.com/roboll/helmfile/issues/1337
   # https://github.com/roboll/helmfile/issues/1682
@@ -34,24 +34,26 @@ releases:
     needs:
     - cert-manager/cert-manager
     hooks:
-      - events:
-          - presync
-        showlogs: true
-        command: "sh"
-        args: ["../cert-manager/Set-CAKeyPair.sh"]
+    - events:
+        - presync
+      showlogs: true
+      command: "sh"
+      args: 
+      - "../cert-manager/Set-CAKeyPair.sh"
 
   - name: traefik
     chart: traefik/traefik
     namespace: traefik
     values:
-      - ../traefik/values.yaml
+    - ../traefik/values.yaml
 
   - name: traefik-addition-resources
-    chart: ../traefik/traefik-addition-resources
+    chart: ../traefik/addition-resources
     namespace: traefik
     needs: 
-    - traefik/traefik
+    - cert-manager/cert-manager
     - cert-manager/cert-manager-issuer
+    - traefik/traefik
 
   - name: dex
     chart: dex/dex
@@ -61,25 +63,66 @@ releases:
     - cert-manager/cert-manager-issuer
     - traefik/traefik
     values:
-      - ../dex/values.yaml
+    - ../dex/values.yaml
+
+  - name: dex-addition-resources
+    chart: ../dex/addition-resources
+    needs: 
+    - dex/dex
+    hooks:
+    - events:
+        - presync
+      command: "sh"
+      args:
+      - "../dex/Set-RBACUserName.sh"
 
   - name: coredns-custom
     chart: ../coreDNS
     namespace: kube-system
-
-  - name: loginapp
-    chart: fydrah-stable/loginapp
-    namespace: dex
-    needs: 
-    - dex/dex
-    - traefik/traefik
-    - traefik/traefik-addition-resources
-    - kube-system/coredns-custom
     hooks:
       - events:
           - presync
         showlogs: true
         command: "sh"
-        args: ["../loginapp/Set-CACert.sh"]
+        args: 
+        - "../coreDNS/Set-IPAddress.sh"
+
+  - name: loginapp
+    chart: fydrah-stable/loginapp
+    namespace: dex
+    needs: 
+    - cert-manager/cert-manager
+    - cert-manager/cert-manager-issuer
+    - traefik/traefik
+    - traefik/traefik-addition-resources
+    - dex/dex
+    - kube-system/coredns-custom
+    hooks:
+    - events:
+        - presync
+      showlogs: true
+      command: "sh"
+      args: 
+      - "../loginapp/Set-CACert.sh"
     values:
-      - ../loginapp/values.yaml
+    - ../loginapp/values.yaml
+
+  - name: kube-dashboard-addition-resources
+    chart: ../kube-dashboard/addition-resources
+    namespace: kube-dashboard
+    needs:
+    - traefik/traefik
+
+  - name: kube-dashboard
+    chart: kubernetes-dashboard/kubernetes-dashboard
+    namespace: kube-dashboard
+    needs:
+    - cert-manager/cert-manager
+    - cert-manager/cert-manager-issuer
+    - traefik/traefik
+    - traefik/traefik-addition-resources
+    - dex/dex
+    - dex/loginapp
+    - kube-dashboard/kube-dashboard-addition-resources
+    values:
+    - ../kube-dashboard/values-update.yaml
