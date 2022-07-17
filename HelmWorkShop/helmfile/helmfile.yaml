@@ -1,6 +1,8 @@
 repositories:
-  - name: jetstack
-    url: https://charts.jetstack.io
+  # - name: jetstack
+  #   url: https://charts.jetstack.io
+  - name: bitnami 
+    url: https://charts.bitnami.com/bitnami
   # - name: incubator
   #   url: https://charts.helm.sh/incubator
   - name: traefik
@@ -11,8 +13,8 @@ repositories:
     url: https://storage.googleapis.com/loginapp-releases/charts/
   - name: kubernetes-dashboard
     url: https://kubernetes.github.io/dashboard/
-  # - name: longhorn
-  #   url: https://charts.longhorn.io
+  - name: longhorn
+    url: https://charts.longhorn.io
   # - name: puckpuck
   #   url: https://puckpuck.github.io/helm-charts
   # - name: bitnami
@@ -20,7 +22,7 @@ repositories:
 
 releases:
   - name: cert-manager
-    chart: jetstack/cert-manager
+    chart: bitnami/cert-manager
     namespace: cert-manager
     wait: true
     values:
@@ -33,13 +35,13 @@ releases:
     namespace: cert-manager
     needs:
     - cert-manager/cert-manager
-    hooks:
-    - events:
-        - presync
-      showlogs: true
-      command: "sh"
-      args: 
-      - "../cert-manager/Set-CAKeyPair.sh"
+    # hooks:
+    # - events:
+    #     - presync
+    #   showlogs: true
+    #   command: "sh"
+    #   args: 
+    #   - "../cert-manager/Set-CAKeyPair.sh"
 
   - name: traefik
     chart: traefik/traefik
@@ -69,23 +71,23 @@ releases:
     chart: ../dex/addition-resources
     needs: 
     - dex/dex
-    hooks:
-    - events:
-        - presync
-      command: "sh"
-      args:
-      - "../dex/Set-RBACUserName.sh"
+    # hooks:
+    # - events:
+    #     - presync
+    #   command: "sh"
+    #   args:
+    #   - "../dex/Set-RBACUserName.sh"
 
   - name: coredns-custom
     chart: ../coreDNS
     namespace: kube-system
-    hooks:
-      - events:
-          - presync
-        showlogs: true
-        command: "sh"
-        args: 
-        - "../coreDNS/Set-IPAddress.sh"
+    # hooks:
+    #   - events:
+    #       - presync
+    #     showlogs: true
+    #     command: "sh"
+    #     args: 
+    #     - "../coreDNS/Set-IPAddress.sh"
 
   - name: loginapp
     chart: fydrah-stable/loginapp
@@ -97,13 +99,13 @@ releases:
     - traefik/traefik-addition-resources
     - dex/dex
     - kube-system/coredns-custom
-    hooks:
-    - events:
-        - presync
-      showlogs: true
-      command: "sh"
-      args: 
-      - "../loginapp/Set-CACert.sh"
+    # hooks:
+    # - events:
+    #     - presync
+    #   showlogs: true
+    #   command: "sh"
+    #   args: 
+    #   - "../loginapp/Set-CACert.sh"
     values:
     - ../loginapp/values.yaml
 
@@ -126,3 +128,21 @@ releases:
     - kube-dashboard/kube-dashboard-addition-resources
     values:
     - ../kube-dashboard/values-update.yaml
+  
+  - name: longhorn
+    chart: longhorn/longhorn
+    namespace: longhorn
+    needs:
+    - cert-manager/cert-manager
+    - cert-manager/cert-manager-issuer
+    - traefik/traefik
+    - traefik/traefik-addition-resources
+    # hooks:
+    # - events:
+    #     - presync
+    #   showlogs: true
+    #   command: "sh"
+    #   args:
+    #   - "../longhorn/Set-MountShare.sh"
+    values:
+      - ../longhorn/values.yaml

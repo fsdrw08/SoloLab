@@ -544,10 +544,11 @@ Ref:
       - [Rancher 2: Kubernetes cluster provisioning fails with error response / is not a shared mount](https://www.claudiokuenzler.com/blog/955/rancher2-kubernetes-cluster-provisioning-fails-error-response-not-a-shared-mount)
       - [k3s 安装 longhorn 持久存储](https://cloud.tencent.com/developer/article/1982067)
   ```shell
-  mount --make-rshared
-  if [ -x /etc/init.d/k3s ]; then
-    sed -i 's#start_pre() {#start_pre() {\n    mount --make-rshared /#' /etc/init.d/k3s
+  sudo mount --make-rshared
+  if [ -x /etc/init.d/k3s ] && [[ -z $(grep -l "mount --make-rshared" /etc/init.d/k3s) ]] ; then
+    sudo sed -i 's#start_pre() {#start_pre() {\n    mount --make-rshared /#' /etc/init.d/k3s
   fi
+  cat /etc/init.d/k3s
   # sudo sh -c "cat >/etc/local.d/make-shared.start" <<EOF
   # #!/bin/ash
   # mount --make-shared /

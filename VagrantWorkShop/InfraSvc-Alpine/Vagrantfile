@@ -16,7 +16,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "InfraSvc-Alpine"
-    hv.memory = 2048
+    hv.maxmemory = 3096
+    hv.memory = 1024
     hv.cpus = 2
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
     #   trigger.info = "Run-Dos2Unix"
@@ -38,7 +39,8 @@ Vagrant.configure("2") do |config|
 
   # install k8s related tools
   # for alpine
-  config.vm.provision "shell", inline: "sudo apk add helm curl yq"
+  config.vm.provision "shell", inline: "sudo apk add helm curl yq git helmfile"
+  config.vm.provision "shell", inline: "sudo apk add bash lsblk nfs-utils open-iscsi"
   # for others
   # config.vm.provision "shell", inline: "sudo snap install helm --classic"
 

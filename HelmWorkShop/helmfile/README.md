@@ -1,16 +1,19 @@
-1. fill out the k3s ca cert and key in helmfile for cert-manager ca issuer
-```shell
-# switch to root first
-sudo su
-# prase the key info
-sed -i -e "/tls.crt:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.crt | base64 -w0)/" \
--e "/tls.key:/s/$/$(cat /var/lib/rancher/k3s/server/tls/server-ca.key | base64 -w0)/" \
-/var/vagrant/HelmWorkShop/cert-manager/extra-raw-values.yaml
-# have a check
-cat /var/vagrant/HelmWorkShop/cert-manager/extra-raw-values.yaml
+1. run presync script to prepare the helm chart related info (e.g. CA key pair, RBAC user name)
+```
+sh Start-PreConfig.sh
 ```
 
-then install
+2. Run helmfile
 ```
 helmfile -f /var/vagrant/HelmWorkShop/helmfile/helmfile.yaml sync
+```
+or 
+```
+sh /var/vagrant/HelmWorkShop/helmfile/Start-PreConfig.sh && helmfile -f /var/vagrant/HelmWorkShop/helmfile/helmfile.yaml apply --skip-deps
+```
+to run helmfile -f ... apply, need to install helm diff first
+```
+helm plugin install https://github.com/databus23/helm-diff
+# or
+helm plugin install https://gitee.com/baijunyao/helm-diff
 ```
