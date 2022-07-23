@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "powerdns.fullname" . }}
+  labels:
+    app: {{ template "powerdns.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "powerdns.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "powerdns.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/entrypoint.sh"]
+        args: 
+          - "--api=yes"
+          - "--api-key=$(POWERDNS_API_KEY)"
+          - "--webserver=yes"
+          - "--webserver-port=8081"
+          - "--webserver-address=0.0.0.0"
+          - "--webserver-allow-from=0.0.0.0/0"
+          - "--slave=yes"
+        env:
+            - name: MYSQL_HOST
+              value: {{ template "mariadb.fullname" . }}
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: db-user
+            - name: MYSQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: db-password
+            - name: MYSQL_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: db-name
+            - name: POWERDNS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: api-key
+        ports:
+          - name: dns-udp
+            containerPort: 53
+            protocol: UDP
+          - name: dns-tcp
+            containerPort: 53
+            protocol: TCP
+          - name: api
+            containerPort: 8081
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: api
+        readinessProbe:
+          httpGet:
+            path: /
+            port: api
+        volumeMounts:
+        - name: config
+          mountPath: /etc/pdns/schema.sql
+          subPath: schema.sql              
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "powerdns.fullname" . }}          
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
