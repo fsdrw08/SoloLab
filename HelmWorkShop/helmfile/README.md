@@ -1,5 +1,6 @@
 1. run presync script to prepare the helm chart related info (e.g. CA key pair, RBAC user name)
 ```
+cd /var/vagrant/HelmWorkShop/helmfile/
 sh Start-PreConfig.sh
 ```
 
