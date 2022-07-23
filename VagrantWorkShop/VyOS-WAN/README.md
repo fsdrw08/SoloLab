@@ -16,6 +16,7 @@ clash
 # select 主路由
 bash ~/finalConfig.sh
 ```
+
 to config bgp, run below command in git-bash
 ```shell
 ssh vyos < <location_of_this_repo>/VagrantWorkShop/VyOS-WAN/provisionConfig-BGP.sh
