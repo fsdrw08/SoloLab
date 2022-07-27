@@ -79,7 +79,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /etc/pdns/schema.sql
-          subPath: schema.sql              
+          subPath: schema.sql
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:

@@ -1,0 +1,36 @@
+# https://github.com/Improwised/charts/blob/main/charts/freeipa/values.yaml
+hostname: infra.sololab
+
+image:
+  repository: freeipa/freeipa-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  # https://hub.docker.com/r/freeipa/freeipa-server/tags
+  tag: "centos-8-stream"
+
+args:
+  realm: sololab
+  domain: sololab
+  dspassword: password #pragma: allowlist secret
+  adminpassword: password #pragma: allowlist secret
+  nohostdns: true
+  nontp: true
+  setupdns: true
+  autoforwarders: true # if setup dns is true thiw will be applicable
+  allowzoneoverlap: true # if setup dns is true thiw will be applicable
+  sshtrustdns: false
+
+ingress:
+  enable: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+  hosts:
+    - host: infra.sololab
+      paths:
+        - path: /sub-freeipa/
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: infra.sololab
+      hosts:
+        - infra.sololab

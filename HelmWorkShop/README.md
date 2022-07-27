@@ -591,6 +591,17 @@ Ref:
   kubectl describe pod longhorn-manager-c8vmh --namespace longhorn-system
   ```
 
+## Install freeipa
+- Install FreeIPA helm chart
+  - Ref:
+    - [ArtifactHub/Improwised/freeipa](https://artifacthub.io/packages/helm/improwised/freeipa)
+  ```
+  helm repo add improwised https://improwised.github.io/charts/
+  helm install freeipa improwised/freeipa \
+    -f /var/vagrant/HelmWorkShop/freeipa/values.yaml \
+    --namespace freeipa --create-namespace --wait
+  ```
+
 ## Install powerdns
 - Install PowerDNS helm chart (puckpuck version)
   - Ref:
@@ -599,7 +610,7 @@ Ref:
   helm repo add puckpuck https://puckpuck.github.io/helm-charts
 
   helm install powerdns puckpuck/powerdns \
-    -f /vagrant/HelmWorkShop/powerdns/values-puckpuck.yaml \
+    -f /var/vagrant/HelmWorkShop/powerdns/values-puckpuck.yaml \
     --namespace powerdns --create-namespace --wait
   
   kubectl get pods --namespace powerdns
