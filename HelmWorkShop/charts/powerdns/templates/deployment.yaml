@@ -32,6 +32,9 @@ spec:
           - "--webserver-address=0.0.0.0"
           - "--webserver-allow-from=0.0.0.0/0"
           - "--slave=yes"
+        {{- with .Values.powerdns.additionalArgs }}
+          {{ toYaml . | indent 10 }}
+        {{- end }}
         env:
             - name: MYSQL_HOST
               value: {{ template "mariadb.fullname" . }}
