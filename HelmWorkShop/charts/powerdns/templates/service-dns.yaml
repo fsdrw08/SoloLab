@@ -5,11 +5,15 @@ metadata:
   labels:
     {{- include "powerdns.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.api.type }}
+  type: {{ .Values.service.dns.type }}
   ports:
-    - port: {{ .Values.service.api.port }}
-      targetPort: api
+    - port: 53
+      targetPort: dns-tcp
       protocol: TCP
-      name: api
+      name: dns-tcp
+    - port: 53
+      targetPort: dns-udp
+      protocol: UDP
+      name: dns-tcp
   selector:
     {{- include "powerdns.selectorLabels" . | nindent 4 }}

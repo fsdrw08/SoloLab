@@ -1,100 +1,79 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "powerdns.fullname" . }}
+  name: {{ include "powerdns.fullname" . }}
   labels:
-    app: {{ template "powerdns.name" . }}
+    {{- include "powerdns.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      app: {{ template "powerdns.name" . }}
-      release: {{ .Release.Name }}
+      {{- include "powerdns.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      labels:
-        app: {{ template "powerdns.name" . }}
-        release: {{ .Release.Name }}
+      {{- with .Values.podAnnotations }}
       annotations:
-        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "powerdns.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "powerdns.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command: ["/entrypoint.sh"]
-        args: 
-          - "--api=yes"
-          - "--api-key=$(POWERDNS_API_KEY)"
-          - "--webserver=yes"
-          - "--webserver-port=8081"
-          - "--webserver-address=0.0.0.0"
-          - "--webserver-allow-from=0.0.0.0/0"
-          - "--slave=yes"
-        {{- with .Values.powerdns.additionalArgs }}
-          {{ toYaml . | indent 10 }}
-        {{- end }}
-        env:
-            - name: MYSQL_HOST
-              value: {{ template "mariadb.fullname" . }}
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "powerdns.fullname" . }}
-                  key: db-user
-            - name: MYSQL_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "powerdns.fullname" . }}
-                  key: db-password
-            - name: MYSQL_DB
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "powerdns.fullname" . }}
-                  key: db-name
-            - name: POWERDNS_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "powerdns.fullname" . }}
-                  key: api-key
-        ports:
-          - name: dns-udp
-            containerPort: 53
-            protocol: UDP
-          - name: dns-tcp
-            containerPort: 53
-            protocol: TCP
-          - name: api
-            containerPort: 8081
-            protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /
-            port: api
-        readinessProbe:
-          httpGet:
-            path: /
-            port: api
-        volumeMounts:
-        - name: config
-          mountPath: /etc/pdns/schema.sql
-          subPath: schema.sql
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
-      volumes:
-      - name: config
-        configMap:
-          name: {{ template "powerdns.fullname" . }}          
-    {{- with .Values.nodeSelector }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- with .Values.envVars }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: api
+              containerPort: 8081
+              protocol: TCP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
