@@ -1,8 +1,16 @@
-to create a helm chart, cd to this folder, then run 
-```
-cd "$(git rev-parse --show-toplevel)/HelmWorkShop/charts/"
-helm create <chart name>
-```
+- to create a helm chart, cd to this folder, then run 
+  ```
+  cd "$(git rev-parse --show-toplevel)/HelmWorkShop/charts/"
+  helm create <chart name>
+  ```
+
+- to install local helm chart
+  ```powershell
+  # if there are some dependencies in the chart, build those dependencies first
+  helm dependency build
+  # then install the local helm chart
+  helm install <release name> /path/to/helm/chart/dir --namespace <namespace> --create-namespace
+  ```
 
 about powerdns, there are 3 most popular powerdns docker image:
 - psitrax/powerdns  

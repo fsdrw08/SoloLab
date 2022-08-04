@@ -34,6 +34,22 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: MYSQL_ENV_MYSQL_HOST
+              value: {{ .Release.Name }}-mariadb
+            - name: MYSQL_ENV_MYSQL_DATABASE
+              value: {{ .Values.mariadb.auth.database | quote }} 
+            - name: MYSQL_ENV_MYSQL_USER
+              value: {{ .Values.mariadb.auth.username | quote }} 
+            - name: MYSQL_ENV_MYSQL_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: MYSQL_PASS
+            - name: MYSQL_ENV_MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "powerdns.fullname" . }}
+                  key: MYSQL_ROOT_PASS
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -58,11 +74,11 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: http
+              port: api
           readinessProbe:
             httpGet:
               path: /
-              port: http
+              port: api
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -8,7 +8,7 @@ image:
   repository: pschiffe/pdns-mysql
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "alpine"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -33,7 +33,8 @@ env:
   PDNS_webserver: yes
   # https://doc.powerdns.com/authoritative/settings.html#webserver-address
   PDNS_webserver_address: 0.0.0.0
-
+  # https://doc.powerdns.com/authoritative/settings.html#setting-webserver-allow-from
+  PDNS_webserver_allow_from: 0.0.0.0/0
 # -- Similar to env but with support for all possible configurations.
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
 envVars: []
@@ -93,8 +94,8 @@ ingress:
         - path: /sub-powerdns/
           pathType: ImplementationSpecific
   tls:
-   - secretName: sololab
-     hosts:
+    - secretName: sololab
+      hosts:
        - infra.sololab
 
 resources: {}
@@ -127,10 +128,49 @@ mariadb:
   enabled: true
 
   auth:
-    rootPassword: 
+    rootPassword: root
     database: powerdns
     username: powerdns
     password: powerdns
 
   persistence:
     enabled: true
+
+# https://github.com/k8s-at-home/charts/blob/master/charts/stable/powerdns-admin/values.yaml
+# https://github.com/k8s-at-home/library-charts/blob/main/charts/stable/common/values.yaml
+powerdns-admin:
+  enabled: true
+
+  image:
+    tag: latest
+
+  env:
+    SECRET_KEY: PowerDNSAPI
+
+  ingress: 
+    main:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: ca-issuer
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+      ingressClassName: traefik
+      hosts:
+        - host: infra.sololab
+          ## Configure the paths for the host
+          paths:
+            # -- Path.  Helm template can be passed.
+          - path: /sub-powerdnsadmin/
+            pathType: ImplementationSpecific
+
+        # -- Configure TLS for the ingress. Both secretName and hosts can process a Helm template.
+      tls:
+        - secretName: sololab
+          hosts:
+          - infra.sololab
+  
+  persistence:
+    data:
+      enabled: false
+    # config:
+    #   enabled: true
+    #   accessMode: ReadWriteOnce

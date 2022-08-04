@@ -1,0 +1,9 @@
+dependencies:
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.1.3
+- name: powerdns-admin
+  repository: https://k8s-at-home.com/charts/
+  version: 1.2.0
+digest: sha256:1feebcb56c8374619150ea3a317ce9d324b9fc4aea703d0ac86dc563d2a6e759
+generated: "2022-08-02T16:49:01.6720147+08:00"

@@ -28,3 +28,8 @@ dependencies:
   version: "11"
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled
+
+- name: powerdns-admin
+  version: "1"
+  repository: https://k8s-at-home.com/charts/
+  condition: powerdns-admin.enabled
