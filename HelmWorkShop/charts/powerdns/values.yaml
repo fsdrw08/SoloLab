@@ -136,6 +136,8 @@ powerdns:
   api-key: PowerDNSAPI
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-host
   gmysql-host: 
+  # some wired config inside the docker image
+  # https://github.com/pschiffe/docker-pdns/blob/master/pdns/docker-entrypoint.sh#L10
   rootPassword: root
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-dbname
   gmysql-dbname: powerdns
