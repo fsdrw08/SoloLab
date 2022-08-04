@@ -123,6 +123,28 @@ tolerations: []
 
 affinity: {}
 
+powerdns:
+  # https://doc.powerdns.com/authoritative/settings.html#primary
+  primary: yes
+  # https://doc.powerdns.com/authoritative/settings.html#webserver
+  webserver: yes
+  # https://doc.powerdns.com/authoritative/settings.html#webserver-address
+  webserver-address: 0.0.0.0
+  # https://doc.powerdns.com/authoritative/settings.html#webserver-allow-from
+  webserver-allow-from: 0.0.0.0/0
+  # https://doc.powerdns.com/authoritative/settings.html#api-key
+  api-key: PowerDNSAPI
+  # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-host
+  gmysql-host: 
+  rootPassword: root
+  # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-dbname
+  gmysql-dbname: powerdns
+  # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-user
+  gmysql-user: powerdns
+  # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-password
+  gmysql-password: powerdns
+
+
 # https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
@@ -135,6 +157,7 @@ mariadb:
 
   persistence:
     enabled: true
+
 
 # https://github.com/k8s-at-home/charts/blob/master/charts/stable/powerdns-admin/values.yaml
 # https://github.com/k8s-at-home/library-charts/blob/main/charts/stable/common/values.yaml

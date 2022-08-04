@@ -10,6 +10,8 @@
   helm dependency build
   # then install the local helm chart
   helm install <release name> /path/to/helm/chart/dir --namespace <namespace> --create-namespace
+  # to upgrade local helm chart
+  helm upgrade <release name> /path/to/helm/chart/dir --namespace <namespace> 
   ```
 
 about powerdns, there are 3 most popular powerdns docker image:
