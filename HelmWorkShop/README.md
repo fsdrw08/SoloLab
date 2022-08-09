@@ -602,19 +602,34 @@ Ref:
     --namespace freeipa --create-namespace --wait
   ```
 
-## Install powerdns
+## Install and config powerdns
 - Install PowerDNS helm chart (puckpuck version)
   - Ref:
     - [.\powerdns\values-puckpuck.yaml](powerdns/values-puckpuck.yaml)
+  ```powershell
+  cd "$(git rev-parse --show-toplevel)/HelmWorkShop/charts/powerdns"
+  # if there are some dependencies in the chart, build those dependencies first
+  helm dependency build
+  # then install the local helm chart
+  helm install powerdns ./ --namespace powerdns --create-namespace
   ```
-  helm repo add puckpuck https://puckpuck.github.io/helm-charts
-
-  helm install powerdns puckpuck/powerdns \
-    -f /var/vagrant/HelmWorkShop/powerdns/values-puckpuck.yaml \
-    --namespace powerdns --create-namespace --wait
-  
-  kubectl get pods --namespace powerdns
-  ```
+- Config powerdns-admin
+  1. create admin user
+  2. config powerdns api url, API KEY and PDNS version,
+     api url format: http://<helm release name>.<namespace>:8081/
+  3. create domain and related in-addr domain
+- Create domain from powerdns-admin, should create domain and in-addr domain
+- Create TSIG key in powerdns pod
+  1. get into the pod
+     ```powershell
+     kubectl.exe -n powerdns exec <powerdns pod> -it -- /bin/sh
+     ```
+  2. run command
+     ```
+    pdnsutil generate-tsig-key <key name> hmac-sha256
+    pdnsutil activate-tsig-key <domain name> dhcp-key primary
+    pdnsutil activate-tsig-key <rever domain name> dhcp-key primary
+     ```
 <!-- 
 browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
 create new user account

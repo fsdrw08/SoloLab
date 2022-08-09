@@ -22,19 +22,10 @@ envFrom: []
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
 env: 
   # https://github.com/pschiffe/docker-pdns/blob/master/docker-compose.yml
-  PDNS_gmysql_password: powerdns
-  # https://doc.powerdns.com/authoritative/settings.html#primary
-  PDNS_primary: yes
-  # https://doc.powerdns.com/authoritative/settings.html#api
-  PDNS_api: yes
-  # https://doc.powerdns.com/authoritative/settings.html#api-key
-  PDNS_api_key: PowerDNSAPI
-  # https://doc.powerdns.com/authoritative/settings.html#webserver
-  PDNS_webserver: yes
-  # https://doc.powerdns.com/authoritative/settings.html#webserver-address
-  PDNS_webserver_address: 0.0.0.0
-  # https://doc.powerdns.com/authoritative/settings.html#setting-webserver-allow-from
-  PDNS_webserver_allow_from: 0.0.0.0/0
+  # https://doc.powerdns.com/authoritative/dnsupdate.html#dnsupdate
+  PDNS_dnsupdate: yes
+  # https://doc.powerdns.com/authoritative/settings.html#allow-dnsupdate-from
+  PDNS_allow_dnsupdate_from: 0.0.0.0/0
 # -- Similar to env but with support for all possible configurations.
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
 envVars: []
@@ -132,20 +123,22 @@ powerdns:
   webserver-address: 0.0.0.0
   # https://doc.powerdns.com/authoritative/settings.html#webserver-allow-from
   webserver-allow-from: 0.0.0.0/0
+  # https://doc.powerdns.com/authoritative/settings.html#api
+  api: yes
   # https://doc.powerdns.com/authoritative/settings.html#api-key
   api-key: PowerDNSAPI
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-host
-  gmysql-host: 
-  # some wired config inside the docker image
-  # https://github.com/pschiffe/docker-pdns/blob/master/pdns/docker-entrypoint.sh#L10
-  rootPassword: root
+  # this var only take effect when mariabld.enabled set to false
+  gmysql-host: <release name>-mariadb
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-dbname
   gmysql-dbname: powerdns
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-user
   gmysql-user: powerdns
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-password
   gmysql-password: powerdns
-
+  # some wired config inside the docker image
+  # https://github.com/pschiffe/docker-pdns/blob/master/pdns/docker-entrypoint.sh#L10
+  rootPassword: root
 
 # https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 mariadb:
@@ -160,6 +153,22 @@ mariadb:
   persistence:
     enabled: true
 
+# https://github.com/bitnami/charts/blob/master/bitnami/phpmyadmin/values.yaml
+phpmyadmin:
+  enabled: true
+
+  ingress: 
+    enabled: true
+    ingressClassName: "traefik"
+    annotations:
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      cert-manager.io/cluster-issuer: ca-issuer
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+    hostname: infra.sololab
+    path: /sub-phpmyadmin/
+    pathType: ImplementationSpecific
+    tls: true
 
 # https://github.com/k8s-at-home/charts/blob/master/charts/stable/powerdns-admin/values.yaml
 # https://github.com/k8s-at-home/library-charts/blob/main/charts/stable/common/values.yaml
@@ -180,22 +189,20 @@ powerdns-admin:
         traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
       ingressClassName: traefik
       hosts:
-        - host: infra.sololab
+        - host: pdns-admin.infra.sololab
           ## Configure the paths for the host
           paths:
             # -- Path.  Helm template can be passed.
-          - path: /sub-powerdnsadmin/
-            pathType: ImplementationSpecific
+            - path: /
 
         # -- Configure TLS for the ingress. Both secretName and hosts can process a Helm template.
       tls:
-        - secretName: sololab
+        - secretName: pdns-admin
           hosts:
-          - infra.sololab
+          - pdns-admin.infra.sololab
   
   persistence:
     data:
       enabled: false
-    # config:
-    #   enabled: true
-    #   accessMode: ReadWriteOnce
+    config:
+      enabled: true
