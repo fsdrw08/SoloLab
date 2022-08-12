@@ -25,7 +25,7 @@ env:
   # https://doc.powerdns.com/authoritative/dnsupdate.html#dnsupdate
   PDNS_dnsupdate: yes
   # https://doc.powerdns.com/authoritative/settings.html#allow-dnsupdate-from
-  PDNS_allow_dnsupdate_from: 0.0.0.0/0
+  # PDNS_allow_dnsupdate_from: 0.0.0.0/0
 # -- Similar to env but with support for all possible configurations.
 # See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
 envVars: []
@@ -129,7 +129,7 @@ powerdns:
   api-key: PowerDNSAPI
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-host
   # this var only take effect when mariabld.enabled set to false
-  gmysql-host: <release name>-mariadb
+  gmysql-host: "{{ .Release.Name }}-mariadb"
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-dbname
   gmysql-dbname: powerdns
   # https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-user
@@ -150,12 +150,52 @@ mariadb:
     username: powerdns
     password: powerdns
 
-  persistence:
-    enabled: true
+  initdbScripts: 
+    initPDA.sql: |
+      CREATE DATABASE pda;
+      CREATE USER 'pda' IDENTIFIED BY 'pda';
+      GRANT ALL PRIVILEGES ON pda.* TO 'pda';
+      FLUSH PRIVILEGES;
+
+
+  primary:
+    # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_general_log
+    # https://mariadb.com/kb/en/server-system-variables/
+    configuration: |-
+      [mysqld]
+      skip_name_resolve
+      explicit_defaults_for_timestamp
+      basedir=/opt/bitnami/mariadb
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      tmpdir=/opt/bitnami/mariadb/tmp
+      max_allowed_packet=16M
+      bind_address=*
+      pid_file=/opt/bitnami/mariadb/tmp/mysqld.pid
+      log_error=/opt/bitnami/mariadb/logs/mysqld.log
+      character_set_server=UTF8
+      collation_server=utf8_general_ci
+      slow_query_log=0
+      slow_query_log_file=/opt/bitnami/mariadb/logs/mysqld.log
+      long_query_time=10.0
+      [client]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      default-character-set=UTF8
+      plugin_dir=/opt/bitnami/mariadb/plugin
+      [manager]
+      port=3306
+      socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      pid_file=/opt/bitnami/mariadb/tmp/mysqld.pid
 
 # https://github.com/bitnami/charts/blob/master/bitnami/phpmyadmin/values.yaml
 phpmyadmin:
   enabled: true
+
+  extraEnvVars:
+   - name: TZ
+     value: Asia/Shanghai
 
   ingress: 
     enabled: true
@@ -179,7 +219,9 @@ powerdns-admin:
     tag: latest
 
   env:
+    TZ: Asia/Shanghai
     SECRET_KEY: PowerDNSAPI
+    SQLALCHEMY_DATABASE_URI: "mysql://pda:pda@{{ .Release.Name }}-mariadb/pda"
 
   ingress: 
     main:
@@ -201,8 +243,8 @@ powerdns-admin:
           hosts:
           - pdns-admin.infra.sololab
   
-  persistence:
-    data:
-      enabled: false
-    config:
-      enabled: true
+  # persistence:
+  #   data:
+  #     enabled: false
+  #   config:
+  #     enabled: true

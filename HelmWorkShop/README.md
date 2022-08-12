@@ -625,11 +625,25 @@ Ref:
      kubectl.exe -n powerdns exec <powerdns pod> -it -- /bin/sh
      ```
   2. run command
-     ```
-    pdnsutil generate-tsig-key <key name> hmac-sha256
-    pdnsutil activate-tsig-key <domain name> dhcp-key primary
-    pdnsutil activate-tsig-key <rever domain name> dhcp-key primary
-     ```
+    ```shell
+    KEY_NAME="dhcp-key"
+    KEY_CONTENT="FrumijkFJtKANXpQ/ast8uZAtEa0/OO/0qwLIjPesqCe2a0WE05v1Ax4NBxP2EZI2+j1cYq/99hbwi3epUldWg=="
+    DOMAIN_NAME="sololab"
+    REVERT_DOMAIN_NAME="255.168.192.in-addr.arpa"
+
+    pdnsutil generate-tsig-key $KEY_NAME hmac-sha256
+    # or
+    pdnsutil import-tsig-key $KEY_NAME hmac-sha256 $KEY_CONTENT
+
+    pdnsutil activate-tsig-key $DOMAIN_NAME $KEY_NAME primary
+    pdnsutil activate-tsig-key $REVERT_DOMAIN_NAME $KEY_NAME primary
+
+    pdnsutil add-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 192.168.255.1
+    pdnsutil add-meta $DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+
+    pdnsutil add-meta $REVERT_DOMAIN_NAME ALLOW-DNSUPDATE-FROM 192.168.255.1
+    pdnsutil add-meta $REVERT_DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+    ```
 <!-- 
 browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
 create new user account

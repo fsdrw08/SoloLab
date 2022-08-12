@@ -46,8 +46,9 @@ del service dhcp-server
 config dynamic dns update to powerdns from vyos dhcp server (dhcpd)
 ref:
     https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
-```
+```shell
 config
+set service dhcp-server dynamic-dns-update
 set service dhcp-server shared-network-name LAN shared-network-parameters "key dhcp-key { algorithm hmac-sha256; secret FrumijkFJtKANXpQ/ast8uZAtEa0/OO/0qwLIjPesqCe2a0WE05v1Ax4NBxP2EZI2+j1cYq/99hbwi3epUldWg==; };"
 
 set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;sololab.&quot;;"

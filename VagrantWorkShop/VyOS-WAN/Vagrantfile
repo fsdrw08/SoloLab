@@ -28,7 +28,6 @@ Vagrant.configure("2") do |config|
     end
   end
   config.vm.provision "shell", path: "./provisionConfig-LAN.sh"
-  # config.vm.provision "shell", path: "./provisionConfig-dhcp_relay.sh"
   config.vm.provision "shell", path: "./provisionConfig-dns_forwarding.sh"
   config.vm.provision "shell", path: "./provisionConfig-dhcp_server.sh"
   config.vm.provision "file", source: "./install.sh", destination: "/home/vagrant/install-clash.sh"
