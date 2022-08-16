@@ -638,10 +638,12 @@ Ref:
     pdnsutil activate-tsig-key $DOMAIN_NAME $KEY_NAME primary
     pdnsutil activate-tsig-key $REVERT_DOMAIN_NAME $KEY_NAME primary
 
-    pdnsutil add-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 192.168.255.1
+    # specify actual dhcp server ip (192.168.255.1/32 in this case) will make dns update get refuse,
+    # seems need to specify the ip according the container network environment
+    pdnsutil add-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
     pdnsutil add-meta $DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
 
-    pdnsutil add-meta $REVERT_DOMAIN_NAME ALLOW-DNSUPDATE-FROM 192.168.255.1
+    pdnsutil add-meta $REVERT_DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
     pdnsutil add-meta $REVERT_DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
     ```
 <!-- 

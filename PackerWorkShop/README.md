@@ -1,5 +1,5 @@
 1. Download related ISO to `$env:USERPROFILE\Downloads\ISO\`  
-   VYOS: https://vyos.net/get/snapshots/  
+   VYOS: https://github.com/naa0yama/vyos-build-lts/releases ~~https://vyos.net/get/snapshots/~~ (already disapeared)  
    Alpine Linux: https://www.alpinelinux.org/downloads/
 2. Run script [.\ISO\New-HardLink.bat](ISO/New-HardLink.bat) to create ISO hardlink from `$env:USERPROFILE\Downloads\ISO\` to this folder
 3. Install dos2unix, mkisofs

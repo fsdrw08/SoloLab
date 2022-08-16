@@ -72,21 +72,20 @@ service:
     port: 8081
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: traefik
-    # traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
-    # cert-manager.io/cluster-issuer: ca-issuer
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
   hosts:
     - host: infra.sololab
       paths:
         - path: /sub-powerdns/
           pathType: ImplementationSpecific
-  tls: []
-    # - secretName: sololab
-    #   hosts:
-    #    - infra.sololab
+  tls:
+    - secretName: sololab
+      hosts:
+       - infra.sololab
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -151,7 +150,7 @@ mariadb:
     password: powerdns
 
   initdbScripts: 
-    # sql script to create DB for powerdns-admin
+      # sql script to create DB for powerdns-admin
     initPDA.sql: |
       CREATE DATABASE pda;
       CREATE USER 'pda' IDENTIFIED BY 'pda';
@@ -163,31 +162,30 @@ mariadb:
 phpmyadmin:
   enabled: true
 
-## @param extraEnvVars Extra environment variables to be set on PhpMyAdmin container
+  ## @param extraEnvVars Extra environment variables to be set on PhpMyAdmin container
   ## For example:
   ## extraEnvVars:
   ## - name: PHP_UPLOAD_MAX_FILESIZE
   ##   value: "80M"
   ## - name: TZ
   ##   value: Asia/Shanghai
-  extraEnvVars: []
-  #  - name: TZ
-  #    value: Asia/Shanghai
+  extraEnvVars:
+   - name: TZ
+     value: Asia/Shanghai
 
   ingress: 
-    enabled: false
-    ingressClassName: ""
-    annotations: {}
-      # kubernetes.io/ingress.class: traefik
-      # traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
-      # cert-manager.io/cluster-issuer: ca-issuer
+    enabled: true
+    ingressClassName: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: ca-issuer
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
     hostname: infra.sololab
     path: /sub-phpmyadmin/
     pathType: ImplementationSpecific
     tls: true
 
-  db:
-    chartName: mariadb
+    db:
+      chartName: mariadb
 
 
 # https://github.com/k8s-at-home/charts/blob/master/charts/stable/powerdns-admin/values.yaml
@@ -198,25 +196,18 @@ powerdns-admin:
   image:
     tag: latest
 
-  # -- environment variables. See [undocumented configs](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/configs/docker_config.py)
-  # and [application docs](# https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/configs/development.py) for more details.
-  # @default -- See below (only deviations from the default settings are specified)
   env:
-    # -- Application Timezone
     TZ: Asia/Shanghai
-    # -- Unique app Key
     SECRET_KEY: PowerDNSAPI
-    # -- Database connection string - if not set uses internal sqlite db
     SQLALCHEMY_DATABASE_URI: "mysql://pda:pda@{{ .Release.Name }}-mariadb/pda"
 
   ingress: 
     main:
-      enabled: false
-      annotations: {}
-        # kubernetes.io/ingress.class: traefik
-        # traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
-        # cert-manager.io/cluster-issuer: ca-issuer
-      ingressClassName: # "traefik"
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: ca-issuer
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+      ingressClassName: "traefik"
       hosts:
         - host: pdns-admin.infra.sololab
           ## Configure the paths for the host
@@ -229,4 +220,3 @@ powerdns-admin:
         - secretName: pdns-admin
           hosts:
           - pdns-admin.infra.sololab
-  

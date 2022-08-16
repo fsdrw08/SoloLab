@@ -1,12 +1,12 @@
 dependencies:
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
-  version: 11.1.6
+  version: 11.1.7
 - name: phpmyadmin
   repository: https://charts.bitnami.com/bitnami
-  version: 10.2.3
+  version: 10.2.4
 - name: powerdns-admin
   repository: https://k8s-at-home.com/charts/
   version: 1.2.2
-digest: sha256:fbf91ce2ecca8ff0f27b53fb495c4a6251288d8e155fe2f3b8343e81da0babc6
-generated: "2022-08-08T18:33:46.7645511+08:00"
+digest: sha256:85923760e7ca0bea2303fc4b87121e5b8c76c2bfbdaa810d0777a45224aa6699
+generated: "2022-08-15T10:29:38.584958+08:00"

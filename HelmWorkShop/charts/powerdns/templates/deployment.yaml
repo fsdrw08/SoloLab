@@ -51,11 +51,8 @@ spec:
                   name: {{ template "powerdns.fullname" . }}
                   key: PDNS_api_key
             - name: MYSQL_ENV_MYSQL_HOST
-            {{- if .Values.mariadb.enabled }}
-              value: {{ .Release.Name }}-mariadb
-            {{- else }}
-              value: {{ index .Values.powerdns "gmysql-host" | quote }}
-            {{- end }}
+              # https://github.com/helm/helm/issues/3558
+              value: {{ tpl ( index .Values.powerdns "gmysql-host" ) . }}
             - name: MYSQL_ENV_MYSQL_DATABASE
               value: {{ index .Values.powerdns "gmysql-dbname" | quote }}
             - name: MYSQL_ENV_MYSQL_USER

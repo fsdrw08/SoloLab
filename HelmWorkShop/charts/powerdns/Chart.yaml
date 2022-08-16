@@ -1,6 +1,13 @@
 apiVersion: v2
 name: powerdns
-description: Deploy PowerDNS
+description: PowerDNS all in one (powerdns + powerdns-admin + mariadb + phpmyadmin) helm chart. 
+keywords:
+  - powerdns
+  - pdns
+  - dns
+maintainers:
+  - name: Windom WU
+home: https://github.com/fsdrw08/sololab
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -21,7 +28,7 @@ version: 0.1.2
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "alpine"
+appVersion: "4.5.3"
 
 dependencies:
 - name: mariadb
