@@ -1,0 +1,22 @@
+# https://github.com/johanneskastl/389server-helm-chart/blob/main/charts/389server/values.yaml
+
+image:
+  repository: 389ds/dirsrv
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+tls_certificates_from_secret:
+  enabled: true
+
+  # generate a certificate resource for cert-manager
+  #
+  generate_certificate: true
+  certificate:
+    commonName: infra.sololab
+    dnsNames:
+      - infra.sololab
+    issuerRef:
+      name: ca-issuer
+      kind: ClusterIssuer
+    secretName: infra.sololab
