@@ -5,3 +5,4 @@
 [submodule "HelmWorkShop/helm-charts"]
 	path = HelmWorkShop/helm-charts
 	url = https://github.com/fsdrw08/helm-charts.git
+	branch = gh-pages

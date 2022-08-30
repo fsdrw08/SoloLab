@@ -12,3 +12,5 @@ according to below info, need to manually init/create backend (dsconf localhost 
 https://fy.blackhats.net.au/blog/html/2019/07/05/using_389ds_with_docker.html
 https://www.reddit.com/r/kubernetes/comments/jqymmu/anyone_deployed_a_389ds_ldap_server_on_k8s/
 https://github.com/gabibbo97/k8s-misc/tree/master/389ds
+
+https://directory.fedoraproject.org/docs/389ds/howto/howto-deploy-389ds-on-openshift.html
