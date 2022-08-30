@@ -1,7 +1,3 @@
-[submodule "PackerWorkShop/hv-packer"]
-	path = PackerWorkShop/hv-packer
-	url = https://github.com/fsdrw08/hv-packer.git
-	branch = SoloLab
 [submodule "HelmWorkShop/helm-charts"]
 	path = HelmWorkShop/helm-charts
 	url = https://github.com/fsdrw08/helm-charts.git
