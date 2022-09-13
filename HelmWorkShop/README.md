@@ -607,11 +607,24 @@ Ref:
   - Ref:
     - [.\powerdns\values-puckpuck.yaml](powerdns/values-puckpuck.yaml)
   ```powershell
-  cd "$(git rev-parse --show-toplevel)/HelmWorkShop/charts/powerdns"
+  cd "$(git rev-parse --show-toplevel)/HelmWorkShop/helm-charts/charts/powerdns"
   # if there are some dependencies in the chart, build those dependencies first
   helm dependency build
   # then install the local helm chart
   helm install powerdns ./ --namespace powerdns --create-namespace
+  
+  # or install from online repo
+  helm repo add fsdrw08 https://fsdrw08.github.io/helm-charts/
+
+  $releaseName="powerdns-test"
+  $chartDir="C:\Users\drw_0\source\repos\SoloLab\HelmWorkShop\helm-charts\charts\powerdns"
+  $nameSpace="powerdns-test"
+  $customValue="C:\Users\drw_0\source\repos\SoloLab\HelmWorkShop\powerdns\values-sololab-test.yaml"
+  helm install $releaseName $chartDir --namespace $nameSpace --create-namespace -f $customValue
+  
+  helm install powerdns-test fsdrw08/powerdns `
+    -f .\HelmWorkShop\powerdns\values-sololab-test.yaml `
+    --namespace powerdns-test --create-namespace
   ```
 - Config powerdns-admin
   1. create admin user
