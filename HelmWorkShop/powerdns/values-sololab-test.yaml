@@ -1,0 +1,222 @@
+# Default values for powerdns.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: pschiffe/pdns-mysql
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "alpine"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Additional environment variables mounted from [secrets](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) or [config maps](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables).
+# See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
+envFrom: []
+
+# -- Additional environment variables passed directly to containers.
+# See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
+env: 
+  # PowerDNS server is configurable via env vars. Every variable starting with PDNS_ will be inserted into /etc/pdns/pdns.conf conf file in the following way: prefix PDNS_ will be stripped and every _ will be replaced with -. 
+  # ref: https://github.com/pschiffe/docker-pdns#pdns-mysql
+  # https://doc.powerdns.com/authoritative/dnsupdate.html#dnsupdate
+  PDNS_dnsupdate: yes
+
+# -- Similar to env but with support for all possible configurations.
+# See the [API reference](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables) for details.
+envVars: []
+# - name: SOME_ENV_VAR
+#   value: value
+# - name: SOME_ENV_VAR2
+#   valueFrom:
+#     secretKeyRef:
+#       name: secret-name
+#       key: secret-key
+# - name: SOME_ENV_VAR3
+#   valueFrom:
+#     configMapKeyRef:
+#       name: config-map-name
+#       key: config-map-key
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  dns:
+    type: ClusterIP
+  api:
+    type: ClusterIP
+    port: 8081
+
+ingress:
+  enabled: false
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+  hosts:
+    - host: infra.sololab
+      paths:
+        - path: /sub-powerdns/
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: sololab
+      hosts:
+       - infra.sololab
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+powerdns:
+  # ref: https://doc.powerdns.com/authoritative/settings.html#primary
+  primary: yes
+  # ref: https://doc.powerdns.com/authoritative/settings.html#webserver
+  webserver: yes
+  # ref: https://doc.powerdns.com/authoritative/settings.html#webserver-address
+  webserver-address: 0.0.0.0
+  # ref: https://doc.powerdns.com/authoritative/settings.html#webserver-allow-from
+  webserver-allow-from: 0.0.0.0/0
+  # ref: https://doc.powerdns.com/authoritative/settings.html#api
+  api: yes
+  # ref: https://doc.powerdns.com/authoritative/settings.html#api-key
+  api-key: PowerDNSAPI
+  # ref: https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-host
+  # no need to change this var if mariabld.enabled set to true
+  gmysql-host: "{{ .Release.Name }}-mariadb"
+  # ref: https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-dbname
+  gmysql-dbname: powerdns
+  # ref: https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-user
+  gmysql-user: powerdns
+  # ref: https://doc.powerdns.com/authoritative/backends/generic-mysql.html#gmysql-password
+  gmysql-password: powerdns
+  # some weird config inside the docker image
+  # ref: https://github.com/pschiffe/docker-pdns/blob/master/pdns/docker-entrypoint.sh#L10
+  rootPassword: root
+
+
+# https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+mariadb:
+  enabled: true
+
+  auth:
+    rootPassword: root
+    database: powerdns
+    username: powerdns
+    password: powerdns
+
+  initdbScripts: 
+      # sql script to create DB for powerdns-admin
+    initPDA.sql: |
+      CREATE DATABASE pda;
+      CREATE USER 'pda' IDENTIFIED BY 'pda';
+      GRANT ALL PRIVILEGES ON pda.* TO 'pda';
+      FLUSH PRIVILEGES;
+
+
+# https://github.com/bitnami/charts/blob/master/bitnami/phpmyadmin/values.yaml
+phpmyadmin:
+  enabled: false
+
+  ## @param extraEnvVars Extra environment variables to be set on PhpMyAdmin container
+  ## For example:
+  ## extraEnvVars:
+  ## - name: PHP_UPLOAD_MAX_FILESIZE
+  ##   value: "80M"
+  ## - name: TZ
+  ##   value: Asia/Shanghai
+  extraEnvVars:
+   - name: TZ
+     value: Asia/Shanghai
+
+  ingress: 
+    enabled: true
+    ingressClassName: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: ca-issuer
+      traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+    hostname: infra.sololab
+    path: /sub-phpmyadmin/
+    pathType: ImplementationSpecific
+    tls: true
+
+    db:
+      chartName: mariadb
+
+
+# https://github.com/k8s-at-home/charts/blob/master/charts/stable/powerdns-admin/values.yaml
+# https://github.com/k8s-at-home/library-charts/blob/main/charts/stable/common/values.yaml
+powerdns-admin:
+  enabled: false
+
+  image:
+    tag: latest
+
+  env:
+    TZ: Asia/Shanghai
+    SECRET_KEY: PowerDNSAPI
+    SQLALCHEMY_DATABASE_URI: "mysql://pda:pda@{{ .Release.Name }}-mariadb/pda"
+
+  ingress: 
+    main:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: ca-issuer
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+      ingressClassName: "traefik"
+      hosts:
+        - host: pdns-admin.infra.sololab
+          ## Configure the paths for the host
+          paths:
+            # -- Path.  Helm template can be passed.
+            - path: /
+
+        # -- Configure TLS for the ingress. Both secretName and hosts can process a Helm template.
+      tls:
+        - secretName: pdns-admin
+          hosts:
+          - pdns-admin.infra.sololab
