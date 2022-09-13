@@ -1,0 +1,42 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks: 
+  - name: install pre-requirest
+    pip:
+      name:
+        - pyyaml
+        - kubernetes
+
+  # kubectl get po -n powerdns -l app.kubernetes.io/name=powerdns -o=jsonpath='{.items..metadata.name}'
+  - name: Get PDNS pod name
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: Pod
+      namespace: powerdns
+      label_selectors:
+        - app.kubernetes.io/name=powerdns
+    register: pod_name
+
+  - name: output
+    debug: 
+      # https://github.com/rcarrata/devsecops-demo/blob/main/bootstrap/roles/ocp4-install-cicd/tasks/cicd.yaml#L41
+      # msg: "{{ pod_name.resources[0].metadata.name }}"
+      var: pod_name.resources[0].metadata.name
+
+  - name: pdnsutil create-zone 
+    kubernetes.core.k8s_exec:
+      namespace: powerdns
+      pod: "{{ pod_name.resources[0].metadata.name }}"
+      command: pdnsutil create-zone sololab
+    ignore_errors: True
+
+  - name: pdnsutil list-zone 
+    kubernetes.core.k8s_exec:
+      namespace: powerdns
+      pod: "{{ pod_name.resources[0].metadata.name }}"
+      command: pdnsutil list-zone sololab
+    register: zone
+    
+  - name: output
+    debug: var=zone.stdout_lines
