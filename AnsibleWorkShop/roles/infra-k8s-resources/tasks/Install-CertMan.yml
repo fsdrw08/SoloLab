@@ -1,0 +1,57 @@
+---
+- name: Install Cert Manager
+  block:
+    - name: Add bitnami chart repo
+      kubernetes.core.helm_repository:
+        name: bitnami
+        repo_url: "https://charts.bitnami.com/bitnami"
+
+    - name: Install Cert Manager helm chart
+      kubernetes.core.helm:
+        chart_ref: bitnami/cert-manager
+        release_name: cert-manager
+        release_namespace: cert-manager
+        create_namespace: yes
+        wait: yes
+        values:
+          installCRDs: true
+      register: certManHelm
+
+    - name: Get k3s server ca crt
+      become: yes
+      ansible.builtin.slurp:
+        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
+      register: crt
+      when: (certManHelm is succeeded)
+
+    - name: Get k3s server ca key
+      become: yes
+      ansible.builtin.slurp:
+        path: /var/lib/rancher/k3s/server/tls/server-ca.key
+      register: key
+      when: (certManHelm is succeeded)
+
+    # - name: Debug template
+    #   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
+    #   ansible.builtin.debug: 
+    #     msg: "{{ lookup('ansible.builtin.template', 'ca-key-pair.yaml.j2') | split('\n') | from_yaml }}"
+
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: find all templates in directories
+      ansible.builtin.find:
+        paths: "{{ certman_resources_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    # https://github.com/BriceMichalski/mbcaas/blob/develop/roles/kube-core/tasks/production.yml
+    # https://github.com/BonusPlay/infra/blob/63253142e5bd33880de2a976fb171fa8f797c139/roles/k8s/tasks/templates.yaml
+    - name: Config Cert Manager additional resources (e.g. CA issuer)
+      kubernetes.core.k8s:
+        state: present
+        template: "{{ item }}"
+        namespace: cert-manager
+      with_items: "{{ templates.files | map(attribute='path') }}"
+      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#conditions-based-on-registered-variables
+      when: (certManHelm is succeeded) and (crt is defined) and (key is defined)

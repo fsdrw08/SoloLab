@@ -1,0 +1,40 @@
+---
+- name: Install Dex
+  block:
+    - name: Add dex chart repo
+      kubernetes.core.helm_repository:
+        name: dex
+        repo_url: "https://charts.dexidp.io"
+
+    - name: Install Traefik helm chart
+      kubernetes.core.helm:
+        chart_ref: dex/dex
+        release_name: dex
+        release_namespace: dex
+        create_namespace: yes
+        wait: yes
+        values_files:
+          - "{{ dex_helm_values_path }}"
+      register: dexHelm
+    
+    - name: Get dex local user name(email)
+      ansible.builtin.slurp:
+        path: "{{ dex_helm_values_path }}"
+      register: crt
+      when: (certManHelm is succeeded)
+
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: find all templates in directories
+      ansible.builtin.find:
+        paths: "{{ dex_resources_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    - name: Dex additional resources (RBAC for dex "local admin" user)
+      kubernetes.core.k8s:
+        state: present
+        template: "{{ item }}"
+        namespace: dex
+      with_items: "{{ templates.files | map(attribute='path') }}"

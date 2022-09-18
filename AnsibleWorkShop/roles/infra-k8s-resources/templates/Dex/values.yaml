@@ -1,0 +1,103 @@
+# https://github.com/dexidp/helm-charts/blob/master/charts/dex/values.yaml
+# https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
+# https://zhuanlan.zhihu.com/p/381755603
+# replicaCount: 3
+image:  
+  repository: dexidp/dex
+
+ingress:
+  enabled: true
+  # className: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    # create cert when the helm install run
+    # https://cert-manager.io/docs/usage/ingress/
+    cert-manager.io/cluster-issuer: ca-issuer
+  hosts:
+    - host: infra.sololab
+      paths:
+        - path: /dex/
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: infra.sololab
+      hosts:
+        - infra.sololab
+
+# -- Application configuration.
+# See the [official documentation](https://dexidp.io/docs/).
+# https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
+config:
+  issuer: https://infra.sololab/dex
+
+  # https://dexidp.io/docs/storage/#configuration
+  storage:
+    type: kubernetes
+    config:
+      inCluster: true
+
+  web:
+      http: 0.0.0.0:5556
+      # tlsCert: /etc/dex/tls/tls.crt
+      # tlsKey: /etc/dex/tls/tls.key
+      
+  # frontend:
+  #   theme: "coreos"
+  #   issuer: "kube-dtln"
+  #   issuerUrl: "https://login.ash.dtln.cloud"
+  # oauth2:
+  #   # responseTypes: ["code", "token", "id_token"]
+  #   skipApprovalScreen: true
+
+  # connectors:
+  #   - type: github
+  #     id: github
+  #     name: GitHub
+  #     config:
+  #       clientID: "{{ .Env.GITHUB_CLIENT_ID }}"
+  #       clientSecret: "{{ .Env.GITHUB_CLIENT_SECRET }}"
+  #       redirectURI: https://dex.lab/callback
+  #       orgs:4
+  #         - name: your-github-org-name
+  #           teams:
+  #             - your-github-team-name
+
+  # Uncomment this block to enable configuration for the expiration time durations.
+  # Is possible to specify units using only s, m and h suffixes.
+  expiry:
+    deviceRequests: "5m"
+    signingKeys: "6h"
+    idTokens: "24h"
+    refreshTokens:
+      reuseInterval: "3s"
+      validIfNotUsedFor: "2160h" # 90 days
+      absoluteLifetime: "3960h" # 165 days
+
+  # Options for controlling the logger.
+  logger:
+    level: "debug"
+    format: "text"
+
+  staticClients:
+    - id: kubernetes
+      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      name: "SoloLab Cluster"
+      redirectURIs:
+      - https://infra.sololab/sub-loginapp/callback
+      - https://core.harbor.lab/c/oidc/callback
+      # - http://localhost:8000
+
+  # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
+  enablePasswordDB: true
+  staticPasswords:
+  - email: "dexadmin@infra.sololab"
+  # echo $(echo password | htpasswd -BinC 10 dexadmin | cut -d: -f2)
+  # https://httpd.apache.org/docs/current/programs/htpasswd.html
+  # echo $(echo password | htpasswd -n -i -BC 10 dexadmin | cut -d: -f2)
+    # hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2y$10$.V6EcNlkVPqzx21QIh7HA.QL.Fqi91FTaMsEGqstQnxm.5JyGpBOW"
+    username: "dexadmin"
+    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+# Note: this will inject the environment variables directly to the pods.# In a production environment you should mount these keys from a secret using envFrom.# See https://artifacthub.io/packages/helm/dex/dex#values
+# env:
+#   GITHUB_CLIENT_ID: "your-github-client-id"
+#   GITHUB_CLIENT_SECRET: "your-github-client-secret"

@@ -1,0 +1,48 @@
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+
+# Use ingressClass. Ignored if Traefik version < 2.3 / kubernetes < 1.18.x
+ingressClass:
+  # true is not unit-testable yet, pending https://github.com/rancher/helm-unittest/pull/12
+  enabled: true
+  isDefaultClass: true
+  fallbackApiVersion: "v1"
+
+ports:
+  web:
+    # Added in 2.2, you can make permanent redirects via entrypoints.
+    # https://docs.traefik.io/routing/entrypoints/#redirection
+    redirectTo: websecure
+  websecure:
+    # Set TLS at the entrypoint
+    # https://doc.traefik.io/traefik/routing/entrypoints/#tls
+    tls:
+      enabled: true
+
+ingressRoute:
+  # install traefik dashboard later
+  dashboard:
+    enabled: false
+
+# Configure providers
+#
+# https://github.com/himynameisjonas/evil-exes/blob/9d9a30ca1881cef49eb0b4de7c222694670a59ae/cluster/apps/networking/traefik/helm-release.yaml
+providers:
+  kubernetesIngress:
+    # IP used for Kubernetes Ingress endpoints
+    publishedService:
+      enabled: true
+    ingressClass: traefik
+
+# additionalArguments:
+#   - "--serversTransport.insecureSkipVerify=true"
+
+# Logs
+# https://docs.traefik.io/observability/logs/
+logs:
+  # Traefik logs concern everything that happens to Traefik itself (startup, configuration, events, shutdown, and so on).
+  general:
+    # By default, the logs use a text format (common), but you can
+    # also ask for the json format in the format option
+    # format: json
+    # By default, the level is set to ERROR. Alternative logging levels are DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
+    level: FATAL

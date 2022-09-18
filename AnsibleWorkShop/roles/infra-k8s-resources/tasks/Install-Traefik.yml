@@ -1,0 +1,34 @@
+---
+- name: Install Traefik ingress
+  block:
+    - name: Add Traefik chart repo
+      kubernetes.core.helm_repository:
+        name: traefik
+        repo_url: "https://helm.traefik.io/traefik"
+
+    - name: Install Traefik helm chart
+      kubernetes.core.helm:
+        chart_ref: traefik/traefik
+        release_name: traefik
+        release_namespace: traefik
+        create_namespace: yes
+        wait: yes
+        values_files:
+          - "{{ traefik_helm_values_path }}"
+      register: traefikHelm
+    
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: find all templates in directories
+      ansible.builtin.find:
+        paths: "{{ traefik_resources_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    - name: Traefik additional resources (dashboard, StripPrefixRegex)
+      kubernetes.core.k8s:
+        state: present
+        template: "{{ item }}"
+        namespace: traefik
+      with_items: "{{ templates.files | map(attribute='path') }}"

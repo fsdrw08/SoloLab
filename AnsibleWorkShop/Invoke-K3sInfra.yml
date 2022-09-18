@@ -1,0 +1,4 @@
+---
+- hosts: localhost
+  roles:
+  - infra-k8s-resources

@@ -1,0 +1,15 @@
+---
+# tasks file for infra
+  - name: Install Pre-Requirement
+    ansible.builtin.include_tasks: Install-PreRequirements.yml
+    register: Install_PreRequirements
+
+  - name: Install CertMan
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_tasks_module.html
+    ansible.builtin.include_tasks: Install-CertMan.yml
+    register: Install_CertMan
+    when: Install_PreRequirements is succeeded
+
+  - name: Install Traefik
+    ansible.builtin.include_tasks: Install-Traefik.yml
+    when: Install_CertMan is succeeded

@@ -1,0 +1,9 @@
+---
+- name: Install Pre-Requirest
+  block:
+    - name: Install Pre-Requirest
+      pip:
+        name:
+          - pyyaml
+          - kubernetes
+          - jsonpatch

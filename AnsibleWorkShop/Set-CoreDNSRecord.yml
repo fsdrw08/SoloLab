@@ -1,0 +1,43 @@
+- hosts: localhost
+  gather_facts: true
+  tasks: 
+  - name: output IP address
+    debug:
+      msg: "{{ ansible_default_ipv4.address }}"
+
+  - name: Get coreDNS template
+    ansible.builtin.slurp: 
+      path: /var/vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
+    register: coreDNS
+
+  - name: Get coreDNS template content
+    ansible.builtin.set_fact:
+      coreDNSTemplate: "{{ coreDNS.content | b64decode | from_yaml }}"
+
+  - name: Update coreDNS template content
+    ansible.builtin.set_fact:
+      updated: "{{ coreDNSTemplate | combine(newdata, recursive=True) }}"
+    vars: 
+      newdata:
+        data:
+          sololab.server: |-
+            infra.sololab {
+              hosts {
+                "{{ ansible_default_ipv4.address }}"  infra.sololab
+                fallthrough
+              }
+            }
+
+  - name: Write yaml file
+    ansible.builtin.copy:
+      content: "{{ updated | to_nice_yaml(indent=2, width=1337) }}"
+      dest: /var/vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
+
+  - name: Read yaml file
+    ansible.builtin.shell: |
+      cat /var/vagrant/HelmWorkShop/coreDNS/CM-coredns-custom.yaml
+    register: YAML
+    
+  - name: output
+    # debug: var={{user.config.staticPasswords[0].email}}
+    debug: var=YAML

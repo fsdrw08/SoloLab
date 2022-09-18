@@ -1,0 +1,55 @@
+---
+- hosts: localhost
+  gather_facts: false
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  tasks:
+    - name: find all directories in templates
+      become: yes
+      ansible.builtin.find:
+        paths: /var/lib/rancher/k3s/server/tls/
+        file_type: file
+        patterns: '*crt'
+        recurse: yes
+      register: templates
+
+    - name: Debug template
+      become: yes
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
+      ansible.builtin.debug: 
+        msg: "{{ item }}"
+        # msg: "{{ lookup('fileglob', '/var/vagrant/AnsibleWorkShop/*', wantlist=True) | map('basename') | list  }}"
+      with_items: "{{ templates.files | map(attribute='path') }}"
+
+  # - name: Get secret template
+  #   ansible.builtin.slurp:
+  #     path: /var/vagrant/HelmWorkShop/cert-manager/ca-issuer/ca-key-pair.yaml
+  #   register: ca
+
+  # - name: Get secret template content
+  #   ansible.builtin.set_fact:
+  #     caTemplate: "{{ ca.content | b64decode | from_yaml }}"
+
+  # - name: Update secret template
+  #   ansible.utils.update_fact:
+  #     updates:
+  #     - path: caTemplate.data['tls.crt']
+  #       value: "{{ crt.content }}"
+  #     - path: caTemplate.data['tls.key']
+  #       value: "{{ key.content }}"
+  #   register: updated
+
+  # - name: Write yaml file
+  #   ansible.builtin.copy:
+  #     # https://stackoverflow.com/questions/65139989/ansible-how-to-fix-to-nice-yaml-output-quotation-and-line-breaks
+  #     content: '{{ updated.caTemplate | to_nice_yaml(indent=2) }}'
+  #     dest: /var/vagrant/HelmWorkShop/cert-manager/ca-issuer/ca-key-pair.yaml
+
+  # - name: Read yaml file
+  #   ansible.builtin.shell: |
+  #     cat /var/vagrant/HelmWorkShop/cert-manager/ca-issuer/ca-key-pair.yaml
+  #   register: YAML
+
+  # - name: output
+  #   # debug: var={{user.config.staticPasswords[0].email}}
+  #   debug:
+  #     msg: "{{ YAML.stdout_lines }}"

@@ -1,0 +1,8 @@
+---
+# defaults file for infra
+certman_resources_dir: "{{ role_path }}/templates/CertMan"
+
+traefik_helm_values_path: "{{ role_path }}/templates/Traefik/values.yaml"
+traefik_resources_dir: "{{ role_path }}/templates/Traefik"
+
+dex_helm_values_path: "{{ role_path }}/templates/Dex/values.yaml"
