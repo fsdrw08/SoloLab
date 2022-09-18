@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "hyperv" do |hv, config|
     # hv.mac = "0000BABEFACE"
     hv.vmname = "InfraSvc-oSLMicro"
-    hv.maxmemory = 2048
+    hv.maxmemory = 4096
     hv.memory = 1024
     hv.cpus = 2
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
@@ -35,12 +35,19 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
 
   # set static ip for this VM
+  # ref: https://forums.opensuse.org/showthread.php/431523-Configure-Static-Ip-using-the-Terminal?p=2109324#post2109324
+
+  # config IP address to the interface
   config.vm.provision "file", source: "./ifcfg-eth0", destination: "/home/vagrant/ifcfg-eth0"
+  # https://documentation.suse.com/sles/15-SP4/html/SLES-all/cha-network.html#sec-network-manconf-files-ifcfg
   config.vm.provision "shell", inline: "sudo cp /home/vagrant/ifcfg-eth0 /etc/sysconfig/network/ifcfg-eth0"
 
+  # config gateway address
   config.vm.provision "file", source: "./routes", destination: "/home/vagrant/routes"
+  # https://documentation.suse.com/sles/15-SP4/html/SLES-all/cha-network.html#sec-network-manconf-files-routes
   config.vm.provision "shell", inline: "sudo cp /home/vagrant/routes /etc/sysconfig/network/routes"
   
+  # config DNS server
   config.vm.provision "shell", path: "Set-StaticDNSServer.sh"
 
   # install k8s related tools
