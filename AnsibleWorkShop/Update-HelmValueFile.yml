@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  gather_facts: false
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  become: yes
+  tasks:
+    - name: Get server ca crt
+      ansible.builtin.slurp:
+        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
+      register: crtEncoded
+    
+    - name: decode crt
+      ansible.builtin.set_fact:
+        crt: "{{ crtEncoded['content'] | b64decode }}"
+        valuePath: '/var/vagrant/AnsibleWorkShop/roles/infra-k8s-resources/templates/Loginapp/values.yaml.j2'
+
+    - name: debug
+      debug:
+        msg: "{{ lookup('template', valuePath) }}"

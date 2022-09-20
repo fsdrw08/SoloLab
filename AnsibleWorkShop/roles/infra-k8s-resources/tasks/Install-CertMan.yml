@@ -16,6 +16,8 @@
         values:
           installCRDs: true
       register: certManHelm
+      retries: 10
+      until: certManHelm is not failed
 
     - name: Get k3s server ca crt
       become: yes

@@ -1,0 +1,33 @@
+---
+- name: Install Loginapp
+  block:
+    - name: Add Loginapp chart repo
+      kubernetes.core.helm_repository:
+        name: loginapp
+        repo_url: "https://storage.googleapis.com/loginapp-releases/charts/"
+
+    - name: Get k3s server ca crt
+      become: yes
+      ansible.builtin.slurp:
+        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
+      register: crtEncoded
+
+    - name: decode crt
+      ansible.builtin.set_fact:
+        crt: "{{ crtEncoded['content'] | b64decode }}"
+
+    - name: Install loginapp helm chart
+      kubernetes.core.helm:
+        chart_ref: loginapp/loginapp
+        release_name: loginapp
+        release_namespace: dex
+        wait: yes
+        values_files:
+          - "{{ loginapp_helm_values_path }}"
+        values: 
+          config.clusters[0].certificate-authority: "{{ crt }}"
+
+      register: loginappHelm
+      retries: 3
+      delay: 3
+      until: loginappHelm is not failed

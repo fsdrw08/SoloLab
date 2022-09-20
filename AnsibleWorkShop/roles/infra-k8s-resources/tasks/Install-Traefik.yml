@@ -16,6 +16,8 @@
         values_files:
           - "{{ traefik_helm_values_path }}"
       register: traefikHelm
+      retries: 10
+      until: traefikHelm is not failed
     
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
     - name: find all templates in directories

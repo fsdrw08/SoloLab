@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  gather_facts: false
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  become: yes
+  tasks:
+    - name: update text
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html
+      ansible.builtin.blockinfile:
+        path: /home/vagrant/k3s
+        insertbefore: '>>/var/log/k3s.log 2>&1"'
+        block: |2+
+                  '--kube-apiserver-arg' \
+                  'oidc-issuer-url=https://infra.sololab/dex' \
+                  '--kube-apiserver-arg' \
+                  'oidc-client-id=kubernetes' \
+                  '--kube-apiserver-arg' \
+                  'oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt' \
+                  '--kube-apiserver-arg' \
+                  'oidc-username-claim=email' \
+                  '--kube-apiserver-arg' \
+                  'oidc-groups-claim=groups' \

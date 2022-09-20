@@ -6,7 +6,7 @@
         name: dex
         repo_url: "https://charts.dexidp.io"
 
-    - name: Install Traefik helm chart
+    - name: Install Dex helm chart
       kubernetes.core.helm:
         chart_ref: dex/dex
         release_name: dex
@@ -16,12 +16,19 @@
         values_files:
           - "{{ dex_helm_values_path }}"
       register: dexHelm
+      retries: 10
+      until: dexHelm is not failed
     
     - name: Get dex local user name(email)
-      ansible.builtin.slurp:
-        path: "{{ dex_helm_values_path }}"
-      register: crt
-      when: (certManHelm is succeeded)
+      # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook
+      ansible.builtin.include_vars:
+        file: "{{ dex_helm_values_path }}"
+        name: dexValue
+      when: (dexHelm is succeeded)
+
+    - name: set fact
+      ansible.builtin.set_fact: 
+        user: "{{ dexValue.config.staticPasswords[0].email }}"
 
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
     - name: find all templates in directories

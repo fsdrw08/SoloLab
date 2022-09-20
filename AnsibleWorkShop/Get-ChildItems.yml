@@ -3,22 +3,32 @@
   gather_facts: false
   # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
   tasks:
-    - name: find all directories in templates
-      become: yes
-      ansible.builtin.find:
-        paths: /var/lib/rancher/k3s/server/tls/
-        file_type: file
-        patterns: '*crt'
-        recurse: yes
-      register: templates
+    # - name: find all directories in templates
+    #   become: yes
+    #   ansible.builtin.find:
+    #     paths: /var/lib/rancher/k3s/server/tls/
+    #     file_type: file
+    #     patterns: '*crt'
+    #     recurse: yes
+    #   register: templates
 
-    - name: Debug template
-      become: yes
-      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
+    - name: get values from yaml
+      ansible.builtin.include_vars:
+        # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook
+        file: /var/vagrant/HelmWorkShop/dex/values.yaml
+        name: dexValue
+
+    - name: set fact
+      ansible.builtin.set_fact: 
+        user: "{{ dexValue.config.staticPasswords[0].email }}"
+
+    - name: Debug dexValue
+      # become: yes
       ansible.builtin.debug: 
-        msg: "{{ item }}"
+        msg: "{{ user }}"
+        # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
         # msg: "{{ lookup('fileglob', '/var/vagrant/AnsibleWorkShop/*', wantlist=True) | map('basename') | list  }}"
-      with_items: "{{ templates.files | map(attribute='path') }}"
+      # with_items: "{{ templates.files | map(attribute='path') }}"
 
   # - name: Get secret template
   #   ansible.builtin.slurp:

@@ -1,0 +1,13 @@
+# https://github.com/kingdonb/github-actions-demo/blob/main/scripts/patch-coredns.sh
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+data:
+  sololab.server: |
+    infra.sololab {
+      hosts {
+        {{ ansible_default_ipv4.address }}  infra.sololab
+        fallthrough
+      }
+    }
