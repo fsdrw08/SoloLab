@@ -1,4 +1,4 @@
 ---
 - hosts: localhost
   roles:
-  - infra-k8s-resources
+  - infra-kube-resources
