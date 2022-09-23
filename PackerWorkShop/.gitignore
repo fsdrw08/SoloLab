@@ -1,5 +1,6 @@
 vbox/*
 ISO/*
+*/packer_cache
 
 !ISO/New-HardLink.ps1
 !ISO/New-HardLink.bat
