@@ -96,6 +96,7 @@ source "hyperv-iso" "vm" {
   iso_url               = "${var.iso_url}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
+  skip_export           = "true"
   shutdown_command      = "echo 'vagrant' | sudo -S shutdown -P now"
   shutdown_timeout      = "30m"
   ssh_password          = "vagrant"
