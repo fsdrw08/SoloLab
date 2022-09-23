@@ -2,7 +2,7 @@ galaxy_info:
   author: Windom
   description: Deploy kubernetes componments for Sololab k3s Infra cluster
   company: your company (optional)
-  role_name: infra
+  role_name: infra-kube-resources
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

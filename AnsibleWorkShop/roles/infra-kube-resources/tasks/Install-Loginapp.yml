@@ -26,7 +26,6 @@
           - "{{ loginapp_helm_values_path }}"
         values: 
           config.clusters[0].certificate-authority: "{{ crt }}"
-
       register: loginappHelm
       retries: 3
       delay: 3
