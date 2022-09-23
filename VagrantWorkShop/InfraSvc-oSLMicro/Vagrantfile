@@ -65,7 +65,9 @@ Vagrant.configure("2") do |config|
   # set dns record for the cluster fqdn
   config.vm.provision "shell", path: "Add-HostsResolve.sh"
 
-  
+  # config podman
+  config.vm.provision "shell", path: "Grant-PodmanAccess.sh"
+
   # reboot
   config.vm.provision "shell", reboot: true
 
