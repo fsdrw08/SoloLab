@@ -1,6 +1,5 @@
 ---
 - name: Install Dex
-  gather_facts: true
   block:
     - name: Add dex chart repo
       kubernetes.core.helm_repository:

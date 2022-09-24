@@ -1,4 +1,5 @@
 ---
 - hosts: localhost
+  gather_facts: true
   roles:
   - infra-kube-resources

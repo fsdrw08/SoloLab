@@ -1,6 +1,7 @@
 ---
 # handlers file for infra
 - name: Restart k3s service
+  become: yes
   ansible.builtin.service:
     name: k3s
     state: restarted
