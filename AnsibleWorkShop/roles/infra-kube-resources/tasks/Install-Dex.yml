@@ -1,5 +1,6 @@
 ---
 - name: Install Dex
+  gather_facts: true
   block:
     - name: Add dex chart repo
       kubernetes.core.helm_repository:
@@ -20,15 +21,18 @@
       until: dexHelm is not failed
     
     - name: Get dex local user name(email)
-      # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook
+      # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook/68731110#68731110
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_vars_module.html
       ansible.builtin.include_vars:
         file: "{{ dex_helm_values_path }}"
         name: dexValue
       when: (dexHelm is succeeded)
 
-    - name: set fact
+    - name: set fact (assign value to var)
       ansible.builtin.set_fact: 
         user: "{{ dexValue.config.staticPasswords[0].email }}"
+        issuer: "{{ dexValue.config.issuer }}"
+        staticClientID: "{{ dexValue.config.staticClients[0].id }}"
 
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
     - name: find all templates in directories
@@ -45,3 +49,23 @@
         template: "{{ item }}"
         namespace: dex
       with_items: "{{ templates.files | map(attribute='path') }}"
+      
+    - name: update k3s service config
+      become: yes
+      ansible.builtin.blockinfile:
+        path: /etc/init.d/k3s
+        insertbefore: '>>/var/log/k3s.log 2>&1"'
+        block: |2+
+                  '--kube-apiserver-arg' \
+                  'oidc-issuer-url={{ issuer }}' \
+                  '--kube-apiserver-arg' \
+                  'oidc-client-id={{ staticClientID }}' \
+                  '--kube-apiserver-arg' \
+                  'oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt' \
+                  '--kube-apiserver-arg' \
+                  'oidc-username-claim=email' \
+                  '--kube-apiserver-arg' \
+                  'oidc-groups-claim=groups' \
+      when: ansible_service_mgr == "openrc"
+      notify:
+        - "Restart k3s service"
