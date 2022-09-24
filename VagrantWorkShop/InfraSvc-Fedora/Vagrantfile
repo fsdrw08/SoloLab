@@ -32,6 +32,12 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder "../../HelmWorkShop", "/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
 
+  # set static ip
+  config.vm.provision "shell", path: "Set-StaticIP.sh"
+
+  # extend root partition
+  config.vm.provision "shell", path: "Resize-Partition.sh"
+
   # https://github.com/kurokobo/awx-on-k3s
   # for china
   # https://serverok.in/wget-print-content-to-screen#:~:text=wget%20print%20content%20to%20screen%20wget%20is%20used,this%2C%20you%20can%20replace%20wget%20command%20with%20curl.
