@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "InfraSvc-Debian"
     hv.memory = 1024
+    hv.maxmemory = 4096
     hv.cpus = 2
     # config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
     #   trigger.info = "Run-Dos2Unix"
