@@ -1,0 +1,9 @@
+---
+# https://docs.ansible.com/ansible/devel/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
+collections:
+- name: kubernetes.core
+
+# https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file
+roles:
+- src: xanmanning.k3s
+  # version: v3.3.0

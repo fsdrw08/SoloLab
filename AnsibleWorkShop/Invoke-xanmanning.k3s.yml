@@ -1,0 +1,21 @@
+---
+# ref https://github.com/squishykid/k3s-the-dumb-way/blob/master/ansible/main.yml
+- hosts: k3s_cluster
+  gather_facts: yes
+  vars:
+    k3s_github_download_url: "rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s"
+    k3s_etcd_datastore: true
+    # https://github.com/PyratLabs/ansible-role-k3s/tree/v3_release#grouphost-variables
+    # https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/
+    k3s_server:
+      disable:
+        - traefik
+        - servicelb
+        - local-storage
+  pre_tasks:
+    - name: Set each node to be a control node
+      ansible.builtin.set_fact:
+        k3s_control_node: true
+      when: inventory_hostname in groups['servers']
+  roles:
+    - role: xanmanning.k3s
