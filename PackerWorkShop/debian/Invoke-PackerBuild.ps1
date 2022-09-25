@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('1130')]
+    [ValidateSet('1130','1150')]
     [int16]
     $DebianVersion
 )

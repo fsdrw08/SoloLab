@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "DEBIAN1130-G2"
+  config.vm.box = "DEBIAN11-G2"
 
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "InfraSvc-Debian"
@@ -32,6 +32,9 @@ Vagrant.configure("2") do |config|
   config.vm.hostname = "InfraSvc-Debian"
 
   config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+
+  # Install helm
+  config.vm.provision "shell", path: "Install-Helm.sh"
 
   # set static ip for this VM
   # https://www.cyberciti.biz/faq/add-configure-set-up-static-ip-address-on-debianlinux/
@@ -60,8 +63,6 @@ Vagrant.configure("2") do |config|
   # install helm
   # for alpine
   #config.vm.provision "shell", inline: "sudo apk add helm"
-  # for debian/ubuntu use nix
-  config.vm.provision "file", source: "./.config", destination: "/home/vagrant/"
 
   # reboot
   config.vm.provision "shell", reboot: true

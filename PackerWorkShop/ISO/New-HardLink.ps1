@@ -1,7 +1,7 @@
 @"
 $env:USERPROFILE\Downloads\ISO\vyos-1.3.0-epa3-amd64.iso
 $env:USERPROFILE\Downloads\ISO\alpine-virt-3.16.1-x86_64.iso
-$env:USERPROFILE\Downloads\ISO\debian-11.3.0-amd64-netinst.iso
+$env:USERPROFILE\Downloads\ISO\debian-11.5.0-amd64-netinst.iso
 $env:USERPROFILE\Downloads\ISO\openSUSE-Leap-Micro-5.2-DVD-x86_64-Build38.1-Media.iso
 $env:USERPROFILE\Downloads\ISO\openSUSE-Leap-15.4-DVD-x86_64-Build243.2-Media.iso
 $env:USERPROFILE\Downloads\ISO\Fedora-Server-netinst-x86_64-36-1.5.iso
