@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks: 
+  - name: get k3s release version
+    ansible.builtin.uri:
+      url: https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/channels/stable
+      return_content: yes
+    register: k3s_stable_version
+  
+  - name: debug
+    debug:
+      msg: "{{ k3s_stable_version.content | replace('+', '-') | replace('\n', '') }}"

@@ -1,0 +1,28 @@
+---
+# ref https://github.com/squishykid/k3s-the-dumb-way/blob/master/ansible/main.yml
+- hosts: kube-0
+  gather_facts: yes
+  tasks:
+  - name: Get k3s stable release version
+    ansible.builtin.uri:
+      url: https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/channels/stable
+      return_content: yes
+    register: cn_k3s_stable_version
+  # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+  - name: run role xanmanning.k3s
+    ansible.builtin.include_role:
+      name: xanmanning.k3s
+    vars:
+      # the process of k3s_api_releases is only fit for k3s' office web site
+      # k3s_api_releases: https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/channels
+      k3s_github_download_url: https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s
+      k3s_release_version: "{{ cn_k3s_stable_version.content | replace('+', '-') | replace('\n', '') }}"
+      k3s_etcd_datastore: true
+      k3s_become: true
+      # https://github.com/PyratLabs/ansible-role-k3s/tree/v3_release#grouphost-variables
+      # https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/
+      k3s_server:
+        disable:
+          - traefik
+          - servicelb
+          - local-storage

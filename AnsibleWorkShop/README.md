@@ -17,3 +17,7 @@ Install related ansible collections and roles
 ```
 ansible-galaxy install -r requirements.yml
 ```
+
+todo:
+Investage python venv to run ansible playbook
+https://www.redhat.com/sysadmin/python-venv-ansible

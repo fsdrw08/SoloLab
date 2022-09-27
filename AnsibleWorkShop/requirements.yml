@@ -2,8 +2,11 @@
 # https://docs.ansible.com/ansible/devel/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
 collections:
 - name: kubernetes.core
+- name: ansible.utils
 
 # https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file
 roles:
-- src: xanmanning.k3s
-  # version: v3.3.0
+# https://github.com/PyratLabs/ansible-role-k3s/issues/196
+- name: xanmanning.k3s
+  src: https://github.com/PyratLabs/ansible-role-k3s.git
+  version: v3.3.0
