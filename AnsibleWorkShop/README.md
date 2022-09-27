@@ -10,12 +10,12 @@ The host you're running Ansible from requires the following Python dependencies:
 
 Install python related dependency 
 ```
-pip3 install -r requirements.txt
+pip3 install -r requirement.txt
 ```
 
 Install related ansible collections and roles
 ```
-ansible-galaxy install -r requirements.yml
+ansible-galaxy install -r requirement.yml
 ```
 
 todo:
