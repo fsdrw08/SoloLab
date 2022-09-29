@@ -1,0 +1,4 @@
+netaddr
+pyyaml>=3.11
+kubernetes>=12.0.0
+jsonpatch

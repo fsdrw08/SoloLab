@@ -1,0 +1,65 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks: 
+  # https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html
+  # https://stackoverflow.com/questions/32994002/is-there-a-yaml-editing-module-for-ansible
+  - name: Get k3s config values
+    ansible.builtin.slurp: 
+      path: /etc/rancher/k3s/config.yaml
+    register: configb64
+
+  - name: decode values
+    ansible.builtin.set_fact:
+      # https://github.com/sangramrath/osodeploy-disconnected/blob/master/openshift-ansible/playbooks/openshift-master/private/set_network_facts.yml
+      config: "{{ (configb64['content'] | b64decode | from_yaml | combine(newdata, recursive=True)) }}"
+    vars:
+      newdata:
+        kube-apiserver-arg:
+          - 123=456
+          - 789=147
+
+  # - name: Get dex RBAC template
+  #   ansible.builtin.slurp: 
+  #     path: /var/vagrant/HelmWorkShop/dex/addition-resources/RBAC.yaml
+  #   register: RBAC
+  
+  # - name: Get dex RBAC template content
+  #   ansible.builtin.set_fact:
+  #     rbacTemplate: "{{ RBAC['content'] | b64decode | from_yaml }}"
+
+  # - name: Update dex RBAC template content
+  #   ansible.utils.update_fact:
+  #     updates:
+  #     - path: config.kube-apiserver-arg
+  #       value: "{{ user }}"
+  #   register: updated
+
+  - name: Write yaml file
+    ansible.builtin.copy:
+      # https://stackoverflow.com/questions/65139989/ansible-how-to-fix-to-nice-yaml-output-quotation-and-line-breaks
+      content: '{{ config | to_nice_yaml(indent=2) }}'
+      dest: ~/newConfig.yaml
+
+  # - name: Update dex RBAC template content
+  #   ansible.builtin.set_fact:
+  #     result: "{{ rbacTemplate | combine(newdata, recursive=True) }}"
+  #   vars: 
+  #     newdata:
+  #       subjects:
+  #         - name: "{{ user }}"
+
+  # - name: Write yaml file
+  #   ansible.builtin.copy:
+  #     # https://stackoverflow.com/questions/65139989/ansible-how-to-fix-to-nice-yaml-output-quotation-and-line-breaks
+  #     content: '{{ template | to_nice_yaml(indent=2) }}'
+  #     dest: /var/vagrant/HelmWorkShop/dex/addition-resources/RBAC.yaml
+
+  - name: Read yaml file
+    ansible.builtin.shell: |
+      cat ~/newConfig.yaml
+    register: YAML
+    
+  - name: output
+    # debug: var={{user.config.staticPasswords[0].email}}
+    debug: var=YAML
