@@ -31,6 +31,10 @@ podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansi
 ```
 
 ## Run the ansible container (Ansible Runner)
+ref: 
+ - [Using Runner as a container interface to Ansible](https://ansible-runner.readthedocs.io/en/stable/container/)
+ - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
 ```
-podman run --rm -e RUNNER_PLAYBOOK=test.yml -v $PWD/demo:/runner localhost/ansible-ee-k8s
+
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-k8s
 ```

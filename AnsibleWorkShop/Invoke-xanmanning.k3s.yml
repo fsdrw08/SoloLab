@@ -2,16 +2,16 @@
 # https://marketplace.visualstudio.com/items?itemName=redhat.ansible#:~:text=Modelines%20(optional)
 ---
 # ref https://github.com/squishykid/k3s-the-dumb-way/blob/master/ansible/main.yml
-- hosts: localhost
-  gather_facts: no
-  tasks:
-  - name: Copy vagrant key
-    ansible.builtin.copy:
-      src: /var/vagrant/LocalWorkShop/.ssh/vagrant
-      dest: ~/.ssh/vagrant
-      mode: '0600'
+# - hosts: localhost
+#   gather_facts: no
+#   tasks:
+#   - name: Copy vagrant key
+#     ansible.builtin.copy:
+#       src: /var/vagrant/LocalWorkShop/.ssh/vagrant
+#       dest: ~/.ssh/vagrant
+#       mode: '0600'
 
-- hosts: kube-0
+- hosts: kube-1
   gather_facts: yes
   tasks:
   - name: Get k3s stable release version
