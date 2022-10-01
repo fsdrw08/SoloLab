@@ -1,3 +1,4 @@
+# code: language=ansible
 ---
 - name: Install Dex
   block:
@@ -49,22 +50,40 @@
         namespace: dex
       with_items: "{{ templates.files | map(attribute='path') }}"
       
-    - name: update k3s service config
-      become: yes
-      ansible.builtin.blockinfile:
-        path: /etc/init.d/k3s
-        insertbefore: '>>/var/log/k3s.log 2>&1"'
-        block: |2+
-                  '--kube-apiserver-arg' \
-                  'oidc-issuer-url={{ issuer }}' \
-                  '--kube-apiserver-arg' \
-                  'oidc-client-id={{ staticClientID }}' \
-                  '--kube-apiserver-arg' \
-                  'oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt' \
-                  '--kube-apiserver-arg' \
-                  'oidc-username-claim=email' \
-                  '--kube-apiserver-arg' \
-                  'oidc-groups-claim=groups' \
-      when: ansible_service_mgr == "openrc"
-      notify:
-        - "Restart k3s service"
+    - name: Get k3s config values
+      ansible.builtin.slurp: 
+        path: /etc/rancher/k3s/config.yaml
+      register: configb64
+
+    - name: decode values
+      ansible.builtin.set_fact:
+        # https://github.com/sangramrath/osodeploy-disconnected/blob/master/openshift-ansible/playbooks/openshift-master/private/set_network_facts.yml
+        config: "{{ (configb64['content'] | b64decode | from_yaml | combine(newdata, recursive=True)) }}"
+      vars:
+        newdata:
+          kube-apiserver-arg:
+            - oidc-issuer-url={{ issuer }}
+            - oidc-client-id={{ staticClientID }}
+            - oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt
+            - oidc-username-claim=email
+            - oidc-groups-claim=groups
+
+    # - name: update k3s service config
+    #   become: yes
+    #   ansible.builtin.blockinfile:
+    #     path: /etc/init.d/k3s
+    #     insertbefore: '>>/var/log/k3s.log 2>&1"'
+    #     block: |2+
+    #               '--kube-apiserver-arg' \
+    #               'oidc-issuer-url={{ issuer }}' \
+    #               '--kube-apiserver-arg' \
+    #               'oidc-client-id={{ staticClientID }}' \
+    #               '--kube-apiserver-arg' \
+    #               'oidc-ca-file=/var/lib/rancher/k3s/server/tls/server-ca.crt' \
+    #               '--kube-apiserver-arg' \
+    #               'oidc-username-claim=email' \
+    #               '--kube-apiserver-arg' \
+    #               'oidc-groups-claim=groups' \
+    #   when: ansible_service_mgr == "openrc"
+    #   notify:
+    #     - "Restart k3s service"

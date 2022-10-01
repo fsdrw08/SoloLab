@@ -1,3 +1,4 @@
+# code: language=ansible
 ---
 # tasks file for infra
   - name: Install Pre-Requirement
