@@ -36,11 +36,3 @@ COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
 COPY --from=builder /output/ /output/
 RUN /output/install-from-bindep && rm -rf /output/wheels
-RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} && \
-    curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && \
-    ls -al /usr/local/bin/kubectl && \
-    chmod 0755 /usr/local/bin/kubectl && \
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-    chmod 700 get_helm.sh && VERIFY_CHECKSUM=false bash ./get_helm.sh && rm -f ./get_helm.sh \
-    unset HTTPS_PROXY && \
-    unset HTTP_PROXY
