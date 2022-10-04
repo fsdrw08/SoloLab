@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: localhost
+- hosts: kube-1
   gather_facts: true
   roles:
   - infra-kube-resources
