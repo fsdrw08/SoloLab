@@ -1,0 +1,1 @@
+vagrant box add VYOS14x-WAN-G2 $PSScriptRoot\..\PackerWorkShop\vbox\packer-vyos14x_wan-hv-g2.box --force

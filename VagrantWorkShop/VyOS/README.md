@@ -1,3 +1,8 @@
+Set internal switch net adapter profile to private
+```powershell
+sudo Set-NetConnectionProfile -InterfaceAlias *Internal* -NetworkCategory Private
+```
+
 to install clash and config as transparnt proxy into the VYOS box, run following command in the vm:
 
 `sudo su`

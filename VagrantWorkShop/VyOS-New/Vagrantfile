@@ -12,17 +12,17 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "VYOS130-WAN-G2"
+  config.vm.box = "VYOS14x-WAN-G2"
   config.vm.network "private_network", bridge: "Default Switch"
   
   config.vm.provider "hyperv" do |hv, config|
-    hv.vmname = "VYOS130-WAN-G2-New"
+    hv.vmname = "VYOS14x-G2"
     # hv.auto_stop_action  = "Save"
     hv.maxmemory = 2048
     hv.memory = 768
     config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
       trigger.info = "Add new network addapter"
-      trigger.run = {inline: "./Add-InternalSwitch.ps1;
+      trigger.run = {inline: "./Add-VMNetworkAdapter.ps1 -vmname VYOS14x-G2;
                               Start-BitsTransfer 'https://raw.githubusercontent.com/juewuy/ShellClash/master/install.sh'
                     "}
     end

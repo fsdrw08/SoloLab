@@ -16,10 +16,17 @@ setconfig(){
 	configpath=$clashdir/mark
 	[ -n "$(grep ${1} $configpath)" ] && sed -i "s#${1}=.*#${1}=${2}#g" $configpath || echo "${1}=${2}" >> $configpath
 }
-[ -f "/etc/storage/started_script.sh" ] && systype=Padavan && initdir='/etc/storage/started_script.sh'
-[ -d "/jffs/scripts" ] && systype=asusrouter && initdir='/jffs/scripts/net-start'
-[ -f "/jffs/.asusrouter" ] && systype=asusrouter && initdir='/jffs/.asusrouter'
-[ -f "/data/etc/crontabs/root" -a "$(dir_avail /etc)" = 0 ] && systype=mi_snapshot
+#特殊固件识别及标记
+[ -f "/etc/storage/started_script.sh" ] && {
+	systype=Padavan #老毛子固件
+	initdir='/etc/storage/started_script.sh'
+	}
+[ -d "/jffs" ] && {
+	systype=asusrouter #华硕固件
+	[ -f "/jffs/.asusrouter" ] && initdir='/jffs/.asusrouter'
+	[ -d "/jffs/scripts" ] && initdir='/jffs/scripts/nat-start' 
+	}
+[ -f "/data/etc/crontabs/root" ] && systype=mi_snapshot #小米设备
 #检查root权限
 if [ "$USER" != "root" -a -z "$systype" ];then
 	echo 当前用户:$USER
@@ -51,7 +58,7 @@ webget(){
 	fi
 }
 #检查更新
-url_cdn="https://cdn.jsdelivr.net/gh/juewuy/ShellClash"
+url_cdn="https://raw.githubusercontents.com/juewuy/ShellClash"
 [ -z "$url" ] && url=$url_cdn
 echo -----------------------------------------------
 $echo "\033[33m请选择想要安装的版本：\033[0m"	
@@ -62,10 +69,10 @@ read -p "请输入相应数字 > " num
 if [ -z $num ];then
 	echo 安装已取消！ && exit 1;
 elif [ "$num" = "1" ];then
-	webget /tmp/clashrelease $url_cdn@master/bin/release_version echoon rediroff 2>/tmp/clashrelease
+	webget /tmp/clashrelease $url_cdn/master/bin/release_version echoon rediroff 2>/tmp/clashrelease
 	if [ "$result" = "200" ];then
 		release_new=$(cat /tmp/clashrelease | head -1)
-		url_dl="$url_cdn@$release_new"
+		url_dl="$url_cdn/$release_new"
 	else
 		echo "无法切换版本，尝试安装测试版！"
 	fi
@@ -129,9 +136,11 @@ gettar(){
 		echo 无法写入环境变量！请检查安装权限！
 		exit 1
 	fi
-	#华硕/Padavan额外设置
+	#梅林/Padavan额外设置
 	[ -n "$initdir" ] && {
-		sed -i '/ShellClash初始化/'d $initdir && touch $initdir && echo "$clashdir/start.sh init #ShellClash初始化脚本" >> $initdir
+		sed -i '/ShellClash初始化/'d $initdir
+		touch $initdir
+		echo "$clashdir/start.sh init #ShellClash初始化脚本" >> $initdir
 		setconfig initdir $initdir
 		}
 	#小米镜像化OpenWrt额外设置
@@ -147,6 +156,12 @@ gettar(){
 		rm -rf $clashdir/misnap_init.sh
 		rm -rf $clashdir/clashservice
 	fi
+	#华硕USB启动额外设置
+	[ "$usb_status" = "1" ]	&& {
+		echo "$clashdir/start.sh init #ShellClash初始化脚本" > $clashdir/asus_usb_mount.sh
+		nvram set script_usbmount="$clashdir/asus_usb_mount.sh"
+		nvram commit
+	}
 	#删除临时文件
 	rm -rf /tmp/clashfm.tar.gz 
 	rm -rf $clashdir/clash.service
@@ -165,17 +180,74 @@ $echo "\033[33m输入\033[30;47m clash \033[0;33m命令即可管理！！！\033
 echo -----------------------------------------------
 }
 setdir(){
+	set_usb_dir(){
+		$echo "请选择安装目录"
+		du -hL /mnt | awk '{print " "NR" "$2"  "$1}'
+		read -p "请输入相应数字 > " num
+		dir=$(du -hL /mnt | awk '{print $2}' | sed -n "$num"p)
+		if [ -z "$dir" ];then
+			$echo "\033[31m输入错误！请重新设置！\033[0m"
+			set_usb_dir
+		fi
+	}
+echo -----------------------------------------------
 if [ -n "$systype" ];then
 	[ "$systype" = "Padavan" ] && dir=/etc/storage
-	[ "$systype" = "asusrouter" ] && dir=/jffs
-	[ "$systype" = "mi_snapshot" ] && dir=/data
+	[ "$systype" = "mi_snapshot" ] && {
+		$echo "\033[33m检测到当前设备为小米官方系统，请选择安装位置\033[0m"	
+		$echo " 1 安装到/data目录(推荐，支持软固化功能)"
+		$echo " 2 安装到USB设备(支持软固化功能)"
+		[ "$(dir_avail /etc)" != 0 ] && $echo " 3 安装到/etc目录(不推荐)"
+		$echo " 0 退出安装"
+		echo -----------------------------------------------
+		read -p "请输入相应数字 > " num
+		case "$num" in 
+		1)
+			dir=/data
+			;;
+		2)
+			set_usb_dir ;;
+		3)
+			if [ "$(dir_avail /etc)" != 0 ];then
+				dir=/etc
+				systype=""
+			else
+				$echo "\033[31m你的设备不支持安装到/etc目录，已改为安装到/data\033[0m"	
+				dir=data
+			fi
+			;;
+		*)
+			exit 1 ;;
+		esac
+	}
+	[ "$systype" = "asusrouter" ] && {
+		$echo "\033[33m检测到当前设备为华硕固件，请选择安装方式\033[0m"	
+		$echo " 1 基于USB设备安装(通用，须插入\033[31m任意\033[0mUSB设备)"
+		$echo " 2 基于自启脚本安装(仅支持梅林及部分官改固件)"
+		$echo " 0 退出安装"
+		echo -----------------------------------------------
+		read -p "请输入相应数字 > " num
+		case "$num" in 
+		1)
+			read -p "将脚本安装到USB存储/系统闪存？(1/0) > " res
+			[ "$res" = "1" ] && set_usb_dir || dir=/jffs
+			usb_status=1
+			;;
+		2)
+			$echo "如无法正常开机启动，请重新使用USB方式安装！"
+			sleep 2
+			dir=/jffs ;;
+		*)
+			exit 1 ;;
+		esac
+	}
 else
-	echo -----------------------------------------------
 	$echo "\033[33m安装ShellClash至少需要预留约1MB的磁盘空间\033[0m"	
 	$echo " 1 在\033[32m/etc目录\033[0m下安装(适合root用户)"
-	$echo " 2 在\033[32m/usr/share目录\033[0m下安装(适合Linux设备)"
+	$echo " 2 在\033[32m/usr/share目录\033[0m下安装(适合Linux系统)"
 	$echo " 3 在\033[32m当前用户目录\033[0m下安装(适合非root用户)"
-	$echo " 4 手动设置安装目录"
+	$echo " 4 在\033[32m外置存储\033[0m中安装"
+	$echo " 5 手动设置安装目录"
 	$echo " 0 退出安装"
 	echo -----------------------------------------------
 	read -p "请输入相应数字 > " num
@@ -191,6 +263,8 @@ else
 		dir=~/.local/share
 		mkdir -p ~/.config/systemd/user
 	elif [ "$num" = "4" ];then
+		set_usb_dir
+	elif [ "$num" = "5" ];then
 		echo -----------------------------------------------
 		echo '可用路径 剩余空间:'
 		df -h | awk '{print $6,$4}'| sed 1d 
@@ -218,7 +292,7 @@ fi
 #输出
 $echo "最新版本：\033[32m$release_new\033[0m"
 echo -----------------------------------------------
-$echo "\033[44m如遇问题请加TG群反馈：\033[42;30m t.me/clashfm \033[0m"
+$echo "\033[44m如遇问题请加TG群反馈：\033[42;30m t.me/ShellClash \033[0m"
 $echo "\033[37m支持各种基于openwrt的路由器设备"
 $echo "\033[33m支持Debian、Centos等标准Linux系统\033[0m"
 

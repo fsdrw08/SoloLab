@@ -1,8 +1,15 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [ValidateSet('13x','14x')]
+    [string]
+    $VyOSVersion
+)
+
 #Verify the pre-request
 @"
 packer
 dos2unix
-mkisofs
 "@ -split "`r`n" | ForEach-Object {
   if (!(Get-Command $_)) {
     [bool]$Ready = $false
@@ -24,17 +31,17 @@ if ($Ready -ne $false) {
 
   # Get Start Time
   $startDTM = (Get-Date)
-
-  # Variables 
-  $template_file="$PSScriptRoot\Templates\hv_vyos130_g2_vagrant.pkr.hcl"
-  $var_file="$PSScriptRoot\Variables\variables_vyos130.pkrvars.hcl"
-  $machine="vyos"
+  
+  # Variables
+  $template_file="$PSScriptRoot\tmpl-hv_g2-VyOS.pkr.hcl"
+  $var_file="$PSScriptRoot\vars-VyOS$VyOSVersion.pkrvars.hcl"
+  $machine="VyOS$VyOSVersion-g2"
   $packer_log=0
-  #$InternalSwitch = "Internal Switch"
-
+  
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
     Write-Output "Template and var file found"
     Write-Output "Building: $machine"
+    $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
       $env:PACKER_LOG=$packer_log
@@ -45,7 +52,6 @@ if ($Ready -ne $false) {
       exit (-1)
     }
     try {
-      Get-Job | Remove-Job -Force
       $env:PACKER_LOG=$packer_log
       packer version
       packer build --force -var-file="$var_file" "$template_file"
@@ -54,12 +60,13 @@ if ($Ready -ne $false) {
       Write-Output "Packer build failed, exiting."
       exit (-1)
     }
+    Set-Location $currentLocation
   }
   else {
     Write-Output "Template or var file not found - exiting"
     exit (-1)
   }
-
-  $endDTM = (Get-Date)
-  Write-Host "[INFO]  - Elapsed Time: $(($endDTM-$startDTM).totalseconds) seconds" -ForegroundColor Yellow
 }
+
+$endDTM = (Get-Date)
+Write-Host "[INFO]  - Elapsed Time: $(($endDTM-$startDTM).totalseconds) seconds" -ForegroundColor Yellow
