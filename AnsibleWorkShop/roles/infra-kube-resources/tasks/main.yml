@@ -1,15 +1,15 @@
 # code: language=ansible
 ---
 # tasks file for infra
-  - name: Install Pre-Requirement
-    ansible.builtin.include_tasks: Install-PreRequirements.yml
-    register: Install_PreRequirements
+  - name: Confirm-KubeConfig
+    ansible.builtin.include_tasks: Confirm-KubeConfig.yml
+    register: Confirm_KubeConfig
 
   - name: Install CertMan
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_tasks_module.html
     ansible.builtin.include_tasks: Install-CertMan.yml
     register: Install_CertMan
-    when: Install_PreRequirements is succeeded
+    when: Confirm_KubeConfig is succeeded
 
   - name: Install Traefik
     ansible.builtin.include_tasks: Install-Traefik.yml

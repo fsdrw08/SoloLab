@@ -9,6 +9,7 @@
 
     - name: Install Cert Manager helm chart
       kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
         chart_ref: bitnami/cert-manager
         release_name: cert-manager
         release_namespace: cert-manager
@@ -20,18 +21,20 @@
       retries: 10
       until: certManHelm is not failed
 
-    - name: Get k3s server ca crt
+    - name: Get ca crt
       become: yes
       ansible.builtin.slurp:
-        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
+        path: "{{ ca_crt_path }}"
       register: crt
+      delegate_to: "{{ kube_node }}"
       when: (certManHelm is succeeded)
 
-    - name: Get k3s server ca key
+    - name: Get ca key
       become: yes
       ansible.builtin.slurp:
-        path: /var/lib/rancher/k3s/server/tls/server-ca.key
+        path: "{{ ca_key_path }}"
       register: key
+      delegate_to: "{{ kube_node }}"
       when: (certManHelm is succeeded)
 
     # - name: Debug template
@@ -52,6 +55,7 @@
     # https://github.com/BonusPlay/infra/blob/63253142e5bd33880de2a976fb171fa8f797c139/roles/k8s/tasks/templates.yaml
     - name: Config Cert Manager additional resources (e.g. CA issuer)
       kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         template: "{{ item }}"
         namespace: cert-manager

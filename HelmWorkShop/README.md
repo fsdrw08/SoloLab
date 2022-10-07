@@ -55,7 +55,7 @@ Ref: [bash auto-completion on Linux
 
 ## Install kube-vip for control panel HA
 - Before install kube-vip, confirm that the router(vyos in this case) had already configed related bgp peering  
-<br>
+
 - Install kube-vip from helm
   - Ref:
     - [.\HelmWorkShop\kube-vip\values.yaml](kube-vip/values.yaml)

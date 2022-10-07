@@ -19,7 +19,10 @@
       ansible.utils.update_fact:
         updates:
         - path: kubeconfig.clusters[0].cluster.server
-          value: https://192.168.255.31:6443
+          # value: https://192.168.255.31:6443
+          # https://stackoverflow.com/questions/40027847/accessing-inventory-host-variable-in-ansible-playbook
+          # https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#information-about-ansible-magic-variables
+          value: "https://{{ hostvars['kube-1'].ansible_host }}:6443"
       register: updated
 
     - name: Write yaml file
@@ -38,13 +41,11 @@
         msg: "{{ YAML.stdout_lines }}"
 
     - name: try helm
-      kubernetes.core.helm_info:
+      kubernetes.core.k8s_cluster_info:
         kubeconfig: /var/kubeconfig.yaml
         context: default
-        name: cert-manager
-        namespace: cert-manager
       register: info
 
     - name: output info
       debug:
-        msg: "{{ info }}"
+        msg: "{{ info.connection }}"

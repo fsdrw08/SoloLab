@@ -1,6 +1,37 @@
 # code: language=ansible
 ---
-- hosts: kube-1
+- hosts: localhost
   gather_facts: true
-  roles:
-  - infra-kube-resources
+  tasks:
+  - name: Get kubeconfig from remote host
+    ansible.builtin.slurp:
+      path: /etc/rancher/k3s/k3s.yaml
+    register: kubeconfigB64
+    delegate_to: kube-1
+
+  - name: Decode kubeconfig
+    ansible.builtin.set_fact:
+      kubeconfig: "{{ (kubeconfigB64['content'] | b64decode | from_yaml) }}"
+    
+  - name: Update kubeconfig
+    # https://docs.ansible.com/ansible/latest/collections/ansible/utils/update_fact_module.html#ansible-collections-ansible-utils-update-fact-module
+    ansible.utils.update_fact:
+      updates:
+      - path: kubeconfig.clusters[0].cluster.server
+        # value: https://192.168.255.31:6443
+        # https://stackoverflow.com/questions/40027847/accessing-inventory-host-variable-in-ansible-playbook
+        # https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#information-about-ansible-magic-variables
+        value: "https://{{ hostvars['kube-1'].ansible_host }}:6443"
+    register: updated
+
+  - name: Write yaml file
+    ansible.builtin.copy:
+      content: '{{ updated.kubeconfig | to_nice_yaml(indent=2) }}'
+      dest: /var/kubeconfig.yaml
+      
+  - name: install k8s resources
+    ansible.builtin.include_role:
+      name: infra-kube-resources
+    vars:
+      kube_node: "kube-1"
+      kubeconfig_from_path: "/var/kubeconfig.yaml"
