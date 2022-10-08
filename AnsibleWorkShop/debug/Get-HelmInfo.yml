@@ -2,50 +2,56 @@
 ---
 - hosts: localhost
   gather_facts: false
+  vars:
+    kube_node: kube-1
   # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
   tasks:
-    - name: Get kubeconfig from remote host
-      ansible.builtin.slurp:
-        path: /etc/rancher/k3s/k3s.yaml
-      register: kubeconfigB64
-      delegate_to: kube-1
+    - name: Prepare kubeconfig
+      block:
+      - name: Get kubeconfig from remote host
+        ansible.builtin.slurp:
+          path: /etc/rancher/k3s/k3s.yaml
+        register: kubeconfigB64
+        delegate_to: "{{ kube_node }}"
 
-    - name: Decode kubeconfig
-      ansible.builtin.set_fact:
-        kubeconfig: "{{ (kubeconfigB64['content'] | b64decode | from_yaml) }}"
-      
-    - name: Update kubeconfig
-      # https://docs.ansible.com/ansible/latest/collections/ansible/utils/update_fact_module.html#ansible-collections-ansible-utils-update-fact-module
-      ansible.utils.update_fact:
-        updates:
-        - path: kubeconfig.clusters[0].cluster.server
-          # value: https://192.168.255.31:6443
-          # https://stackoverflow.com/questions/40027847/accessing-inventory-host-variable-in-ansible-playbook
-          # https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#information-about-ansible-magic-variables
-          value: "https://{{ hostvars['kube-1'].ansible_host }}:6443"
-      register: updated
+      - name: Decode kubeconfig
+        ansible.builtin.set_fact:
+          kubeconfig: "{{ (kubeconfigB64['content'] | b64decode | from_yaml) }}"
 
-    - name: Write yaml file
-      ansible.builtin.copy:
-        content: '{{ updated.kubeconfig | to_nice_yaml(indent=2) }}'
-        dest: /var/kubeconfig.yaml
+      - name: Update kubeconfig
+        # https://docs.ansible.com/ansible/latest/collections/ansible/utils/update_fact_module.html#ansible-collections-ansible-utils-update-fact-module
+        ansible.utils.update_fact:
+          updates:
+          - path: kubeconfig.clusters[0].cluster.server
+            # value: https://192.168.255.31:6443
+            # https://stackoverflow.com/questions/40027847/accessing-inventory-host-variable-in-ansible-playbook
+            # https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#information-about-ansible-magic-variables
+            value: "https://{{ hostvars['kube-1'].ansible_host }}:6443"
+        register: updated
 
-    - name: Read yaml file
-      ansible.builtin.shell: |
-        cat /var/kubeconfig.yaml
-      register: YAML
+      - name: Write yaml file
+        ansible.builtin.copy:
+          content: '{{ updated.kubeconfig | to_nice_yaml(indent=2) }}'
+          dest: /var/kubeconfig.yaml
 
-    - name: output
-      # debug: var={{user.config.staticPasswords[0].email}}
-      debug:
-        msg: "{{ YAML.stdout_lines }}"
+      - name: Read yaml file
+        ansible.builtin.shell: |
+          cat /var/kubeconfig.yaml
+        register: YAML
 
-    - name: try helm
-      kubernetes.core.k8s_cluster_info:
-        kubeconfig: /var/kubeconfig.yaml
-        context: default
-      register: info
+      - name: output
+        # debug: var={{user.config.staticPasswords[0].email}}
+        debug:
+          msg: "{{ YAML.stdout_lines }}"
 
-    - name: output info
-      debug:
-        msg: "{{ info.connection }}"
+    - name: try
+      block:
+      - name: try helm
+        kubernetes.core.k8s_cluster_info:
+          kubeconfig: /var/kubeconfig.yaml
+          context: default
+        register: info
+
+      - name: output info
+        debug:
+          msg: "{{ info.connection }}"

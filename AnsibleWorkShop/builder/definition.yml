@@ -12,13 +12,25 @@ dependencies:
   python: ../requirements.txt
   system: ../bindep.txt
 
+# https://github.com/lshake/ee_shakeytowers2/blob/c8886455e01774b34a22096452d266723250ef7c/shakeytowers/ee.yml
+# https://docs.openshift.com/container-platform/4.11/applications/working_with_helm_charts/installing-helm.html
 additional_build_steps:
   append: |
-    RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} && \
+    RUN export HTTPS_PROXY=${PROXY} && \
+      export HTTP_PROXY=${PROXY} && \
+      export https_proxy=${PROXY} && \
+      export http_proxy=${PROXY} && \
       curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && \
       ls -al /usr/local/bin/kubectl && \
       chmod 0755 /usr/local/bin/kubectl && \
-      curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-      chmod 700 get_helm.sh && VERIFY_CHECKSUM=false bash ./get_helm.sh && rm -f ./get_helm.sh \
+      curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm && \
+      chmod +x /usr/local/bin/helm && \
+      git config --global http.proxy $PROXY && \
+      git config --global https.proxy $PROXY && \
+      /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff && \
+      git config --global --unset http.proxy && \
+      git config --global --unset https.proxy && \
       unset HTTPS_PROXY && \
-      unset HTTP_PROXY
+      unset HTTP_PROXY &&\
+      unset https_proxy && \
+      unset http_proxy

@@ -9,6 +9,7 @@
 
     - name: Install Traefik helm chart
       kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
         chart_ref: traefik/traefik
         release_name: traefik
         release_namespace: traefik
@@ -29,8 +30,9 @@
         recurse: yes
       register: templates
 
-    - name: Traefik additional resources (dashboard, StripPrefixRegex)
+    - name: Apply Traefik additional resources (dashboard, StripPrefixRegex)
       kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         template: "{{ item }}"
         namespace: traefik

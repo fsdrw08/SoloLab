@@ -1,0 +1,16 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: 
+  tasks:
+    - name: get remote ip
+      ansible.builtin.setup:
+        filter: 
+          - 'ansible_eth0'
+      delegate_facts: true
+      delegate_to: kube-1
+      register: kube_node_facts
+
+    - name: ansible-orchestration | get master facts
+      ansible.builtin.debug:
+        msg: "{{ kube_node_facts.ansible_facts.ansible_eth0.ipv4.address }}"

@@ -8,7 +8,7 @@
 1. Install ansible-builder
    - Create and active python venv
     ```powershell
-    python -m venv
+    python -m venv venv
     . .\venv\Scripts\active.bat
     ```
    - Install ansible-builder from pip
@@ -24,10 +24,11 @@
    ansible-builder create -f .\definition.yml 
    ```
    - Fix some syntax (POIXFX) error in the Containerfile
+   - Update the Containerfile, e.g.
 
 3. Build the ansible runner image
 ```
-podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-k8s
+podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-k8s-lite
 ```
 
 ## Run the ansible container (Ansible Runner)
@@ -36,8 +37,8 @@ ref:
  - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
 
 ```powershell
- cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-k8s
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s
+cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml -v ../:/runner localhost/ansible-ee-k8s-lite
 ```

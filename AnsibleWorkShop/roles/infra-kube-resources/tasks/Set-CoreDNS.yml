@@ -2,10 +2,6 @@
 ---
 - name: Set CoreDNS
   block:
-    - name: output IP address
-      debug:
-        msg: "{{ ansible_default_ipv4.address }}"
-
     - name: find all templates in directories
       ansible.builtin.find:
         paths: "{{ coreDNS_resources_dir }}"
@@ -16,7 +12,8 @@
 
     - name: apply CoreDNS additional resources (DNS record)
       kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
         state: present
         template: "{{ item }}"
-        namespace: dex
+        namespace: kube-system
       with_items: "{{ templates.files | map(attribute='path') }}"

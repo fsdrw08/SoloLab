@@ -30,3 +30,8 @@
     ansible.builtin.include_tasks: Install-Loginapp.yml
     register: Set_Loginapp
     when: Set_CoreDNS is succeeded
+
+  # - name: Install kubernetes dashboard
+  #   ansible.builtin.include_tasks: Install-KubeDashboard.yml
+  #   register: Install_KubeDashboard
+  #   when: Install_Traefik is succeeded

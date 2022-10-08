@@ -7,7 +7,9 @@ data:
   sololab.server: |
     infra.sololab {
       hosts {
-        {{ ansible_default_ipv4.address }}  infra.sololab
+      {% if cluster_ip is defined %}
+        {{ cluster_ip }}  infra.sololab
         fallthrough
+      {% endif %}
       }
     }

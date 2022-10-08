@@ -2,6 +2,21 @@
 ref: 
 https://github.com/PyratLabs/ansible-role-k3s/tree/main
 
+add xanmanning.k3s repo as a submodule
+```powershell
+git submodule add https://github.com/PyratLabs/ansible-role-k3s.git AnsibleWorkShop/roles/xanmanning.k3s
+# List Remote Git Tags
+# https://phoenixnap.com/kb/git-list-tags
+cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\roles\xanmanning.k3s)
+git ls-remote --tags origin
+# fetch remote tags
+git fetch --all --tags --prune
+# switch to the version tag
+git checkout tags/v3.3.0
+# if you want to remove it
+cd (git rev-parse --show-toplevel)
+git rm AnsibleWorkShop/roles/xanmanning.k3s
+```
 ## Requirements
 The host you're running Ansible from requires the following Python dependencies:
 

@@ -3,8 +3,8 @@ kind: Secret
 metadata:
   name: ca-key-pair
 data:
-  tls.crt: {{ crt.content }}
-  tls.key: {{ key.content }}
+  tls.crt: {{ crtEncoded.content }}
+  tls.key: {{ keyEncoded.content }}
 
 ---
 apiVersion: cert-manager.io/v1

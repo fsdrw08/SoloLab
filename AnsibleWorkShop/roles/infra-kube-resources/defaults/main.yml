@@ -5,9 +5,6 @@ kube_node: "kube-1"
 
 kubeconfig_path: "/var/kubeconfig.yaml"
 
-ca_crt_path: "/var/lib/rancher/k3s/server/tls/server-ca.crt"
-ca_key_path: "/var/lib/rancher/k3s/server/tls/server-ca.key"
-
 certman_resources_dir: "{{ role_path }}/templates/CertMan"
 
 traefik_helm_values_path: "{{ role_path }}/templates/Traefik/values.yaml"

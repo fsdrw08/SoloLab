@@ -13,9 +13,11 @@
     #   register: templates
 
     - name: get values from yaml
+      # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_vars_module.html
       ansible.builtin.include_vars:
-        # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook
-        file: /var/vagrant/HelmWorkShop/dex/values.yaml
+        # file: /var/vagrant/HelmWorkShop/dex/values.yaml
+        file: /runner/roles/infra-kube-resources/templates/Dex/values.yaml
         name: dexValue
 
     - name: set fact
@@ -25,7 +27,11 @@
     - name: Debug dexValue
       # become: yes
       ansible.builtin.debug: 
-        msg: "{{ user }}"
+        # msg: "{{ user }}"
+        msg: 
+          - user is {{ user }}
+          - user2 is "{{ user }}"
+          - user3 is "{{ user }}"
         # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
         # msg: "{{ lookup('fileglob', '/var/vagrant/AnsibleWorkShop/*', wantlist=True) | map('basename') | list  }}"
       # with_items: "{{ templates.files | map(attribute='path') }}"

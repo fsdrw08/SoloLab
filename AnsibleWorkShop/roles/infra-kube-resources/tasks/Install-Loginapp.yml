@@ -7,18 +7,13 @@
         name: loginapp
         repo_url: "https://storage.googleapis.com/loginapp-releases/charts/"
 
-    - name: Get k3s server ca crt
-      become: yes
-      ansible.builtin.slurp:
-        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
-      register: crtEncoded
-
     - name: decode crt
       ansible.builtin.set_fact:
         crt: "{{ crtEncoded['content'] | b64decode }}"
 
     - name: Install loginapp helm chart
       kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
         chart_ref: loginapp/loginapp
         release_name: loginapp
         release_namespace: dex

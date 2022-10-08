@@ -44,5 +44,4 @@
           - infra.sololab
         disable:
           - traefik
-          - servicelb
 

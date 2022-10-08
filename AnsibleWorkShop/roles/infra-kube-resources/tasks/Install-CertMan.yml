@@ -21,22 +21,6 @@
       retries: 10
       until: certManHelm is not failed
 
-    - name: Get ca crt
-      become: yes
-      ansible.builtin.slurp:
-        path: "{{ ca_crt_path }}"
-      register: crt
-      delegate_to: "{{ kube_node }}"
-      when: (certManHelm is succeeded)
-
-    - name: Get ca key
-      become: yes
-      ansible.builtin.slurp:
-        path: "{{ ca_key_path }}"
-      register: key
-      delegate_to: "{{ kube_node }}"
-      when: (certManHelm is succeeded)
-
     # - name: Debug template
     #   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html
     #   ansible.builtin.debug: 
@@ -53,7 +37,7 @@
 
     # https://github.com/BriceMichalski/mbcaas/blob/develop/roles/kube-core/tasks/production.yml
     # https://github.com/BonusPlay/infra/blob/63253142e5bd33880de2a976fb171fa8f797c139/roles/k8s/tasks/templates.yaml
-    - name: Config Cert Manager additional resources (e.g. CA issuer)
+    - name: Apply Cert Manager additional resources (e.g. CA issuer)
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
@@ -61,4 +45,4 @@
         namespace: cert-manager
       with_items: "{{ templates.files | map(attribute='path') }}"
       # https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#conditions-based-on-registered-variables
-      when: (certManHelm is succeeded) and (crt is defined) and (key is defined)
+      when: (certManHelm is succeeded) and (crtEncoded is defined) and (keyEncoded is defined)
