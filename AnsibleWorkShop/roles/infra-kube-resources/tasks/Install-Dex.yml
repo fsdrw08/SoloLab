@@ -21,20 +21,6 @@
       retries: 10
       until: dexHelm is not failed
     
-    - name: Get dex local user name(email)
-      # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook/68731110#68731110
-      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_vars_module.html
-      ansible.builtin.include_vars:
-        file: "{{ dex_helm_values_path }}"
-        name: dexValue
-      when: (dexHelm is succeeded)
-
-    - name: set fact (assign value to var)
-      ansible.builtin.set_fact: 
-        user: "{{ dexValue.config.staticPasswords[0].email }}"
-        issuer: "{{ dexValue.config.issuer }}"
-        staticClientID: "{{ dexValue.config.staticClients[0].id }}"
-
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
     - name: find all templates in directories
       ansible.builtin.find:
@@ -53,18 +39,6 @@
       with_items: "{{ templates.files | map(attribute='path') }}"
       when: (dexHelm is succeeded)
       
-    - name: Output OIDC config info
-      vars:
-        msg: |
-          dex deploy successed, please update kubernetes oidc config with below values:
-          - oidc-issuer-url={{ issuer }}
-          - oidc-client-id={{ staticClientID }}
-          - oidc-ca-file=<the ca crt file path in the control plane node>
-          - oidc-username-claim=email
-          - oidc-groups-claim=groups
-      ansible.builtin.debug: 
-        msg: "{{ msg.split('\n') }}"
-      when: (dexHelm is succeeded)
 
     # - name: Get k3s config values
     #   ansible.builtin.slurp: 

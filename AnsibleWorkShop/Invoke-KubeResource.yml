@@ -28,7 +28,7 @@
               # value: https://192.168.255.31:6443
               # https://stackoverflow.com/questions/40027847/accessing-inventory-host-variable-in-ansible-playbook
               # https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#information-about-ansible-magic-variables
-              value: "https://{{ hostvars['kube-1'].ansible_host }}:6443"
+              value: "https://{{ hostvars[kube_node].ansible_host }}:6443"
           register: updated
 
         - name: Write yaml file
@@ -51,6 +51,33 @@
             path: "{{ ca_key_path }}"
           register: keyEncoded
           delegate_to: "{{ kube_node }}"
+
+    - name: Update dex additional resource
+      block:
+        - name: Get dex local user name(email)
+          # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook/68731110#68731110
+          # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_vars_module.html
+          ansible.builtin.include_vars:
+            file: "{{ playbook_dir }}/roles/infra-kube-resources/templates/Dex/values.yaml"
+            name: dexValue
+
+        - name: set fact (assign value to var)
+          ansible.builtin.set_fact: 
+            dex_staticUser: "{{ dexValue.config.staticPasswords[0].email }}"
+            dex_issuer: "{{ dexValue.config.issuer }}"
+            dex_staticClientID: "{{ dexValue.config.staticClients[0].id }}"
+
+        - name: Output OIDC config info
+          vars:
+            msg: |
+              After dex deploy success, please update kubernetes oidc config with below values:
+              - oidc-issuer-url={{ dex_issuer }}
+              - oidc-client-id={{ dex_staticClientID }}
+              - oidc-ca-file=<the ca crt file path in the control plane node>
+              - oidc-username-claim=email
+              - oidc-groups-claim=groups
+          ansible.builtin.debug: 
+            msg: "{{ msg.split('\n') }}"
 
     - name: Gather kube_node fact
       block:

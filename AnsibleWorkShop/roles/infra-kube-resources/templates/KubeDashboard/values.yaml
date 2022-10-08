@@ -1,0 +1,72 @@
+# https://github.com/kubernetes/dashboard/blob/master/aio/deploy/helm-chart/kubernetes-dashboard/values.yaml
+# Additional container arguments
+# replicaCount: 3
+
+extraArgs:
+# https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md#login-view
+  - --enable-skip-login
+  - --system-banner="Welcome to Infra.SoloLab"
+
+service:
+  annotations:
+    # https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service
+    traefik.ingress.kubernetes.io/service.serverstransport: kube-dashboard-insecure-transport@kubernetescrd
+
+ingress:
+  ## If true, Kubernetes Dashboard Ingress will be created.
+  ##
+  enabled: true
+  ## Kubernetes Dashboard Ingress annotations
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: ca-issuer
+    # https://www.ziji.work/ingress/traefik-route-traefik-middlewares-configure.html
+    # 指定使用的 Middleware，规则是 {namespace名称}-{middleware名称}@{资源类型}，如果使用多个中间件，则逗号隔开
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-subpath-stripprefixregex@kubernetescrd
+  ## Kubernetes Dashboard Ingress paths
+  ## Both `/` and `/*` are required to work on gce ingress.
+  paths:
+    - /sub-k8sdashboard/
+      # pathType: ImplementationSpecific
+  hosts:
+    - infra.sololab
+  ## Kubernetes Dashboard Ingress TLS configuration
+  ## Secrets must be manually created in the namespace
+  ##
+  tls:
+    - secretName: infra.sololab
+      hosts:
+        - infra.sololab
+
+# Global dashboard settings
+settings:
+  # Max number of items that can be displayed on each list page
+  itemsPerPage: 20
+  # Number of seconds between every auto-refresh of logs
+  logsAutoRefreshTimeInterval: 5
+  # Number of seconds between every auto-refresh of every resource. Set 0 to disable
+  resourceAutoRefreshTimeInterval: 5
+  # Hide all access denied warnings in the notification panel
+  disableAccessDeniedNotifications: false
+
+# metricsScraper:                
+#   enabled: true
+
+rbac:
+  # The basic idea of the clusterReadOnlyRole
+  # is not to hide all the secrets and sensitive data but more
+  # to avoid accidental changes in the cluster outside the standard CI/CD.
+  #
+  # It is NOT RECOMMENDED to use this version in production.
+  # Instead you should review the role and remove all potentially sensitive parts such as
+  # access to persistentvolumes, pods/log etc.
+  #
+  # Independent from rbac.create parameter.
+  clusterReadOnlyRole: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: k8s-dashboard

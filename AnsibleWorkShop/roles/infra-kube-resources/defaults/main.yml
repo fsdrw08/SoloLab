@@ -16,3 +16,6 @@ dex_resources_dir: "{{ role_path }}/templates/Dex"
 coreDNS_resources_dir: "{{ role_path }}/templates/CoreDNS"
 
 loginapp_helm_values_path: "{{ role_path }}/templates/Loginapp/values.yaml"
+
+kubeDashboard_helm_values_path: "{{ role_path }}/templates/KubeDashboard/values.yaml"
+kubeDashboard_resources_dir: "{{ role_path }}/templates/KubeDashboard"

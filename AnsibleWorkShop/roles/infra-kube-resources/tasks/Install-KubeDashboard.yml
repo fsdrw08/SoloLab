@@ -1,0 +1,41 @@
+# code: language=ansible
+---
+- name: Install Kubernetes Dashboard
+  block:
+    - name: Add kube dashboard repo
+      kubernetes.core.helm_repository:
+        name: kubernetes-dashboard
+        repo_url: "https://kubernetes.github.io/dashboard/"
+
+    - name: Install kube dashboard helm chart
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        chart_ref: kubernetes-dashboard/kubernetes-dashboard
+        release_name: kube-dashboard
+        release_namespace: kube-dashboard
+        create_namespace: yes
+        wait: yes
+        values_files:
+          - "{{ kubeDashboard_helm_values_path }}"
+      register: dexHelm
+      retries: 10
+      until: dexHelm is not failed
+    
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: find all templates in directories
+      ansible.builtin.find:
+        paths: "{{ dex_resources_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    - name: Apply Dex additional resources (RBAC for dex "local admin" user)
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: present
+        template: "{{ item }}"
+        namespace: dex
+      with_items: "{{ templates.files | map(attribute='path') }}"
+      when: (dexHelm is succeeded)
+      
