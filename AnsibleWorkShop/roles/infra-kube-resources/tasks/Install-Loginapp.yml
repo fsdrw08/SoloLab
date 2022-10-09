@@ -6,10 +6,9 @@
       kubernetes.core.helm_repository:
         name: loginapp
         repo_url: "https://storage.googleapis.com/loginapp-releases/charts/"
-
-    - name: decode crt
-      ansible.builtin.set_fact:
-        crt: "{{ crtEncoded['content'] | b64decode }}"
+      register: loginappHelmRepo
+      retries: 10
+      until: loginappHelmRepo is not failed
 
     - name: Install loginapp helm chart
       kubernetes.core.helm:
@@ -20,8 +19,6 @@
         wait: yes
         values_files:
           - "{{ loginapp_helm_values_path }}"
-        values: 
-          config.clusters[0].certificate-authority: "{{ crt }}"
       register: loginappHelm
       retries: 3
       delay: 3

@@ -6,6 +6,9 @@
       kubernetes.core.helm_repository:
         name: dex
         repo_url: "https://charts.dexidp.io"
+      register: dexHelmRepo
+      retries: 10
+      until: dexHelmRepo is not failed
 
     - name: Install Dex helm chart
       kubernetes.core.helm:
@@ -18,7 +21,7 @@
         values_files:
           - "{{ dex_helm_values_path }}"
       register: dexHelm
-      retries: 10
+      retries: 3
       until: dexHelm is not failed
     
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module

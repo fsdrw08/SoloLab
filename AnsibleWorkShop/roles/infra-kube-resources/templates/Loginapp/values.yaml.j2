@@ -39,8 +39,8 @@ config:
   # This must end with /callback
   # if empty, defaults to:
   #
-  # 1. '{{ .Values.ingress.hosts[0].host }}/callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
-  # 2. '{{ .Release.Name }}.{{ .Release.Namespace }}.svc:5555/callback'
+  ##  1. ' .Values.ingress.hosts[0].host /callback' if 'ingress.enabled: true' and 'ingress.hosts[0]' exists
+  ## 2. ' .Release.Name .  .Release.Namespace .svc:5555/callback'
   clientRedirectURL: https://infra.sololab/sub-loginapp/callback
   # Issuer root CA configMap
   # ConfigMap containing the root CA
@@ -76,17 +76,13 @@ config:
     altIPs: []
   # List of kubernetes clusters to add on web frontend
   clusters: 
-   - name: infra.sololab
-     server: https://infra.sololab:6443
-     # ca information will replaced by yq command
-     certificate-authority: |
-       -----BEGIN CERTIFICATE-----
-       MIIC/zCCAeegAwIBAgIULkYvGJPRl50tMoVE4BNM0laRQncwDQYJKoZIhvcNAQEL
-       BQAwDzENMAsGA1UEAwwEbXljYTAeFw0xOTAyMTgyMjA5NTJaFw0xOTAyMjgyMjA5
-       NTJaMA8xDTALBgNVBAMMBG15Y2EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-       -----END CERTIFICATE-----
+    - name: infra.sololab
+      server: https://infra.sololab:6443
+      # ca information will replaced by yq command
+      certificate-authority: |
+        {{ crt | indent(width=8) }}
     #  insecure-skip-tls-verify: true
-  #    # Alternative context name for this cluster
+  # Alternative context name for this cluster
   #    contextName: altcontextname
 
 # Configuration overrides, this is a free configuration merged

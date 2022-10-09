@@ -1,19 +1,34 @@
 ---
 - hosts: localhost
   gather_facts: false
-  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
-  become: yes
+  vars: 
+    kube_node: "kube-1"
+    kubeconfig_path: "/var/kubeconfig.yaml"
+    ca_crt_path: "/var/lib/rancher/k3s/server/tls/server-ca.crt"
+    ca_key_path: "/var/lib/rancher/k3s/server/tls/server-ca.key"
   tasks:
-    - name: Get server ca crt
+    - name: Get ca crt from "{{ kube_node.ansible_host }}"
+      become: yes
       ansible.builtin.slurp:
-        path: /var/lib/rancher/k3s/server/tls/server-ca.crt
+        path: "{{ ca_crt_path }}"
       register: crtEncoded
+      delegate_to: "{{ kube_node }}"
     
     - name: decode crt
       ansible.builtin.set_fact:
         crt: "{{ crtEncoded['content'] | b64decode }}"
-        valuePath: '/var/vagrant/AnsibleWorkShop/roles/infra-k8s-resources/templates/Loginapp/values.yaml.j2'
+        valuePath: '/runner/roles/infra-kube-resources/templates/Loginapp/values.yaml.j2'
+
+    - name: create temp file
+      ansible.builtin.tempfile:
+        state: file
+      register: loginapp_helm_values_path
+
+    - name: Copy rendered YAML into temporary file
+      ansible.builtin.copy:
+        content: "{{ lookup('template', '/runner/roles/infra-kube-resources/templates/Loginapp/values.yaml.j2') }}"
+        dest:    "{{ loginapp_helm_values_path.path }}"
 
     - name: debug
       debug:
-        msg: "{{ lookup('template', valuePath) }}"
+        msg: "{{ lookup('file', loginapp_helm_values_path.path).split('\n') }}"

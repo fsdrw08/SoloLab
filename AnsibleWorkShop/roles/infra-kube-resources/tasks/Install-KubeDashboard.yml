@@ -6,6 +6,9 @@
       kubernetes.core.helm_repository:
         name: kubernetes-dashboard
         repo_url: "https://kubernetes.github.io/dashboard/"
+      register: kubeDashboardHelmRepo
+      retries: 10
+      until: kubeDashboardHelmRepo is not failed
 
     - name: Install kube dashboard helm chart
       kubernetes.core.helm:
@@ -17,25 +20,25 @@
         wait: yes
         values_files:
           - "{{ kubeDashboard_helm_values_path }}"
-      register: dexHelm
-      retries: 10
-      until: dexHelm is not failed
+      register: kubeDashboardHelm
+      retries: 3
+      until: kubeDashboardHelm is not failed
     
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
     - name: find all templates in directories
       ansible.builtin.find:
-        paths: "{{ dex_resources_dir }}"
+        paths: "{{ kubeDashboard_resources_dir }}"
         file_type: file
         patterns: 'resource*'
         recurse: yes
       register: templates
 
-    - name: Apply Dex additional resources (RBAC for dex "local admin" user)
+    - name: Apply kube-dashboard additional resources
       kubernetes.core.k8s:
         kubeconfig: "{{ kubeconfig_path }}"
         state: present
         template: "{{ item }}"
-        namespace: dex
+        namespace: kube-dashboard
       with_items: "{{ templates.files | map(attribute='path') }}"
-      when: (dexHelm is succeeded)
+      when: (kubeDashboardHelm is succeeded)
       

@@ -16,9 +16,9 @@
   #   register: Install_Traefik
   #   when: Install_CertMan is succeeded
 
-  - name: Install Dex
-    ansible.builtin.include_tasks: Install-Dex.yml
-    register: Install_Dex
+  # - name: Install Dex
+  #   ansible.builtin.include_tasks: Install-Dex.yml
+  #   register: Install_Dex
     # when: Install_Traefik is succeeded
 
   # - name: Set CoreDNS
@@ -26,9 +26,9 @@
   #   register: Set_CoreDNS
   #   when: Install_Dex is succeeded
 
-  # - name: Install Loginapp
-  #   ansible.builtin.include_tasks: Install-Loginapp.yml
-  #   register: Set_Loginapp
+  - name: Install Loginapp
+    ansible.builtin.include_tasks: Install-Loginapp.yml
+    register: Set_Loginapp
   #   when: Set_CoreDNS is succeeded
 
   # - name: Install kubernetes dashboard

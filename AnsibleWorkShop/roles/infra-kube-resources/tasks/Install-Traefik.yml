@@ -6,6 +6,9 @@
       kubernetes.core.helm_repository:
         name: traefik
         repo_url: "https://helm.traefik.io/traefik"
+      register: traefikHelmRepo
+      retries: 10
+      until: traefikHelmRepo is not failed
 
     - name: Install Traefik helm chart
       kubernetes.core.helm:
@@ -18,7 +21,7 @@
         values_files:
           - "{{ traefik_helm_values_path }}"
       register: traefikHelm
-      retries: 10
+      retries: 3
       until: traefikHelm is not failed
     
     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module

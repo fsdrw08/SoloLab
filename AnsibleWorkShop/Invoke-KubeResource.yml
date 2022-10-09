@@ -13,12 +13,12 @@
         - name: Get kubeconfig from remote host
           ansible.builtin.slurp:
             path: /etc/rancher/k3s/k3s.yaml
-          register: kubeconfigB64
+          register: kubeconfigEncoded
           delegate_to: "{{ kube_node }}"
 
         - name: Decode kubeconfig
           ansible.builtin.set_fact:
-            kubeconfig: "{{ (kubeconfigB64['content'] | b64decode | from_yaml) }}"
+            kubeconfig: "{{ (kubeconfigEncoded['content'] | b64decode | from_yaml) }}"
 
         - name: Update kubeconfig
           # https://docs.ansible.com/ansible/latest/collections/ansible/utils/update_fact_module.html#ansible-collections-ansible-utils-update-fact-module
@@ -36,9 +36,9 @@
             content: '{{ updated.kubeconfig | to_nice_yaml(indent=2) }}'
             dest: "{{ kubeconfig_path }}"
 
-    - name: Prepare CA cert and key
+    - name: Prepare cluster CA cert and key
       block:
-        - name: Get ca crt from "{{ kube_node.ansible_host }}"
+        - name: Get ca crt from {{ hostvars[kube_node].ansible_host }}
           become: yes
           ansible.builtin.slurp:
             path: "{{ ca_crt_path }}"
@@ -51,6 +51,11 @@
             path: "{{ ca_key_path }}"
           register: keyEncoded
           delegate_to: "{{ kube_node }}"
+
+        - name: decode crt
+          ansible.builtin.set_fact:
+            crt: "{{ crtEncoded['content'] | b64decode }}"
+            # crt: "{{ crtEncoded['content'] | b64decode | replace('\n', '')}}"
 
     - name: Update dex additional resource
       block:
@@ -71,11 +76,12 @@
           vars:
             msg: |
               After dex deploy success, please update kubernetes oidc config with below values:
-              - oidc-issuer-url={{ dex_issuer }}
-              - oidc-client-id={{ dex_staticClientID }}
-              - oidc-ca-file=<the ca crt file path in the control plane node>
-              - oidc-username-claim=email
-              - oidc-groups-claim=groups
+              kube-apiserver-arg:
+                - oidc-issuer-url={{ dex_issuer }}
+                - oidc-client-id={{ dex_staticClientID }}
+                - oidc-ca-file=<the ca crt file path in the control plane node>
+                - oidc-username-claim=email
+                - oidc-groups-claim=groups
           ansible.builtin.debug: 
             msg: "{{ msg.split('\n') }}"
 
@@ -97,8 +103,51 @@
           ansible.builtin.debug:
             msg: "kube_node cluster_ip is {{ cluster_ip }}"
 
-    - name: invoke role
-      block: 
-        - name: install k8s resources
-          ansible.builtin.include_role:
-            name: infra-kube-resources
+    # https://github.com/BulntYilmaz/dev/blob/8ab4285ea88bb3be2cdefd83068bee6f9dc3019f/roles/butane/tasks/butane.yml
+    - name: Prepare loginapp helm value temp file
+      block:
+        - name: create temp file
+          ansible.builtin.tempfile:
+            state: file
+          register: loginapp_helm_values
+
+        - name: Copy rendered YAML into temporary file
+          ansible.builtin.copy:
+            content: "{{ lookup('template', playbook_dir + '/roles/infra-kube-resources/templates/Loginapp/values.yaml.j2') }}"
+            dest:    "{{ loginapp_helm_values.path }}"
+
+        - name: set loginapp helm value path
+          ansible.builtin.set_fact:
+            loginapp_helm_values_path: "{{ loginapp_helm_values.path }}"
+
+    # - name: invoke role
+    #   block: 
+    #     - name: install k8s resources
+    #       ansible.builtin.include_role:
+    #         name: infra-kube-resources
+
+    - name: update api server config
+      block:
+        - name: Get k3s config values
+          ansible.builtin.slurp: 
+            path: /etc/rancher/k3s/config.yaml
+          register: k3sConfigEncoded
+          delegate_to: "{{ kube_node }}"
+
+        - name: Decode and update k3s config values
+          ansible.builtin.set_fact:
+            k3sConfig: "{{ k3sConfigEncoded['content'] | b64decode | from_yaml | combine(newdata, recursive=True) }}"
+          vars:
+            newdata:
+              kube-apiserver-arg:
+                - "oidc-issuer-url={{ dex_issuer }}"
+                - "oidc-client-id={{ dex_staticClientID }}"
+                - "oidc-ca-file={{ ca_crt_path }}"
+                - "oidc-username-claim=email"
+                - "oidc-groups-claim=groups"
+
+        - name: Write yaml file
+          ansible.builtin.copy:
+            # https://stackoverflow.com/questions/65139989/ansible-how-to-fix-to-nice-yaml-output-quotation-and-line-breaks
+            content: '{{ k3sConfig | to_nice_yaml(indent=2) }}'
+            dest: /etc/rancher/k3s/config.yaml
