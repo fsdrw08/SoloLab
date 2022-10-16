@@ -14,19 +14,23 @@ traefik_resources_dir: "{{ role_path }}/templates/Traefik"
 
 dex_helm_values_path: "{{ role_path }}/templates/Dex/values.yaml"
 dex_resources_dir: "{{ role_path }}/templates/Dex"
+dex_staticUser: null
 
 coreDNS_resources_dir: "{{ role_path }}/templates/CoreDNS"
+cluster_ip: null
 
 loginapp_helm_values_path: "{{ role_path }}/templates/Loginapp/values.yaml"
+crt: null
 
 kubeDashboard_helm_values_path: "{{ role_path }}/templates/KubeDashboard/values.yaml"
 kubeDashboard_resources_dir: "{{ role_path }}/templates/KubeDashboard"
 
 bundles:
+  # cert-manager
   - enabled: true
     namespace: cert-manager
     helm_create_namespace: true
-    helm_repo_url: https://charts.bitnami.com/bitnami 
+    helm_repo_url: https://charts.bitnami.com/bitnami
     helm_repo_name: bitnami
     helm_chart_ref: bitnami/cert-manager
     helm_chart_release_name: cert-manager
@@ -37,4 +41,68 @@ bundles:
     # helm_chart_state:
     # helm_wait:
     k8s_manifests_dir: "{{ role_path }}/templates/CertMan"
+    # k8s_manifests_state:
+
+  # Traefik
+  - enabled: true
+    namespace: traefik
+    helm_create_namespace: true
+    helm_repo_url: https://helm.traefik.io/traefik
+    helm_repo_name: traefik
+    helm_chart_ref: traefik/traefik
+    helm_chart_release_name: traefik
+    # helm_chart_version:
+    helm_chart_values_files: "{{ role_path }}/templates/Traefik/values.yaml"
+    # helm_chart_values:
+    # helm_chart_state:
+    # helm_wait:
+    k8s_manifests_dir: "{{ role_path }}/templates/Traefik"
+    # k8s_manifests_state:
+
+  # Dex idp
+  - enabled: true
+    namespace: dex
+    helm_create_namespace: true
+    helm_repo_url: https://charts.dexidp.io
+    helm_repo_name: dex
+    helm_chart_ref: dex/dex
+    helm_chart_release_name: dex
+    # helm_chart_version:
+    helm_chart_values_files: "{{ role_path }}/templates/Dex/values.yaml"
+    # helm_chart_values:
+    # helm_chart_state:
+    # helm_wait:
+    k8s_manifests_dir: "{{ role_path }}/templates/Dex"
+    # k8s_manifests_state:
+
+  # CoreDNS
+  - enabled: true
+    namespace: kube-system
+    # helm_create_namespace: 
+    # helm_repo_url: 
+    # helm_repo_name: 
+    # helm_chart_ref: 
+    # helm_chart_release_name: 
+    # helm_chart_version:
+    # helm_chart_values_files: 
+    # helm_chart_values:
+    # helm_chart_state:
+    # helm_wait:
+    k8s_manifests_dir: "{{ role_path }}/templates/CoreDNS"
+    # k8s_manifests_state:
+
+  # Loginapp
+  - enabled: true
+    namespace: dex
+    # helm_create_namespace: true
+    helm_repo_url: https://storage.googleapis.com/loginapp-releases/charts/
+    helm_repo_name: loginapp
+    helm_chart_ref: loginapp/loginapp
+    helm_chart_release_name: loginapp
+    # helm_chart_version:
+    helm_chart_values_files: "{{ loginapp_helm_values_path }}"
+    # helm_chart_values:
+    # helm_chart_state:
+    # helm_wait:
+    # k8s_manifests_dir: "{{ role_path }}/templates/Dex"
     # k8s_manifests_state:
