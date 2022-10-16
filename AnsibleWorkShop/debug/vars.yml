@@ -1,0 +1,17 @@
+# code: language=ansible
+---
+bundles:
+  - enabled: yes
+    namespace: cert-manager
+    helm_create_namespace: true
+    helm_repo_url: https://charts.bitnami.com/bitnami 
+    helm_repo_name: bitnami
+    helm_chart_ref: bitnami/cert-manager
+    helm_chart_release_name: cert-manager
+    helm_chart_version:
+    helm_chart_values_files: "{{ HelmWorkShop }}"
+    helm_chart_values:
+    helm_chart_state:
+    helm_waite:
+    k8s_manifests_dir:
+    k8s_manifests_state:

@@ -39,6 +39,10 @@ ref:
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+
 podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s-lite ansible-runner run /runner -vvvv
+
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+podman run --rm -e RUNNER_PLAYBOOK=./debug/test.yml -v ../:/runner localhost/ansible-ee-k8s-lite ansible-runner run /runner -vvvv
 ```

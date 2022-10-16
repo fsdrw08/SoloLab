@@ -1,7 +1,10 @@
 ---
 - hosts: localhost
   gather_facts: true
+  vars: 
+    kube_node: "kube-1"  
   tasks:
     - name: debug
-      debug:
-        msg: "{{ ansible_distribution }}"
+      ansible.builtin.debug:
+        msg: "{{ lookup('ansible.builtin.file', '/etc/rancher/k3s/config.yaml') }}"
+      delegate_to: "{{ kube_node }}"

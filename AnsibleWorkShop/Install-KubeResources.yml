@@ -1,0 +1,52 @@
+# code: language=ansible
+---
+- name: Install Bundle
+  hosts: all
+  environment:
+    kubeconfig_path: "/var/kubeconfig.yaml"
+  # ref: https://github.com/gepaplexx-archive/playbook-bundle/blob/026ad21a1e874e0d4df70ad23c0615a62734a4bc/install.yml
+  tasks:
+    - name: Add Helm Repositories
+      when: helm_chart_ref is defined and ( enabled | default (true) )
+      kubernetes.core.helm_repository:
+        repo_url: "{{ helm_repo_url | mandatory }}"
+        repo_name: "{{ helm_repo_name | mandatory }}"
+      register: Add_HelmRepo
+      retries: 10
+      until: Add_HelmRepo is not failed
+
+    - name: Install Helm Charts
+      when: helm_chart_ref is defined and ( enabled | default (yes) )
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        release_name: "{{ helm_chart_release_name | mandatory }}"
+        chart_ref: "{{ helm_chart_ref | mandatory }}"
+        chart_version: "{{ helm_chart_version | default(omit) }}"
+        release_namespace: "{{ namespace | default('default') }}"
+        create_namespace: "{{ helm_create_namespace | default(true) }}"
+        values_files: "{{ helm_chart_values_files | default('[]') }}"
+        release_values: "{{ helm_chart_values | default({}) }}"
+        release_state: "{{ helm_chart_state | default('present') }}"
+        wait: "{{ helm_wait | default(no) }}"
+      register: Apply_HelmChart
+      retries: 3
+      until: Apply_HelmChart is not failed
+
+     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: Find all manifests templates in directories
+      when: k8s_manifests_dir is defined
+      ansible.builtin.find:
+        paths: "{{ k8s_manifests_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    - name: Apply Manifests from template
+      when: (k8s_manifests_dir is defined) and ( enabled | default (yes) ) and ( Apply_HelmChart is not failed)
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: "{{ k8s_manifests_state | default('present') }}"
+        template: "{{ item }}"
+        namespace: "{{ namespace | default('default') }}"
+      with_items: "{{ templates.files | map(attribute='path') }}"

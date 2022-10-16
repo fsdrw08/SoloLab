@@ -42,22 +42,24 @@
           become: yes
           ansible.builtin.slurp:
             path: "{{ ca_crt_path }}"
-          register: crtEncoded
+          register: caCrtEncoded
           delegate_to: "{{ kube_node }}"
     
         - name: Get ca key from "{{ kube_node }}"
           become: yes
           ansible.builtin.slurp:
             path: "{{ ca_key_path }}"
-          register: keyEncoded
+          register: caKeyEncoded
           delegate_to: "{{ kube_node }}"
 
         - name: decode crt
           ansible.builtin.set_fact:
-            crt: "{{ crtEncoded['content'] | b64decode }}"
-            # crt: "{{ crtEncoded['content'] | b64decode | replace('\n', '')}}"
+            caCrtEncoded_content: "{{ caCrtEncoded['content'] }}"
+            caKeyEncoded_content: "{{ caKeyEncoded['content'] }}"
+            crt: "{{ caCrtEncoded['content'] | b64decode }}"
+            # crt: "{{ caCrtEncoded['content'] | b64decode | replace('\n', '')}}"
 
-    - name: Update dex additional resource
+    - name: Update dex additional resources
       block:
         - name: Get dex local user name(email)
           # https://stackoverflow.com/questions/68729876/get-a-yaml-file-with-http-and-use-it-as-a-variable-in-an-ansible-playbook/68731110#68731110
@@ -85,7 +87,7 @@
           ansible.builtin.debug: 
             msg: "{{ msg.split('\n') }}"
 
-    - name: Gather kube_node fact
+    - name: Gather kube_node fact (add dns record in CoreDNS)
       block:
         - name: get remote ip
           ansible.builtin.setup:
@@ -106,7 +108,7 @@
     # https://github.com/BulntYilmaz/dev/blob/8ab4285ea88bb3be2cdefd83068bee6f9dc3019f/roles/butane/tasks/butane.yml
     - name: Prepare loginapp helm value temp file
       block:
-        - name: create temp file
+        - name: create temp file for loginapp helm value
           ansible.builtin.tempfile:
             state: file
           register: loginapp_helm_values
@@ -120,11 +122,11 @@
           ansible.builtin.set_fact:
             loginapp_helm_values_path: "{{ loginapp_helm_values.path }}"
 
-    # - name: invoke role
-    #   block: 
-    #     - name: install k8s resources
-    #       ansible.builtin.include_role:
-    #         name: infra-kube-resources
+    - name: invoke role
+      block: 
+        - name: install k8s resources
+          ansible.builtin.include_role:
+            name: infra-kube-resources
 
     - name: update api server config
       block:
@@ -147,7 +149,16 @@
                 - "oidc-groups-claim=groups"
 
         - name: Write yaml file
+          become: yes
           ansible.builtin.copy:
             # https://stackoverflow.com/questions/65139989/ansible-how-to-fix-to-nice-yaml-output-quotation-and-line-breaks
             content: '{{ k3sConfig | to_nice_yaml(indent=2) }}'
             dest: /etc/rancher/k3s/config.yaml
+          delegate_to: "{{ kube_node }}"
+          notify: "restart k3s service"
+
+  handlers:
+    - name: restart k3s service
+      ansible.builtin.service:
+        name: k3s
+        state: restarted

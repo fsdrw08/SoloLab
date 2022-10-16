@@ -1,0 +1,62 @@
+# code: language=ansible
+---
+- name: Install Bundle
+  # ref: 
+    # - https://github.com/gepaplexx-archive/playbook-bundle/blob/026ad21a1e874e0d4df70ad23c0615a62734a4bc/install.yml
+    # - https://github.com/jpclipffel/ansible_collection.k8s/blob/eae3fabd0f097dc786e87fb2388d220d82ecb729/roles/helm/tasks/main.yml
+  block:
+    - name: Add Helm Repositories
+      when: 
+        - item.helm_chart_ref is defined 
+        - item.enabled | default (true)
+      kubernetes.core.helm_repository:
+        repo_url: "{{ item.helm_repo_url | mandatory }}"
+        repo_name: "{{ item.helm_repo_name | mandatory }}"
+      register: Add_HelmRepo
+      retries: 10
+      until: Add_HelmRepo is not failed
+
+    - name: Install Helm Charts
+      when:
+        - item.helm_chart_ref is defined
+        - item.enabled | default (true)
+      kubernetes.core.helm:
+        kubeconfig: "{{ kubeconfig_path }}"
+        release_name: "{{ item.helm_chart_release_name | mandatory }}"
+        chart_ref: "{{ item.helm_chart_ref | mandatory }}"
+        chart_version: "{{ item.helm_chart_version | default(omit) }}"
+        release_namespace: "{{ item.namespace | default('default') }}"
+        create_namespace: "{{ item.helm_create_namespace | default(true) }}"
+        values_files: "{{ item.helm_chart_values_files | default([]) }}"
+        release_values: "{{ item.helm_chart_values | default({}) }}"
+        release_state: "{{ item.helm_chart_state | default('present') }}"
+        wait: "{{ item.helm_wait | default('no') }}"
+      register: Apply_HelmChart
+      retries: 3
+      until: Apply_HelmChart is not failed
+
+     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html#ansible-collections-ansible-builtin-find-module
+    - name: Find all manifests templates in directories
+      when: 
+        - item.k8s_manifests_dir is defined
+      ansible.builtin.find:
+        paths: "{{ item.k8s_manifests_dir }}"
+        file_type: file
+        patterns: 'resource*'
+        recurse: yes
+      register: templates
+
+    - name: Apply Manifests from template
+      when: 
+        - item.k8s_manifests_dir is defined
+        - enabled | default (true)
+        - Apply_HelmChart is not failed
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        state: "{{ item.k8s_manifests_state | default('present') }}"
+        template: "{{ templates_path }}"
+        # template: "{{ templates.files | map(attribute='path') }}"
+        namespace: "{{ item.namespace | default('default') }}"
+      loop: "{{ templates.files | map(attribute='path') }}"
+      loop_control:
+        loop_var: templates_path

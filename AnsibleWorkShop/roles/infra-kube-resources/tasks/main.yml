@@ -2,8 +2,16 @@
 ---
 # tasks file for infra
   - name: Confirm-KubeConfig
-    ansible.builtin.include_tasks: Confirm-KubeConfig.yml
+    ansible.builtin.include_tasks:
+      file: Confirm-KubeConfig.yml
     register: Confirm_KubeConfig
+
+  - name: Install Kube Resources
+    when: Confirm_KubeConfig is succeeded
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_tasks_module.html
+    ansible.builtin.include_tasks:
+      file: Install-KubeResources.yml
+    loop: "{{ bundles }}"
 
   # - name: Install CertMan
   #   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_tasks_module.html
@@ -26,9 +34,9 @@
   #   register: Set_CoreDNS
   #   when: Install_Dex is succeeded
 
-  - name: Install Loginapp
-    ansible.builtin.include_tasks: Install-Loginapp.yml
-    register: Set_Loginapp
+  # - name: Install Loginapp
+  #   ansible.builtin.include_tasks: Install-Loginapp.yml
+  #   register: Set_Loginapp
   #   when: Set_CoreDNS is succeeded
 
   # - name: Install kubernetes dashboard

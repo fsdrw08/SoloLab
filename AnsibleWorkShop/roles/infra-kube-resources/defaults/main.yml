@@ -1,11 +1,13 @@
 # code: language=ansible
 ---
 # defaults file for infra
-kube_node: "kube-1"
+# kube_node: "kube-1"
 
 kubeconfig_path: "/var/kubeconfig.yaml"
 
 certman_resources_dir: "{{ role_path }}/templates/CertMan"
+caCrtEncoded_content: null
+caKeyEncoded_content: null
 
 traefik_helm_values_path: "{{ role_path }}/templates/Traefik/values.yaml"
 traefik_resources_dir: "{{ role_path }}/templates/Traefik"
@@ -19,3 +21,20 @@ loginapp_helm_values_path: "{{ role_path }}/templates/Loginapp/values.yaml"
 
 kubeDashboard_helm_values_path: "{{ role_path }}/templates/KubeDashboard/values.yaml"
 kubeDashboard_resources_dir: "{{ role_path }}/templates/KubeDashboard"
+
+bundles:
+  - enabled: true
+    namespace: cert-manager
+    helm_create_namespace: true
+    helm_repo_url: https://charts.bitnami.com/bitnami 
+    helm_repo_name: bitnami
+    helm_chart_ref: bitnami/cert-manager
+    helm_chart_release_name: cert-manager
+    # helm_chart_version:
+    # helm_chart_values_files: 
+    helm_chart_values:
+      installCRDs: true
+    # helm_chart_state:
+    # helm_wait:
+    k8s_manifests_dir: "{{ role_path }}/templates/CertMan"
+    # k8s_manifests_state:
