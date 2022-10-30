@@ -1,0 +1,15 @@
+# https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/blob/master/charts/nfs-subdir-external-provisioner/values.yaml
+
+image:
+  # https://zhuanlan.zhihu.com/p/414156155
+  repository: lank8s.cn/sig-storage/nfs-subdir-external-provisioner
+
+nfs:
+  server: 192.168.255.100
+  path: /nfs
+  mountOptions:
+    - nfsvers=3
+
+storageClass:
+  name: nfs-client
+  accessModes: ReadWriteMany

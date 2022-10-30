@@ -1,0 +1,27 @@
+# https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/storageclass-smb.yaml
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: smb
+provisioner: smb.csi.k8s.io
+parameters:
+  source: "//192.168.255.100/smb"
+  # if csi.storage.k8s.io/provisioner-secret is provided, will create a sub directory
+  # with PV name under source
+  csi.storage.k8s.io/provisioner-secret-name: "smbcreds"
+  csi.storage.k8s.io/provisioner-secret-namespace: "kube-system"
+  csi.storage.k8s.io/node-stage-secret-name: "smbcreds"
+  csi.storage.k8s.io/node-stage-secret-namespace: "kube-system"
+  # https://github.com/thinkier/k8s_minecrafting/blob/5dd8ae3ffc6c874fca4a927244574e2cc18e2bc5/_defunct/sc.yml
+  createSubDir: "true" # optional: create a sub dir for new volume
+volumeBindingMode: Immediate
+mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=1001
+  - gid=1001
+  # - noperm
+  # - mfsymlinks
+  # - cache=strict
+  # - noserverino  # required to prevent data corruption

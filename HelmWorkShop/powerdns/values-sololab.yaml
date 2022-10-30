@@ -143,6 +143,9 @@ powerdns:
 mariadb:
   enabled: true
 
+  global:
+    storageClass: smb
+
   auth:
     rootPassword: root
     database: powerdns

@@ -527,6 +527,44 @@ Ref:
   kubectl -n kube-dashboard describe secret $(kubectl -n kube-dashboard get secret | grep kube-dashboard | awk '{print $1}')
   ```
 
+## Install smb csi driver
+- Install helm chart
+  - ref: https://github.com/kubernetes-csi/csi-driver-smb/tree/master/charts
+  ```
+  helm repo add csi-driver-smb https://raw.githubusercontent.com/kubernetes-csi/csi-driver-smb/master/charts
+  helm install csi-driver-smb csi-driver-smb/csi-driver-smb --namespace kube-system 
+  ```
+- Create and assign permission to smb share from windows
+  ```powershell
+  $smbPath="C:\Users\Public\Documents\smb"
+  $smbShareName="smb"
+  $user="root"
+  New-Item -Type Directory -Path $smbPath
+  New-SmbShare -Name $smbShareName -Path $smbPath -FullAccess $user
+
+  # Grant user Modify Permission to the smb share
+  # ref: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl?view=powershell-7.2#example-5-grant-administrators-full-control-of-the-file
+  $smbAcl = Get-Acl -Path $smbPath
+  $IdentityReference = $user
+  $FileSystemRights = "Modify, Synchronize"
+  $AccessControlType = "Allow"
+  # Create new rule
+  $fileSystemAccessRuleArgumentList = $IdentityReference, $FileSystemRights, $AccessControlType
+  $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList  $fileSystemAccessRuleArgumentList
+  # Apply new rule
+  $smbAcl.SetAccessRule($fileSystemAccessRule)
+  Set-Acl -Path $smbPath -AclObject $smbAcl
+  ```  
+- Create credential secret for smb
+  - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#prerequisite
+  ```
+  kubectl create secret generic smbcreds --from-literal username=root --from-literal password="root" -n kube-system
+  ```
+- Create storageclass for smb
+  - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/storageclass-smb.yaml
+  ```
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/storageclass-smb.yaml
+  ```
 ## Install Longhorn
 - Perpare the pre-request config
   1. Install pre-request package  
@@ -603,6 +641,13 @@ Ref:
   ```
 
 ## Install and config powerdns
+- Install fsdrw08 PowerDNS helm chart
+  ```
+  helm repo add fsdrw08 https://fsdrw08.github.io/helm-charts/
+  helm install powerdns fsdrw08/powerdns \
+    --namespace powerdns --create-namespace \
+    -f /var/vagrant/HelmWorkShop/powerdns/values-sololab.yaml
+  ```
 - Install PowerDNS helm chart (puckpuck version)
   - Ref:
     - [.\powerdns\values-puckpuck.yaml](powerdns/values-puckpuck.yaml)
