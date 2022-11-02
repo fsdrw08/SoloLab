@@ -14,7 +14,7 @@ parameters:
   csi.storage.k8s.io/node-stage-secret-name: "smbcreds"
   csi.storage.k8s.io/node-stage-secret-namespace: "kube-system"
   # https://github.com/thinkier/k8s_minecrafting/blob/5dd8ae3ffc6c874fca4a927244574e2cc18e2bc5/_defunct/sc.yml
-  createSubDir: "true" # optional: create a sub dir for new volume
+reclaimPolicy: Retain
 volumeBindingMode: Immediate
 mountOptions:
   - dir_mode=0777

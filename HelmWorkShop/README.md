@@ -554,6 +554,7 @@ Ref:
   # Apply new rule
   $smbAcl.SetAccessRule($fileSystemAccessRule)
   Set-Acl -Path $smbPath -AclObject $smbAcl
+  (Get-Acl -Path  $smbPath).Access | ft
   ```  
 - Create credential secret for smb
   - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#prerequisite
@@ -561,9 +562,16 @@ Ref:
   kubectl create secret generic smbcreds --from-literal username=root --from-literal password="root" -n kube-system
   ```
 - Create storageclass for smb
-  - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/storageclass-smb.yaml
+  - ref: 
+    - [Create a storage class](https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#1-create-a-storage-class)
+    - [storageclass-smb.yaml](https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/storageclass-smb.yaml)
+    - [smb-csi-dirver/storageclass-smb.yaml](smb-csi-dirver/storageclass-smb.yaml)
   ```
   kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/storageclass-smb.yaml
+  ```
+- Have a test
+  ```
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/statefulset.yaml
   ```
 ## Install Longhorn
 - Perpare the pre-request config
@@ -646,64 +654,50 @@ Ref:
   helm repo add fsdrw08 https://fsdrw08.github.io/helm-charts/
   helm install powerdns fsdrw08/powerdns \
     --namespace powerdns --create-namespace \
-    -f /var/vagrant/HelmWorkShop/powerdns/values-sololab.yaml
+    -f /var/vagrant/HelmWorkShop/powerdns/values-sololab-smb.yaml
   ```
-- Install PowerDNS helm chart (puckpuck version)
-  - Ref:
-    - [.\powerdns\values-puckpuck.yaml](powerdns/values-puckpuck.yaml)
-  ```powershell
-  cd "$(git rev-parse --show-toplevel)/HelmWorkShop/helm-charts/charts/powerdns"
-  # if there are some dependencies in the chart, build those dependencies first
-  helm dependency build
-  # then install the local helm chart
-  helm install powerdns ./ --namespace powerdns --create-namespace
   
-  # or install from online repo
-  helm repo add fsdrw08 https://fsdrw08.github.io/helm-charts/
-
-  $releaseName="powerdns-test"
-  $chartDir="C:\Users\drw_0\source\repos\SoloLab\HelmWorkShop\helm-charts\charts\powerdns"
-  $nameSpace="powerdns-test"
-  $customValue="C:\Users\drw_0\source\repos\SoloLab\HelmWorkShop\powerdns\values-sololab-test.yaml"
-  helm install $releaseName $chartDir --namespace $nameSpace --create-namespace -f $customValue
-  
-  helm install powerdns-test fsdrw08/powerdns `
-    -f .\HelmWorkShop\powerdns\values-sololab-test.yaml `
-    --namespace powerdns-test --create-namespace
-  ```
 - Config powerdns-admin
   1. create admin user
   2. config powerdns api url, API KEY and PDNS version,
-     api url format: http://<helm release name>.<namespace>:8081/
-  3. create domain and related in-addr domain
-- Create domain from powerdns-admin, should create domain and in-addr domain
-- Create TSIG key in powerdns pod
+     api url format: `http://<helm release name>.<namespace>:8081/`, e.g. `http://powerdns.powerdns:8081`
+  3. create domain and related in-addr domain, or
+- Create domain from powerdns cli (should create domain and in-addr domain), and create TSIG key in powerdns pod, for dynamic dns update
   1. get into the pod
-     ```powershell
-     kubectl.exe -n powerdns exec <powerdns pod> -it -- /bin/sh
-     ```
+      ```powershell
+      kubectl.exe -n powerdns exec <powerdns pod> -it -- /bin/sh
+      ```
   2. run command
-    ```shell
-    KEY_NAME="dhcp-key"
-    KEY_CONTENT="FrumijkFJtKANXpQ/ast8uZAtEa0/OO/0qwLIjPesqCe2a0WE05v1Ax4NBxP2EZI2+j1cYq/99hbwi3epUldWg=="
-    DOMAIN_NAME="sololab"
-    REVERT_DOMAIN_NAME="255.168.192.in-addr.arpa"
+     - ref: 
+       - [Setting up PowerDNS](https://docs.powerdns.com/authoritative/dnsupdate.html#setting-up-powerdns)
+       - [PowerDNS with DNS-Update](https://github.com/olivermichel/pdns-dnsupdate/blob/195ba37566f5b4c34d8deadd7dd170f6cc5428c2/README.md)
+      ```shell
+      KEY_NAME="dhcp-key"
+      KEY_CONTENT="FrumijkFJtKANXpQ/ast8uZAtEa0/OO/0qwLIjPesqCe2a0WE05v1Ax4NBxP2EZI2+j1cYq/99hbwi3epUldWg=="
+      DOMAIN_NAME="sololab"
+      REVERT_DOMAIN_NAME="255.168.192.in-addr.arpa"
 
-    pdnsutil generate-tsig-key $KEY_NAME hmac-sha256
-    # or
-    pdnsutil import-tsig-key $KEY_NAME hmac-sha256 $KEY_CONTENT
+      pdnsutil create-zone $DOMAIN_NAME
+      pdnsutil create-zone $REVERT_DOMAIN_NAME
 
-    pdnsutil activate-tsig-key $DOMAIN_NAME $KEY_NAME primary
-    pdnsutil activate-tsig-key $REVERT_DOMAIN_NAME $KEY_NAME primary
+      pdnsutil generate-tsig-key $KEY_NAME hmac-sha256
+      # or
+      pdnsutil import-tsig-key $KEY_NAME hmac-sha256 $KEY_CONTENT
 
-    # specify actual dhcp server ip (192.168.255.1/32 in this case) will make dns update get refuse,
-    # seems need to specify the ip according the container network environment
-    pdnsutil add-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
-    pdnsutil add-meta $DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+      pdnsutil activate-tsig-key $DOMAIN_NAME $KEY_NAME primary
+      pdnsutil activate-tsig-key $REVERT_DOMAIN_NAME $KEY_NAME primary
 
-    pdnsutil add-meta $REVERT_DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
-    pdnsutil add-meta $REVERT_DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
-    ```
+      # specify actual dhcp server ip (192.168.255.1/32 in this case) will make dns update get refuse,
+      # seems need to specify the ip according the container network environment
+      # pdnsutil add-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
+      # pdnsutil add-meta $DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+      pdnsutil set-meta $DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
+      pdnsutil set-meta $DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+
+      pdnsutil set-meta $REVERT_DOMAIN_NAME ALLOW-DNSUPDATE-FROM 0.0.0.0/0
+      pdnsutil set-meta $REVERT_DOMAIN_NAME TSIG-ALLOW-DNSUPDATE $KEY_NAME
+      ```
+  3. In order to take effect of dynamic dns update, apply [dynamic-dns-update](../VagrantWorkShop/VyOS-WAN/provisionConfig-DynDnsUpdate.sh)  to vyos in this case
 <!-- 
 browser visit powerdns-admin.lab (the address which show in ./powerdns-admin/values.yaml .ingress.hosts.host)
 create new user account
