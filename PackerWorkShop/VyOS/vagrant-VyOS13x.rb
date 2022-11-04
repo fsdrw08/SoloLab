@@ -14,7 +14,6 @@ Vagrant.configure("2") do |config|
   config.ssh.username = "vagrant"
   # config.ssh.password = "vagrant"
   config.vm.guest = :debian
-  config.ssh.insert_key = false
 
   config.vm.provider "hyperv" do |hv|
     hv.mac = "0000deadbeef"
