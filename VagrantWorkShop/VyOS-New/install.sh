@@ -58,10 +58,7 @@ webget(){
 	fi
 }
 #检查更新
-# https://zhuanlan.zhihu.com/p/420873495
-mirror="raw.fastgit.org"
-# raw.githubusercontents.com
-url_cdn="https://$mirror/juewuy/ShellClash"
+url_cdn="https://raw.githubusercontents.com/juewuy/ShellClash"
 [ -z "$url" ] && url=$url_cdn
 echo -----------------------------------------------
 $echo "\033[33m请选择想要安装的版本：\033[0m"	

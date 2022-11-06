@@ -1,0 +1,194 @@
+# https://github.com/dexidp/helm-charts/blob/master/charts/dex/values.yaml
+# https://aws.amazon.com/cn/blogs/china/using-dex-and-dex-k8s-authenticator-to-authenticate-amazon-eks
+# https://zhuanlan.zhihu.com/p/381755603
+# replicaCount: 3
+image:  
+  repository: dexidp/dex
+
+ingress:
+  enabled: true
+  # className: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    # create cert when the helm install run
+    # https://cert-manager.io/docs/usage/ingress/
+    cert-manager.io/cluster-issuer: ca-issuer
+  hosts:
+    - host: infra.sololab
+      paths:
+        - path: /dex/
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: infra.sololab
+      hosts:
+        - infra.sololab
+
+# -- Application configuration.
+# See the [official documentation](https://dexidp.io/docs/).
+# https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
+config:
+  issuer: https://infra.sololab/dex
+
+  # https://dexidp.io/docs/storage/#configuration
+  storage:
+    type: kubernetes
+    config:
+      inCluster: true
+
+  web:
+      http: 0.0.0.0:5556
+      # tlsCert: /etc/dex/tls/tls.crt
+      # tlsKey: /etc/dex/tls/tls.key
+      
+  # frontend:
+  #   theme: "coreos"
+  #   issuer: "kube-dtln"
+  #   issuerUrl: "https://login.ash.dtln.cloud"
+  # oauth2:
+  #   # responseTypes: ["code", "token", "id_token"]
+  #   skipApprovalScreen: true
+
+  # connectors:
+  #   - type: github
+  #     id: github
+  #     name: GitHub
+  #     config:
+  #       clientID: "{{ .Env.GITHUB_CLIENT_ID }}"
+  #       clientSecret: "{{ .Env.GITHUB_CLIENT_SECRET }}"
+  #       redirectURI: https://dex.lab/callback
+  #       orgs:4
+  #         - name: your-github-org-name
+  #           teams:
+  #             - your-github-team-name
+
+  connectors:
+    # https://dexidp.io/docs/connectors/ldap/
+    - type: ldap
+      # Required field for connector id.
+      id: ldap
+      # Required field for connector name.
+      name: LDAP
+      config:
+        # Host and optional port of the LDAP server in the form "host:port".
+        # If the port is not supplied, it will be guessed based on "insecureNoSSL",
+        # and "startTLS" flags. 389 for insecure or StartTLS connections, 636
+        # otherwise.
+        host: 192.168.255.1:3890
+
+        # Following field is required if the LDAP host is not using TLS (port 389).
+        # Because this option inherently leaks passwords to anyone on the same network
+        # as dex, THIS OPTION MAY BE REMOVED WITHOUT WARNING IN A FUTURE RELEASE.
+        #
+        insecureNoSSL: true
+
+        # If a custom certificate isn't provide, this option can be used to turn on
+        # TLS certificate checks. As noted, it is insecure and shouldn't be used outside
+        # of explorative phases.
+        #
+        # insecureSkipVerify: true
+
+        # When connecting to the server, connect using the ldap:// protocol then issue
+        # a StartTLS command. If unspecified, connections will use the ldaps:// protocol
+        #
+        startTLS: false
+
+        # Path to a trusted root certificate file. Default: use the host's root CA.
+        # rootCA: /etc/dex/ldap.ca
+
+        # A raw certificate file can also be provided inline.
+        # rootCAData: ( base64 encoded PEM file )
+
+        # The DN and password for an application service account. The connector uses
+        # these credentials to search for users and groups. Not required if the LDAP
+        # server provides access for anonymous auth.
+        # Please note that if the bind password contains a `$`, it has to be saved in an
+        # environment variable which should be given as the value to `bindPW`.
+        bindDN: uid=admin,ou=people,dc=example,dc=com
+        bindPW: password
+
+        # The attribute to display in the provided password prompt. If unset, will
+        # display "Username"
+        usernamePrompt: ldap Username
+
+        # User search maps a username and password entered by a user to a LDAP entry.
+        userSearch:
+          # BaseDN to start the search from. It will translate to the query
+          # "(&(objectClass=person)(uid=<username>))".
+          baseDN: dc=example,dc=com
+          # Optional filter to apply when searching the directory.
+          filter: "(objectClass=person)"
+
+          # username attribute used for comparing user entries. This will be translated
+          # and combined with the other filter as "(<attr>=<username>)".
+          username: uid
+          # The following three fields are direct mappings of attributes on the user entry.
+          # String representation of the user.
+          idAttr: uid
+          # Required. Attribute to map to Email.
+          emailAttr: mail
+          # Maps to display name of users. No default value.
+          nameAttr: uid
+          # Maps to preferred username of users. No default value.
+          preferredUsernameAttr: uid
+
+        # Group search queries for groups given a user entry.
+        groupSearch:
+          # BaseDN to start the search from. It will translate to the query
+          # "(&(objectClass=group)(member=<user uid>))".
+          baseDN: ou=groups,dc=example,dc=com
+          # Optional filter to apply when searching the directory.
+          # https://github.com/nitnelave/lldap/blob/main/example_configs/keycloak.md#configure-group-mapping
+          filter: "(objectClass=groupOfUniqueNames)"
+
+          # Following list contains field pairs that are used to match a user to a group. It adds an additional
+          # requirement to the filter that an attribute in the group must match the user's
+          # attribute value.
+          # https://github.com/nitnelave/lldap/issues/254#issuecomment-1274807006
+          userMatchers:
+          - userAttr: DN
+            groupAttr: member
+
+          # Represents group name.
+          # https://github.com/nitnelave/lldap/blob/main/example_configs/keycloak.md#configure-group-mapping
+          nameAttr: cn
+
+  # Uncomment this block to enable configuration for the expiration time durations.
+  # Is possible to specify units using only s, m and h suffixes.
+  expiry:
+    deviceRequests: "5m"
+    signingKeys: "6h"
+    idTokens: "24h"
+    refreshTokens:
+      reuseInterval: "3s"
+      validIfNotUsedFor: "2160h" # 90 days
+      absoluteLifetime: "3960h" # 165 days
+
+  # Options for controlling the logger.
+  logger:
+    level: "debug"
+    format: "text"
+
+  staticClients:
+    - id: kubernetes
+      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      name: "SoloLab Cluster"
+      redirectURIs:
+      - https://infra.sololab/sub-loginapp/callback
+      - https://core.harbor.lab/c/oidc/callback
+      # - http://localhost:8000
+
+  # https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml#L135
+  enablePasswordDB: true
+  staticPasswords:
+  - email: "dexadmin@infra.sololab"
+  # echo $(echo password | htpasswd -BinC 10 dexadmin | cut -d: -f2)
+  # https://httpd.apache.org/docs/current/programs/htpasswd.html
+  # echo $(echo password | htpasswd -n -i -BC 10 dexadmin | cut -d: -f2)
+    # hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
+    hash: "$2y$10$.V6EcNlkVPqzx21QIh7HA.QL.Fqi91FTaMsEGqstQnxm.5JyGpBOW"
+    username: "dexadmin"
+    userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"
+# Note: this will inject the environment variables directly to the pods.# In a production environment you should mount these keys from a secret using envFrom.# See https://artifacthub.io/packages/helm/dex/dex#values
+# env:
+#   GITHUB_CLIENT_ID: "your-github-client-id"
+#   GITHUB_CLIENT_SECRET: "your-github-client-secret"

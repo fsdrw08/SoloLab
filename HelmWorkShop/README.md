@@ -311,7 +311,7 @@ Ref:
   ```
   helm upgrade dex dex/dex \
     --namespace dex \
-    -f /vagrant/HelmWorkShop/dex/values.yaml
+    -f /var/vagrant/HelmWorkShop/dex/values.yaml
   # or
   helm upgrade dex dex/dex `
     --namespace dex `

@@ -60,3 +60,4 @@ set service dhcp-server shared-network-name LAN shared-network-parameters "zone 
 set service dhcp-server shared-network-name LAN shared-network-parameters "zone 255.168.192.in-addr.arpa. { primary 192.168.255.21; key dhcp-key; }"
 ```
 
+podman run 

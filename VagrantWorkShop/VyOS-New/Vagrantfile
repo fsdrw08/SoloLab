@@ -19,20 +19,22 @@ Vagrant.configure("2") do |config|
   config.vm.provider "hyperv" do |hv, config|
     hv.vmname = "VYOS14x-G2"
     # hv.auto_stop_action  = "Save"
-    hv.maxmemory = 2048
-    hv.memory = 768
+    # hv.maxmemory = 2048
+    hv.memory = 2048
     config.trigger.before :'VagrantPlugins::HyperV::Action::StartInstance', type: :action do |trigger|
       trigger.info = "Add new network addapter"
       trigger.run = {inline: "./Add-VMNetworkAdapter.ps1 -vmname VYOS14x-G2;
-                              Start-BitsTransfer 'https://raw.githubusercontent.com/juewuy/ShellClash/master/install.sh'
+
                     "}
     end
   end
   config.vm.provision "shell", path: "./provisionConfig-LAN.sh"
   config.vm.provision "shell", path: "./provisionConfig-dns_forwarding.sh"
   config.vm.provision "shell", path: "./provisionConfig-dhcp_server.sh"
-  config.vm.provision "file", source: "./install.sh", destination: "/home/vagrant/install-clash.sh"
+  config.vm.provision "file", source: "./install.sh.bak", destination: "/home/vagrant/install-clash.sh"
   config.vm.provision "file", source: "./finalConfig.sh", destination: "/home/vagrant/finalConfig.sh"
+  config.vm.provision "file", source: "./Run-LLDAP.sh", destination: "/home/vagrant/Run-LLDAP.sh"
+  config.vm.provision "file", source: "./Run-Pihole.sh", destination: "/home/vagrant/Run-Pihole.sh"
   # config.vm.provision "file", source: "./vyos-install-docker.sh", destination: "/home/vagrant/vyos-install-docker.sh"
   # config.vm.provision "file", source: "./docker-compose.vyos-pihole.yaml", destination: "/home/vagrant/docker-compose.yaml"
   # Disable automatic box update checking. If you disable this, then
