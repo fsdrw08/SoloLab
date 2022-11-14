@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-smb-samba
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - vers=3.0
+  # https://github.com/kubernetes-csi/csi-driver-smb/blob/master/docs/driver-parameters.md#pvpvc-usage
+  csi:
+    driver: smb.csi.k8s.io
+    readOnly: false
+    volumeHandle: unique-volumeid
+    volumeAttributes:
+      source: "//192.168.255.1/sololab"
+    nodeStageSecretRef:
+      name: smbcreds-samba
+      namespace: kube-system

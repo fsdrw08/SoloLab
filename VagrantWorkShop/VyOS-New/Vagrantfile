@@ -14,6 +14,8 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.ssh.insert_key = false
   config.vm.box = "VYOS14x-WAN-G2"
+
+  # have to selete network manually, otherwise, vagrant will re-add this switch each time when run vagrant reload
   # config.vm.network "private_network", bridge: "Default Switch"
   
   config.vm.provider "hyperv" do |hv, config|
@@ -33,8 +35,10 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "./provisionConfig-dhcp_server.sh"
   config.vm.provision "file", source: "./install.sh.bak", destination: "/home/vagrant/install-clash.sh"
   config.vm.provision "file", source: "./finalConfig.sh", destination: "/home/vagrant/finalConfig.sh"
+  config.vm.provision "file", source: "./Add-Containers.sh", destination: "/home/vagrant/Add-Containers.sh"
   config.vm.provision "file", source: "./Run-LLDAP.sh", destination: "/home/vagrant/Run-LLDAP.sh"
-  config.vm.provision "file", source: "./Run-Pihole.sh", destination: "/home/vagrant/Run-Pihole.sh"
+  config.vm.provision "file", source: "./Run-Samba2.sh", destination: "/home/vagrant/Run-Samba2.sh"
+  config.vm.provision "file", source: "./samba", destination: "/home/vagrant/samba"
   # config.vm.provision "file", source: "./vyos-install-docker.sh", destination: "/home/vagrant/vyos-install-docker.sh"
   # config.vm.provision "file", source: "./docker-compose.vyos-pihole.yaml", destination: "/home/vagrant/docker-compose.yaml"
   # Disable automatic box update checking. If you disable this, then

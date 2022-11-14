@@ -402,6 +402,13 @@ Ref:
   kubectl apply -f /var/vagrant/HelmWorkShop/dex/RBAC.yaml
   ```
 
+- or add rbac for lldap groups
+  - Ref:
+    - [.\HelmWorkShop\dex\RBAC-lldap.yaml](dex/RBAC-lldap.yaml)
+  ```
+  kubectl apply -f /var/vagrant/HelmWorkShop/dex/RBAC-lldap.yaml
+  ```
+
 - Modify api server arg config to make dex as oidc provider  
   - Ref:
     - [K3s customized flags](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#customized-flags)
@@ -556,22 +563,49 @@ Ref:
   Set-Acl -Path $smbPath -AclObject $smbAcl
   (Get-Acl -Path  $smbPath).Access | ft
   ```  
+- Have a check with smbclient
+  ```shell
+  smbclient //192.168.255.100/smb -m SMB3 -U root
+  # or
+  smbclient //192.168.255.1/sololab -m SMB3 -U sololab
+  ```
 - Create credential secret for smb
   - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#prerequisite
-  ```
+  ```shell
   kubectl create secret generic smbcreds --from-literal username=root --from-literal password="root" -n kube-system
+  # or
+  kubectl create secret generic smbcreds-samba --from-literal username=sololab --from-literal password="sololab" -n kube-system
   ```
+- Create pv and pvc to have a check
+  - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#option2-pvpvc-usage
+  ```shell
+  # create pv first
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/pv-smb-win.yaml
+  # or
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/pv-smb-samba.yaml
+
+  # then create pvc
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/pvc-smb-win.yaml
+  # or
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/pvc-smb-samba.yaml
+
+  # have a check
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/deployment-smb-samba.yaml
+  ```
+
 - Create storageclass for smb
   - ref: 
     - [Create a storage class](https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#1-create-a-storage-class)
     - [storageclass-smb.yaml](https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/storageclass-smb.yaml)
     - [smb-csi-dirver/storageclass-smb.yaml](smb-csi-dirver/storageclass-smb.yaml)
-  ```
+  ```shell
   kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/storageclass-smb.yaml
+  # or
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/storageclass-smb-samba.yaml
   ```
 - Have a test
   ```
-  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/statefulset.yaml
+  kubectl apply -f /var/vagrant/HelmWorkShop/smb-csi-dirver/statefulset-samba.yaml
   ```
 ## Install Longhorn
 - Perpare the pre-request config

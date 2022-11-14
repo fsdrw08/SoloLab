@@ -144,7 +144,7 @@ mariadb:
   enabled: true
 
   global:
-    storageClass: smb
+    storageClass: smb-samba
 
   auth:
     rootPassword: root

@@ -1,0 +1,31 @@
+# https://github.com/crazy-max/docker-samba
+
+auth:
+  - user: sambauser
+    group: sambauser
+  # run "ls -al <share dir path>" to understand which user have access right
+  # then run "id -u <username>" to get the related user's uid and gid
+    uid: 1003
+    gid: 1003
+    password: samba
+  # - user: baz
+  #   group: xxx
+  #   uid: 1100
+  #   gid: 1200
+  #   password_file: /run/secrets/baz_password
+
+global:
+  - "force user = sambauser"
+  - "force group = sambauser"
+
+share:
+  - name: share
+    path: /samba/share
+    browsable: yes
+    readonly: no
+    guestok: no
+    validusers: sambauser
+    writelist: sambauser
+    veto: no
+    hidefiles: /_*/
+    recycle: yes

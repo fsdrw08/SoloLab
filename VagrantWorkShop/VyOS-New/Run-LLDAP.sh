@@ -1,11 +1,10 @@
 #!/bin/vbash
+mkdir -p /home/vagrant/lldap_data
 # Ensure that we have the correct group or we'll corrupt the configuration
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
     exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
 fi
 
-mkdir -p /home/vagrant/lldap_data
-add container image docker.io/nitnelave/lldap:latest
 
 source /opt/vyatta/etc/functions/script-template
 configure
