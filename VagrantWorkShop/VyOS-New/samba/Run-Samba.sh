@@ -1,6 +1,6 @@
 #!/bin/vbash
 # Ensure that we have the correct group or we'll corrupt the configuration
-mkdir -p /home/vagrant/samba/{config,share}
+su vagrant -c "mkdir -p /home/vagrant/samba/{config,share} && chmod -R 777 samba/share/"
 
 if [ "$(id -g -n)" != 'vyattacfg' ] ; then
     exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"

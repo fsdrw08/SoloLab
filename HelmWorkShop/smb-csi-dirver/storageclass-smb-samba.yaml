@@ -7,8 +7,8 @@ metadata:
 provisioner: smb.csi.k8s.io
 # https://github.com/kubernetes-csi/csi-driver-smb/blob/master/docs/driver-parameters.md#storage-class-usage
 parameters:
-  source: "//192.168.255.1/sololab"
-  subDIr: "infra"
+  source: "//192.168.255.1/share"
+  # subDIr: "infra"
   # if csi.storage.k8s.io/provisioner-secret is provided, will create a sub directory
   # with PV name under source
   csi.storage.k8s.io/provisioner-secret-name: "smbcreds-samba"

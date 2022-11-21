@@ -574,7 +574,7 @@ Ref:
   ```shell
   kubectl create secret generic smbcreds --from-literal username=root --from-literal password="root" -n kube-system
   # or
-  kubectl create secret generic smbcreds-samba --from-literal username=sololab --from-literal password="sololab" -n kube-system
+  kubectl create secret generic smbcreds-samba --from-literal username=sambauser --from-literal password="samba" -n kube-system
   ```
 - Create pv and pvc to have a check
   - ref: https://github.com/kubernetes-csi/csi-driver-smb/blob/master/deploy/example/e2e_usage.md#option2-pvpvc-usage

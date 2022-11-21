@@ -18,7 +18,7 @@ spec:
     readOnly: false
     volumeHandle: unique-volumeid
     volumeAttributes:
-      source: "//192.168.255.1/sololab"
+      source: "//192.168.255.1/share"
     nodeStageSecretRef:
       name: smbcreds-samba
       namespace: kube-system
