@@ -75,3 +75,4 @@ systemctl --user enable $SERVICENAME.service
 loginctl enable-linger vagrant
 ```
 
+Deploy Consul
