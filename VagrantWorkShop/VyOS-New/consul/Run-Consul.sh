@@ -54,8 +54,7 @@ commit
 save
 
 # show log container consul 
-# # sudo podman run -d --name consul --network=consul_net --port 8500:8500 -v /home/vagrant/consul/data:/bitnami docker.io/bitnami/consul:latest consul agent -server -bind=127.0.0.1 -data-dir /bitnami
+# sudo podman run -d --name consul --network=consul_net --port 8500:8500 -v /home/vagrant/consul/data:/bitnami docker.io/bitnami/consul:latest consul agent -server -bind=127.0.0.1 -data-dir /bitnami
+
 # sudo podman run --name consul --network=consul_net -p 8500:8500 -v /home/vagrant/consul/data:/bitnami \
 # -e CONSUL_BIND_INTERFACE=eth0 -e CONSUL_BIND_ADDR=127.0.0.1 docker.io/bitnami/consul:latest 
-# -e CONSUL_CLIENT_LAN_ADDRESS=127.0.0.1 docker.io/bitnami/consul:latest 
-# consul agent -server -data-dir /bitnami

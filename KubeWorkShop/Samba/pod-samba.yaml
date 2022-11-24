@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: samba
+  labels:
+    name: samba
+spec:
+  # https://github.com/samba-in-kubernetes/samba-container/tree/master
+  # https://github.com/samba-in-kubernetes/samba-container/blob/master/examples/kubernetes/sambapod.yml
+  containers:
+    - name: samba
+      image: quay.io/samba.org/samba-server:latest
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SAMBACC_CONFIG
+          value: /etc/samba-container/config.json
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 445
+      volumeMounts:
+        # https://www.cnblogs.com/liugp/p/16651760.html
+        # https://dev.to/joshduffney/kubernetes-using-configmap-subpaths-to-mount-files-3a1i
+        # SubPaths are not automatically updated when a ConfigMap is modified.
+        # but subpath have not support from podman
+        # https://github.com/containers/podman/issues/12929
+        - name: samba_config
+          mountPath: /etc/samba-container/ #config.json
+          # subPath: config.json
+        - name: samba_share
+          mountPath: /share
+  volumes:
+    - name: samba_config
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: samba
+        items:
+          - key: config.json
+            path: config.json
+    - name: samba_share
+      hostPath:
+        path: /home/vagrant/infra/
+        type: Directory
+  restartPolicy: OnFailure

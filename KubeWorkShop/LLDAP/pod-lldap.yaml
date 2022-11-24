@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lldap
+  labels:
+    name: lldap
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://github.com/containers/podman/issues/7626
+  containers:
+    - name: lldap
+      image: docker.io/nitnelave/lldap:latest
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: LLDAP_JWT_SECRET
+          value: REPLACE_WITH_RANDOM
+        - name: LLDAP_LDAP_USER_PASS
+          value: password
+        - name: LLDAP_LDAP_BASE_DN
+          value: dc=example,dc=com
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 17170
+        - containerPort: 3890
+      volumeMounts:
+        - name: lldap_data
+          mountPath: /data
+  volumes:
+    - name: lldap_data
+      hostPath:
+        path: /home/vagrant/infra/lldap/data
+        type: Directory
+  restartPolicy: OnFailure

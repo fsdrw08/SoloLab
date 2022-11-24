@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: samba
+data:
+  config.json: |
+    {
+      "_NOTE1": "https://github.com/samba-in-kubernetes/samba-container/blob/e42bb52a8a624e37547ec39ce5f1f38c636d9f96/examples/podman/config.json",
+      "_NOTE2": "https://github.com/samba-in-kubernetes/sambacc/blob/ae4bf96cba0cd9dab9e95c03482f66833d5ce7c5/examples/minimal.json",
+      "samba-container-config": "v0",
+      "configs": {
+        "demo": {
+          "shares": [
+            "share"
+          ],
+          "globals": [
+            "default"
+          ],
+          "instance_name": "SAMBA"
+        }
+      },
+      "shares": {
+        "_NOTE3": "https://github.com/samba-in-kubernetes/sambacc/blob/a24d4dea719b201075af36fa3d31d87ab1ca4f15/tests/test_config.py#L79",
+        "_NOTE4": "https://www.samba.org/samba/docs/using_samba/ch09.html",
+        "share": {
+          "options": {
+            "path": "/share",
+            "valid users": "sambauser",
+            "writable": "yes"
+          }
+        }
+      },
+      "globals": {
+        "default": {
+          "options": {
+            "security": "user",
+            "server min protocol": "SMB2",
+            "load printers": "no",
+            "printing": "bsd",
+            "printcap name": "/dev/null",
+            "disable spoolss": "yes",
+            "guest ok": "no"
+          }
+        }
+      },
+      "users": {
+        "_NOTE": "https://github.com/samba-in-kubernetes/sambacc/blob/a24d4dea719b201075af36fa3d31d87ab1ca4f15/tests/test_config.py#L150",
+        "all_entries": [
+          {
+            "name": "sambauser",
+            "uid": 1000,
+            "gid": 1000,
+            "password": "samba"
+          }
+        ]
+      },
+      "_footer": 1
+    }
