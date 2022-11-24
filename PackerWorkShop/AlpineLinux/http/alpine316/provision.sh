@@ -54,10 +54,10 @@ chown -R vagrant:vagrant /home/vagrant/.ssh
 # fi
 
 # install the nfs client to support nfs synced folders in vagrant.
-apk add nfs-utils
+# apk add nfs-utils
 
 # install vim.
-apk add vim
+# apk add vim
 
 # install rsync.
 apk add rsync

@@ -18,9 +18,9 @@ iface eth0 inet dhcp
 DNSOPTS=""
 TIMEZONEOPTS="-z PRC"
 PROXYOPTS="none"
-APKREPOSOPTS="https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.16/main/
-https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.16/community
-https://mirrors.tuna.tsinghua.edu.cn/alpine/edge/testing"
+APKREPOSOPTS="https://mirrors.ustc.edu.cn/alpine/v3.16/main/
+https://mirrors.ustc.edu.cn/alpine/v3.16/community/
+https://mirrors.ustc.edu.cn/alpine/edge/testing/"
 SSHDOPTS="-c openssh"
 NTPOPTS="-c chrony"
 DISKOPTS="-s 0 -m sys $boot_device"

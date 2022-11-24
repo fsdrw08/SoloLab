@@ -5,11 +5,12 @@ variable "ansible_override" {
 
 variable "alpine_version" {
   type    = string
+  default = "alpine316"
 }
 
-// variable "boot_command" {
-//   type    = list(string)
-// }
+variable "boot_command" {
+  type    = list(string)
+}
 
 variable "configuration_version" {
   type    = string
@@ -44,11 +45,6 @@ variable "iso_checksum_type" {
 variable "iso_url" {
   type    = string
   default = ""
-}
-
-variable "mirror" {
-  type    = string
-  default = "3.14"
 }
 
 variable "output_directory" {
@@ -100,29 +96,7 @@ variable "vm_name" {
 }
 
 source "hyperv-iso" "vm" {
-  boot_command          = ["root<enter><wait>",
-    "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
-    "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
-    "setup-alpine -f answers<enter><wait5>",
-    "root<enter><wait>",
-    "root<enter><wait20>",
-    "y<enter><wait40>",
-    "rc-service sshd stop<enter>",
-    "mount /dev/sda3 /mnt<enter>",
-    "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
-    "umount /mnt<enter>",
-    "reboot<enter><wait20>",
-    "root<enter>",
-    "root<enter><wait5>",
-    "apk add hvtools dhclient<enter><wait10>",
-    "rc-update add hv_fcopy_daemon<enter><wait>",
-    "rc-update add hv_kvp_daemon<enter><wait>",
-    "rc-update add hv_vss_daemon<enter><wait>",
-    "rc-service hv_fcopy_daemon start<enter><wait>",
-    "rc-service hv_kvp_daemon start<enter><wait>",
-    "rc-service hv_vss_daemon start<enter><wait>",
-    "exit<enter>"
-  ]
+  boot_command          = "${var.boot_command}"
   boot_wait             = "10s"
   communicator          = "ssh"
   configuration_version = "${var.configuration_version}"
@@ -137,11 +111,12 @@ source "hyperv-iso" "vm" {
   ]
   generation            = 2
   guest_additions_mode  = "disable"
-  http_directory        = "./http/alpine315"
+  http_directory        = "./http/alpine${var.alpine_version}"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
+  skip_export           = "false"
   shutdown_command      = "poweroff"
   shutdown_timeout      = "30m"
   ssh_password          = "root"
@@ -157,41 +132,19 @@ build {
   sources = ["source.hyperv-iso.vm"]
 
   provisioner "shell" {
-      // "echo ${var.mirror}v${var.alpine_version}/community >> /etc/apk/repositories",
-      // "echo ${var.mirror}edge/testing >> /etc/apk/repositories",
-    inline          = [
-      "apk update",
-      "apk add sudo",
-      "echo '%wheel ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/wheel",
-      "user=${var.ssh_username}",
-      "group=${var.ssh_username}",
-      "echo Add group $group for user $user",
-      "addgroup $group",
-      "echo Add user $user with NOPASSWD sudo",
-      "adduser $user --ingroup $group --disabled-password",
-      "echo '${var.ssh_username}:${var.ssh_password}' | chpasswd",
-      "adduser $user wheel",
-      "echo add ssh key",
-      "cd ~${var.ssh_username}",
-      "mkdir .ssh",
-      "chmod 700 .ssh",
-      "echo ${var.ssh_key} > .ssh/authorized_keys",
-      "chown -R $user .ssh",
-      "echo install rsync",
-      "apk add rsync curl",
-      "echo disable ssh root login",
-      "sed '/PermitRootLogin yes/d' -i /etc/ssh/sshd_config",
-      "sudo sed -n '1w /etc/dhcp/dhclient.conf' /etc/dhcp/dhclient.conf.example",
-      "echo -e '#!/bin/ash\nsudo dhclient -r eth0' | sudo tee /etc/local.d/release-ip.stop",
-      "sudo chmod +x /etc/local.d/release-ip.stop",
-      "sudo rc-service local start",
-      "sudo rc-update add local default"
-    ]
+    script          = "./http/alpine${var.alpine_version}/provision.sh"
   }
 
-  post-processor "vagrant" {
-    keep_input_artifact  = true
-    output               = "${var.output_vagrant}"
-    vagrantfile_template = "${var.vagrantfile_template}"
+  post-processors {
+    // https://developer.hashicorp.com/packer/plugins/post-processors/vagrant/vagrant
+    post-processor "vagrant" {
+      output               = "${var.output_vagrant}"
+      vagrantfile_template = "${var.vagrantfile_template}"
+    }
+
+    // post-processor "checksum" {
+    //   checksum_types = [ "md5", "sha512" ]
+    //   keep_input_artifact = true
+    // }
   }
 }

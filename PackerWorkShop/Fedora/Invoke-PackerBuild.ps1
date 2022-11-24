@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('36')]
+    [ValidateSet('36','37')]
     [int16]
     $FedoraVersion
 )
@@ -23,8 +23,8 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2_fedora.pkr.hcl"
-  $var_file="$PSScriptRoot\vars_fedora$FedoraVersion.pkrvars.hcl"
+  $template_file="$PSScriptRoot\tmpl-hv_g2-fedora.pkr.hcl"
+  $var_file="$PSScriptRoot\vars-fedora$FedoraVersion.pkrvars.hcl"
   $machine="Fedora $FedoraVersion"
   $packer_log=0
   

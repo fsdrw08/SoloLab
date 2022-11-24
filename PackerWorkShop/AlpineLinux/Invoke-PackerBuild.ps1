@@ -23,8 +23,8 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2-alpine$AlpineVersion.pkr.hcl"
-  $var_file="$PSScriptRoot\vars-alpine$AlpineVersion.pkrvars.hcl"
+  $template_file="$PSScriptRoot\tmpl-hv_g2-AlpineLinux.pkr.hcl"
+  $var_file="$PSScriptRoot\vars-AlpineLinux$AlpineVersion.pkrvars.hcl"
   $machine="Alpine $AlpineVersion"
   $packer_log=0
   
