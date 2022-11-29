@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul
+data:
+  config.json: |
+    {
+        "datacenter": "localhost",
+        "domain":"consul",
+        "data_dir": "/consul/data",
+        "log_level": "DEBUG",
+        "server": true,
+        "ui": true,
+        "bootstrap_expect":1,
+        "addresses": {
+            "http":"0.0.0.0"
+        },
+        "retry_join": ["127.0.0.1"],
+        "ports": {
+          "server":8300,
+          "serf_lan":8301,
+          "http":8500,
+          "dns":8600
+        },
+        "serf_lan":"0.0.0.0"
+    }

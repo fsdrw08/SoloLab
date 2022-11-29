@@ -20,7 +20,8 @@ spec:
           memory: "128Mi"
           cpu: "500m"
       ports:
-        - containerPort: 445
+        - name: smb
+          containerPort: 445
       volumeMounts:
         # https://www.cnblogs.com/liugp/p/16651760.html
         # https://dev.to/joshduffney/kubernetes-using-configmap-subpaths-to-mount-files-3a1i

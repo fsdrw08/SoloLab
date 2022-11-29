@@ -32,16 +32,20 @@ spec:
         - consul
       args:
         - agent
-        - -server
-        - -ui
-        - -bootstrap-expect=1
-        - -client=0.0.0.0
-        # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_data_dir
-        - -data-dir=/consul/data
+        - -config-file=/consul/config/config.json
       volumeMounts:
+        - name: consul_config
+          mountPath: /consul/config/
         - name: consul_data
           mountPath: /consul/data
   volumes:
+    - name: consul_config
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: consul
+        items:
+          - key: config.json
+            path: config.json
     - name: consul_data
       hostPath:
         path: /home/vagrant/infra/consul/data
