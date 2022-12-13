@@ -1,0 +1,42 @@
+# Static Configuration
+
+## Configuration Discovery
+# https://doc.traefik.io/traefik/providers/overview/
+providers:
+# https://doc.traefik.io/traefik/providers/file/#directory
+  file:
+    directory: /etc/traefik/dynamic/
+    watch: true
+
+# ref: https://www.vtulluru.com/how-to-install-traefik-as-a-container-using-docker-or-podman/
+# https://doc.traefik.io/traefik/reference/static-configuration/file/
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+
+## Routing & Load Balancing
+# https://doc.traefik.io/traefik/routing/overview/
+entryPoints:
+  # https://doc.traefik.io/traefik/routing/entrypoints/#entrypoints
+  # https://doc.traefik.io/traefik/routing/routers/#configuration-example
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+# https://doc.traefik.io/traefik/routing/overview/#transport-configuration
+serversTransport:
+  rootCAs:
+    - root_ca.crt
+
+
+## Operations
+# https://doc.traefik.io/traefik/operations/api/
+api:
+  dashboard: true

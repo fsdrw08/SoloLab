@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik
+data:
+  # ref: https://doc.traefik.io/traefik/providers/file/#configuration-examples
+  traefik.yml: |
+    providers:
+      file:
+        directory: /etc/traefik/dynamic/
+        watch: true
