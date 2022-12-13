@@ -22,7 +22,8 @@ resource "vault_pki_secret_backend_intermediate_cert_request" "sololab_org_v1_ic
 
 resource "tls_locally_signed_cert" "sololab_org_v1_ica1_v1" {
   depends_on = [
-    vault_pki_secret_backend_intermediate_cert_request.sololab_org_v1_ica1_v1
+    vault_pki_secret_backend_intermediate_cert_request.sololab_org_v1_ica1_v1,
+    tls_self_signed_cert.root_ca
   ]
 
   cert_request_pem   = vault_pki_secret_backend_intermediate_cert_request.sololab_org_v1_ica1_v1.csr
