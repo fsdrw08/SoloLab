@@ -2,3 +2,4 @@
 *.sh    text eol=lf
 *.ps1   text eol=crlf
 *.yaml  text eol=lf
+ipa-server-install-options*  text eol=lf
