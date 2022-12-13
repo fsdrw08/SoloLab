@@ -35,6 +35,13 @@ EOF"
 # sudo reboot
 ```
 
+### Enable lingering
+ref: 
+    - [Installation of generated systemd unit files](https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html#installation-of-generated-systemd-unit-files)
+```shell
+loginctl enable-linger vagrant
+```
+
 ### Deploy LLDAP
 Deploy the container
 ```shell
@@ -57,8 +64,10 @@ podman generate systemd --name lldap-lldap > $HOME/.config/systemd/user/lldap-ll
 # have a check
 cat $HOME/.config/systemd/user/lldap-lldap.service
 systemctl --user enable lldap-lldap.service
-# lingering
-loginctl enable-linger vagrant
+
+# to disable this service
+systemctl --user disable lldap-lldap.service
+rm -f $HOME/.config/systemd/user/lldap-lldap.service
 ```
 
 ### Deploy Samba
@@ -144,6 +153,7 @@ systemctl --user enable $SERVICENAME.service
 # lingering
 loginctl enable-linger vagrant
 ```
+
 Config vault (get root token) from UI first (server_ip:8200/ui)
 To get access to vault from cli, run commands in vault container:
 ```shell
@@ -154,3 +164,34 @@ vault login $VAULT_TOKEN
 vault auth list
 ```
 Then refer [Build Your Own Certificate Authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine#step-1-generate-root-ca) to set up root ca
+
+see [README.md](../TerraformWorkShop/Vault/PKI/README.md)
+
+### Deploy FreeIPA
+update [.\FreeIPA\data\ipa-server-install-options](FreeIPA/data/ipa-server-install-options) first,
+ref: https://freeipa.readthedocs.io/en/latest/workshop/1-server-install.html
+```shell
+# update /etc/hosts, hostname must lower case
+"127.0.0.1 infrasvc-fedora37.sololab ..."
+# stop and disable systemd-resolved
+# sudo systemctl stop systemd-resolved
+# sudo systemctl disable systemd-resolved
+# sudo systemctl enable --now systemd-resolved
+mkdir -p $HOME/infra/FreeIPA/data
+cp -r /var/vagrant/KubeWorkShop/FreeIPA/data/ $HOME/infra/freeipa/data/
+
+# !! need to update yaml file
+podman network create freeipa_net
+podman kube play /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml \
+    --network freeipa_net
+
+# have a check
+cat infra/freeipa/data/var/log/ipa-server-configure-first.log
+cat infra/freeipa/data/var/log/ipaserver-install.log
+tail -n 100 $HOME/infra/freeipa/data/var/log/ipaserver-install.log
+
+# delete freeipa
+podman kube down /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml
+
+sudo rm -rf infra/freeipa/data/
+```
