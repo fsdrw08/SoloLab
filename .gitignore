@@ -1,4 +1,5 @@
 .terraform
 terraform.tfstate*
+.terraform.lock.hcl
 *.key
 *.crt
