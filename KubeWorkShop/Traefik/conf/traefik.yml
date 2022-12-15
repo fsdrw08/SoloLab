@@ -5,7 +5,7 @@
 providers:
 # https://doc.traefik.io/traefik/providers/file/#directory
   file:
-    directory: /etc/traefik/dynamic/
+    directory: /etc/traefik/dynamic
     watch: true
 
 # ref: https://www.vtulluru.com/how-to-install-traefik-as-a-container-using-docker-or-podman/
@@ -22,21 +22,27 @@ entryPoints:
   # https://doc.traefik.io/traefik/routing/routers/#configuration-example
   web:
     address: ":80"
-    http:
-      redirections:
-        entryPoint:
-          to: websecure
-          scheme: https
+    # http:
+    #   redirections:
+    #     entryPoint:
+    #       to: websecure
+    #       scheme: https
   websecure:
     address: ":443"
 
 # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
 serversTransport:
+  # https://doc.traefik.io/traefik/routing/overview/#rootcas
   rootCAs:
-    - root_ca.crt
+    - /etc/traefik/root_ca.crt
 
 
 ## Operations
 # https://doc.traefik.io/traefik/operations/api/
 api:
   dashboard: true
+
+
+## Observability
+log:
+  level: DEBUG

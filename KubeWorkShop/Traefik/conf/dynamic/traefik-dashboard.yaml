@@ -1,0 +1,10 @@
+# Dynamic Configuration
+http:
+  routers:
+    dashboard:
+      rule: Host(`infra.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      # https://www.teanote.pub/archives/247
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # will terminate the TLS request
+      tls: true

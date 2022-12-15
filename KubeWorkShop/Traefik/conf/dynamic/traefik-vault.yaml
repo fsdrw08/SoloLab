@@ -1,0 +1,47 @@
+# Dynamic Configuration
+http:
+  routers:
+    # for the url of issuering CA, crl, ocsp, they should connect with http, not https
+    # e.g. http://vault.infra.sololab/v1/sololab-pki/v1/ica2/v1/crl
+    # ref: https://serverfault.com/questions/1023474/ocsp-setup-for-vault
+    vault:
+      rule: Host(`vault.infra.sololab`) || Path(`/v1/sololab-pki/v1/ica2/v1/crl`) || Path(`/v1/sololab-pki/v1/ica2/v1/ca.crt`) || Path(`/ocsp`)
+      entryPoints: 
+        - web
+      # middlewares:
+      #   - subpath-stripprefixregex
+      service: vault
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # tls: true
+  # middlewares:
+  #   subpath-stripprefixregex:
+  #     # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+  #     stripPrefixRegex:
+  #       regex:
+  #         - "/sub-[a-zA-Z0-9]{1,30}"
+  services:
+    vault:
+      loadBalancer:
+        servers:
+          - url: "https://vault:8200/"
+        # serversTransport: vault
+  # serversTransports:
+  #   vault:
+  #     insecureSkipVerify: true
+
+# https://doc.traefik.io/traefik/routing/services/#configuring-tcp-services
+# https://github.com/Binsabbar/vault-cluster/blob/8c557a5028b3cfb439e49e2096532f92481bae96/edgeRouter/routes.yml
+tcp:
+  routers:
+    vault:
+      rule: "HostSNI(`vault.infra.sololab`)"
+      entryPoints: 
+        - websecure
+      service: vault
+      tls:
+        passthrough: true
+  services:
+    vault:
+      loadBalancer:
+        servers:
+          - address: "vault:8200"

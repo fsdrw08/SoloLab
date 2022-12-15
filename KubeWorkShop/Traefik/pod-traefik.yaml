@@ -22,21 +22,25 @@ spec:
         - name: http
           containerPort: 80
           hostPort: 80
-        - name: "8080"
-          containerPort: 8080
-          hostPort: 8080
+        - name: https
+          containerPort: 443
+          hostPort: 443
 
       volumeMounts:
         # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
         - name: traefik
-          mountPath: /etc/traefik/ #config.json
-          # subPath: config.json
+          mountPath: /etc/traefik/ #traefik.yml
+          # subPath: traefik.yml
   volumes:
+    # - name: traefik
+    #   # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+    #   configMap:
+    #     name: traefik
+    #     items:
+    #       - key: traefik.yml
+    #         path: traefik.yml
     - name: traefik
-      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
-      configMap:
-        name: traefik
-        items:
-          - key: traefik.yml
-            path: traefik.yml
+      hostPath:
+        path: /home/vagrant/infra/traefik/
+        type: Directory
   restartPolicy: OnFailure

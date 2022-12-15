@@ -131,11 +131,12 @@ loginctl enable-linger vagrant
 ### Deploy Vault
 
 ```shell
-mkdir -p $HOME/infra/vault/data
-podman network create vault_net
+APP_DIR="vault"
+mkdir -p $HOME/infra/$APP_DIR/
+cp -r /var/vagrant/KubeWorkShop/Vault/data/ $HOME/infra/$APP_DIR/
+
 podman kube play /var/vagrant/KubeWorkShop/Vault/pod-vault.yaml \
-    --configmap /var/vagrant/KubeWorkShop/Vault/cm-vault.yaml \
-    --network vault_net
+    --configmap /var/vagrant/KubeWorkShop/Vault/cm-vault.yaml
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/Vault/pod-vault.yaml
 ```
@@ -152,6 +153,9 @@ cat $HOME/.config/systemd/user/$SERVICENAME.service
 systemctl --user enable $SERVICENAME.service
 # lingering
 loginctl enable-linger vagrant
+
+# delete
+systemctl --user disable $SERVICENAME.service
 ```
 
 Config vault (get root token) from UI first (server_ip:8200/ui)
@@ -167,18 +171,51 @@ Then refer [Build Your Own Certificate Authority (CA)](https://developer.hashico
 
 see [README.md](../TerraformWorkShop/Vault/PKI/README.md)
 
+
+### Deploy Traefik
+```shell
+APP_DIR="traefik"
+mkdir -p $HOME/infra/$APP_DIR/
+cp -r /var/vagrant/KubeWorkShop/Traefik/conf/* $HOME/infra/$APP_DIR/
+
+podman kube play /var/vagrant/KubeWorkShop/Traefik/pod-traefik.yaml
+
+# delete traefik
+podman kube down /var/vagrant/KubeWorkShop/Traefik/pod-traefik.yaml
+```
+
+Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)
+```shell
+mkdir -p $HOME/.config/systemd/user
+# generate the systemd unit file
+SERVICENAME="traefik-traefik"
+echo $SERVICENAME
+podman generate systemd --name $SERVICENAME > $HOME/.config/systemd/user/$SERVICENAME.service
+# have a check
+cat $HOME/.config/systemd/user/$SERVICENAME.service
+systemctl --user enable $SERVICENAME.service
+# lingering
+loginctl enable-linger vagrant
+
+# delete
+systemctl --user disable $SERVICENAME.service
+```
+
+
 ### Deploy FreeIPA
 update [.\FreeIPA\data\ipa-server-install-options](FreeIPA/data/ipa-server-install-options) first,
 ref: https://freeipa.readthedocs.io/en/latest/workshop/1-server-install.html
 ```shell
 # update /etc/hosts, hostname must lower case
-"127.0.0.1 infrasvc-fedora37.sololab ..."
+"192.168.255.31 ipa.infra.sololab ..."
 # stop and disable systemd-resolved
 # sudo systemctl stop systemd-resolved
 # sudo systemctl disable systemd-resolved
 # sudo systemctl enable --now systemd-resolved
-mkdir -p $HOME/infra/FreeIPA/data
-cp -r /var/vagrant/KubeWorkShop/FreeIPA/data/ $HOME/infra/freeipa/data/
+
+APP_DIR="freeipa"
+mkdir -p $HOME/infra/$APP_DIR
+cp -r /var/vagrant/KubeWorkShop/FreeIPA/data/ $HOME/infra/$APP_DIR/
 
 # !! need to update yaml file
 podman network create freeipa_net

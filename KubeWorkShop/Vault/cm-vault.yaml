@@ -10,12 +10,14 @@ data:
       node_id = "vault"
     }
 
+    # https://developer.hashicorp.com/vault/docs/configuration/ui#activating-the-vault-ui
     ui = true
 
-    # https://developer.hashicorp.com/vault/docs/configuration/ui#activating-the-vault-ui
     listener "tcp" {
       address = "0.0.0.0:8200"
-      tls_disable = true
+      # https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_cert_file
+      tls_cert_file = "/vault/data/sololab_vault.crt"
+      tls_key_file = "/vault/data/sololab_vault.key"
     }
 
     api_addr = "http://127.0.0.1:8200"

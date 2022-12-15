@@ -1,0 +1,44 @@
+# Dynamic Configuration
+http:
+  routers:
+    freeipa:
+      rule: Host(`ipa.infra.sololab`)
+      # rule: PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+      # entryPoints: 
+      #   - websecure
+      # middlewares:
+      #   - subpath-stripprefixregex
+      service: freeipa
+      # tls: true
+  # middlewares:
+  #   subpath-stripprefixregex:
+  #     # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+  #     stripPrefixRegex:
+  #       regex:
+  #         - "/sub-[a-zA-Z0-9]{1,30}"
+  services:
+    freeipa:
+      loadBalancer:
+        servers:
+          - url: "http://freeipa/"
+        # serversTransport: freeipa
+  serversTransports:
+    freeipa:
+      insecureSkipVerify: true
+
+# https://doc.traefik.io/traefik/routing/services/#configuring-tcp-services
+# https://github.com/Binsabbar/freeipa-cluster/blob/8c557a5028b3cfb439e49e2096532f92481bae96/edgeRouter/routes.yml
+# tcp:
+#   routers:
+#     freeipa:
+#       rule: "HostSNI(`freeipa.infra.sololab`)"
+#       entryPoints: 
+#         - websecure
+#       service: freeipa
+#       tls:
+#         passthrough: true
+#   services:
+#     freeipa:
+#       loadBalancer:
+#         servers:
+#           - address: "freeipa:8200"
