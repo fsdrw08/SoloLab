@@ -7,7 +7,7 @@ metadata:
 spec:
   # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
   # https://www.freeipa.org/page/Docker#FreeIPA_server_containers
-  hostname: infrasvc-fedora37.sololab
+  hostname: ipa.infra.sololab
   containers:
     - name: freeipa
       image: docker.io/freeipa/freeipa-server:fedora-37
@@ -18,7 +18,7 @@ spec:
           value: ""
           # value: "192.168.255.31"
         - name: IPA_SERVER_HOSTNAME
-          value: infrasvc-fedora37.sololab
+          value: ipa.infra.sololab
       resources:
         limits:
           memory: "512Mi"
