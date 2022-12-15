@@ -22,8 +22,9 @@ terraform {
 }
 
 locals {
-  address = "http://192.168.255.31:8200"
+  VAULT_ADDR = "vault.infra.sololab"
   token   = "hvs.pqibSbWZDHGmY2ZBlT0IHKXG"
+  skip_tls_verify = true
 
   default_3y_in_sec  = 94608000
   default_1y_in_sec  = 31536000
@@ -31,6 +32,8 @@ locals {
 }
 
 provider "vault" {
-  address = local.address
+  address = "https://${local.VAULT_ADDR}"
   token   = local.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = local.skip_tls_verify
 }
