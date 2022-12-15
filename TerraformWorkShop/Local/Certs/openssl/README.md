@@ -39,7 +39,7 @@ openssl req -x509 `
 
 ### sign a cert with CA
 ```powershell
-$csr="..\csr\Sololab_Org_v1_ICA1_v1.csr"
+$csr="..\csr\sololab_v1_ica1_v1.csr"
 $CACert="openssl-root-ca.crt"
 $CAKey="openssl-root-ca.key"
 $CertOut="Intermediate_CA1_v1.crt"
@@ -53,6 +53,6 @@ openssl x509 -req `
 
 ### merge the cert 
 ```powershell
-$bundle=".\Sololab_org_v1_ica1_v1.crt"
+$bundle=".\sololab_v1_ica1_v1.crt"
 Get-Content .\*.crt | Set-Content -Path $bundle -Force
 ```

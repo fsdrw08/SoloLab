@@ -15,7 +15,7 @@ certstrap init `
 certstrap sign `
     --passphrase "changeit" `
     --expires "3 year" `
-    --csr ..\csr\Sololab_Org_v1_ICA1_v1.csr `
+    --csr ..\csr\sololab_v1_ica1_v1.csr `
     --cert .\out\Intermediate_CA1_v1.crt `
     --intermediate `
     --CA "Sololab Root" `
@@ -26,6 +26,6 @@ certstrap sign `
 ### merge the cert 
 ```powershell
 $certs=".\out\*.crt"
-$bundle=".\out\Sololab_org_v1_ica1_v1.crt"
+$bundle=".\out\sololab_v1_ica1_v1.crt"
 Get-Content $certs | Set-Content -Path $bundle -Force
 ```

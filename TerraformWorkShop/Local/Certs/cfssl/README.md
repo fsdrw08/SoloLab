@@ -16,7 +16,7 @@ cfssl sign -ca .\out\ca.pem `
            -ca-key .\out\ca-key.pem `
            -config cfssl-config.json `
            -profile intermediate `
-           .\csr\Sololab_Org_v1_ICA1_v1.csr | cfssljson -bare out\Intermediate_CA1_v1
+           .\csr\sololab_v1_ica1_v1.csr | cfssljson -bare out\Intermediate_CA1_v1
 # have a check
 cfssl certinfo -cert out\Intermediate_CA1_v1.pem
 ```
