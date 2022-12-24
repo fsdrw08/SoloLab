@@ -14,9 +14,9 @@ resource "vault_pki_secret_backend_crl_config" "sololab_root_v1" {
 }
 
 resource "vault_pki_secret_backend_config_urls" "sololab_root_v1" {
-  depends_on              = [vault_pki_secret_backend_crl_config.sololab_root_v1]
-  backend                 = vault_mount.sololab_root_v1.path
-  
+  depends_on = [vault_pki_secret_backend_crl_config.sololab_root_v1]
+  backend    = vault_mount.sololab_root_v1.path
+
   # for the url of issuering CA, crl, ocsp, they should connect with http, not https
   # e.g. http://vault.infra.sololab/v1/sololab-pki/v1/ica1/v1/crl
   # ref: https://serverfault.com/questions/1023474/ocsp-setup-for-vault
@@ -30,20 +30,19 @@ variable "load_root_ca_bool" {
 }
 
 data "terraform_remote_state" "sololab_root_v1" {
-  count = var.load_root_ca_bool ? 1 : 0
+  count   = var.load_root_ca_bool ? 1 : 0
   backend = "local"
   config = {
     path = "${path.module}/../../Local/Certs/terraform.tfstate"
   }
 }
 
-
 resource "vault_pki_secret_backend_config_ca" "sololab_root_v1" {
   count = var.load_root_ca_bool ? 1 : 0
 
   depends_on = [vault_mount.sololab_root_v1]
+  backend    = vault_mount.sololab_root_v1.path
 
-  backend = vault_mount.sololab_root_v1.path
-
-  pem_bundle = format("%s\n%s", data.terraform_remote_state.sololab_root_v1[0].outputs.root_ca_key, data.terraform_remote_state.sololab_root_v1[0].outputs.root_ca_crt)
+  pem_bundle = format("%s\n%s", data.terraform_remote_state.sololab_root_v1[0].outputs.root_ca_key,
+  data.terraform_remote_state.sololab_root_v1[0].outputs.root_ca_crt)
 }
