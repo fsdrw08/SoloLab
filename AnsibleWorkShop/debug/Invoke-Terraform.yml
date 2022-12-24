@@ -1,0 +1,15 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    var_terraform_folder: "{{ playbook_dir }}/terraform/"
+  tasks:
+    - name: Create selfsign CA
+      block:
+      - name: include_vars
+        community.general.terraform:
+          project_path: "{{ var_terraform_folder }}"
+          force_init: true
+          state: present
+      

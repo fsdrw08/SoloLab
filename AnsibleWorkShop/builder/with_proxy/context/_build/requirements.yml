@@ -12,6 +12,7 @@ collections:
 #   type: git
 #   version: 2.6.1
 
+- name: community.general
 # https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file
 # roles:
 # # https://github.com/PyratLabs/ansible-role-k3s/issues/196
