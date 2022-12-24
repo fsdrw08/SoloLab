@@ -46,3 +46,6 @@ api:
 ## Observability
 log:
   level: DEBUG
+
+accessLog: {}
+  

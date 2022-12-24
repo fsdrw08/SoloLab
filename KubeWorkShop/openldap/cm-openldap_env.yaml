@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap_env
+data:
+  # https://github.com/bitnami/containers/tree/main/bitnami/openldap#configuration
+  # https://github.com/bitnami/containers/issues/982#issuecomment-1220354408
+  BITNAMI_DEBUG: "yes"
+  # LDAP_BASE_DN ↓
+  LDAP_ROOT: dc=infra,dc=sololab
+  LDAP_ADMIN_USERNAME: admin
+  LDAP_ADMIN_PASSWORD: password
+  LDAP_CONFIG_ADMIN_ENABLED: "yes"
+  # LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis,memberof
+  LDAP_EXTRA_SCHEMAS: cosine,inetorgperson,nis
+  LDAP_CUSTOM_LDIF_DIR: /ldifs
+  LDAP_ENABLE_TLS: "yes"
+  LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/sololab_ldap.crt
+  LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/sololab_ldap.key
+  LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/CA_chain.crt 

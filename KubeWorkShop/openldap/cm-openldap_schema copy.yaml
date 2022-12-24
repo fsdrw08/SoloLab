@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap_ldif
+data:
+  # https://github.com/bitnami/containers/tree/main/bitnami/openldap#configuration
+  # https://github.com/bitnami/containers/issues/982#issuecomment-1220354408
+  # https://github.com/d7z-project/all-in-kubernetes/blob/main/system-app-deploy/openldap/conf/04-ldap-schema.yaml
+  # https://github.com/balemy/ldap-commander/blob/main/resources/ldap/bitnami-openldap-memberof.ldif
+  memberof.ldif: |
+    dn: cn=module,cn=config
+    cn: module
+    objectClass: olcModuleList
+    olcModulePath: /opt/bitnami/openldap/lib/openldap
+    olcModuleLoad: memberof.so
+    olcModuleLoad: refint.so
+
+    dn: olcOverlay=memberof,olcDatabase={2}mdb,cn=config
+    objectClass: olcOverlayConfig
+    objectClass: olcMemberOf
+    olcOverlay: memberof
+    olcMemberOfRefint: TRUE
+    olcMemberOfGroupOC: groupOfUniqueNames
+    olcMemberOfMemberAD: UniqueMember
+
+    dn: olcOverlay=refint,olcDatabase={2}mdb,cn=config
+    objectClass: olcConfig
+    objectClass: olcOverlayConfig
+    objectClass: olcRefintConfig
+    objectClass: top
+    olcOverlay: refint
+    olcRefintAttribute: memberof member manager owner
+  01-top.ldif: |
+    dn: dc=infra,dc=sololab
+    objectClass: dcObject
+    objectClass: organization
+    dc: infra
+    o: infra sololab
+    
+    dn: ou=people,dc=infra,dc=sololab
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: people
+    description: LDAP系统角色分组
+    
+    dn: ou=groups,dc=infra,dc=sololab
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: groups
+    description: LDAP集群用户分组
+    
+  #   dn: cn=service-account,dc=infra,dc=sololab
+  #   objectClass: simpleSecurityObject
+  #   objectClass: organizationalRole
+  #   cn: service-account
+  #   userPassword: password
+  #   description: Bind DN 账户，用于查询LDAP服务器内部信息
+  # 02-users-admin.ldif: |
+  #   dn: cn=system admin,ou=people,dc=infra,dc=sololab
+  #   objectClass: people
+  #   objectClass: inetOrgPerson
+  #   objectClass: posixAccount
+  #   objectClass: top
+  #   description: 系统自动创建的默认管理员用户
+  #   cn: system admin
+  #   mail: admin@sololab
+  #   userPassword: password
+  # # https://chenzhonzhou.github.io/2020/11/04/openldap-tian-jia-groupofuniquenames-shu-xing/
+  # 03-cluster-groups.ldif: |
+  #   dn: cn=oci,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: oci
+  #   description: 镜像操作员角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+    
+  #   dn: cn=admin,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: admin
+  #   description: 管理员角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+    
+  #   dn: cn=develop,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: develop
+  #   description: 项目开发者角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+    
+  #   dn: cn=library,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: library
+  #   description: 依赖库上传者角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+
+  #   dn: cn=package,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: package
+  #   description: 软件包上传者角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+
+  #   dn: cn=monitor,ou=groups,dc=infra,dc=sololab
+  #   objectClass: posixGroup
+  #   objectClass: groupOfUniqueNames
+  #   objectClass: top
+  #   cn: monitor
+  #   description: 集群监控监控管理角色
+  #   uniqueMember: cn=system admin,ou=people,dc=infra,dc=sololab
+

@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  openldap:
+    image: docker.io/bitnami/openldap:2.6.3-debian-11-r55
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: 256m
+    ports:
+      - '389:1389'
+      - '636:1636'
+    environment:
+      - TZ=Asia/Shanghai
+      - LDAP_ROOT=dc=infra,dc=sololab
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=password
+      - LDAP_CONFIG_ADMIN_ENABLED=yes
+      - LDAP_EXTRA_SCHEMAS=cosine,inetorgperson,nis,memberof
+      - LDAP_GROUP=group01
+      - LDAP_USERS=user01,user02
+      - LDAP_PASSWORDS=password1,password2
+      - LDAP_ENABLE_TLS=yes
+      - LDAP_TLS_CERT_FILE=/opt/bitnami/openldap/certs/sololab_ldap.crt
+      - LDAP_TLS_KEY_FILE=/opt/bitnami/openldap/certs/sololab_ldap.key
+      - LDAP_TLS_CA_FILE=/opt/bitnami/openldap/certs/CA_chain.crt 
+    volumes:
+      - '/home/vagrant/infra/openldap/data/:/bitnami/openldap/'
+      - '/home/vagrant/infra/openldap/schema/memberof.ldif:/opt/bitnami/openldap/etc/schema/memberof.ldif'
+      # - '/home/vagrant/infra/openldap/ldifs/:/ldifs/'
+      - '/home/vagrant/infra/openldap/certs/:/opt/bitnami/openldap/certs/'
+  lum:
+    image: docker.io/wheelybird/ldap-user-manager:v1.10
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+    ports:
+      - '8080:80'
+      - '8443:443'
+    environment:
+      - TZ=Asia/Shanghai
+      - LDAP_URI=ldap://openldap:1389
+      - LDAP_BASE_DN=dc=infra,dc=sololab
+      - LDAP_ADMIN_BIND_DN=cn=admin,dc=infra,dc=sololab
+      - LDAP_ADMIN_BIND_PWD=password
+      - LDAP_ADMINS_GROUP=lum-admins
+      - ORGANISATION_NAME=sololab
+
+volumes:
+  openldap_data:
+    driver: local

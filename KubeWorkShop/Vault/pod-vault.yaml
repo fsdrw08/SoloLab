@@ -47,4 +47,5 @@ spec:
       hostPath:
         path: /home/vagrant/infra/vault/data
         type: Directory
-  restartPolicy: OnFailure
+        
+  restartPolicy: Never

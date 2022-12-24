@@ -17,8 +17,6 @@ spec:
           value: REPLACE_WITH_RANDOM
         - name: LLDAP_LDAP_USER_PASS
           value: password
-        - name: LLDAP_LDAP_BASE_DN
-          value: dc=example,dc=com
       resources:
         limits:
           memory: "128Mi"
@@ -36,4 +34,5 @@ spec:
       hostPath:
         path: /home/vagrant/infra/lldap/data
         type: Directory
-  restartPolicy: OnFailure
+
+  restartPolicy: Never

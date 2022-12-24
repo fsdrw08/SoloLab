@@ -43,4 +43,4 @@ spec:
       hostPath:
         path: /home/vagrant/infra/traefik/
         type: Directory
-  restartPolicy: OnFailure
+  restartPolicy: Never

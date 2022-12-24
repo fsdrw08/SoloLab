@@ -1,0 +1,15 @@
+dn: dc=infra,dc=sololab
+objectClass: dcObject
+objectClass: organization
+dc: infra
+o: infra sololab
+    
+dn: ou=people,dc=infra,dc=sololab
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+
+dn: ou=groups,dc=infra,dc=sololab
+objectClass: organizationalUnit
+objectClass: top
+ou: groups

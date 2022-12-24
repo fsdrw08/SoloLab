@@ -5,7 +5,7 @@ http:
     # e.g. http://vault.infra.sololab/v1/sololab-pki/v1/ica2/v1/crl
     # ref: https://serverfault.com/questions/1023474/ocsp-setup-for-vault
     vault:
-      rule: Host(`vault.infra.sololab`) || Path(`/v1/sololab-pki/v1/ica2/v1/crl`) || Path(`/v1/sololab-pki/v1/ica2/v1/ca.crt`) || Path(`/ocsp`)
+      rule: Host(`vault.infra.sololab`) || Path(`/v1/sololab-pki/int1_v1/crl`) || Path(`/v1/sololab-pki/int_v1/ca.crt`) || Path(`/ocsp_int1`)
       entryPoints: 
         - web
       # middlewares:
@@ -24,7 +24,7 @@ http:
       loadBalancer:
         servers:
           - url: "https://vault:8200/"
-        # serversTransport: vault
+  #       serversTransport: vault
   # serversTransports:
   #   vault:
   #     insecureSkipVerify: true

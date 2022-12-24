@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openldap_ldif
+data:
+  # https://github.com/bitnami/containers/tree/main/bitnami/openldap#configuration
+  # https://github.com/bitnami/containers/issues/982#issuecomment-1220354408
+  # https://github.com/d7z-project/all-in-kubernetes/blob/main/system-app-deploy/openldap/conf/04-ldap-schema.yaml
+  # https://github.com/balemy/ldap-commander/blob/main/resources/ldap/bitnami-openldap-memberof.ldif
+  memberof.ldif: |
+    dn: cn=module,cn=config
+    cn: module
+    objectClass: olcModuleList
+    olcModulePath: /opt/bitnami/openldap/lib/openldap
+    olcModuleLoad: memberof.so
+    olcModuleLoad: refint.so
+
+    dn: olcOverlay=memberof,olcDatabase={2}mdb,cn=config
+    objectClass: olcOverlayConfig
+    objectClass: olcMemberOf
+    olcOverlay: memberof
+    olcMemberOfRefint: TRUE
+    olcMemberOfGroupOC: groupOfUniqueNames
+    olcMemberOfMemberAD: UniqueMember
+
+    dn: olcOverlay=refint,olcDatabase={2}mdb,cn=config
+    objectClass: olcConfig
+    objectClass: olcOverlayConfig
+    objectClass: olcRefintConfig
+    objectClass: top
+    olcOverlay: refint
+    olcRefintAttribute: memberof member manager owner
+  01-top.ldif: |
+    dn: dc=infra,dc=sololab
+    objectClass: dcObject
+    objectClass: organization
+    dc: infra
+    o: infra sololab
+    
+    dn: ou=people,dc=infra,dc=sololab
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: people
+    description: LDAP系统角色分组
+    
+    dn: ou=groups,dc=infra,dc=sololab
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: groups
+    description: LDAP集群用户分组
+    

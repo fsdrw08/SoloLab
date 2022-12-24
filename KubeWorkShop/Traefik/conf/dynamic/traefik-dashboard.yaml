@@ -8,3 +8,10 @@ http:
       # https://doc.traefik.io/traefik/routing/routers/#tls
       # will terminate the TLS request
       tls: true
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/dynamic/sololab_infra.crt
+        keyFile: /etc/traefik/dynamic/sololab_infra.key

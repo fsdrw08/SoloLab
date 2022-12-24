@@ -19,7 +19,7 @@ EOF"
 ### Low down the unprivileged port
 For samba deployment (samba require port 443 which lower than 1024 in the limit set)
 ```shell
-sudo sh -c "echo 'net.ipv4.ip_unprivileged_port_start=80'>>/etc/sysctl.conf"
+sudo sh -c "echo 'net.ipv4.ip_unprivileged_port_start=53'>>/etc/sysctl.conf"
 # sudo reboot
 ```
 
@@ -47,9 +47,11 @@ Deploy the container
 ```shell
 podman network create ldap_net
 mkdir -p $HOME/infra/lldap/data
-podman kube play /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml --network ldap_net
+podman kube play /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml 
+cp /var/vagrant/KubeWorkShop/Traefik/conf/dynamic/traefik-lldap.yaml $HOME/infra/traefik/dynamic/
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml
+rm -rf $HOME/infra/lldap/data/*
 ```
 
 Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)
@@ -102,15 +104,11 @@ loginctl enable-linger vagrant
 Deploy the container
 ```shell
 mkdir -p $HOME/infra/consul/data
-podman network create consul_net
-podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul.yaml \
-    --network consul_net
-# to delete
-podman kube down /var/vagrant/KubeWorkShop/Consul/pod-consul.yaml
 
 podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
-    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml \
-    --network consul_net
+    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml 
+
+# to delete
 podman kube down /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml
 ```
 
@@ -139,6 +137,8 @@ podman kube play /var/vagrant/KubeWorkShop/Vault/pod-vault.yaml \
     --configmap /var/vagrant/KubeWorkShop/Vault/cm-vault.yaml
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/Vault/pod-vault.yaml
+podman volume prune -f
+
 ```
 
 Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)
@@ -202,7 +202,7 @@ systemctl --user disable $SERVICENAME.service
 ```
 
 
-### Deploy FreeIPA
+<!-- ### Deploy FreeIPA
 update [.\FreeIPA\data\ipa-server-install-options](FreeIPA/data/ipa-server-install-options) first,
 ref: https://freeipa.readthedocs.io/en/latest/workshop/1-server-install.html
 ```shell
@@ -218,9 +218,8 @@ mkdir -p $HOME/infra/$APP_DIR
 cp -r /var/vagrant/KubeWorkShop/FreeIPA/data/ $HOME/infra/$APP_DIR/
 
 # !! need to update yaml file
-podman network create freeipa_net
-podman kube play /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml \
-    --network freeipa_net
+podman kube play /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml 
+
 
 # have a check
 cat infra/freeipa/data/var/log/ipa-server-configure-first.log
@@ -230,5 +229,43 @@ tail -n 100 $HOME/infra/freeipa/data/var/log/ipaserver-install.log
 # delete freeipa
 podman kube down /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml
 
-sudo rm -rf infra/freeipa/data/
+sudo rm -rf $HOME/infra/freeipa/data/
+``` -->
+
+### Deploy OpenLDAP & LDAP Account Manager
+```shell
+APP_DIR="openldap"
+mkdir -p $HOME/infra/$APP_DIR/{data,certs,lam_config}
+cp -r /var/vagrant/KubeWorkShop/openldap/certs/* $HOME/infra/$APP_DIR/certs/
+cp -r /var/vagrant/KubeWorkShop/openldap/lam_config/* $HOME/infra/$APP_DIR/lam_config/
+chmod -R 777 $HOME/infra/openldap/data/
+
+podman kube play /var/vagrant/KubeWorkShop/openldap/pod-openldap.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-lam_env.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-openldap_env.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-openldap_schema.yaml 
+
+
+APP_DIR="openldap"
+mkdir -p $HOME/infra/$APP_DIR/{data,schema,ldifs,certs}
+cp -r /var/vagrant/KubeWorkShop/openldap/schema/* $HOME/infra/$APP_DIR/schema/
+cp -r /var/vagrant/KubeWorkShop/openldap/ldifs/* $HOME/infra/$APP_DIR/ldifs/
+cp -r /var/vagrant/KubeWorkShop/openldap/certs/* $HOME/infra/$APP_DIR/certs/
+chmod -R 777 $HOME/infra/openldap/data/
+
+
+# install podman-compose first
+sudo dnf install podman-compose -y
+
+cd /var/vagrant/KubeWorkShop/openldap/ && podman-compose up -d
+cd /var/vagrant/KubeWorkShop/openldap/ && podman-compose down
+
+podman kube play /var/vagrant/KubeWorkShop/openldap/pod-openldap.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-openldap_env.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-openldap_schema.yaml \
+    --configmap /var/vagrant/KubeWorkShop/openldap/cm-lum_env.yaml 
+
+podman kube down /var/vagrant/KubeWorkShop/openldap/pod-openldap.yaml
+podman volume prune -f
+sudo rm -rf $HOME/infra/openldap/*
 ```

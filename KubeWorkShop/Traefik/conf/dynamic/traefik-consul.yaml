@@ -1,0 +1,27 @@
+# Dynamic Configuration
+http:
+  routers:
+    consul:
+      rule: Host(`infra.sololab`) || Path(`/sub-consul/`)
+      # entryPoints:
+      #   - web
+      middlewares:
+        - subpath-stripprefixregex
+      service: consul
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # tls: true
+  middlewares:
+    subpath-stripprefixregex:
+      # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+      stripPrefixRegex:
+        regex:
+          - "/sub-[a-zA-Z0-9]{1,30}"
+  services:
+    consul:
+      loadBalancer:
+        servers:
+          - url: "http://consul:8500/"
+        # serversTransport: consul
+  # serversTransports:
+  #   consul:
+  #     insecureSkipVerify: true

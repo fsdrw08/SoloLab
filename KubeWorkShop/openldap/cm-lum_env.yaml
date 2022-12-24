@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lum_env
+data:
+  LDAP_URI: ldap://openldap:1389
+  LDAP_BASE_DN: dc=infra,dc=sololab
+  LDAP_ADMIN_BIND_DN: cn=admin,dc=infra,dc=sololab
+  LDAP_ADMIN_BIND_PWD: password
+  LDAP_ADMINS_GROUP: lum-admins
+  
+  ORGANISATION_NAME: sololab
+
+  FORCE_RFC2307BIS: "TRUE"

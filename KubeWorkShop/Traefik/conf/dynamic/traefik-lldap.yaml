@@ -1,0 +1,27 @@
+# Dynamic Configuration
+http:
+  routers:
+    lldap:
+      rule: Host(`lldap.infra.sololab`)
+      # entryPoints:
+      #   - web
+      middlewares:
+        - subpath-stripprefixregex
+      service: lldap
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # tls: true
+  middlewares:
+    subpath-stripprefixregex:
+      # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+      stripPrefixRegex:
+        regex:
+          - "/sub-[a-zA-Z0-9]{1,30}"
+  services:
+    lldap:
+      loadBalancer:
+        servers:
+          - url: "http://lldap:17170/"
+        # serversTransport: lldap
+  # serversTransports:
+  #   lldap:
+  #     insecureSkipVerify: true

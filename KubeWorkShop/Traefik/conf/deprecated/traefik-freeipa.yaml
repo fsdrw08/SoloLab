@@ -9,7 +9,7 @@ http:
       # middlewares:
       #   - subpath-stripprefixregex
       service: freeipa
-      # tls: true
+      tls: true
   # middlewares:
   #   subpath-stripprefixregex:
   #     # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
@@ -20,25 +20,38 @@ http:
     freeipa:
       loadBalancer:
         servers:
-          - url: "http://freeipa/"
-        # serversTransport: freeipa
+          - url: "https://freeipa/"
+        serversTransport: freeipa
+        passHostHeader: true
+        sticky:
+          cookie: 
+            name: my_sticky_cookie_name
+            secure: true
+            httpOnly: true
   serversTransports:
     freeipa:
       insecureSkipVerify: true
+
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/dynamic/sololab_freeipa.crt
+        keyFile: /etc/traefik/dynamic/sololab_freeipa.key
 
 # https://doc.traefik.io/traefik/routing/services/#configuring-tcp-services
 # https://github.com/Binsabbar/freeipa-cluster/blob/8c557a5028b3cfb439e49e2096532f92481bae96/edgeRouter/routes.yml
 # tcp:
 #   routers:
 #     freeipa:
-#       rule: "HostSNI(`freeipa.infra.sololab`)"
+#       rule: "HostSNI(`ipa.infra.sololab`)"
 #       entryPoints: 
 #         - websecure
 #       service: freeipa
-#       tls:
+#       tls: 
 #         passthrough: true
 #   services:
 #     freeipa:
 #       loadBalancer:
 #         servers:
-#           - address: "freeipa:8200"
+#           - address: "freeipa:443"
