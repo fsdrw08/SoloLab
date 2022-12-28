@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: powerdns
+data:
+  pdns_auth.j2: |
+    dnsupdate={{ PNDS_DNSUPDATE }}
+    launch=gsqlite3
+    gsqlite3-database=/opt/powerdns/pdns.sqlite3
+    local-port=5300

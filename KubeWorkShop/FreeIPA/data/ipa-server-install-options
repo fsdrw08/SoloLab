@@ -2,19 +2,9 @@
 --realm=infra.sololab
 --ds-password=P@ssw0rd
 --admin-password=P@ssw0rd
---master-password=P@ssw0rd
 --no-ntp
 --unattended
 --no_hbac_allow
-
---http-cert-file=/data/sololab_freeipa.crt
---http-cert-file=/data/sololab_freeipa.key
---http-pin=''
---dirsrv-cert-file=/data/sololab_freeipa.crt
---dirsrv-cert-file=/data/sololab_freeipa.key
---dirsrv-pin=''
---no-pkinit
---ca-cert-file=/data/CA_chain.crt
 
 --setup-dns
 --no-host-dns
@@ -22,3 +12,4 @@
 --auto-reverse
 
 --debug
+--skip-mem-check

@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: powerdns
+  labels:
+    name: powerdns
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://github.com/docker-library/docs/tree/master/vault
+  # https://github.com/PowerDNS/pdns/blob/master/docker-compose.yml
+  # https://github.com/hwaastad/powerdns-helm/blob/308eec60b80e50dc5f27f0562e566c6fa9ad3354/templates/auth/deployment.yaml
+  securityContext:
+    fsGroup: 953
+  initContainers:
+    - name: powerdns_init
+      image: docker.io/powerdns/pdns-auth-47:latest
+      command:
+        - "/bin/bash"
+        - "-c"
+      args:
+        - '[ ! -f /opt/powerdns/pdns.sqlite3 ] && cp /var/lib/powerdns/pdns.sqlite3 /opt/powerdns/ || echo "DB initialized already"'
+      volumeMounts:
+        - name: pdns_data
+          mountPath: /opt/powerdns
+  containers:
+    - name: powerdns
+      image: docker.io/powerdns/pdns-auth-47:latest
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: PDNS_AUTH_API_KEY
+          value: powerdns
+        - name: TEMPLATE_FILES
+          value: pdns_auth
+        - name: PNDS_DNSUPDATE
+          value: yes
+      ports:
+        - name: dns_tcp
+          containerPort: 5300
+          protocol: TCP
+          hostPort: 53
+          hostIP: 127.0.0.1
+        - name: dns_udp
+          containerPort: 5300
+          protocol: UDP
+          hostPort: 53
+          hostIP: 127.0.0.1
+        - name: api
+          containerPort: 8081
+      volumeMounts:
+        - name: pdns_data
+          mountPath: /opt/powerdns
+        - name: pdns_conf
+          mountPath: /etc/powerdns/templates.d/
+    # https://github.com/PowerDNS-Admin/PowerDNS-Admin#option-1-from-docker-hub
+    - name: powerdns_admin
+      image: docker.io/powerdnsadmin/pda-legacy:v0.3.0
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SECRET_KEY
+          value: a-very-secret-key
+      ports:
+        - name: pda_web
+          containerPort: 80
+          hostPort: 9191
+      volumeMounts:
+        - name: pda_data
+          mountPath: /data/
+  volumes:
+    - name: pdns_data
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      hostPath:
+        path: /home/vagrant/infra/powerdns/data
+        type: Directory
+    - name: pdns_conf
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: powerdns
+        items:
+          - key: pdns_auth.j2
+            path: pdns_auth.j2
+    - name: pda_data
+      hostPath:
+        path: /home/vagrant/infra/powerdns-admin/data
+        type: Directory
+  restartPolicy: Never

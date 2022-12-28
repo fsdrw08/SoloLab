@@ -178,10 +178,10 @@ APP_DIR="traefik"
 mkdir -p $HOME/infra/$APP_DIR/
 cp -r /var/vagrant/KubeWorkShop/Traefik/conf/* $HOME/infra/$APP_DIR/
 
-podman kube play /var/vagrant/KubeWorkShop/Traefik/pod-traefik.yaml
+podman kube play /var/vagrant/KubeWorkShop/traefik/pod-traefik.yaml
 
 # delete traefik
-podman kube down /var/vagrant/KubeWorkShop/Traefik/pod-traefik.yaml
+podman kube down /var/vagrant/KubeWorkShop/traefik/pod-traefik.yaml
 ```
 
 Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)
@@ -202,35 +202,58 @@ systemctl --user disable $SERVICENAME.service
 ```
 
 
-<!-- ### Deploy FreeIPA
+### Deploy FreeIPA
 update [.\FreeIPA\data\ipa-server-install-options](FreeIPA/data/ipa-server-install-options) first,
 ref: https://freeipa.readthedocs.io/en/latest/workshop/1-server-install.html
 ```shell
 # update /etc/hosts, hostname must lower case
-"192.168.255.31 ipa.infra.sololab ..."
+"192.168.255.32 ipa.infra.sololab ..."
 # stop and disable systemd-resolved
 # sudo systemctl stop systemd-resolved
 # sudo systemctl disable systemd-resolved
 # sudo systemctl enable --now systemd-resolved
 
 APP_DIR="freeipa"
-mkdir -p $HOME/infra/$APP_DIR
-cp -r /var/vagrant/KubeWorkShop/FreeIPA/data/ $HOME/infra/$APP_DIR/
+mkdir -p $HOME/infra/$APP_DIR/data
+cp -r /var/vagrant/KubeWorkShop/$APP_DIR/data/ipa-server-install-options $HOME/infra/$APP_DIR/data/
+
+cp -r /var/vagrant/KubeWorkShop/$APP_DIR/data/ $HOME/infra/$APP_DIR/
+
+chmod -R 777 $HOME/infra/freeipa/data/
 
 # !! need to update yaml file
-podman kube play /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml 
+podman kube play /var/vagrant/KubeWorkShop/freeipa/pod-freeipa.yaml 
 
 
 # have a check
 cat infra/freeipa/data/var/log/ipa-server-configure-first.log
 cat infra/freeipa/data/var/log/ipaserver-install.log
-tail -n 100 $HOME/infra/freeipa/data/var/log/ipaserver-install.log
+tail -n 500 $HOME/infra/freeipa/data/var/log/ipaserver-install.log
 
+tail -n 300 $HOME/infra/freeipa/data/var/log/pki/pki-ca-spawn.20221228024225.log
 # delete freeipa
-podman kube down /var/vagrant/KubeWorkShop/FreeIPA/pod-freeipa.yaml
+podman kube down /var/vagrant/KubeWorkShop/freeipa/pod-freeipa.yaml
 
 sudo rm -rf $HOME/infra/freeipa/data/
-``` -->
+```
+
+config dns dynamic update
+ref: 
+- https://astrid.tech/2021/04/18/0/k8s-freeipa-dns/
+- https://forum.netgate.com/topic/153869/dnssec-keygen-unknown-algorithm-hmac-md5/3
+- https://www.freeipa.org/page/Howto/DNS_updates_and_zone_transfers_with_TSIG
+```shell
+podman exec -it freeipa-freeipa /bin/bash
+echo "$(tsig-keygen sololab)" >> /etc/named.conf
+cat /etc/named.conf
+# key "sololab" {
+#         algorithm hmac-sha256;
+#         secret "CdfWki3NHLLizpZ9nvK/wqojh//xENcu8zX8aYfcOds=";
+# };
+kinit admin
+# ipa dnszone-mod infra.sololab. --update-policy="<grant|deny> <keyname> <nametype: name, subdomain, wildcard, self> infra.sololab ANY;"
+ipa dnszone-mod infra.sololab. --update-policy="grant sololab wildcard * ANY;"
+```
 
 ### Deploy OpenLDAP & LDAP Account Manager
 ```shell
@@ -268,4 +291,41 @@ podman kube play /var/vagrant/KubeWorkShop/openldap/pod-openldap.yaml \
 podman kube down /var/vagrant/KubeWorkShop/openldap/pod-openldap.yaml
 podman volume prune -f
 sudo rm -rf $HOME/infra/openldap/*
+```
+
+### Deploy powerdns
+ref: 
+    - [pdns/Dockerfile-auth](https://github.com/PowerDNS/pdns/blob/master/Dockerfile-auth)
+    - [pdns/dockerdata/startup.py](https://github.com/PowerDNS/pdns/blob/master/dockerdata/startup.py)
+    - [powerdns-helm/backend/pdns.j2](https://github.com/hwaastad/powerdns-helm/blob/308eec60b80e50dc5f27f0562e566c6fa9ad3354/backend/pdns.j2)
+how does the container work:
+startup.py -> pdns_server-startup  
+
+apiconftemplate -> jinja2.Template(apiconftemplate).render(apikey=apikey) -> open(conffile, 'w').write(webserver_conf) -> conffile.content
+```conf
+api
+api-key={{ apikey }}
+webserver
+webserver-address=0.0.0.0
+webserver-allow-from=0.0.0.0/0
+webserver-password={{ apikey }}
+```
+templatedestination (/etc/`<role, "powerdns" for auth>`/pdns.d) + _api.conf -> conffile.path
+
+templateroot (/etc/`<role>`/templates.d) + templateFile (the filename assign from ENV VAR `TEMPLATE_FILES`) + .j2 -> jinja2.Template.render(os.environ) ->  target.content
+```conf
+
+```
+templatedestination (/etc/`<role>`/pdns.d) + templateFile (the filename assign from ENV VAR `TEMPLATE_FILES`) + .conf -> target.path
+
+```shell
+APP_DIR="powerdns powerdns-admin"
+for APP in $APP_DIR; do \
+mkdir -p $HOME/infra/$APP/data; chmod -R 777 $HOME/infra/$APP/data; \
+done
+
+podman kube play /var/vagrant/KubeWorkShop/powerdns/pod-powerdns.yaml \
+    --configmap /var/vagrant/KubeWorkShop/powerdns/cm-powerdns.yaml
+
+podman kube down /var/vagrant/KubeWorkShop/powerdns/pod-powerdns.yaml  
 ```
