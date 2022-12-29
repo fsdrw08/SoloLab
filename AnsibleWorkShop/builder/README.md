@@ -38,6 +38,7 @@ podman build .\context\ --tag ansible-ee-k8s
 ## Run the ansible container (Ansible Runner)
 ref: 
  - [Using Runner as a container interface to Ansible](https://ansible-runner.readthedocs.io/en/stable/container/)
+ - [ansible-runner/Dockerfile](https://github.com/ansible/ansible-runner/blob/devel/Dockerfile)
  - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
 
 ```powershell
@@ -50,4 +51,10 @@ podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localh
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml -v ../:/runner localhost/ansible-ee-k8s-lite
 podman run --rm -e RUNNER_PLAYBOOK=./debug/test.yml -v ../:/runner localhost/ansible-ee-k8s-lite ansible-runner run /runner -vvvv
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+
+# install freeipa server
+podman run --rm -e RUNNER_PLAYBOOK=./Invoke-FreeIPA.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 ```

@@ -1,0 +1,49 @@
+# code: language=ansible
+---
+# https://github.com/linuxnerds/edge-hmi-demo/blob/c77629777385388ab6fd6a2a7b0169605c9b0538/ansible/collections/ansible_collections/fedora/linux_system_roles/tests/certificate/tasks/setup_ipa.yml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create freeipa role link
+      ansible.builtin.file:
+        src: "{{ playbook_dir }}/roles/ansible-freeipa/roles/{{ item }}"
+        dest: "{{ playbook_dir }}/roles/{{ item }}"
+        state: link
+      loop:
+        - ipaserver
+        - ipaclient
+
+# https://github.com/RobVerduijn/lab/blob/3c0ad12b5409c499da65bbb7adfce8483087d7f9/playbooks/create_ipa_lab.yml
+- hosts: kube-1
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: update hosts file
+      # need to update /etc/hosts file, to add dns mapping to the intranet IP to <hostname> of local machine
+      # e.g. 192.168.255.31 ipa.infra.sololab
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html
+      # https://serverfault.com/questions/1066011/i-have-50-servers-want-to-update-etc-hosts-file-using-ansible
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: "^{{ ansible_default_ipv4.address }}"
+        line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }}"
+        state: present
+
+    # https://github.com/Qubinode/qubinode-installer/blob/07127319a71f8a70cec7cd9fb6fd4785df73e9b7/playbooks/idm_server.yml
+    - name: Running the ipaserver role
+      ansible.builtin.include_role:
+        name: ipaserver
+      vars:
+        - domain: infra.sololab
+        - dns_forwarder: 192.168.255.1
+        - ipaserver_domain: "{{ domain }}"
+        - idm_realm: "{{ domain | upper }}"
+        - ipaserver_realm: "{{ idm_realm }}"
+        - ipaserver_setup_dns: "yes"
+        - ipaserver_no_host_dns: yes
+        - ipaserver_setup_kra: yes
+        - ipaserver_forwarders:
+          - "{{ dns_forwarder }}"
+        - ipaadmin_password: P@ssw0rd
+        - ipadm_password: P@ssw0rd
+        - ipaserver_mem_check: no

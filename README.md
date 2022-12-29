@@ -10,3 +10,10 @@ a lab to build all VMs in one (windows 10+) host
 4. Build vagrant box (the hyper-v vm template) from packer
 5. Up the vagrant box
 6. Config k3s cluster
+
+### to add git sub module
+```powershell
+$url="https://github.com/freeipa/ansible-freeipa.git"
+$path="AnsibleWorkShop/roles/ansible-freeipa"
+git submodule add $url $path
+```

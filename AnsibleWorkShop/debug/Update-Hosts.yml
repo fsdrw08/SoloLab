@@ -1,0 +1,16 @@
+---
+- hosts: kube-1
+  gather_facts: true
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  become: yes
+  tasks:
+    - name: debug
+      debug: 
+        msg: "{{ ansible_service_mgr }}"
+    - name: update hosts file
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: "^{{ ansible_default_ipv4.address }}"
+        line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }}"
+        state: present

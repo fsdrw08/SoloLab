@@ -11,5 +11,6 @@
         community.general.terraform:
           project_path: "{{ var_terraform_folder }}"
           force_init: true
+          overwrite_init: false
           state: present
       
