@@ -21,11 +21,11 @@ spec:
         # https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-official-docker-image
         - name: http
           containerPort: 80
-          hostIP: 192.168.255.31
+          hostIP: 192.168.255.32
           hostPort: 80
         - name: https
           containerPort: 443
-          hostIP: 192.168.255.31
+          hostIP: 192.168.255.32
           hostPort: 443
 
       volumeMounts:

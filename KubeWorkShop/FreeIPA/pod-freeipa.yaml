@@ -69,14 +69,6 @@ spec:
         - name: freeipa
           mountPath: /data
   volumes:
-    # - name: freeipa
-    #   # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
-    #   configMap:
-    #     name: freeipa
-    #     items:
-    #       - key: config.hcl
-    #         path: config.hcl
-    
     # https://manpages.debian.org/experimental/freeipa-server/ipa-server-install.1.en.html
     # https://github.com/search?p=1&q=ipa-server-install-options&type=Code
     - name: freeipa
