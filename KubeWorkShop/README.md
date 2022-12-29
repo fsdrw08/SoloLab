@@ -19,7 +19,7 @@ EOF"
 ### Low down the unprivileged port
 For samba deployment (samba require port 443 which lower than 1024 in the limit set)
 ```shell
-sudo sh -c "echo 'net.ipv4.ip_unprivileged_port_start=53'>>/etc/sysctl.conf"
+sudo sh -c "echo 'net.ipv4.ip_unprivileged_port_start=80'>>/etc/sysctl.conf"
 # sudo reboot
 ```
 
@@ -176,7 +176,7 @@ see [README.md](../TerraformWorkShop/Vault/PKI/README.md)
 ```shell
 APP_DIR="traefik"
 mkdir -p $HOME/infra/$APP_DIR/
-cp -r /var/vagrant/KubeWorkShop/Traefik/conf/* $HOME/infra/$APP_DIR/
+cp -r /var/vagrant/KubeWorkShop/$APP_DIR/conf/* $HOME/infra/$APP_DIR/
 
 podman kube play /var/vagrant/KubeWorkShop/traefik/pod-traefik.yaml
 
@@ -244,7 +244,7 @@ ref:
 - https://www.freeipa.org/page/Howto/DNS_updates_and_zone_transfers_with_TSIG
 ```shell
 podman exec -it freeipa-freeipa /bin/bash
-echo "$(tsig-keygen sololab)" >> /etc/named.conf
+echo "$(tsig-keygen sololab)" >> /etc/named/ipa-ext.conf
 cat /etc/named.conf
 # key "sololab" {
 #         algorithm hmac-sha256;
@@ -328,4 +328,13 @@ podman kube play /var/vagrant/KubeWorkShop/powerdns/pod-powerdns.yaml \
     --configmap /var/vagrant/KubeWorkShop/powerdns/cm-powerdns.yaml
 
 podman kube down /var/vagrant/KubeWorkShop/powerdns/pod-powerdns.yaml  
+```
+
+### install dex
+```shell
+APP_DIR="dex"
+mkdir -p $HOME/infra/$APP_DIR/data
+
+podman kube play /var/vagrant/KubeWorkShop/dex/pod-dex.yaml \
+    --configmap /var/vagrant/KubeWorkShop/dex/cm-dex.yaml
 ```
