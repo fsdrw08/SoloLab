@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dex
+  labels:
+    name: dex
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://github.com/docker-library/docs/tree/master/dex
+  containers:
+    - name: dex
+      image: docker.io/dexidp/dex:v2.35.3
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      ports:
+        - name: http
+          containerPort: 5556
+      # https://developer.hashicorp.com/dex/tutorials/day-0/docker-container-agents#configure-and-run-a-dex-server
+      command:
+        - "/usr/local/bin/dex"
+        - "serve"
+        - "/etc/dex/cfg/config.yaml"
+      volumeMounts:
+        - name: dex_config
+          mountPath: /etc/dex/cfg
+        - name: dex_data
+          mountPath: /var/dex/
+  volumes:
+    - name: dex_config
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: dex
+        items:
+          - key: config.yaml
+            path: config.yaml
+    - name: dex_data
+      hostPath:
+        path: /home/vagrant/infra/dex/data
+        type: Directory
+  restartPolicy: OnFailure
