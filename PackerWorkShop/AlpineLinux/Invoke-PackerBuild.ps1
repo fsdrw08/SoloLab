@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('315','316')]
+    [ValidateSet('315','316','317')]
     [int16]
     $AlpineVersion
 )
