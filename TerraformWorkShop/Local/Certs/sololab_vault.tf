@@ -29,10 +29,10 @@ resource "tls_locally_signed_cert" "sololab_vault" {
 resource "local_file" "sololab_vault_crt" {
   content = format("%s\n%s", tls_locally_signed_cert.sololab_vault.cert_pem,
   tls_self_signed_cert.root_ca.cert_pem)
-  filename = "${path.module}/../../../KubeWorkShop/Vault/data/sololab_vault.crt"
+  filename = "${path.module}/../../../HelmWorkShop/vault/sololab_vault.crt"
 }
 
 resource "local_file" "sololab_vault_key" {
   content  = tls_cert_request.sololab_vault.private_key_pem
-  filename = "${path.module}/../../../KubeWorkShop/Vault/data/sololab_vault.key"
+  filename = "${path.module}/../../../HelmWorkShop/vault/sololab_vault.key"
 }

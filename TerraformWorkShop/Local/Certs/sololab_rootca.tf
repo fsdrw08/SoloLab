@@ -31,7 +31,7 @@ resource "tls_self_signed_cert" "root_ca" {
 resource "local_file" "root_ca" {
   content = tls_self_signed_cert.root_ca.cert_pem
   # content = tls_locally_signed_cert.vault.cert_pem
-  filename = "${path.module}/../../../KubeWorkShop/Traefik/conf/root_ca.crt"
+  filename = "${path.module}/root_ca.crt"
 }
 
 # https://developer.hashicorp.com/terraform/language/values/outputs#output-values
