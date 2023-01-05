@@ -11,14 +11,6 @@ spec:
   containers:
     - name: freeipa
       image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
-      env:
-        - name: TZ
-          value: Asia/Shanghai
-        - name: IPA_SERVER_IP
-          # value: ""
-          value: "192.168.255.32"
-        - name: IPA_SERVER_HOSTNAME
-          value: ipa.infra.sololab
       resources:
         limits:
           memory: "1536Mi"
@@ -29,21 +21,25 @@ spec:
         # https://github.com/sameersbn/docker-bind/issues/65
         - name: dns_tcp
           containerPort: 53
-          hostIP: 192.168.255.32
+          hostIP: 192.168.255.31
           protocol: TCP
         - name: dns_udp
-          hostIP: 192.168.255.32
+          hostIP: 192.168.255.31
           containerPort: 53
           protocol: UDP
 
         - name: http
           containerPort: 80
-          hostIP: 192.168.255.32
+          hostIP: 192.168.255.31
           hostPort: 80
         - name: https
           containerPort: 443
-          hostIP: 192.168.255.32
+          hostIP: 192.168.255.31
           hostPort: 443
+        - name: https-pki
+          containerPort: 8443
+          hostIP: 192.168.255.31
+          hostPort: 8443
 
         - name: ldap
           containerPort: 389
@@ -63,7 +59,14 @@ spec:
         - name: kpasswd_udp
           containerPort: 464
           protocol: UDP
-
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: IPA_SERVER_IP
+          # value: ""
+          value: "192.168.255.31"
+        - name: IPA_SERVER_HOSTNAME
+          value: ipa.infra.sololab
       volumeMounts:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
         - name: freeipa
@@ -75,4 +78,7 @@ spec:
       hostPath:
         path: /home/vagrant/infra/freeipa/data
         type: Directory
+  dnsConfig:
+    nameservers:
+      - 127.0.0.1
   restartPolicy: OnFailure
