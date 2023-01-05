@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+# https://docs.ansible.com/ansible/devel/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
+collections:
+- name: kubernetes.core
+# - name: https://github.com/ansible-collections/kubernetes.core.git
+#   type: git
+#   version: 2.3.2
+
+- name: ansible.utils
+# - name: https://github.com/ansible-collections/ansible.utils.git
+#   type: git
+#   version: 2.6.1
+
+- name: community.general
+# https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file
+
+- name: containers.podman
+
+# roles:
+# # https://github.com/PyratLabs/ansible-role-k3s/issues/196
+# - name: xanmanning.k3s
+#   src: https://github.com/PyratLabs/ansible-role-k3s.git
+#   version: v3.3.0

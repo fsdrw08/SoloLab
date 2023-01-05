@@ -1,0 +1,4 @@
+netaddr
+pyyaml
+kubernetes
+jsonpatch
