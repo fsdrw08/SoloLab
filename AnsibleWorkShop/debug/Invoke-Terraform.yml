@@ -3,7 +3,8 @@
 - hosts: localhost
   gather_facts: false
   vars:
-    var_terraform_folder: "{{ playbook_dir }}/terraform/"
+    # var_terraform_folder: "{{ playbook_dir }}/terraform/"
+    var_terraform_folder: "/TerraformWorkShop/Local/Certs"
   tasks:
     - name: Create selfsign CA
       block:

@@ -1,0 +1,27 @@
+# code: language=ansible
+---
+- hosts: kube-2
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Create dir if not exist
+      ansible.builtin.file:
+        path: /var/lib/rancher/k3s/server/tls/
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
+
+    - name: Copy item
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+      # https://github.com/k3s-io/k3s/issues/1868
+      ansible.builtin.copy:
+        src: /TerraformWorkShop/Local/Certs/{{ item }}
+        dest: /var/lib/rancher/k3s/server/tls/{{ item }}
+      loop:
+        - client-ca.crt
+        - client-ca.key
+        - server-ca.crt
+        - server-ca.key
+        - request-header-ca.crt
+        - request-header-ca.key

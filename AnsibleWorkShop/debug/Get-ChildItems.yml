@@ -1,3 +1,4 @@
+# code: language=ansible
 ---
 - hosts: localhost
   gather_facts: false
