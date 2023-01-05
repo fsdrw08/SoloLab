@@ -101,6 +101,46 @@ Ref:
 Ref:  
 - https://lemonlzy.cn/2020/07/21/Pod-Preset/ -->
 
+## Install hashicorp vault
+- Create vault ingress cert
+```powershell
+cd (Join-Path (git rev-parse --show-toplevel) Terraform\Local\Certs)
+terraform apply --auto-approve
+```
+
+[TLS secrets](https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets)
+[How To Decode / Decrypt Kubernetes Secret](https://computingforgeeks.com/how-to-decrypt-kubernetes-secret/)
+```shell
+kubectl create ns vault
+kubectl create secret tls vault.infra.sololab \
+  --cert=/var/vagrant/HelmWorkShop/vault/sololab_vault.crt \
+  --key=/var/vagrant/HelmWorkShop/vault/sololab_vault.key \
+  -n vault
+
+# have a check
+kubectl get secret vault.infra.sololab -n vault -o jsonpath="{.data.tls\.crt}" | base64 --decode
+```
+
+install vault from helm
+```
+helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install vault hashicorp/vault  \
+--namespace vault \
+-f /var/vagrant/HelmWorkShop/vault/values.yaml
+```
+
+init the pod
+```shell
+kubectl -n vault exec vault-0 -- vault operator init \
+    -key-shares=1 \
+    -key-threshold=1 \
+    -format=json > cluster-keys.json
+
+VAULT_UNSEAL_KEY=$(jq -r ".unseal_keys_b64[]" cluster-keys.json)
+
+kubectl -n vault exec vault-0 -- vault operator unseal $VAULT_UNSEAL_KEY
+
+```
 ## Use Cert-manager to manage certificates in cluster
 - Add the Jetstack Helm repository:  
   ```

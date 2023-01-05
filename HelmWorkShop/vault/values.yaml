@@ -1,0 +1,20 @@
+# https://github.com/hashicorp/vault-helm/blob/main/values.yaml
+# https://developer.hashicorp.com/vault/tutorials/kubernetes/kubernetes-minikube-raft
+server:
+  affinity: ""
+
+  ingress:
+    enabled: true
+    ingressClass: traefik
+    hosts:
+      - host: vault.infra.sololab
+    tls:
+      - secretName: vault.infra.sololab
+        hosts:
+          - vault.infra.sololab
+
+  ha:
+    enabled: true
+    replicas: 1
+    raft: 
+      enabled: true
