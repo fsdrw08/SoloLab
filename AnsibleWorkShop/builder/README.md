@@ -29,10 +29,12 @@
    - Update the Containerfile, e.g.
 
 3. Build the ansible runner image
-```
-podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-k8s-lite
-podman build .\context\ --build-arg PROXY="http://192.168.255.102:7890" --tag ansible-ee-k8s
-podman build .\context\ --tag ansible-ee-k8s
+```powershell
+# with_proxy
+podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-aio
+podman build .\context\ --build-arg PROXY="http://192.168.255.102:7890" --tag ansible-ee-aio
+# without_proxy
+podman build .\context\ --tag ansible-ee-aio
 ```
 
 ## Run the ansible container (Ansible Runner)
@@ -43,15 +45,28 @@ ref:
 
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-k8s-lite
+# deploy k3s
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
 
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s-lite
-podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-k8s-lite ansible-runner run /runner -vvvv
+# have a check of k3s cert
+openssl s_client -connect 127.0.0.1:6443
 
-podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml -v ../:/runner localhost/ansible-ee-k8s-lite
-podman run --rm -e RUNNER_PLAYBOOK=./debug/test.yml -v ../:/runner localhost/ansible-ee-k8s-lite ansible-runner run /runner -vvvv
+openssl x509 -in /var/lib/rancher/k3s/server/tls/server-ca.crt -text -noout
+
+
+# deploy k8s resources 
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-aio
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vvvv
+
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml -v ../:/runner localhost/ansible-ee-aio
+podman run --rm -e RUNNER_PLAYBOOK=./debug/test.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vvvv
+
+# debug terraform
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner -v ../../TerraformWorkShop/:/TerraformWorkShop/ localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
-podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+
+# copy items
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Copy-Items.yml -v ../:/runner -v ../../TerraformWorkShop/:/TerraformWorkShop/ localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 # install freeipa server
 podman run --rm -e RUNNER_PLAYBOOK=./Invoke-FreeIPA.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
