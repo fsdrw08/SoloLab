@@ -10,11 +10,6 @@ spec:
   containers:
     - name: samba
       image: quay.io/samba.org/samba-server:latest
-      env:
-        - name: TZ
-          value: Asia/Shanghai
-        - name: SAMBACC_CONFIG
-          value: /etc/samba-container/config.json
       resources:
         limits:
           memory: "128Mi"
@@ -22,6 +17,11 @@ spec:
       ports:
         - name: smb
           containerPort: 445
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SAMBACC_CONFIG
+          value: /etc/samba-container/config.json
       volumeMounts:
         # https://www.cnblogs.com/liugp/p/16651760.html
         # https://dev.to/joshduffney/kubernetes-using-configmap-subpaths-to-mount-files-3a1i
@@ -45,4 +45,4 @@ spec:
       hostPath:
         path: /home/vagrant/infra/
         type: Directory
-  restartPolicy: OnFailure
+  restartPolicy: Never

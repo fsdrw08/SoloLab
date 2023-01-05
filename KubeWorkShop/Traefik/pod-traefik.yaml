@@ -10,9 +10,6 @@ spec:
   containers:
     - name: traefik
       image: docker.io/library/traefik:latest
-      env:
-        - name: TZ
-          value: Asia/Shanghai
       resources:
         limits:
           memory: "256Mi"
@@ -27,7 +24,11 @@ spec:
           containerPort: 443
           hostIP: 192.168.255.32
           hostPort: 443
-
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: LEGO_CA_CERTIFICATES
+          value: /etc/traefik/ca.crt
       volumeMounts:
         # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
         - name: traefik
