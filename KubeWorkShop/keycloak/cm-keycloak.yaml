@@ -1,0 +1,157 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak
+data:
+  freeipa-realm.json: |
+    {
+      "id": "freeipa-realm",
+      "realm": "freeipa-realm",
+      "displayName": "Sololab Realm",
+      "enabled": true,
+      "requiredCredentials": [
+        "password"
+      ],
+      "clients": [
+        {
+          "clientId": "jenkins",
+          "enabled": true,
+          "publicClient": true,
+          "protocol": "openid-connect",
+          "rootUrl": "https://jenkins.rancher.example.com",
+          "redirectUris": [
+            "https://jenkins.rancher.example.com/*"
+          ],
+          "webOrigins": [
+            "https://jenkins.rancher.example.com"
+          ]
+        }
+      ],
+      "userFederationProviders": [
+        {
+          "displayName": "ldap-freeipa",
+          "providerName": "ldap",
+          "priority": 1,
+          "fullSyncPeriod": -1,
+          "changedSyncPeriod": -1,
+          "config": {
+            "pagination": "true",
+            "debug": "false",
+            "searchScope": "1",
+            "connectionPooling": "true",
+            "usersDn": "cn=users,cn=accounts,dc=infra,dc=sololab",
+            "userObjectClasses": "inetOrgPerson, organizationalPerson",
+            "usernameLDAPAttribute": "uid",
+            "bindDn": "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab",
+            "bindCredential": "P@ssw0rd",
+            "rdnLDAPAttribute": "uid",
+            "vendor": "rhds",
+            "editMode": "READ_ONLY",
+            "uuidLDAPAttribute": "ipaUniqueID",
+            "connectionUrl": "ldap://freeipa:389",
+            "syncRegistrations": "false",
+            "authType": "simple"
+          }
+        }
+      ],
+      "userFederationMappers": [
+        {
+          "name": "username",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "uid",
+            "user.model.attribute": "username",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "first_name",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "givenName",
+            "user.model.attribute": "firstName",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "last_name",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "sn",
+            "user.model.attribute": "lastName",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "email",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "mail",
+            "user.model.attribute": "email",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "creation_date",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "createTimestamp",
+            "user.model.attribute": "createTimestamp",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "modify_date",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "modifyTimestamp",
+            "user.model.attribute": "modifyTimestamp",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "picture",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "jpegPhoto",
+            "user.model.attribute": "picture",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "true"
+          }
+        },
+        {
+          "name": "groups",
+          "federationMapperType": "role-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "roles.dn": "cn=groups,cn=accounts,dc=example,dc=com",
+            "membership.ldap.attribute": "member",
+            "role.name.ldap.attribute": "cn",
+            "role.object.classes": "groupOfNames",
+            "mode": "LDAP_ONLY",
+            "use.realm.roles.mapping": "true"
+          }
+        }
+      ]
+    }
+

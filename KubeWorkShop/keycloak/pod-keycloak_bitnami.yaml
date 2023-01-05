@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: keycloak
+  labels:
+    name: keycloak
+spec:
+  containers:
+    - name: postgresql
+      image: docker.io/bitnami/postgresql:15.1.0
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: postgresql
+          containerPort: 5432
+      env:
+        - name: POSTGRESQL_USERNAME
+          value: bn_keycloak
+        - name: POSTGRESQL_PASSWORD
+          value: password
+        - name: POSTGRESQL_DATABASE
+          value: bitnami_keycloak
+      volumeMounts:
+        - name: postgresql_data
+          mountPath: /bitnami/postgresql
+    - name: keycloak
+      image: docker.io/bitnami/keycloak:20-debian-11
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "1000m"
+      ports:
+        - name: http
+          containerPort: 8080
+        # - name: https
+        #   containerPort: 8443
+      # https://github.com/bitnami/containers/tree/main/bitnami/keycloak#configuration
+      env:
+        - name: KEYCLOAK_ADMIN_USER
+          value: user
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: bitnami
+        - name: KEYCLOAK_MANAGEMENT_USER
+          value: manager
+        - name: KEYCLOAK_MANAGEMENT_PASSWORD
+          value: bitnami1
+        - name: KEYCLOAK_DATABASE_HOST
+          value: keycloak
+        - name: KEYCLOAK_DATABASE_NAME
+          value: bitnami_keycloak
+        - name: KEYCLOAK_DATABASE_USER
+          value: bn_keycloak
+        - name: KEYCLOAK_DATABASE_PASSWORD
+          value: password
+        # https://thomascfoulds.com/2020/04/09/jenkins-authentication-with-keycloak.html
+        # https://github.com/argoflow/argoflow-aws/blob/62dfef8c9d674f2bc5041ecc2f3a64820c70c6b1/distribution/oidc-auth/overlays/keycloak/keycloak.yaml
+        - name: KEYCLOAK_EXTRA_ARGS
+          value: -Dkeycloak.import=/config/freeipa-realm.json
+      volumeMounts:
+        - name: keycloak_config
+          mountPath: /config/
+  volumes:
+    - name: postgresql_data
+      hostPath:
+        path: /home/vagrant/infra/keycloak/postgresql/
+        type: Directory
+    - name: keycloak_config
+      configMap:
+        name: keycloak
+        items:
+          - key: freeipa-realm.json
+            path: freeipa-realm.json
+  restartPolicy: Never

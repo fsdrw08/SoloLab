@@ -1,0 +1,26 @@
+# https://github.com/sonatype/docker-nexus3#notes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nexus3
+  labels:
+    name: nexus3
+spec:
+  containers:
+  - name: nexus3
+    image: docker.io/sonatype/nexus3:3.45.0
+    resources:
+      limits:
+        memory: "3Gi"
+        cpu: "1500m"
+    ports:
+      - name: http
+        containerPort: 8081
+    volumeMounts:
+      - name: nexus3_data
+        mountPath: /nexus-data
+  volumes:
+    - name: nexus3_data
+      hostPath:
+        path: /home/vagrant/infra/nexus/data/
+        type: Directory
