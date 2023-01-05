@@ -31,10 +31,10 @@ entryPoints:
     address: ":443"
 
 # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
-serversTransport:
-  # https://doc.traefik.io/traefik/routing/overview/#rootcas
-  rootCAs:
-    - /etc/traefik/root_ca.crt
+# serversTransport:
+#   # https://doc.traefik.io/traefik/routing/overview/#rootcas
+#   rootCAs:
+#     - /etc/traefik/root_ca.crt
 
 
 ## Operations
@@ -42,6 +42,16 @@ serversTransport:
 api:
   dashboard: true
 
+# https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+certificatesResolvers:
+  freeipa:
+    acme:
+      caServer: https://ipa-ca.infra.sololab/acme/directory
+      email: admin@INFRA.SOLOLAB
+      storage: acme.json
+      httpChallenge:
+        # used during the challenge
+        entryPoint: web
 
 ## Observability
 log:
