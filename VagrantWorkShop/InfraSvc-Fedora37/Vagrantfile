@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   
   config.ssh.insert_key = false
   
-  config.vm.hostname = "ipa.infra.sololab"
+  config.vm.hostname = "fedora.infra.sololab"
 
   # config.vm.synced_folder "../../AnsibleWorkShop", "/var/vagrant/AnsibleWorkShop", type: "rsync", rsync__auto: true
   # config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
@@ -48,6 +48,12 @@ Vagrant.configure("2") do |config|
   
   # install packages
   config.vm.provision "shell", path: "Install-Packages.sh"
+  
+  # initialize cockpit
+  config.vm.provision "shell", path: "Initialize-Cockpit.sh"
+  
+  # install podman
+  config.vm.provision "shell", path: "Initialize-Podman.sh"
   
   # reboot
   config.vm.provision "shell", reboot: true
