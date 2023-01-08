@@ -7,11 +7,11 @@
   tasks:
     - name: load vars from file
       block:
-      - name: include_vars
-        ansible.builtin.include_vars:
-          file: "{{ var_file_path }}"
-      
-      - name: print
-        ansible.builtin.debug:
-          msg: "{{ item.name }}"
-        with_items: "{{ helm_repos }}"
+        - name: include_vars
+          ansible.builtin.include_vars:
+            file: "{{ var_file_path }}"
+        
+        - name: print
+          ansible.builtin.debug:
+            msg: "{{ item.name }}"
+          with_items: "{{ helm_repos }}"

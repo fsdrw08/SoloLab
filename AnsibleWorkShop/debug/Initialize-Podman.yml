@@ -1,0 +1,123 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: true
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  become: yes
+  tasks:
+    - name: Prepare Firewalld automation requirement
+      when: ansible_service_mgr == "systemd"
+      block:
+        - name: "Ensure firewalld related packages exist"
+          ansible.builtin.package:
+            name: 
+              - firewalld
+              - python-firewall
+            state: present
+
+        - name: Config Systemd for Firewalld
+          ansible.builtin.systemd:
+            name: firewalld
+            state: started
+            enabled: yes
+            masked: no
+
+        - name: Set default zone
+          ansible.posix.firewalld:
+            zone: trusted
+            state: present
+            permanent: yes
+
+    - name: Config Cockpit
+      when: ansible_service_mgr == "systemd"
+      block:
+        - name: Install package
+          ansible.builtin.package:
+            name:
+              - cockpit
+              - cockpit-pcp
+              - cockpit-podman
+            state: present
+
+        - name: Config systemd for Cockpit
+          ansible.builtin.systemd:
+            name: cockpit.socket
+            state: started
+            enabled: yes
+
+        - name: Config Firewalld for Cockpit
+          ansible.posix.firewalld:
+            service: cockpit
+            permanent: yes
+            state: enabled
+
+    - name: Config Podman
+      block:
+        - name: Install package
+          ansible.builtin.package:
+            name:
+              - podman
+            state: present
+
+        - name: Auto start podman socket
+          ansible.builtin.systemd:
+            name: podman.socket
+            state: started
+            enabled: yes
+          when: ansible_service_mgr == "systemd"
+
+    # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
+    - name: Delegate container related permission to non-root user
+      when: ansible_service_mgr == "systemd"
+      block:
+        - name: mkdir for /etc/systemd/system/user@.service.d
+          ansible.builtin.file:
+            path: /etc/systemd/system/user@.service.d
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+        
+        - name: Create /etc/systemd/system/user@.service.d/delegate.conf
+          ansible.builtin.file:
+            path: /etc/systemd/system/user@.service.d/delegate.conf
+            state: file
+
+        - name: Enable CPU, CPUSET, and I/O delegation for non-root users
+          ansible.builtin.blockinfile:
+            path: /etc/systemd/system/user@.service.d/delegate.conf
+            marker: "# {mark} Enable CPU, CPUSET, and I/O delegation for non-root users"
+            block: |
+              [Service]
+              Delegate=cpu cpuset io memory pids
+          notify: Reload-SystemdDaemon
+
+        # https://github.com/sassoftware/viya4-iac-k8s/blob/bb753957b373a53086f347b04d30f01865796133/roles/kubernetes/common/tasks/main.yaml#L82
+        # - name: Adding delegation
+        #   ansible.builtin.copy:
+        #     dest: /etc/systemd/system/user@.service.d/delegate.conf
+        #     content: |
+        #       [Service]
+        #       Delegate=cpu cpuset io memory pids
+
+        - name: Low down the unprivileged port
+          ansible.posix.sysctl:
+            name: net.ipv4.ip_unprivileged_port_start
+            value: "53"
+            state: present
+            reload: true
+
+        - name: Enable memlock for all users (hashicorp vault required)
+          community.general.pam_limits:
+            domain: "*"
+            limit_type: "{{ item }}"
+            limit_item: memlock
+            value: -1
+          with_items:
+            - hard
+            - soft
+
+  handlers:
+    - name: Reload-SystemdDaemon
+      ansible.builtin.systemd:
+        daemon_reload: yes

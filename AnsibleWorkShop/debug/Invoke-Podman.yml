@@ -1,0 +1,45 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: no
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  become: no
+  tasks:
+    - name: Create kube yaml folder
+      ansible.builtin.file:
+        # https://serverfault.com/questions/985957/ansible-split-string-on-backslash
+        path: /home/{{ ansible_user }}{{ item | replace(item.split('/')[-1],'') }}
+        state: directory
+      with_items:
+        - /KubeWorkShop/Consul/pod-consul_new.yaml.j2
+        - /KubeWorkShop/Consul/cm-consul.yaml
+
+    - name: Render yaml and put into target
+      ansible.builtin.copy:
+        dest: /home/{{ ansible_user }}{{ item | replace('.j2','') }}
+        content: "{{ lookup('ansible.builtin.template', item) }}"
+      with_items:
+        - /KubeWorkShop/Consul/pod-consul_new.yaml.j2
+        - /KubeWorkShop/Consul/cm-consul.yaml
+      vars:
+        consul_data: "/home/{{ ansible_user }}/infra/consul/data"
+
+    - name: Create data persistent folder
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ consul_data }}"
+      vars:
+        consul_data: "/home/{{ ansible_user }}/infra/consul/data"
+
+    - name: run podman
+      containers.podman.podman_play:
+        kube_file: "{{ item.pod }}"
+        configmap: "{{ item.cm }}"
+        state: started
+      with_items:
+        - {
+          pod: "/home/{{ ansible_user }}/KubeWorkShop/Consul/pod-consul_new.yaml",
+          cm: "/home/{{ ansible_user }}/KubeWorkShop/Consul/cm-consul.yaml"
+        }
