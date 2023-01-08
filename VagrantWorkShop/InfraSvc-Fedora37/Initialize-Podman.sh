@@ -1,7 +1,9 @@
 # Start Podman’s API so that Cockpit can interact with it
 sudo systemctl enable --now podman.socket
+systemctl enable --now --user podman.socket
 
 # Enable CPU or CPUSET limit delegation for all users
+# https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
 sudo mkdir -p /etc/systemd/system/user@.service.d
 sudo sh -c "cat >/etc/systemd/system/user@.service.d/delegate.conf<<EOF
 [Service]
