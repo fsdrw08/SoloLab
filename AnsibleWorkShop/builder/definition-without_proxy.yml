@@ -8,9 +8,9 @@ build_arg_defaults:
 # ansible_config: 'ansible.cfg'
 
 dependencies:
-  galaxy: ../requirements.yml
-  python: ../requirements.txt
-  system: ../bindep.txt
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
 
 # https://github.com/lshake/ee_shakeytowers2/blob/c8886455e01774b34a22096452d266723250ef7c/shakeytowers/ee.yml
 # https://docs.openshift.com/container-platform/4.11/applications/working_with_helm_charts/installing-helm.html
