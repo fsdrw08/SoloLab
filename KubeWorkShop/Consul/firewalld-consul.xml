@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service>
+    <!-- https://firewalld.org/documentation/man-pages/firewalld.service.html -->
+    <!-- https://gist.github.com/mbillow/8c8f9cdb0bc62c8b517dbf7a9d1d119c -->
+    <short>Consul</short>
+    <description>HashiCorp Consul - A service mesh solution</description>
+    <!-- DNS: The DNS server (TCP and UDP) -->
+    <port protocol="tcp" port="8600" />
+    <port protocol="udp" port="8600" />
+    <!-- HTTP: The HTTP API (TCP Only) -->
+    <port protocol="tcp" port="8500" />
+    <!-- HTTPS: The HTTPs API (Suggested Port) -->
+    <port protocol="tcp" port="8501" />
+    <!-- gRPC: The gRPC API (Suggested Port) -->
+    <port protocol="tcp" port="8502" />
+    <!-- LAN Serf: The Serf LAN port (TCP and UDP) -->
+    <port protocol="tcp" port="8301" />
+    <port protocol="udp" port="8301" />
+    <!-- WAN Serf: The Serf WAN port (TCP and UDP) -->
+    <port protocol="tcp" port="8302" />
+    <port protocol="udp" port="8302" />
+    <!-- Server RPC address (TCP Only) -->
+    <port protocol="tcp" port="8300" />
+    <!-- Sidecar Proxy -->
+    <port protocol="tcp" port="21000-21255" />
+</service>

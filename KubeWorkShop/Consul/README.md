@@ -3,11 +3,21 @@ Deploy the container
 ```shell
 mkdir -p $HOME/infra/consul/data
 
+# add firewalld service
+sudo firewall-cmd --permanent --new-service-from-file=/var/vagrant/KubeWorkShop/Consul/firewalld-consul.xml --name=consul
+sudo firewall-cmd --permanent --add-service=consul
+sudo firewall-cmd --reload
+
 podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
     --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml 
 
+
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml
+# remove from firewalld
+sudo firewall-cmd --permanent --remove-service=consul
+sudo firewall-cmd --permanent --delete-service=consul
+sudo firewall-cmd --reload
 ```
 
 Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)

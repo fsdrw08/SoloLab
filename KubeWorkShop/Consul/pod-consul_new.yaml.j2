@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: consul
+  labels:
+    name: consul
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://github.com/docker-library/docs/tree/master/consul
+  containers:
+    - name: consul
+      image: docker.io/library/consul:latest
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      ports:
+        - name: server
+          containerPort: 8300
+        - name: serf_lan
+          containerPort: 8301
+        - name: web
+          containerPort: 8500
+        - name: dns
+          containerPort: 8600
+          protocol: UDP
+      # https://developer.hashicorp.com/consul/tutorials/day-0/docker-container-agents#configure-and-run-a-consul-server
+      command:
+        - consul
+      args:
+        - agent
+        - -config-file=/consul/config/config.json
+      volumeMounts:
+        - name: consul_config
+          mountPath: /consul/config/
+        - name: consul_data
+          mountPath: /consul/data
+  volumes:
+    - name: consul_config
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: consul
+        items:
+          - key: config.json
+            path: config.json
+    - name: consul_data
+      hostPath:
+        path: {{ consul_data }}
+        type: Directory
+  restartPolicy: OnFailure
