@@ -1,0 +1,37 @@
+# code: language=ansible
+---
+- name: Detect /etc/sysctl.d/{{ role_spec_name }}.conf
+  ansible.builtin.stat:
+    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+  when:
+    - definitive_sysctl_params.conf_state == "present"
+  register: sysctl_podman_rootless_conf
+
+- name: Create /etc/sysctl.d/podman.conf
+  ansible.builtin.file:
+    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+    state: touch
+    mode: u=rw,g=r,o=r
+  when:
+    - sysctl_podman_rootless_conf.stat.exists is defined
+    - sysctl_podman_rootless_conf.stat.exists is false
+
+# https://github.com/ahwayakchih/nobbic/blob/82509c475de075670de910f56b550709c4665e08/docs/SetupPodmanOnAlpineHost.markdown#enable-pinging-from-containers
+- name: Set sysctl conf file
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/{{ role_spec_name }}.conf
+    state: "{{ definitive_sysctl_params.conf_state }}"
+    reload: true
+  loop: "{{ sysctl_params.list }}"
+  when:
+    - sysctl_podman_rootless_conf.stat.exists is defined
+    - sysctl_podman_rootless_conf.stat.exists is true
+
+- name: Delete /etc/sysctl.d/podman.conf
+  ansible.builtin.file:
+    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+    state: absent
+  when:
+    - definitive_sysctl_params.conf_state == "absent"

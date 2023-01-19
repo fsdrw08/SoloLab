@@ -1,7 +1,14 @@
 Ansible-Podman-Rootless
 =========
 
-Roles of podman binary installation and related system configuration for rootless container deployment
+Roles of podman binary installation and related system configuration for rootless container deployment  
+whole process:  
+1. Install podman package
+2. Set cgroup permission for unpriviledged user
+3. Set sysctl permission for unpriviledged user
+4. Set subuid & subgid
+5. Set linux kernel modules for podman rootless
+6. Set podman socket service in user scope
 
 Requirements
 ------------

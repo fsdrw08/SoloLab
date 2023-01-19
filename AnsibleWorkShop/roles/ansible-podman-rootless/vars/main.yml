@@ -1,2 +1,77 @@
+# code: language=ansible
 ---
 # vars file for ansible-podman-rootless
+
+# podman package state,
+# 3 states of podman package: present, absent, skipped
+# present, means install podman package
+# absent, means uninstall podman package
+# skipped, means do not implement the podman package task
+package:
+  podman:
+    state: present
+
+# target user to setup rootless podman
+target_user: "{{ ansible_user }}"
+
+
+# 3 states of cgroup delegate state: present, absent, skipped
+# present, config cgroup with this role own partten
+# absent, remove cgroup config with this role own partten (if there)
+# skipped, do not implement the cgroup config
+# note: if podman package is not there, the cgroup delegate file create by this role 
+#         will also be delete
+cgroups_delegation:
+  state: present
+  resources: cpu cpuset io memory pids
+  # rc_conf_override only work for the linux distro with openrc init system, e.g. alpine linux and gentoo
+  rc_conf_override: true
+
+
+# 3 states of sysctl_params state: present, absent, skipped
+# present: create sysctl conf file for podman-rootless rootless
+# absent: delete sysctl conf file for podman-rootless rootless
+# skip: do not implement the sysctl permission config task 
+# note: if podman package is not there, the sysctl conf file create by this role 
+#         will also be delete
+sysctl_params:
+  state: present
+  list:
+    - name: net.ipv4.ping_group_range
+      value: 0 2000000
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: 53
+
+
+# present: /etc/sub<u,g>id file will be created if not exists,
+#   if file exist, it will check with the user/group exists or not,
+#   if user/group not exist, it will create new record for user/group
+#   if user/group exists, it will not change anything
+# absent: the config create by this role in /etc/sub<u,g>ids file will be delete,
+#   it will not delete if the config is not create by this role.
+# skipped: it will not check the state of /etc/sub<u,g>ids files or related config in the file.
+#   note: if podman package is not there, the config in sub<u,g>id create by this role 
+#         will be delete
+sub_ids:
+  state: present
+  subuid:
+    user: "{{ target_user }}"
+    start_from: 100000
+    offset: 65536
+  subgid:
+    group: "{{ target_user }}"
+    start_from: 100000
+    offset: 65536
+
+
+kernel_modules:
+  state: present
+  list:
+    - ip_tables
+
+service:
+  podman_socket:
+    # 3 states of podman socket service: present, absent, skipped
+    user_scope: present
+    system_scope: skipped
+

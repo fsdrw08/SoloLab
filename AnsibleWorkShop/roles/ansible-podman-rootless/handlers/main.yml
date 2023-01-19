@@ -1,2 +1,6 @@
+# code: language=ansible
 ---
 # handlers file for ansible-podman-rootless
+- name: Reload-SystemdDaemon
+  ansible.builtin.systemd:
+    daemon_reload: yes

@@ -1,0 +1,15 @@
+# code: language=ansible
+---
+# - name: Set Podman package state in apline linux
+#   community.general.apk:
+#     name: podman
+#     state: "{{ package_podman_state }}"
+#     repository: "{{ package_podman_apk_repo_url }}"
+#   when:
+#     - ansible_pkg_mgr | lower == 'apk'
+
+- name: "{{ package.podman.state }} Podman package"
+  ansible.builtin.package:
+    name:
+      - podman
+    state: "{{ package.podman.state }}"

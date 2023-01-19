@@ -1,0 +1,66 @@
+# code: language=ansible
+---
+# https://stackoverflow.com/questions/29075287/ansible-insert-line-if-not-exists
+- name: Detect {{ kernel_modules.list }} kernel module
+  ansible.builtin.shell:
+    cmd: lsmod | grep -c {{ item }} || true
+  loop: "{{ kernel_modules.list }}"
+  when: 
+    - definitive_kernel_modules.state == "present"
+  register: module_detected
+  changed_when: false
+
+- name: Set var "kernel_modules_to_load"
+  # https://stackoverflow.com/questions/47244834/how-to-join-a-list-of-strings-in-ansible
+  ansible.builtin.set_fact:
+    kernel_modules_to_load_list: "{{ module_detected.results | community.general.json_query(\"[?stdout == '0'].item\") }}"
+    kernel_modules_to_load: "{{ module_detected.results | community.general.json_query(\"[?stdout == '0'].item\") | join('\n') }}"
+  when:
+    - module_detected is defined
+
+
+- name: Enable kernel module for podman rootless
+  when: 
+    - kernel_modules_to_load != ""
+    - definitive_kernel_modules.state == "present"
+  block:
+    - name: debug
+      ansible.builtin.debug:
+        var: item
+      loop: "{{ kernel_modules_to_load_list }}"
+
+    - name: Temporarily enable "{{ item }}" kernel module
+      ansible.builtin.modprobe:
+            name: ip_tables
+            state: present
+      loop: "{{ kernel_modules_to_load_list }}"
+
+    - name: Detect /etc/modules-load.d/{{ role_spec_name }}.conf file state
+      ansible.builtin.stat:
+        path: /etc/modules-load.d/{{ role_spec_name }}.conf
+      register: modules_podman_rootless
+
+    - name: Create /etc/modules-load.d/{{ role_spec_name }}.conf
+      ansible.builtin.file:
+        path: /etc/modules-load.d/{{ role_spec_name }}.conf
+        state: touch
+        mode: u=rw,g=r,o=r
+      when:
+        - modules_podman_rootless.stat.exists is defined
+        - modules_podman_rootless.stat.exists is false
+
+    - name: Set content in /etc/modules-load.d/{{ role_spec_name }}.conf
+      ansible.builtin.blockinfile:
+        path: /etc/modules-load.d/{{ role_spec_name }}.conf
+        marker: "# {mark} {{ role_spec_name }}"
+        block: |
+          {{ kernel_modules_to_load }}
+        state: present
+
+
+- name: Delete /etc/modules-load.d/{{ role_spec_name }}.conf
+  ansible.builtin.file:
+    path: /etc/modules-load.d/{{ role_spec_name }}.conf
+    state: absent
+  when:
+    - definitive_kernel_modules.state == "absent"
