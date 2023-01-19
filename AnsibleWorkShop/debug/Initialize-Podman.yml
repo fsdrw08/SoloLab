@@ -62,8 +62,8 @@
         - name: Auto start podman socket
           ansible.builtin.systemd:
             name: podman.socket
-            state: started
             enabled: yes
+            state: started
           when: ansible_service_mgr == "systemd"
 
     # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error

@@ -1,0 +1,75 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: no
+  become: yes
+  vars:
+    kernel_modules:
+      list:
+        - ip_tables
+        - tun
+        - tap
+  tasks:
+    - name: Get kernel modules
+      ansible.builtin.shell:
+        cmd: lsmod | grep -c {{ item }} || true
+      loop: "{{ kernel_modules.list }}"
+      register: module_detect
+      changed_when: false
+
+    - name: set fact
+      # https://stackoverflow.com/questions/47244834/how-to-join-a-list-of-strings-in-ansible
+      ansible.builtin.set_fact:
+        kernel_modules_to_load_list: "{{ module_detect.results | community.general.json_query(\"[?stdout == '0'].item\") }}"
+        kernel_modules_to_load: "{{ module_detect.results | community.general.json_query(\"[?stdout == '0'].item\") | join('\n') }}"
+        
+    - name: Put conf to modules-load.d
+      when: 
+        - kernel_modules_to_load != ""
+      block:
+        - name: debug
+          ansible.builtin.debug:
+            var: item
+          loop: "{{ kernel_modules_to_load_list }}"
+
+        - name: new item
+          ansible.builtin.file:
+            path: /home/vagrant/module.conf
+            state: touch
+            mode: u=rw,g=r,o=r
+
+        - name: set content
+          ansible.builtin.blockinfile:
+            path: /home/vagrant/module.conf
+            marker: "# {mark} ansible-podman-rootless-provision"
+            block: |
+              {{ kernel_modules_to_load }}
+
+    # - name: set fact loop
+    #   ansible.builtin.debug:
+    #     # https://stackoverflow.com/questions/56395331/ansible-how-to-extract-values-from-a-dictionary-of-lists
+    #     # https://itnext.io/complex-json-parsing-with-ansible-and-jmespath-5ca58ad5fbf3
+    #     # https://docs.ansible.com/ansible/latest/collections/community/general/docsite/filter_guide_selecting_json_data.html
+    #     # https://jmespath.org/examples.html
+    #     # msg: "{{ module_detect.results }}"
+    #     # msg: "{{ module_detect | community.general.json_query(\"results[?stdout == \"0\"].{item: item, stdout: stdout}\") }}"
+    #     # msg: "{{ module_detect.results | community.general.json_query(\"[?stdout != '0'].{item: item, stdout: stdout}\") }}"
+    #     var: item
+    #     # msg: "{{ module_detect | community.general.json_query('results[].{item: item, count: stdout}') }}"
+    #   # with_items: "{{ module_detect.results | community.general.json_query(\"[?stdout != '0'].{item: item, stdout: stdout}\") }}"
+    #   loop: "{{ module_detect.results | community.general.json_query(\"[?stdout == '0'].{item: item, stdout: stdout}\") }}"
+    #   # loop: "{{ module_detect.results | community.general.json_query(\"[?stdout != '0'].{item: item, stdout: stdout}\") | flatten(levels=1) }}"
+
+    # - name: set fact with_items
+    #   ansible.builtin.debug:
+    #     # https://stackoverflow.com/questions/56395331/ansible-how-to-extract-values-from-a-dictionary-of-lists
+    #     # https://itnext.io/complex-json-parsing-with-ansible-and-jmespath-5ca58ad5fbf3
+    #     # https://docs.ansible.com/ansible/latest/collections/community/general/docsite/filter_guide_selecting_json_data.html
+    #     # https://jmespath.org/examples.html
+    #     # msg: "{{ module_detect.results }}"
+    #     # msg: "{{ module_detect | community.general.json_query(\"results[?stdout == \"0\"].{item: item, stdout: stdout}\") }}"
+    #     # msg: "{{ module_detect.results | community.general.json_query(\"[?stdout != '0'].{item: item, stdout: stdout}\") }}"
+    #     var: item
+    #     # msg: "{{ module_detect | community.general.json_query('results[].{item: item, count: stdout}') }}"
+    #   with_items: "{{ module_detect.results | community.general.json_query(\"[?stdout == '0'].{item: item, stdout: stdout}\") }}"
+    #   # loop: "{{ module_detect.results | community.general.json_query(\"[?stdout != '0'].{item: item, stdout: stdout}\") | flatten(levels=1) }}"

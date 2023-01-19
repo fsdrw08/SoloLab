@@ -1,0 +1,23 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    sysctl_params:
+      state: present
+      # cannot use keyword "items"
+      list:
+        - name: net.ipv4.ping_group_range
+          value: "0 2000000"
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: "53"
+  tasks:
+    - name: test
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+          # - "{{ sysctl_params.params }}"
+          # - "{{ item.value }}"
+      # with_list: "{{ items }}"
+      # with_dict: "{{ sysctl_params.items }}"
+      loop: 
+        "{{ sysctl_params.list }}"
