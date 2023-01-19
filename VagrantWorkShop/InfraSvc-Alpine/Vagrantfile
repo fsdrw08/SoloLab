@@ -31,8 +31,9 @@ Vagrant.configure("2") do |config|
   
   config.vm.hostname = "InfraSvc-Alpine"
 
-  config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+  # config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
   # config.vm.synced_folder "../../AnsibleWorkShop", "/var/vagrant/AnsibleWorkShop", type: "rsync", rsync__auto: true
+  config.vm.synced_folder "../../KubeWorkShop", "/var/vagrant/KubeWorkShop", type: "rsync", rsync__auto: true
 
   # set static ip for this VM
   config.vm.provision "file", source: "./interfaces.conf", destination: "/home/vagrant/interfaces"
@@ -40,6 +41,9 @@ Vagrant.configure("2") do |config|
 
   # install python
   config.vm.provision "shell", path: "Add-Apks.sh"
+
+  # Setup ACF
+  config.vm.provision "shell", path: "Setup-ACF.sh"
   
   # install k8s related tools
   # for alpine
@@ -50,7 +54,7 @@ Vagrant.configure("2") do |config|
   # config.vm.provision "shell", inline: "sudo snap install helm --classic"
 
   # set dns record for the cluster fqdn
-  config.vm.provision "shell", inline: "sudo sed -i '/^127.0.0.1/ s/$/ infra.sololab/' /etc/hosts"
+  # config.vm.provision "shell", inline: "sudo sed -i '/^127.0.0.1/ s/$/ infra.sololab/' /etc/hosts"
 
   
   # reboot for alpine
