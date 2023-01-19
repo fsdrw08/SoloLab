@@ -1,0 +1,18 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: yes
+  become: yes
+  tasks:
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless
+    # - name: whoami
+    #   shell:
+    #     cmd: id -u
+    #   become_user: "{{ ansible_user }}"
+    #   register: whoami
+    # - name: debug
+    #   debug:
+    #     var: ansible_facts
