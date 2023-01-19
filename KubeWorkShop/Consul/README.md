@@ -9,7 +9,17 @@ sudo firewall-cmd --permanent --add-service=consul
 sudo firewall-cmd --reload
 
 podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
-    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml 
+    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml \
+    --userns=keep-id
+
+
+mkdir -p $HOME/.local/share/containers/log/
+podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
+    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml \
+    --userns=keep-id \
+    --log-driver k8s-file \
+    --log-opt path=/home/vagrant/.local/share/containers/log/consul.json \
+    --log-opt max-size=10mb
 
 
 # to delete
