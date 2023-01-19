@@ -1,3 +1,7 @@
+# https://www.tutorialworks.com/podman-monitoring-cockpit-fedora/
+# https://www.how2shout.com/how-to/how-to-install-cockpit-on-fedora-server.html
+sudo dnf install cockpit cockpit-pcp cockpit-podman -y
+
 sudo firewall-cmd --set-default-zone trusted
 
 sudo systemctl enable --now cockpit.socket

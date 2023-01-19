@@ -1,3 +1,5 @@
+sudo dnf install podman -y
+
 # Start Podman’s API so that Cockpit can interact with it
 sudo systemctl enable --now podman.socket
 systemctl enable --now --user podman.socket
