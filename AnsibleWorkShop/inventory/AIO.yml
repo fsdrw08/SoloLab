@@ -26,3 +26,10 @@ k3s_cluster:
       ansible_host: 192.168.255.21
       # ansible_python_interpreter: /usr/bin/python3
       # ansible_ssh_private_key_file:  ~/.ssh/vagrant
+    kube-3:
+      ansible_user: vagrant
+      # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
+      ansible_ssh_pass: vagrant
+      ansible_host: 192.168.255.12
+      # ansible_python_interpreter: /usr/bin/python3
+      # ansible_ssh_private_key_file:  ~/.ssh/vagrant
