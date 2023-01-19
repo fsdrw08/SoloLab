@@ -71,9 +71,10 @@ podman run --rm -e RUNNER_PLAYBOOK=./debug/Copy-Items.yml -v ../:/runner -v ../.
 podman run --rm -e RUNNER_PLAYBOOK=./Invoke-FreeIPA.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 # config podman in target host
-podman run --rm -e RUNNER_PLAYBOOK=./debug/Initialize-Podman.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Get-KernelModules.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # test j2 template render and copy to target
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Podman.yml -v ../:/runner -v ../../KubeWorkShop/:/KubeWorkShop/ localhost/ansible-ee-aio ansible-runner run /runner -vv
@@ -83,4 +84,7 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible-galaxy init ansible-podman-rootless"
 
 podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible --version"
+
+# deploy podman rootless
+podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootless.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
 ```
