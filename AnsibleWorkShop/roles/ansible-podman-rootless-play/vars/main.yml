@@ -1,0 +1,11 @@
+---
+# vars file for ansible-podman-rootless-play
+kube_state:
+
+kube_file:
+  src:
+  dest:
+
+configmap_files:
+  - src:
+    dest:
