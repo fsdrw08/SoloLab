@@ -64,6 +64,8 @@ podman run --rm -e RUNNER_PLAYBOOK=./debug/test.yml -v ../:/runner localhost/ans
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner -v ../../TerraformWorkShop/:/TerraformWorkShop/ localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
+podman run --rm -e RUNNER_PLAYBOOK=./debug/Debug-Vars.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 # copy items
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Copy-Items.yml -v ../:/runner -v ../../TerraformWorkShop/:/TerraformWorkShop/ localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
@@ -81,7 +83,8 @@ podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Podman.yml -v ../:/runner -v .
 
 # create a role
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
-podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible-galaxy init ansible-podman-rootless"
+$roleName="ansible-podman-rootless-play"
+podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible-galaxy init $roleName"
 
 podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible --version"
 
