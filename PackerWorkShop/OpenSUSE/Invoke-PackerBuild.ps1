@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('leap','leap_micro')]
+    [ValidateSet('Leap','Leap_Micro','Tumbleweed')]
     [string]
     $Distro
 )
@@ -33,7 +33,12 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
+  if ($Distro = "Tumbleweed") {
+    $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE_Tumbleweed.pkr.hcl"
+  }
+  else {
+    $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
+  }
   $var_file="$PSScriptRoot\vars-openSUSE_$Distro.pkrvars.hcl"
   $machine="openSUSE_$Distro-g2"
   $packer_log=0

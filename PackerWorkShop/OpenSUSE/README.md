@@ -16,6 +16,10 @@ sudo zypper ar -cfg 'https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/x
 https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/openSUSE-stable/x86_64/
 ```
 
+- disable repo
+```shell
+sudo zypper mr -d 'Update repository of openSUSE Backports'
+```
 - remove package
   ```shell
   sudo transactional-update --non-interactive -c pkg remove python3
