@@ -33,7 +33,7 @@
     - name: Set {{ target_user }} in /etc/subuid
       ansible.builtin.blockinfile:
         path: /etc/subuid
-        marker: "# {mark} {{ role_spec_name }} {{ target_user }}"
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
         block: |
           {{ sub_ids.subuid.user }}:{{ sub_ids.subuid.start_from }}:{{ sub_ids.subuid.offset }}
         state: "{{ definitive_sub_ids.state }}"
@@ -72,21 +72,10 @@
       changed_when: false
       register: subgid_target
 
-    # - name: Set {{ target_user }} in /etc/subgid
-    #   ansible.builtin.lineinfile:
-    #     path: /etc/subgid
-    #     line: "{{ target_user }}:{{ subgid_start_from }}:{{ subgid_offset }}"
-    #     state: present
-    #   when: 
-    #     - definitive_sub_ids.state != "skipped"
-    #     # - ((subgid_target is defined) and (subgid_target.found == 0)) or (definitive_sub_ids.state == "absent")
-    #     # - etc_subgid.stat.exists is defined
-    #     - etc_subgid.stat.exists is true
-
     - name: Set {{ target_user }} in /etc/subgid
       ansible.builtin.blockinfile:
         path: /etc/subgid
-        marker: "# {mark} {{ role_spec_name }} {{ target_user }}"
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
         block: |
           {{ sub_ids.subgid.group }}:{{ sub_ids.subgid.start_from }}:{{ sub_ids.subgid.offset }}
         state: "{{ definitive_sub_ids.state }}"

@@ -1,15 +1,15 @@
 # code: language=ansible
 ---
-- name: Detect /etc/sysctl.d/{{ role_spec_name }}.conf
+- name: Detect /etc/sysctl.d/{{ role_name }}.conf
   ansible.builtin.stat:
-    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+    path: /etc/sysctl.d/{{ role_name }}.conf
   when:
-    - definitive_sysctl_params.conf_state == "present"
+    - definitive_sysctl_params.state == "present"
   register: sysctl_podman_rootless_conf
 
 - name: Create /etc/sysctl.d/podman.conf
   ansible.builtin.file:
-    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+    path: /etc/sysctl.d/{{ role_name }}.conf
     state: touch
     mode: u=rw,g=r,o=r
   when:
@@ -21,8 +21,8 @@
   ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
-    sysctl_file: /etc/sysctl.d/{{ role_spec_name }}.conf
-    state: "{{ definitive_sysctl_params.conf_state }}"
+    sysctl_file: /etc/sysctl.d/{{ role_name }}.conf
+    state: "{{ definitive_sysctl_params.state }}"
     reload: true
   loop: "{{ sysctl_params.list }}"
   when:
@@ -31,7 +31,7 @@
 
 - name: Delete /etc/sysctl.d/podman.conf
   ansible.builtin.file:
-    path: /etc/sysctl.d/{{ role_spec_name }}.conf
+    path: /etc/sysctl.d/{{ role_name }}.conf
     state: absent
   when:
-    - definitive_sysctl_params.conf_state == "absent"
+    - definitive_sysctl_params.state == "absent"

@@ -16,10 +16,10 @@
       block:
         - name: Detect file state
           ansible.builtin.stat:
-            path: /etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_spec_name }}.conf
+            path: /etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf
           register: systemd_user_serviced
 
-        - name: Create /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_spec_name }}.conf
+        - name: Create /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_name }}.conf
           ansible.builtin.file:
             path: "{{ item.path }}"
             state: "{{ item.state }}"
@@ -30,7 +30,7 @@
             # https://wiki.archlinux.org/title/Cgroups
             - path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d"
               state: directory
-            - path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_spec_name }}.conf"
+            - path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
               state: touch
           when:
             - systemd_user_serviced.stat.exists is defined
@@ -39,8 +39,8 @@
         - name: Enable resources delegation for non-root users
           ansible.builtin.blockinfile:
             # https://wiki.archlinux.org/title/Cgroups#Controller_types
-            path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_spec_name }}.conf"
-            marker: "# {mark} {{ role_spec_name }} delegation"
+            path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
+            marker: "# {mark} {{ role_name }} delegation"
             block: |
               [Service]
               Delegate={{ cgroups_delegation.resources }}
@@ -51,9 +51,9 @@
       when:
         - definitive_cgroups_delegation.state == "absent"
       block:
-        - name: Delete /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_spec_name }}.conf
+        - name: Delete /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_name }}.conf
           ansible.builtin.file:
-            path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_spec_name }}.conf"
+            path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
             state: absent
           notify: 
             - Reload-SystemdDaemon
@@ -83,7 +83,7 @@
     - name: Set rc_cgroup_mode
       ansible.builtin.blockinfile:
         path: /etc/rc.conf
-        marker: "# {mark} {{ role_spec_name }} rc_cgroup_mode"
+        marker: "# {mark} {{ role_name }} rc_cgroup_mode"
         insertafter: '^#rc_cgroup_mode=(.*)'
         block: rc_cgroup_mode="unified"
         state: "{{ definitive_cgroups_delegation.state }}"
@@ -115,7 +115,7 @@
     - name: Set rc_cgroup_controllers
       ansible.builtin.blockinfile:
         path: /etc/rc.conf
-        marker: "# {mark} {{ role_spec_name }} rc_cgroup_controllers"
+        marker: "# {mark} {{ role_name }} rc_cgroup_controllers"
         insertafter: '^#rc_cgroup_controllers(.*)'
         block: rc_cgroup_controllers="{{ cgroups_delegation.resources }}"
         state: "{{ definitive_cgroups_delegation.state }}"

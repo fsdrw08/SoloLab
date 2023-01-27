@@ -1,0 +1,11 @@
+# code: language=ansible
+---
+- name: Set PAM limits
+  community.general.pam_limits:
+    comment: "{{ item.comment }}"
+    dest: "/etc/security/limits.d/{{ role_name }}-{{ target_user }}.conf"
+    domain: "{{ target_user }}"
+    limit_item: "{{ item.limit_item }}"
+    limit_type: "{{ item.limit_type }}"
+    value: "{{ item.value }}"
+  loop: "{{ pam_limits.list }}"

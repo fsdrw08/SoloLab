@@ -1,0 +1,147 @@
+# code: language=ansible
+---
+# defaults file for ansible-podman-rootless-provision
+
+role_name: ansible-podman-rootless-provision
+
+
+#--- podman package
+defaults_package:
+  podman:
+    state: present
+
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html#combining-hashes-dictionaries
+package: "{{ defaults_package | ansible.builtin.combine(vars_package, recursive=True) }}"
+
+
+#--- cgroups_delegation
+defaults_cgroups_delegation:
+  state: present
+  resources: cpu cpuset io memory pids
+  rc_conf_override: true
+
+cgroups_delegation: "{{ defaults_cgroups_delegation | ansible.builtin.combine(vars_cgroups_delegation, recursive=True) }}"
+
+switch_cgroups_delegation:
+  case_present:
+    state: present
+  case_absent:
+    state: absent
+  case_skipped:
+    state: skipped
+
+
+#--- sysctl_params
+defaults_sysctl_params:
+  state: present
+  list:
+    - name: net.ipv4.ping_group_range
+      value: 0 2000000
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: 53
+
+sysctl_params: "{{ defaults_sysctl_params | ansible.builtin.combine(vars_sysctl_params, recursive=True) }}"
+
+switch_sysctl_params:
+  case_present:
+    state: present
+  case_absent:
+    state: absent
+  case_skipped:
+    state: skipped
+
+
+#--- pam_limits
+default_pam_limits:
+  state: skipped
+  list:
+    - comment: add memory lock hard limit to {{ target_user }}
+      limit_item: memlock
+      limit_type: hard
+      value: -1
+    - comment: add memory lock soft limit to {{ target_user }}
+      limit_item: memlock
+      limit_type: soft
+      value: -1
+
+pam_limits: "{{ default_pam_limits | ansible.builtin.combine(vars_pam_limits, recursive=True) }}"
+
+switch_pam_limits:
+  case_present:
+    state: present
+  case_absent:
+    state: absent
+  case_skipped:
+    state: skipped
+
+
+#--- sub_ids
+defaults_sub_ids:
+  state: present
+  subuid:
+    user: "{{ target_user }}"
+    start_from: 100000
+    offset: 65536
+  subgid:
+    group: "{{ target_user }}"
+    start_from: 100000
+    offset: 65536
+
+sub_ids: "{{ defaults_sub_ids | ansible.builtin.combine(vars_sub_ids, recursive=True) }}"
+
+switch_sub_ids:
+  case_present:
+    state: present
+  case_absent:
+    state: absent
+  case_skipped:
+    state: skipped
+
+
+#--- kernel_modules
+defaults_kernel_modules:
+  state: present
+  list:
+    - ip_tables
+
+kernel_modules: "{{ defaults_kernel_modules | ansible.builtin.combine(vars_kernel_modules, recursive=True) }}"
+
+switch_kernel_modules:
+  case_present:
+    state: present
+  case_absent:
+    state: absent
+  case_skipped:
+    state: skipped
+
+
+#--- service
+defaults_service:
+  podman_socket:
+    skipped: false
+    user_scope: 
+      enabled: true
+      state: started
+    system_scope: 
+      enabled: false
+      state: stopped
+
+service: "{{ defaults_service | ansible.builtin.combine(vars_service, recursive=True) }}"
+
+switch_service_podman_socket_user_scope:
+  case_true:
+    enabled: true
+    state: started
+  case_false:
+    enabled: false
+    state: stopped
+
+switch_service_podman_socket_system_scope:
+  case_true:
+    enabled: true
+    state: started
+  case_false:
+    enabled: false
+    state: stopped
+
+

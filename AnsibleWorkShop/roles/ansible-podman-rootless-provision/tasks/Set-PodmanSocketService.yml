@@ -1,0 +1,94 @@
+# code: language=ansible
+---
+- name: Set podman socket service (systemd)
+  when: 
+    - ansible_service_mgr == "systemd"
+  block:
+    - name: Set systemd user scope podman socket service
+      ansible.builtin.systemd:
+        name: podman.socket
+        enabled: "{{ definitive_service_podman_socket_user_scope.enabled }}"
+        state: "{{ definitive_service_podman_socket_user_scope.state }}"
+        scope: user
+      become_user: "{{ target_user }}"
+
+    - name: Set systemd system scope podman socket service
+      ansible.builtin.systemd:
+        name: podman.socket
+        enabled: "{{ definitive_service_podman_socket_system_scope.enabled }}"
+        state: "{{ definitive_service_podman_socket_system_scope.state }}"
+        scope: system
+
+# https://github.com/ahwayakchih/nobbic/blob/82509c475de075670de910f56b550709c4665e08/docs/SetupPodmanOnAlpineHost.markdown
+- name: Set podman socket service (openrc)
+  when:
+    - ansible_service_mgr == "openrc"
+  block:
+    - name: Create openrc script folder in home directory
+      ansible.builtin.file:
+        path: "/home/{{ target_user }}/{{ role_name }}/openrc"
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: u=rwx,g=r,o=rx
+      when:
+        - definitive_service_podman_socket_user_scope.enabled is true
+
+    # https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/podman/podman.initd
+    # https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/podman/podman.confd
+    # https://virtualzone.de/posts/openrc-podman-kube-play/
+    - name: Deploy podman rootless socket service related openrc script and config
+      ansible.builtin.template:
+        src: podman-rootless-socket.confd.j2
+        dest: "/home/{{ target_user }}/{{ role_name }}/openrc/podman-rootless-{{ target_user }}-socket.confd"
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: u=rwx,g=r,o=r
+      become_user: "{{ target_user }}"
+      when:
+        - definitive_service_podman_socket_user_scope.enabled is true
+
+    - name: Delete podman rootless socket service related openrc script and config
+      # https://wiki.archlinux.org/title/Cgroups
+      ansible.builtin.file:
+        path: "/home/{{ target_user }}/{{ role_name }}/openrc/"
+        state: absent
+      when:
+        - definitive_service_podman_socket_user_scope.enabled is false
+
+    - name: Link podman rootless socket service related openrc script
+      ansible.builtin.file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+      loop:
+        - src: "/etc/init.d/podman"
+          dest: "/etc/init.d/podman-rootless-{{ target_user }}-socket"
+        - src: "/home/{{ target_user }}/{{ role_name }}/openrc/podman-rootless-{{ target_user }}-socket.confd"
+          dest: "/etc/conf.d/podman-rootless-{{ target_user }}-socket"
+      when:
+        - definitive_service_podman_socket_user_scope.enabled is true
+
+    - name: Unlink podman rootless socket service related openrc script
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/etc/init.d/podman-rootless-{{ target_user }}-socket"
+        - "/etc/conf.d/podman-rootless-{{ target_user }}-socket"
+      when:
+        - definitive_service_podman_socket_user_scope.enabled is false
+
+    # https://gist.github.com/danmack/53eaea4353d6b3dcfd20238741557290
+    - name: Set openrc podman socket user scope service
+      ansible.builtin.service:
+        name: "podman-rootless-{{ target_user }}-socket"
+        enabled: "{{ definitive_service_podman_socket_user_scope.enabled }}"
+        state: "{{ definitive_service_podman_socket_user_scope.state }}"
+    
+    - name: Set openrc podman socket system scope service
+      ansible.builtin.service:
+        name: podman
+        enabled: "{{ definitive_service_podman_socket_system_scope.enabled }}"
+        state: "{{ definitive_service_podman_socket_system_scope.state }}"
+
