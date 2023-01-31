@@ -16,19 +16,27 @@ package: "{{ defaults_package | ansible.builtin.combine(vars_package, recursive=
 
 #--- cgroups_delegation
 defaults_cgroups_delegation:
-  state: present
-  resources: cpu cpuset io memory pids
-  rc_conf_override: true
+  all_users:
+    skipped: false
+    state: present
+    rc_conf_override: true
+    resources: cpu cpuset memory pids
+  per_user:
+    skipped: false
+    state: present
+    resources: io
 
 cgroups_delegation: "{{ defaults_cgroups_delegation | ansible.builtin.combine(vars_cgroups_delegation, recursive=True) }}"
 
 switch_cgroups_delegation:
-  case_present:
-    state: present
-  case_absent:
-    state: absent
-  case_skipped:
-    state: skipped
+  case_other: "{{ cgroups_delegation }}"
+  case_pkg_absent:
+    all_users:
+      skipped: false
+      state: absent
+    per_user:
+      skipped: false
+      state: absent
 
 
 #--- sysctl_params
@@ -43,12 +51,9 @@ defaults_sysctl_params:
 sysctl_params: "{{ defaults_sysctl_params | ansible.builtin.combine(vars_sysctl_params, recursive=True) }}"
 
 switch_sysctl_params:
-  case_present:
-    state: present
-  case_absent:
+  case_other: "{{ sysctl_params }}" 
+  case_pkg_absent:
     state: absent
-  case_skipped:
-    state: skipped
 
 
 #--- pam_limits
@@ -67,12 +72,9 @@ default_pam_limits:
 pam_limits: "{{ default_pam_limits | ansible.builtin.combine(vars_pam_limits, recursive=True) }}"
 
 switch_pam_limits:
-  case_present:
-    state: present
-  case_absent:
+  case_other: "{{ pam_limits }}"
+  case_pkg_absent:
     state: absent
-  case_skipped:
-    state: skipped
 
 
 #--- sub_ids
@@ -90,12 +92,9 @@ defaults_sub_ids:
 sub_ids: "{{ defaults_sub_ids | ansible.builtin.combine(vars_sub_ids, recursive=True) }}"
 
 switch_sub_ids:
-  case_present:
-    state: present
-  case_absent:
+  case_other: "{{ sub_ids }}"
+  case_pkg_absent:
     state: absent
-  case_skipped:
-    state: skipped
 
 
 #--- kernel_modules
@@ -107,40 +106,38 @@ defaults_kernel_modules:
 kernel_modules: "{{ defaults_kernel_modules | ansible.builtin.combine(vars_kernel_modules, recursive=True) }}"
 
 switch_kernel_modules:
-  case_present:
-    state: present
-  case_absent:
+  case_other: "{{ kernel_modules }}" 
+  case_pkg_absent:
     state: absent
-  case_skipped:
-    state: skipped
 
 
 #--- service
 defaults_service:
   podman_socket:
-    skipped: false
     user_scope: 
+      skipped: false
       enabled: true
       state: started
     system_scope: 
+      skipped: true
       enabled: false
       state: stopped
+  systemd_lingering:
+    state: enable
 
 service: "{{ defaults_service | ansible.builtin.combine(vars_service, recursive=True) }}"
 
 switch_service_podman_socket_user_scope:
-  case_true:
-    enabled: true
-    state: started
-  case_false:
+  case_other: "{{ service.podman_socket.user_scope }}"
+  case_pkg_absent:
+    skipped: false
     enabled: false
     state: stopped
 
 switch_service_podman_socket_system_scope:
-  case_true:
-    enabled: true
-    state: started
-  case_false:
+  case_other: "{{ service.podman_socket.system_scope }}"
+  case_pkg_absent:
+    skipped: false
     enabled: false
     state: stopped
 

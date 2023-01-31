@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- name: Check if user is lingering
+  ansible.builtin.stat:
+      path: "/var/lib/systemd/linger/{{ target_user }}"
+  register: user_lingering
+  when: 
+    - target_user != "root"
+
+- name: Enable user linger
+  ansible.builtin.shell: 
+    cmd: loginctl enable-linger {{ target_user }}
+  become_user: "{{ target_user }}"
+  when: 
+    - user_lingering.stat.exists is false
+    - service.systemd_lingering.state == "enable"
+
+- name: Disable user linger
+  ansible.builtin.shell: 
+    cmd: loginctl disable-linger {{ target_user }}
+  become_user: "{{ target_user }}"
+  when: 
+    - user_lingering.stat.exists is true
+    - service.systemd_lingering.state == "disable"

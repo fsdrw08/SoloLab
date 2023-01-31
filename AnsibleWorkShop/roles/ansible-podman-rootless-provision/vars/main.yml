@@ -3,50 +3,83 @@
 # vars file for ansible-podman-rootless-provision
 
 # podman package state,
-# 3 states of vars_package.podman_state: present, absent, skipped
-# vars_package.podman_state: present
-#   install podman package
-# vars_package.podman_state: absent
-#   uninstall podman package
-# vars_package.podman_state: skipped
-#   skip the implement the podman package task
+# vars_package.podman_state: present/absent/skipped
+#   present: 
+#     install podman package
+#   absent:
+#     uninstall podman package
+#   skipped: 
+#     skip the implement the podman package task
 vars_package:
   podman:
     state: present
 
 
-# target user to setup rootless podman
+# target user to run rootless podman
 target_user: "{{ ansible_user }}"
 
 
 # background: 
-#    https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
-# 3 states of vars_cgroups_delegation: present, absent, skipped
-# vars_cgroups_delegation.state: present
-#   config cgroup with this role own partten
-# vars_cgroups_delegation.state: absent
-#   remove cgroup config with this role own partten (if there)
-# vars_cgroups_delegation.state: skipped
-#   skip the implement of cgroup config
+#   https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
+#   https://wiki.archlinux.org/title/Cgroups#User_delegation
+# vars_cgroups_delegation.all_users: 
+#   skipped: true/false
+#     true:
+#       skip the cgroup delegation config process for all users
+#     false:
+#       implement the cgroup delegation config process for all users
+#   state: present/absent
+#     present:
+#       for systemd distro: config cgroup delegate in /etc/systemd/system/user@.service.d/delegate.conf 
+#       for openrc distro: config cgroup delegate in /etc/rc.conf
+#       according to the setting in vars_cgroups_delegation.all_users.resources
+#     absent:
+#       remove cgroup config with this role own partten (if there)
+#   conf_override: true/false
+#       override the origin cgroup delegation config if there
+#
+# pre_user cgroup delegation settings only work for systemd base distro
+# vars_cgroups_delegation.pre_user: 
+#   skipped: true/false
+#     true:
+#       skip the cgroup delegation config process for each target user
+#     false:
+#       implement the cgroup delegation config process for each target user
+#   state: present/absent
+#     present:
+#       for systemd distro: config cgroup delegate in /etc/systemd/system/user@{{ target_user_uid }}.service.d/delegate.conf 
+#       according to the setting in vars_cgroups_delegation.pre_user.resources
+#     absent:
+#       remove cgroup config with this role own partten (if there)
 # note: if podman package is not there, the cgroup delegate file create by this role 
 #   will also be delete
+
 vars_cgroups_delegation:
-  state: present
-  resources: cpu cpuset io memory pids
-  # rc_conf_override only work for the linux distro with openrc init system, e.g. alpine linux and gentoo
-  rc_conf_override: true
+  all_users:
+    skipped: false
+    state: present
+    rc_conf_override: true
+    resources: cpu cpuset io memory pids
+  per_user:
+    skipped: true
+    state: present
+    resources: cpu cpuset io memory pids
+  # state: present
+  # resources: cpu cpuset io memory pids
+  # rc_conf_override: true
 
 
 # background:
 #   https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
 #   https://github.com/containers/podman/blob/main/rootless.md#:~:text=Podman%20can%20not%20create%20containers%20that%20bind%20to%20ports%20%3C%201024
-# 3 states of vars_sysctl_params.state: present, absent, skipped
-# vars_sysctl_params.state:present
-#   create sysctl conf file for podman-rootless rootless
-# vars_sysctl_params.state:absent
-#   delete sysctl conf file for podman-rootless rootless
-# vars_sysctl_params.state:skip
-#   skip the implement of sysctl permission config task 
+# vars_sysctl_params.state: present/absent/skipped
+#   present:
+#     create sysctl conf file for podman-rootless rootless 
+#     according to vars_sysctl_params.list
+#   absent：
+#     delete sysctl conf file for podman-rootless rootless
+#   skip：
+#     skip the implement of sysctl permission config task 
 # note: if podman package is not there, the sysctl conf file create by this role 
 #   will also be delete
 vars_sysctl_params:
@@ -59,20 +92,47 @@ vars_sysctl_params:
 
 
 # background:
+#   https://github.com/containers/podman/issues/10051
+#   https://phoenixnap.com/kb/ulimit-linux-command
+# vars_pam_limits.state: present/absent/skipped
+#   present: 
+#     create security limits drop-in conf file for podman-rootless rootless 
+#     according to vars_pam_limits.list
+#   absent:
+#     delete security limits drop-in conf file for podman-rootless rootless
+#   skip:
+#     skip the implement of security limits drop-in conf file
+# note: if podman package is not there, the security limits drop-in conf file create by this role 
+#   will also be delete
+vars_pam_limits:
+  state: skipped
+  list:
+    - comment: add memory lock hard limit to {{ target_user }}
+      limit_item: memlock
+      limit_type: hard
+      value: -1
+    - comment: add memory lock soft limit to {{ target_user }}
+      limit_item: memlock
+      limit_type: soft
+      value: -1
+
+
+# background:
 #   https://github.com/containers/podman/blob/main/troubleshooting.md#10-rootless-setup-user-invalid-argument
-# 3 states of vars_sub_ids.state: present, absent, skipped
-# vars_sub_ids.state: present
-#   /etc/sub<u,g>id file will be created if not exists,
+# vars_sub_ids.state: present/absent/skipped
+#   present:
+#     /etc/sub<u,g>id file will be created if not exists,
 #     if file exist, it will check with the user/group exists or not,
-#       if user/group not exist, it will create new record for user/group
+#       if user/group not exist, it will create new record for user/group 
+#         according to vars_sub_ids.subuid and vars_sub_ids.subgid
 #       if user/group exists, it will not change anything
-# vars_sub_ids.state: absent
-#   the config create by this role in /etc/sub<u,g>ids file will be delete,
-#   it will not delete if the config is not create by this role.
-# vars_sub_ids.state: skipped
-#   it will not check the state of /etc/sub<u,g>ids files or related config in the file.
+#   absent:
+#     the config create by this role in /etc/sub<u,g>ids file will be delete,
+#     it will not delete if the config is not create by this role.
+#   skipped:
+#     it will not check the state of /etc/sub<u,g>ids files or related config in the file.
 # note: if podman package is not there, the config in sub<u,g>id create by this role 
-#         will be delete
+#   will be delete
 vars_sub_ids:
   state: present
   subuid:
@@ -88,28 +148,48 @@ vars_sub_ids:
 # background:
 #   https://github.com/containers/podman/commit/eab5a4cfb7b3bbb63cd2a1d9a5a69e9bc32d4cef#diff-d77924824df4702948dd3cfd6e377da2eb169d2811b4bfe072061f1f9aee48a0
 #   https://virtualzone.de/posts/alpine-podman/#install-podman
-# 3 states of vars_kernel_modules.state: present, absent, skipped
-# vars_kernel_modules.state: present
-#   enable podman rootless required kernel module(s) if they are not exist
+# vars_kernel_modules.state: present/absent/skipped
+#   present:
+#     according to the kernel module requirement in vars_kernel_modules, enable podman rootless required kernel module(s) 
 #     if related kernel modules not exist, the task will create related drop-in config file /etc/modules-load.d/{{ role_name }}.conf 
 #     to present the kernel modules
-# vars_kernel_modules.state: absent
-#   delete the related drop-in config file /etc/modules-load.d/{{ role_name }}.conf
-# vars_kernel_modules.state: skipped
-#   skip this task
+#   absent:
+#     delete the related drop-in config file /etc/modules-load.d/{{ role_name }}.conf
+#   skipped:
+#     skip this task
 vars_kernel_modules:
   state: present
   list:
     - ip_tables
 
 
-
+# background: 
+#   https://github.com/containers/podman/blob/main/docs/tutorials/socket_activation.md#socket-activation-of-the-api-service
+#   https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/assembly_using-the-container-tools-api_building-running-and-managing-containers#proc_enabling-the-podman-api-using-systemd-in-rootless-mode_assembly_using-the-container-tools-api
+#   https://wiki.archlinux.org/title/Systemd/User#Automatic_start-up_of_systemd_user_instances
+# vars_service.podman_socket.skipped: true/false, 
+#   true:
+#     skip the process of podman.socket service
+#   false:
+#     start the process of podman.socket service 
+#     according to the config in vars_service.podman_socket.user_scope and
+#     vars_service.podman_socket.system_scope
+# vars_service.systemd_lingering.state: present/absent/skipped
+#   enable:
+#     enable the target user systemd lingering, aka: loginctl enable-linger {{ target_user }}
+#   disable:
+#     disable the target user systemd lingering, aka: loginctl disable-linger {{ target_user }}
+#   skipped:
+#     skip the systemd lingering process
 vars_service:
   podman_socket:
-    skipped: false
     user_scope: 
+      skipped: false
       enabled: true
       state: started
     system_scope: 
+      skipped: true
       enabled: false
       state: stopped
+  systemd_lingering:
+    state: enable

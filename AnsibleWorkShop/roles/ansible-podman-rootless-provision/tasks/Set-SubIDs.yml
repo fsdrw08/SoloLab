@@ -1,6 +1,7 @@
 # code: language=ansible
 ---
 - name: Set value in /etc/subuid
+  become: yes
   block:
     - name: Detect subuid file
       ansible.builtin.stat:
@@ -14,7 +15,6 @@
         mode: u=rw,g=r,o=r
       when:
         - definitive_sub_ids.state == "present"
-        # - etc_subuid.stat.exists is defined
         - etc_subuid.stat.exists is false
 
     # https://stackoverflow.com/questions/29075287/ansible-insert-line-if-not-exists
@@ -24,11 +24,11 @@
         regexp: "^{{ target_user }}"
         state: absent
       when:
+        - definitive_sub_ids.state == "present"
         - etc_subuid.stat.exists is true
-        # - definitive_sub_ids.state == "present"
-      register: subuid_target
       check_mode: true
       changed_when: false
+      register: subuid_target
 
     - name: Set {{ target_user }} in /etc/subuid
       ansible.builtin.blockinfile:
@@ -36,14 +36,24 @@
         marker: "# {mark} {{ role_name }} {{ target_user }}"
         block: |
           {{ sub_ids.subuid.user }}:{{ sub_ids.subuid.start_from }}:{{ sub_ids.subuid.offset }}
-        state: "{{ definitive_sub_ids.state }}"
+        state: present
       when: 
+        - definitive_sub_ids.state == "present"
         - etc_subuid.stat.exists is true
-        - (subuid_target.found == 0) 
-          or (definitive_sub_ids.state == "absent")
+        - subuid_target.found == 0
+
+    - name: Remove {{ target_user }} in /etc/subuid
+      ansible.builtin.blockinfile:
+        path: /etc/subuid
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
+        state: absent
+      when: 
+        - definitive_sub_ids.state == "absent"
+        - etc_subuid.stat.exists is true
 
 
 - name: Set value in /etc/subgid
+  become: yes
   block:
     - name: Detect subgid file
       ansible.builtin.stat:
@@ -57,7 +67,6 @@
         mode: u=rw,g=r,o=r
       when:
         - definitive_sub_ids.state == "present"
-        # - etc_subgid.stat.exists is defined
         - etc_subgid.stat.exists is false
 
     - name: Detect config in /etc/subgid
@@ -66,8 +75,8 @@
         regexp: "^{{ target_user }}"
         state: absent
       when:
+        - definitive_sub_ids.state == "present"
         - etc_subgid.stat.exists is true
-        # - definitive_sub_ids.state == "present"
       check_mode: true
       changed_when: false
       register: subgid_target
@@ -78,9 +87,17 @@
         marker: "# {mark} {{ role_name }} {{ target_user }}"
         block: |
           {{ sub_ids.subgid.group }}:{{ sub_ids.subgid.start_from }}:{{ sub_ids.subgid.offset }}
-        state: "{{ definitive_sub_ids.state }}"
+        state: present
       when: 
+        - definitive_sub_ids.state == "present"
         - etc_subgid.stat.exists is true
-        - (subgid_target.found == 0) 
-          or (definitive_sub_ids.state == "absent")
-        # - etc_subuid.stat.exists is defined
+        - subgid_target.found == 0
+
+    - name: Remove {{ target_user }} in /etc/subgid
+      ansible.builtin.blockinfile:
+        path: /etc/subgid
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
+        state: absent
+      when: 
+        - definitive_sub_ids.state == "absent"
+        - etc_subgid.stat.exists is true

@@ -18,8 +18,8 @@
   when:
     - module_detected is defined
 
-
 - name: Enable kernel module for podman rootless
+  become: true
   when: 
     - kernel_modules_to_load != ""
     - definitive_kernel_modules.state == "present"
@@ -62,5 +62,6 @@
   ansible.builtin.file:
     path: /etc/modules-load.d/{{ role_name }}.conf
     state: absent
+  become: true
   when:
     - definitive_kernel_modules.state == "absent"

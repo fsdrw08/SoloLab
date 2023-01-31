@@ -12,12 +12,15 @@
           value: 22
         - name: 31
           value: 32
-      test2: 2
+      test2:
+        test21: 21
+        test22: 22
       test3: no
   tasks:
     - name: test
       ansible.builtin.debug:
         msg: 
+          - "{{ vars_test2 }}"
           - "{{ default_test | combine(vars_test, recursive=True) }}"
           - "{{ lookup_test }}"
           - "{{ bool_test }}"
@@ -27,7 +30,10 @@
           test1: 
             - name: 11
               value: 45
+        vars_test2:
+          test2: "{{ default_test.test2 }}"
         subitem: test1
         lookup_test: "{{ lookup('list',default_test)[subitem] }}"
         combine_test: "{{ default_test | combine(vars_test, recursive=True, list_merge='replace') }}"
+        # combine_test2: "{{ default_test | combine(vars_test2, recursive=True, list_merge='replace') }}"
         bool_test: "{{ default_test.test3 | bool }}"

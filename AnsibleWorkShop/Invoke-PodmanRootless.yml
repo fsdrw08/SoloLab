@@ -1,20 +1,25 @@
 # code: language=ansible
 ---
-- hosts: kube-2 # kube-2
+- hosts: kube-1 # kube-2
   gather_facts: yes
-  become: yes
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: run role ansible-podman-rootless-provision
       ansible.builtin.include_role:
         name: ansible-podman-rootless-provision
       vars:
-        vars_sysctl_params:
-          state: skipped
-        vars_sub_ids:
-          state: skipped
-        vars_kernel_modules:
-          state: skipped
+        vars_cgroups_delegation:
+          all_users:
+            skipped: false
+            state: present
+            rc_conf_override: true
+            resources: cpu
+        # vars_sub_ids:
+        #   state: skipped
+        # vars_kernel_modules:
+        #   state: skipped
+        # vars_pam_limits:
+        #   state: present
     # - name: whoami
     #   shell:
     #     cmd: id -u

@@ -1,30 +1,81 @@
 # code: language=ansible
 ---
 - name: Delegate container related permission to non-root user (systemd)
-  when: ansible_service_mgr == "systemd"
+  when: 
+    - ansible_service_mgr == "systemd"
   block:
-    - name: Detect {{ target_user }} uid
-      ansible.builtin.shell: 
-        cmd: id -u
-      become_user: "{{ target_user }}"
-      register: target_user_uid
-      changed_when: false
-
-    - name: Present delegate config
+    - name: Set cgroup delegation to all users
+      become: yes
       when:
-        - definitive_cgroups_delegation.state == "present"
+        - definitive_cgroups_delegation.all_users.skipped is false
       block:
-        - name: Detect file state
+        - name: Detect file state for all users
+          ansible.builtin.stat:
+            path: /etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf
+          register: systemd_all_users_serviced
+
+        - name: Create /etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: "{{ item.state }}"
+            mode: '0755'
+          loop:
+            # https://wiki.archlinux.org/title/Cgroups
+            - path: "/etc/systemd/system/user@.service.d"
+              state: directory
+            - path: "/etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf"
+              state: touch
+          when:
+            - systemd_all_users_serviced.stat.exists is defined
+            - systemd_all_users_serviced.stat.exists is false
+            - definitive_cgroups_delegation.all_users.state == "present"
+
+        - name: Enable resources delegation for all users
+          ansible.builtin.blockinfile:
+            # https://wiki.archlinux.org/title/Cgroups#Controller_types
+            path: "/etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf"
+            marker: "# {mark} {{ role_name }} delegation"
+            block: |
+              [Service]
+              Delegate={{ cgroups_delegation.all_users.resources }}
+          when:
+            - definitive_cgroups_delegation.all_users.state == "present"
+          notify: 
+            - Reload-SystemdDaemon
+
+        - name: Delete /etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf
+          ansible.builtin.file:
+            path: "/etc/systemd/system/user@.service.d/delegate-{{ role_name }}.conf"
+            state: absent
+          when:
+            - definitive_cgroups_delegation.all_users.state == "absent"
+          notify: 
+            - Reload-SystemdDaemon
+
+    - name: Set cgroup delegation to {{ target_user }}
+      become: yes
+      when:
+        - definitive_cgroups_delegation.per_user.skipped is false
+      block:
+        - name: Detect {{ target_user }} uid
+          ansible.builtin.shell: 
+            cmd: id -u
+          become_user: "{{ target_user }}"
+          register: target_user_uid
+          changed_when: false
+
+        # https://wiki.archlinux.org/title/Cgroups#User_delegation
+        - name: Detect file state for {{ target_user }}
           ansible.builtin.stat:
             path: /etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf
-          register: systemd_user_serviced
+          register: systemd_per_user_serviced
 
         - name: Create /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_name }}.conf
           ansible.builtin.file:
             path: "{{ item.path }}"
             state: "{{ item.state }}"
-            owner: "{{ target_user }}"
-            group: "{{ target_user }}"
+            # owner: "{{ target_user }}"
+            # group: "{{ target_user }}"
             mode: '0755'
           loop:
             # https://wiki.archlinux.org/title/Cgroups
@@ -33,34 +84,39 @@
             - path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
               state: touch
           when:
-            - systemd_user_serviced.stat.exists is defined
-            - systemd_user_serviced.stat.exists is false
+            - systemd_per_user_serviced.stat.exists is defined
+            - systemd_per_user_serviced.stat.exists is false
+            - definitive_cgroups_delegation.per_user.state == "present"
 
-        - name: Enable resources delegation for non-root users
+        - name: Enable resources delegation for {{ target_user }}
           ansible.builtin.blockinfile:
             # https://wiki.archlinux.org/title/Cgroups#Controller_types
             path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
             marker: "# {mark} {{ role_name }} delegation"
             block: |
               [Service]
-              Delegate={{ cgroups_delegation.resources }}
+              Delegate={{ cgroups_delegation.per_user.resources }}
+          when:
+            - definitive_cgroups_delegation.per_user.state == "present"
           notify: 
             - Reload-SystemdDaemon
 
-    - name: Delete delegate config
-      when:
-        - definitive_cgroups_delegation.state == "absent"
-      block:
         - name: Delete /etc/systemd/system/user@"{{ target_user_uid.stdout }}".service.d/delegate-{{ role_name }}.conf
           ansible.builtin.file:
             path: "/etc/systemd/system/user@{{ target_user_uid.stdout }}.service.d/delegate-{{ role_name }}.conf"
             state: absent
+          when:
+            - definitive_cgroups_delegation.per_user.state == "absent"
           notify: 
             - Reload-SystemdDaemon
+        
 
   # https://github.com/ahwayakchih/nobbic/blob/82509c475de075670de910f56b550709c4665e08/docs/SetupPodmanOnAlpineHost.markdown#switch-cgroups-to-v2
-- name: Set cgroup resource config to non-root user (openrc)
-  when: ansible_service_mgr == "openrc"
+- name: Set cgroup resource config to all user (openrc)
+  when: 
+    - ansible_service_mgr == "openrc"
+    - definitive_cgroups_delegation.all_users.skipped is false
+  become: yes
   block:
     - name: Detect rc_cgroup_mode config in /etc/rc.conf
       ansible.builtin.lineinfile:
@@ -76,9 +132,9 @@
         path: /etc/rc.conf
         regexp: "^rc_cgroup_mode"
         state: absent
-      when:
-        - cgroups_delegation.rc_conf_override is true
       check_mode: false
+      when:
+        - cgroups_delegation.all_users.rc_conf_override is true
 
     - name: Set rc_cgroup_mode
       ansible.builtin.blockinfile:
@@ -86,12 +142,21 @@
         marker: "# {mark} {{ role_name }} rc_cgroup_mode"
         insertafter: '^#rc_cgroup_mode=(.*)'
         block: rc_cgroup_mode="unified"
-        state: "{{ definitive_cgroups_delegation.state }}"
+        state: present
       when:
-        - (cgroups_delegation.rc_conf_override is true) 
-          or (rc_cgroup_mode_config.found == 0)
-          or (definitive_cgroups_delegation.state == "absent")
-        
+        - (cgroups_delegation.all_users.rc_conf_override is true
+            or rc_cgroup_mode_config.found == 0)
+        - definitive_cgroups_delegation.all_users.state == "present"
+
+    - name: Remove rc_cgroup_mode
+      ansible.builtin.blockinfile:
+        path: /etc/rc.conf
+        marker: "# {mark} {{ role_name }} rc_cgroup_mode"
+        state: absent
+      when:
+        - definitive_cgroups_delegation.all_users.state == "absent"
+
+
     # https://wiki.gentoo.org/wiki/OpenRC/CGroups
     - name: Detect rc_cgroup_controllers line in /etc/rc.conf
       ansible.builtin.lineinfile:
@@ -107,20 +172,26 @@
         path: /etc/rc.conf
         regexp: "^rc_cgroup_controllers"
         state: absent
-      when:
-        - "'podman' in ansible_facts.packages"
-        - cgroups_delegation.rc_conf_override is true
       check_mode: no
+      when:
+        - cgroups_delegation.all_users.rc_conf_override is true
 
     - name: Set rc_cgroup_controllers
       ansible.builtin.blockinfile:
         path: /etc/rc.conf
         marker: "# {mark} {{ role_name }} rc_cgroup_controllers"
         insertafter: '^#rc_cgroup_controllers(.*)'
-        block: rc_cgroup_controllers="{{ cgroups_delegation.resources }}"
-        state: "{{ definitive_cgroups_delegation.state }}"
+        block: rc_cgroup_controllers="{{ definitive_cgroups_delegation.all_users.resources }}"
+        state: present
       when:
-        - (cgroups_delegation.rc_conf_override is true) 
-          or (rc_cgroup_controllers_config.found == 0)
-          or (definitive_cgroups_delegation.state == "absent")
+        - ( cgroups_delegation.all_users.rc_conf_override is true
+            or rc_cgroup_mode_config.found == 0 )
+        - definitive_cgroups_delegation.all_users.state == "present"
 
+    - name: Remove rc_cgroup_controllers
+      ansible.builtin.blockinfile:
+        path: /etc/rc.conf
+        marker: "# {mark} {{ role_name }} rc_cgroup_controllers"
+        state: absent
+      when:
+        - definitive_cgroups_delegation.all_users.state == "absent"

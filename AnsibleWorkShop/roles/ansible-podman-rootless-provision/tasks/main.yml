@@ -2,9 +2,9 @@
 ---
 # tasks file for ansible-podman-rootless-provision
 - name: "{{ package.podman.state }} Podman Package"
-  when: package.podman.state != "skipped"
   ansible.builtin.include_tasks:
     file: Set-PodmanPackage.yml
+  when: package.podman.state != "skipped"
 
 - name: Detect podman package
   ansible.builtin.package_facts:
@@ -13,84 +13,109 @@
 
 # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
 - name: Set cgroup resource permission to unprivileged user
-  when:
-    - not (
-      ('podman' in ansible_facts.packages) 
-      and (cgroups_delegation.state == "skipped") 
-      )
   vars:
     # https://serverfault.com/questions/907164/ansible-conditionally-define-variables-in-vars-file-if-a-certain-condition-is-m
-    # switch_cgroups_delegation: "{% if not 'podman' in ansible_facts.packages %}absent{% else %}{{ cgroups_delegation.state }}{% endif %}"
-    # definitive_cgroups_delegation: "{{ lookup('vars','case_cgroups_delegate_' + switch_cgroups_delegation) }}"
-    case_cgroups_delegation: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ cgroups_delegation.state }}{% endif %}"
+    case_cgroups_delegation: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-nested-variables
     definitive_cgroups_delegation: "{{ lookup('list', switch_cgroups_delegation)[case_cgroups_delegation] }}"
   ansible.builtin.include_tasks:
     file: Set-CgroupConfig.yml
-  register: Grant_ResourcePermission
+  when:
+    - not (
+        (definitive_cgroups_delegation.all_users.skipped is true) 
+        and (definitive_cgroups_delegation.per_user.skipped is true) 
+      )
+    # - not (
+    #     ('podman' in ansible_facts.packages) 
+    #     and (cgroups_delegation.all_users.skipped is true) 
+    #     and (cgroups_delegation.pre_user.skipped is true) 
+    #   )
+    
+
 
 # https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md#enable-unprivileged-ping
 - name: Set Sysctl control permission to unprivileged user
-  when:
-    - not (
-      ('podman' in ansible_facts.packages) 
-        and (sysctl_params.state == "skipped") 
-      )
   vars:
-    # https://serverfault.com/questions/907164/ansible-conditionally-define-variables-in-vars-file-if-a-certain-condition-is-m
-    # switch_sysctl_params: "{% if not 'podman' in ansible_facts.packages %}absent{% else %}{{ sysctl_params.state }}{% endif %}"
-    # definitive_sysctl_params: "{{ lookup('vars','case_sysctl_params_' + switch_sysctl_params) }}"
-    case_sysctl_params: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ sysctl_params.state }}{% endif %}"
+    case_sysctl_params: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     definitive_sysctl_params: "{{ lookup('list', switch_sysctl_params)[case_sysctl_params] }}"
   ansible.builtin.include_tasks:
     file: Set-SysctlParams.yml
+  when:
+    - definitive_sysctl_params.state != "skipped"
+    # - not (
+    #   ('podman' in ansible_facts.packages) 
+    #     and (sysctl_params.state == "skipped") 
+    #   )
+
+
+# https://github.com/containers/podman/issues/10051
+- name: Set PAM limits to unprivileged user
+  vars:
+    case_pam_limits: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
+    definitive_pam_limits: "{{ lookup('list', switch_pam_limits)[case_pam_limits] }}"
+  ansible.builtin.include_tasks:
+    file: Set-PAMLimits.yml
+  when:
+    - definitive_pam_limits.state != "skipped"
+    # - not (
+    #   ('podman' in ansible_facts.packages) 
+    #   and (pam_limits.state == "skipped") 
+    #   )
+
 
 # https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md#etcsubuid-and-etcsubgid-configuration
 - name: Set subgid & subuid
-  when:
-    - not (
-      ('podman' in ansible_facts.packages) 
-      and (sub_ids.state == "skipped") 
-      )
   vars:
-    # https://serverfault.com/questions/907164/ansible-conditionally-define-variables-in-vars-file-if-a-certain-condition-is-m
-    # switch_sub_ids: "{% if not 'podman' in ansible_facts.packages %}absent{% else %}{{ sub_ids.state }}{% endif %}"
-    # definitive_sub_ids: "{{ lookup('vars','case_sub_ids_' + switch_sub_ids) }}"
-    case_sub_ids: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ sub_ids.state }}{% endif %}"
+    case_sub_ids: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     definitive_sub_ids: "{{ lookup('list', switch_sub_ids)[case_sub_ids] }}"
   ansible.builtin.include_tasks:
     file: Set-SubIDs.yml
-
-
-- name: Set kernel modules for podman
   when:
-    - not (
-      ('podman' in ansible_facts.packages) 
-      and (kernel_modules.state == "skipped") 
-      )
+    - definitive_sub_ids.state != "skipped"
+    # - not (
+    #   ('podman' in ansible_facts.packages) 
+    #   and (sub_ids.state == "skipped") 
+    #   )
+
+
+# https://github.com/containers/podman/commit/eab5a4cfb7b3bbb63cd2a1d9a5a69e9bc32d4cef#diff-d77924824df4702948dd3cfd6e377da2eb169d2811b4bfe072061f1f9aee48a0
+- name: Set kernel modules for podman
   vars:
-    # https://serverfault.com/questions/907164/ansible-conditionally-define-variables-in-vars-file-if-a-certain-condition-is-m
-    # switch_kernel_modules: "{% if not 'podman' in ansible_facts.packages %}absent{% else %}{{ kernel_modules.state }}{% endif %}"
-    # definitive_kernel_modules: "{{ lookup('vars','case_kernel_modules_' + switch_kernel_modules) }}"
-    case_kernel_modules: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ kernel_modules.state }}{% endif %}"
+    case_kernel_modules: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     definitive_kernel_modules: "{{ lookup('list', switch_kernel_modules)[case_kernel_modules] }}"
   ansible.builtin.include_tasks:
     file: Set-KernelModules.yml
+  when:
+    - definitive_kernel_modules.state != "skipped"
+    # - not (
+    #   ('podman' in ansible_facts.packages) 
+    #   and (kernel_modules.state == "skipped") 
+    #   )
 
 
 - name: Set podman socket service
-  when:
-    - not (
-      ('podman' in ansible_facts.packages) 
-      and (service.podman_socket.skipped is true) 
-      )
   vars:
-    # https://serverfault.com/questions/907164/ansible-conditionally-define-variables-in-vars-file-if-a-certain-condition-is-m
-    case_service_podman_socket_user_scope: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ service.podman_socket.user_scope.enabled | bool | lower }}{% endif %}"
+    case_service_podman_socket_user_scope: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     definitive_service_podman_socket_user_scope: "{{ lookup('list', switch_service_podman_socket_user_scope)[case_service_podman_socket_user_scope] }}"
-    case_service_podman_socket_system_scope: "{% if not 'podman' in ansible_facts.packages %}case_absent{% else %}case_{{ service.podman_socket.system_scope.enabled | bool | lower }}{% endif %}"
+    case_service_podman_socket_system_scope: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
     definitive_service_podman_socket_system_scope: "{{ lookup('list', switch_service_podman_socket_system_scope)[case_service_podman_socket_system_scope] }}"
   ansible.builtin.include_tasks:
     file: Set-PodmanSocketService.yml
-  register: Enable_PodmanSocket
-  
+  when:
+    - not (
+        (definitive_service_podman_socket_user_scope.skipped is true) 
+          and (definitive_service_podman_socket_system_scope.skipped is true) 
+      )
+    # - not (
+    #     ('podman' in ansible_facts.packages) 
+    #     and (service.podman_socket.user_scope.skipped is true) 
+    #     and (service.podman_socket.system_scope.skipped is true) 
+    #   )
+
+
+- name: Set systemd lingering
+  ansible.builtin.include_tasks:
+    file: Set-SystemdLinger.yml
+  when:
+    - ansible_service_mgr == "systemd"
+    - service.systemd_lingering.state != "skipped"

@@ -1,11 +1,41 @@
 # code: language=ansible
 ---
 - name: Set PAM limits
-  community.general.pam_limits:
-    comment: "{{ item.comment }}"
-    dest: "/etc/security/limits.d/{{ role_name }}-{{ target_user }}.conf"
-    domain: "{{ target_user }}"
-    limit_item: "{{ item.limit_item }}"
-    limit_type: "{{ item.limit_type }}"
-    value: "{{ item.value }}"
-  loop: "{{ pam_limits.list }}"
+  become: yes
+  block:
+    - name: Set PAM limits
+      community.general.pam_limits:
+        comment: "{{ item.comment }}"
+        dest: "/etc/security/limits.d/{{ role_name }}-{{ target_user }}.conf"
+        domain: "{{ target_user }}"
+        limit_item: "{{ item.limit_item }}"
+        limit_type: "{{ item.limit_type }}"
+        value: "{{ item.value }}"
+      loop: "{{ pam_limits.list }}"
+      when:
+        - definitive_pam_limits.state == "present"
+
+    - name: Delete {{ target_user }} PAM limits drop-in conf file
+      ansible.builtin.file:
+        path: "/etc/security/limits.d/{{ role_name }}-{{ target_user }}.conf"
+        state: absent
+      when: 
+        - definitive_pam_limits.state == "absent"
+
+    - name: Delete all PAM limits
+      when: 
+        - definitive_pam_limits.state == "absent"
+        - not (podman in ansible_facts.packages)
+      block:
+        # https://blog.csdn.net/byygyy/article/details/87822468
+        - name: Find related drop-in conf file
+          ansible.builtin.find:
+            paths: /etc/security/limits.d/
+            patterns: "{{ role_name }}-*.conf"
+          register: pam_limits_conf_files
+
+        - name: Delete found files
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ pam_limits_conf_files.files }}"
