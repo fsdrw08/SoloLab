@@ -34,11 +34,11 @@ target_user: "{{ ansible_user }}"
 #       for openrc distro: config cgroup delegate in /etc/rc.conf
 #       according to the setting in vars_cgroups_delegation.all_users.resources
 #     absent:
-#       remove cgroup config with this role own partten (if there)
-#   conf_override: true/false
-#       override the origin cgroup delegation config if there
+#       remove cgroup config with this role own partten (if exist)
+#   present_override: true/false
+#       override the origin cgroup delegation config when state set to present if exist
 #
-# pre_user cgroup delegation settings only work for systemd base distro
+# per_user cgroup delegation settings only work for systemd base distro
 # vars_cgroups_delegation.pre_user: 
 #   skipped: true/false
 #     true:
@@ -53,20 +53,16 @@ target_user: "{{ ansible_user }}"
 #       remove cgroup config with this role own partten (if there)
 # note: if podman package is not there, the cgroup delegate file create by this role 
 #   will also be delete
-
 vars_cgroups_delegation:
   all_users:
     skipped: false
     state: present
-    rc_conf_override: true
+    present_override: true
     resources: cpu cpuset io memory pids
   per_user:
     skipped: true
     state: present
     resources: cpu cpuset io memory pids
-  # state: present
-  # resources: cpu cpuset io memory pids
-  # rc_conf_override: true
 
 
 # background:

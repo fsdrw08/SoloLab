@@ -9,6 +9,8 @@
 - name: Detect podman package
   ansible.builtin.package_facts:
     manager: auto
+  # https://stackoverflow.com/questions/71782925/how-can-we-hide-ignoring-tasks-output-from-ansible-output
+  no_log: true
 
 
 # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
@@ -25,12 +27,6 @@
         (definitive_cgroups_delegation.all_users.skipped is true) 
         and (definitive_cgroups_delegation.per_user.skipped is true) 
       )
-    # - not (
-    #     ('podman' in ansible_facts.packages) 
-    #     and (cgroups_delegation.all_users.skipped is true) 
-    #     and (cgroups_delegation.pre_user.skipped is true) 
-    #   )
-    
 
 
 # https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md#enable-unprivileged-ping
@@ -42,10 +38,6 @@
     file: Set-SysctlParams.yml
   when:
     - definitive_sysctl_params.state != "skipped"
-    # - not (
-    #   ('podman' in ansible_facts.packages) 
-    #     and (sysctl_params.state == "skipped") 
-    #   )
 
 
 # https://github.com/containers/podman/issues/10051
@@ -57,10 +49,6 @@
     file: Set-PAMLimits.yml
   when:
     - definitive_pam_limits.state != "skipped"
-    # - not (
-    #   ('podman' in ansible_facts.packages) 
-    #   and (pam_limits.state == "skipped") 
-    #   )
 
 
 # https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md#etcsubuid-and-etcsubgid-configuration
@@ -72,10 +60,6 @@
     file: Set-SubIDs.yml
   when:
     - definitive_sub_ids.state != "skipped"
-    # - not (
-    #   ('podman' in ansible_facts.packages) 
-    #   and (sub_ids.state == "skipped") 
-    #   )
 
 
 # https://github.com/containers/podman/commit/eab5a4cfb7b3bbb63cd2a1d9a5a69e9bc32d4cef#diff-d77924824df4702948dd3cfd6e377da2eb169d2811b4bfe072061f1f9aee48a0
@@ -87,10 +71,6 @@
     file: Set-KernelModules.yml
   when:
     - definitive_kernel_modules.state != "skipped"
-    # - not (
-    #   ('podman' in ansible_facts.packages) 
-    #   and (kernel_modules.state == "skipped") 
-    #   )
 
 
 - name: Set podman socket service
@@ -106,11 +86,6 @@
         (definitive_service_podman_socket_user_scope.skipped is true) 
           and (definitive_service_podman_socket_system_scope.skipped is true) 
       )
-    # - not (
-    #     ('podman' in ansible_facts.packages) 
-    #     and (service.podman_socket.user_scope.skipped is true) 
-    #     and (service.podman_socket.system_scope.skipped is true) 
-    #   )
 
 
 - name: Set systemd lingering

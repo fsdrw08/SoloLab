@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: kube-1 # kube-2
+- hosts: kube-2 # kube-2
   gather_facts: yes
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
@@ -8,12 +8,19 @@
       ansible.builtin.include_role:
         name: ansible-podman-rootless-provision
       vars:
+        vars_package:
+          podman:
+            state: present
         vars_cgroups_delegation:
           all_users:
             skipped: false
             state: present
-            rc_conf_override: true
-            resources: cpu
+            present_override: true
+            resources: cpu io
+          per_user:
+            skipped: true
+            state: absent
+            resources: io
         # vars_sub_ids:
         #   state: skipped
         # vars_kernel_modules:
