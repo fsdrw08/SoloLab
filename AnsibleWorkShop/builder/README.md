@@ -90,4 +90,9 @@ podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/role
 
 # deploy podman rootless
 podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootless.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootless.yml `
+   -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+   -v ../:/runner localhost/ansible-ee-aio `
+   ansible-runner run /runner -vv
 ```
