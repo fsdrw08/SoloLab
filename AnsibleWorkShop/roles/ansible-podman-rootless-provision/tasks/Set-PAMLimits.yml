@@ -1,7 +1,7 @@
 # code: language=ansible
 ---
 - name: Set PAM limits
-  become: yes
+  become: true
   block:
     - name: Set PAM limits
       community.general.pam_limits:
@@ -25,7 +25,7 @@
     - name: Delete all PAM limits
       when: 
         - definitive_pam_limits.state == "absent"
-        - not (podman in ansible_facts.packages)
+        - not ('podman' in ansible_facts.packages)
       block:
         # https://blog.csdn.net/byygyy/article/details/87822468
         - name: Find related drop-in conf file
