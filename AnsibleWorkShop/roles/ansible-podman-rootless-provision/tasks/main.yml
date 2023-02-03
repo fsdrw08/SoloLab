@@ -24,8 +24,8 @@
     file: Set-CgroupConfig.yml
   when:
     - not (
-        (definitive_cgroups_delegation.all_users.skipped is true) 
-        and (definitive_cgroups_delegation.per_user.skipped is true) 
+        (definitive_cgroups_delegation.all_users.state == "skipped") 
+        and (definitive_cgroups_delegation.per_user.state == "skipped") 
       )
 
 
@@ -83,8 +83,8 @@
     file: Set-PodmanSocketService.yml
   when:
     - not (
-        (definitive_service_podman_socket_user_scope.skipped is true) 
-          and (definitive_service_podman_socket_system_scope.skipped is true) 
+        ( definitive_service_podman_socket_user_scope.state == "skipped" )
+          and ( definitive_service_podman_socket_system_scope.state == "skipped" )
       )
 
 

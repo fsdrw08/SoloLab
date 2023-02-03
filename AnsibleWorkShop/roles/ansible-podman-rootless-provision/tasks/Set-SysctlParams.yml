@@ -1,24 +1,29 @@
 # code: language=ansible
 ---
-- name: Set Sysctl parameters
-  become: yes
-  block:
-    - name: Detect /etc/sysctl.d/{{ role_name }}.conf
-      ansible.builtin.stat:
-        path: /etc/sysctl.d/{{ role_name }}.conf
-      when:
-        - definitive_sysctl_params.state == "present"
-      register: sysctl_podman_rootless_conf
+# Detect
+- name: Detect /etc/sysctl.d/{{ role_name }}.conf
+  ansible.builtin.stat:
+    path: /etc/sysctl.d/{{ role_name }}.conf
+  register: sysctl_podman_rootless_conf
 
-    - name: Create /etc/sysctl.d/podman.conf
+# Present
+- name: Present sysctl params
+  become: true
+  when:
+    - definitive_sysctl_params.state == "present"
+  block:
+    # Create file
+    - name: Create /etc/sysctl.d/{{ role_name }}.conf
       ansible.builtin.file:
         path: /etc/sysctl.d/{{ role_name }}.conf
         state: touch
         mode: u=rw,g=r,o=r
+      become: true
       when:
         - sysctl_podman_rootless_conf.stat.exists is defined
         - sysctl_podman_rootless_conf.stat.exists is false
 
+    # Set sysctl params
     # https://github.com/ahwayakchih/nobbic/blob/82509c475de075670de910f56b550709c4665e08/docs/SetupPodmanOnAlpineHost.markdown#enable-pinging-from-containers
     - name: Set /etc/sysctl.d/{{ role_name }}.conf
       ansible.posix.sysctl:
@@ -28,13 +33,12 @@
         state: present
         reload: true
       loop: "{{ sysctl_params.list }}"
-      when:
-        - sysctl_podman_rootless_conf.stat.exists is defined
-        - sysctl_podman_rootless_conf.stat.exists is true
 
-    - name: Delete /etc/sysctl.d/{{ role_name }}.conf
-      ansible.builtin.file:
-        path: /etc/sysctl.d/{{ role_name }}.conf
-        state: absent
-      when:
-        - definitive_sysctl_params.state == "absent"
+# Absent
+- name: Delete /etc/sysctl.d/{{ role_name }}.conf
+  ansible.builtin.file:
+    path: /etc/sysctl.d/{{ role_name }}.conf
+    state: absent
+  when:
+    - definitive_sysctl_params.state == "absent"
+    - sysctl_podman_rootless_conf.stat.exists is true

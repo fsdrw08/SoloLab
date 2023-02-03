@@ -19,52 +19,54 @@ vars_package:
 target_user: "{{ ansible_user }}"
 
 
+# cgroups_delegation:
 # background: 
 #   https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
 #   https://wiki.archlinux.org/title/Cgroups#User_delegation
+#   https://wiki.gentoo.org/wiki/OpenRC/CGroups#CGroups_version_2_2
+#   https://github.com/containers/podman/issues/11841#issuecomment-933596023
 # vars_cgroups_delegation.all_users: 
-#   skipped: true/false
-#     true:
-#       skip the cgroup delegation config process for all users
-#     false:
-#       implement the cgroup delegation config process for all users
 #   state: present/absent
 #     present:
 #       for systemd distro: config cgroup delegate in /etc/systemd/system/user@.service.d/delegate.conf 
-#       for openrc distro: config cgroup delegate in /etc/rc.conf
 #       according to the setting in vars_cgroups_delegation.all_users.resources
+#       
+#       for openrc distro: config cgroup mode to unified in /etc/rc.conf
 #     absent:
 #       remove cgroup config with this role own partten (if exist)
+#     skipped:
+#       skip the cgroup delegation config process for all users
 #   present_override: true/false
 #       override the origin cgroup delegation config when state set to present if exist
 #
 # per_user cgroup delegation settings only work for systemd base distro
 # vars_cgroups_delegation.pre_user: 
-#   skipped: true/false
+#   : true/false
 #     true:
 #       skip the cgroup delegation config process for each target user
 #     false:
 #       implement the cgroup delegation config process for each target user
-#   state: present/absent
+#   state: present/absent/skipped
 #     present:
 #       for systemd distro: config cgroup delegate in /etc/systemd/system/user@{{ target_user_uid }}.service.d/delegate.conf 
 #       according to the setting in vars_cgroups_delegation.pre_user.resources
 #     absent:
 #       remove cgroup config with this role own partten (if there)
+#     skipped:
+#       skip the cgroup delegation config process for each target user
 # note: if podman package is not there, the cgroup delegate file create by this role 
 #   will also be delete
 vars_cgroups_delegation:
   all_users:
-    skipped: false
     state: present
-    present_override: true
+    present_override: false
     resources: cpu cpuset io memory pids
   per_user:
-    skipped: true
-    state: present
+    state: skipped
     resources: cpu cpuset io memory pids
 
 
+# sysctl_params:
 # background:
 #   https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
 #   https://github.com/containers/podman/blob/main/rootless.md#:~:text=Podman%20can%20not%20create%20containers%20that%20bind%20to%20ports%20%3C%201024
@@ -87,6 +89,7 @@ vars_sysctl_params:
       value: 53
 
 
+# pam_limits:
 # background:
 #   https://github.com/containers/podman/issues/10051
 #   https://phoenixnap.com/kb/ulimit-linux-command
@@ -113,6 +116,7 @@ vars_pam_limits:
       value: -1
 
 
+# sub_ids:
 # background:
 #   https://github.com/containers/podman/blob/main/troubleshooting.md#10-rootless-setup-user-invalid-argument
 # vars_sub_ids.state: present/absent/skipped
@@ -131,6 +135,7 @@ vars_pam_limits:
 #   will be delete
 vars_sub_ids:
   state: present
+  present_override: false
   subuid:
     user: "{{ target_user }}"
     start_from: 100000

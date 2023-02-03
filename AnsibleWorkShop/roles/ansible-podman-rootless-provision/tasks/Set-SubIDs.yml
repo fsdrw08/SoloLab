@@ -1,64 +1,32 @@
 # code: language=ansible
 ---
-- name: Set value in /etc/subuid
-  become: yes
+# Detect files
+- name: Detect /etc/subuid and /etc/subgid
   block:
     - name: Detect subuid file
       ansible.builtin.stat:
         path: /etc/subuid
       register: etc_subuid
 
+    - name: Detect subgid file
+      ansible.builtin.stat:
+        path: /etc/subgid
+      register: etc_subgid
+
+# Present block for sub ids
+- name: Present subuid and subgid
+  become: true
+  when:
+    - definitive_sub_ids.state == "present"
+  block:
+    # Create files
     - name: Create /etc/subuid
       ansible.builtin.file:
         path: /etc/subuid
         state: touch
         mode: u=rw,g=r,o=r
       when:
-        - definitive_sub_ids.state == "present"
         - etc_subuid.stat.exists is false
-
-    # https://stackoverflow.com/questions/29075287/ansible-insert-line-if-not-exists
-    - name: Detect config in /etc/subuid for present
-      ansible.builtin.lineinfile:
-        path: /etc/subuid
-        regexp: "^{{ target_user }}"
-        state: absent
-      when:
-        - definitive_sub_ids.state == "present"
-        - etc_subuid.stat.exists is true
-      check_mode: true
-      changed_when: false
-      register: subuid_target
-
-    - name: Set {{ target_user }} in /etc/subuid
-      ansible.builtin.blockinfile:
-        path: /etc/subuid
-        marker: "# {mark} {{ role_name }} {{ target_user }}"
-        block: |
-          {{ sub_ids.subuid.user }}:{{ sub_ids.subuid.start_from }}:{{ sub_ids.subuid.offset }}
-        state: present
-      when: 
-        - definitive_sub_ids.state == "present"
-        - etc_subuid.stat.exists is true
-        - subuid_target.found == 0
-
-    - name: Remove {{ target_user }} in /etc/subuid
-      ansible.builtin.blockinfile:
-        path: /etc/subuid
-        marker: "# {mark} {{ role_name }} {{ target_user }}"
-        state: absent
-      when: 
-        - definitive_sub_ids.state == "absent"
-        - etc_subuid.stat.exists is true
-
-
-- name: Set value in /etc/subgid
-  become: yes
-  block:
-    - name: Detect subgid file
-      ansible.builtin.stat:
-        path: /etc/subgid
-      register: etc_subgid
 
     - name: Create /etc/subgid
       ansible.builtin.file:
@@ -66,22 +34,78 @@
         state: touch
         mode: u=rw,g=r,o=r
       when:
-        - definitive_sub_ids.state == "present"
         - etc_subgid.stat.exists is false
 
-    - name: Detect config in /etc/subgid
+    # Detect blocks
+    - name: Detect {{ target_user }} subuid_block in /etc/subuid
+      ansible.builtin.blockinfile:
+        path: /etc/subuid
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
+        state: absent
+      check_mode: true
+      changed_when: false
+      register: subuid_block
+
+    - name: Detect {{ target_user }} subgid_block in /etc/subgid
+      ansible.builtin.blockinfile:
+        path: /etc/subgid
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
+        state: absent
+      check_mode: true
+      changed_when: false
+      register: subgid_block
+
+    # Detect lines
+    # https://stackoverflow.com/questions/29075287/ansible-insert-line-if-not-exists
+    - name: Detect {{ target_user }} subuid line in /etc/subuid for present
+      ansible.builtin.lineinfile:
+        path: /etc/subuid
+        regexp: "^{{ target_user }}"
+        state: absent
+      check_mode: true
+      changed_when: false
+      register: subuid_line
+
+    - name: Detect {{ target_user }} subgid line in /etc/subgid for present
       ansible.builtin.lineinfile:
         path: /etc/subgid
         regexp: "^{{ target_user }}"
         state: absent
-      when:
-        - definitive_sub_ids.state == "present"
-        - etc_subgid.stat.exists is true
       check_mode: true
       changed_when: false
-      register: subgid_target
+      register: subgid_line
 
-    - name: Set {{ target_user }} in /etc/subgid
+    # Comment out origin one
+    - name: Comment out previous {{ target_user }} subuid line subgid line for override
+      ansible.builtin.replace:
+        path: "{{ item.path }}"
+        regexp: "{{ item.regexp }}"
+        replace: '# comment by {{ role_name }} \1'
+      loop:
+        - path: /etc/subuid
+          regexp: '^\s*({{ sub_ids.subuid.user }}.*)'
+        - path: /etc/subgid
+          regexp: '^\s*({{ sub_ids.subgid.user }}.*)'
+      when:
+        - sub_ids.present_override is true
+
+    # Set blocks
+    - name: Set {{ target_user }} subuid_block in /etc/subuid
+      ansible.builtin.blockinfile:
+        path: /etc/subuid
+        marker: "# {mark} {{ role_name }} {{ target_user }}"
+        block: |
+          {{ sub_ids.subuid.user }}:{{ sub_ids.subuid.start_from }}:{{ sub_ids.subuid.offset }}
+        state: present
+      when: 
+        - not (
+            sub_ids.present_override is false
+            and not 'Block removed' in subuid_block.msg
+            and subuid_line.found is defined
+            and subuid_line.found != 0
+          )
+
+    - name: Set {{ target_user }} subgid_block in /etc/subgid
       ansible.builtin.blockinfile:
         path: /etc/subgid
         marker: "# {mark} {{ role_name }} {{ target_user }}"
@@ -89,15 +113,40 @@
           {{ sub_ids.subgid.group }}:{{ sub_ids.subgid.start_from }}:{{ sub_ids.subgid.offset }}
         state: present
       when: 
-        - definitive_sub_ids.state == "present"
-        - etc_subgid.stat.exists is true
-        - subgid_target.found == 0
-
-    - name: Remove {{ target_user }} in /etc/subgid
+        - not (
+            sub_ids.present_override is false
+            and not 'Block removed' in subgid_block.msg
+            and subgid_line.found is defined
+            and subgid_line.found != 0
+          )
+    
+# Absent block for sub ids
+- name: Absent subuid and subgid
+  become: true
+  when:
+    - definitive_sub_ids.state == "absent"
+    - etc_subuid.stat.exists is true
+    - etc_subgid.stat.exists is true
+  block:
+    # Remove blocks
+    - name: Remove {{ target_user }} subuid_block in /etc/subuid and subgid_block in /etc/subgid
       ansible.builtin.blockinfile:
-        path: /etc/subgid
+        path: "{{ item }}"
         marker: "# {mark} {{ role_name }} {{ target_user }}"
         state: absent
-      when: 
-        - definitive_sub_ids.state == "absent"
-        - etc_subgid.stat.exists is true
+      loop:
+        - /etc/subuid
+        - /etc/subgid
+
+    # Uncomment lines
+    - name: Uncomment {{ target_user }} subuid line in /etc/subuid
+      ansible.builtin.replace:
+        path: "{{ item.path }}"
+        regexp: "{{ iteam.regexp }}"
+        replace: '\1'
+      loop:
+        - path: /etc/subuid
+          regexp: '^\s*# comment by {{ role_name }} ({{ sub_ids.subuid.user }}.*)'
+        - path: /etc/subgid
+          regexp: '^\s*# comment by {{ role_name }} ({{ sub_ids.subgid.user }}.*)'
+

@@ -17,13 +17,11 @@ package: "{{ defaults_package | ansible.builtin.combine(vars_package, recursive=
 #--- cgroups_delegation
 defaults_cgroups_delegation:
   all_users:
-    skipped: false
     state: present
-    present_override: true
+    present_override: false
     resources: cpu cpuset memory pids
   per_user:
-    skipped: false
-    state: present
+    state: skipped
     resources: io
 
 cgroups_delegation: "{{ defaults_cgroups_delegation | ansible.builtin.combine(vars_cgroups_delegation, recursive=True) }}"
@@ -80,6 +78,7 @@ switch_pam_limits:
 #--- sub_ids
 defaults_sub_ids:
   state: present
+  present_override: false
   subuid:
     user: "{{ target_user }}"
     start_from: 100000
