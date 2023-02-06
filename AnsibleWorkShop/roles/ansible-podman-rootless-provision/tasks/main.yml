@@ -73,6 +73,24 @@
     - definitive_kernel_modules.state != "skipped"
 
 
+- name: Set podman configuration files
+  vars:
+    case_app_config_podman_containers_conf: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
+    definitive_app_config_podman_containers_conf: "{{ lookup('list', switch_app_config_podman_containers_conf)[case_app_config_podman_containers_conf] }}"
+    case_app_config_podman_storage_conf: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
+    definitive_app_config_podman_storage_conf: "{{ lookup('list', switch_app_config_podman_storage_conf)[case_app_config_podman_storage_conf] }}"
+    case_app_config_podman_registries_conf: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
+    definitive_app_config_podman_registries_conf: "{{ lookup('list', switch_app_config_podman_registries_conf)[case_app_config_podman_registries_conf] }}"
+  ansible.builtin.include_tasks:
+    file: Set-PodmanConfig.yml
+  when:
+    - not (
+        ( definitive_app_config_podman_containers_conf.state is true )
+        and ( definitive_app_config_podman_storage_conf.state is true )
+        and ( definitive_app_config_podman_registries_conf.state is true )
+      )
+
+
 - name: Set podman socket service
   vars:
     case_service_podman_socket_user_scope: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
@@ -83,8 +101,8 @@
     file: Set-PodmanSocketService.yml
   when:
     - not (
-        ( definitive_service_podman_socket_user_scope.state == "skipped" )
-          and ( definitive_service_podman_socket_system_scope.state == "skipped" )
+        ( definitive_service_podman_socket_user_scope.skipped is true )
+        and ( definitive_service_podman_socket_system_scope.skipped is true )
       )
 
 

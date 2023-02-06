@@ -29,9 +29,12 @@
   when:
     - ansible_service_mgr == "openrc"
   block:
+    # Present podman socket user scope service
     - name: Set openrc user scope podman socket service
+      become: true
       when:
         - definitive_service_podman_socket_user_scope.skipped is false
+        - definitive_service_podman_socket_user_scope.enabled is true
       block:
         - name: Create openrc script folder in home directory
           ansible.builtin.file:
@@ -40,8 +43,6 @@
             owner: "{{ target_user }}"
             group: "{{ target_user }}"
             mode: u=rwx,g=r,o=rx
-          when:
-            - definitive_service_podman_socket_user_scope.enabled is true
 
         # https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/podman/podman.initd
         # https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/podman/podman.confd
@@ -53,16 +54,6 @@
             owner: "{{ target_user }}"
             group: "{{ target_user }}"
             mode: u=rwx,g=r,o=r
-          when:
-            - definitive_service_podman_socket_user_scope.enabled is true
-
-        - name: Delete podman rootless socket service related openrc script and config
-          # https://wiki.archlinux.org/title/Cgroups
-          ansible.builtin.file:
-            path: "/home/{{ target_user }}/{{ role_name }}/openrc/"
-            state: absent
-          when:
-            - definitive_service_podman_socket_user_scope.enabled is false
 
         - name: Link podman rootless socket service related openrc script
           ansible.builtin.file:
@@ -74,10 +65,27 @@
               dest: "/etc/init.d/podman-rootless-{{ target_user }}-socket"
             - src: "/home/{{ target_user }}/{{ role_name }}/openrc/podman-rootless-{{ target_user }}-socket.confd"
               dest: "/etc/conf.d/podman-rootless-{{ target_user }}-socket"
-          become: true
-          when:
-            - definitive_service_podman_socket_user_scope.enabled is true
-
+          
+        # https://gist.github.com/danmack/53eaea4353d6b3dcfd20238741557290
+        - name: Set openrc podman socket user scope service
+          ansible.builtin.service:
+            name: "podman-rootless-{{ target_user }}-socket"
+            enabled: "{{ definitive_service_podman_socket_user_scope.enabled }}"
+            state: "{{ definitive_service_podman_socket_user_scope.state }}"
+    
+    # Absent podman socket user scope service
+    - name: Set openrc user scope podman socket service
+      become: true
+      when:
+        - definitive_service_podman_socket_user_scope.skipped is false
+        - definitive_service_podman_socket_user_scope.enabled is false
+      block:
+        - name: Delete podman rootless socket service related openrc script and config
+          # https://wiki.archlinux.org/title/Cgroups
+          ansible.builtin.file:
+            path: "/home/{{ target_user }}/{{ role_name }}/openrc/"
+            state: absent
+          
         - name: Unlink podman rootless socket service related openrc script
           ansible.builtin.file:
             path: "{{ item }}"
@@ -85,18 +93,9 @@
           loop:
             - "/etc/init.d/podman-rootless-{{ target_user }}-socket"
             - "/etc/conf.d/podman-rootless-{{ target_user }}-socket"
-          become: true
-          when:
-            - definitive_service_podman_socket_user_scope.enabled is false
+          
 
-        # https://gist.github.com/danmack/53eaea4353d6b3dcfd20238741557290
-        - name: Set openrc podman socket user scope service
-          ansible.builtin.service:
-            name: "podman-rootless-{{ target_user }}-socket"
-            enabled: "{{ definitive_service_podman_socket_user_scope.enabled }}"
-            state: "{{ definitive_service_podman_socket_user_scope.state }}"
-          become: true
-    
+    # Set podman socket system scope service
     - name: Set openrc system scope podman socket service
       ansible.builtin.service:
         name: podman

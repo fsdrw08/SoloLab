@@ -1,0 +1,123 @@
+# code: language=ansible
+---
+- name: Set Podman containers.conf
+  when:
+    - definitive_app_config_podman_containers_conf.state != "skipped"
+  block:
+    - name: Detect Podman containers.conf
+      ansible.builtin.stat:
+        path: "{{ app_config.podman.containers_conf.path }}"
+      register: podman_containers_conf
+
+    - name: Present Podman containers.conf
+      when:
+        - definitive_app_config_podman_containers_conf.state == "present"
+      block:
+        - name: Create {{ app_config.podman.containers_conf.path }}
+          ansible.builtin.file:
+            path: "{{ app_config.podman.containers_conf.path }}"
+            state: touch
+            mode: u=rw,g=r,o=r
+          become: true
+          when:
+            - podman_containers_conf.stat.exists is defined
+            - podman_containers_conf.stat.exists is false
+
+        - name: Set content in {{ app_config.podman.containers_conf.path }}
+          ansible.builtin.blockinfile:
+            path: "{{ app_config.podman.containers_conf.path }}"
+            marker: "# {mark} {{ role_name }}"
+            block: |
+              {{ app_config.podman.containers_conf.content }}
+            state: present
+
+    - name: Absent Podman containers.conf
+      ansible.builtin.file:
+        path: "{{ app_config.podman.containers_conf.path }}"
+        state: absent
+      when:
+        - definitive_app_config_podman_containers_conf.state == "absent"
+        - podman_containers_conf.stat.exists is defined
+        - podman_containers_conf.stat.exists is true
+
+
+- name: Set Podman storage.conf
+  when:
+    - definitive_app_config_podman_storage_conf.state != "skipped"
+  block:
+    - name: Detect Podman storage.conf
+      ansible.builtin.stat:
+        path: "{{ app_config.podman.storage_conf.path }}"
+      register: podman_storage_conf
+
+    - name: Present Podman storage.conf
+      when:
+        - definitive_app_config_podman_storage_conf.state == "present"
+      block:
+        - name: Create {{ app_config.podman.storage_conf.path }}
+          ansible.builtin.file:
+            path: "{{ app_config.podman.storage_conf.path }}"
+            state: touch
+            mode: u=rw,g=r,o=r
+          become: true
+          when:
+            - podman_storage_conf.stat.exists is defined
+            - podman_storage_conf.stat.exists is false
+
+        - name: Set content in {{ app_config.podman.storage_conf.path }}
+          ansible.builtin.blockinfile:
+            path: "{{ app_config.podman.storage_conf.path }}"
+            marker: "# {mark} {{ role_name }}"
+            block: |
+              {{ app_config.podman.storage_conf.content }}
+            state: present
+
+    - name: Absent Podman storage.conf
+      ansible.builtin.file:
+        path: "{{ app_config.podman.storage_conf.path }}"
+        state: absent
+      when:
+        - definitive_app_config_podman_storage_conf.state == "absent"
+        - podman_storage_conf.stat.exists is defined
+        - podman_storage_conf.stat.exists is true
+
+
+- name: Set Podman registries.conf
+  when:
+    - definitive_app_config_podman_registries_conf.state != "skipped"
+  block:
+    - name: Detect Podman registries.conf
+      ansible.builtin.stat:
+        path: "{{ app_config.podman.registries_conf.path }}"
+      register: podman_registries_conf
+
+    - name: Present Podman registries.conf
+      when:
+        - definitive_app_config_podman_registries_conf.state == "present"
+      block:
+        - name: Create {{ app_config.podman.registries_conf.path }}
+          ansible.builtin.file:
+            path: "{{ app_config.podman.registries_conf.path }}"
+            state: touch
+            mode: u=rw,g=r,o=r
+          become: true
+          when:
+            - podman_registries_conf.stat.exists is defined
+            - podman_registries_conf.stat.exists is false
+
+        - name: Set content in {{ app_config.podman.registries_conf.path }}
+          ansible.builtin.blockinfile:
+            path: "{{ app_config.podman.registries_conf.path }}"
+            marker: "# {mark} {{ role_name }}"
+            block: |
+              {{ app_config.podman.registries_conf.content }}
+            state: present
+
+    - name: Absent Podman registries.conf
+      ansible.builtin.file:
+        path: "{{ app_config.podman.registries_conf.path }}"
+        state: absent
+      when:
+        - definitive_app_config_podman_registries_conf.state == "absent"
+        - podman_registries_conf.stat.exists is defined
+        - podman_registries_conf.stat.exists is true
