@@ -9,9 +9,9 @@ param (
 #Verify the pre-request
 @"
 packer
-dos2unix
+mkisofs
 "@ -split "`r`n" | ForEach-Object {
-  if (!(Get-Command $_)) {
+  if (-not (Get-Command $_)) {
     [bool]$Ready = $false
   }
   $Ready
@@ -20,14 +20,14 @@ dos2unix
 # Build images
 if ($Ready -ne $false) {
   # Convert dos format to unix format
-  "dos2unix"
-  Get-ChildItem -Path $PSScriptRoot -Recurse -Filter "*.sh" `
-    | Select-Object -ExpandProperty VersionInfo `
-    | Select-Object -ExpandProperty filename `
-    | ForEach-Object {
-      #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
-      dos2unix $_
-    }
+  # "dos2unix"
+  # Get-ChildItem -Path $PSScriptRoot -Recurse -Filter "*.sh" `
+  #   | Select-Object -ExpandProperty VersionInfo `
+  #   | Select-Object -ExpandProperty filename `
+  #   | ForEach-Object {
+  #     #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
+  #     dos2unix $_
+  #   }
 
   # Get Start Time
   $startDTM = (Get-Date)
