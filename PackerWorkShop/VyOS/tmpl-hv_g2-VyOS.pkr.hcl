@@ -101,6 +101,16 @@ variable "vm_name" {
   default = ""
 }
 
+// https://github.com/hashicorp/packer-plugin-hyperv/issues/65
+packer {
+  required_plugins {
+    hyperv = {
+      version = ">= 1.0.4"
+      source  = "github.com/hashicorp/hyperv"
+    }
+  }
+}
+
 source "hyperv-iso" "vm" {
   boot_command          = "${var.boot_command}"
   boot_wait             = "2s"
