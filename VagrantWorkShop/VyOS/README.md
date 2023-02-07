@@ -3,6 +3,8 @@ Set internal switch net adapter profile to private
 sudo Set-NetConnectionProfile -InterfaceAlias *Internal* -NetworkCategory Private
 ```
 
+config net adapter interface metric before `vagrant up`
+
 to install clash and config as transparnt proxy into the VYOS box, run following command in the vm:
 
 ```shell
@@ -13,10 +15,13 @@ or
 ```shell
 mkdir ~/.local/share -p
 bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
+# 当前用户目录下安装(适合非root用户)
 source ~/.bashrc
 clash
 #
-主路由
+# 主路由
+# 2 - 纯净模式
+# 9 更新/卸载 - 4 安装本地Dashboard面板 - ...
 bash ~/finalConfig.sh
 ```
 settings for reuse

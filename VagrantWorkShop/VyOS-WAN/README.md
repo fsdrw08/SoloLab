@@ -1,3 +1,7 @@
+**Deprecated**
+Use Vyos instead
+
+
 to install clash and config as transparnt proxy into the VYOS box, run following command in the vm:
 
 `sudo su`
