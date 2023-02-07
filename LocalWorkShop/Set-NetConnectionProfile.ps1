@@ -1,1 +1,1 @@
-sudo Set-NetConnectionProfile -InterfaceAlias *internal* -NetworkCategory private
+Set-NetConnectionProfile -InterfaceAlias *internal* -NetworkCategory private
