@@ -13,8 +13,10 @@ bash -c "$(cat /tmp/install.sh)"  && source /etc/profile &> /dev/null
 ```
 or
 ```shell
-mkdir ~/.local/share -p
-bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
+# mkdir ~/.local/share -p
+# bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
+sudo su
+bash -c "$(cat /home/vagrant/install-clash.sh)"  && source /etc/profile &> /dev/null
 # 当前用户目录下安装(适合非root用户)
 source ~/.bashrc
 clash
