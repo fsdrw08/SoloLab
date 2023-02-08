@@ -47,6 +47,15 @@ variable "iso_url" {
   default = ""
 }
 
+variable "cd_files" {
+  type    = list(string)
+}
+
+variable "cd_label" {
+  type    = string
+  default = "cidata"
+}
+
 variable "output_directory" {
   type    = string
   default = ""
@@ -111,9 +120,15 @@ source "hyperv-iso" "vm" {
   secure_boot_template  = "MicrosoftUEFICertificateAuthority"
   generation            = 2
   guest_additions_mode  = "disable"
-  http_directory        = "./http"
+  // http_directory        = "./http"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
+  // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
+  // https://wiki.debian.org/CDDVD
+  // https://github.com/brantleyp1/packer-image-builder/blob/dec07815501f30f2f96a653805048af5193ed333/vsphere.pkr.hcl
+  // https://github.com/brantleyp1/packer-image-builder/blob/dec07815501f30f2f96a653805048af5193ed333/rocky8.pkrvars.hcl
+  cd_files              = "${var.cd_files}"
+  cd_label              = "${var.cd_label}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
   skip_export           = "false"
