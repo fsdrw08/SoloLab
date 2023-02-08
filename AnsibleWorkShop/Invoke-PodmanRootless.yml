@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: kube-2 # kube-2
+- hosts: kube-1 # kube-2
   gather_facts: yes
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
@@ -22,10 +22,10 @@
         vars_sub_ids:
           state: present
           present_override: false
-        # vars_kernel_modules:
-        #   state: skipped
-        # vars_pam_limits:
-        #   state: present
+        vars_app_config:
+          podman:
+            containers_conf:
+              state: present
     # - name: whoami
     #   shell:
     #     cmd: id -u

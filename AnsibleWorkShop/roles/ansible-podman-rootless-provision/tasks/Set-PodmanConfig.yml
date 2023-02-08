@@ -15,10 +15,15 @@
       block:
         - name: Create {{ app_config.podman.containers_conf.path }}
           ansible.builtin.file:
-            path: "{{ app_config.podman.containers_conf.path }}"
-            state: touch
-            mode: u=rw,g=r,o=r
-          become: true
+            path: "{{ item.path }}"
+            state: "{{ item.state }}"
+            mode: u=rwx,g-rwx,o-rwx
+          loop:
+            - path: "{{ app_config.podman.containers_conf.path | replace(app_config.podman.containers_conf.path.split('/')[-1],'')}}"
+              state: directory
+            - path: "{{ app_config.podman.containers_conf.path }}"
+              state: touch
+          become_user: "{{ target_user }}"
           when:
             - podman_containers_conf.stat.exists is defined
             - podman_containers_conf.stat.exists is false

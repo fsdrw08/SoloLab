@@ -115,7 +115,7 @@ defaults_app_config:
   podman:
     containers_conf:
       state: skipped
-      path: /home/{{ target_user }}/.conf/containers/containers.conf.d/{{ role_name }}.conf
+      path: /home/{{ target_user }}/.config/containers/containers.conf.d/{{ role_name }}.conf
       content: |
         [containers]
         # log_driver="k8s-file"
@@ -123,11 +123,11 @@ defaults_app_config:
         userns = "keep-id"
     storage_conf:
       state: skipped
-      path: /home/{{ target_user }}/.conf/containers/storage.conf
+      path: /home/{{ target_user }}/.config/containers/storage.conf
       content:
     registries_conf:
       state: skipped
-      path: /home/{{ target_user }}/.conf/containers/registries.conf
+      path: /home/{{ target_user }}/.config/containers/registries.conf
       content:
 
 app_config: "{{ defaults_app_config | ansible.builtin.combine(vars_app_config, recursive=True) }}"
