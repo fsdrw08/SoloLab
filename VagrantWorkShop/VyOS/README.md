@@ -17,15 +17,20 @@ or
 # bash -c "$(cat ~/install-clash.sh)"  && source /etc/profile &> /dev/null
 sudo su
 bash -c "$(cat /home/vagrant/install-clash.sh)"  && source /etc/profile &> /dev/null
-# 当前用户目录下安装(适合非root用户)
+#  2 在/usr/share目录下安装(适合Linux系统)
+echo "alias clash=\"bash /usr/share/clash/clash.sh\"" >> ~/.bashrc
+echo "export clashdir=\"/usr/share/clash\"" >> ~/.bashrc
 source ~/.bashrc
 clash
-#
-# 主路由
-# 2 - 纯净模式
-# 9 更新/卸载 - 4 安装本地Dashboard面板 - ...
+# 1  路由设备配置局域网透明代理
+# ...
+# 2 clash功能设置 -> 1 切换Clash运行模式: -> 2 混合模式： Redir转发TCP，Tun转发UDP / 7 Nft混合：使用nft_tproxy转发
+# 2 clash功能设置 ->  6 设置本机代理服务:    未开启   ————使本机流量经过clash内核
+TCP&UDP
 bash ~/finalConfig.sh
+# 当前用户目录下安装(适合非root用户)
 ```
+
 settings for reuse
 ```
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start 192.168.255.10
