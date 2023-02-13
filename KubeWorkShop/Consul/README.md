@@ -12,6 +12,9 @@ podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
     --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml \
     --userns=keep-id
 
+podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_pvc.yaml \
+    --configmap /var/vagrant/KubeWorkShop/Consul/cm-consul.yaml \
+    --userns=keep-id
 
 mkdir -p $HOME/.local/share/containers/log/
 podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
