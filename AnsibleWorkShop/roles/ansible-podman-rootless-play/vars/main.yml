@@ -1,11 +1,65 @@
+# code: language=ansible
 ---
 # vars file for ansible-podman-rootless-play
-kube_state:
 
-kube_file:
-  src:
-  dest:
+# containers.podman.podman_network
+# https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_network_module.html#ansible-collections-containers-podman-podman-network-module
+vars_podman_network:
+  debug: false
+  disable_dns: false
+  driver: bridge
+  executable: podman
+  gateway:
+  internal: false
+  ip_range:
+  ipv6: false
+  macvlan:
+  # required
+  name: test
+  opt:
+  recreate: false
+  # required
+  state: skipped
+  subnet:
 
-configmap_files:
-  - src:
-    dest:
+# containers.podman.podman_volume
+# https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_volume_module.html#ansible-collections-containers-podman-podman-volume-module
+vars_podman_volume:
+  driver: local
+  executable: podman
+  label:
+    app: test
+  # required
+  name: test
+  options:
+    - o=timeout=10
+  recreate: false
+  # required
+  state: skipped
+
+# containers.podman.podman_play
+# https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_play_module.html#ansible-collections-containers-podman-podman-play-module
+vars_podman_play:
+  authfile: ${XDG_RUNTIME_DIR}/containers/auth.json
+  cert_dir: /etc/containers/certs.d
+  # https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
+  configmap:
+    # - /path/to/configmap1
+    # - /path/to/configmap2
+  debug: false
+  executable: podman
+  # required
+  kube_file: /path/to/kube_file
+  log_driver: journald
+  log_level: error
+  network:
+    - podman
+  password:
+  quiet: false
+  recreate: false
+  seccomp_profile_root: /var/lib/kubelet/seccomp
+  # required
+  state: started
+  tls_verify: false
+  username:
+    

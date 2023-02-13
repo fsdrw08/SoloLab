@@ -22,7 +22,7 @@ defaults_cgroups_delegation:
     resources: cpu cpuset memory pids
   per_user:
     state: skipped
-    resources: io
+    resources: cpu cpuset io memory pids
 
 cgroups_delegation: "{{ defaults_cgroups_delegation | ansible.builtin.combine(vars_cgroups_delegation, recursive=True) }}"
 

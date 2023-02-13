@@ -1,2 +1,24 @@
+# code: language=ansible
 ---
 # defaults file for ansible-podman-rootless-play
+
+role_name: ansible-podman-rootless-play
+
+#--- podman network
+defaults_podman_network:
+  name: "{{ role_name }}"
+  state: skipped
+
+podman_network: "{{ defaults_podman_network | ansible.builtin.combine(vars_podman_network, recursive=True) }}"
+
+
+#--- podman volume
+defaults_podman_volume:
+  state: skipped
+
+podman_volume: "{{ defaults_podman_volume | ansible.builtin.combine(vars_podman_volume, recursive=True) }}"
+
+
+#--- podman_play
+defaults_podman_play:
+  state: skipped

@@ -1,2 +1,55 @@
+# code: language=ansible
 ---
 # tasks file for ansible-podman-rootless-play
+- name: Set podman network
+  containers.podman.podman_network:
+    debug: "{{ podman_network.debug | default(omit) }}"
+    disable_dns: "{{ podman_network.disable_dns | default(omit) }}"
+    driver: "{{ podman_network.driver | default(omit) }}"
+    executable: "{{ podman_network.executable | default(omit) }}"
+    gateway: "{{ podman_network.gateway | default(omit) }}"
+    internal: "{{ podman_network.internal | default(omit) }}"
+    ip_range: "{{ podman_network.ip_range | default(omit) }}"
+    ipv6: "{{ podman_network.ipv6 | default(omit) }}"
+    macvlan: "{{ podman_network.macvlan | default(omit) }}"
+    name: "{{ podman_network.name }}"
+    opt: "{{ podman_network.opt | default(omit) }}"
+    recreate: "{{ podman_network.recreate | default(omit) }}"
+    state: "{{ podman_network.state }}"
+    subnet: "{{ podman_network.subnet | default(omit) }}"
+  when:
+    - podman_network.state != "skipped"
+
+- name: Set Podman volume
+  containers.podman.podman_volume:
+    debug: "{{ podman_volume.debug | default(omit) }}"
+    driver: "{{ podman_volume.driver | default(omit) }}"
+    executable: "{{ podman_volume.executable | default(omit) }}"
+    label: "{{ podman_volume.label | default(omit) }}"
+    name: "{{ podman_volume.name }}"
+    options: "{{ podman_volume | default(omit) }}"
+    recreate: "{{ podman_volume.recreate | default(omit) }}"
+    state: "{{ podman_volume.state }}"
+  when:
+    - podman_volume.state != "skipped"
+
+- name: Run Podman play
+  containers.podman.podman_play:
+    authfile: "{{ podman_play.authfile | default(omit) }}"
+    cert_dir: "{{ podman_play.cert_dir | default(omit) }}"
+    configmap: "{{ podman_play.configmap | default(omit) }}"
+    debug: "{{ podman_play.debug | default(omit) }}"
+    executable: "{{ podman_play.executable | default(omit) }}"
+    kube_file: "{{ podman_play.kube_file }}"
+    log_driver: "{{ podman_play.log_driver | default(omit) }}"
+    log_level: "{{ podman_play.log_level | default(omit) }}"
+    network: "{{ podman_play.network | default(omit) }}"
+    password: "{{ podman_play.password | default(omit) }}"
+    quiet: "{{ podman_play.quiet | default(omit) }}"
+    recreate: "{{ podman_play.recreate | default(omit) }}"
+    seccomp_profile_root: "{{ podman_play.seccomp_profile_root | default(omit) }}"
+    state: "{{ podman_play.state }}"
+    tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
+    username: "{{ podman_play.username | default(omit) }}"
+  when:
+    - podman_volume.podman_play != "skipped"
