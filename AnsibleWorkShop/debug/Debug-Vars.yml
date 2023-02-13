@@ -28,8 +28,8 @@
       vars:
         vars_test:
           test1: 
-            - name: 11
-              value: 45
+            - name: 12
+              value: 
         vars_test2:
           test2: "{{ default_test.test2 }}"
         subitem: test1
