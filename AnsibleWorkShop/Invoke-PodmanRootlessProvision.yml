@@ -10,7 +10,7 @@
       vars:
         vars_package:
           podman:
-            state: latest
+            state: present
             dnf:
               enablerepo: updates-testing
               update_cache: true
@@ -29,6 +29,11 @@
           podman:
             containers_conf:
               state: present
+              content: |
+                [containers]
+                # log_driver="k8s-file"
+                # log_size_max="10m"
+                tz = "Asia/Shanghai"
     # - name: whoami
     #   shell:
     #     cmd: id -u

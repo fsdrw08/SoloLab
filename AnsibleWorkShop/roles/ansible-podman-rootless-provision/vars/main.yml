@@ -10,12 +10,14 @@
 #     uninstall podman package
 #   skipped: 
 #     skip the implement the podman package task
+# vars_package.podman.dnf:
+#   dnf related config to install podman for special requirement, e.g. install the latest version from update testing repo
 vars_package:
   podman:
     state: present
     dnf:
-      enablerepo: updates-testing
-      update_cache: true
+      enablerepo: # updates-testing
+      update_cache: # true
 
 
 # target user to run rootless podman
@@ -180,12 +182,14 @@ vars_app_config:
   podman:
     containers_conf:
       state: skipped
-      path: /home/{{ target_user }}/.config/containers/containers.conf.d/{{ role_name }}.conf
+      # path: /home/{{ target_user }}/.config/containers/containers.conf.d/{{ role_name }}.conf
+      # dir: /home/{{ target_user }}/.config/containers/containers.conf.d/
+      file_name: "{{ role_name }}.conf"
       content: |
         [containers]
         # log_driver="k8s-file"
         # log_size_max="10m"
-        userns = "keep-id"
+        # tz = "Asia/Shanghai"
     storage_conf:
       state: skipped
       path: /home/{{ target_user }}/.config/containers/storage.conf
