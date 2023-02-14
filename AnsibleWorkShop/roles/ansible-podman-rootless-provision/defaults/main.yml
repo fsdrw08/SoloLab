@@ -118,9 +118,7 @@ defaults_app_config:
   podman:
     containers_conf:
       state: skipped
-      # path: /home/{{ target_user }}/.config/containers/containers.conf.d/{{ role_name }}.conf
-      dir: /home/{{ target_user }}/.config/containers/containers.conf.d/
-      file_name: "{{ role_name }}.conf"
+      path: /home/{{ target_user }}/.config/containers/containers.conf.d/{{ role_name }}.conf
       content: |
         [containers]
         # log_driver="k8s-file"
