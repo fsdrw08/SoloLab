@@ -1,4 +1,16 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lldap
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: default
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: lldap
@@ -10,9 +22,12 @@ spec:
   containers:
     - name: lldap
       image: docker.io/nitnelave/lldap:latest
+      # securityContext:
+      #   runAsUser: 1000
+      #   runAsGroup: 1000
       env:
-        - name: TZ
-          value: Asia/Shanghai
+        # - name: TZ
+        #   value: Asia/Shanghai
         - name: LLDAP_JWT_SECRET
           value: REPLACE_WITH_RANDOM
         - name: LLDAP_LDAP_USER_PASS
@@ -30,9 +45,11 @@ spec:
         - name: lldap_data
           mountPath: /data
   volumes:
+    # - name: lldap_data
+    #   hostPath:
+    #     path: /home/vagrant/infra/lldap/data
+    #     type: Directory
     - name: lldap_data
-      hostPath:
-        path: /home/vagrant/infra/lldap/data
-        type: Directory
-
+      persistentVolumeClaim:
+        claimName: lldap
   restartPolicy: Never

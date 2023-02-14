@@ -5,6 +5,9 @@ Deploy the container
 podman network create ldap_net
 mkdir -p $HOME/infra/lldap/data
 podman kube play /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml 
+podman kube play /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml \
+    --userns=keep-id
+
 cp /var/vagrant/KubeWorkShop/Traefik/conf/dynamic/traefik-lldap.yaml $HOME/infra/traefik/dynamic/
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/LLDAP/pod-lldap.yaml
