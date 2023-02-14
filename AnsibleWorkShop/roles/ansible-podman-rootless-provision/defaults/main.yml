@@ -9,6 +9,9 @@ role_name: ansible-podman-rootless-provision
 defaults_package:
   podman:
     state: present
+    dnf:
+      enablerepo: # updates-testing
+      update_cache: # true
 
 # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html#combining-hashes-dictionaries
 package: "{{ defaults_package | ansible.builtin.combine(vars_package, recursive=True) }}"

@@ -13,6 +13,9 @@
 vars_package:
   podman:
     state: present
+    dnf:
+      enablerepo: updates-testing
+      update_cache: true
 
 
 # target user to run rootless podman

@@ -10,7 +10,10 @@
       vars:
         vars_package:
           podman:
-            state: present
+            state: latest
+            dnf:
+              enablerepo: updates-testing
+              update_cache: true
         vars_cgroups_delegation:
           all_users:
             state: present

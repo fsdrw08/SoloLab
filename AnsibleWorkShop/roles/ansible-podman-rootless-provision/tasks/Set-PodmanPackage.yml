@@ -1,8 +1,22 @@
 # code: language=ansible
 ---
-- name: "{{ package.podman.state }} Podman package"
+- name: "{{ package.podman.state }} Podman package in non-dnf pkg mgr system"
   ansible.builtin.package:
     name:
       - podman
     state: "{{ package.podman.state }}"
   become: true
+  when:
+    - ansible_pkg_mgr != "dnf"
+
+- name: "{{ package.podman.state }} Podman package in dnf pkg mgr system"
+  ansible.builtin.dnf:
+    name:
+      - podman
+    state: "{{ package.podman.state }}"
+    # https://fedoraproject.org/wiki/QA:Updates_Testing#Enabling_the_repositories_temporarily
+    enablerepo: "{{ package.podman.dnf.enablerepo | default(omit) }}"
+    update_cache: "{{ package.podman.dnf.update_cache | default(omit) }}"
+  become: true
+  when:
+    - ansible_pkg_mgr == "dnf"

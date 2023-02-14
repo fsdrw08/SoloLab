@@ -1,4 +1,8 @@
 sudo dnf install podman -y
+# or
+# https://fedoraproject.org/wiki/QA:Updates_Testing#Enabling_the_repositories_temporarily
+sudo dnf install podman --enablerepo=updates-testing,updates-testing-modular --best
+
 
 # Start Podman’s API so that Cockpit can interact with it
 sudo systemctl enable --now podman.socket
