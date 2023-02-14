@@ -17,23 +17,46 @@
         test22: 22
       test3: no
   tasks:
-    - name: test
-      ansible.builtin.debug:
-        msg: 
-          - "{{ vars_test2 }}"
-          - "{{ default_test | combine(vars_test, recursive=True) }}"
-          - "{{ lookup_test }}"
-          - "{{ bool_test }}"
-        # var: bool_test
+    # - name: Update fact
+    #   ansible.utils.update_fact:
+    #     updates:
+    #       - path: default_test.test2.test23
+    #         value: 23
+    #   register: default_test_updated
+    - name: Set fact
+      set_fact:
+        default_test: "{{ default_test | combine(new_var, recursive=true) }}"
+        # default_test: "{{ default_test | combine({ 'test2' : { 'test23' : 23 } }, recursive=True) }}"
       vars:
-        vars_test:
-          test1: 
-            - name: 12
-              value: 
-        vars_test2:
-          test2: "{{ default_test.test2 }}"
-        subitem: test1
-        lookup_test: "{{ lookup('list',default_test)[subitem] }}"
-        combine_test: "{{ default_test | combine(vars_test, recursive=True, list_merge='replace') }}"
-        # combine_test2: "{{ default_test | combine(vars_test2, recursive=True, list_merge='replace') }}"
-        bool_test: "{{ default_test.test3 | bool }}"
+        # https://www.jeffgeerling.com/blog/2017/changing-deeply-nested-dict-variable-ansible-playbook
+        new_var: 
+          "{{ 
+            {
+              'test2' : { 
+                'test23' : 23 
+              } 
+            } 
+          }}"
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ default_test }}"
+    # - name: test
+    #   ansible.builtin.debug:
+    #     msg: 
+    #       - "{{ vars_test2 }}"
+    #       - "{{ default_test | combine(vars_test, recursive=True) }}"
+    #       - "{{ lookup_test }}"
+    #       - "{{ bool_test }}"
+    #     # var: bool_test
+    #   vars:
+    #     vars_test:
+    #       test1: 
+    #         - name: 12
+    #           value: 
+    #     vars_test2:
+    #       test2: "{{ default_test.test2 }}"
+    #     subitem: test1
+    #     lookup_test: "{{ lookup('list',default_test)[subitem] }}"
+    #     combine_test: "{{ default_test | combine(vars_test, recursive=True, list_merge='replace') }}"
+    #     # combine_test2: "{{ default_test | combine(vars_test2, recursive=True, list_merge='replace') }}"
+    #     bool_test: "{{ default_test.test3 | bool }}"

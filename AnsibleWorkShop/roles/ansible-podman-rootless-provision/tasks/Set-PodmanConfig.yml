@@ -4,9 +4,24 @@
   when:
     - definitive_app_config_podman_containers_conf.state != "skipped"
   block:
+    - name: Set fact
+      ansible.builtin.set_fact:
+        app_config: "{{ app_config | ansible.builtin.combine({ containers_conf_path, recursive=true }) }}"
+      vars:
+        containers_conf_path: 
+          "{{
+            {
+              'podman': {
+                'containers_conf': {
+                  'path': {{ (app_config.podman.containers_conf.dir, app_config.podman.containers_conf.name) | ansible.builtin.path_join }} 
+                } 
+              } 
+            } 
+          }}"
     - name: Detect Podman containers.conf
       ansible.builtin.stat:
         path: "{{ app_config.podman.containers_conf.path }}"
+        # path: "{{ (app_config.podman.containers_conf.dir, app_config.podman.containers_conf.name) | ansible.builtin.path_join }}"
       register: podman_containers_conf
 
     - name: Present Podman containers.conf
@@ -17,12 +32,15 @@
           ansible.builtin.file:
             path: "{{ item.path }}"
             state: "{{ item.state }}"
-            mode: u=rwx,g-rwx,o-rwx
+            mode: "{{ item.mode }}"
           loop:
-            - path: "{{ app_config.podman.containers_conf.path | replace(app_config.podman.containers_conf.path.split('/')[-1],'')}}"
+            - path: "{{ app_config.podman.containers_conf.dir }}"
+            # - path: "{{ app_config.podman.containers_conf.path | replace(app_config.podman.containers_conf.path.split('/')[-1],'')}}"
               state: directory
-            - path: "{{ app_config.podman.containers_conf.path }}"
+              mode: u=rwx,g-rwx,o-rwx
+            - path: "{{ app_config.podman.containers_conf.file_name }}"
               state: touch
+              mode: u=rw,g=r,o=r
           become_user: "{{ target_user }}"
           when:
             - podman_containers_conf.stat.exists is defined
