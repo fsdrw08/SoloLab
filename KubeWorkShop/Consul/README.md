@@ -24,9 +24,10 @@ podman kube play /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml \
     --log-opt path=/home/vagrant/.local/share/containers/log/consul.json \
     --log-opt max-size=10mb
 
-
+podman kube play /var/vagrant/KubeWorkShop/Consul/aio-consul.yaml
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/Consul/pod-consul_new.yaml
+podman kube down /var/vagrant/KubeWorkShop/Consul/aio-consul.yaml --force
 # remove from firewalld
 sudo firewall-cmd --permanent --remove-service=consul
 sudo firewall-cmd --permanent --delete-service=consul

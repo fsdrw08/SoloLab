@@ -49,9 +49,9 @@ spec:
   containers:
     - name: consul
       image: docker.io/library/consul:latest
-      env:
-        - name: TZ
-          value: Asia/Shanghai
+      # env:
+      #   - name: TZ
+      #     value: Asia/Shanghai
       resources:
         limits:
           memory: "256Mi"
