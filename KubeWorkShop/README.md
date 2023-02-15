@@ -50,11 +50,14 @@ Deploy the container
 ```shell
 mkdir -p $HOME/infra
 # podman network create samba_net
+podman kube play /var/vagrant/KubeWorkShop/Samba/aio-samba.yaml
+
 podman kube play /var/vagrant/KubeWorkShop/Samba/pod-samba.yaml \
     --configmap /var/vagrant/KubeWorkShop/Samba/cm-samba.yaml 
 
 # to delete
 podman kube down /var/vagrant/KubeWorkShop/Samba/pod-samba.yaml
+podman kube down /var/vagrant/KubeWorkShop/Samba/aio-samba.yaml --force
 ```
 
 Enable container start up when system start (gen the unit file and pass to home path systemd, also lingering current user)

@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: freeipa
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: freeipa
+  labels:
+    name: freeipa
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://www.freeipa.org/page/Docker#FreeIPA_server_containers
+  hostname: ipa.infra.sololab
+  containers:
+    - name: freeipa
+      image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
+      resources:
+        limits:
+          memory: "1536Mi"
+          cpu: "1000m"
+      # https://www.freeipa.org/page/V4/Replica_Conncheck
+      # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html#container-fields
+      ports:
+        # https://github.com/sameersbn/docker-bind/issues/65
+        - name: dns_tcp
+          containerPort: 53
+          hostIP: 192.168.255.31
+          protocol: TCP
+        - name: dns_udp
+          hostIP: 192.168.255.31
+          containerPort: 53
+          protocol: UDP
+
+        - name: http
+          containerPort: 80
+          hostIP: 192.168.255.31
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostIP: 192.168.255.31
+          hostPort: 443
+        - name: https-pki
+          containerPort: 8443
+          hostIP: 192.168.255.31
+          hostPort: 8443
+
+        - name: ldap
+          containerPort: 389
+        - name: ldaps
+          containerPort: 636
+
+        - name: kerberos_tcp
+          containerPort: 88
+          protocol: TCP
+        - name: kerberos_udp
+          containerPort: 88
+          protocol: UDP
+
+        - name: kpasswd_tcp
+          containerPort: 464
+          protocol: TCP
+        - name: kpasswd_udp
+          containerPort: 464
+          protocol: UDP
+      env:
+        # https://github.com/freeipa/freeipa-container#running-freeipa-server-container:~:text=Alternatively%2C%20the-,IPA_SERVER_IP,-environment%20variable%20via
+        - name: IPA_SERVER_IP
+          # value: ""
+          value: "192.168.255.31"
+        - name: IPA_SERVER_HOSTNAME
+          value: ipa.infra.sololab
+      volumeMounts:
+        # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
+        - name: freeipa
+          mountPath: /data
+  volumes:
+    # https://manpages.debian.org/experimental/freeipa-server/ipa-server-install.1.en.html
+    # https://github.com/search?p=1&q=ipa-server-install-options&type=Code
+    - name: freeipa
+      hostPath:
+        path: /home/vagrant/infra/freeipa/data
+        type: Directory
+  dnsConfig:
+    nameservers:
+      - 127.0.0.1
+  restartPolicy: OnFailure

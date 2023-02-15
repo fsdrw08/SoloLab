@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      containers:
+        - name: traefik
+          image: docker.io/library/traefik:latest
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - name: http
+              containerPort: 80
+              hostIP: 192.168.255.32
+              hostPort: 80
+            - name: https
+              containerPort: 443
+              hostIP: 192.168.255.32
+              hostPort: 443
+          env:
+            # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+            - name: LEGO_CA_CERTIFICATES
+              value: /etc/traefik/ca.crt
+          volumeMounts:
+            # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
+            - name: traefik_stat_conf
+              mountPath: /etc/traefik/traefik.yml
+              subPath: traefik.yml
+            - name: traefik_dyn_conf
+              mountPath: /etc/traefik/dynamic/
+      volumes:
+        - name: traefik_stat_conf
+          # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+          configMap:
+            name: traefik
+            items:
+              - key: traefik.yml
+                path: traefik.yml
+        - name: traefik_dyn_conf
+          persistentVolumeClaim:
+            claimName: traefik

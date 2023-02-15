@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik
+data:
+  traefik.yml: |
+    # Static Configuration
+
+    ## Configuration Discovery
+    # https://doc.traefik.io/traefik/providers/overview/
+    providers:
+    # https://doc.traefik.io/traefik/providers/file/#directory
+      file:
+        directory: /etc/traefik/dynamic/
+        watch: true
+
+    # ref: https://www.vtulluru.com/how-to-install-traefik-as-a-container-using-docker-or-podman/
+    # https://doc.traefik.io/traefik/reference/static-configuration/file/
+    global:
+      checkNewVersion: false
+      sendAnonymousUsage: false
+
+
+    ## Routing & Load Balancing
+    # https://doc.traefik.io/traefik/routing/overview/
+    entryPoints:
+      # https://doc.traefik.io/traefik/routing/entrypoints/#entrypoints
+      # https://doc.traefik.io/traefik/routing/routers/#configuration-example
+      web:
+        address: ":80"
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+      websecure:
+        address: ":443"
+
+    # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
+    serversTransport:
+      # https://doc.traefik.io/traefik/routing/overview/#rootcas
+      rootCAs:
+        - /etc/traefik/root_ca.crt
+
+
+    ## Operations
+    # https://doc.traefik.io/traefik/operations/api/
+    api:
+      dashboard: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traefik
+  labels:
+    name: traefik
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://www.traefik.org/page/Docker#traefik_server_containers
+  containers:
+    - name: traefik
+      image: docker.io/library/traefik:latest
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      ports:
+        # https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-official-docker-image
+        - name: http
+          containerPort: 80
+          hostIP: 192.168.255.32
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostIP: 192.168.255.32
+          hostPort: 443
+      env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: LEGO_CA_CERTIFICATES
+          value: /etc/traefik/ca.crt
+      volumeMounts:
+        # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
+        - name: traefik
+          mountPath: /etc/traefik/ #traefik.yml
+          # subPath: traefik.yml
+  volumes:
+    # - name: traefik
+    #   # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+    #   configMap:
+    #     name: traefik
+    #     items:
+    #       - key: traefik.yml
+    #         path: traefik.yml
+    - name: traefik
+      hostPath:
+        path: /home/vagrant/infra/traefik/
+        type: Directory
+  restartPolicy: Never
