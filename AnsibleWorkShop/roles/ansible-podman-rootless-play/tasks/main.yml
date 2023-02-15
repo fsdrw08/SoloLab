@@ -15,10 +15,10 @@
     name: "{{ podman_network.name }}"
     opt: "{{ podman_network.opt | default(omit) }}"
     recreate: "{{ podman_network.recreate | default(omit) }}"
-    state: "{{ podman_network.state }}"
+    state: "{{ podman_network.state | default(omit) }}"
     subnet: "{{ podman_network.subnet | default(omit) }}"
   when:
-    - podman_network.state != "skipped"
+    - podman_network.name is not None
 
 - name: Set Podman volume
   containers.podman.podman_volume:
@@ -29,9 +29,9 @@
     name: "{{ podman_volume.name }}"
     options: "{{ podman_volume | default(omit) }}"
     recreate: "{{ podman_volume.recreate | default(omit) }}"
-    state: "{{ podman_volume.state }}"
+    state: "{{ podman_volume.state | default(omit) }}"
   when:
-    - podman_volume.state != "skipped"
+    - podman_volume.name is not None
 
 - name: Run Podman play
   containers.podman.podman_play:
@@ -52,4 +52,45 @@
     tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
     username: "{{ podman_play.username | default(omit) }}"
   when:
-    - podman_volume.podman_play != "skipped"
+    - podman_play.kube_file is not None
+    - podman_play.state is not None
+
+- name: Detect pod info
+  containers.podman.podman_pod_info:
+    name: "{{ vars_pod_name }}"
+  register: 
+
+- name: Set pod systemd service
+  when:
+    - podman_generate_systemd.name is not None
+    - service.podman_pod.user_scope.skipped is false
+  block:
+    - name: Enable pod systemd service
+      when:
+        - service.podman_pod.user_scope.enabled is true
+      block:
+        - name: Generate systemd service
+          containers.podman.podman_generate_systemd:
+            after: "{{ podman_generate_systemd.after | default(omit) }}"
+            container_prefix: "{{ podman_generate_systemd.container_prefix | default(omit) }}"
+            dest: "{{ podman_generate_systemd.dest | default(omit) }}"
+            env: "{{ podman_generate_systemd.env | default(omit) }}"
+            executable: "{{ podman_generate_systemd.executable | default(omit) }}"
+            name: "{{ podman_generate_systemd.name }}"
+            new: "{{ podman_generate_systemd.new | default(omit) }}"
+            no_header: "{{ podman_generate_systemd.no_header | default(omit) }}"
+            pod_prefix: "{{ podman_generate_systemd.pod_prefix | default(omit) }}"
+            requires: "{{ podman_generate_systemd.requires | default(omit) }}"
+            restart_policy: "{{ podman_generate_systemd.restart_policy | default(omit) }}"
+            restart_sec: "{{ podman_generate_systemd.restart_sec | default(omit) }}"
+            separator: "{{ podman_generate_systemd.separator | default(omit) }}"
+            start_timeout: "{{ podman_generate_systemd.start_timeout | default(omit) }}"
+            stop_timeout: "{{ podman_generate_systemd.stop_timeout | default(omit) }}"
+            use_names: "{{ podman_generate_systemd.use_names | default(omit) }}"
+            wants: "{{ podman_generate_systemd.wants | default(omit) }}"
+  
+        - name: Enable systemd service
+          ansible.builtin.systemd:
+            name: "{{ podman_generate_systemd.pod_prefix }}-{{ podman_generate_systemd.name }}"
+            state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
+            enabled: true

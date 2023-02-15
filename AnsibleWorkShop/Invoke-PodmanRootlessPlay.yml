@@ -9,9 +9,10 @@
         name: ansible-podman-rootless-provision
       vars:
         vars_podman_volume:
-          name:  consul
+          name:  samba
           state: present
         vars_podman_play:
-          configmap: 
-            - /KubeWorkShop/Consul/cm-consul.yaml
-          kube_file: /KubeWorkShop/Consul/
+          kube_file: /KubeWorkShop/Samba/aio-consul.yaml
+        vars_podman_generate_systemd:
+          state: present
+          dest: ~/.config/systemd/user/
