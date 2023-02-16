@@ -6,13 +6,15 @@
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: run role ansible-podman-rootless-provision
       ansible.builtin.include_role:
-        name: ansible-podman-rootless-provision
+        name: ansible-podman-rootless-play
       vars:
         vars_podman_volume:
-          name:  samba
+          name: samba
           state: present
         vars_podman_play:
-          kube_file: /KubeWorkShop/Samba/aio-consul.yaml
+          kube_file: /KubeWorkShop/Samba/aio-samba.yaml
+          state: started
+        vars_pod_name: test
         vars_podman_generate_systemd:
-          state: present
           dest: ~/.config/systemd/user/
+          # name: "{{ vars_pod_name }}"

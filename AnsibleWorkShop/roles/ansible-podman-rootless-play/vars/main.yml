@@ -5,57 +5,59 @@
 # containers.podman.podman_network
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_network_module.html#ansible-collections-containers-podman-podman-network-module
 vars_podman_network:
-  debug: false
-  disable_dns: false
-  driver: bridge
-  executable: podman
-  gateway:
-  internal: false
-  ip_range:
-  ipv6: false
-  macvlan:
+  debug: # false ← (default) / true
+  disable_dns: # false ← (default) / true
+  driver: # bridge ← (default)
+  executable: # podman ← (default)
+  gateway: # IPv4 or IPv6 gateway for the subnet
+  internal: # false ← (default) / true
+  ip_range: # Allocate container IP from range
+  ipv6: # false / true
+  macvlan: # Create a Macvlan connection based on this device
   name: # required, skip if empty
   opt:
-  recreate: false
-  state: 
-  subnet:
+    # mtu: 
+    # vlan: 
+  recreate: # false ← (default) / true
+  state: # present ← (default) / absent
+  subnet: # Subnet in CIDR format
 
 # containers.podman.podman_volume
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_volume_module.html#ansible-collections-containers-podman-podman-volume-module
 vars_podman_volume:
-  driver: local
-  executable: podman
-  label:
-    app: 
+  debug: # false ← (default) / true
+  driver: # local ← (default)
+  executable: # podman ← (default)
+  label: 
+    # key: value
   name: # required, skip if empty
   options:
-    - o=timeout=10
-  recreate: false
-  state: 
+    # - o=timeout=10
+  recreate: # false ← (default) / true
+  state: # present ← (default) / absent
 
 # containers.podman.podman_play
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_play_module.html#ansible-collections-containers-podman-podman-play-module
 vars_podman_play:
-  authfile: ${XDG_RUNTIME_DIR}/containers/auth.json
-  cert_dir: /etc/containers/certs.d
-  # https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
+  authfile: # default is ${XDG_RUNTIME_DIR}/containers/auth.json
+  cert_dir: # /etc/containers/certs.d ← (default) 
   configmap:
     # - /path/to/configmap1
     # - /path/to/configmap2
-  debug: false
-  executable: podman
+  debug: # false ← (default) / true
+  executable: # podman ← (default)
   kube_file: # required, skip if empty
-  log_driver: journald
-  log_level: error
+  log_driver: # Set logging driver for all created containers.
+  log_level: # error ← (default) / info / warn / error / fatal / panic
   network:
-    - podman
-  password:
-  quiet: false
-  recreate: false
-  seccomp_profile_root: /var/lib/kubelet/seccomp
-  state: # required, skip if empty
-  tls_verify: false
-  username:
+    # - podman
+  password: # The username and password to use to authenticate with the registry if required.
+  quiet: # false / true
+  recreate: # false / true
+  seccomp_profile_root: # /var/lib/kubelet/seccomp ← (default)
+  state: # required, containers.podman.podman_play will skip if empty
+  tls_verify: # false / true
+  username: # The username and password to use to authenticate with the registry if required.
     
 vars_pod_name: # required, Name of the pod to generate systemd unit file, skip if empty
 
@@ -63,23 +65,23 @@ vars_pod_name: # required, Name of the pod to generate systemd unit file, skip i
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_generate_systemd_module.html#ansible-collections-containers-podman-podman-generate-systemd-module
 # https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html
 vars_podman_generate_systemd:
-  after:
-  container_prefix: container
-  dest: ~/.config/systemd/user/
-  env:
-  executable: podman
+  after: # Add the systemd unit after (After=) option, that ordering dependencies between the list of dependencies and this service.
+  container_prefix: # container ← (default)
+  dest: ~/.config/systemd/user/ # required, skiped if empty
+  env: # Set environment variables to the systemd unit files.
+  executable: # podman ← (default)
   name: "{{ vars_pod_name }}" # required, Name of the pod to generate systemd unit file, skip if empty
-  new: false
-  no_header: false
-  pod_prefix: pod
-  requires: 
-  restart_policy: no-restart
-  restart_sec: 
-  separator: "-"
-  start_timeout:
-  stop_timeout:
-  use_names: true
-  wants: 
+  new: # false ← (default) / true | Generate unit files that create containers and pods, not only start them. 
+  no_header: # false ← (default) / true
+  pod_prefix: # pod  ← (default)
+  requires: # Set the systemd unit requires (Requires=) option.
+  restart_policy: # no-restart / on-success / on-failure / on-abnormal / on-watchdog / on-abort / always
+  restart_sec: # Configures the time to sleep before restarting a service (as configured with restart-policy). Takes a value in seconds.
+  separator: # "-" ← (default) Systemd unit name separator between the name/id of a container/pod and the prefix.
+  start_timeout: # Override the default start timeout for the container with the given value in seconds.
+  stop_timeout: # Override the default stop timeout for the container with the given value in seconds.
+  use_names: # false / true ← (default)
+  wants: # Add the systemd unit wants (Wants=) option, that this service is (weak) dependent on.
 
 vars_service:
   podman_pod:

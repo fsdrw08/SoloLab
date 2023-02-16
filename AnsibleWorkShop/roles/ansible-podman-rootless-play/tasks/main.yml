@@ -1,6 +1,7 @@
 # code: language=ansible
 ---
 # tasks file for ansible-podman-rootless-play
+# https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
 - name: Set podman network
   containers.podman.podman_network:
     debug: "{{ podman_network.debug | default(omit) }}"
@@ -18,7 +19,7 @@
     state: "{{ podman_network.state | default(omit) }}"
     subnet: "{{ podman_network.subnet | default(omit) }}"
   when:
-    - podman_network.name is not None
+    - podman_network.name != none
 
 - name: Set Podman volume
   containers.podman.podman_volume:
@@ -27,11 +28,16 @@
     executable: "{{ podman_volume.executable | default(omit) }}"
     label: "{{ podman_volume.label | default(omit) }}"
     name: "{{ podman_volume.name }}"
-    options: "{{ podman_volume | default(omit) }}"
+    options: "{{ podman_volume.options | default(omit) }}"
     recreate: "{{ podman_volume.recreate | default(omit) }}"
     state: "{{ podman_volume.state | default(omit) }}"
   when:
-    - podman_volume.name is not None
+    - podman_volume.name != none
+
+- name: Copy k8s yaml file to target host
+  ansible.builtin.copy:
+    src: "{{ podman_play.kube_file }}"
+    dest: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
 
 - name: Run Podman play
   containers.podman.podman_play:
@@ -40,7 +46,7 @@
     configmap: "{{ podman_play.configmap | default(omit) }}"
     debug: "{{ podman_play.debug | default(omit) }}"
     executable: "{{ podman_play.executable | default(omit) }}"
-    kube_file: "{{ podman_play.kube_file }}"
+    kube_file: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
     log_driver: "{{ podman_play.log_driver | default(omit) }}"
     log_level: "{{ podman_play.log_level | default(omit) }}"
     network: "{{ podman_play.network | default(omit) }}"
@@ -52,17 +58,27 @@
     tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
     username: "{{ podman_play.username | default(omit) }}"
   when:
-    - podman_play.kube_file is not None
-    - podman_play.state is not None
+    - podman_play.kube_file != none
+    - podman_play.state != none
+
+- name: Delete tmp k8s yaml file
+  ansible.builtin.file:
+    path: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
+    state: absent
 
 - name: Detect pod info
   containers.podman.podman_pod_info:
     name: "{{ vars_pod_name }}"
-  register: 
+  register: pod_info
+
+- name: debug
+  debug:
+    msg: "{{ pod_info.pods[0].Hostname }}"
 
 - name: Set pod systemd service
   when:
-    - podman_generate_systemd.name is not None
+    - pod_info.pods[0].Hostname is defined
+    - podman_generate_systemd.name != none
     - service.podman_pod.user_scope.skipped is false
   block:
     - name: Enable pod systemd service

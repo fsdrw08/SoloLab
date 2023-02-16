@@ -101,8 +101,8 @@ podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootlessProvision.yml `
    localhost/ansible-ee-aio `
    ansible-runner run /runner -vv
 
-podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Podman.yml `
-   -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False ` 
+podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootlessPlay.yml `
+   -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
    -v ../:/runner `
    -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
