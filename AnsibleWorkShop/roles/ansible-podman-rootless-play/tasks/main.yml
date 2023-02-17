@@ -68,17 +68,13 @@
 
 - name: Detect pod info
   containers.podman.podman_pod_info:
-    name: "{{ vars_pod_name }}"
+    name: "{{ podman_generate_systemd.name }}"
   register: pod_info
-
-- name: debug
-  debug:
-    msg: "{{ pod_info.pods[0].Hostname }}"
 
 - name: Set pod systemd service
   when:
-    - pod_info.pods[0].Hostname is defined
     - podman_generate_systemd.name != none
+    - pod_info.pods[0].Hostname is defined
     - service.podman_pod.user_scope.skipped is false
   block:
     - name: Enable pod systemd service
@@ -107,6 +103,17 @@
   
         - name: Enable systemd service
           ansible.builtin.systemd:
-            name: "{{ podman_generate_systemd.pod_prefix }}-{{ podman_generate_systemd.name }}"
+            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
             state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
             enabled: true
+            scope: user
+
+
+- name: Set systemd lingering
+  ansible.builtin.include_tasks:
+    file: Set-SystemdLinger.yml
+  vars:
+    target_user: "{{ ansible_user }}"
+  when:
+    - ansible_service_mgr == "systemd"
+    - service.systemd_lingering.state != "skipped"
