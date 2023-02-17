@@ -12,9 +12,7 @@
           name: samba
           state: present
         vars_podman_play:
-          kube_file: /KubeWorkShop/Samba/aio-samba.yaml
-          state: started
-        vars_pod_name: test
+          kube_file: /KubeWorkShop/Samba/pod-samba.yaml
+          state: absent
         vars_podman_generate_systemd:
-          dest: ~/.config/systemd/user/
-          # name: "{{ vars_pod_name }}"
+          name: samba
