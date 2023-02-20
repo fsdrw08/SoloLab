@@ -49,12 +49,11 @@
 - name: Set pod systemd service
   when:
     - podman_generate_systemd.name != none
-    - pod_info.pods[0].Hostname is defined
-    - service.podman_pod.user_scope.skipped is false
   block:
-    - name: Enable pod systemd service
+    - name: Set pod systemd service when pod exist
       when:
-        - service.podman_pod.user_scope.enabled is true
+        - pod_info.pods[0].Hostname is defined
+        - service.podman_pod.user_scope.skipped is false
       block:
         - name: Generate systemd service
           containers.podman.podman_generate_systemd:
@@ -76,12 +75,55 @@
             use_names: "{{ podman_generate_systemd.use_names | default(omit) }}"
             wants: "{{ podman_generate_systemd.wants | default(omit) }}"
   
-        - name: Enable systemd service
+        # https://stackoverflow.com/a/74475354
+        - name: omit service.podman_pod.user_scope.state
+          set_fact:
+            service: "{{ service | combine(new_var, recursive=true) }}"
+          vars:
+            new_var:
+              "{{
+                {
+                  'podman_pod': {
+                    'user_scope': {
+                      'state': omit
+                    }
+                  }
+                }
+              }}"
+          when:
+            - pod_info.pods[0].State == 'Running'
+
+        - name: Set pod systemd service
           ansible.builtin.systemd:
             name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
             state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
-            enabled: true
+            enabled: "{{ service.podman_pod.user_scope.enabled | default(true) }}"
             scope: user
+
+    - name: Disable pod systemd service when pod not exist
+      when:
+        - pod_info.pods[0].Hostname is not defined
+      block:
+        - name: Disable systemd service
+          ansible.builtin.systemd:
+            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+            state: stopped
+            enabled: false
+            scope: user
+
+        - name: Find pod related unit file
+          ansible.builtin.find:
+            paths: "{{ podman_generate_systemd.dest }}"
+            patterns: 
+              - "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+              - "{{ podman_generate_systemd.container_prefix | default('container')}}-{{ podman_generate_systemd.name }}*.service"
+          register: service_unit_to_delete
+
+        - name: Delete pod related unit file
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ service_unit_to_delete.files }}"
 
 
 - name: Set systemd lingering
