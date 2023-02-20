@@ -28,7 +28,11 @@
 
 - name: Run podman kube down
   ansible.builtin.shell:
-    cmd: podman kube down "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
+    cmd: podman kube down "/home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}" {{ force | default(omit) }}
+  vars:
+    force: "{% if podman_play.force %}--force{% endif %}"
+  become_user: "{{ ansible_user }}"
+  ignore_errors: true
   when:
     - podman_play.state == "absent"
 

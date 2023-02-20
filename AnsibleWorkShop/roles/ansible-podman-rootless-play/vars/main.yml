@@ -56,6 +56,7 @@ vars_podman_play:
   recreate: # false / true
   seccomp_profile_root: # /var/lib/kubelet/seccomp ← (default)
   state: # !!required, created / started / absent , containers.podman.podman_play will skip if empty
+  force: # false / true , when state set to absent, whether delete related volume mention in kube_file
   tls_verify: # false / true
   username: # The username and password to use to authenticate with the registry if required.
     
@@ -86,7 +87,7 @@ vars_podman_generate_systemd:
 vars_service:
   podman_pod:
     user_scope:
-      skipped: false
+      skipped: true
       enabled: true
       state: started
   systemd_lingering:

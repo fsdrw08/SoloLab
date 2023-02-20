@@ -22,13 +22,14 @@ podman_volume: "{{ defaults_podman_volume | ansible.builtin.combine(vars_podman_
 defaults_podman_play:
   kube_file: # required, skip if empty
   state: # required, skip if empty
+  force: false
 
 podman_play: "{{ defaults_podman_play | ansible.builtin.combine(vars_podman_play, recursive=True) }}"
 
 
 # podman_generate_systemd
 defaults_podman_generate_systemd:
-  dest: ~/.config/systemd/user/ # required, skip if empty
+  dest: /home/{{ ansible_user }}/.config/systemd/user/ # required, skip if empty
   name: # required, skip if empty
 
 podman_generate_systemd: "{{ defaults_podman_generate_systemd | ansible.builtin.combine(vars_podman_generate_systemd, recursive=True) }}"
@@ -40,7 +41,7 @@ defaults_service:
     user_scope:
       skipped: true
       enabled: true
-      state: started
+      # state: 
   systemd_lingering:
     state: enable
 
