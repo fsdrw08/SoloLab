@@ -68,7 +68,7 @@ spec:
   # https://github.com/samba-in-kubernetes/samba-container/blob/master/examples/kubernetes/sambapod.yml
   containers:
     - name: samba
-      image: quay.io/samba.org/samba-server:latest
+      image: quay.io/samba.org/samba-server:v0.2
       resources:
         limits:
           memory: "128Mi"
@@ -101,6 +101,7 @@ spec:
             path: config.json
     - name: samba_share
       hostPath:
+        # path: /home/vagrant/infra/
         path: /home/vagrant/.local/share/containers/storage/volumes/
         type: Directory
   restartPolicy: Never
