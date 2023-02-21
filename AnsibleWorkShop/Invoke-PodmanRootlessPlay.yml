@@ -15,6 +15,8 @@
           kube_file: /KubeWorkShop/Samba/aio-samba.yaml
           state: started # absent / created / started
           force: true
+          # env_var:
+          #   PODMAN_USERNS: keep-id:uid=1000,gid=1000
         vars_podman_generate_systemd:
           name: samba
         vars_service:

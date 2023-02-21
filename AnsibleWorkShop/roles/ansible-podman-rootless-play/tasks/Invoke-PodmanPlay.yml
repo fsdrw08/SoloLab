@@ -23,6 +23,7 @@
     state: "{{ podman_play.state }}"
     tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
     username: "{{ podman_play.username | default(omit) }}"
+  environment: "{{ podman_play.env_var | default(omit) }}"
   when:
     - podman_play.state != "absent"
 
