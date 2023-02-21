@@ -42,6 +42,7 @@ podman build .\context\ --tag ansible-ee-aio
 
 ## Run the ansible container (Ansible Runner)
 ref: 
+ - [Introduction to Ansible Runner](https://ansible-runner.readthedocs.io/en/stable/intro/)
  - [Using Runner as a container interface to Ansible](https://ansible-runner.readthedocs.io/en/stable/container/)
  - [ansible-runner/Dockerfile](https://github.com/ansible/ansible-runner/blob/devel/Dockerfile)
  - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
