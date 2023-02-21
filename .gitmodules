@@ -2,9 +2,3 @@
 	path = HelmWorkShop/helm-charts
 	url = https://github.com/fsdrw08/helm-charts.git
 	branch = gh-pages
-[submodule "AnsibleWorkShop/roles/xanmanning.k3s"]
-	path = AnsibleWorkShop/roles/xanmanning.k3s
-	url = https://github.com/PyratLabs/ansible-role-k3s.git
-[submodule "AnsibleWorkShop/roles/ansible-freeipa"]
-	path = AnsibleWorkShop/roles/ansible-freeipa
-	url = https://github.com/freeipa/ansible-freeipa.git
