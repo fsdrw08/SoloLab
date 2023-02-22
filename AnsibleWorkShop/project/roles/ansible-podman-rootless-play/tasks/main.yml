@@ -104,12 +104,21 @@
       when:
         - pod_info.pods[0].Hostname is not defined
       block:
+        # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
+        - name: Detect pod systemd service state
+          ansible.builtin.systemd:
+            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+            scope: user
+          register: pod_service_status
+
         - name: Disable systemd service
           ansible.builtin.systemd:
             name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
             state: stopped
             enabled: false
             scope: user
+          when:
+            - pod_service_status.status.ActiveState == "active"
 
         - name: Find pod related unit file
           ansible.builtin.find:
