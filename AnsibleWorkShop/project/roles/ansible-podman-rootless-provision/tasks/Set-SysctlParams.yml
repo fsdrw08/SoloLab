@@ -18,7 +18,6 @@
         path: /etc/sysctl.d/{{ role_name }}.conf
         state: touch
         mode: u=rw,g=r,o=r
-      become: true
       when:
         - sysctl_podman_rootless_conf.stat.exists is defined
         - sysctl_podman_rootless_conf.stat.exists is false
@@ -39,6 +38,7 @@
   ansible.builtin.file:
     path: /etc/sysctl.d/{{ role_name }}.conf
     state: absent
+  become: true
   when:
     - definitive_sysctl_params.state == "absent"
     - sysctl_podman_rootless_conf.stat.exists is true

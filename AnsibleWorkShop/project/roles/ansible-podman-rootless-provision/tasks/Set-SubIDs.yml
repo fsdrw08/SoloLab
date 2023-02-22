@@ -139,14 +139,14 @@
         - /etc/subgid
 
     # Uncomment lines
-    - name: Uncomment {{ target_user }} subuid line in /etc/subuid
+    - name: Uncomment {{ target_user }} subuid line in "{{ item.path }}"
       ansible.builtin.replace:
         path: "{{ item.path }}"
-        regexp: "{{ iteam.regexp }}"
+        regexp: "{{ item.regexp }}"
         replace: '\1'
       loop:
         - path: /etc/subuid
           regexp: '^\s*# comment by {{ role_name }} ({{ sub_ids.subuid.user }}.*)'
         - path: /etc/subgid
-          regexp: '^\s*# comment by {{ role_name }} ({{ sub_ids.subgid.user }}.*)'
+          regexp: '^\s*# comment by {{ role_name }} ({{ sub_ids.subgid.group }}.*)'
 
