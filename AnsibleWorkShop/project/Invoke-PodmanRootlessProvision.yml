@@ -10,7 +10,7 @@
       vars:
         vars_package:
           podman:
-            state: present
+            state: absent
             dnf:
               enablerepo: updates-testing
               update_cache: true
@@ -18,7 +18,7 @@
           all_users:
             state: present
             present_override: false
-            resources: cpu
+            resources: cpu cpuset io memory pids
           per_user:
             state: skipped
             resources: io
