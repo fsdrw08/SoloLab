@@ -30,6 +30,7 @@
 3. Build the ansible runner image
 ref: https://docs.podman.io/en/latest/markdown/podman-build.1.html#examples
 ```powershell
+cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 # with_proxy
 podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-aio
 podman build .\context\ --build-arg PROXY="http://192.168.255.102:7890" --tag ansible-ee-aio
@@ -40,7 +41,7 @@ podman build -f .\context\Containerfile.with_semi_proxy --build-arg PROXY="$PROX
 podman build .\context\ --tag ansible-ee-aio
 ```
 
-## Run the ansible container (Ansible Runner)
+## Run ansible command in ansible container (Ansible Runner)
 ref: 
  - [Introduction to Ansible Runner](https://ansible-runner.readthedocs.io/en/stable/intro/)
  - [Using Runner as a container interface to Ansible](https://ansible-runner.readthedocs.io/en/stable/container/)
@@ -50,6 +51,7 @@ ref:
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 # deploy k3s
+# ansible runner will make the project dir as default dir
 podman run --rm -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # have a check of k3s cert
@@ -75,7 +77,7 @@ podman run --rm -e RUNNER_PLAYBOOK=./debug/Debug-Vars.yml -v ../:/runner localho
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Copy-Items.yml -v ../:/runner -v ../../TerraformWorkShop/:/TerraformWorkShop/ localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 # install freeipa server
-podman run --rm -e RUNNER_PLAYBOOK=./Invoke-FreeIPA.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-FreeIPA.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 podman run --rm -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml -v ../:/runner localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
@@ -89,9 +91,9 @@ podman run --rm -e RUNNER_PLAYBOOK=./debug/Invoke-Podman.yml -v ../:/runner -v .
 # create a role
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 $roleName="ansible-podman-rootless-play"
-podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible-galaxy init $roleName"
+podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/project/roles/ && ansible-galaxy init $roleName"
 
-podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible --version"
+podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "ansible --version"
 
 # deploy podman rootless
 podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootless.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
@@ -102,7 +104,6 @@ podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
    localhost/ansible-ee-aio `
    ansible-runner run /runner -vv
 
-# https://ansible-runner.readthedocs.io/en/stable/container/
 podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessPlay.yml `
    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
    -v ../:/runner `
