@@ -76,9 +76,9 @@ spec:
     # https://github.com/search?p=1&q=ipa-server-install-options&type=Code
     - name: freeipa
       hostPath:
-        path: /home/vagrant/infra/freeipa/data
+        path: /home/vagrant/infra/FreeIPA/data
         type: Directory
   dnsConfig:
     nameservers:
       - 127.0.0.1
-  restartPolicy: OnFailure
+  restartPolicy: Never

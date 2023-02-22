@@ -5,10 +5,32 @@ metadata:
 spec:
   resources:
     requests:
-      storage: 5Gi
+      storage: 20Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: freeipa
+data:
+  ipa-server-install-options: |
+    --domain=infra.sololab
+    --realm=infra.sololab
+    --ds-password=P@ssw0rd
+    --admin-password=P@ssw0rd
+    --no-ntp
+    --unattended
+    --no_hbac_allow
+
+    --setup-dns
+    --no-host-dns
+    --forwarder=192.168.255.1
+    --auto-reverse
+
+    --debug
+    --skip-mem-check
 ---
 apiVersion: v1
 kind: Pod
@@ -22,7 +44,8 @@ spec:
   hostname: ipa.infra.sololab
   containers:
     - name: freeipa
-      image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
+      image: quay.io/freeipa/freeipa-server:fedora-37-4.10.0
+      # image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
       resources:
         limits:
           memory: "1536Mi"
@@ -74,7 +97,6 @@ spec:
       env:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container:~:text=Alternatively%2C%20the-,IPA_SERVER_IP,-environment%20variable%20via
         - name: IPA_SERVER_IP
-          # value: ""
           value: "192.168.255.31"
         - name: IPA_SERVER_HOSTNAME
           value: ipa.infra.sololab
@@ -82,14 +104,36 @@ spec:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
         - name: freeipa
           mountPath: /data
+        - name: ipa-server-install-options
+          mountPath: /data/ipa-server-install-options
+          subPath: ipa-server-install-options
+        # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
+        - name: dshm
+          mountPath: /dev/shm
+        # - name: cgroups
+        #   mountPath: /sys/fs/cgroup
+        #   readOnly: true
   volumes:
     # https://manpages.debian.org/experimental/freeipa-server/ipa-server-install.1.en.html
     # https://github.com/search?p=1&q=ipa-server-install-options&type=Code
     - name: freeipa
-      hostPath:
-        path: /home/vagrant/infra/freeipa/data
-        type: Directory
+      persistentVolumeClaim:
+        claimName: freeipa
+    - name: ipa-server-install-options
+      configMap:
+        name: freeipa
+        items:
+          - key: ipa-server-install-options
+            path: ipa-server-install-options
+    # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
+    - name: dshm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 128Mi
+    # - name: cgroups
+    #   hostPath:
+    #     path: /sys/fs/cgroup
   dnsConfig:
     nameservers:
       - 127.0.0.1
-  restartPolicy: OnFailure
+  restartPolicy: Never
