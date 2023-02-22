@@ -22,11 +22,7 @@ podman run --rm -v ../:/runner `
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
 
-podman run --rm `
-    -e RUNNER_PLAYBOOK=Invoke-PodmanRootless.yml `
-    -v ../:/runner `
-    localhost/ansible-ee-aio ansible-runner run /runner -vv
-
+# deploy and config podman package
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
@@ -34,6 +30,7 @@ podman run --rm `
     localhost/ansible-ee-aio `
     ansible-runner run /runner -vv
 
+# deploy pod (run podman play)
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessPlay.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
