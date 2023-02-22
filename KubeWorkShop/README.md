@@ -85,16 +85,16 @@ ref: https://freeipa.readthedocs.io/en/latest/workshop/1-server-install.html
 
 # sudo bash -c "echo '192.168.255.31 ipa.infra.sololab' >> /etc/hosts"
 
-APP_DIR="freeipa"
+APP_DIR="FreeIPA"
 mkdir -p $HOME/infra/$APP_DIR/data
 cp -r /var/vagrant/KubeWorkShop/$APP_DIR/data/ipa-server-install-options $HOME/infra/$APP_DIR/data/
 
 cp -r /var/vagrant/KubeWorkShop/$APP_DIR/data/ $HOME/infra/$APP_DIR/
 
-chmod -R 777 $HOME/infra/freeipa/data/
+chmod -R 777 $HOME/infra/$APP_DIR/data/
 
 # !! need to update yaml file
-podman kube play /var/vagrant/KubeWorkShop/freeipa/pod-freeipa.yaml 
+podman kube play /var/vagrant/KubeWorkShop/$APP_DIR/pod-freeipa.yaml 
 
 
 mkdir -p $HOME/.config/systemd/user
@@ -110,13 +110,13 @@ loginctl enable-linger vagrant
 
 
 # have a check
-cat infra/freeipa/data/var/log/ipa-server-configure-first.log
-cat infra/freeipa/data/var/log/ipaserver-install.log
-tail -n 500 $HOME/infra/freeipa/data/var/log/ipaserver-install.log
+cat infra/$APP_DIR/data/var/log/ipa-server-configure-first.log
+cat infra/$APP_DIR/data/var/log/ipaserver-install.log
+tail -n 500 $HOME/infra/$APP_DIR/data/var/log/ipaserver-install.log
 
-tail -n 300 $HOME/infra/freeipa/data/var/log/pki/pki-ca-spawn.20230102132637.log
+tail -n 300 $HOME/infra/$APP_DIR/data/var/log/pki/pki-ca-spawn.20230102132637.log
 # to delete freeipa
-podman kube down /var/vagrant/KubeWorkShop/freeipa/pod-freeipa.yaml
+podman kube down /var/vagrant/KubeWorkShop/$APP_DIR/pod-freeipa.yaml
 
 sudo rm -rf $HOME/infra/freeipa/data/
 
