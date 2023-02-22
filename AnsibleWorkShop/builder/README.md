@@ -94,15 +94,16 @@ podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/role
 podman run --rm -v ../:/runner localhost/ansible-ee-aio bash -c "cd /runner/roles/ && ansible --version"
 
 # deploy podman rootless
-podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootless.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootless.yml -v ../:/runner localhost/ansible-ee-aio ansible-runner run /runner -vv
 
-podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootlessProvision.yml `
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
    -v ../:/runner `
    localhost/ansible-ee-aio `
    ansible-runner run /runner -vv
 
-podman run --rm -e RUNNER_PLAYBOOK=./Invoke-PodmanRootlessPlay.yml `
+# https://ansible-runner.readthedocs.io/en/stable/container/
+podman run --rm -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessPlay.yml `
    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
    -v ../:/runner `
    -v ../../KubeWorkShop/:/KubeWorkShop/ `
