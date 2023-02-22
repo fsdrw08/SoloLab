@@ -17,6 +17,7 @@ git fetch --all --tags --prune
 git checkout tags/v3.3.0
 # if you want to remove it
 cd (git rev-parse --show-toplevel)
+# https://devconnected.com/how-to-clear-git-cache/#:~:text=The%20easiest%20way%20to%20clear%20your%20Git%20cache,ignore%20all%20files%20ending%20in%20%E2%80%9C%20.conf%20%E2%80%9C
 git rm --cached AnsibleWorkShop/project/roles/xanmanning.k3s
 ```
 ## Requirements
