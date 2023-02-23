@@ -95,6 +95,7 @@ chmod -R 777 $HOME/infra/$APP_DIR/data/
 
 # !! need to update yaml file
 podman kube play /var/vagrant/KubeWorkShop/$APP_DIR/pod-freeipa.yaml 
+podman kube play /var/vagrant/KubeWorkShop/$APP_DIR/aio-freeipa.yaml 
 
 
 mkdir -p $HOME/.config/systemd/user
@@ -115,6 +116,8 @@ cat infra/$APP_DIR/data/var/log/ipaserver-install.log
 tail -n 500 $HOME/infra/$APP_DIR/data/var/log/ipaserver-install.log
 
 tail -n 300 $HOME/infra/$APP_DIR/data/var/log/pki/pki-ca-spawn.20230102132637.log
+
+sudo cat  ~/.local/share/containers/storage/volumes/freeipa/_data/var/log/dirsrv/slapd-INFRA-SOLOLAB/errors
 # to delete freeipa
 podman kube down /var/vagrant/KubeWorkShop/$APP_DIR/pod-freeipa.yaml
 

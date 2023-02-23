@@ -10,7 +10,8 @@ spec:
   hostname: ipa.infra.sololab
   containers:
     - name: freeipa
-      image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
+      image: quay.io/freeipa/freeipa-server:fedora-37-4.10.0
+      # image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
       resources:
         limits:
           memory: "1536Mi"
