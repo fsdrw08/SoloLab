@@ -1,8 +1,13 @@
 # code: language=ansible
 ---
+- name: Get service fact
+  ansible.builtin.service_facts:
+  no_log: true
+
 - name: Set podman socket service (systemd)
   when: 
     - ansible_service_mgr == "systemd"
+    - ansible_facts.services['podman.service'] is defined
   block:
     - name: Set systemd user scope podman socket service
       ansible.builtin.systemd:
