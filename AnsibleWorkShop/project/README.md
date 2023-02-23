@@ -143,6 +143,12 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# get service
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Get-Service.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 

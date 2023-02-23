@@ -1,0 +1,19 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: no
+  tasks:
+    # - name: Get podman socket service
+    #   ansible.builtin.systemd:
+    #     name: podman.socket
+    #     scope: user
+      # become: true
+
+    # https://stackoverflow.com/questions/30328506/check-if-service-exists-with-ansible
+    - name: Get service fact
+      ansible.builtin.service_facts:
+
+    - name: debug
+      debug:
+      #  msg: "{{ ansible_facts.services['podman.service'] }}"
+       var: ansible_facts.services['podman.service']
