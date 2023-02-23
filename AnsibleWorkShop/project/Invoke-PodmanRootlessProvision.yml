@@ -22,6 +22,8 @@
           per_user:
             state: skipped
             resources: io
+        vars_pam_limits:
+          state: present
         vars_sub_ids:
           state: present
           present_override: false
@@ -33,6 +35,7 @@
                 [containers]
                 # log_driver="k8s-file"
                 # log_size_max="10m"
+                shm_size="128m"
                 tz = "Asia/Shanghai"
     # - name: whoami
     #   shell:
