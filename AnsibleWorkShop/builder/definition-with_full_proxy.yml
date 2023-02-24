@@ -21,7 +21,6 @@ additional_build_steps:
 
     - RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} https_proxy=${PROXY} &&
       export http_proxy=${PROXY} &&
-      dnf install -y unzip &&
       cd /tmp &&
       curl -LO https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_linux_amd64.zip &&
       unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip &&
