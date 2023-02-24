@@ -149,6 +149,12 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# new podman session
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/New-PodmanSession.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 

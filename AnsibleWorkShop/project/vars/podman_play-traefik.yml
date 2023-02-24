@@ -1,0 +1,14 @@
+# code: language=ansible
+---
+vars_podman_play:
+  kube_file: /KubeWorkShop/Traefik/aio-traefik.yaml
+  state: started # absent / created / started
+  force: true
+vars_podman_generate_systemd:
+  name: traefik
+vars_service:
+  podman_pod:
+    user_scope:
+      skipped: false
+      enabled: true
+      state: started

@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: no
+  tasks:
+    # https://github.com/containers/ansible-podman-collections/issues/246#issuecomment-825786767
+    - name: Add remote system connection definition for remote_container
+      command: |
+        podman --remote system connection add remote_container --identity "{{ ansible_user_dir }}/.ssh/id_rsa" "ssh://{{ ansible_host }}{{ systemd_runtime_path.stdout }}/podman/podman.sock"
+      delegate_to: localhost
+    # https://github.com/jpace121/j7s-jwt-mosquitto-auth/blob/b7cd1ce78e0f36cb832fa040b422d9435080c5e2/playbooks/build.yaml
+    - name: Add podman container to inventory
+      ansible.builtin.add_host:
+        hostname: freeipa
+        ansible_connection: containers.podman.podman
+        ansible_python_interpreter: /usr/bin/python3
+        ansible_podman_extra_args: --remote --connection 192.168.255.31
+        ansible_user: root
+        changed_when: false
+
+    - name: Run command in freeipa pod
+      ansible.builtin.raw: podman system connection ls
+      # ansible.builtin.raw: echo 'P@ssw0rd' | kinit admin; klist
+      delegate_to: localhost
