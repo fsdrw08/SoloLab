@@ -3,22 +3,94 @@
 - hosts: kube-1 # kube-2
   gather_facts: no
   tasks:
-    # https://github.com/containers/ansible-podman-collections/issues/246#issuecomment-825786767
-    - name: Add remote system connection definition for remote_container
-      command: |
-        podman --remote system connection add remote_container --identity "{{ ansible_user_dir }}/.ssh/id_rsa" "ssh://{{ ansible_host }}{{ systemd_runtime_path.stdout }}/podman/podman.sock"
-      delegate_to: localhost
-    # https://github.com/jpace121/j7s-jwt-mosquitto-auth/blob/b7cd1ce78e0f36cb832fa040b422d9435080c5e2/playbooks/build.yaml
-    - name: Add podman container to inventory
-      ansible.builtin.add_host:
-        hostname: freeipa
-        ansible_connection: containers.podman.podman
-        ansible_python_interpreter: /usr/bin/python3
-        ansible_podman_extra_args: --remote --connection 192.168.255.31
-        ansible_user: root
-        changed_when: false
+    # - name: Retrieve remote user runtime path
+    #   command: |
+    #     loginctl show-user {{ ansible_user }} -p RuntimePath --value
+    #   register: systemd_runtime_path
 
-    - name: Run command in freeipa pod
-      ansible.builtin.raw: podman system connection ls
-      # ansible.builtin.raw: echo 'P@ssw0rd' | kinit admin; klist
-      delegate_to: localhost
+    # - name: mainpulate request body
+    #   ansible.builtin.set_fact:
+    #     request_body: "{{ request_body_dict | ansible.builtin.to_json }}"
+    #   vars:
+    #     request_body_dict:
+    #       AttachStderr: true
+    #       AttachStdin: true
+    #       AttachStdout: true
+    #       cmd:
+    #         - echo 'P@ssw0rd' | kinit admin; klist
+          
+    # https://github.com/skupperproject/skupper/blob/043cb3246c2541e8f392a59d416b4884bea7231c/client/podman/container.go  
+    - name: new podman exec session
+      ansible.builtin.uri:
+        url: http://d/{{ api_version }}/libpod/containers/{{ container_name }}/exec
+        unix_socket: /run/user/1000/podman/podman.sock
+        method: POST
+        status_code: 201
+        body_format: json
+        body: "{{ exec_create_request_body_dict }}"
+      vars:
+        api_version: v4.4.1
+        container_name: freeipa-freeipa
+        exec_create_request_body_dict:
+          # AttachStderr: true
+          # AttachStdin: true
+          AttachStdout: true
+          Cmd:
+            - bash
+            - -c
+            - "echo 'P@ssw0rd' | kinit admin; klist"
+            # - /usr/bin/bash -c "echo 'P@ssw0rd' | kinit admin; klist"
+          # Env:
+          #   - PATH=/usr/bin/:/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+          Tty: true
+          Privileged: false
+          User: root
+      register: exec_create_exec_respond
+
+    - name: start podman exec session
+      ansible.builtin.uri:
+        url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
+        unix_socket: /run/user/1000/podman/podman.sock
+        method: POST
+        status_code: 200
+        body_format: json
+        body: "{{ exec_start_request_body_dict }}"
+        # https://serverfault.com/questions/722852/how-to-check-the-json-response-from-a-uri-request-with-ansible
+        return_content: true
+      vars:
+        exec_start_request_body_dict:
+          Detach: false
+          Tty: true
+      register: exec_start_respond
+
+    - name: debug
+      debug:
+        # var: exec_start_respond.content.stdout_lines
+        msg: "{{ exec_start_respond.content.split('\r\n') }}"
+
+    # - name: inspect
+    #   ansible.builtin.uri:
+    #     url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/json
+    #     unix_socket: /run/user/1000/podman/podman.sock
+    #     method: GET
+    #     status_code: 200
+    # # https://github.com/containers/ansible-podman-collections/issues/246#issuecomment-825786767
+    # - name: Add remote system connection definition for remote_container
+    #   command: |
+    #     podman --remote system connection add remote_container --identity "{{ ansible_user_dir }}/.ssh/id_rsa" "ssh://{{ ansible_host }}{{ systemd_runtime_path.stdout }}/podman/podman.sock"
+    #   delegate_to: localhost
+
+    # # https://github.com/jpace121/j7s-jwt-mosquitto-auth/blob/b7cd1ce78e0f36cb832fa040b422d9435080c5e2/playbooks/build.yaml
+    # - name: Add podman container to inventory
+    #   ansible.builtin.add_host:
+    #     hostname: freeipa
+    #     ansible_connection: containers.podman.podman
+    #     ansible_python_interpreter: /usr/bin/python3
+    #     ansible_podman_extra_args: --remote --connection 192.168.255.31
+    #     ansible_user: root
+    #     changed_when: false
+
+    # - name: Run command in freeipa pod
+    #   ansible.builtin.raw: podman system connection ls
+    #   # ansible.builtin.raw: echo 'P@ssw0rd' | kinit admin; klist
+    #   delegate_to: localhost
