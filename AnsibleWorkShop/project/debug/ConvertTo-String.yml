@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- hosts: localhost # kube-2
+  gather_facts: no
+  tasks:
+    - name: mainpulate query parameter
+      ansible.builtin.set_fact:
+        # https://www.techbeatly.com/ansible-convert-list-to-string/
+        query_param_string: "{{ query_param_list | join('&') }}"
+        # https://stackoverflow.com/questions/62239167/how-to-format-a-dict-to-a-string-in-ansible
+        # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/zip_filter.html
+        # https://jinja.palletsprojects.com/en/3.0.x/templates/#jinja-filters.map
+        query_param_string2: "{{ query_param_dict.keys() | 
+                                  ansible.builtin.zip(query_param_dict.values()) |
+                                  map('join', '=') |
+                                  join('&') }}"
+      vars:
+        query_param_list:
+          - logDriver=k8s-file
+          - network=podman
+        query_param_dict:
+          logDriver: k8s-file
+          network: podman
+    
