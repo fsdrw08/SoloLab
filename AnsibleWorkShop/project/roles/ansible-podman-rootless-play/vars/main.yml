@@ -2,65 +2,81 @@
 ---
 # vars file for ansible-podman-rootless-play
 
+api_version: v4.0.0 # v4.0.0 ← (default)
+
 # containers.podman.podman_network
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_network_module.html#ansible-collections-containers-podman-podman-network-module
 vars_podman_network:
-  debug: # false ← (default) / true
-  disable_dns: # false ← (default) / true
-  driver: # bridge ← (default)
-  executable: # podman ← (default)
-  gateway: # IPv4 or IPv6 gateway for the subnet
-  internal: # false ← (default) / true
-  ip_range: # Allocate container IP from range
-  ipv6: # false / true
-  macvlan: # Create a Macvlan connection based on this device
-  name: # !!required, skip if empty
-  opt:
-    # mtu: 
-    # vlan: 
-  recreate: # false ← (default) / true
-  state: # present ← (default) / absent
-  subnet: # Subnet in CIDR format
+  state: # present / absent, if empty, related process will skip 
+  request_body:
+    created: # string <date-time>, Created contains the timestamp when this network was created.
+    dns_enabled: # boolean, false ← (default) / true
+    driver: # Driver for this Network, e.g. bridge ← (default), macvlan
+    id: # ID of the Network.
+    internal: # boolean, false ← (default) / true, Internal is whether the Network should not have external routes to public or other Networks
+    ipam_options: # object(dict), IPAMOptions contains options used for the ip assignment.
+    ipv6_enabled: # boolean, false ← (default) / true, IPv6Enabled if set to true an ipv6 subnet should be created for this net.
+    labels: # object(dict), Labels is a set of key-value labels that have been applied to the Network.
+    name: # string, Name of the Network, if empty, related process will skip 
+    network_dns_servers: # Array of strings, List of custom DNS server for podman's DNS resolver at network level, all the containers attached to this network will consider resolvers configured at network level.
+    network_interface: # string, NetworkInterface is the network interface name on the host.
+    options: # object(dict), Options is a set of key-value options that have been applied to the Network.
+    subnets: # Array of objects (Subnet), Subnets to use for this network.
 
-# containers.podman.podman_volume
-# https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_volume_module.html#ansible-collections-containers-podman-podman-volume-module
-vars_podman_volume:
-  debug: # false ← (default) / true
-  driver: # local ← (default)
-  executable: # podman ← (default)
-  label: 
-    # key: value
-  name: # !!required, skip if empty
-  options:
-    # - o=timeout=10
-  recreate: # false ← (default) / true
-  state: # present ← (default) / absent
+# vars_podman_network:
+  # debug: # false ← (default) / true
+  # disable_dns: # false ← (default) / true
+  # driver: # bridge ← (default)
+  # executable: # podman ← (default)
+  # gateway: # IPv4 or IPv6 gateway for the subnet
+  # internal: # false ← (default) / true
+  # ip_range: # Allocate container IP from range
+  # ipv6: # false / true
+  # macvlan: # Create a Macvlan connection based on this device
+  # name: # !!required, skip if empty
+  # opt:
+  #   # mtu: 
+  #   # vlan: 
+  # recreate: # false ← (default) / true
+  # state: # present ← (default) / absent
+  # subnet: # Subnet in CIDR format
 
 # containers.podman.podman_play
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_play_module.html#ansible-collections-containers-podman-podman-play-module
 vars_podman_play:
-  authfile: # default is ${XDG_RUNTIME_DIR}/containers/auth.json
-  cert_dir: # /etc/containers/certs.d ← (default) 
-  configmap:
-    # - /path/to/configmap1
-    # - /path/to/configmap2
-  debug: # false ← (default) / true
-  executable: # podman ← (default)
-  force: # false / true , when state set to absent, whether delete related volume mention in kube_file
-  kube_file: # !!required, skip if empty
-  log_driver: # Set logging driver for all created containers.
-  log_level: # error ← (default) / info / warn / error / fatal / panic
-  network:
-    # - podman
-  password: # The username and password to use to authenticate with the registry if required.
-  quiet: # false / true
-  recreate: # false / true
-  seccomp_profile_root: # /var/lib/kubelet/seccomp ← (default)
-  state: # !!required, created / started / absent , containers.podman.podman_play will skip if empty
-  tls_verify: # false / true
-  username: # The username and password to use to authenticate with the registry if required.
-  env_var:
-    PODMAN_USERNS: # keep-id / keep-id:uid=200,gid=210 / auto / nomap, https://docs.podman.io/en/latest/markdown/options/userns.container.html
+  state: # present / absent, if empty, podman play process will skip 
+  kube_file: # path to the kube file, if empty, podman play process will skip 
+  query_params_for_create:
+    logDriver: # string, Logging driver for the containers in the pod.
+    network: # Array of strings, USe the network mode or specify an array of networks.
+    start: # boolean, false / true ← (default), Start the pod after creating it.
+    staticIPs: # Array of strings, Static IPs used for the pods.
+    staticMACs: # Array of strings, Static MACs used for the pods.
+    tlsVerify: # boolean, false / true ← (default), Require HTTPS and verify signatures when contacting registries.
+  query_params_for_delete:
+    force: # boolean, false  ← (default) / true, Remove volumes.
+  # authfile: # default is ${XDG_RUNTIME_DIR}/containers/auth.json
+  # cert_dir: # /etc/containers/certs.d ← (default) 
+  # configmap:
+  #   # - /path/to/configmap1
+  #   # - /path/to/configmap2
+  # debug: # false ← (default) / true
+  # executable: # podman ← (default)
+  # force: # false / true , when state set to absent, whether delete related volume mention in kube_file
+  # kube_file: # !!required, skip if empty
+  # log_driver: # Set logging driver for all created containers.
+  # log_level: # error ← (default) / info / warn / error / fatal / panic
+  # network:
+  #   # - podman
+  # password: # The username and password to use to authenticate with the registry if required.
+  # quiet: # false / true
+  # recreate: # false / true
+  # seccomp_profile_root: # /var/lib/kubelet/seccomp ← (default)
+  # state: # !!required, created / started / absent , containers.podman.podman_play will skip if empty
+  # tls_verify: # false / true
+  # username: # The username and password to use to authenticate with the registry if required.
+  # env_var:
+  #   PODMAN_USERNS: # keep-id / keep-id:uid=200,gid=210 / auto / nomap, https://docs.podman.io/en/latest/markdown/options/userns.container.html
     
 # vars_pod_name: # Name of the pod to generate systemd unit file, if empty, below process will be skipped
 

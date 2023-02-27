@@ -1,0 +1,19 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: no
+  vars:
+    api_version: v4.0.0
+    unix_socket: /run/user/1000/podman/podman.sock
+    podman_play:
+      state: # !!required, present / absent, if empty, podman play process will skip 
+      kube_file: # !!required, path to the kube file, if empty, podman play process will skip 
+  tasks:
+    - name: Invoke podman play
+      ansible.builtin.uri:
+        url: http://d/{{ api_version }}/libpod/play/kube
+        unix_socket: "{{ unix_socket }}"
+        method: POST
+        status_code: 200
+        body_format: json
+        body: "{{ podman_play.request_body }}"

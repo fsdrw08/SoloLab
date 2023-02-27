@@ -1,39 +1,61 @@
 # code: language=ansible
 ---
-- name: Copy k8s yaml file to target host
-  ansible.builtin.copy:
+# - name: Copy k8s yaml file to target host
+#   ansible.builtin.copy:
+#     src: "{{ podman_play.kube_file }}"
+#     dest: "/home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
+
+- name: slurp yaml file
+  ansible.builtin.slurp:
     src: "{{ podman_play.kube_file }}"
-    dest: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
+  register: podman_kube_file_slurp
 
 - name: Run Podman kube play
-  containers.podman.podman_play:
-    authfile: "{{ podman_play.authfile | default(omit) }}"
-    cert_dir: "{{ podman_play.cert_dir | default(omit) }}"
-    configmap: "{{ podman_play.configmap | default(omit) }}"
-    debug: "{{ podman_play.debug | default(omit) }}"
-    executable: "{{ podman_play.executable | default(omit) }}"
-    kube_file: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
-    log_driver: "{{ podman_play.log_driver | default(omit) }}"
-    log_level: "{{ podman_play.log_level | default(omit) }}"
-    network: "{{ podman_play.network | default(omit) }}"
-    password: "{{ podman_play.password | default(omit) }}"
-    quiet: "{{ podman_play.quiet | default(omit) }}"
-    recreate: "{{ podman_play.recreate | default(omit) }}"
-    seccomp_profile_root: "{{ podman_play.seccomp_profile_root | default(omit) }}"
-    state: "{{ podman_play.state }}"
-    tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
-    username: "{{ podman_play.username | default(omit) }}"
-  environment: "{{ podman_play.env_var | default(omit) }}"
+  ansible.builtin.uri:
+    url: http://d/{{ api_version }}/libpod/play/kube
+    unix_socket: "{{ unix_socket }}"
+    method: POST
+    status_code: 200
+    timeout: 300
+    body_format: json
+    body: "{{ podman_kube_file_slurp.content | b64decode }}"
   when:
-    - podman_play.state != "absent"
+    - podman_play.state == "present"
+  # containers.podman.podman_play:
+  #   authfile: "{{ podman_play.authfile | default(omit) }}"
+  #   cert_dir: "{{ podman_play.cert_dir | default(omit) }}"
+  #   configmap: "{{ podman_play.configmap | default(omit) }}"
+  #   debug: "{{ podman_play.debug | default(omit) }}"
+  #   executable: "{{ podman_play.executable | default(omit) }}"
+  #   kube_file: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
+  #   log_driver: "{{ podman_play.log_driver | default(omit) }}"
+  #   log_level: "{{ podman_play.log_level | default(omit) }}"
+  #   network: "{{ podman_play.network | default(omit) }}"
+  #   password: "{{ podman_play.password | default(omit) }}"
+  #   quiet: "{{ podman_play.quiet | default(omit) }}"
+  #   recreate: "{{ podman_play.recreate | default(omit) }}"
+  #   seccomp_profile_root: "{{ podman_play.seccomp_profile_root | default(omit) }}"
+  #   state: "{{ podman_play.state }}"
+  #   tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
+  #   username: "{{ podman_play.username | default(omit) }}"
+  # environment: "{{ podman_play.env_var | default(omit) }}"
+  # when:
+  #   - podman_play.state != "absent"
 
 - name: Run podman kube down
-  ansible.builtin.shell:
-    cmd: "{{ podman_play.executable | default(\"podman\") }} kube down /home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }} {{ force | default(omit) }}"
-  vars:
-    force: "{% if podman_play.force %}--force{% endif %}"
-  become_user: "{{ ansible_user }}"
-  ignore_errors: true
+  ansible.builtin.uri:
+    url: http://d/{{ api_version }}/libpod/play/kube?force={{ podman_play.force | default(false) | bool }}
+    unix_socket: "{{ unix_socket }}"
+    method: DELETE
+    status_code: 200
+    body_format: json
+    body: "{{ podman_kube_file_slurp.content | b64decode }}"
+  # ansible.builtin.shell:
+  #   cmd: "{{ podman_play.executable | default(\"podman\") }} kube down /home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }} {{ force | default(omit) }}"
+  # vars:
+  #   force: "{% if podman_play.force %}--force{% endif %}"
+  # become_user: "{{ ansible_user }}"
+  # ignore_errors: true
   when:
     - podman_play.state == "absent"
 

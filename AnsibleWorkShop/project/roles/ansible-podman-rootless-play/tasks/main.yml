@@ -1,145 +1,160 @@
 # code: language=ansible
 ---
 # tasks file for ansible-podman-rootless-play
+- name: Retrieve remote user runtime path
+  command: |
+    loginctl show-user {{ ansible_user }} -p RuntimePath --value
+  register: systemd_runtime_path
+
+- name: Set unix_socket
+  ansible.builtin.set_fact:
+    unix_socket: "{{ systemd_runtime_path.stdout }}/podman/podman.sock"
+
 # https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
 - name: Set podman network
-  containers.podman.podman_network:
-    debug: "{{ podman_network.debug | default(omit) }}"
-    disable_dns: "{{ podman_network.disable_dns | default(omit) }}"
-    driver: "{{ podman_network.driver | default(omit) }}"
-    executable: "{{ podman_network.executable | default(omit) }}"
-    gateway: "{{ podman_network.gateway | default(omit) }}"
-    internal: "{{ podman_network.internal | default(omit) }}"
-    ip_range: "{{ podman_network.ip_range | default(omit) }}"
-    ipv6: "{{ podman_network.ipv6 | default(omit) }}"
-    macvlan: "{{ podman_network.macvlan | default(omit) }}"
-    name: "{{ podman_network.name }}"
-    opt: "{{ podman_network.opt | default(omit) }}"
-    recreate: "{{ podman_network.recreate | default(omit) }}"
-    state: "{{ podman_network.state | default(omit) }}"
-    subnet: "{{ podman_network.subnet | default(omit) }}"
+  ansible.builtin.include_tasks:
+    file: Set-PodmanNetwork.yml
   when:
-    - podman_network.name != none
+    - (podman_network.state == "present") or (podman_network.state == "absent")
+    - podman_network.request_body.name is not none
 
-- name: Set Podman volume
-  containers.podman.podman_volume:
-    debug: "{{ podman_volume.debug | default(omit) }}"
-    driver: "{{ podman_volume.driver | default(omit) }}"
-    executable: "{{ podman_volume.executable | default(omit) }}"
-    label: "{{ podman_volume.label | default(omit) }}"
-    name: "{{ podman_volume.name }}"
-    options: "{{ podman_volume.options | default(omit) }}"
-    recreate: "{{ podman_volume.recreate | default(omit) }}"
-    state: "{{ podman_volume.state | default(omit) }}"
-  when:
-    - podman_volume.name != none
+  # containers.podman.podman_network:
+  #   debug: "{{ podman_network.debug | default(omit) }}"
+  #   disable_dns: "{{ podman_network.disable_dns | default(omit) }}"
+  #   driver: "{{ podman_network.driver | default(omit) }}"
+  #   executable: "{{ podman_network.executable | default(omit) }}"
+  #   gateway: "{{ podman_network.gateway | default(omit) }}"
+  #   internal: "{{ podman_network.internal | default(omit) }}"
+  #   ip_range: "{{ podman_network.ip_range | default(omit) }}"
+  #   ipv6: "{{ podman_network.ipv6 | default(omit) }}"
+  #   macvlan: "{{ podman_network.macvlan | default(omit) }}"
+  #   name: "{{ podman_network.name }}"
+  #   opt: "{{ podman_network.opt | default(omit) }}"
+  #   recreate: "{{ podman_network.recreate | default(omit) }}"
+  #   state: "{{ podman_network.state | default(omit) }}"
+  #   subnet: "{{ podman_network.subnet | default(omit) }}"
+  # when:
+  #   - podman_network.name != none
+
+# - name: Set Podman volume
+#   containers.podman.podman_volume:
+#     debug: "{{ podman_volume.debug | default(omit) }}"
+#     driver: "{{ podman_volume.driver | default(omit) }}"
+#     executable: "{{ podman_volume.executable | default(omit) }}"
+#     label: "{{ podman_volume.label | default(omit) }}"
+#     name: "{{ podman_volume.name }}"
+#     options: "{{ podman_volume.options | default(omit) }}"
+#     recreate: "{{ podman_volume.recreate | default(omit) }}"
+#     state: "{{ podman_volume.state | default(omit) }}"
+#   when:
+#     - podman_volume.name != none
 
 - name: Invoke podman play
   ansible.builtin.include_tasks:
     file: Invoke-PodmanPlay.yml
   when:
+    - (podman_play.state == "present") or (podman_network.state == "absent")
     - podman_play.kube_file != none
-    - podman_play.state != none
 
-- name: Detect pod info
-  containers.podman.podman_pod_info:
-    name: "{{ podman_generate_systemd.name }}"
-  register: pod_info
+# - name: Detect pod info
+#   containers.podman.podman_pod_info:
+#     name: "{{ podman_generate_systemd.name }}"
+#   register: pod_info
 
-- name: Set pod systemd service
-  when:
-    - podman_generate_systemd.name != none
-  block:
-    - name: Set pod systemd service when pod exist
-      when:
-        - pod_info.pods[0].Hostname is defined
-        - service.podman_pod.user_scope.skipped is false
-      block:
-        - name: Generate systemd service
-          containers.podman.podman_generate_systemd:
-            after: "{{ podman_generate_systemd.after | default(omit) }}"
-            container_prefix: "{{ podman_generate_systemd.container_prefix | default(omit) }}"
-            dest: "{{ podman_generate_systemd.dest | default(omit) }}"
-            env: "{{ podman_generate_systemd.env | default(omit) }}"
-            executable: "{{ podman_generate_systemd.executable | default(omit) }}"
-            name: "{{ podman_generate_systemd.name }}"
-            new: "{{ podman_generate_systemd.new | default(omit) }}"
-            no_header: "{{ podman_generate_systemd.no_header | default(omit) }}"
-            pod_prefix: "{{ podman_generate_systemd.pod_prefix | default(omit) }}"
-            requires: "{{ podman_generate_systemd.requires | default(omit) }}"
-            restart_policy: "{{ podman_generate_systemd.restart_policy | default(omit) }}"
-            restart_sec: "{{ podman_generate_systemd.restart_sec | default(omit) }}"
-            separator: "{{ podman_generate_systemd.separator | default(omit) }}"
-            start_timeout: "{{ podman_generate_systemd.start_timeout | default(omit) }}"
-            stop_timeout: "{{ podman_generate_systemd.stop_timeout | default(omit) }}"
-            use_names: "{{ podman_generate_systemd.use_names | default(omit) }}"
-            wants: "{{ podman_generate_systemd.wants | default(omit) }}"
+# - name: Set pod systemd service
+#   when:
+#     - podman_generate_systemd.name != none
+#   block:
+#     - name: Set pod systemd service when pod exist
+#       when:
+#         - pod_info.pods[0].Hostname is defined
+#         - service.podman_pod.user_scope.skipped is false
+#       block:
+#         - name: Generate systemd service
+#           containers.podman.podman_generate_systemd:
+#             after: "{{ podman_generate_systemd.after | default(omit) }}"
+#             container_prefix: "{{ podman_generate_systemd.container_prefix | default(omit) }}"
+#             dest: "{{ podman_generate_systemd.dest | default(omit) }}"
+#             env: "{{ podman_generate_systemd.env | default(omit) }}"
+#             executable: "{{ podman_generate_systemd.executable | default(omit) }}"
+#             name: "{{ podman_generate_systemd.name }}"
+#             new: "{{ podman_generate_systemd.new | default(omit) }}"
+#             no_header: "{{ podman_generate_systemd.no_header | default(omit) }}"
+#             pod_prefix: "{{ podman_generate_systemd.pod_prefix | default(omit) }}"
+#             requires: "{{ podman_generate_systemd.requires | default(omit) }}"
+#             restart_policy: "{{ podman_generate_systemd.restart_policy | default(omit) }}"
+#             restart_sec: "{{ podman_generate_systemd.restart_sec | default(omit) }}"
+#             separator: "{{ podman_generate_systemd.separator | default(omit) }}"
+#             start_timeout: "{{ podman_generate_systemd.start_timeout | default(omit) }}"
+#             stop_timeout: "{{ podman_generate_systemd.stop_timeout | default(omit) }}"
+#             use_names: "{{ podman_generate_systemd.use_names | default(omit) }}"
+#             wants: "{{ podman_generate_systemd.wants | default(omit) }}"
   
-        # https://stackoverflow.com/a/74475354
-        - name: omit service.podman_pod.user_scope.state
-          set_fact:
-            service: "{{ service | combine(new_var, recursive=true) }}"
-          vars:
-            new_var:
-              "{{
-                {
-                  'podman_pod': {
-                    'user_scope': {
-                      'state': omit
-                    }
-                  }
-                }
-              }}"
-          when:
-            - pod_info.pods[0].State == 'Running'
+#         # https://stackoverflow.com/a/74475354
+#         - name: omit service.podman_pod.user_scope.state
+#           set_fact:
+#             service: "{{ service | combine(new_var, recursive=true) }}"
+#           vars:
+#             new_var:
+#               "{{
+#                 {
+#                   'podman_pod': {
+#                     'user_scope': {
+#                       'state': omit
+#                     }
+#                   }
+#                 }
+#               }}"
+#           when:
+#             - pod_info.pods[0].State == 'Running'
 
-        - name: Set pod systemd service
-          ansible.builtin.systemd:
-            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
-            state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
-            enabled: "{{ service.podman_pod.user_scope.enabled | default(true) }}"
-            scope: user
+#         - name: Set pod systemd service
+#           ansible.builtin.systemd:
+#             name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+#             state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
+#             enabled: "{{ service.podman_pod.user_scope.enabled | default(true) }}"
+#             scope: user
 
-    - name: Disable pod systemd service when pod not exist
-      when:
-        - pod_info.pods[0].Hostname is not defined
-      block:
-        # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
-        - name: Detect pod systemd service state
-          ansible.builtin.systemd:
-            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
-            scope: user
-          register: pod_service_status
+#     - name: Disable pod systemd service when pod not exist
+#       when:
+#         - pod_info.pods[0].Hostname is not defined
+#       block:
+#         # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
+#         - name: Detect pod systemd service state
+#           ansible.builtin.systemd:
+#             name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+#             scope: user
+#           register: pod_service_status
 
-        - name: Disable systemd service
-          ansible.builtin.systemd:
-            name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
-            state: stopped
-            enabled: false
-            scope: user
-          when:
-            - pod_service_status.status.ActiveState == "active"
+#         - name: Disable systemd service
+#           ansible.builtin.systemd:
+#             name: "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+#             state: stopped
+#             enabled: false
+#             scope: user
+#           when:
+#             - pod_service_status.status.ActiveState == "active"
 
-        - name: Find pod related unit file
-          ansible.builtin.find:
-            paths: "{{ podman_generate_systemd.dest }}"
-            patterns: 
-              - "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
-              - "{{ podman_generate_systemd.container_prefix | default('container')}}-{{ podman_generate_systemd.name }}*.service"
-          register: service_unit_to_delete
+#         - name: Find pod related unit file
+#           ansible.builtin.find:
+#             paths: "{{ podman_generate_systemd.dest }}"
+#             patterns: 
+#               - "{{ podman_generate_systemd.pod_prefix | default('pod')}}-{{ podman_generate_systemd.name }}.service"
+#               - "{{ podman_generate_systemd.container_prefix | default('container')}}-{{ podman_generate_systemd.name }}*.service"
+#           register: service_unit_to_delete
 
-        - name: Delete pod related unit file
-          ansible.builtin.file:
-            path: "{{ item.path }}"
-            state: absent
-          loop: "{{ service_unit_to_delete.files }}"
+#         - name: Delete pod related unit file
+#           ansible.builtin.file:
+#             path: "{{ item.path }}"
+#             state: absent
+#           loop: "{{ service_unit_to_delete.files }}"
 
 
-- name: Set systemd lingering
-  ansible.builtin.include_tasks:
-    file: Set-SystemdLinger.yml
-  vars:
-    target_user: "{{ ansible_user }}"
-  when:
-    - ansible_service_mgr == "systemd"
-    - service.systemd_lingering.state != "skipped"
+# - name: Set systemd lingering
+#   ansible.builtin.include_tasks:
+#     file: Set-SystemdLinger.yml
+#   vars:
+#     target_user: "{{ ansible_user }}"
+#   when:
+#     - ansible_service_mgr == "systemd"
+#     - service.systemd_lingering.state != "skipped"

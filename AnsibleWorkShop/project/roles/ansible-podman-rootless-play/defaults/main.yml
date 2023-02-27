@@ -3,10 +3,13 @@
 # defaults file for ansible-podman-rootless-play
 
 role_name: ansible-podman-rootless-play
+api_version: v4.0.0 # v4.0.0 ← (default)
 
 # podman_network
 defaults_podman_network:
-  name: # required, skip if empty
+  state: # present / absent, if empty, related process will skip 
+  request_body:
+    name: # string, Name of the Network, if empty, related process will skip 
 
 podman_network: "{{ defaults_podman_network | ansible.builtin.combine(vars_podman_network, recursive=True) }}"
 
