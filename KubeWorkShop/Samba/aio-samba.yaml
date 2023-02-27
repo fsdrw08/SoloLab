@@ -69,6 +69,7 @@ spec:
   containers:
     - name: samba
       image: quay.io/samba.org/samba-server:v0.2
+      imagePullPolicy: IfNotPresent
       resources:
         limits:
           memory: "128Mi"
