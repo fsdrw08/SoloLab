@@ -45,16 +45,19 @@ vars_podman_network:
 # https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_play_module.html#ansible-collections-containers-podman-podman-play-module
 vars_podman_play:
   state: # present / absent, if empty, podman play process will skip 
-  kube_file: # path to the kube file, if empty, podman play process will skip 
-  query_params_for_create:
-    logDriver: # string, Logging driver for the containers in the pod.
-    network: # Array of strings, USe the network mode or specify an array of networks.
-    start: # boolean, false / true ← (default), Start the pod after creating it.
-    staticIPs: # Array of strings, Static IPs used for the pods.
-    staticMACs: # Array of strings, Static MACs used for the pods.
-    tlsVerify: # boolean, false / true ← (default), Require HTTPS and verify signatures when contacting registries.
-  query_params_for_delete:
-    force: # boolean, false  ← (default) / true, Remove volumes.
+  timeout: 300
+  query_params:
+    create:
+      logDriver: # string, Logging driver for the containers in the pod.
+      network: # Array of strings, USe the network mode or specify an array of networks.
+      start: # boolean, false / true ← (default), Start the pod after creating it.
+      staticIPs: # Array of strings, Static IPs used for the pods.
+      staticMACs: # Array of strings, Static MACs used for the pods.
+      tlsVerify: # boolean, false / true ← (default), Require HTTPS and verify signatures when contacting registries.
+    delete:
+      force: # boolean, false  ← (default) / true, Remove volumes.
+  request_body:
+    kube_file: # path to the kube file, if empty, podman play process will skip 
   # authfile: # default is ${XDG_RUNTIME_DIR}/containers/auth.json
   # cert_dir: # /etc/containers/certs.d ← (default) 
   # configmap:

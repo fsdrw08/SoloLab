@@ -5,6 +5,7 @@
   command: |
     loginctl show-user {{ ansible_user }} -p RuntimePath --value
   register: systemd_runtime_path
+  changed_when: false
 
 - name: Set unix_socket
   ansible.builtin.set_fact:
@@ -18,49 +19,34 @@
     - (podman_network.state == "present") or (podman_network.state == "absent")
     - podman_network.request_body.name is not none
 
-  # containers.podman.podman_network:
-  #   debug: "{{ podman_network.debug | default(omit) }}"
-  #   disable_dns: "{{ podman_network.disable_dns | default(omit) }}"
-  #   driver: "{{ podman_network.driver | default(omit) }}"
-  #   executable: "{{ podman_network.executable | default(omit) }}"
-  #   gateway: "{{ podman_network.gateway | default(omit) }}"
-  #   internal: "{{ podman_network.internal | default(omit) }}"
-  #   ip_range: "{{ podman_network.ip_range | default(omit) }}"
-  #   ipv6: "{{ podman_network.ipv6 | default(omit) }}"
-  #   macvlan: "{{ podman_network.macvlan | default(omit) }}"
-  #   name: "{{ podman_network.name }}"
-  #   opt: "{{ podman_network.opt | default(omit) }}"
-  #   recreate: "{{ podman_network.recreate | default(omit) }}"
-  #   state: "{{ podman_network.state | default(omit) }}"
-  #   subnet: "{{ podman_network.subnet | default(omit) }}"
-  # when:
-  #   - podman_network.name != none
-
-# - name: Set Podman volume
-#   containers.podman.podman_volume:
-#     debug: "{{ podman_volume.debug | default(omit) }}"
-#     driver: "{{ podman_volume.driver | default(omit) }}"
-#     executable: "{{ podman_volume.executable | default(omit) }}"
-#     label: "{{ podman_volume.label | default(omit) }}"
-#     name: "{{ podman_volume.name }}"
-#     options: "{{ podman_volume.options | default(omit) }}"
-#     recreate: "{{ podman_volume.recreate | default(omit) }}"
-#     state: "{{ podman_volume.state | default(omit) }}"
-#   when:
-#     - podman_volume.name != none
-
 - name: Invoke podman play
   ansible.builtin.include_tasks:
     file: Invoke-PodmanPlay.yml
   when:
-    - (podman_play.state == "present") or (podman_network.state == "absent")
-    - podman_play.kube_file != none
+    - (podman_play.state == "present") or (podman_play.state == "absent")
+    - podman_play.request_body.kube_file != none
 
-# - name: Detect pod info
-#   containers.podman.podman_pod_info:
-#     name: "{{ podman_generate_systemd.name }}"
-#   register: pod_info
+- name: Detect pod info
+  ansible.builtin.uri:
+    url: http://d/{{ api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.name) }}/json
+    unix_socket: "{{ unix_socket }}"
+    method: GET
+    status_code: 
+      - 200
+      - 404
+    return_content: true
+  register: pod_info
 
+- name: debug
+  debug:
+    msg: "{{ pod_info }}"
+  
+- name: debug
+  debug:
+    # msg: "{{ pod_info.json.Hostname }}"
+    msg: "{{ pod_info.json.State }}"
+
+# - name: Invoke podman socket 
 # - name: Set pod systemd service
 #   when:
 #     - podman_generate_systemd.name != none

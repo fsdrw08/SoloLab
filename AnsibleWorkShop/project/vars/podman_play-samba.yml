@@ -1,10 +1,13 @@
 # code: language=ansible
 ---
 vars_podman_play:
-  state: absent # absent / created / started
-  kube_file: /KubeWorkShop/Samba/aio-samba.yaml
-  # env_var:
-  #   PODMAN_USERNS: keep-id:uid=1000,gid=1000
+  state: present # absent / present
+  query_params:
+    delete:
+      force: "true"
+  request_body:
+    kube_file: /KubeWorkShop/Samba/aio-samba.yaml
+
 vars_podman_generate_systemd:
   name: samba
 vars_service:

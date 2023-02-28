@@ -1,65 +1,99 @@
 # code: language=ansible
 ---
-# - name: Copy k8s yaml file to target host
-#   ansible.builtin.copy:
-#     src: "{{ podman_play.kube_file }}"
-#     dest: "/home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
-
 - name: slurp yaml file
   ansible.builtin.slurp:
-    src: "{{ podman_play.kube_file }}"
-  register: podman_kube_file_slurp
+    src: "{{ podman_play.request_body.kube_file }}"
+  register: kube_file_slurp
+  delegate_to: localhost
 
-- name: Run Podman kube play
-  ansible.builtin.uri:
-    url: http://d/{{ api_version }}/libpod/play/kube
-    unix_socket: "{{ unix_socket }}"
-    method: POST
-    status_code: 200
-    timeout: 300
-    body_format: json
-    body: "{{ podman_kube_file_slurp.content | b64decode }}"
+- name: podman kube play
   when:
     - podman_play.state == "present"
-  # containers.podman.podman_play:
-  #   authfile: "{{ podman_play.authfile | default(omit) }}"
-  #   cert_dir: "{{ podman_play.cert_dir | default(omit) }}"
-  #   configmap: "{{ podman_play.configmap | default(omit) }}"
-  #   debug: "{{ podman_play.debug | default(omit) }}"
-  #   executable: "{{ podman_play.executable | default(omit) }}"
-  #   kube_file: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
-  #   log_driver: "{{ podman_play.log_driver | default(omit) }}"
-  #   log_level: "{{ podman_play.log_level | default(omit) }}"
-  #   network: "{{ podman_play.network | default(omit) }}"
-  #   password: "{{ podman_play.password | default(omit) }}"
-  #   quiet: "{{ podman_play.quiet | default(omit) }}"
-  #   recreate: "{{ podman_play.recreate | default(omit) }}"
-  #   seccomp_profile_root: "{{ podman_play.seccomp_profile_root | default(omit) }}"
-  #   state: "{{ podman_play.state }}"
-  #   tls_verify: "{{ podman_play.tls_verify | default(omit) }}"
-  #   username: "{{ podman_play.username | default(omit) }}"
-  # environment: "{{ podman_play.env_var | default(omit) }}"
-  # when:
-  #   - podman_play.state != "absent"
+  block:
+    - name: Clean up the query params dict
+      ansible.builtin.set_fact:
+        podman_play_query_params_create: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_play.query_params.create | dict2items }}"
+      when:
+        - podman_play.query_params.create is defined
+        - item.value is not none
 
-- name: Run podman kube down
-  ansible.builtin.uri:
-    url: http://d/{{ api_version }}/libpod/play/kube?force={{ podman_play.force | default(false) | bool }}
-    unix_socket: "{{ unix_socket }}"
-    method: DELETE
-    status_code: 200
-    body_format: json
-    body: "{{ podman_kube_file_slurp.content | b64decode }}"
-  # ansible.builtin.shell:
-  #   cmd: "{{ podman_play.executable | default(\"podman\") }} kube down /home/{{ ansible_user }}/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }} {{ force | default(omit) }}"
-  # vars:
-  #   force: "{% if podman_play.force %}--force{% endif %}"
-  # become_user: "{{ ansible_user }}"
-  # ignore_errors: true
+    - name: Prepare query params for create
+      ansible.builtin.set_fact:
+        podman_play_query_params_create_definitive: "?{{ podman_play_query_params_create.keys() | 
+                                                        ansible.builtin.zip(podman_play_query_params_create.values()) |
+                                                        map('join', '=') |
+                                                        join('&') }}"
+      when: 
+        - podman_play_query_params_create is defined
+
+    - name: Run Podman kube play
+      ansible.builtin.uri:
+        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_create_definitive | default('') }}
+        unix_socket: "{{ unix_socket }}"
+        method: POST
+        status_code: 
+          - 200
+          - 500
+        timeout: "{{ podman_play.timeout | default(300) }}"
+        body_format: json
+        body: "{{ kube_file_slurp.content | b64decode }}"
+      register: podman_kube_play
+      changed_when: 
+        - podman_kube_play.status == 200
+      
+    - name: debug
+      debug:
+        msg: "{{ podman_kube_play }}"
+
+    - name: set pod id
+      ansible.builtin.set_fact:
+        pod_id: "{{ podman_kube_play.json.Pods[0].ID }}"
+      when:
+        - podman_kube_play.status == 200
+
+    - name: debug
+      debug:
+        msg: "{{ pod_id }}"
+      when:
+        - podman_kube_play.status == 200
+
+- name: podman kube down
   when:
     - podman_play.state == "absent"
+  block:
+    - name: Clean up the query params dict
+      ansible.builtin.set_fact:
+        podman_play_query_params_delete: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_play.query_params.delete | dict2items }}"
+      when:
+        - podman_play.query_params.delete is defined
+        - item.value is not none
 
-- name: Delete tmp k8s yaml file
-  ansible.builtin.file:
-    path: "~/.ansible/tmp/{{ podman_play.kube_file.split('/')[-1] }}"
-    state: absent
+    - name: Prepare query params for delete
+      ansible.builtin.set_fact:
+        podman_play_query_params_delete_definitive: "?{{ podman_play_query_params_delete.keys() | 
+                                                        ansible.builtin.zip(podman_play_query_params_delete.values()) |
+                                                        map('join', '=') |
+                                                        join('&') }}"
+      when:
+        - podman_play_query_params_delete is defined
+
+    - name: Run podman kube down
+      ansible.builtin.uri:
+        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_delete_definitive | default('') }}
+        unix_socket: "{{ unix_socket }}"
+        method: DELETE
+        status_code: 
+          - 200
+          - 500
+        body_format: json
+        body: "{{ kube_file_slurp.content | b64decode }}"
+        return_content: true
+      register: podman_kube_down
+      changed_when: 
+        - podman_kube_down.status == 200
+
+    - name: debug
+      debug:
+        msg: "{{ podman_kube_down }}"
