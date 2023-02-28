@@ -49,7 +49,7 @@ additional_build_steps:
       curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm &&
       chmod +x /usr/local/bin/helm  &&
       unset HTTPS_PROXY &&
-      unset HTTP_PROXY &&\
+      unset HTTP_PROXY &&
       unset https_proxy &&
       unset http_proxy
       
