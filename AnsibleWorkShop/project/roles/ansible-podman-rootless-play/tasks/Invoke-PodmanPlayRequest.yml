@@ -12,24 +12,24 @@
   block:
     - name: Clean up the query params dict
       ansible.builtin.set_fact:
-        podman_play_query_params_create: "{{ {item.key: item.value} }}"
-      loop: "{{ podman_play.query_params.create | dict2items }}"
+        podman_play_query_params_POST: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_play.query_params.POST | dict2items }}"
       when:
-        - podman_play.query_params.create is defined
+        - podman_play.query_params.POST is defined
         - item.value is not none
 
     - name: Prepare query params for create
       ansible.builtin.set_fact:
-        podman_play_query_params_create_definitive: "?{{ podman_play_query_params_create.keys() | 
-                                                        ansible.builtin.zip(podman_play_query_params_create.values()) |
+        podman_play_query_params_POST_string: "?{{ podman_play_query_params_POST.keys() | 
+                                                        ansible.builtin.zip(podman_play_query_params_POST.values()) |
                                                         map('join', '=') |
                                                         join('&') }}"
       when: 
-        - podman_play_query_params_create is defined
+        - podman_play_query_params_POST is defined
 
     - name: Run Podman kube play
       ansible.builtin.uri:
-        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_create_definitive | default('') }}
+        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_POST_string | default('') }}
         unix_socket: "{{ unix_socket }}"
         method: POST
         status_code: 
@@ -38,25 +38,25 @@
         timeout: "{{ podman_play.timeout | default(300) }}"
         body_format: json
         body: "{{ kube_file_slurp.content | b64decode }}"
-      register: podman_kube_play
+      register: podman_kube_play_respond
       changed_when: 
-        - podman_kube_play.status == 200
+        - podman_kube_play_respond.status == 200
       
     - name: debug
       debug:
-        msg: "{{ podman_kube_play }}"
+        msg: "{{ podman_kube_play_respond }}"
 
     - name: set pod id
       ansible.builtin.set_fact:
-        pod_id: "{{ podman_kube_play.json.Pods[0].ID }}"
+        pod_id: "{{ podman_kube_play_respond.json.Pods[0].ID }}"
       when:
-        - podman_kube_play.status == 200
+        - podman_kube_play_respond.status == 200
 
     - name: debug
       debug:
         msg: "{{ pod_id }}"
       when:
-        - podman_kube_play.status == 200
+        - podman_kube_play_respond.status == 200
 
 - name: podman kube down
   when:
@@ -90,10 +90,10 @@
         body_format: json
         body: "{{ kube_file_slurp.content | b64decode }}"
         return_content: true
-      register: podman_kube_down
+      register: podman_kube_down_respond
       changed_when: 
-        - podman_kube_down.status == 200
+        - podman_kube_down_respond.status == 200
 
     - name: debug
       debug:
-        msg: "{{ podman_kube_down }}"
+        msg: "{{ podman_kube_down_respond }}"

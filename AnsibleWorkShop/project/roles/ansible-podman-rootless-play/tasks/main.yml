@@ -12,23 +12,23 @@
     unix_socket: "{{ systemd_runtime_path.stdout }}/podman/podman.sock"
 
 # https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
-- name: Set podman network
+- name: Invoke podman network request
   ansible.builtin.include_tasks:
     file: Set-PodmanNetwork.yml
   when:
     - (podman_network.state == "present") or (podman_network.state == "absent")
     - podman_network.request_body.name is not none
 
-- name: Invoke podman play
+- name: Invoke podman play request
   ansible.builtin.include_tasks:
-    file: Invoke-PodmanPlay.yml
+    file: Invoke-PodmanPlayRequest.yml
   when:
     - (podman_play.state == "present") or (podman_play.state == "absent")
     - podman_play.request_body.kube_file != none
 
 - name: Detect pod info
   ansible.builtin.uri:
-    url: http://d/{{ api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.name) }}/json
+    url: http://d/{{ api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/json
     unix_socket: "{{ unix_socket }}"
     method: GET
     status_code: 
@@ -40,13 +40,13 @@
 - name: debug
   debug:
     msg: "{{ pod_info }}"
-  
-- name: debug
-  debug:
-    # msg: "{{ pod_info.json.Hostname }}"
-    msg: "{{ pod_info.json.State }}"
 
-# - name: Invoke podman socket 
+- name: Invoke podman generate request
+  ansible.builtin.include_tasks:
+    file: Invoke-PodmanGenerateRequest.yml
+  when:
+    - pod_id | default(podman_generate_systemd.path_params.name)  is not none
+
 # - name: Set pod systemd service
 #   when:
 #     - podman_generate_systemd.name != none

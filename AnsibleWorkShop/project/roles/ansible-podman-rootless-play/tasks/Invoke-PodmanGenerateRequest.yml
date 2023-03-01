@@ -1,0 +1,97 @@
+# code: language=ansible
+---
+- name: Set pod systemd service when pod exist
+  when:
+    - pod_info.json.Hostname is defined
+    - service.podman_pod.user_scope.skipped is false
+  block:
+    - name: Clean up the podman_generate_systemd query params dict
+      ansible.builtin.set_fact:
+        podman_generate_systemd_query_params_GET: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_generate_systemd.query_params | dict2items }}"
+      when:
+        - podman_generate_systemd.query_params is defined
+        - item.value is not none
+
+    - name: Convert query_params from dict to string for podman_generate_systemd
+      ansible.builtin.set_fact:
+        podman_generate_systemd_query_params_GET_string: "?{{ podman_generate_systemd_query_params_GET.keys() | 
+                                                        ansible.builtin.zip(podman_generate_systemd_query_params_GET.values()) |
+                                                        map('join', '=') |
+                                                        join('&') }}"
+      when: 
+        - podman_generate_systemd_query_params_GET is defined
+
+    - name: Get pod systemd unit content
+      ansible.builtin.uri:
+        url: http://d/{{ api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_GET_string | default('')}}
+        unix_socket: "{{ unix_socket }}"
+        method: GET
+        status_code: 
+          - 200
+      register: podman_generate_systemd_respond
+
+    - name: Create systemd unit file
+      ansible.builtin.file:
+        path: "{{ podman_generate_systemd.dest }}/{{ item.key }}.service"
+        state: touch
+        mode: '0755'
+      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      when:
+        - podman_generate_systemd.dest is defined
+        - podman_generate_systemd_respond.json is defined
+        
+    - name: Set systemd unit to file
+      ansible.builtin.blockinfile:
+        path: "{{ podman_generate_systemd.dest }}/{{ item.key }}.service"
+        marker: "# {mark} {{ role_name }}"
+        block: "{{ item.value }}"
+        state: present
+      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      when:
+        - podman_generate_systemd.dest is defined
+        - podman_generate_systemd_respond.json is defined
+
+    - name: Set pod systemd service
+      ansible.builtin.systemd:
+        name: "{{ item.key }}.service"
+        state: "{{ service.podman_pod.user_scope.state | default(omit) }}"
+        enabled: "{{ service.podman_pod.user_scope.enabled | default(true) }}"
+        scope: user
+      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      when: 
+        - item.key.startswith(podman_generate_systemd.podPrefix.GET.podPrefix | default('pod'))
+
+- name: Disable pod systemd service when pod not exist
+  when:
+    - pod_info.json.Hostname is not defined
+  block:
+    # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
+    - name: Detect pod systemd service state
+      ansible.builtin.systemd:
+        name: "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        scope: user
+      register: pod_service_status
+
+    - name: Disable systemd service
+      ansible.builtin.systemd:
+        name: "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        state: stopped
+        enabled: false
+        scope: user
+      when:
+        - pod_service_status.status.ActiveState == "active"
+
+    - name: Find pod related unit file
+      ansible.builtin.find:
+        paths: "{{ podman_generate_systemd.dest }}"
+        patterns: 
+          - "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+          - "{{ podman_generate_systemd.podPrefix.GET.containerPrefix | default('container')}}-{{ podman_generate_systemd.path_params.name }}*.service"
+      register: service_unit_to_delete
+
+    - name: Delete pod related unit file
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ service_unit_to_delete.files }}"
