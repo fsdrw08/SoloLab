@@ -6,16 +6,10 @@
     - name: mainpulate query parameter
       ansible.builtin.set_fact:
         # https://www.techbeatly.com/ansible-convert-list-to-string/
-        # query_param_string: "{{ query_param_list | join('&') }}"
+        query_param_string: "{{ query_param_list | join('&') }}"
 
-        # https://stackoverflow.com/questions/62239167/how-to-format-a-dict-to-a-string-in-ansible
-        # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/zip_filter.html
-        # https://jinja.palletsprojects.com/en/3.0.x/templates/#jinja-filters.map
-        # query_param_string2: "{{ query_param_dict.keys() | 
-        #                           ansible.builtin.zip(query_param_dict.values() | default(omit) ) |
-        #                           map('join', '=') |
-        #                           join('&') }}"
         # query_param_string2: "{{ query_param_dict | combine({item.key: item.value}) }}"
+        # https://stackoverflow.com/questions/50514383/ansible-remove-item-from-dict/57324251#57324251
         query_param_string2: "{{ {item.key: item.value} }}"
       vars:
         query_param_list:
@@ -32,6 +26,9 @@
 
     - name: set fact
       set_fact:
+        # https://stackoverflow.com/questions/62239167/how-to-format-a-dict-to-a-string-in-ansible/62242361#62242361
+        # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/zip_filter.html
+        # https://jinja.palletsprojects.com/en/3.0.x/templates/#jinja-filters.map
         query_param_string3: "{{ query_param_string2.keys() | 
                                   ansible.builtin.zip(query_param_string2.values()) |
                                   map('join', '=') |

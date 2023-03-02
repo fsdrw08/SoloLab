@@ -31,19 +31,31 @@
           - 200
       register: podman_generate_systemd_respond
 
-    - name: Create systemd unit file
+    - name: Detect pod related unit file
+      ansible.builtin.stat:
+        path: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
+      loop: "{{ podman_generate_systemd_respond.json.keys() | 
+                ansible.builtin.product(['.service']) | map('join') | list }}"
+      register: service_unit_to_create            
+
+    # - name: debug
+    #   debug:
+    #     msg: "{{ service_unit_to_create }}"
+
+    # https://luiscachog.io/using-the-ansible-stat-module-on-a-loop/
+    - name: Create systemd unit file if not exist
       ansible.builtin.file:
-        path: "{{ podman_generate_systemd.dest }}/{{ item.key }}.service"
-        state: touch
+        path: "{{ [podman_generate_systemd.dest, item.item] | ansible.builtin.path_join }}"
+        state: "{{ 'file' if item.stat.exists else 'touch' }}"
         mode: '0755'
-      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      loop: "{{ service_unit_to_create.results }}"
       when:
         - podman_generate_systemd.dest is defined
         - podman_generate_systemd_respond.json is defined
         
     - name: Set systemd unit to file
       ansible.builtin.blockinfile:
-        path: "{{ podman_generate_systemd.dest }}/{{ item.key }}.service"
+        path: "{{ [podman_generate_systemd.dest, item.key + '.service'] | ansible.builtin.path_join }}"
         marker: "# {mark} {{ role_name }}"
         block: "{{ item.value }}"
         state: present
@@ -51,6 +63,24 @@
       when:
         - podman_generate_systemd.dest is defined
         - podman_generate_systemd_respond.json is defined
+
+    # https://stackoverflow.com/a/74475354
+    - name: omit service.podman_pod.user_scope.state
+      set_fact:
+        service: "{{ service | combine(new_var, recursive=true) }}"
+      vars:
+        new_var:
+          "{{
+            {
+              'podman_pod': {
+                'user_scope': {
+                  'state': omit
+                }
+              }
+            }
+          }}"
+      when:
+        - pod_info.json.State == 'Running'
 
     - name: Set pod systemd service
       ansible.builtin.systemd:
@@ -60,7 +90,10 @@
         scope: user
       loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
       when: 
+        # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
+        # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
         - item.key.startswith(podman_generate_systemd.podPrefix.GET.podPrefix | default('pod'))
+
 
 - name: Disable pod systemd service when pod not exist
   when:
