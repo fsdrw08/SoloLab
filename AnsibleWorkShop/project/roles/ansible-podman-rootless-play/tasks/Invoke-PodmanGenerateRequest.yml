@@ -25,7 +25,7 @@
     - name: Get pod systemd unit content
       ansible.builtin.uri:
         url: http://d/{{ api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_GET_string | default('')}}
-        unix_socket: "{{ unix_socket }}"
+        unix_socket: "{{ podman_unix_socket | default(omit) }}"
         method: GET
         status_code: 
           - 200
@@ -92,7 +92,7 @@
       when: 
         # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
         # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
-        - item.key.startswith(podman_generate_systemd.podPrefix.GET.podPrefix | default('pod'))
+        - item.key.startswith(podman_generate_systemd.query_params.GET.podPrefix | default('pod'))
 
 
 - name: Disable pod systemd service when pod not exist
@@ -102,13 +102,13 @@
     # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
     - name: Detect pod systemd service state
       ansible.builtin.systemd:
-        name: "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        name: "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
         scope: user
       register: pod_service_status
 
     - name: Disable systemd service
       ansible.builtin.systemd:
-        name: "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        name: "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
         state: stopped
         enabled: false
         scope: user
@@ -119,8 +119,8 @@
       ansible.builtin.find:
         paths: "{{ podman_generate_systemd.dest }}"
         patterns: 
-          - "{{ podman_generate_systemd.podPrefix.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
-          - "{{ podman_generate_systemd.podPrefix.GET.containerPrefix | default('container')}}-{{ podman_generate_systemd.path_params.name }}*.service"
+          - "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+          - "{{ podman_generate_systemd.query_params.GET.containerPrefix | default('container')}}-{{ podman_generate_systemd.path_params.name }}*.service"
       register: service_unit_to_delete
 
     - name: Delete pod related unit file

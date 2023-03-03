@@ -3,7 +3,7 @@
 - name: create podman network {{ podman_network.request_body.name }}
   ansible.builtin.uri:
     url: http://d/{{ api_version }}/libpod/networks/create
-    unix_socket: "{{ unix_socket }}"
+    unix_socket: "{{ podman_unix_socket | default(omit) }}"
     method: POST
     status_code: 200
     body_format: json
@@ -14,6 +14,6 @@
 - name: delete podman network {{ podman_network.request_body.name }}
   ansible.builtin.uri:
     url: http://d/{{ api_version }}/libpod/networks/{{ podman_network.request_body.name }}
-    unix_socket: "{{ unix_socket }}"
+    unix_socket: "{{ podman_unix_socket | default(omit) }}"
     method: DELETE
     status_code: 200
