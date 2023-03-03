@@ -26,7 +26,7 @@
     - name: Get pod systemd unit content
       ansible.builtin.uri:
         url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_string | default('')}}"
-        unix_socket: "{{ podman_unix_socket | default(omit) }}"
+        unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: GET
         status_code: 
           - 200
@@ -53,6 +53,8 @@
       loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
       when:
         - podman_generate_systemd_respond.json is defined
+      delegate_to: localhost
+      changed_when: false
 
     - name: Copy systemd unit file to dest path
       ansible.builtin.copy:

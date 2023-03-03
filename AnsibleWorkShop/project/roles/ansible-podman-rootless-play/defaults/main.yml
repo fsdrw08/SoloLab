@@ -5,12 +5,12 @@
 role_name: ansible-podman-rootless-play
 
 # podman_uri:
-default_podman_uri:
+defaults_podman_uri:
   host: http://d
   api_version: v4.0.0
   unix_socket:
 
-podman_uri: "{{ default_podman_uri | ansible.builtin.combine(vars_podman_uri, recursive=True) }}"
+podman_uri: "{{ defaults_podman_uri | ansible.builtin.combine(vars_podman_uri, recursive=True) }}"
 
 
 # podman_network

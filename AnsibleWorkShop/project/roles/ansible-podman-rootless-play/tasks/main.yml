@@ -15,7 +15,7 @@
     file: Invoke-PodmanPlayRequest.yml
   when:
     - (podman_play.state == "present") or (podman_play.state == "absent")
-    - podman_play.request_body.kube_file != none
+    - podman_play.kube_file != none
 
 - name: Detect pod info
   ansible.builtin.uri:
