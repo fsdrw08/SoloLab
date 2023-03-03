@@ -8,6 +8,16 @@
         file: vars/podman_play-samba.yml
         # file: vars/podman_play-freeipa.yml
 
+    - name: Retrieve remote user runtime path
+      command: |
+        loginctl show-user {{ ansible_user }} -p RuntimePath --value
+      register: systemd_runtime_path
+      changed_when: false
+
+    - name: Set unix_socket
+      ansible.builtin.set_fact:
+        podman_unix_socket: "{{ systemd_runtime_path.stdout }}/podman/podman.sock"
+
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: run role ansible-podman-rootless-provision
       ansible.builtin.include_role:

@@ -1,20 +1,11 @@
 # code: language=ansible
 ---
 # tasks file for ansible-podman-rootless-play
-- name: Retrieve remote user runtime path
-  command: |
-    loginctl show-user {{ ansible_user }} -p RuntimePath --value
-  register: systemd_runtime_path
-  changed_when: false
-
-- name: Set unix_socket
-  ansible.builtin.set_fact:
-    unix_socket: "{{ systemd_runtime_path.stdout }}/podman/podman.sock"
 
 # https://stackoverflow.com/questions/41725555/how-to-use-omit-with-ansible-and-avoid-any-errors
 - name: Invoke podman network request
   ansible.builtin.include_tasks:
-    file: Set-PodmanNetwork.yml
+    file: Invoke-PodmanNetworkRequest.yml
   when:
     - (podman_network.state == "present") or (podman_network.state == "absent")
     - podman_network.request_body.name is not none
@@ -29,7 +20,7 @@
 - name: Detect pod info
   ansible.builtin.uri:
     url: http://d/{{ api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/json
-    unix_socket: "{{ unix_socket }}"
+    unix_socket: "{{ podman_unix_socket | default(omit) }}"
     method: GET
     status_code: 
       - 200
