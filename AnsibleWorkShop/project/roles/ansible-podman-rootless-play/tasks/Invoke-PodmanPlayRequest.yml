@@ -2,7 +2,7 @@
 ---
 - name: slurp yaml file
   ansible.builtin.slurp:
-    src: "{{ podman_play.request_body.kube_file }}"
+    src: "{{ podman_play.kube_file }}"
   register: kube_file_slurp
   delegate_to: localhost
 
@@ -12,24 +12,24 @@
   block:
     - name: Clean up the query params dict
       ansible.builtin.set_fact:
-        podman_play_query_params_POST: "{{ {item.key: item.value} }}"
-      loop: "{{ podman_play.query_params.POST | dict2items }}"
+        podman_play_present_query_params: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_play.present.query_params | dict2items }}"
       when:
-        - podman_play.query_params.POST is defined
+        - podman_play.present.query_params is defined
         - item.value is not none
 
     - name: Prepare query params for create
       ansible.builtin.set_fact:
-        podman_play_query_params_POST_string: "?{{ podman_play_query_params_POST.keys() | 
-                                                        ansible.builtin.zip(podman_play_query_params_POST.values()) |
+        podman_play_present_query_params_string: "?{{ podman_play_present_query_params.keys() | 
+                                                        ansible.builtin.zip(podman_play_present_query_params.values()) |
                                                         map('join', '=') |
                                                         join('&') }}"
       when: 
-        - podman_play_query_params_POST is defined
+        - podman_play_present_query_params is defined
 
     - name: Run Podman kube play
       ansible.builtin.uri:
-        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_POST_string | default('') }}
+        url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_present_query_params_string | default('') }}"
         unix_socket: "{{ podman_unix_socket | default(omit) }}"
         method: POST
         status_code: 
@@ -64,24 +64,24 @@
   block:
     - name: Clean up the query params dict
       ansible.builtin.set_fact:
-        podman_play_query_params_delete: "{{ {item.key: item.value} }}"
-      loop: "{{ podman_play.query_params.delete | dict2items }}"
+        podman_play_absent_query_params: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_play.absent.query_params | dict2items }}"
       when:
-        - podman_play.query_params.delete is defined
+        - podman_play.absent.query_params is defined
         - item.value is not none
 
     - name: Prepare query params for delete
       ansible.builtin.set_fact:
-        podman_play_query_params_delete_definitive: "?{{ podman_play_query_params_delete.keys() | 
-                                                        ansible.builtin.zip(podman_play_query_params_delete.values()) |
+        podman_play_absent_query_params_string: "?{{ podman_play_absent_query_params.keys() | 
+                                                        ansible.builtin.zip(podman_play_absent_query_params.values()) |
                                                         map('join', '=') |
                                                         join('&') }}"
       when:
-        - podman_play_query_params_delete is defined
+        - podman_play_absent_query_params is defined
 
     - name: Run podman kube down
       ansible.builtin.uri:
-        url: http://d/{{ api_version }}/libpod/play/kube{{ podman_play_query_params_delete_definitive | default('') }}
+        url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_absent_query_params_string | default('') }}"
         unix_socket: "{{ podman_unix_socket | default(omit) }}"
         method: DELETE
         status_code: 

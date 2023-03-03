@@ -8,7 +8,7 @@
     file: Invoke-PodmanNetworkRequest.yml
   when:
     - (podman_network.state == "present") or (podman_network.state == "absent")
-    - podman_network.request_body.name is not none
+    - podman_network.name is not none
 
 - name: Invoke podman play request
   ansible.builtin.include_tasks:
@@ -19,8 +19,8 @@
 
 - name: Detect pod info
   ansible.builtin.uri:
-    url: http://d/{{ api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/json
-    unix_socket: "{{ podman_unix_socket | default(omit) }}"
+    url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/json"
+    unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
     method: GET
     status_code: 
       - 200
