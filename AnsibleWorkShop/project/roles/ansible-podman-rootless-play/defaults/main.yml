@@ -4,12 +4,22 @@
 
 role_name: ansible-podman-rootless-play
 
-api_version: v4.0.0 # v4.0.0 ← (default)
+# podman_uri:
+default_podman_uri:
+  host: http://d
+  api_version: v4.0.0
+  unix_socket:
+
+podman_uri: "{{ default_podman_uri | ansible.builtin.combine(vars_podman_uri, recursive=True) }}"
+
 
 # podman_network
 defaults_podman_network:
   state: # present / absent, if empty, related process will skip 
   name: # string, Name of the Network, if empty, related process will skip 
+  present:
+    request_body:
+      name: "{{ vars_podman_network.name }}"
 
 podman_network: "{{ defaults_podman_network | ansible.builtin.combine(vars_podman_network, recursive=True) }}"
 
@@ -24,11 +34,7 @@ podman_volume: "{{ defaults_podman_volume | ansible.builtin.combine(vars_podman_
 # podman_play
 defaults_podman_play:
   state: # required, skip if empty
-  query_params:
-    delete:
-      force: false # boolean, false  ← (default) / true, Remove volumes.
-  request_body:
-    kube_file: # required, skip if empty
+  kube_file: # required, skip if empty
 
 podman_play: "{{ defaults_podman_play | ansible.builtin.combine(vars_podman_play, recursive=True) }}"
 

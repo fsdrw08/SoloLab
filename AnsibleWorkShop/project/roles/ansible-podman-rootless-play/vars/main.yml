@@ -2,9 +2,11 @@
 ---
 # vars file for ansible-podman-rootless-play
 
-api_version: v4.0.0 # v4.0.0 ← (default)
+vars_podman_uri:
+  host: # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+  api_version: # v4.0.0 ← (default)
+  unix_socket: # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
-podman_unix_socket: # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
 # Send POST request to podman socket end point /libpod/networks/create
 # aka podman cli: podman network create
@@ -22,29 +24,12 @@ vars_podman_network:
       ipam_options: # object(dict), IPAMOptions contains options used for the ip assignment.
       ipv6_enabled: # boolean, false ← (default) / true, IPv6Enabled if set to true an ipv6 subnet should be created for this net.
       labels: # object(dict), Labels is a set of key-value labels that have been applied to the Network.
-      # name: # string, Name of the Network, if empty, related process will skip 
+      # name: "{{ vars_podman_network.name }}" # string, Name of the Network, if empty, related process will skip 
       network_dns_servers: # Array of strings, List of custom DNS server for podman's DNS resolver at network level, all the containers attached to this network will consider resolvers configured at network level.
       network_interface: # string, NetworkInterface is the network interface name on the host.
       options: # object(dict), Options is a set of key-value options that have been applied to the Network.
       subnets: # Array of objects (Subnet), Subnets to use for this network.
 
-# vars_podman_network:
-  # debug: # false ← (default) / true
-  # disable_dns: # false ← (default) / true
-  # driver: # bridge ← (default)
-  # executable: # podman ← (default)
-  # gateway: # IPv4 or IPv6 gateway for the subnet
-  # internal: # false ← (default) / true
-  # ip_range: # Allocate container IP from range
-  # ipv6: # false / true
-  # macvlan: # Create a Macvlan connection based on this device
-  # name: # !!required, skip if empty
-  # opt:
-  #   # mtu: 
-  #   # vlan: 
-  # recreate: # false ← (default) / true
-  # state: # present ← (default) / absent
-  # subnet: # Subnet in CIDR format
 
 # Send POST request to podman socket end point /libpod/play/kube
 # aka podman kube play
@@ -73,21 +58,20 @@ vars_podman_generate_systemd:
   path_params:
     name: # string, Name or ID of the container or pod.
   query_params:
-    GET:
-      additionalEnvVariables: # Array of strings, Default: [], Set environment variables to the systemd unit files.
-      after: # Array of strings, Default: [], Systemd After list for the container or pods.
-      containerPrefix: # string, Default: "container", Systemd unit name prefix for containers.
-      new: # boolean, Default: false, Create a new container instead of starting an existing one.
-      noHeader: # boolean, Default: false, Do not generate the header including the Podman version and the timestamp.
-      podPrefix: # string, Default: "pod", Systemd unit name prefix for pods.
-      requires: # Array of strings, Default: [], Systemd Requires list for the container or pods.
-      restartPolicy: # string, Default: "on-failure", Enum: "no" "on-success" "on-failure" "on-abnormal" "on-watchdog" "on-abort" "always", Systemd restart-policy.
-      restartSec: # integer, Default: 0, Configures the time to sleep before restarting a service.
-      separator: # string, Default: "-", Systemd unit name separator between name/id and prefix.
-      startTimeout: # integer, Default: 0, Start timeout in seconds.
-      stopTimeout: # integer, Default: 10, Stop timeout in seconds.
-      useName: # boolean, Default: false, Use container/pod names instead of IDs.
-      wants: # Array of strings, Default: [], Systemd Wants list for the container or pods.
+    additionalEnvVariables: # Array of strings, Default: [], Set environment variables to the systemd unit files.
+    after: # Array of strings, Default: [], Systemd After list for the container or pods.
+    containerPrefix: # string, Default: "container", Systemd unit name prefix for containers.
+    new: # boolean, Default: false, Create a new container instead of starting an existing one.
+    noHeader: # boolean, Default: false, Do not generate the header including the Podman version and the timestamp.
+    podPrefix: # string, Default: "pod", Systemd unit name prefix for pods.
+    requires: # Array of strings, Default: [], Systemd Requires list for the container or pods.
+    restartPolicy: # string, Default: "on-failure", Enum: "no" "on-success" "on-failure" "on-abnormal" "on-watchdog" "on-abort" "always", Systemd restart-policy.
+    restartSec: # integer, Default: 0, Configures the time to sleep before restarting a service.
+    separator: # string, Default: "-", Systemd unit name separator between name/id and prefix.
+    startTimeout: # integer, Default: 0, Start timeout in seconds.
+    stopTimeout: # integer, Default: 10, Stop timeout in seconds.
+    useName: # boolean, Default: false, Use container/pod names instead of IDs.
+    wants: # Array of strings, Default: [], Systemd Wants list for the container or pods.
   # after: # Add the systemd unit after (After=) option, that ordering dependencies between the list of dependencies and this service.
   # container_prefix: # container ← (default)
   # dest: # ~/.config/systemd/user/ ← (default), Destination of the generated systemd unit file(s), usually no need to change
