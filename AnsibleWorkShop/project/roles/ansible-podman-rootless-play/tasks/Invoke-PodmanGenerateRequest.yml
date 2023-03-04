@@ -25,56 +25,62 @@
 
     - name: Get pod systemd unit content
       ansible.builtin.uri:
-        url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_string | default('')}}"
+        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_string | default('')}}"
         unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: GET
         status_code: 
           - 200
       register: podman_generate_systemd_respond
 
-    - name: Create systemd unit file in /tmp
-      ansible.builtin.file:
-        path: "{{ ['/tmp', item.item] | ansible.builtin.path_join }}"
-        state: touch
-        mode: '0755'
-      loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                ansible.builtin.product(['.service']) | map('join') | list }}"
+    - name: Set pod systemd unit 
       when:
         - podman_generate_systemd_respond.json is defined
-      delegate_to: localhost
-      changed_when: false
+      block:
+        - name: Delete systemd unit file in /tmp
+          ansible.builtin.file:
+            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+            state: absent
+          loop: "{{ podman_generate_systemd_respond.json.keys() | 
+                    ansible.builtin.product(['.service']) | map('join') | list }}"
+          delegate_to: localhost
+          changed_when: false
 
-    - name: Set systemd unit to file
-      ansible.builtin.blockinfile:
-        path: "{{ ['/tmp', item.key + '.service'] | ansible.builtin.path_join }}"
-        marker: "# {mark} {{ role_name }}"
-        block: "{{ item.value }}"
-        state: present
-      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
-      when:
-        - podman_generate_systemd_respond.json is defined
-      delegate_to: localhost
-      changed_when: false
+        - name: Create systemd unit file in /tmp
+          ansible.builtin.file:
+            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+            state: touch
+            mode: '0755'
+          loop: "{{ podman_generate_systemd_respond.json.keys() | 
+                    ansible.builtin.product(['.service']) | map('join') | list }}"
+          delegate_to: localhost
+          changed_when: false
 
-    - name: Copy systemd unit file to dest path
-      ansible.builtin.copy:
-        scr: "{{ ['/tmp', item.item] | ansible.builtin.path_join }}"
-        dest: "{{ [podman_generate_systemd.dest, item.item] | ansible.builtin.path_join }}"
-      loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                ansible.builtin.product(['.service']) | map('join') | list }}"
-      when:
-        - podman_generate_systemd_respond.json is defined
+        - name: Set systemd unit to file
+          ansible.builtin.blockinfile:
+            path: "{{ ['/tmp', item.key + '.service'] | ansible.builtin.path_join }}"
+            marker: "# {mark} {{ role_name }}"
+            block: "{{ item.value }}"
+            state: present
+          loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+          delegate_to: localhost
+          changed_when: false
 
-    - name: Delete systemd unit file in /tmp
-      ansible.builtin.file:
-        path: "{{ ['/tmp', item.item] | ansible.builtin.path_join }}"
-        state: absent
-      loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                ansible.builtin.product(['.service']) | map('join') | list }}"
-      when:
-        - podman_generate_systemd_respond.json is defined
-      delegate_to: localhost
-      changed_when: false
+        - name: Copy systemd unit file to dest path
+          ansible.builtin.copy:
+            src: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+            dest: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
+          loop: "{{ podman_generate_systemd_respond.json.keys() | 
+                    ansible.builtin.product(['.service']) | map('join') | list }}"
+          # delegate_to: "{{ podman_host }}"
+
+        - name: Delete systemd unit file in /tmp
+          ansible.builtin.file:
+            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+            state: absent
+          loop: "{{ podman_generate_systemd_respond.json.keys() | 
+                    ansible.builtin.product(['.service']) | map('join') | list }}"
+          delegate_to: localhost
+          changed_when: false
 
     # - name: Detect pod related unit file
     #   ansible.builtin.stat:

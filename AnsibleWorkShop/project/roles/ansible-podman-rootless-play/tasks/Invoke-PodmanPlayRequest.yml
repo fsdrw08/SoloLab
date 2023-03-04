@@ -29,7 +29,7 @@
 
     - name: Run Podman kube play
       ansible.builtin.uri:
-        url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_present_query_params_string | default('') }}"
+        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_present_query_params_string | default('') }}"
         unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: POST
         status_code: 
@@ -81,7 +81,7 @@
 
     - name: Run podman kube down
       ansible.builtin.uri:
-        url: "{{ podman_uri.host }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_absent_query_params_string | default('') }}"
+        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/play/kube{{ podman_play_absent_query_params_string | default('') }}"
         unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: DELETE
         status_code: 
