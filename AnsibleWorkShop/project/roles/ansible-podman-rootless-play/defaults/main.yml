@@ -4,9 +4,13 @@
 
 role_name: ansible-podman-rootless-play
 
+defaults_podman_host: "{{ ansible_host }}"
+
+podman_host: "{{ vars_podman_host | default(defaults_podman_host) }}"
+
 # podman_uri:
 defaults_podman_uri:
-  host: http://d
+  scheme_authority: http://d
   api_version: v4.0.0
   unix_socket:
 

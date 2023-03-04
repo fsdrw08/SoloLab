@@ -2,8 +2,15 @@
 ---
 # vars file for ansible-podman-rootless-play
 
+# the host running podman
+vars_podman_host:
+
+# podman socket url config
+# background: 
+#   https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#basics_anatomy_of_a_url
+#   https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
 vars_podman_uri:
-  host: # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+  scheme_authority: # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
   api_version: # v4.0.0 ← (default)
   unix_socket: # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
