@@ -90,6 +90,7 @@
     #   register: service_unit_to_create            
 
     # https://luiscachog.io/using-the-ansible-stat-module-on-a-loop/
+    # https://jinja.palletsprojects.com/en/latest/templates/#if-expression
     # - name: Create systemd unit file if not exist
     #   ansible.builtin.file:
     #     path: "{{ [podman_generate_systemd.dest, item.item] | ansible.builtin.path_join }}"
