@@ -65,13 +65,17 @@
           delegate_to: localhost
           changed_when: false
 
+        - name: debug 
+          debug:
+            msg: "ansible_host: {{ ansible_host }}\n podman_host: {{ podman_host }}"
+
         - name: Copy systemd unit file to dest path
           ansible.builtin.copy:
             src: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
             dest: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
           loop: "{{ podman_generate_systemd_respond.json.keys() | 
                     ansible.builtin.product(['.service']) | map('join') | list }}"
-          # delegate_to: "{{ podman_host }}"
+          delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
         - name: Delete systemd unit file in /tmp
           ansible.builtin.file:
@@ -141,9 +145,11 @@
         # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
         # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
         - item.key.startswith(podman_generate_systemd.query_params.GET.podPrefix | default('pod'))
+      delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
 
 - name: Disable pod systemd service when pod not exist
+  delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
   when:
     - pod_info.json.Hostname is not defined
   block:

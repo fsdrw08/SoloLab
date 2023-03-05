@@ -1,12 +1,14 @@
 # code: language=ansible
 ---
+vars_podman_host: kube-1
+
 vars_podman_uri:
   scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
   api_version: v4.0.0 # v4.0.0 ← (default)
   unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
 vars_podman_play:
-  state: present # absent / present
+  state: absent # absent / present
   kube_file: /KubeWorkShop/Samba/aio-samba.yaml
   absent:
     query_params:
