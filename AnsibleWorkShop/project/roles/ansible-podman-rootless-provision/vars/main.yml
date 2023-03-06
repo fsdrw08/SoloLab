@@ -15,6 +15,7 @@
 vars_package:
   podman:
     state: present
+    include_cockpit_podman: false
     dnf:
       enablerepo: # updates-testing
       update_cache: # true

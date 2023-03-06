@@ -4,6 +4,7 @@
   ansible.builtin.package:
     name:
       - podman
+      - "{{ 'cockpit-podman' if package.podman.include_cockpit_podman is true else omit }}"
     state: "{{ package.podman.state }}"
   become: true
   when:
@@ -13,10 +14,11 @@
   ansible.builtin.dnf:
     name:
       - podman
+      - "{{ 'cockpit-podman' if package.podman.include_cockpit_podman is true else omit }}"
     state: "{{ package.podman.state }}"
     # https://fedoraproject.org/wiki/QA:Updates_Testing#Enabling_the_repositories_temporarily
     enablerepo: "{{ package.podman.dnf.enablerepo | default(omit) }}"
-    update_cache: "{{ package.podman.dnf.update_cache | default(omit) }}"
+    update_cache: "{{ omit if package.podman.dnf.update_cache is none }}"
   become: true
   when:
     - ansible_pkg_mgr == "dnf"

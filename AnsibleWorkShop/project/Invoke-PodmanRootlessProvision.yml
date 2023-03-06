@@ -10,10 +10,11 @@
       vars:
         vars_package:
           podman:
-            state: absent
+            state: present
+            include_cockpit_podman: true
             dnf:
-              enablerepo: updates-testing
-              update_cache: true
+              enablerepo:
+              update_cache:
         vars_cgroups_delegation:
           all_users:
             state: present
