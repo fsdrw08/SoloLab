@@ -10,8 +10,8 @@ vars_podman_host:
 #   https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#basics_anatomy_of_a_url
 #   https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
 vars_podman_uri:
-  scheme_authority: # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
-  api_version: # v4.0.0 ← (default)
+  scheme_authority: # default: http://d/ , https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+  api_version: # default: v4.0.0
   unix_socket: # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
 
@@ -24,12 +24,12 @@ vars_podman_network:
   present:
     request_body:
       created: # string <date-time>, Created contains the timestamp when this network was created.
-      dns_enabled: # boolean, false ← (default) / true
+      dns_enabled: # boolean, default: false
       driver: # Driver for this Network, e.g. bridge ← (default), macvlan
       id: # ID of the Network.
-      internal: # boolean, false ← (default) / true, Internal is whether the Network should not have external routes to public or other Networks
+      internal: # boolean, default: false, Internal is whether the Network should not have external routes to public or other Networks
       ipam_options: # object(dict), IPAMOptions contains options used for the ip assignment.
-      ipv6_enabled: # boolean, false ← (default) / true, IPv6Enabled if set to true an ipv6 subnet should be created for this net.
+      ipv6_enabled: # boolean, default: false, IPv6Enabled if set to true an ipv6 subnet should be created for this net.
       labels: # object(dict), Labels is a set of key-value labels that have been applied to the Network.
       # name: "{{ vars_podman_network.name }}" # string, Name of the Network, if empty, related process will skip 
       network_dns_servers: # Array of strings, List of custom DNS server for podman's DNS resolver at network level, all the containers attached to this network will consider resolvers configured at network level.
@@ -50,18 +50,19 @@ vars_podman_play:
     query_params:
       logDriver: # string, Logging driver for the containers in the pod.
       network: # Array of strings, USe the network mode or specify an array of networks.
-      start: # boolean, false / true ← (default), Start the pod after creating it.
+      start: # boolean, Default: true, Start the pod after creating it.
       staticIPs: # Array of strings, Static IPs used for the pods.
       staticMACs: # Array of strings, Static MACs used for the pods.
-      tlsVerify: # boolean, false / true ← (default), Require HTTPS and verify signatures when contacting registries.
+      tlsVerify: # boolean, Default: true, Require HTTPS and verify signatures when contacting registries.
+      wait: # boolean, Default: false, Clean up all objects created when a SIGTERM is received or pods exit.
   absent: # params for podman kube down
     query_params:
-      force: # boolean, false  ← (default) / true, Remove volumes.
+      force: # boolean, default: false, Remove volumes.
 
 # https://docs.podman.io/en/latest/markdown/podman-generate-systemd.1.html
 # https://docs.podman.io/en/latest/_static/api.html#tag/containers/operation/GenerateSystemdLibpod
 vars_podman_generate_systemd:
-  dest: # ~/.config/systemd/user/ ← (default), Destination of the generated systemd unit file(s), usually no need to change
+  dest: # default: /home/{{ ansible_user }}/.config/systemd/user/, Destination of the generated systemd unit file(s), usually no need to change
   get:
     path_params:
       name: # string, Name or ID of the container or pod.
@@ -87,5 +88,3 @@ vars_service:
       skipped: true
       enabled: true
       state: started
-  systemd_lingering:
-    state: enable

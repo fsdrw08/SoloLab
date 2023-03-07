@@ -119,7 +119,7 @@
     #     - podman_generate_systemd.dest is defined
     #     - podman_generate_systemd_respond.json is defined
 
-    # https://stackoverflow.com/a/74475354
+    # https://stackoverflow.com/questions/40496021/how-to-remove-a-single-key-from-an-ansible-dictionary/74475354#74475354
     - name: omit service.podman_pod.user_scope.state
       set_fact:
         service: "{{ service | combine(new_var, recursive=true) }}"
