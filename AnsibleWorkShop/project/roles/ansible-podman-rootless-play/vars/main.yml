@@ -62,40 +62,24 @@ vars_podman_play:
 # https://docs.podman.io/en/latest/_static/api.html#tag/containers/operation/GenerateSystemdLibpod
 vars_podman_generate_systemd:
   dest: # ~/.config/systemd/user/ ← (default), Destination of the generated systemd unit file(s), usually no need to change
-  path_params:
-    name: # string, Name or ID of the container or pod.
-  query_params:
-    additionalEnvVariables: # Array of strings, Default: [], Set environment variables to the systemd unit files.
-    after: # Array of strings, Default: [], Systemd After list for the container or pods.
-    containerPrefix: # string, Default: "container", Systemd unit name prefix for containers.
-    new: # boolean, Default: false, Create a new container instead of starting an existing one.
-    noHeader: # boolean, Default: false, Do not generate the header including the Podman version and the timestamp.
-    podPrefix: # string, Default: "pod", Systemd unit name prefix for pods.
-    requires: # Array of strings, Default: [], Systemd Requires list for the container or pods.
-    restartPolicy: # string, Default: "on-failure", Enum: "no" "on-success" "on-failure" "on-abnormal" "on-watchdog" "on-abort" "always", Systemd restart-policy.
-    restartSec: # integer, Default: 0, Configures the time to sleep before restarting a service.
-    separator: # string, Default: "-", Systemd unit name separator between name/id and prefix.
-    startTimeout: # integer, Default: 0, Start timeout in seconds.
-    stopTimeout: # integer, Default: 10, Stop timeout in seconds.
-    useName: # boolean, Default: false, Use container/pod names instead of IDs.
-    wants: # Array of strings, Default: [], Systemd Wants list for the container or pods.
-  # after: # Add the systemd unit after (After=) option, that ordering dependencies between the list of dependencies and this service.
-  # container_prefix: # container ← (default)
-  # dest: # ~/.config/systemd/user/ ← (default), Destination of the generated systemd unit file(s), usually no need to change
-  # env: # Set environment variables to the systemd unit files.
-  # executable: # podman ← (default)
-  # name: # !!required, Name of the pod or container to export, if empty, below process will be skipped
-  # new: # false ← (default) / true | Generate unit files that create containers and pods, not only start them. 
-  # no_header: # false ← (default) / true
-  # pod_prefix: # pod  ← (default)
-  # requires: # Set the systemd unit requires (Requires=) option.
-  # restart_policy: # no-restart / on-success / on-failure / on-abnormal / on-watchdog / on-abort / always
-  # restart_sec: # Configures the time to sleep before restarting a service (as configured with restart-policy). Takes a value in seconds.
-  # separator: # "-" ← (default) Systemd unit name separator between the name/id of a container/pod and the prefix.
-  # start_timeout: # Override the default start timeout for the container with the given value in seconds.
-  # stop_timeout: # Override the default stop timeout for the container with the given value in seconds.
-  # use_names: # false / true ← (default)
-  # wants: # Add the systemd unit wants (Wants=) option, that this service is (weak) dependent on.
+  get:
+    path_params:
+      name: # string, Name or ID of the container or pod.
+    query_params:
+      additionalEnvVariables: # Array of strings, Default: [], Set environment variables to the systemd unit files.
+      after: # Array of strings, Default: [], Systemd After list for the container or pods.
+      containerPrefix: # string, Default: "container", Systemd unit name prefix for containers.
+      new: # boolean, Default: false, Create a new container instead of starting an existing one.
+      noHeader: # boolean, Default: false, Do not generate the header including the Podman version and the timestamp.
+      podPrefix: # string, Default: "pod", Systemd unit name prefix for pods.
+      requires: # Array of strings, Default: [], Systemd Requires list for the container or pods.
+      restartPolicy: # string, Default: "on-failure", Enum: "no" "on-success" "on-failure" "on-abnormal" "on-watchdog" "on-abort" "always", Systemd restart-policy.
+      restartSec: # integer, Default: 0, Configures the time to sleep before restarting a service.
+      separator: # string, Default: "-", Systemd unit name separator between name/id and prefix.
+      startTimeout: # integer, Default: 0, Start timeout in seconds.
+      stopTimeout: # integer, Default: 10, Stop timeout in seconds.
+      useName: # boolean, Default: false, Use container/pod names instead of IDs.
+      wants: # Array of strings, Default: [], Systemd Wants list for the container or pods.
 
 vars_service:
   podman_pod:

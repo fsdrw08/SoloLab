@@ -8,24 +8,24 @@
   block:
     - name: Clean up the podman_generate_systemd query params dict
       ansible.builtin.set_fact:
-        podman_generate_systemd_query_params: "{{ {item.key: item.value} }}"
-      loop: "{{ podman_generate_systemd.query_params | dict2items }}"
+        podman_generate_systemd_get_query_params: "{{ {item.key: item.value} }}"
+      loop: "{{ podman_generate_systemd.get.query_params | dict2items }}"
       when:
-        - podman_generate_systemd.query_params is defined
+        - podman_generate_systemd.get.query_params is defined
         - item.value is not none
 
     - name: Convert query_params from dict to string for podman_generate_systemd
       ansible.builtin.set_fact:
-        podman_generate_systemd_query_params_string: "?{{ podman_generate_systemd_query_params.keys() | 
-                                                        ansible.builtin.zip(podman_generate_systemd_query_params.values()) |
-                                                        map('join', '=') |
-                                                        join('&') }}"
+        podman_generate_systemd_get_query_params_string: "?{{ podman_generate_systemd_get_query_params.keys() | 
+                                                          ansible.builtin.zip(podman_generate_systemd_get_query_params.values()) |
+                                                          map('join', '=') |
+                                                          join('&') }}"
       when: 
-        - podman_generate_systemd_query_params is defined
+        - podman_generate_systemd_get_query_params is defined
 
     - name: Get pod systemd unit content
       ansible.builtin.uri:
-        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_query_params_string | default('')}}"
+        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.path_params.name) }}/systemd{{ podman_generate_systemd_get_query_params_string | default('')}}"
         unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: GET
         status_code: 
@@ -40,6 +40,7 @@
           ansible.builtin.file:
             path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
             state: absent
+          # https://stackoverflow.com/questions/56508435/how-to-concatenate-with-a-string-each-element-of-a-list-in-ansible
           loop: "{{ podman_generate_systemd_respond.json.keys() | 
                     ansible.builtin.product(['.service']) | map('join') | list }}"
           delegate_to: localhost
@@ -75,6 +76,8 @@
             dest: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
           loop: "{{ podman_generate_systemd_respond.json.keys() | 
                     ansible.builtin.product(['.service']) | map('join') | list }}"
+          # https://jinja.palletsprojects.com/en/latest/templates/#if-expression
+          # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#:~:text=assigned%20to%20them-,inventory_hostname,-The%20inventory%20name
           delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
         - name: Delete systemd unit file in /tmp
@@ -144,7 +147,7 @@
       when: 
         # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
         # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
-        - item.key.startswith(podman_generate_systemd.query_params.GET.podPrefix | default('pod'))
+        - item.key.startswith(podman_generate_systemd.get.query_params.podPrefix | default('pod'))
       delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
 
@@ -156,13 +159,13 @@
     # https://stackoverflow.com/questions/38847824/ansible-how-to-get-service-status-by-ansible/69827034#69827034
     - name: Detect pod systemd service state
       ansible.builtin.systemd:
-        name: "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        name: "{{ podman_generate_systemd.get.query_params.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
         scope: user
       register: pod_service_status
 
     - name: Disable systemd service
       ansible.builtin.systemd:
-        name: "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+        name: "{{ podman_generate_systemd.get.query_params.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
         state: stopped
         enabled: false
         scope: user
@@ -173,8 +176,8 @@
       ansible.builtin.find:
         paths: "{{ podman_generate_systemd.dest }}"
         patterns: 
-          - "{{ podman_generate_systemd.query_params.GET.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
-          - "{{ podman_generate_systemd.query_params.GET.containerPrefix | default('container')}}-{{ podman_generate_systemd.path_params.name }}*.service"
+          - "{{ podman_generate_systemd.get.query_params.podPrefix | default('pod')}}-{{ podman_generate_systemd.path_params.name }}.service"
+          - "{{ podman_generate_systemd.get.query_params.containerPrefix | default('container')}}-{{ podman_generate_systemd.path_params.name }}*.service"
       register: service_unit_to_delete
 
     - name: Delete pod related unit file

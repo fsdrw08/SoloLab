@@ -12,7 +12,7 @@ defaults_package:
     include_cockpit_podman: false
     dnf:
       enablerepo: # updates-testing
-      update_cache:
+      update_cache: false
 
 # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html#combining-hashes-dictionaries
 package: "{{ defaults_package | ansible.builtin.combine(vars_package, recursive=True) }}"
