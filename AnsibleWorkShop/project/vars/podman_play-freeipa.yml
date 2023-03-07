@@ -1,13 +1,26 @@
 # code: language=ansible
 ---
+vars_podman_host: kube-1
+
+vars_podman_uri:
+  scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+  api_version: v4.0.0 # v4.0.0 ← (default)
+  unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+
 vars_podman_play:
+  state: present # absent / present
   kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
-  state: started # absent / created / started
-  force: true
-  # env_var:
-  #   PODMAN_USERNS: keep-id:uid=1000,gid=1000
+  absent:
+    query_params:
+      force: "true"
+
 vars_podman_generate_systemd:
-  name: freeipa
+  get:
+    path_params:
+      name: freeipa
+    query_params:
+      useName: true
+
 vars_service:
   podman_pod:
     user_scope:
