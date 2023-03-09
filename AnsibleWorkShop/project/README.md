@@ -37,7 +37,19 @@ podman run --rm `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# deploy freeipa pod (run podman play)
+podman run --rm `
+    -e RUNNER_PLAYBOOK=PodmanPlay-FreeIPA.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# config freeipa
+
 ```
+
 
 ## deploy k3s
 ref: 
@@ -158,6 +170,18 @@ podman run --rm `
 # new podman session
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/New-PodmanNetwork.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# get vyos version 
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Get-VyosInfo.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# Set vyos dhcp ddns
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Set-VyosDhcpDDNS.yml `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
