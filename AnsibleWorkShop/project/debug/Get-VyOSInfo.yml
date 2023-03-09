@@ -1,0 +1,10 @@
+# code: language=ansible
+---
+- hosts: vyos
+  gather_facts: false
+  # https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/
+  tasks:
+    - name: Retrieve VyOS version info
+      vyos.vyos.vyos_command:
+        commands: show version
+      when: ansible_network_os == 'vyos.vyos.vyos'
