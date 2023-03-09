@@ -12,11 +12,11 @@ vars_podman_play:
   kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
   absent:
     query_params:
-      force: "true"
+      force: false
 
 vars_podman_generate_systemd:
-  get:
-    path_params:
+  generate:
+    path_params: 
       name: freeipa
     query_params:
       useName: true

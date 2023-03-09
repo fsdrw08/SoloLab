@@ -15,7 +15,7 @@ vars_podman_play:
       force: "true"
 
 vars_podman_generate_systemd:
-  get:
+  generate:
     path_params:
       name: samba
     query_params:

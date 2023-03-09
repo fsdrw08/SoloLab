@@ -63,7 +63,7 @@ vars_podman_play:
 # https://docs.podman.io/en/latest/_static/api.html#tag/containers/operation/GenerateSystemdLibpod
 vars_podman_generate_systemd:
   dest: # default: /home/{{ ansible_user }}/.config/systemd/user/, Destination of the generated systemd unit file(s), usually no need to change
-  get:
+  generate:
     path_params:
       name: # string, Name or ID of the container or pod.
     query_params:
