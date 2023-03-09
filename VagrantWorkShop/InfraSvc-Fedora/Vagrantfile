@@ -12,10 +12,10 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "FEDORA36-G2"
+  config.vm.box = "FEDORA37-G2"
 
   config.vm.provider "hyperv" do |hv, config|
-    hv.vmname = "InfraSvc-Fedora"
+    hv.vmname = "InfraSvc-Fedora2"
     hv.memory = 1024
     hv.maxmemory = 4096
     hv.cpus = 4
@@ -31,9 +31,9 @@ Vagrant.configure("2") do |config|
   
   config.vm.hostname = "InfraSvc-Fedora"
 
-  config.vm.synced_folder "../../AnsibleWorkShop", "/var/vagrant/AnsibleWorkShop", type: "rsync", rsync__auto: true
-  config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
-  config.vm.synced_folder "../../LocalWorkShop", "/var/vagrant/LocalWorkShop", type: "rsync", rsync__auto: true
+  # config.vm.synced_folder "../../AnsibleWorkShop", "/var/vagrant/AnsibleWorkShop", type: "rsync", rsync__auto: true
+  # config.vm.synced_folder "../../HelmWorkShop", "/var/vagrant/HelmWorkShop", type: "rsync", rsync__auto: true
+  # config.vm.synced_folder "../../LocalWorkShop", "/var/vagrant/LocalWorkShop", type: "rsync", rsync__auto: true
 
   
   # config repo source
@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "Resize-Partition.sh"
   
   # set static ip
-  config.vm.provision "shell", path: "Set-StaticIP.sh"
+  # config.vm.provision "shell", path: "Set-StaticIP.sh"
   
   # reboot
   config.vm.provision "shell", reboot: true

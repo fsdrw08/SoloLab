@@ -185,6 +185,12 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# get freeipa root ca cert
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Get-IPACACert.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 

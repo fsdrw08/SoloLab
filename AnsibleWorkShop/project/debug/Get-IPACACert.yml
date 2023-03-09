@@ -1,0 +1,66 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: false
+  vars: 
+    ipa_hostname: ipa.infra.sololab
+  tasks:
+    - name: add record in /etc/hosts
+      ansible.builtin.lineinfile:
+        path: "/etc/hosts"
+        line: 192.168.255.31 {{ ipa_hostname }}
+        state: present
+      become: true
+
+    # https://access.redhat.com/articles/2728021#end-point-pwd
+    # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
+    # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
+    - name: Get cookie for service ipa
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/login_password"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: text/plain
+          Content-Type: "application/x-www-form-urlencoded"
+        body_format: form-urlencoded
+        body:
+          user: "admin"
+          password: "P@ssw0rd"
+        status_code: 200
+      register: ipa_session
+
+    - name: Get CA root cert
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          id: 0
+          method: cert_show/1
+          params:
+            # serial_number
+            - - 1
+            # Include certificate chain in output
+            - chain: true
+              raw: true
+        status_code: 200
+        return_content: true
+      register: cert_show
+
+    - name: delete record in /etc/hosts
+      ansible.builtin.lineinfile:
+        path: "/etc/hosts"
+        line: 192.168.255.31 {{ ipa_hostname }}
+        state: absent
+      become: true
+
+    - name: debug
+      debug:
+        msg: "{{ cert_show.json.result.result.certificate }}"

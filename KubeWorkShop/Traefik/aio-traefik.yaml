@@ -78,6 +78,7 @@ spec:
       env:
         - name: TZ
           value: Asia/Shanghai
+        # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
         - name: LEGO_CA_CERTIFICATES
           value: /etc/traefik/ca.crt
       volumeMounts:
