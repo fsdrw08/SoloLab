@@ -31,6 +31,11 @@ data:
 
     --debug
     --skip-mem-check
+  ipa-ext.conf: |
+    key "keySololab" {
+            algorithm hmac-sha256;
+            secret "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=";
+    };
 ---
 apiVersion: v1
 kind: Pod
@@ -110,6 +115,9 @@ spec:
         - name: ipa-server-install-options
           mountPath: /data/ipa-server-install-options
           subPath: ipa-server-install-options
+        - name: ipa-ext.conf
+          mountPath: /etc/named/ipa-ext.conf
+          subPath: ipa-ext.conf
         # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
         # - name: dshm
         #   mountPath: /dev/shm
@@ -128,6 +136,12 @@ spec:
         items:
           - key: ipa-server-install-options
             path: ipa-server-install-options
+    - name: ipa-ext.conf
+      configMap:
+        name: freeipa
+        items:
+          - key: ipa-ext.conf
+            path: ipa-ext.conf
     # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
     # - name: dshm
     #   emptyDir:

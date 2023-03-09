@@ -38,8 +38,8 @@
           Cmd:
             - bash
             - -c
-            - "echo 'P@ssw0rd' | kinit admin; klist"
-            # - /usr/bin/bash -c "echo 'P@ssw0rd' | kinit admin; klist"
+            - "echo 'P@ssw0rd' | kinit admin; ipa dnszone-mod infra.sololab. --update-policy='grant keySololab wildcard * ANY;'; ipa-acme-manage enable"
+            # - "echo 'P@ssw0rd' | kinit admin; klist"
           # Env:
           #   - PATH=/usr/bin/:/root/.local/bin:/root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           Tty: true

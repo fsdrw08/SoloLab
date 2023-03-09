@@ -144,7 +144,7 @@ cat /etc/named/ipa-ext.conf
 #         secret "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=";
 # };
 cat << EOF >> /etc/named/ipa-ext.conf
-key "sololab" {
+key "keySololab" {
         algorithm hmac-sha256;
         secret "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=";
 };
@@ -152,7 +152,7 @@ EOF
 
 kinit admin
 # ipa dnszone-mod infra.sololab. --update-policy="<grant|deny> <keyname> <nametype: name, subdomain, wildcard, self> infra.sololab ANY;"
-ipa dnszone-mod infra.sololab. --update-policy="grant sololab wildcard * ANY;"
+ipa dnszone-mod infra.sololab. --update-policy="grant keySololab wildcard * ANY;"
 ipa-acme-manage enable
 ```
 then go to [..\TerraformWorkShop\LDAP](..\TerraformWorkShop\LDAP), run terraform to apply some ldap resources (service account)
