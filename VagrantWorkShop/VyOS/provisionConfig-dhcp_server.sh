@@ -11,7 +11,7 @@ set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop 192.168.255.250
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 name-server 192.168.255.1
 set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 default-router 192.168.255.1
-set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name sololab
+set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name infra.sololab
 
 set service dhcp-server shared-network-name LAN authoritative
 set service dhcp-server shared-network-name LAN ping-check

@@ -1,0 +1,23 @@
+# code: language=ansible
+---
+- hosts: vyos
+  gather_facts: false
+  tasks:
+    - name: Set vyos dhcp ddns
+      vyos.vyos.vyos_config :
+        lines:
+          - set service dhcp-server dynamic-dns-update
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "key {{ key_name }} { algorithm {{ algorithm }}; secret {{ secret }}; };"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;{{ domainname }}&quot;;"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-rev-domainname &quot;{{ rev_domainname }}&quot;;"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ zonename }} { primary {{ name_server }}; key {{ key_name }}; }"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ rev_zonename }} { primary {{ name_server }}; key {{ key_name }}; }"
+      vars:
+        key_name: keySololab
+        algorithm: hmac-sha256
+        secret: j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=
+        domainname: infra.sololab.
+        rev_domainname: in-addr.arpa.
+        zonename: "{{ domainname }}"
+        rev_zonename: "255.168.192.{{ rev_domainname }}"
+        name_server: 192.168.255.31
