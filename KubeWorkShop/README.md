@@ -158,7 +158,7 @@ ipa-acme-manage enable
 then go to [..\TerraformWorkShop\LDAP](..\TerraformWorkShop\LDAP), run terraform to apply some ldap resources (service account)
 -ref: 
     - [Jenkins Authentication With Keycloak](https://thomascfoulds.com/2020/04/09/jenkins-authentication-with-keycloak.html)
-    - 
+    - [Setting up Containerized FreeIPA & KeyCloak Single Sign-On](https://blog.sakuragawa.moe/setting-up-containerized-freeipa-keycloak-single-sign-on/)
 ```powershell
 terraform init
 terraform apply --auto-approve

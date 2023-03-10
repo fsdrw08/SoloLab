@@ -31,6 +31,27 @@
         status_code: 200
       register: ipa_session
 
+    - name: Enable dynamic DNS update
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_mod
+          params:
+            - - infra.sololab.
+            # BIND update policy, CLI option name--update-policy
+            - idnsupdatepolicy: grant keySololab wildcard * ANY;
+        status_code: 200
+        return_content: true
+      register: cert_show
+      when: false
+
     - name: Get CA root cert
       ansible.builtin.uri:
         url: "https://{{ ipa_hostname }}/ipa/session/json"

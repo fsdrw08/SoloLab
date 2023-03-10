@@ -1,0 +1,21 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: false
+  vars: 
+    ipa_hostname: ipa.infra.sololab
+  tasks:
+    - name: create ldap object
+      community.general.ldap_entry:
+        server_uri: ldap://{{ ipa_hostname }}:389
+        bind_dn: uid=admin,cn=users,cn=accounts,dc=infra,dc=sololab
+        bind_pw: P@ssw0rd
+        dn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+        objectClass:
+          - simpleSecurityObject
+          - organizationalRole
+        attributes:
+          uid: system
+          userPassword: P@ssw0rd
+          passwordExpirationTime: 20380119031407Z
+          nsIdleTimeout: 0

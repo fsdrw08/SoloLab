@@ -1,3 +1,4 @@
 kubernetes-client [platform:fedora]
 podman
 unzip
+python3-ldap
