@@ -22,7 +22,7 @@
    - Generate Containerfile and podman related context with [definition.yml](definition.yml)
    ```powershell
    . .\venv\Scripts\activate
-   ansible-builder create -f .\definition-with_semi_proxy.yml 
+   ansible-builder create -f .\definition-with_semi_proxy.yml
    ```
    - Fix some syntax (POIXFX) error in the Containerfile
    - Update the Containerfile, e.g.
@@ -32,8 +32,8 @@ ref: https://docs.podman.io/en/latest/markdown/podman-build.1.html#examples
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\builder)
 # with_proxy
-podman build .\context\ --build-arg PROXY="http://192.168.1.189:7890" --tag ansible-ee-aio
-podman build .\context\ --build-arg PROXY="http://192.168.255.102:7890" --tag ansible-ee-aio
+podman build .\context\ --build-arg PROXY="$PROXY" --tag ansible-ee-aio
+podman build -f .\context\Containerfile.with_full_proxy --build-arg PROXY="$PROXY" --tag ansible-ee-aio  .\context\
 # with_semi_proxy
 # $PROXY="http://10.20.72.21:9999"
 $PROXY="http://192.168.255.1:7890"

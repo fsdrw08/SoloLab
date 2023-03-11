@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: kube-1
+- hosts: localhost
   gather_facts: false
   vars: 
     ipa_hostname: ipa.infra.sololab

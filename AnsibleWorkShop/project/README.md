@@ -191,6 +191,18 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# new ldap object
+podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/New-LDAPObject.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Get-Facts.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
+
+
 ```
 
 

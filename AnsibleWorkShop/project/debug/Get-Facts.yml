@@ -1,0 +1,18 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  vars: 
+    ipa_hostname: ipa.infra.sololab
+  tasks:
+    - name: Detect podman package
+      ansible.builtin.package_facts:
+        manager: auto
+    # - name: Detect podman package
+    #   ansible.builtin.shell: 
+    #     cmd: ls -al /usr/lib64/python3.6
+    #   register: ls
+
+    # - name: debug
+    #   debug:
+    #     msg: "{{ ls.stdout_ }}"
