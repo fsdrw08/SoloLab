@@ -3,6 +3,7 @@
 version: 1
 
 build_arg_defaults:
+  EE_BASE_IMAGE: 'quay.io/ansible/awx-ee:21.13.0'
   ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: "-v"
 
 # ansible_config: 'ansible.cfg'

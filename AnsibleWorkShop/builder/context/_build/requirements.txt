@@ -1,5 +1,5 @@
 netaddr
-pyyaml
-kubernetes
-jsonpatch
-jmespath
+pyyaml # required by kubernetes.core.k8s module
+kubernetes # required by kubernetes.core.k8s module
+jsonpatch # required by kubernetes.core.k8s module
+jmespath # required by community.general.json_query module
