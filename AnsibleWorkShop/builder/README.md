@@ -22,7 +22,7 @@
    - Generate Containerfile and podman related context with [definition.yml](definition.yml)
    ```powershell
    . .\venv\Scripts\activate
-   ansible-builder create -f .\definition-with_semi_proxy.yml
+   ansible-builder create --file .\definition-with_semi_proxy.yml
    ```
    - Fix some syntax (POIXFX) error in the Containerfile
    - Update the Containerfile, e.g.

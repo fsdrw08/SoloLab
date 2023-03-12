@@ -1,5 +1,5 @@
-ARG EE_BASE_IMAGE=quay.io/ansible/ansible-runner:latest
-ARG EE_BUILDER_IMAGE=quay.io/ansible/ansible-builder:latest
+ARG EE_BASE_IMAGE=ghcr.io/ryanmerolle/ansible-runner:stable-2.12
+ARG EE_BUILDER_IMAGE=ghcr.io/ryanmerolle/ansible-builder:latest
 
 FROM $EE_BASE_IMAGE as galaxy
 ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=-v
