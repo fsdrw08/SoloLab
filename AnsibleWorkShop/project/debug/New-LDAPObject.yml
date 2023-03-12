@@ -12,10 +12,11 @@
         bind_pw: P@ssw0rd
         dn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
         objectClass:
+          - account
           - simpleSecurityObject
-          - organizationalRole
         attributes:
           uid: system
           userPassword: P@ssw0rd
           passwordExpirationTime: 20380119031407Z
           nsIdleTimeout: 0
+        state: present
