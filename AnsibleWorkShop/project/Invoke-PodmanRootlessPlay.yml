@@ -5,8 +5,7 @@
   tasks:
     - name: incloude vars
       ansible.builtin.include_vars:
-        file: vars/podman_play-samba.yml
-        # file: vars/podman_play-freeipa.yml
+        file: "{{ podman_play_var_file }}"
 
     # - name: Retrieve remote user runtime path
     #   command: |

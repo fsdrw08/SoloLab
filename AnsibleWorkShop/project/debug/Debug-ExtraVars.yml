@@ -1,0 +1,8 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ extra }}"

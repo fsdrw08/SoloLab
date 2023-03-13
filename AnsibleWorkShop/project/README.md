@@ -202,7 +202,18 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
+# extra vars
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Debug-ExtraVars.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
+# traefik
+podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
+    -e RUNNER_PLAYBOOK=Invoke-PodmanPlayTraefik.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
 ```
 
 

@@ -1,0 +1,5 @@
+# code: language=ansible
+---
+extra: test
+
+podman_play_var_file: vars/podman_play-traefik.yml
