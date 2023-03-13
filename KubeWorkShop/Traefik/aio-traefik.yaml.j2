@@ -48,7 +48,7 @@ data:
     api:
       dashboard: true
   ca.crt: |
-    {{ CA_Cert }}
+    {{ CA_Cert.json.result.result.certificate | indent(width=4) }}
 ---
 apiVersion: v1
 kind: Pod
