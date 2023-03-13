@@ -1,8 +1,10 @@
 # code: language=ansible
 # https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.0-ea/html-single/ansible_builder_guide/index
+# https://ansible-builder.readthedocs.io/en/latest/definition/
 version: 1
 
 build_arg_defaults:
+  # https://github.com/ryanmerolle/awx-network-ee
   EE_BASE_IMAGE: "ghcr.io/ryanmerolle/ansible-runner:stable-2.12"
   EE_BUILDER_IMAGE: "ghcr.io/ryanmerolle/ansible-builder:latest"
   ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: "-v"
