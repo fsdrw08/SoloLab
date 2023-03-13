@@ -155,6 +155,7 @@ kinit admin
 ipa dnszone-mod infra.sololab. --update-policy="grant keySololab wildcard * ANY;"
 ipa-acme-manage enable
 ```
+
 then go to [..\TerraformWorkShop\LDAP](..\TerraformWorkShop\LDAP), run terraform to apply some ldap resources (service account)
 -ref: 
     - [Jenkins Authentication With Keycloak](https://thomascfoulds.com/2020/04/09/jenkins-authentication-with-keycloak.html)
