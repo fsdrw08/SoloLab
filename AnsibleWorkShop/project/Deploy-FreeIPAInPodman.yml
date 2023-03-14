@@ -1,0 +1,13 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: yes
+  tasks:
+    - name: incloude vars
+      ansible.builtin.include_vars:
+        file: vars/podman_play-freeipa.yml
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless-provision
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play

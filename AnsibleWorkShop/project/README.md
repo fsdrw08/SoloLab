@@ -40,7 +40,7 @@ podman run --rm `
 
 # deploy freeipa pod (run podman play)
 podman run --rm `
-    -e RUNNER_PLAYBOOK=PodmanPlay-FreeIPA.yml `
+    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
@@ -48,6 +48,13 @@ podman run --rm `
 
 # config freeipa
 
+# deploy traefik in podman
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
 ```
 
 
@@ -210,7 +217,7 @@ podman run --rm `
 
 # traefik
 podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
-    -e RUNNER_PLAYBOOK=Invoke-PodmanPlayTraefik.yml `
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
