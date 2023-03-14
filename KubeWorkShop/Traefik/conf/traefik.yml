@@ -43,6 +43,7 @@ api:
   dashboard: true
 
 # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+# https://doc.traefik.io/traefik/https/acme/#certificate-resolvers
 certificatesResolvers:
   freeipa:
     acme:
