@@ -42,12 +42,24 @@ data:
       rootCAs:
         - /etc/traefik/root_ca.crt
 
-
     ## Operations
     # https://doc.traefik.io/traefik/operations/api/
     api:
       dashboard: true
-  ca.crt: |
+
+    # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+    # https://doc.traefik.io/traefik/https/acme/#certificate-resolvers
+    certificatesResolvers:
+      freeipa:
+        acme:
+          caServer: https://ipa-ca.infra.sololab/acme/directory
+          email: admin@INFRA.SOLOLAB
+          storage: acme.json
+          httpChallenge:
+            # used during the challenge
+            entryPoint: web
+  root_ca.crt: |
+    -----BEGIN CERTIFICATE-----
     MIIEkTCCAvmgAwIBAgIBATANBgkqhkiG9w0BAQsFADA4MRYwFAYDVQQKDA1JTkZSQS5TT0xPTEFC
     MR4wHAYDVQQDDBVDZXJ0aWZpY2F0ZSBBdXRob3JpdHkwHhcNMjMwMjIzMDkwOTQ4WhcNNDMwMjIz
     MDkwOTQ4WjA4MRYwFAYDVQQKDA1JTkZSQS5TT0xPTEFCMR4wHAYDVQQDDBVDZXJ0aWZpY2F0ZSBB
@@ -69,6 +81,7 @@ data:
     DxDtZCeA1hs13sRK3v+wYS82DA9QvlRdAzUQjgkDt8q2ZwfvDDJ2SvZsXndFw65yHNjNdQTrXE36
     IN4oqTqoDvFDCvHZZqrtBCSV4nO1I6lc1F0ZbKYZXrMW1Rzww6DlrTf4k3OngQWuyBWoZdfUhoI0
     tdcDz5OEODZ6ynHurr0QGmCew/+gFkm/BtGIYom4S3pA
+    -----END CERTIFICATE-----
 ---
 apiVersion: v1
 kind: Pod
@@ -98,26 +111,35 @@ spec:
           hostIP: 192.168.255.32
           hostPort: 443
       env:
-        - name: TZ
-          value: Asia/Shanghai
         # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
         - name: LEGO_CA_CERTIFICATES
-          value: /etc/traefik/ca.crt
+          value: /etc/traefik/root_ca.crt
       volumeMounts:
         # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
-        - name: traefik
-          mountPath: /etc/traefik/ #traefik.yml
-          # subPath: traefik.yml
+        - name: traefik.yml
+          mountPath: /etc/traefik/traefik.yml
+          subPath: traefik.yml
+        - name: root_ca.crt
+          mountPath: /etc/traefik/root_ca.crt
+          subPath: root_ca.crt
+        - name: fileProvider
+          mountPath: /etc/traefik/dynamic/
   volumes:
-    # - name: traefik
-    #   # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
-    #   configMap:
-    #     name: traefik
-    #     items:
-    #       - key: traefik.yml
-    #         path: traefik.yml
-    - name: traefik
+    - name: traefik.yml
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: traefik
+        items:
+          - key: traefik.yml
+            path: traefik.yml
+    - name: root_ca.crt
+      configMap:
+        name: traefik
+        items:
+          - key: root_ca.crt
+            path: root_ca.crt
+    - name: fileProvider
       hostPath:
-        path: /home/vagrant/infra/traefik/
+        path: /home/vagrant/traefik/
         type: Directory
   restartPolicy: Never
