@@ -1,11 +1,12 @@
 # code: language=ansible
 ---
-- hosts: localhost # kube-2
+- hosts: kube-1 # kube-2
   gather_facts: yes
   vars: 
     ipa_hostname: ipa.infra.sololab
   tasks:
     - name: Get root ca
+      delegate_to: localhost
       block:
         - name: Get cookie for service ipa
           ansible.builtin.uri:
@@ -44,27 +45,32 @@
                   raw: true
             status_code: 200
             return_content: true
-          register: CA_Cert
+          register: Root_CA_Cert
           when:
             - ipa_session is defined
 
-    - name: Render traefik kube_file
-      ansible.builtin.template:
-        src: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
-        dest: /KubeWorkShop/Traefik/aio-traefik-rendered.yaml
+        - name: Render traefik kube_file
+          ansible.builtin.template:
+            src: /KubeWorkShop/Traefik/aio-traefik.yaml
+            dest: /KubeWorkShop/Traefik/aio-traefik-rendered.yaml
 
-    - name: cat
-      shell:
-        cmd: cat /KubeWorkShop/Traefik/aio-traefik-rendered.yaml
-      register: cat
-    - name: debug
-      debug:
-        msg: "{{ cat }}"
-    # - name: incloude vars
-    #   ansible.builtin.include_vars:
-    #     file: "{{ podman_play_var_file }}"
+    - name: present traefik dynamic conf
+      block:
+        - name: present traefik dynamic conf dir
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/
+            state: directory
 
-    #  # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
-    # - name: run role ansible-podman-rootless-provision
-    #   ansible.builtin.include_role:
-    #     name: ansible-podman-rootless-play
+        - name: copy traefik dynamic config to dir
+          ansible.builtin.copy:
+            src: /KubeWorkShop/Traefik/conf/dynamic/
+            dest: /home/{{ ansible_user }}/traefik/
+
+    - name: incloude vars
+      ansible.builtin.include_vars:
+        file: vars/podman_play-traefik.yml
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless-provision
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
