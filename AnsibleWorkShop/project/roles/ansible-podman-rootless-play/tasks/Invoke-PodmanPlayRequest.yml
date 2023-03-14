@@ -2,9 +2,9 @@
 ---
 - name: slurp yaml file
   ansible.builtin.slurp:
-    src: "{{ podman_play.kube_file }}"
+    src: "{{ podman_play.kube_file.path }}"
   register: kube_file_slurp
-  delegate_to: localhost
+  delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
 
 - name: podman kube play
   when:

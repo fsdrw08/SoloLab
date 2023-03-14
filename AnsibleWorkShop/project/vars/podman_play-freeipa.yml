@@ -9,7 +9,9 @@ vars_podman_uri:
 
 vars_podman_play:
   state: present # absent / present
-  kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
+  kube_file: 
+    host: localhost
+    path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
   absent:
     query_params:
       force: false

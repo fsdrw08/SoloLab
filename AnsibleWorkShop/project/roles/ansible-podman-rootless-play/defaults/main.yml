@@ -38,7 +38,9 @@ podman_volume: "{{ defaults_podman_volume | ansible.builtin.combine(vars_podman_
 # podman_play
 defaults_podman_play:
   state: # required, skip if empty
-  kube_file: # required, skip if empty
+  kube_file: 
+    host: # hostname of the host where kube file place in, 
+    path: # path to the kube file, if empty, podman play process will skip 
 
 podman_play: "{{ defaults_podman_play | ansible.builtin.combine(vars_podman_play, recursive=True) }}"
 
