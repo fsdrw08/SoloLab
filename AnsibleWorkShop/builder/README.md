@@ -54,3 +54,9 @@ ref:
 podman run --rm -v ../:/runner `
    localhost/ansible-ee-aio bash -c "ansible --version"
 ```
+
+## Push image to docker hub
+```powershell
+podman login
+podman push localhost/ansible-ee-aio docker.io/fsdrw08/sololab-ansible-ee
+```
