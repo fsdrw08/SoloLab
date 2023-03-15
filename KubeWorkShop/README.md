@@ -171,6 +171,7 @@ APP_DIR="traefik"
 mkdir -p $HOME/infra/$APP_DIR/
 cp -r /var/vagrant/KubeWorkShop/$APP_DIR/conf/* $HOME/infra/$APP_DIR/
 cp $HOME/infra/freeipa/data/etc/ipa/ca.crt $HOME/infra/traefik/
+nmcli con show
 sudo nmcli con mod 'eth0' IPv4.dns "192.168.255.31"
 sudo systemctl restart NetworkManager
 podman kube play /var/vagrant/KubeWorkShop/traefik/pod-traefik.yaml 

@@ -19,7 +19,8 @@
     #       cmd:
     #         - echo 'P@ssw0rd' | kinit admin; klist
           
-    # https://github.com/skupperproject/skupper/blob/043cb3246c2541e8f392a59d416b4884bea7231c/client/podman/container.go  
+    # https://github.com/skupperproject/skupper/blob/043cb3246c2541e8f392a59d416b4884bea7231c/client/podman/container.go
+    # https://docs.docker.com/engine/api/v1.42/#tag/Exec
     - name: new podman exec session
       ansible.builtin.uri:
         url: http://d/{{ api_version }}/libpod/containers/{{ container_name }}/exec
