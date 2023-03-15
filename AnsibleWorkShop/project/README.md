@@ -38,7 +38,7 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
-# deploy freeipa pod (run podman play)
+# deploy freeipa in podman
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
@@ -46,7 +46,13 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
-# config freeipa
+# freeipa post-process
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # deploy traefik in podman
 podman run --rm `

@@ -1,0 +1,104 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: false
+  vars: 
+    ipa_hostname: ipa.infra.sololab
+  tasks:
+    - name: Update host DNS config
+      community.general.nmcli:
+        conn_name: eth0
+        type: ethernet
+        dns4:
+          - 192.168.255.31
+        state: present
+
+    - name: Config FreeIPA dynamic DNS update
+      block:
+        # https://access.redhat.com/articles/2728021#end-point-pwd
+        # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
+        # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
+        - name: Get cookie for service ipa
+          ansible.builtin.uri:
+            url: "https://{{ ipa_hostname }}/ipa/session/login_password"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ ipa_hostname }}/ipa
+              Accept: text/plain
+              Content-Type: "application/x-www-form-urlencoded"
+            body_format: form-urlencoded
+            body:
+              user: "admin"
+              password: "P@ssw0rd"
+            status_code: 200
+          register: ipa_session
+
+        - name: Enable dynamic DNS update
+          ansible.builtin.uri:
+            url: "https://{{ ipa_hostname }}/ipa/session/json"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ ipa_hostname }}/ipa
+              Accept: application/json
+              Cookie: "{{ ipa_session.set_cookie }}"
+            body_format: json
+            body:
+              method: dnszone_mod
+              params:
+                - - infra.sololab.
+                # BIND update policy, CLI option name--update-policy
+                - idnsupdatepolicy: grant keySololab wildcard * ANY;
+            status_code: 200
+            return_content: true
+          register: cert_show
+          # when: false
+
+    - name: Enable FreeIPA ACME
+      block:
+        - name: new podman exec session
+          ansible.builtin.uri:
+            url: http://d/{{ api_version }}/libpod/containers/{{ container_name }}/exec
+            unix_socket: /run/user/1000/podman/podman.sock
+            method: POST
+            status_code: 201
+            body_format: json
+            body: "{{ exec_create_request_body_dict }}"
+          vars:
+            api_version: v4.4.1
+            container_name: freeipa-freeipa
+            exec_create_request_body_dict:
+              # AttachStderr: true
+              # AttachStdin: true
+              AttachStdout: true
+              Cmd:
+                - bash
+                - -c
+                # https://www.freeipa.org/page/V4/ACME#Feature_management
+                - "echo 'P@ssw0rd' | kinit admin; ipa-acme-manage enable"
+              Tty: true
+              Privileged: false
+              User: root
+          register: exec_create_exec_respond
+
+        - name: start podman exec session
+          ansible.builtin.uri:
+            url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
+            unix_socket: /run/user/1000/podman/podman.sock
+            method: POST
+            status_code: 200
+            body_format: json
+            body: "{{ exec_start_request_body_dict }}"
+            # https://serverfault.com/questions/722852/how-to-check-the-json-response-from-a-uri-request-with-ansible
+            return_content: true
+          vars:
+            exec_start_request_body_dict:
+              Detach: false
+              Tty: true
+          register: exec_start_respond
+
+        - name: debug
+          debug:
+            # var: exec_start_respond.content.stdout_lines
+            msg: "{{ exec_start_respond.content.split('\r\n') }}"
