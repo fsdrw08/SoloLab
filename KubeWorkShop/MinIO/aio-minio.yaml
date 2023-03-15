@@ -1,0 +1,52 @@
+# https://github.com/grafana/loki/blob/main/examples/getting-started/docker-compose.yaml#L59
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio
+spec:
+  resources:
+    requests:
+      storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: minio
+  labels:
+    name: minio
+spec:
+  containers:
+    - name: minio
+      image: docker.io/minio/minio:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      # ports:
+      #   - name: minio
+      #     containerPort: 9000
+      #     hostIP: 192.168.255.32
+      #     hostPort: 9000
+      env:
+        # https://blog.csdn.net/weixin_45395031/article/details/119273223
+        # https://github.com/minio/minio/tree/master/docs/config#credentials
+        - name: MINIO_ROOT_USER # MINIO_ACCESS_KEY
+          value: loki
+        - name: MINIO_ROOT_PASSWORD # MINIO_SECRET_KEY
+          value: supersecret
+        # https://github.com/minio/minio/blob/master/docs/metrics/prometheus/README.md#2-configure-authentication-type-for-prometheus-metrics
+        - name: MINIO_PROMETHEUS_AUTH_TYPE
+          value: public
+        # https://github.com/minio/minio/blob/a6057c35cc05eba06c531e7c2f833e0b0880614f/cmd/common-main.go#L727
+        - name: MINIO_UPDATE
+          value: off
+      volumeMounts:
+        - name: minio
+          mountPath: /data
+  volumes:
+    - name: minio
+      persistentVolumeClaim:
+        claimName: minio

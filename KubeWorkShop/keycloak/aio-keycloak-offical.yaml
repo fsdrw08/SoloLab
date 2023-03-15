@@ -1,0 +1,252 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak
+data:
+  freeipa-realm.json: |
+    {
+      "id": "freeipa-realm",
+      "realm": "freeipa-realm",
+      "displayName": "Sololab Realm",
+      "enabled": true,
+      "requiredCredentials": [
+        "password"
+      ],
+      "clients": [
+        {
+          "clientId": "jenkins",
+          "enabled": true,
+          "publicClient": true,
+          "protocol": "openid-connect",
+          "rootUrl": "https://jenkins.rancher.example.com",
+          "redirectUris": [
+            "https://jenkins.rancher.example.com/*"
+          ],
+          "webOrigins": [
+            "https://jenkins.rancher.example.com"
+          ]
+        }
+      ],
+      "userFederationProviders": [
+        {
+          "displayName": "ldap-freeipa",
+          "providerName": "ldap",
+          "priority": 1,
+          "fullSyncPeriod": -1,
+          "changedSyncPeriod": -1,
+          "config": {
+            "pagination": "true",
+            "debug": "false",
+            "searchScope": "1",
+            "connectionPooling": "true",
+            "usersDn": "cn=users,cn=accounts,dc=infra,dc=sololab",
+            "userObjectClasses": "inetOrgPerson, organizationalPerson",
+            "usernameLDAPAttribute": "uid",
+            "bindDn": "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab",
+            "bindCredential": "P@ssw0rd",
+            "rdnLDAPAttribute": "uid",
+            "vendor": "rhds",
+            "editMode": "READ_ONLY",
+            "uuidLDAPAttribute": "ipaUniqueID",
+            "connectionUrl": "ldap://freeipa:389",
+            "syncRegistrations": "false",
+            "authType": "simple"
+          }
+        }
+      ],
+      "userFederationMappers": [
+        {
+          "name": "username",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "uid",
+            "user.model.attribute": "username",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "first_name",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "givenName",
+            "user.model.attribute": "firstName",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "last_name",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "sn",
+            "user.model.attribute": "lastName",
+            "is.mandatory.in.ldap": "true",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "email",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "mail",
+            "user.model.attribute": "email",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "creation_date",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "createTimestamp",
+            "user.model.attribute": "createTimestamp",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "modify_date",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "modifyTimestamp",
+            "user.model.attribute": "modifyTimestamp",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "false"
+          }
+        },
+        {
+          "name": "picture",
+          "federationMapperType": "user-attribute-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "ldap.attribute": "jpegPhoto",
+            "user.model.attribute": "picture",
+            "is.mandatory.in.ldap": "false",
+            "read.only": "true",
+            "always.read.value.from.ldap": "true"
+          }
+        },
+        {
+          "name": "groups",
+          "federationMapperType": "role-ldap-mapper",
+          "federationProviderDisplayName": "ldap-freeipa",
+          "config": {
+            "roles.dn": "cn=groups,cn=accounts,dc=example,dc=com",
+            "membership.ldap.attribute": "member",
+            "role.name.ldap.attribute": "cn",
+            "role.object.classes": "groupOfNames",
+            "mode": "LDAP_ONLY",
+            "use.realm.roles.mapping": "true"
+          }
+        }
+      ]
+    }
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: keycloak
+  labels:
+    name: keycloak
+spec:
+  containers:
+    - name: postgresql
+      # https://hub.docker.com/_/postgres/tags?page=1
+      image: docker.io/library/postgres:15-alpine
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: postgresql
+          containerPort: 5432
+      env:
+        # https://github.com/docker-library/docs/tree/master/postgres#environment-variables
+        - name: POSTGRES_USER
+          value: pg_keycloak
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_DB
+          value: postgres_keycloak
+      volumeMounts:
+        - name: postgresql_data
+          mountPath: /var/lib/postgresql/data
+
+    - name: keycloak
+      # https://quay.io/repository/keycloak/keycloak?tab=tags
+      image: quay.io/keycloak/keycloak:20.0
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "1000m"
+      ports:
+        - name: http
+          containerPort: 8080
+        # - name: https
+        #   containerPort: 8443
+      # https://www.keycloak.org/server/all-config
+      # https://github.com/zak905/extending-keycloak-udemy-course/blob/fb271e99b7091ab39fcca76ef21387bdbb1407ce/docker-compose.yaml
+      env:
+        # https://www.keycloak.org/server/configuration
+        - name: KEYCLOAK_ADMIN
+          value: admin
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: password
+
+        - name: KC_DB
+          value: postgres
+        - name: KC_DB_URL_HOST
+          value: keycloak
+        - name: KC_DB_URL_DATABASE
+          value: postgres_keycloak
+        - name: KC_DB_USERNAME
+          value: bn_keycloak
+        - name: KC_DB_PASSWORD
+          value: password
+
+        # production mode need hostname and tls cert
+        # hostname will force redirect url to the fqdn of
+        # hostname value in browser
+        # - name: KC_HOSTNAME
+        #   value: keycloak
+
+        # the way to import realm
+        # 1. use JAVA_OPTS_APPEND
+        # 2. use --import-realm + data in /opt/keycloak/data/import/
+        # - name: JAVA_OPTS_APPEND
+        #   value: -Dkeycloak.import=/opt/keycloak/data/import/freeipa-realm.json
+      args:
+        - 'start-dev'
+        # https://www.keycloak.org/server/importExport#_importing_a_realm_during_startup
+        - '--import-realm'
+      volumeMounts:
+        - name: keycloak_config
+          mountPath: /opt/keycloak/data/import/
+  volumes:
+    - name: postgresql_data
+      hostPath:
+        path: /home/vagrant/infra/keycloak/postgresql/
+        type: Directory
+    - name: keycloak_config
+      configMap:
+        name: keycloak
+        items:
+          - key: freeipa-realm.json
+            path: freeipa-realm.json
+  restartPolicy: Never
