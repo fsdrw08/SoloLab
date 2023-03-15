@@ -7,7 +7,8 @@ metadata:
 spec:
   containers:
   - name: pgadmin4
-    image: docker.io/dpage/pgadmin4:latest
+    image: docker.io/dpage/pgadmin4:6
+    imagePullPolicy: IfNotPresent
     resources:
       limits:
         memory: "256Mi"

@@ -20,7 +20,6 @@ data:
       checkNewVersion: false
       sendAnonymousUsage: false
 
-
     ## Routing & Load Balancing
     # https://doc.traefik.io/traefik/routing/overview/
     entryPoints:
