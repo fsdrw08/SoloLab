@@ -20,7 +20,6 @@ data:
       checkNewVersion: false
       sendAnonymousUsage: false
 
-
     ## Routing & Load Balancing
     # https://doc.traefik.io/traefik/routing/overview/
     entryPoints:
@@ -28,11 +27,11 @@ data:
       # https://doc.traefik.io/traefik/routing/routers/#configuration-example
       web:
         address: ":80"
-        http:
-          redirections:
-            entryPoint:
-              to: websecure
-              scheme: https
+        # http:
+        #   redirections:
+        #     entryPoint:
+        #       to: websecure
+        #       scheme: https
       websecure:
         address: ":443"
 

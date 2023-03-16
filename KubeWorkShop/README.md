@@ -198,6 +198,11 @@ loginctl enable-linger vagrant
 systemctl --user disable $SERVICENAME.service
 ```
 
+## debug traefik
+```
+wget -q -O - http://
+```
+
 
 ### deploy pgadmin4
 ```shell
