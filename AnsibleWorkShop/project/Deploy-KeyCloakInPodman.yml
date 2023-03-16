@@ -1,0 +1,25 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: yes
+  tasks:
+    - name: incloude vars
+      ansible.builtin.include_vars:
+        file: vars/podman_play-keycloak.yml
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless-provision
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+
+    - name: present traefik dynamic conf
+      block:
+        - name: present traefik dynamic conf dir
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/
+            state: directory
+
+        - name: copy traefik dynamic config to dir
+          ansible.builtin.copy:
+            src: /KubeWorkShop/KeyCloak/traefik-keycloak.yaml
+            dest: /home/{{ ansible_user }}/traefik/traefik-keycloak.yaml

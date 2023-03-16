@@ -61,6 +61,15 @@ podman run --rm `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# deploy keycloak in podman
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Deploy-KeyCloakInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 
@@ -227,6 +236,14 @@ podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
+
+# create pod
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/New-PodmanPod.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
+
 ```
 
 

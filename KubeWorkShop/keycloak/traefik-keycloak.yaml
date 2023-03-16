@@ -1,0 +1,26 @@
+# Dynamic Configuration
+http:
+  routers:
+    keycloak:
+      rule: Host(`keycloak.infra.sololab`)
+      entryPoints:
+        - web
+        - websecure
+      service: keycloak
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      tls: true
+  # middlewares:
+  #   subpath-stripprefixregex:
+  #     # https://doc.traefik.io/traefik/middlewares/http/stripprefixregex/
+  #     stripPrefixRegex:
+  #       regex:
+  #         - "/sub-[a-zA-Z0-9]{1,30}"
+  services:
+    keycloak:
+      loadBalancer:
+        servers:
+          - url: "http://keycloak:8080/"
+        # serversTransport: consul
+  # serversTransports:
+  #   consul:
+  #     insecureSkipVerify: true
