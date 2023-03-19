@@ -213,6 +213,13 @@ podman run --rm `
     -v ../:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# invoke freeipa request
+podman run --rm `
+    --add-host ipa.finra.sololab:192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/Invoke-IPARequest.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 # new ldap object
 podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/New-LDAPObject.yml `

@@ -1,17 +1,10 @@
 # code: language=ansible
 ---
-- hosts: kube-1
+- hosts: localhost
   gather_facts: false
   vars: 
     ipa_hostname: ipa.infra.sololab
   tasks:
-    - name: add record in /etc/hosts
-      ansible.builtin.lineinfile:
-        path: "/etc/hosts"
-        line: 192.168.255.31 {{ ipa_hostname }}
-        state: present
-      become: true
-
     # https://access.redhat.com/articles/2728021#end-point-pwd
     # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
     # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
@@ -31,6 +24,81 @@
         status_code: 200
       register: ipa_session
 
+    # - name: Add IPA DNS reverse zone
+    #   community.general.ipa_dnszone:
+    #     ipa_host: "{{ ipa_hostname }}"
+    #     ipa_pass: P@ssw0rd
+    #     state: present
+    #     zone_name: 255.168.192.in-addr.arpa.
+    #     dynamicupdate: true
+
+
+    - name: Show IPA DNS zone
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_show
+          params:
+            - - infra.sololab.
+            - all: true
+              # idnssoarname:
+              #   __dns_name__: hostmaster
+              # idnssoarefresh: 3600
+              # idnssoaretry: 900
+              # idnssoaexpire: 1209600
+              # idnssoaminimum: 3600
+              # skip_overlap_check: false
+              # force: false
+              # skip_nameserver_check: false
+            # BIND update policy, CLI option name--update-policy
+              # idnsupdatepolicy: grant keySololab wildcard * ANY;
+            # Allow dynamic updates. CLI option name--dynamic-update
+              # idnsallowdynupdate: true
+        status_code: 200
+        return_content: true
+      register: dnszone_show
+      when: true
+
+    - name: Add IPA DNS reverse zone
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_add/1
+          params:
+            - - 255.168.192.in-addr.arpa.
+            - name_from_ip: 192.168.255.0/24
+              # idnssoarname:
+              #   __dns_name__: hostmaster
+              # idnssoarefresh: 3600
+              # idnssoaretry: 900
+              # idnssoaexpire: 1209600
+              # idnssoaminimum: 3600
+              # skip_overlap_check: false
+              # force: false
+              # skip_nameserver_check: false
+            # BIND update policy, CLI option name--update-policy
+              idnsupdatepolicy: grant keySololab wildcard * ANY;
+            # Allow dynamic updates. CLI option name--dynamic-update
+              idnsallowdynupdate: true
+        status_code: 200
+        return_content: true
+      register: dnszone_add
+      when: false
+
     - name: Enable dynamic DNS update
       ansible.builtin.uri:
         url: "https://{{ ipa_hostname }}/ipa/session/json"
@@ -49,7 +117,7 @@
             - idnsupdatepolicy: grant keySololab wildcard * ANY;
         status_code: 200
         return_content: true
-      register: cert_show
+      register: dnszone_mod
       when: false
 
     - name: Get CA root cert
@@ -74,14 +142,10 @@
         status_code: 200
         return_content: true
       register: cert_show
-
-    - name: delete record in /etc/hosts
-      ansible.builtin.lineinfile:
-        path: "/etc/hosts"
-        line: 192.168.255.31 {{ ipa_hostname }}
-        state: absent
-      become: true
+      when: false
 
     - name: debug
       debug:
-        msg: "{{ cert_show.json.result.result.certificate }}"
+        msg: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} grant keySololab wildcard * ANY;"
+        # msg: "{{ dnszone_mod.json }}"
+        # msg: "{{ cert_show.json.result.result.certificate }}"
