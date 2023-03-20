@@ -3,11 +3,15 @@
 - hosts: kube-1
   gather_facts: false
   vars: 
-    ipa_hostname: ipa.infra.sololab
-    zone_name: infra.sololab.
-    reverse_zone_name: 255.168.192.in-addr.arpa.
-    reverse_zone_ip: 192.168.255.0/24
-    dns_update_policy: grant keySololab wildcard * ANY;
+    ipa:
+      hostname: ipa.infra.sololab
+      admin: admin
+      admin_password: P@ssw0rd
+    ipa_dnszones:
+      - name: infra.sololab.
+        dns_update_policy: grant keySololab wildcard * ANY;
+      - name: 255.168.192.in-addr.arpa.
+        dns_update_policy: grant keySololab wildcard * ANY;
   tasks:
     - name: Update DNS setting
       become: true
@@ -28,134 +32,189 @@
           ansible.builtin.shell:
             cmd: resolvectl dns eth0 192.168.255.31 192.168.255.1
 
+    - name: Set IPA DNS zone
+      ansible.builtin.include_tasks:
+        file: Set-IPADNSZone.yml
+      loop: "{{ ipa_dnszones }}"
+      vars:
+        # ipa: "{{ ipa }}"
+        ipa_dnszone: 
+          name: "{{ item.name }}"
+          dns_update_policy: "{{ item.dns_update_policy }}"
 
-    # https://access.redhat.com/articles/2728021#end-point-pwd
-    # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
-    # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
-    - name: Get cookie for service ipa
-      ansible.builtin.uri:
-        url: "https://{{ ipa_hostname }}/ipa/session/login_password"
-        validate_certs: false
-        method: POST
-        headers:
-          Referer: https://{{ ipa_hostname }}/ipa
-          Accept: text/plain
-          Content-Type: "application/x-www-form-urlencoded"
-        body_format: form-urlencoded
-        body:
-          user: "admin"
-          password: "P@ssw0rd"
-        status_code: 200
-      register: ipa_session
+    # # https://access.redhat.com/articles/2728021#end-point-pwd
+    # # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
+    # # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
+    # - name: Get cookie for service ipa
+    #   ansible.builtin.uri:
+    #     url: "https://{{ ipa_hostname }}/ipa/session/login_password"
+    #     validate_certs: false
+    #     method: POST
+    #     headers:
+    #       Referer: https://{{ ipa_hostname }}/ipa
+    #       Accept: text/plain
+    #       Content-Type: "application/x-www-form-urlencoded"
+    #     body_format: form-urlencoded
+    #     body:
+    #       user: "admin"
+    #       password: "P@ssw0rd"
+    #     status_code: 200
+    #   register: ipa_session
 
-    - name: Add and config IPA DNS reverse zone
-      block:
-        - name: Add IPA DNS reverse zone
-          ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
-            validate_certs: false
-            method: POST
-            headers:
-              Referer: https://{{ ipa_hostname }}/ipa
-              Accept: application/json
-              Cookie: "{{ ipa_session.set_cookie }}"
-            body_format: json
-            body:
-              method: dnszone_add
-              params:
-                - - "{{ reverse_zone_name }}"
-                - name_from_ip: "{{ reverse_zone_ip }}"
-                  idnsallowdynupdate: true
-            status_code: 200
-            return_content: true
-          register: dnszone_add_reverse
+    # - name: Detect DNS zone
+    #   ansible.builtin.uri:
+    #     url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #     validate_certs: false
+    #     method: POST
+    #     headers:
+    #       Referer: https://{{ ipa_hostname }}/ipa
+    #       Accept: application/json
+    #       Cookie: "{{ ipa_session.set_cookie }}"
+    #     body_format: json
+    #     body:
+    #       method: dnszone_find
+    #       params:
+    #         - - "*"
+    #         - all: true
+    #     status_code: 200
+    #     return_content: true
+    #   register: dnszone_find
 
-        - name: Show IPA DNS reverse zone info
-          ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
-            validate_certs: false
-            method: POST
-            headers:
-              Referer: https://{{ ipa_hostname }}/ipa
-              Accept: application/json
-              Cookie: "{{ ipa_session.set_cookie }}"
-            body_format: json
-            body:
-              method: dnszone_show
-              params:
-                - - "{{ reverse_zone_name }}"
-                - all: true
-            status_code: 200
-            return_content: true
-          register: dnszone_show_reverse
+    # # - name: Add and config IPA DNS reverse zone
+    # #   block:
+    # - name: Add and config IPA DNS zone
+    #   loop: "{{ ipa_zone.name }}"
+    #   block:
+    #     - name: Add IPA DNS reverse zone
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_add
+    #           params:
+    #             - - "{{ reverse_zone_name }}"
+    #             - name_from_ip: "{{ reverse_zone_ip }}"
+    #               idnsallowdynupdate: true
+    #         status_code: 200
+    #         return_content: true
+    #       register: dnszone_add_reverse
+    #       when:
+    #         # https://serverfault.com/questions/1031041/ansible-check-if-variable-exists-in-attribute-list
+    #         - not dnszone_find.json.result.result | selectattr("idnsname", "contains", reverse_zone_name)
 
-        - name: Config IPA DNS reverse zone dynamic update
-          ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
-            validate_certs: false
-            method: POST
-            headers:
-              Referer: https://{{ ipa_hostname }}/ipa
-              Accept: application/json
-              Cookie: "{{ ipa_session.set_cookie }}"
-            body_format: json
-            body:
-              method: dnszone_mod
-              params:
-                # Arguments: idnsname, required
-                - - "{{ reverse_zone_name }}"
-                # Options:
-                # BIND update policy, https://bind9.readthedocs.io/en/stable/reference.html#namedconf-statement-update-policy
-                # ( grant | deny ) <identity, the key name> <ruletype>  <name, should match with the ruletype> <types, dns record type>
-                - idnsupdatepolicy: "{{ dnszone_show_reverse.json.result.result.idnsupdatepolicy | join('') }} {{ dns_update_policy }}"
-            status_code: 200
-            return_content: true
-          register: dnszone_mod_reverse
-          when:
-            - dns_update_policy not in dnszone_show_reverse.json.result.result.idnsupdatepolicy | join('') 
+    #     - name: Show IPA DNS reverse zone info
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_show
+    #           params:
+    #             - - "{{ reverse_zone_name }}"
+    #             - all: true
+    #         status_code: 200
+    #         return_content: true
+    #       register: dnszone_show_reverse
 
-    - name: Config FreeIPA DNS zone dynamic DNS update
-      block:
-        - name: Show IPA DNS zone info
-          ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
-            validate_certs: false
-            method: POST
-            headers:
-              Referer: https://{{ ipa_hostname }}/ipa
-              Accept: application/json
-              Cookie: "{{ ipa_session.set_cookie }}"
-            body_format: json
-            body:
-              method: dnszone_show
-              params:
-                - - "{{ zone_name }}"
-                - all: true
-            status_code: 200
-            return_content: true
-          register: dnszone_show
+    #     - name: Config IPA DNS reverse zone dynamic update
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_mod
+    #           params:
+    #             # Arguments: idnsname, required
+    #             - - "{{ reverse_zone_name }}"
+    #             # Options:
+    #             # BIND update policy, https://bind9.readthedocs.io/en/stable/reference.html#namedconf-statement-update-policy
+    #             # ( grant | deny ) <identity, the key name> <ruletype>  <name, should match with the ruletype> <types, dns record type>
+    #             - idnsupdatepolicy: "{{ dnszone_show_reverse.json.result.result.idnsupdatepolicy | join('') }} {{ dns_update_policy }}"
+    #         status_code: 200
+    #         return_content: true
+    #       register: dnszone_mod_reverse
+    #       when:
+    #         - dns_update_policy not in dnszone_show_reverse.json.result.result.idnsupdatepolicy | join('') 
 
-        - name: Config dynamic DNS update
-          ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
-            validate_certs: false
-            method: POST
-            headers:
-              Referer: https://{{ ipa_hostname }}/ipa
-              Accept: application/json
-              Cookie: "{{ ipa_session.set_cookie }}"
-            body_format: json
-            body:
-              method: dnszone_mod
-              params:
-                - - "{{ zone_name }}"
-                # BIND update policy, CLI option name--update-policy
-                - idnsupdatepolicy: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} {{ dns_update_policy }}"
-            status_code: 200
-            return_content: true
-          register: cert_show
-          when: 
-            - dns_update_policy not in dnszone_show.json.result.result.idnsupdatepolicy | join('')
+    # - name: Config FreeIPA DNS zone dynamic DNS update
+    #   block:
+    #     - name: Add IPA DNS zone
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_add
+    #           params:
+    #             - - "{{ zone_name }}"
+    #             - idnsallowdynupdate: true
+    #         status_code: 200
+    #         return_content: true
+    #       register: dnszone_add
+    #       when:
+    #         - not dnszone_find.json.result.result | selectattr("idnsname", "contains", zone_name)
+
+    #     - name: Show IPA DNS zone info
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_show
+    #           params:
+    #             - - "{{ zone_name }}"
+    #             - all: true
+    #         status_code: 200
+    #         return_content: true
+    #       register: dnszone_show
+
+    #     - name: Config dynamic DNS update
+    #       ansible.builtin.uri:
+    #         url: "https://{{ ipa_hostname }}/ipa/session/json"
+    #         validate_certs: false
+    #         method: POST
+    #         headers:
+    #           Referer: https://{{ ipa_hostname }}/ipa
+    #           Accept: application/json
+    #           Cookie: "{{ ipa_session.set_cookie }}"
+    #         body_format: json
+    #         body:
+    #           method: dnszone_mod
+    #           params:
+    #             - - "{{ zone_name }}"
+    #             # BIND update policy, CLI option name--update-policy
+    #             - idnsupdatepolicy: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} {{ dns_update_policy }}"
+    #         status_code: 200
+    #         return_content: true
+    #       register: cert_show
+    #       when: 
+    #         - dns_update_policy not in dnszone_show.json.result.result.idnsupdatepolicy | join('')
 
     - name: Enable FreeIPA ACME
       block:

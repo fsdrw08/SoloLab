@@ -48,6 +48,7 @@ podman run --rm `
 
 # freeipa post-process
 podman run --rm `
+    --add-host ipa.finra.sololab:192.168.255.31 `
     -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/runner `
@@ -216,9 +217,10 @@ podman run --rm `
 # invoke freeipa request
 podman run --rm `
     --add-host ipa.finra.sololab:192.168.255.31 `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -e RUNNER_PLAYBOOK=./debug/Invoke-IPARequest.yml `
     -v ../:/runner `
-    localhost/ansible-ee-aio ansible-runner run /runner -vv
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
 # new ldap object
 podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `

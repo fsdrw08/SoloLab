@@ -1,0 +1,115 @@
+# code: language=ansible
+---
+# - hosts: localhost
+#   gather_facts: false
+#   vars: 
+#     ipa:
+#       hostname: ipa.infra.sololab
+#       admin: admin
+#       admin_password: P@ssw0rd
+#     ipa_dnszone:
+#       zone: infra.sololab.
+#       dns_update_policy: grant keySololab wildcard * ANY;
+#   tasks:
+    # https://access.redhat.com/articles/2728021#end-point-pwd
+    # https://github.com/nasx/rfe-vmware-testing/blob/8b9540ed53d975919b332204f43a3dcf196ad131/ansible/playbooks/provision.yaml
+    # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
+    - name: Get cookie for service ipa
+      ansible.builtin.uri:
+        url: "https://{{ ipa.hostname }}/ipa/session/login_password"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa.hostname }}/ipa
+          Accept: text/plain
+          Content-Type: "application/x-www-form-urlencoded"
+        body_format: form-urlencoded
+        body:
+          user: "{{ ipa.admin }}"
+          password: "{{ ipa.admin_password }}"
+        status_code: 200
+      register: ipa_session
+
+    - name: Detect DNS zone
+      ansible.builtin.uri:
+        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa.hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_find
+          params:
+            - - "*"
+            - all: false
+        status_code: 200
+        return_content: true
+      register: dnszone_find
+
+    - name: Add IPA DNS zone
+      ansible.builtin.uri:
+        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa.hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_add
+          params:
+            - - "{{ ipa_dnszone.name }}"
+            - idnsallowdynupdate: true
+        status_code: 200
+        return_content: true
+      register: dnszone_add
+      when:
+        - not dnszone_find.json.result.result | selectattr("idnsname", "contains", ipa_dnszone.name)
+
+    - name: Show IPA DNS zone info
+      ansible.builtin.uri:
+        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa.hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_show
+          params:
+            - - "{{ ipa_dnszone.name }}"
+            - all: true
+        status_code: 200
+        return_content: true
+      register: dnszone_show
+
+    - name: Config IPA DNS reverse zone dynamic update
+      ansible.builtin.uri:
+        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa.hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_mod
+          params:
+            # Arguments: idnsname, required
+            - - "{{ ipa_dnszone.name }}"
+            # Options:
+            # BIND update policy, https://bind9.readthedocs.io/en/stable/reference.html#namedconf-statement-update-policy
+            # ( grant | deny ) <identity, the key name> <ruletype>  <name, should match with the ruletype> <types, dns record type>
+            - idnsupdatepolicy: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} {{ ipa_dnszone.dns_update_policy }}"
+        status_code: 200
+        return_content: true
+      register: dnszone_mod
+      when:
+        - ipa_dnszone.dns_update_policy not in dnszone_show.json.result.result.idnsupdatepolicy | join('') 

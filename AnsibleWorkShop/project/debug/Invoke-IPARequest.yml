@@ -32,6 +32,38 @@
     #     zone_name: 255.168.192.in-addr.arpa.
     #     dynamicupdate: true
 
+    - name: Find IPA DNS zone
+      ansible.builtin.uri:
+        url: "https://{{ ipa_hostname }}/ipa/session/json"
+        validate_certs: false
+        method: POST
+        headers:
+          Referer: https://{{ ipa_hostname }}/ipa
+          Accept: application/json
+          Cookie: "{{ ipa_session.set_cookie }}"
+        body_format: json
+        body:
+          method: dnszone_find
+          params:
+            - - "*"
+            - all: true
+              # idnssoarname:
+              #   __dns_name__: hostmaster
+              # idnssoarefresh: 3600
+              # idnssoaretry: 900
+              # idnssoaexpire: 1209600
+              # idnssoaminimum: 3600
+              # skip_overlap_check: false
+              # force: false
+              # skip_nameserver_check: false
+            # BIND update policy, CLI option name--update-policy
+              # idnsupdatepolicy: grant keySololab wildcard * ANY;
+            # Allow dynamic updates. CLI option name--dynamic-update
+              # idnsallowdynupdate: true
+        status_code: 200
+        return_content: true
+      register: dnszone_find
+      when: true
 
     - name: Show IPA DNS zone
       ansible.builtin.uri:
@@ -64,7 +96,7 @@
         status_code: 200
         return_content: true
       register: dnszone_show
-      when: true
+      when: false
 
     - name: Add IPA DNS reverse zone
       ansible.builtin.uri:
@@ -146,6 +178,10 @@
 
     - name: debug
       debug:
-        msg: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} grant keySololab wildcard * ANY;"
+        msg: "{{ dnszone_find.json.result | community.general.json_query('result[*].idnsname') | flatten }}"
+        # msg: "{{ dnszone_show.json.result.result.idnsupdatepolicy | join('') }} grant keySololab wildcard * ANY;"
         # msg: "{{ dnszone_mod.json }}"
         # msg: "{{ cert_show.json.result.result.certificate }}"
+      when:
+        # - "'infra.sololab' in (dnszone_find.json.result | community.general.json_query('result[*].idnsname') | flatten | join(' '))"
+        - dnszone_find.json.result.result | selectattr("idnsname", "contains", "infra.sololab.")
