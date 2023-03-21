@@ -144,7 +144,7 @@ data:
           "federationMapperType": "role-ldap-mapper",
           "federationProviderDisplayName": "ldap-freeipa",
           "config": {
-            "roles.dn": "cn=groups,cn=accounts,dc=example,dc=com",
+            "roles.dn": "cn=groups,cn=accounts,dc=infra,dc=sololab",
             "membership.ldap.attribute": "member",
             "role.name.ldap.attribute": "cn",
             "role.object.classes": "groupOfNames",

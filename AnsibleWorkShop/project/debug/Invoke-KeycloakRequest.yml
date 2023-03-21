@@ -1,0 +1,15 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: test
+      community.general.keycloak_client:
+        auth_keycloak_url: https://keycloak.infra.sololab
+        auth_realm: master
+        auth_username: admin
+        auth_password: password
+        validate_certs: false
+        client_id: freeipa-realm-realm
+        state: present
+      check_mode: true

@@ -15,6 +15,9 @@ kind: ConfigMap
 metadata:
   name: keycloak-keycloak-cm
 data:
+  # https://thomascfoulds.com/2020/04/09/jenkins-authentication-with-keycloak.html#:~:text=FreeIPA%20Keycloak%20Realm
+  # https://thomascfoulds.com/assets/files/freeipa-realm.json
+  # https://github.com/jbride/minio_integrations_quickstart/blob/60a17ca654b2a7095da6e41a0a5912ecb062ac0f/etc/sso/ldaprealm.json
   freeipa-realm.json: |
     {
       "id": "freeipa-realm",
@@ -23,21 +26,6 @@ data:
       "enabled": true,
       "requiredCredentials": [
         "password"
-      ],
-      "clients": [
-        {
-          "clientId": "jenkins",
-          "enabled": true,
-          "publicClient": true,
-          "protocol": "openid-connect",
-          "rootUrl": "https://jenkins.rancher.example.com",
-          "redirectUris": [
-            "https://jenkins.rancher.example.com/*"
-          ],
-          "webOrigins": [
-            "https://jenkins.rancher.example.com"
-          ]
-        }
       ],
       "userFederationProviders": [
         {
@@ -156,7 +144,7 @@ data:
           "federationMapperType": "role-ldap-mapper",
           "federationProviderDisplayName": "ldap-freeipa",
           "config": {
-            "roles.dn": "cn=groups,cn=accounts,dc=example,dc=com",
+            "roles.dn": "cn=groups,cn=accounts,dc=infra,dc=sololab",
             "membership.ldap.attribute": "member",
             "role.name.ldap.attribute": "cn",
             "role.object.classes": "groupOfNames",
@@ -215,6 +203,7 @@ spec:
           # mountPath: /bitnami/postgresql
 
     - name: keycloak
+      # https://www.keycloak.org/server/containers#_running_a_standard_keycloak_container
       # https://quay.io/repository/keycloak/keycloak?tab=tags
       image: quay.io/keycloak/keycloak:21.0
       imagePullPolicy: IfNotPresent
@@ -251,6 +240,12 @@ spec:
         # https://www.keycloak.org/server/reverseproxy#_proxy_modes
         - name: KC_PROXY # proxy
           value: edge
+
+        # https://www.keycloak.org/server/containers#_relevant_options
+        # https://www.keycloak.org/server/features#_supported_features
+        - name: KC_FEATURES
+          value: admin-api,admin2,token-exchange
+
         # production mode need hostname and tls cert
         # hostname will force redirect url to the fqdn of
         # hostname value in browser

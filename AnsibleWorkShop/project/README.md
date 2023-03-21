@@ -253,6 +253,14 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
+# call keycloak
+podman run --rm `
+    --dns 192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/Invoke-KeycloakRequest.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vvv
+
 ```
 
 
