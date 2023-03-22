@@ -1,3 +1,24 @@
+## To use my ansible runner image directly
+1. Pull the image first
+```powershell
+podman pull docker.io/fsdrw08/sololab-ansible-ee
+podman tag docker.io/fsdrw08/sololab-ansible-ee localhost/ansible-ee-aio 
+```
+2. Refer to run playbook with this image
+ref: 
+ - [Introduction to Ansible Runner](https://ansible-runner.readthedocs.io/en/stable/intro/)
+ - [Using Runner as a container interface to Ansible](https://ansible-runner.readthedocs.io/en/stable/container/)
+ - [ansible-runner/Dockerfile](https://github.com/ansible/ansible-runner/blob/devel/Dockerfile)
+ - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
+```powershell
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    localhost/ansible-ee-aio `
+    ansible-runner run /runner -vv
+```
+
 ## To build a ansible execution environment (Ansible EE, aka a container)
 0. Pre-request
    - Install RedHat.podman
