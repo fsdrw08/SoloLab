@@ -32,8 +32,15 @@ data:
         #     entryPoint:
         #       to: websecure
         #       scheme: https
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
       websecure:
         address: ":443"
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
 
     # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
     serversTransport:

@@ -1,4 +1,16 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik
+spec:
+  resources:
+    requests:
+      storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: traefik
@@ -32,8 +44,15 @@ data:
         #     entryPoint:
         #       to: websecure
         #       scheme: https
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
       websecure:
         address: ":443"
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
 
     # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
     serversTransport:
@@ -53,7 +72,7 @@ data:
         acme:
           caServer: https://ipa-ca.infra.sololab/acme/directory
           email: admin@INFRA.SOLOLAB
-          storage: acme.json
+          storage: /mnt/acmeStorage/acme.json
           httpChallenge:
             # used during the challenge
             entryPoint: web
@@ -103,6 +122,8 @@ spec:
           subPath: root_ca.crt
         - name: fileProvider
           mountPath: /etc/traefik/dynamic/
+        - name: acmeStorage
+          mountPath: /mnt/acmeStorage
   volumes:
     - name: traefik.yml
       # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
@@ -121,4 +142,7 @@ spec:
       hostPath:
         path: /home/vagrant/traefik/
         type: Directory
+    - name: acmeStorage
+      persistentVolumeClaim:
+        claimName: traefik
   restartPolicy: Never
