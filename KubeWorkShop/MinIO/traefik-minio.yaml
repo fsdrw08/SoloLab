@@ -1,0 +1,44 @@
+# Dynamic Configuration
+http:
+  routers:
+    minio-api:
+      rule: Host(`minio.infra.sololab`) && PathPrefix(`/api`) 
+      entryPoints:
+        # - web
+        - websecure
+      service: minio-api
+      middlewares:
+        - minio-stripprefix
+      tls: 
+        certResolver: freeipa
+    minio-console:
+      rule: Host(`minio.infra.sololab`) && PathPrefix(`/console`) 
+      entryPoints:
+        # - web
+        - websecure
+      service: minio-console
+      middlewares:
+        - minio-stripprefix
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      tls: 
+        certResolver: freeipa
+  middlewares:
+    minio-stripprefix:
+      # https://doc.traefik.io/traefik/middlewares/http/stripprefix/
+      stripPrefix:
+        prefixes:
+          - /api
+          - /console
+  services:
+    minio-api:
+      loadBalancer:
+        servers:
+          - url: "http://minio:9000/"
+    minio-console:
+      loadBalancer:
+        servers:
+          - url: "http://minio:9001/"
+        # serversTransport: consul
+  # serversTransports:
+  #   consul:
+  #     insecureSkipVerify: true

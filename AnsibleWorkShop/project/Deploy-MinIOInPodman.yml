@@ -1,0 +1,31 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: yes
+  vars: 
+    ipa_hostname: ipa.infra.sololab
+  tasks:
+    - name: incloude vars
+      ansible.builtin.include_vars:
+        file: vars/podman_play-minio.yml
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless-provision
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+
+    - name: Ensure dns record is present
+      community.general.ipa_dnsrecord:
+        ipa_host: ipa.infra.sololab
+        ipa_pass: P@ssw0rd
+        validate_certs: false
+        zone_name: infra.sololab
+        record_name: minio
+        record_type: 'A'
+        record_value: '192.168.255.32'
+        state: present
+
+    - name: present minio traefik config
+      ansible.builtin.copy:
+        src: /KubeWorkShop/MinIO/traefik-minio.yaml
+        dest: /home/{{ ansible_user }}/traefik/

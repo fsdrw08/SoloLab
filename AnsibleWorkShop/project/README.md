@@ -71,6 +71,14 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# deploy MinIO in podman
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Deploy-MinIOInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 

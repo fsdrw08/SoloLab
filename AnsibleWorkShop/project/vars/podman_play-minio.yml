@@ -1,0 +1,32 @@
+# code: language=ansible
+---
+vars_podman_host: kube-1
+
+vars_podman_uri:
+  scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+  api_version: v4.4.1 # v4.0.0 ← (default)
+  unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+
+vars_podman_play:
+  state: present # absent / present
+  timeout: 600
+  kube_file: 
+    host: localhost
+    path: /KubeWorkShop/MinIO/aio-minio.yaml
+  absent:
+    query_params:
+      force: true
+
+vars_podman_generate_systemd:
+  generate:
+    path_params: 
+      name: minio
+    query_params:
+      useName: true
+
+vars_service:
+  podman_pod:
+    user_scope:
+      skipped: false
+      enabled: true
+      state: started
