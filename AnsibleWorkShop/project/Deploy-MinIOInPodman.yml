@@ -5,6 +5,55 @@
   vars: 
     ipa_hostname: ipa.infra.sololab
   tasks:
+    - name: Get root ca
+      delegate_to: localhost
+      block:
+        - name: Get cookie for service ipa
+          ansible.builtin.uri:
+            url: "https://{{ ipa_hostname }}/ipa/session/login_password"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ ipa_hostname }}/ipa
+              Accept: text/plain
+              Content-Type: "application/x-www-form-urlencoded"
+            body_format: form-urlencoded
+            body:
+              user: "admin"
+              password: "P@ssw0rd"
+            status_code: 200
+          register: ipa_session
+
+        - name: Get CA root cert
+          ansible.builtin.uri:
+            url: "https://{{ ipa_hostname }}/ipa/session/json"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ ipa_hostname }}/ipa
+              Accept: application/json
+              Cookie: "{{ ipa_session.set_cookie }}"
+            body_format: json
+            body:
+              id: 0
+              method: cert_show/1
+              params:
+                # serial_number
+                - - 1
+                # Include certificate chain in output
+                - chain: true
+                  raw: true
+            status_code: 200
+            return_content: true
+          register: Root_CA_Cert
+          when:
+            - ipa_session is defined
+
+        - name: Render minio kube_file
+          ansible.builtin.template:
+            src: /KubeWorkShop/MinIO/aio-minio.yaml
+            dest: /KubeWorkShop/MinIO/aio-minio-rendered.yaml
+
     - name: incloude vars
       ansible.builtin.include_vars:
         file: vars/podman_play-minio.yml

@@ -12,7 +12,7 @@ vars_podman_play:
   timeout: 600
   kube_file: 
     host: localhost
-    path: /KubeWorkShop/MinIO/aio-minio.yaml
+    path: /KubeWorkShop/MinIO/aio-minio-rendered.yaml
   absent:
     query_params:
       force: true
