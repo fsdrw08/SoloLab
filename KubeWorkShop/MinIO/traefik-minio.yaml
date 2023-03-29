@@ -2,13 +2,11 @@
 http:
   routers:
     minio-api:
-      rule: Host(`minio.infra.sololab`) && PathPrefix(`/api`) 
+      rule: Host(`minio.infra.sololab`)
       entryPoints:
         # - web
         - websecure
       service: minio-api
-      middlewares:
-        - minio-stripprefix
       tls: 
         certResolver: freeipa
     minio-console:
@@ -16,9 +14,9 @@ http:
       entryPoints:
         # - web
         - websecure
-      service: minio-console
       middlewares:
         - minio-stripprefix
+      service: minio-console
       # https://doc.traefik.io/traefik/routing/routers/#tls
       tls: 
         certResolver: freeipa
@@ -27,8 +25,8 @@ http:
       # https://doc.traefik.io/traefik/middlewares/http/stripprefix/
       stripPrefix:
         prefixes:
-          - /api
           - /console
+        forceSlash: false
   services:
     minio-api:
       loadBalancer:
