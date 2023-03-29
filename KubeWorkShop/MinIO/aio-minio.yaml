@@ -81,6 +81,7 @@ spec:
         - name: MINIO_UPDATE
           value: off
         # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#envvar.MINIO_BROWSER_REDIRECT_URL
+        # should match with the url config
         - name: MINIO_BROWSER_REDIRECT_URL
           value: https://minio.infra.sololab/console/
       # https://blog.csdn.net/fly910905/article/details/104706105
@@ -98,6 +99,7 @@ spec:
         - '/mnt/certs'
         # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#minio.server.DIRECTORIES
         - '/data'
+
       # https://github.com/minio/console/issues/2681
       startupProbe:
         exec:
@@ -106,13 +108,14 @@ spec:
         successThreshold: 1
         initialDelaySeconds: 0
         periodSeconds: 1
+      # https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html#node-liveness
       livenessProbe:
         httpGet:
           path: /minio/health/live
           port: 9000
           scheme: HTTP
         initialDelaySeconds: 120
-        periodSeconds: 30
+        periodSeconds: 1800
         timeoutSeconds: 10
         successThreshold: 1
         failureThreshold: 3
