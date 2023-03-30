@@ -180,6 +180,13 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# test podman socket api
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Invoke-PodmanAPI.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 # config podman in target host
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-KernelModules.yml `
@@ -268,6 +275,15 @@ podman run --rm `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
+
+
+# test template check mode
+podman run --rm `
+    --dns 192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/Debug-Template.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 ```
 

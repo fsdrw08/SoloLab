@@ -3,17 +3,21 @@
 - hosts: kube-1 # kube-2
   gather_facts: no
   vars:
-    api_version: v4.0.0
+    api_version: v4.4.0
     unix_socket: /run/user/1000/podman/podman.sock
-    podman_play:
-      state: # !!required, present / absent, if empty, podman play process will skip 
-      kube_file: # !!required, path to the kube file, if empty, podman play process will skip 
+    pods:
+      name: minio
   tasks:
-    - name: Invoke podman play
+    # https://docs.podman.io/en/latest/_static/api.html#tag/pods/operation/PodListLibpod
+    - name: list pods
       ansible.builtin.uri:
-        url: http://d/{{ api_version }}/libpod/play/kube
+        url: http://d/{{ api_version }}/libpod/pods/json?filters=%7B%0A%20%20%22name%22%3A%22minio%22%0A%7D
         unix_socket: "{{ unix_socket }}"
-        method: POST
+        method: GET
         status_code: 200
-        body_format: json
-        body: "{{ podman_play.request_body }}"
+    # - name: check pods exists
+    #   ansible.builtin.uri:
+    #     url: http://d/{{ api_version }}/libpod/pods/{{ pods.name }}/exists
+    #     unix_socket: "{{ unix_socket }}"
+    #     method: GET
+    #     status_code: 204

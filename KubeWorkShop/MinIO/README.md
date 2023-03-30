@@ -51,4 +51,6 @@ curl -k `
     -d "username=keycloak" `
     -d "password=password" `
     https://keycloak.infra.sololab/realms/freeipa-realm/protocol/openid-connect/token
+
+curl -k -X GET https://keycloak.infra.sololab/realms/freeipa-realm/.well-known/openid-configuration
 ```
