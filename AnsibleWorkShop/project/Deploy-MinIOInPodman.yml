@@ -3,34 +3,46 @@
 - hosts: kube-1 # kube-2
   gather_facts: yes
   vars: 
-    ipa_hostname: ipa.infra.sololab
+    ipa:
+      hostname: ipa.infra.sololab
+      admin: admin
+      admin_password: P@ssw0rd
+    kube_file_template: /KubeWorkShop/MinIO/aio-minio.yaml
+    dns:
+      zone_name: infra.sololab
+      record_name: minio
+      record_type: 'A'
+      record_value: '192.168.255.32'
+    ingress_file: /KubeWorkShop/MinIO/traefik-minio.yaml
+  vars_files:
+    - vars/podman_play-minio.yml
   tasks:
     - name: Get root ca
       delegate_to: localhost
       block:
         - name: Get cookie for service ipa
           ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/login_password"
+            url: "https://{{ ipa.hostname }}/ipa/session/login_password"
             validate_certs: false
             method: POST
             headers:
-              Referer: https://{{ ipa_hostname }}/ipa
+              Referer: https://{{ ipa.hostname }}/ipa
               Accept: text/plain
               Content-Type: "application/x-www-form-urlencoded"
             body_format: form-urlencoded
             body:
-              user: "admin"
-              password: "P@ssw0rd"
+              user: "{{ ipa.admin }}"
+              password: "{{ ipa.admin_password }}"
             status_code: 200
           register: ipa_session
 
         - name: Get CA root cert
           ansible.builtin.uri:
-            url: "https://{{ ipa_hostname }}/ipa/session/json"
+            url: "https://{{ ipa.hostname }}/ipa/session/json"
             validate_certs: false
             method: POST
             headers:
-              Referer: https://{{ ipa_hostname }}/ipa
+              Referer: https://{{ ipa.hostname }}/ipa
               Accept: application/json
               Cookie: "{{ ipa_session.set_cookie }}"
             body_format: json
@@ -45,36 +57,51 @@
                   raw: true
             status_code: 200
             return_content: true
-          register: Root_CA_Cert
+          register: Root_CA_Cert_respond
           when:
             - ipa_session is defined
 
-        - name: Render minio kube_file
+        - name: Set fact Root_CA_Cert
+          ansible.builtin.set_fact:
+            Root_CA_Cert: "{{ Root_CA_Cert_respond.json.result.result.certificate }}"
+
+    - name: Prepare kube_file content
+      when:
+        - Root_CA_Cert is defined
+      block:
+        - name: Render kube file content
           ansible.builtin.template:
-            src: /KubeWorkShop/MinIO/aio-minio.yaml
-            dest: /KubeWorkShop/MinIO/aio-minio-rendered.yaml
+            src: "{{ kube_file_template }}"
+            dest: /dev/null
+          check_mode: true
+          diff: true
+          register: template
 
-    - name: incloude vars
-      ansible.builtin.include_vars:
-        file: vars/podman_play-minio.yml
+        - name: Set fact rendered
+          ansible.builtin.set_fact:
+            rendered: "{{ template.diff[0].after }}"
 
-     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
-    - name: run role ansible-podman-rootless-provision
-      ansible.builtin.include_role:
-        name: ansible-podman-rootless-play
+    - name: Deploy MinIO in podman
+      block:
+         # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+        - name: run role ansible-podman-rootless-provision
+          ansible.builtin.include_role:
+            name: ansible-podman-rootless-play
 
-    - name: Ensure dns record is present
-      community.general.ipa_dnsrecord:
-        ipa_host: ipa.infra.sololab
-        ipa_pass: P@ssw0rd
-        validate_certs: false
-        zone_name: infra.sololab
-        record_name: minio
-        record_type: 'A'
-        record_value: '192.168.255.32'
-        state: present
+    - name: Config reverse proxy
+      block:
+        - name: Ensure dns record is present
+          community.general.ipa_dnsrecord:
+            ipa_host: "{{ ipa.hostname }}"
+            ipa_pass: "{{ ipa.admin_password }}"
+            validate_certs: false
+            zone_name: "{{ dns.zone_name }}"
+            record_name: "{{ dns.record_name }}"
+            record_type: "{{ dns.record_type }}"
+            record_value: "{{ dns.record_value }}"
+            state: present
 
-    - name: present minio traefik config
-      ansible.builtin.copy:
-        src: /KubeWorkShop/MinIO/traefik-minio.yaml
-        dest: /home/{{ ansible_user }}/traefik/
+        - name: present minio route config
+          ansible.builtin.copy:
+            src: "{{ ingress_file }}"
+            dest: /home/{{ ansible_user }}/traefik/

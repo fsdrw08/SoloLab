@@ -46,7 +46,8 @@ vars_podman_play:
   state: # present / absent, if empty, podman play process will skip 
   kube_file: 
     host: # hostname of the host where kube file place in, 
-    path: # path to the kube file, if empty, podman play process will skip 
+    path: # path to the kube file, if both path or content empty, podman play process will skip 
+    content: # content of kube file, if both path or content empty, podman play process will skip 
   timeout: 300
   present: # params for podman kube play
     query_params:

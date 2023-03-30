@@ -1,10 +1,26 @@
 # code: language=ansible
 ---
-- name: slurp yaml file
-  ansible.builtin.slurp:
-    src: "{{ podman_play.kube_file.path }}"
-  register: kube_file_slurp
-  delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
+- name: set kube_file_slurp
+  block:
+    - name: slurp yaml file
+      ansible.builtin.slurp:
+        src: "{{ podman_play.kube_file.path }}"
+      register: kube_file_slurp_return
+      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
+      when:
+        - podman_play.kube_file.path is not none
+
+    - name: extract kube_file_slurp_return.content
+      ansible.builtin.set_fact:
+        kube_file_slurp: "{{ kube_file_slurp_return.content }}"
+      when:
+        - podman_play.kube_file.path is not none
+
+    - name: encode kube file content
+      ansible.builtin.set_fact:
+        kube_file_slurp: "{{ podman_play.kube_file.content | b64encode }}"
+      when:
+        - podman_play.kube_file.content is not none
 
 - name: podman kube play
   when:
@@ -37,14 +53,17 @@
           - 500
         timeout: "{{ podman_play.timeout | default(300) }}"
         body_format: json
-        body: "{{ kube_file_slurp.content | b64decode }}"
+        body: "{{ kube_file_slurp | b64decode }}"
       register: podman_kube_play_respond
       changed_when: 
         - podman_kube_play_respond.status == 200
       
-    - name: debug
+    - name: debug podman_kube_play_respond
       debug:
         msg: "{{ podman_kube_play_respond }}"
+      failed_when:
+        - podman_kube_play_respond.status == 500
+        - podman_kube_play_respond.json.cause != 'pod already exists'
 
     - name: set pod id
       ansible.builtin.set_fact:
@@ -52,7 +71,7 @@
       when:
         - podman_kube_play_respond.status == 200
 
-    - name: debug
+    - name: debug pod_id
       debug:
         msg: "{{ pod_id }}"
       when:
@@ -88,7 +107,7 @@
           - 200
           - 500
         body_format: json
-        body: "{{ kube_file_slurp.content | b64decode }}"
+        body: "{{ kube_file_slurp | b64decode }}"
         return_content: true
       register: podman_kube_down_respond
       changed_when: 
