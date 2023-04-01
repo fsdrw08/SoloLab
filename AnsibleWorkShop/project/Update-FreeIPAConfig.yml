@@ -7,13 +7,14 @@
       hostname: ipa.infra.sololab
       admin: admin
       admin_password: P@ssw0rd
-    ipa_dnszones:
-      - name: infra.sololab.
-        dns_update_policy: grant keySololab wildcard * ANY;
-      - name: 255.168.192.in-addr.arpa.
-        dns_update_policy: grant keySololab wildcard * ANY;
+    dns:
+      zones:
+        - name: infra.sololab.
+          dns_update_policy: grant keySololab wildcard * ANY;
+        - name: 255.168.192.in-addr.arpa.
+          dns_update_policy: grant keySololab wildcard * ANY;
   tasks:
-    - name: Update DNS setting
+    - name: Update Host DNS setting
       become: true
       block:
         - name: Update host DNS config
@@ -35,7 +36,7 @@
     - name: Set IPA DNS zone
       ansible.builtin.include_tasks:
         file: Set-IPADNSZone.yml
-      loop: "{{ ipa_dnszones }}"
+      loop: "{{ dns.zones }}"
       vars:
         # ipa: "{{ ipa }}"
         ipa_dnszone: 
@@ -218,7 +219,7 @@
 
     - name: Enable FreeIPA ACME
       block:
-        - name: new podman exec session
+        - name: new podman exec session for freeipa
           ansible.builtin.uri:
             url: http://d/{{ api_version }}/libpod/containers/{{ container_name }}/exec
             unix_socket: /run/user/1000/podman/podman.sock
@@ -243,7 +244,7 @@
               User: root
           register: exec_create_exec_respond
 
-        - name: start podman exec session
+        - name: start podman exec session for freeipa
           ansible.builtin.uri:
             url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
             unix_socket: /run/user/1000/podman/podman.sock
@@ -263,3 +264,42 @@
           debug:
             # var: exec_start_respond.content.stdout_lines
             msg: "{{ exec_start_respond.content.split('\r\n') }}"
+
+    - name: create ldap object
+      community.general.ldap_entry:
+        server_uri: ldap://{{ ipa.hostname }}:389
+        bind_dn: uid=admin,cn=users,cn=accounts,dc=infra,dc=sololab
+        bind_pw: P@ssw0rd
+        dn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+        objectClass:
+          - account
+          - simpleSecurityObject
+        attributes:
+          uid: system
+          userPassword: P@ssw0rd
+          passwordExpirationTime: 20380119031407Z
+          nsIdleTimeout: 0
+        state: present
+      delegate_to: localhost
+
+    - name: Set vyos dhcp ddns
+      vyos.vyos.vyos_config :
+        lines:
+          # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
+          # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
+          - set service dhcp-server dynamic-dns-update
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "key {{ key_name }} { algorithm {{ algorithm }}; secret {{ secret }}; };"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;{{ domainname }}&quot;;"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-rev-domainname &quot;{{ rev_domainname }}&quot;;"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ zonename }} { primary {{ name_server }}; key {{ key_name }}; }"
+          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ rev_zonename }} { primary {{ name_server }}; key {{ key_name }}; }"
+      vars:
+        key_name: keySololab
+        algorithm: hmac-sha256
+        secret: j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=
+        domainname: infra.sololab.
+        rev_domainname: in-addr.arpa.
+        zonename: "{{ domainname }}"
+        rev_zonename: "255.168.192.{{ rev_domainname }}"
+        name_server: 192.168.255.31
+      delegate_to: vyos

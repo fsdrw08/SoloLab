@@ -135,6 +135,7 @@ ref:
 - https://astrid.tech/2021/04/18/0/k8s-freeipa-dns/
 - https://forum.netgate.com/topic/153869/dnssec-keygen-unknown-algorithm-hmac-md5/3
 - https://www.freeipa.org/page/Howto/DNS_updates_and_zone_transfers_with_TSIG
+- https://unix.stackexchange.com/questions/523565/how-to-generate-tsig-key-for-certbot-plugin-certbot-dns-rfc2136
 ```shell
 podman exec -it freeipa-freeipa /bin/bash
 echo "$(tsig-keygen sololab)" >> /etc/named/ipa-ext.conf

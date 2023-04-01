@@ -31,6 +31,9 @@ data:
 
     --debug
     --skip-mem-check
+  # https://www.freeipa.org/page/Howto/DNS_updates_and_zone_transfers_with_TSIG
+  # https://unix.stackexchange.com/questions/523565/how-to-generate-tsig-key-for-certbot-plugin-certbot-dns-rfc2136
+  # tsig-keygen keySololab
   ipa-ext.conf: |
     key "keySololab" {
             algorithm hmac-sha256;
