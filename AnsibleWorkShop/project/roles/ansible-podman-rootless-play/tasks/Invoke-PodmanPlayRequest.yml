@@ -20,6 +20,7 @@
       ansible.builtin.set_fact:
         kube_file_slurp: "{{ podman_play.kube_file.content | b64encode }}"
       when:
+        - podman_play.kube_file.content is defined
         - podman_play.kube_file.content is not none
 
 - name: podman kube play
