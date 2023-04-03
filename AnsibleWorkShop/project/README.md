@@ -48,7 +48,7 @@ podman run --rm `
 
 # freeipa post-process
 podman run --rm `
-    --add-host ipa.finra.sololab:192.168.255.31 `
+    --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/runner `
