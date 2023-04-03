@@ -7,15 +7,14 @@
       hostname: ipa.infra.sololab
       admin: admin
       admin_password: P@ssw0rd
-    kube_file_template: /KubeWorkShop/Traefik/aio-traefik.yaml
     dns:
-      zone_name: infra.sololab
-      record_name: traefik
-      record_type: 'A'
-      record_value: '192.168.255.32'
+      records:
+        - zone_name: infra.sololab
+          record_name: traefik
+          record_type: 'A'
+          record_value: '192.168.255.32'
+    kube_file_template: /KubeWorkShop/Traefik/aio-traefik.yaml
     ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml
-  vars_files: 
-    - vars/podman_play-traefik.yml
   tasks:
     - name: Get root ca
       delegate_to: localhost
@@ -75,6 +74,7 @@
             dest: /dev/null
           check_mode: true
           diff: true
+          no_log: false
           register: template
 
         - name: Set fact rendered
@@ -88,6 +88,10 @@
 
     - name: Deploy Traefik in podman
       block:
+        - name: incloude vars
+          ansible.builtin.include_vars:
+            file: vars/podman_play-traefik.yml
+
          # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
         - name: run role ansible-podman-rootless-provision
           ansible.builtin.include_role:
@@ -100,11 +104,12 @@
             ipa_host: "{{ ipa.hostname }}"
             ipa_pass: "{{ ipa.admin_password }}"
             validate_certs: false
-            zone_name: "{{ dns.zone_name }}"
-            record_name: "{{ dns.record_name }}"
-            record_type: "{{ dns.record_type }}"
-            record_value: "{{ dns.record_value }}"
+            zone_name: "{{ item.zone_name }}"
+            record_name: "{{ item.record_name }}"
+            record_type: "{{ item.record_type }}"
+            record_value: "{{ item.record_value }}"
             state: present
+          loop: "{{ dns.records }}"
 
         - name: present traefik dashboard route config
           ansible.builtin.copy:

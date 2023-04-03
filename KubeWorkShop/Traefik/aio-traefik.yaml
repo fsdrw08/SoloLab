@@ -78,7 +78,7 @@ data:
             entryPoint: web
   root_ca.crt: |
     -----BEGIN CERTIFICATE-----
-    {{ Root_CA_Cert.json.result.result.certificate | indent(width=4) }}
+    {{ Root_CA_Cert | indent(width=4) }}
     -----END CERTIFICATE-----
 ---
 apiVersion: v1
