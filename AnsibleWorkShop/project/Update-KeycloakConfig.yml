@@ -1,0 +1,62 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  vars: 
+    keycloak:
+      auth:
+        auth_client_id: admin-cli
+        auth_keycloak_url: https://keycloak.infra.sololab/
+        auth_realm: master
+        auth_username: admin
+        auth_password: password
+        validate_certs: false
+      realm:
+        id: sololab
+        realm: sololab
+        display_name: sololab
+        state: present
+        verify_email: false
+      user_federation:
+        realm: sololab
+        name: sololab-freeipa
+        state: present
+        provider_id: ldap
+        config:
+          authType: simple
+          bindDn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+          bindCredential: P@ssw0rd
+          connectionUrl: ldap://ipa.infra.sololab:389
+          editMode: READ_ONLY
+          enabled: true
+          rdnLDAPAttribute: uid
+          trustEmail: true
+          usersDn: cn=users,cn=accounts,dc=infra,dc=sololab
+          userObjectClasses: inetOrgPerson, organizationalPerson
+          usernameLDAPAttribute: uid
+          uuidLDAPAttribute: ipaUniqueID
+          vendor: rhds
+        mappers:
+          - name: "group-group"
+            providerId: "group-ldap-mapper"
+            config:
+              drop.non.existing.groups.during.sync: true
+              group.name.ldap.attribute: cn
+              group.object.classes: groupOfNames
+              groups.dn: cn=groups,cn=accounts,dc=infra,dc=sololab
+              mode: READ_ONLY
+      client:
+        realm: sololab
+        client_id: minio
+        state: present
+
+  tasks:
+    - name: new keycloak realm
+      # https://github.com/ansible-collections/community.general/blob/main/tests/integration/targets/keycloak_client/tasks/main.yml
+      community.general.keycloak_realm: "{{ keycloak.auth | combine(keycloak.realm) }}"
+
+    - name: new user federation
+      community.general.keycloak_user_federation: "{{ keycloak.auth | combine(keycloak.user_federation) }}"
+
+    - name: new client
+      community.general.keycloak_client: "{{ keycloak.auth | combine(keycloak.client) }}"

@@ -276,19 +276,19 @@ spec:
       args:
         - 'start-dev'
         # https://www.keycloak.org/server/importExport#_importing_a_realm_during_startup
-        - '--import-realm'
-      volumeMounts:
-        - name: keycloak_config
-          mountPath: /opt/keycloak/data/import/freeipa-realm.json
-          subPath: freeipa-realm.json
+      #   - '--import-realm'
+      # volumeMounts:
+      #   - name: keycloak_config
+      #     mountPath: /opt/keycloak/data/import/master-realm.json
+      #     subPath: master-realm.json
   volumes:
     - name: postgresql_data
       persistentVolumeClaim:
         claimName: keycloak-postgresql-pvc
-    - name: keycloak_config
-      configMap:
-        name: keycloak-keycloak-cm
-        items:
-          - key: freeipa-realm.json
-            path: freeipa-realm.json
+    # - name: keycloak_config
+    #   configMap:
+    #     name: keycloak-keycloak-cm
+    #     items:
+    #       - key: master-realm.json
+    #         path: master-realm.json
   restartPolicy: Never
