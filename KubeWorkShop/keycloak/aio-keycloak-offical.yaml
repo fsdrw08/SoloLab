@@ -164,11 +164,35 @@ metadata:
     name: keycloak
 spec:
   containers:
-    - name: postgresql
+    # - name: postgresql-bitnami
+    #   # https://hub.docker.com/r/bitnami/postgresql/tags?page=1
+    #   image: docker.io/bitnami/postgresql:15
+    #   imagePullPolicy: IfNotPresent
+    #   resources:
+    #     limits:
+    #       memory: "128Mi"
+    #       cpu: "500m"
+    #   ports:
+    #     - name: postgresql
+    #       containerPort: 5432
+    #   env:
+    #     # https://github.com/bitnami/containers/tree/main/bitnami/postgresql#creating-a-database-user-on-first-run
+    #     - name: POSTGRESQL_USERNAME
+    #       value: keycloak
+    #     - name: POSTGRESQL_PASSWORD
+    #       value: password
+    #     - name: POSTGRESQL_DATABASE
+    #       value: keycloak
+    #     - name: POSTGRESQL_LOG_TIMEZONE
+    #       value: Asia/Shanghai
+    #   volumeMounts:
+    #     - name:  postgresql_data
+    #     # https://github.com/bitnami/containers/tree/main/bitnami/postgresql#persisting-your-database
+    #       mountPath: /bitnami/postgresql
+
+    - name: postgresql-docker
       # https://hub.docker.com/_/postgres/tags?page=1
       image: docker.io/library/postgres:15-alpine
-      # https://hub.docker.com/r/bitnami/postgresql/tags?page=1
-      # image: docker.io/bitnami/postgresql:15
       imagePullPolicy: IfNotPresent
       securityContext:
         privileged: true
@@ -187,21 +211,11 @@ spec:
           value: password
         - name: POSTGRES_DB
           value: keycloak
-
-        # https://github.com/bitnami/containers/tree/main/bitnami/postgresql#creating-a-database-user-on-first-run
-        # - name: POSTGRESQL_USERNAME
-        #   value: keycloak
-        # - name: POSTGRESQL_PASSWORD
-        #   value: password
-        # - name: POSTGRESQL_DATABASE
-        #   value: keycloak
       volumeMounts:
         - name: postgresql_data
           # https://github.com/docker-library/docs/tree/master/postgres#pgdata
           mountPath: /var/lib/postgresql/data
-          # https://github.com/bitnami/containers/tree/main/bitnami/postgresql#persisting-your-database
-          # mountPath: /bitnami/postgresql
-
+          
     - name: keycloak
       # https://www.keycloak.org/server/containers#_running_a_standard_keycloak_container
       # https://quay.io/repository/keycloak/keycloak?tab=tags
@@ -246,6 +260,7 @@ spec:
         - name: KC_FEATURES
           value: admin-api,admin2,token-exchange
 
+        # https://www.keycloak.org/server/enabletls#_configuring_tls_in_keycloak
         # production mode need hostname and tls cert
         # hostname will force redirect url to the fqdn of
         # hostname value in browser
@@ -254,9 +269,10 @@ spec:
 
         # the way to import realm
         # 1. use JAVA_OPTS_APPEND
-        # 2. use --import-realm + data in /opt/keycloak/data/import/
         # - name: JAVA_OPTS_APPEND
         #   value: -Dkeycloak.import=/opt/keycloak/data/import/freeipa-realm.json
+
+        # 2. use --import-realm + data in /opt/keycloak/data/import/
       args:
         - 'start-dev'
         # https://www.keycloak.org/server/importExport#_importing_a_realm_during_startup
