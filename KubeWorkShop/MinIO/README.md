@@ -26,7 +26,7 @@ $alias="sololab"
 $idpName="keycloak"
 $clientID="minio"
 $clientSecret="hsRtNv7paVEcACt8Axtvnwu9ZHXhUDAb"
-$configURL="https://keycloak.infra.sololab/realms/freeipa-realm/.well-known/openid-configuration"
+$configURL="https://keycloak.infra.sololab/realms/sololab/.well-known/openid-configuration"
 $scopes="openid,email"
 
 # https://min.io/docs/minio/linux/operations/external-iam/configure-keycloak-identity-management.html#configure-minio-for-keycloak-authentication

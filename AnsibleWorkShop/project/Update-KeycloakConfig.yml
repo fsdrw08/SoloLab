@@ -97,6 +97,9 @@
           group_name: svc-minio-rw
           roles:
             - name: readwrite
+      clientsecret:
+        realm: sololab
+        client_id: minio
   tasks:
     - name: new keycloak realm
       # https://github.com/ansible-collections/community.general/blob/main/tests/integration/targets/keycloak_client/tasks/main.yml
@@ -114,3 +117,5 @@
     - name: new client role mapping
       community.general.keycloak_client_rolemapping: "{{ keycloak.auth | combine(keycloak.rolemapping.minio) }}"
       
+    - name: check client secret
+      community.general.keycloak_clientsecret_info: "{{ keycloak.auth | combine(keycloak.clientsecret) }}"
