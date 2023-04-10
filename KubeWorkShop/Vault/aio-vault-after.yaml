@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault
+spec:
+  resources:
+    requests:
+      storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault
+data:
+  # https://github.com/jace-ys/vault-init/blob/309783a4ca0b88a691da7285200ec933b5738aea/docs/kubernetes/example.yaml
+  config.hcl: |
+    storage "raft" {
+      path = "/vault/data"
+      node_id = "vault"
+    }
+
+    # https://developer.hashicorp.com/vault/docs/configuration/ui#activating-the-vault-ui
+    ui = true
+
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_disable = "true"
+      # https://developer.hashicorp.com/vault/docs/configuration/listener/tcp#tls_cert_file
+      # tls_cert_file = "/vault/data/sololab_vault.crt"
+      # tls_key_file = "/vault/data/sololab_vault.key"
+    }
+
+    api_addr = "http://127.0.0.1:8200"
+
+    cluster_addr = "http://127.0.0.1:8201"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  vault
+data:
+   secretKey:  BASE64_ENCODED_VALUE
+type: Opaque
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vault
+  labels:
+    name: vault
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://github.com/docker-library/docs/tree/master/vault
+  containers:
+    - name: vault
+      image: docker.io/hashicorp/vault:1.13
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      securityContext:
+        capabilities:
+          add:
+            - "IPC_LOCK"
+      ports:
+        - name: server
+          containerPort: 8200
+      # https://developer.hashicorp.com/vault/tutorials/day-0/docker-container-agents#configure-and-run-a-vault-server
+      command:
+        - vault
+      args:
+        - server
+        - -config=/vault/config/config.hcl
+      volumeMounts:
+        - name: vault_config
+          mountPath: /vault/config/config.hcl
+          subPath: config.hcl
+        - name: vault_data
+          mountPath: /vault/data
+  volumes:
+    - name: vault_config
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: vault
+        items:
+          - key: config.hcl
+            path: config.hcl
+    - name: vault_data
+      persistentVolumeClaim:
+        claimName: vault
+        
+  restartPolicy: Never

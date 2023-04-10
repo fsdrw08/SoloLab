@@ -32,3 +32,5 @@
         VAULT_ADDR: https://vault.infra.sololab
         VAULT_SKIP_VERIFY: true
       loop: "{{ vault_unseal_keys_b64 }}"
+
+    - name: render template
