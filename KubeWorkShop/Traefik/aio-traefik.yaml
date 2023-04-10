@@ -39,6 +39,7 @@ data:
       # https://doc.traefik.io/traefik/routing/routers/#configuration-example
       web:
         address: ":80"
+        # https://doc.traefik.io/traefik/routing/entrypoints/#redirection
         # http:
         #   redirections:
         #     entryPoint:
@@ -50,6 +51,11 @@ data:
             - "0.0.0.0/0"
       websecure:
         address: ":443"
+        http:
+          # https://doc.traefik.io/traefik/routing/entrypoints/#tls
+          tls:
+            certResolver: freeipa
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
         forwardedHeaders:
           trustedIPs:
             - "0.0.0.0/0"
