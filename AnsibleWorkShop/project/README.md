@@ -63,6 +63,23 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# deploy hashicorp vault in podman
+podman run --rm `
+    -e RUNNER_PLAYBOOK=Deploy-VaultInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# initialize hashicorp vault
+podman run --rm `
+    --dns 192.168.255.31 `
+    -e RUNNER_PLAYBOOK=Initialize-Vault.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+   localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 # deploy keycloak in podman
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-KeyCloakInPodman.yml `

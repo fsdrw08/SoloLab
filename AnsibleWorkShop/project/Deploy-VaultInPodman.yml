@@ -1,0 +1,38 @@
+# code: language=ansible
+---
+- hosts: kube-1 # kube-2
+  gather_facts: yes
+  tasks:
+    - name: incloude vars
+      ansible.builtin.include_vars:
+        file: vars/podman_play-vault_before.yml
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: run role ansible-podman-rootless-provision
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+
+    - name: Config reverse proxy
+      block:
+        - name: Ensure dns record is present
+          community.general.nsupdate:
+            key_name: "keySololab"
+            key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+            key_algorithm: "hmac-sha256"
+            server: "192.168.255.31"
+            zone: "infra.sololab"
+            record: "vault"
+            value: "192.168.255.32"
+            type: "A"
+            state: present
+          delegate_to: localhost
+
+        - name: present traefik dynamic conf dir
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/
+            state: directory
+
+        - name: copy traefik dynamic config to dir
+          ansible.builtin.copy:
+            src: /KubeWorkShop/Vault/traefik-vault.yaml
+            dest: /home/{{ ansible_user }}/traefik/traefik-vault.yaml

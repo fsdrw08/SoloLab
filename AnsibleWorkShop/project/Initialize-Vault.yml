@@ -1,0 +1,34 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+    # https://github.com/fjacquet/terraform-lab/blob/c9414dc60169de2879325a6c91a15136ce8d36e8/roles/linux_vault/tasks/leader.yml
+    - name: initialize vault on leader
+      ansible.builtin.command:
+        cmd: vault operator init -key-shares=3 -key-threshold=2 -format=yaml
+      register: vault_operator_init
+      environment:
+        VAULT_ADDR: https://vault.infra.sololab
+        VAULT_SKIP_VERIFY: true
+
+    - name: set fact for vault init output
+      ansible.builtin.set_fact:
+        vault_init_stdout: "{{ vault_operator_init.stdout | from_yaml }}"
+
+    - name: set fact for vault keys
+      ansible.builtin.set_fact:
+        vault_unseal_keys_b64: "{{ vault_init_stdout.unseal_keys_b64 }}"
+        vault_root_token: "{{ vault_init_stdout.root_token }}"
+
+    - name: debug
+      debug:
+        msg: "{{ vault_unseal_keys_b64 }}"
+
+    - name: unseal
+      ansible.builtin.command:
+        cmd: vault operator unseal {{ item }}
+      environment:
+        VAULT_ADDR: https://vault.infra.sololab
+        VAULT_SKIP_VERIFY: true
+      loop: "{{ vault_unseal_keys_b64 }}"
