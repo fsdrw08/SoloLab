@@ -4,7 +4,7 @@ vars_podman_host: kube-1
 
 vars_podman_uri:
   scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
-  api_version: v4.0.0 # v4.0.0 ← (default)
+  api_version: v4.4.1 # v4.0.0 ← (default)
   unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
 
 vars_podman_play:
@@ -14,7 +14,7 @@ vars_podman_play:
     path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
   absent:
     query_params:
-      force: false
+      force: true
 
 vars_podman_generate_systemd:
   generate:

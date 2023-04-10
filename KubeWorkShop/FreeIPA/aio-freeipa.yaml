@@ -15,13 +15,16 @@ kind: ConfigMap
 metadata:
   name: freeipa
 data:
+  # https://manpages.ubuntu.com/manpages/focal/man1/ipa-server-install.1.html
   ipa-server-install-options: |
+    --unattended
+
     --domain=infra.sololab
     --realm=infra.sololab
     --ds-password=P@ssw0rd
     --admin-password=P@ssw0rd
+    
     --no-ntp
-    --unattended
     --no_hbac_allow
 
     --setup-dns
