@@ -1,0 +1,21 @@
+# Dynamic Configuration
+tcp:
+  routers:
+    keycloak:
+      rule: HostSNI(`keycloak.infra.sololab`)
+      entryPoints:
+        - websecure
+      service: keycloak
+      # https://doc.traefik.io/traefik/routing/routers/#passthrough
+      tls: 
+        passthrough: true
+  services:
+    keycloak:
+      # https://doc.traefik.io/traefik/routing/services/#servers-load-balancer_1
+      loadBalancer:
+        servers:
+          - address: "keycloak:443"
+        # serversTransport: consul
+  # serversTransports:
+  #   consul:
+  #     insecureSkipVerify: true

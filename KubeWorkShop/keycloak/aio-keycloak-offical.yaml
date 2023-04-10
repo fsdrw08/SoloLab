@@ -11,152 +11,6 @@ spec:
     - ReadWriteOnce
 ---
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: keycloak-keycloak-cm
-data:
-  # https://thomascfoulds.com/2020/04/09/jenkins-authentication-with-keycloak.html#:~:text=FreeIPA%20Keycloak%20Realm
-  # https://thomascfoulds.com/assets/files/freeipa-realm.json
-  # https://github.com/jbride/minio_integrations_quickstart/blob/60a17ca654b2a7095da6e41a0a5912ecb062ac0f/etc/sso/ldaprealm.json
-  freeipa-realm.json: |
-    {
-      "id": "freeipa-realm",
-      "realm": "freeipa-realm",
-      "displayName": "Sololab Realm",
-      "enabled": true,
-      "requiredCredentials": [
-        "password"
-      ],
-      "userFederationProviders": [
-        {
-          "displayName": "ldap-freeipa",
-          "providerName": "ldap",
-          "priority": 1,
-          "fullSyncPeriod": -1,
-          "changedSyncPeriod": -1,
-          "config": {
-            "pagination": "true",
-            "debug": "false",
-            "searchScope": "1",
-            "connectionPooling": "true",
-            "usersDn": "cn=users,cn=accounts,dc=infra,dc=sololab",
-            "userObjectClasses": "inetOrgPerson, organizationalPerson",
-            "usernameLDAPAttribute": "uid",
-            "bindDn": "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab",
-            "bindCredential": "P@ssw0rd",
-            "rdnLDAPAttribute": "uid",
-            "vendor": "rhds",
-            "editMode": "READ_ONLY",
-            "uuidLDAPAttribute": "ipaUniqueID",
-            "connectionUrl": "ldap://freeipa:389",
-            "syncRegistrations": "false",
-            "authType": "simple"
-          }
-        }
-      ],
-      "userFederationMappers": [
-        {
-          "name": "username",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "uid",
-            "user.model.attribute": "username",
-            "is.mandatory.in.ldap": "true",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "first_name",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "givenName",
-            "user.model.attribute": "firstName",
-            "is.mandatory.in.ldap": "true",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "last_name",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "sn",
-            "user.model.attribute": "lastName",
-            "is.mandatory.in.ldap": "true",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "email",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "mail",
-            "user.model.attribute": "email",
-            "is.mandatory.in.ldap": "false",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "creation_date",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "createTimestamp",
-            "user.model.attribute": "createTimestamp",
-            "is.mandatory.in.ldap": "false",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "modify_date",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "modifyTimestamp",
-            "user.model.attribute": "modifyTimestamp",
-            "is.mandatory.in.ldap": "false",
-            "read.only": "true",
-            "always.read.value.from.ldap": "false"
-          }
-        },
-        {
-          "name": "picture",
-          "federationMapperType": "user-attribute-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "ldap.attribute": "jpegPhoto",
-            "user.model.attribute": "picture",
-            "is.mandatory.in.ldap": "false",
-            "read.only": "true",
-            "always.read.value.from.ldap": "true"
-          }
-        },
-        {
-          "name": "groups",
-          "federationMapperType": "role-ldap-mapper",
-          "federationProviderDisplayName": "ldap-freeipa",
-          "config": {
-            "roles.dn": "cn=groups,cn=accounts,dc=infra,dc=sololab",
-            "membership.ldap.attribute": "member",
-            "role.name.ldap.attribute": "cn",
-            "role.object.classes": "groupOfNames",
-            "mode": "LDAP_ONLY",
-            "use.realm.roles.mapping": "true"
-          }
-        }
-      ]
-    }
-
----
-apiVersion: v1
 kind: Pod
 metadata:
   name: keycloak
@@ -260,12 +114,18 @@ spec:
         - name: KC_FEATURES
           value: admin-api,admin2,token-exchange
 
+        # https://www.keycloak.org/server/configuration-production
         # https://www.keycloak.org/server/enabletls#_configuring_tls_in_keycloak
         # production mode need hostname and tls cert
         # hostname will force redirect url to the fqdn of
         # hostname value in browser
         # - name: KC_HOSTNAME
         #   value: keycloak
+
+        # - name: KC_HTTPS_CERTIFICATE_FILE
+          # value: /path/to/certfile.pem
+        # - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+        #   value: /path/to/keyfile.pem
 
         # the way to import realm
         # 1. use JAVA_OPTS_APPEND
