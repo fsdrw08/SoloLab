@@ -3,3 +3,4 @@ pyyaml # required by kubernetes.core.k8s module
 kubernetes # required by kubernetes.core.k8s module
 jsonpatch # required by kubernetes.core.k8s module
 jmespath # required by community.general.json_query module
+dnspython # required by community.general.nsupdate module 

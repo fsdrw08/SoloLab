@@ -39,8 +39,10 @@ COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 COPY --from=builder /output/ /output/
 RUN /output/install-from-bindep && rm -rf /output/wheels
 ARG PROXY
-ARG TERRAFORM_VERSION=1.3.6
+ARG TERRAFORM_VERSION=1.4.4
 RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} https_proxy=${PROXY} && export http_proxy=${PROXY} && cd /tmp && curl -LO https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && install -o root -g root -m 0755 terraform /usr/local/bin/terraform && unset HTTPS_PROXY && unset HTTP_PROXY && unset https_proxy && unset http_proxy
+ARG VAULT_VERSION=1.13.1
+RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} https_proxy=${PROXY} && export http_proxy=${PROXY} && cd /tmp && curl -LO https://releases.hashicorp.com/vault/$VAULT_VERSION/vault_${VAULT_VERSION}_linux_amd64.zip && unzip vault_${VAULT_VERSION}_linux_amd64.zip && install -o root -g root -m 0755 vault /usr/local/bin/vault
 RUN export HTTPS_PROXY=${PROXY} && export HTTP_PROXY=${PROXY} && export https_proxy=${PROXY} && export http_proxy=${PROXY} && curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && ls -al /usr/local/bin/kubectl && chmod 0755 /usr/local/bin/kubectl && unset HTTPS_PROXY && unset HTTP_PROXY && unset https_proxy && unset http_proxy
 RUN export HTTPS_PROXY=${PROXY} && export HTTP_PROXY=${PROXY} && export https_proxy=${PROXY} && export http_proxy=${PROXY} && curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm && chmod +x /usr/local/bin/helm  && unset HTTPS_PROXY && unset HTTP_PROXY && unset https_proxy && unset http_proxy
 RUN export HTTPS_PROXY=${PROXY} && export HTTP_PROXY=${PROXY} && export https_proxy=${PROXY} && export http_proxy=${PROXY} && /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff && unset HTTPS_PROXY && unset HTTP_PROXY && unset https_proxy && unset http_proxy

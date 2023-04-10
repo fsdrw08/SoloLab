@@ -21,7 +21,7 @@ dependencies:
 additional_build_steps:
   append: 
     - ARG PROXY
-    - ARG TERRAFORM_VERSION=1.3.6
+    - ARG TERRAFORM_VERSION=1.4.4
 
     - RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} https_proxy=${PROXY} &&
       export http_proxy=${PROXY} &&
@@ -33,6 +33,15 @@ additional_build_steps:
       unset HTTP_PROXY &&
       unset https_proxy &&
       unset http_proxy
+
+    - ARG VAULT_VERSION=1.13.1
+
+    - RUN export HTTPS_PROXY=${PROXY} HTTP_PROXY=${PROXY} https_proxy=${PROXY} &&
+      export http_proxy=${PROXY} &&
+      cd /tmp && 
+      curl -LO https://releases.hashicorp.com/vault/$VAULT_VERSION/vault_${VAULT_VERSION}_linux_amd64.zip && 
+      unzip vault_${VAULT_VERSION}_linux_amd64.zip && 
+      install -o root -g root -m 0755 vault /usr/local/bin/vault
 
     - RUN export HTTPS_PROXY=${PROXY} &&
       export HTTP_PROXY=${PROXY} &&
