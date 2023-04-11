@@ -9,13 +9,12 @@
       admin_password: P@ssw0rd
     kube_file_template: /KubeWorkShop/MinIO/aio-minio.yaml
     dns:
-      zone_name: infra.sololab
-      record_name: minio
-      record_type: 'A'
-      record_value: '192.168.255.32'
+      server: '192.168.255.31'
+      zone: infra.sololab
+      record: minio
+      value: '192.168.255.32'
+      type: 'A'
     ingress_file: /KubeWorkShop/MinIO/traefik-minio.yaml
-  vars_files:
-    - vars/podman_play-minio.yml
   tasks:
     - name: Get root ca
       delegate_to: localhost
@@ -83,6 +82,9 @@
 
     - name: Deploy MinIO in podman
       block:
+        - name: incloude vars
+          ansible.builtin.include_vars:
+            file: vars/podman_play-minio.yml
          # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
         - name: run role ansible-podman-rootless-provision
           ansible.builtin.include_role:
