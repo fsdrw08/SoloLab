@@ -99,6 +99,7 @@ podman run --rm `
 
 # deploy MinIO in podman
 podman run --rm `
+    --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Deploy-MinIOInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/runner `
@@ -311,6 +312,13 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
+# get cert
+podman run --rm `
+    --dns 192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/Get-RootCACert.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
 ```
 
 
