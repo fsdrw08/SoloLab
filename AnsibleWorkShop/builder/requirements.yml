@@ -8,6 +8,7 @@ collections:
 #   version: 2.6.1
 
 - name: community.general
+- name: community.crypto
 # https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file
 
 - name: ansible.posix
