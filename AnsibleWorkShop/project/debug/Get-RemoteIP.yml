@@ -1,7 +1,7 @@
 # code: language=ansible
 ---
 - hosts: localhost
-  gather_facts: 
+  gather_facts: false
   tasks:
     - name: get remote ip
       ansible.builtin.setup:

@@ -1,0 +1,23 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: get cert
+      community.crypto.get_certificate:
+        host: "ipa.infra.sololab"
+        port: 443
+      register: cert
+
+    - name: debug
+      debug:
+        msg: "{{ cert }}"
+
+    - name: get cert info
+      community.crypto.x509_certificate_info:
+        content: "{{ cert.cert }}"
+      register: result
+
+    - name: debug
+      debug:
+        msg: "{{ result }}"
