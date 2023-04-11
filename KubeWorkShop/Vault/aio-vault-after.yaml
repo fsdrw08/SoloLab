@@ -41,9 +41,18 @@ apiVersion: v1
 kind: Secret
 metadata:
   name:  vault
-data:
-   secretKey:  BASE64_ENCODED_VALUE
 type: Opaque
+data:
+  Unseal-Vault.sh: |
+    keys="
+    {{ vault_unseal_keys_b64 | indent(width=4) }}
+    "
+
+    for i in $keys
+    do
+        vault operator unseal $i
+        sleep 2
+    done
 ---
 apiVersion: v1
 kind: Pod
@@ -75,12 +84,23 @@ spec:
       args:
         - server
         - -config=/vault/config/config.hcl
+      # https://www.cnblogs.com/peng-zone/p/16700401.html
+      startupProbe:
+        exec:
+          command:
+            - bash /tmp/Unseal-Vault.sh
+        successThreshold: 1
+        initialDelaySeconds: 0
+        periodSeconds: 1
       volumeMounts:
         - name: vault_config
           mountPath: /vault/config/config.hcl
           subPath: config.hcl
         - name: vault_data
           mountPath: /vault/data
+        - name: unseal_script
+          mountPath: /mnt/Unseal-Vault.sh
+          subPath: Unseal-Vault.sh
   volumes:
     - name: vault_config
       # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
@@ -92,5 +112,9 @@ spec:
     - name: vault_data
       persistentVolumeClaim:
         claimName: vault
+    - name: unseal_script
+      secret:
+        secretName: vault
+        
         
   restartPolicy: Never
