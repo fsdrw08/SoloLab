@@ -319,6 +319,16 @@ podman run --rm `
     -v ../:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+# try ansible vault
+# https://stackoverflow.com/questions/714915/using-the-passwd-command-from-within-a-shell-script/11787889#11787889
+podman run --rm `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio bash -c 'echo -e "password\npassword" | ansible-vault encrypt /KubeWorkShop/FreeIPA/password.txt'
+
+podman run --rm `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio bash -c 'ansible version'
 ```
 
 
