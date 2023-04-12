@@ -3,19 +3,25 @@
 - hosts: localhost
   gather_facts: false
   tasks:
-    - name: get cert
-      community.crypto.get_certificate:
-        host: "ipa.infra.sololab"
-        port: 443
-      register: cert
+    - name: run shell
+      ansible.builtin.shell:
+        # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+        cmd: >
+          echo | 
+          openssl s_client -showcerts -connect ipa.infra.sololab:443 2>&- | 
+          tac | 
+          sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+          tac
+      changed_when: false
+      register: RootCACert
 
     - name: debug
       debug:
-        msg: "{{ cert }}"
+        msg: "{{ RootCACert.stdout }}"
 
     - name: get cert info
       community.crypto.x509_certificate_info:
-        content: "{{ cert.cert }}"
+        content: "{{ RootCACert.stdout }}"
       register: result
 
     - name: debug

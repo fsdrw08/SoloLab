@@ -41,11 +41,11 @@
     - name: Set IPA DNS zone
       ansible.builtin.include_tasks:
         file: Set-IPADNSZone.yml
-      loop: "{{ dns.zones }}"
       vars:
         ipa_dnszone: 
           name: "{{ item.name }}"
           dns_update_policy: "{{ item.dns_update_policy }}"
+      loop: "{{ dns.zones }}"
 
     - name: Enable FreeIPA ACME
       block:
