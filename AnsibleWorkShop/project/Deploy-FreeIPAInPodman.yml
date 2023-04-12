@@ -2,12 +2,44 @@
 ---
 - hosts: kube-1 # kube-2
   gather_facts: yes
-  tasks:
-    - name: incloude vars
-      ansible.builtin.include_vars:
-        file: vars/podman_play-freeipa.yml
+  vars: 
+    podman_rootless_play:
+      vars_podman_host: kube-1
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: absent # absent / present
+        timeout: 600
+        kube_file: 
+          host: localhost
+          path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
+          # content: "{{ rendered }}"
+        absent:
+          query_params:
+            force: true
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: freeipa
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
 
+  tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
-    - name: run role ansible-podman-rootless-provision
+    - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
         name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"

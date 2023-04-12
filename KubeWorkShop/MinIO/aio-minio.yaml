@@ -30,9 +30,7 @@ metadata:
 data:
   # https://min.io/docs/minio/linux/operations/network-encryption.html#enabling-tls
   sololab.crt: |
-    -----BEGIN CERTIFICATE-----
     {{ Root_CA_Cert | indent(width=4) }}
-    -----END CERTIFICATE-----
 
 ---
 apiVersion: v1
@@ -63,7 +61,7 @@ spec:
         - "/bin/sh"
         - "-c"
       args: 
-        - "while [ $(curl -sw '200' -k -x GET https://keycloak.infra.sololab/realms/freeipa-realm/.well-known/openid-configuration -o /dev/null) -ne 200 ]; do sleep 5; echo 'Waiting for the keycloak...'; done"
+        - "while [ $(curl -sw '200' -k -x GET https://keycloak.infra.sololab/realms/sololab/.well-known/openid-configuration -o /dev/null) -ne 200 ]; do sleep 5; echo 'Waiting for the keycloak...'; done"
   containers:
     - name: minio
       image: quay.io/minio/minio:RELEASE.2023-04-07T05-28-58Z
@@ -123,13 +121,13 @@ spec:
         - '/data'
 
       # https://github.com/minio/console/issues/2681
-      startupProbe:
-        exec:
-          command:
-            - update-ca-trust
-        successThreshold: 1
-        initialDelaySeconds: 0
-        periodSeconds: 1
+      # startupProbe:
+      #   exec:
+      #     command:
+      #       - update-ca-trust
+      #   successThreshold: 1
+      #   initialDelaySeconds: 0
+      #   periodSeconds: 1
       # https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html#node-liveness
       livenessProbe:
         httpGet:
@@ -147,9 +145,9 @@ spec:
         - name: minio
           mountPath: /data
         # https://github.com/minio/console/issues/2681
-        - name: sololab.crt
-          mountPath: /etc/pki/ca-trust/source/anchors/sololab.crt
-          subPath: sololab.crt
+        # - name: sololab.crt
+        #   mountPath: /etc/pki/ca-trust/source/anchors/sololab.crt
+        #   subPath: sololab.crt
         - name: sololab.crt
           mountPath: /mnt/certs/CAs/sololab.crt
           subPath: sololab.crt

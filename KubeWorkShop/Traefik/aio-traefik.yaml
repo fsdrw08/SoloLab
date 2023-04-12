@@ -83,9 +83,7 @@ data:
             # used during the challenge
             entryPoint: web
   root_ca.crt: |
-    -----BEGIN CERTIFICATE-----
     {{ Root_CA_Cert | indent(width=4) }}
-    -----END CERTIFICATE-----
 ---
 apiVersion: v1
 kind: Pod
