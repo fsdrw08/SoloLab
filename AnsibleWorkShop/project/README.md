@@ -329,6 +329,11 @@ podman run --rm `
 podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio bash -c 'ansible version'
+
+podman run --rm `
+    -e RUNNER_PLAYBOOK=./debug/Set-NetDNSServer.yml `
+    -v ../:/runner `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
 ```
 
 

@@ -10,7 +10,7 @@
         api_version: v4.4.1 # v4.0.0 ← (default)
         unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: absent # absent / present
+        state: present # absent / present
         timeout: 600
         kube_file: 
           host: localhost
@@ -31,7 +31,7 @@
             skipped: false
             enabled: true
             state: started
-
+    healthcheck_container_name: freeipa-freeipa
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: Invoke podman-rootless-play
@@ -43,3 +43,45 @@
         vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
         vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
         vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Test freeipa status 
+      ansible.builtin.uri:
+        url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ healthcheck_container_name }}/healthcheck
+        unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
+        method: GET
+        status_code: 200
+      register: result
+      retries: 10
+      until: result.json.Status == "healthy"
+      delay: 30
+      when: 
+        - podman_rootless_play.vars_podman_play.state == 'present'
+
+    - name: Update Host DNS setting
+      become: true
+      block:
+        - name: add freeipa dns server to interface
+          community.general.nmcli:
+            conn_name: eth0
+            type: ethernet
+            dns4:
+              - 192.168.255.31
+              - 192.168.255.1
+            state: present
+          when:
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: only keep default dns server to interface
+          community.general.nmcli:
+            conn_name: eth0
+            type: ethernet
+            dns4:
+              - 192.168.255.1
+            state: present
+          when:
+            - podman_rootless_play.vars_podman_play.state == 'absent'
+        
+        # https://stackoverflow.com/questions/75258022/how-to-bring-up-an-interface-using-ansible-nmcli-module
+        - name: bring up interface
+          ansible.builtin.shell: 
+            cmd: nmcli con up eth0

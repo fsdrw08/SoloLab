@@ -1,0 +1,24 @@
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: false
+  tasks:
+    - name: Update Host DNS setting
+      become: true
+      block:
+        # aka: sudo nmcli con mod eth0 ipv4.dns 192.168.255.31,192.168.255.1
+        - name: Update host DNS config
+          community.general.nmcli:
+            conn_name: eth0
+            type: ethernet
+            dns4:
+              - 192.168.255.31
+              - 192.168.255.1
+            state: present
+          
+        # to have a check: nmcli con show 'eth0' | grep dns
+        # to have a check: resolvectl status
+
+        - name: Brings the interface up or down
+          ansible.builtin.shell: 
+            cmd: nmcli con up eth0

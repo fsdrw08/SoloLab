@@ -62,7 +62,7 @@ spec:
       imagePullPolicy: IfNotPresent
       resources:
         limits:
-          memory: "1536Mi"
+          memory: "1336Mi"
           cpu: "1000m"
       # https://www.freeipa.org/page/V4/Replica_Conncheck
       # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html#container-fields
@@ -114,6 +114,13 @@ spec:
           value: "192.168.255.31"
         - name: IPA_SERVER_HOSTNAME
           value: ipa.infra.sololab
+      # https://github.com/freeipa/freeipa-container/issues/516#issuecomment-1431096973
+      livenessProbe:
+        initialDelaySeconds: 180
+        periodSeconds: 60
+        httpGet:
+          path: /
+          port: 80
       volumeMounts:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
         - name: freeipa

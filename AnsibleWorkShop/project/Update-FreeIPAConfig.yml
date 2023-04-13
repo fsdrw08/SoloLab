@@ -19,25 +19,6 @@
           record_type: 'A'
           record_value: '192.168.255.31'
   tasks:
-    - name: Update Host DNS setting
-      become: true
-      block:
-        - name: Update host DNS config
-          community.general.nmcli:
-            conn_name: eth0
-            type: ethernet
-            dns4:
-              - 192.168.255.31
-            state: present
-        
-        - name: resolvectl
-          ansible.builtin.shell:
-            cmd: resolvectl dns eth0 192.168.255.31
-        
-        - name: resolvectl
-          ansible.builtin.shell:
-            cmd: resolvectl dns eth0 192.168.255.31 192.168.255.1
-
     - name: Set IPA DNS zone
       ansible.builtin.include_tasks:
         file: Set-IPADNSZone.yml
