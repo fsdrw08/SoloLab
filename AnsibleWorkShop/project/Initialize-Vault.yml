@@ -2,6 +2,52 @@
 ---
 - hosts: localhost
   gather_facts: yes
+  vars:
+    podman_rootless_play_before:
+      vars_podman_host: kube-1
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: absent # absent / present
+        timeout: 600
+        kube_file: 
+          host: localhost
+          path: /KubeWorkShop/Vault/aio-vault-before.yaml
+        absent:
+          query_params:
+            force: false
+
+    kube_file_template: /KubeWorkShop/Vault/aio-vault-after.yaml
+
+    podman_rootless_play_after:
+      vars_podman_host: kube-1
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: present # absent / present
+        timeout: 600
+        kube_file: 
+          host: localhost
+          content: "{{ rendered }}"
+        absent:
+          query_params:
+            force: false
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: vault
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
   tasks:
     # https://github.com/fjacquet/terraform-lab/blob/c9414dc60169de2879325a6c91a15136ce8d36e8/roles/linux_vault/tasks/leader.yml
     - name: initialize vault on leader
@@ -33,4 +79,42 @@
         VAULT_SKIP_VERIFY: true
       loop: "{{ vault_unseal_keys_b64 }}"
 
-    - name: render template
+    - name: sleep 3 second
+      ansible.builtin.pause:
+        seconds: 3
+
+    - name: update vault pod
+      delegate_to: kube-1
+      block:
+      - name: delete vault pod
+        ansible.builtin.include_role:
+          name: ansible-podman-rootless-play
+        vars: 
+          vars_podman_host: "{{ podman_rootless_play_before.vars_podman_host }}"
+          vars_podman_uri: "{{ podman_rootless_play_before.vars_podman_uri }}"
+          vars_podman_play: "{{ podman_rootless_play_before.vars_podman_play }}"
+          vars_podman_generate_systemd: "{{ podman_rootless_play_before.vars_podman_generate_systemd }}"
+          vars_service: "{{ podman_rootless_play_before.vars_service }}"
+
+      - name: render template
+        ansible.builtin.template:
+          src: "{{ kube_file_template }}"
+          dest: /dev/null
+        check_mode: true
+        diff: true
+        no_log: false
+        register: template
+
+      - name: Set fact rendered
+        ansible.builtin.set_fact:
+          rendered: "{{ template.diff[0].after }}"
+
+      - name: re-deploy vault pod
+        ansible.builtin.include_role:
+          name: ansible-podman-rootless-play
+        vars: 
+          vars_podman_host: "{{ podman_rootless_play_after.vars_podman_host }}"
+          vars_podman_uri: "{{ podman_rootless_play_after.vars_podman_uri }}"
+          vars_podman_play: "{{ podman_rootless_play_after.vars_podman_play }}"
+          vars_podman_generate_systemd: "{{ podman_rootless_play_after.vars_podman_generate_systemd }}"
+          vars_service: "{{ podman_rootless_play_after.vars_service }}"

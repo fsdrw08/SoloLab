@@ -1,10 +1,8 @@
 keys="
-1
-2
-3
+{{ vault_unseal_keys_b64 }}
 "
-
 for i in $keys
 do
-    echo "it's $i"
+    vault operator unseal $i
+    sleep 2
 done

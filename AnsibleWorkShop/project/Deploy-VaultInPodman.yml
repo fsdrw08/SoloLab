@@ -2,37 +2,106 @@
 ---
 - hosts: kube-1 # kube-2
   gather_facts: yes
-  tasks:
-    - name: incloude vars
-      ansible.builtin.include_vars:
-        file: vars/podman_play-vault_before.yml
+  vars: 
+    ipa:
+      hostname: ipa.infra.sololab
 
-     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
-    - name: run role ansible-podman-rootless-provision
+    unseal_script_path: /KubeWorkShop/Vault/unseal-vault.sh
+
+    kube_file_template: /KubeWorkShop/Vault/aio-vault-before.yaml
+
+    podman_rootless_play:
+      vars_podman_host: kube-1
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: present # absent / present
+        timeout: 600
+        kube_file: 
+          host: localhost
+          # path: /KubeWorkShop/Vault/aio-vault-before.yaml
+          content: "{{ rendered }}"
+        absent:
+          query_params:
+            force: true
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: vault
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
+    dns:
+      key_name: "keySololab"
+      key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+      key_algorithm: "hmac-sha256"
+      server: '192.168.255.31'
+      zone: infra.sololab
+      record: vault
+      value: '192.168.255.32'
+      type: 'A'
+      state: present
+
+    ingress_file: /KubeWorkShop/Vault/traefik-vault.yaml
+  tasks:
+    - name: Prepare kube_file content
+      block:
+        - name: slurp unseal script
+          ansible.builtin.slurp:
+            src: "{{ unseal_script_path }}"
+          delegate_to: localhost
+          register: unseal_script_slurp
+
+        - name: set fact unseal_script 
+          ansible.builtin.set_fact:
+            unseal_script: "{{ unseal_script_slurp.content }}"
+
+        - name: Render kube file content
+          ansible.builtin.template:
+            src: "{{ kube_file_template }}"
+            dest: /dev/null
+          check_mode: true
+          diff: true
+          register: template
+
+        - name: Set fact rendered
+          ansible.builtin.set_fact:
+            rendered: "{{ template.diff[0].after }}"
+
+    - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
         name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
 
     - name: Config reverse proxy
       block:
         - name: Ensure dns record is present
-          community.general.nsupdate:
-            key_name: "keySololab"
-            key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
-            key_algorithm: "hmac-sha256"
-            server: "192.168.255.31"
-            zone: "infra.sololab"
-            record: "vault"
-            value: "192.168.255.32"
-            type: "A"
-            state: present
+          community.general.nsupdate: "{{ dns }}"
           delegate_to: localhost
 
-        - name: present traefik dynamic conf dir
-          ansible.builtin.file:
-            path: /home/{{ ansible_user }}/traefik/
-            state: directory
-
-        - name: copy traefik dynamic config to dir
+        - name: present route config
           ansible.builtin.copy:
-            src: /KubeWorkShop/Vault/traefik-vault.yaml
-            dest: /home/{{ ansible_user }}/traefik/traefik-vault.yaml
+            src: "{{ ingress_file }}"
+            dest: /home/{{ ansible_user }}/traefik/
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: absent route config
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/{{ ingress_file | basename }}
+            state: absent
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'absent'
