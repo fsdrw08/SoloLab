@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: kube-1
+- hosts: localhost
   gather_facts: false
   vars: 
     ipa:
@@ -29,6 +29,7 @@
       loop: "{{ dns.zones }}"
 
     - name: Enable FreeIPA ACME
+      delegate_to: kube-1
       block:
         - name: new podman exec session for freeipa
           ansible.builtin.uri:
@@ -103,7 +104,6 @@
           passwordExpirationTime: 20380119031407Z
           nsIdleTimeout: 0
         state: present
-      delegate_to: localhost
 
     - name: Set vyos dhcp ddns
       vyos.vyos.vyos_config :
