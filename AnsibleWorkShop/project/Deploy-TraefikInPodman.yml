@@ -15,7 +15,7 @@
         api_version: v4.4.1 # v4.0.0 ← (default)
         unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: absent # absent / present
+        state: present # absent / present
         timeout: 600
         kube_file: 
           host: localhost
