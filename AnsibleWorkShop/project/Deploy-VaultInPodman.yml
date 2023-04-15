@@ -54,15 +54,27 @@
   tasks:
     - name: Prepare kube_file content
       block:
-        - name: slurp unseal script
-          ansible.builtin.slurp:
+        - name: Render unseal script
+          ansible.builtin.template:
             src: "{{ unseal_script_path }}"
-          delegate_to: localhost
-          register: unseal_script_slurp
+            dest: /dev/null
+          check_mode: true
+          diff: true
+          register: unseal_script_rendered
 
-        - name: set fact unseal_script 
+        - name: Set fact unseal_script
           ansible.builtin.set_fact:
-            unseal_script: "{{ unseal_script_slurp.content }}"
+            unseal_script: "{{ unseal_script_rendered.diff[0].after | b64decode }}"
+
+        # - name: slurp unseal script
+        #   ansible.builtin.slurp:
+        #     src: "{{ unseal_script_path }}"
+        #   delegate_to: localhost
+        #   register: unseal_script_slurp
+
+        # - name: set fact unseal_script 
+        #   ansible.builtin.set_fact:
+        #     unseal_script: "{{ unseal_script_slurp.content }}"
 
         - name: Render kube file content
           ansible.builtin.template:

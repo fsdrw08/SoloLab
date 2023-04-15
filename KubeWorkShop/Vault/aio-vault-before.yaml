@@ -76,6 +76,14 @@ spec:
       args:
         - server
         - -config=/vault/config/config.hcl
+      # https://www.cnblogs.com/peng-zone/p/16700401.html
+      startupProbe:
+        exec:
+          command:
+            - bash /mnt/unseal/Unseal-Vault.sh
+        successThreshold: 1
+        initialDelaySeconds: 0
+        periodSeconds: 1
       volumeMounts:
         - name: vault_config
           mountPath: /vault/config/config.hcl
@@ -83,8 +91,7 @@ spec:
         - name: vault_data
           mountPath: /vault/data
         - name: unseal_script
-          mountPath: /mnt/Unseal-Vault.sh
-          subPath: Unseal-Vault.sh
+          mountPath: /mnt/unseal/
   volumes:
     - name: vault_config
       # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
