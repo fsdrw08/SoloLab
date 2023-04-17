@@ -1,27 +1,16 @@
 # code: language=ansible
 ---
 - hosts: localhost
-  gather_facts: yes
+  gather_facts: false
   vars:
-    podman_rootless_play_before:
-      vars_podman_host: kube-1
-      vars_podman_uri:
-        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
-        api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
-      vars_podman_play:
-        state: absent # absent / present
-        timeout: 600
-        kube_file: 
-          host: localhost
-          path: /KubeWorkShop/Vault/aio-vault-before.yaml
-        absent:
-          query_params:
-            force: false
+    vault:
+      url: https://vault.infra.sololab
 
-    kube_file_template: /KubeWorkShop/Vault/aio-vault-after.yaml
+    unseal_script_path: /KubeWorkShop/Vault/unseal-vault.sh
 
-    podman_rootless_play_after:
+    kube_file_template: /KubeWorkShop/Vault/aio-vault.yaml
+
+    podman_rootless_play:
       vars_podman_host: kube-1
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
@@ -32,10 +21,10 @@
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ rendered }}"
+          content: "{{ kube_file_content }}"
         absent:
           query_params:
-            force: false
+            force: true
       vars_podman_generate_systemd:
         generate:
           path_params: 
@@ -48,73 +37,116 @@
             skipped: false
             enabled: true
             state: started
+
+    podman_rootless_play_absent:
+      vars_podman_play:
+        state: absent # absent / present
+        absent:
+          query_params:
+            force: false
+
   tasks:
-    # https://github.com/fjacquet/terraform-lab/blob/c9414dc60169de2879325a6c91a15136ce8d36e8/roles/linux_vault/tasks/leader.yml
-    - name: initialize vault on leader
-      ansible.builtin.command:
-        cmd: vault operator init -key-shares=3 -key-threshold=2 -format=yaml
-      register: vault_operator_init
-      environment:
-        VAULT_ADDR: https://vault.infra.sololab
-        VAULT_SKIP_VERIFY: true
+    # https://developer.hashicorp.com/vault/api-docs/system/health
+    # https://github.com/AdamGoldsmith/terraform-lxd/blob/efba7efce88891fcceb008a6bc4b0e188ba4a782/ansible/roles/ansible-role-vault-unseal/tasks/main.yml
+    - name: Detect vault status
+      ansible.builtin.uri:
+        url: "{{ vault.url }}/v1/sys/health"
+        validate_certs: false
+        method: GET
+        status_code:
+          - 200 # if initialized, unsealed, and active
+          - 429 # if unsealed and standby
+          - 501 # if not initialized
+          - 503 # if sealed
+      register: vault_status
 
-    - name: set fact for vault init output
-      ansible.builtin.set_fact:
-        vault_init_stdout: "{{ vault_operator_init.stdout | from_yaml }}"
-
-    - name: set fact for vault keys
-      ansible.builtin.set_fact:
-        vault_unseal_keys_b64: "{{ vault_init_stdout.unseal_keys_b64 }}"
-        vault_root_token: "{{ vault_init_stdout.root_token }}"
-
-    - name: debug
-      debug:
-        msg: "{{ vault_unseal_keys_b64 }}"
-
-    - name: unseal
-      ansible.builtin.command:
-        cmd: vault operator unseal {{ item }}
-      environment:
-        VAULT_ADDR: https://vault.infra.sololab
-        VAULT_SKIP_VERIFY: true
-      loop: "{{ vault_unseal_keys_b64 }}"
-
-    - name: sleep 3 second
-      ansible.builtin.pause:
-        seconds: 3
-
-    - name: update vault pod
-      delegate_to: kube-1
+    - name: Init and unseal vault
+      when:
+            - vault_status.status == 501
+      no_log: true
       block:
-      - name: delete vault pod
-        ansible.builtin.include_role:
-          name: ansible-podman-rootless-play
-        vars: 
-          vars_podman_host: "{{ podman_rootless_play_before.vars_podman_host }}"
-          vars_podman_uri: "{{ podman_rootless_play_before.vars_podman_uri }}"
-          vars_podman_play: "{{ podman_rootless_play_before.vars_podman_play }}"
-          vars_podman_generate_systemd: "{{ podman_rootless_play_before.vars_podman_generate_systemd }}"
-          vars_service: "{{ podman_rootless_play_before.vars_service }}"
+        - name: init vault
+          ansible.builtin.uri:
+            url: "{{ vault.url }}/v1/sys/init"
+            validate_certs: false
+            method: POST
+            body:
+              secret_shares: 5
+              secret_threshold: 3
+            body_format: json
+            return_content: true
+          until: vault_init is succeeded
+          retries: 9
+          changed_when: 
+            - vault_init.status == 200
+          register: vault_init
 
-      - name: render template
-        ansible.builtin.template:
-          src: "{{ kube_file_template }}"
-          dest: /dev/null
-        check_mode: true
-        diff: true
-        no_log: false
-        register: template
+        - name: set fact for vault keys
+          ansible.builtin.set_fact:
+            vault_unseal_keys_b64: "{{ vault_init.json.keys_base64 | join('\n') }}"
+            vault_root_token: "{{ vault_init.json.root_token }}"
 
-      - name: Set fact rendered
-        ansible.builtin.set_fact:
-          rendered: "{{ template.diff[0].after }}"
+        # https://github.com/dbond007/ansible-role-hashicorp_vault/blob/289afbe30b6b467e736866def5d01335077b7983/tasks/unseal_hashicorp_vault.yml#L46
+        - name: unseal
+          ansible.builtin.uri:
+            url: "{{ vault.url }}/v1/sys/unseal"
+            validate_certs: false
+            method: POST
+            body_format: json
+            body: 
+              key: "{{ item }}"
+          loop: "{{ vault_init.json.keys_base64 }}"
 
-      - name: re-deploy vault pod
-        ansible.builtin.include_role:
-          name: ansible-podman-rootless-play
-        vars: 
-          vars_podman_host: "{{ podman_rootless_play_after.vars_podman_host }}"
-          vars_podman_uri: "{{ podman_rootless_play_after.vars_podman_uri }}"
-          vars_podman_play: "{{ podman_rootless_play_after.vars_podman_play }}"
-          vars_podman_generate_systemd: "{{ podman_rootless_play_after.vars_podman_generate_systemd }}"
-          vars_service: "{{ podman_rootless_play_after.vars_service }}"
+    - name: sleep 1 second
+      ansible.builtin.pause:
+        seconds: 1
+
+    - name: Prepare kube_file content
+      when:
+        - vault_unseal_keys_b64 is defined
+        - vault_root_token is defined
+      block:
+        - name: debug
+          debug:
+            msg: "{{ item }}"
+          with_items:
+            - "{{ vault_unseal_keys_b64 }}"
+            - "{{ vault_root_token }}"
+
+        - name: Set fact unseal_script
+          ansible.builtin.set_fact:
+            unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
+
+        - name: Set fact kube_file_content
+          ansible.builtin.set_fact:
+            kube_file_content: "{{ lookup('ansible.builtin.template', kube_file_template) }}"
+
+    - name: re-deploy vault pod
+      delegate_to: kube-1
+      when:
+        - vault_unseal_keys_b64 is defined
+        - vault_root_token is defined
+      block:
+        - name: gather facts from kube-1
+          ansible.builtin.setup:
+          delegate_to: kube-1
+
+        - name: delete vault pod
+          ansible.builtin.include_role:
+            name: ansible-podman-rootless-play
+          vars: 
+            vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+            vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+            vars_podman_play: "{{ podman_rootless_play.vars_podman_play | ansible.builtin.combine(podman_rootless_play_absent.vars_podman_play, recursive=True) }}"
+            vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+            vars_service: "{{ podman_rootless_play.vars_service }}"
+
+        - name: re-deploy vault pod
+          ansible.builtin.include_role:
+            name: ansible-podman-rootless-play
+          vars: 
+            vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+            vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+            vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+            vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+            vars_service: "{{ podman_rootless_play.vars_service }}"

@@ -1,14 +1,14 @@
 # code: language=ansible
 ---
-- hosts: kube-1 # kube-2
-  gather_facts: yes
+- hosts: localhost # kube-2
+  gather_facts: false
   vars: 
     ipa:
       hostname: ipa.infra.sololab
 
     unseal_script_path: /KubeWorkShop/Vault/unseal-vault.sh
 
-    kube_file_template: /KubeWorkShop/Vault/aio-vault-before.yaml
+    kube_file_template: /KubeWorkShop/Vault/aio-vault.yaml
 
     podman_rootless_play:
       vars_podman_host: kube-1
@@ -22,7 +22,7 @@
         kube_file: 
           host: localhost
           # path: /KubeWorkShop/Vault/aio-vault-before.yaml
-          content: "{{ rendered }}"
+          content: "{{ kube_file_content }}"
         absent:
           query_params:
             force: true
@@ -54,43 +54,27 @@
   tasks:
     - name: Prepare kube_file content
       block:
-        - name: Render unseal script
-          ansible.builtin.template:
-            src: "{{ unseal_script_path }}"
-            dest: /dev/null
-          check_mode: true
-          diff: true
-          register: unseal_script_rendered
-
         - name: Set fact unseal_script
           ansible.builtin.set_fact:
-            unseal_script: "{{ unseal_script_rendered.diff[0].after | b64decode }}"
-
-        # - name: slurp unseal script
-        #   ansible.builtin.slurp:
-        #     src: "{{ unseal_script_path }}"
-        #   delegate_to: localhost
-        #   register: unseal_script_slurp
-
-        # - name: set fact unseal_script 
-        #   ansible.builtin.set_fact:
-        #     unseal_script: "{{ unseal_script_slurp.content }}"
-
-        - name: Render kube file content
-          ansible.builtin.template:
-            src: "{{ kube_file_template }}"
-            dest: /dev/null
-          check_mode: true
-          diff: true
-          register: template
+            unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
 
         - name: Set fact rendered
           ansible.builtin.set_fact:
-            rendered: "{{ template.diff[0].after }}"
+            # rendered: "{{ template.diff[0].after }}"
+            kube_file_content: "{{ lookup('ansible.builtin.template', kube_file_template) }}"
+
+    - name: gather facts from kube-1
+      ansible.builtin.setup:
+      delegate_to: kube-1
+      # delegate_facts: true
+      # register: kube1_fact
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
         name: ansible-podman-rootless-play
+        apply: 
+          delegate_to: kube-1
+          # delegate_facts: false
       vars: 
         vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
         vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
@@ -110,6 +94,8 @@
             dest: /home/{{ ansible_user }}/traefik/
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
+          delegate_to: kube-1
+          delegate_facts: true
 
         - name: absent route config
           ansible.builtin.file:
@@ -117,3 +103,5 @@
             state: absent
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
+          delegate_to: kube-1
+          delegate_facts: true

@@ -1,0 +1,13 @@
+# code: language=ansible
+---
+- hosts: localhost
+  gather_facts: true
+  tasks:
+    # - name: debug in localhost
+    #   debug:
+    #     msg: "{{ ansible_user }}"
+    - name: debug in localhost
+      delegate_to: kube-1
+      delegate_facts: false
+      debug:
+        msg: "{{ ansible_user }}"
