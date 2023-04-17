@@ -4,9 +4,11 @@
 
 role_name: ansible-podman-rootless-play
 
+# podman_host:
 defaults_podman_host: "{{ ansible_host }}"
 
 podman_host: "{{ vars_podman_host | default(defaults_podman_host) }}"
+
 
 # podman_uri:
 defaults_podman_uri:
@@ -47,7 +49,8 @@ podman_play: "{{ defaults_podman_play | ansible.builtin.combine(vars_podman_play
 
 # podman_generate_systemd
 defaults_podman_generate_systemd:
-  dest: /home/{{ ansible_user }}/.config/systemd/user/ # required, skip if empty
+  dest: "{{ ansible_user_dir }}/.config/systemd/user/" # required, skip if empty
+  # dest: /home/{{ ansible_env.USER }}/.config/systemd/user/ # required, skip if empty
 
 podman_generate_systemd: "{{ defaults_podman_generate_systemd | ansible.builtin.combine(vars_podman_generate_systemd, recursive=True) }}"
 

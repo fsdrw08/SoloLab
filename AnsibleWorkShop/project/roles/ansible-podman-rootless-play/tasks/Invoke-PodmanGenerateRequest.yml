@@ -32,69 +32,35 @@
           - 200
       register: podman_generate_systemd_respond
 
-    - name: Set pod systemd unit 
+    - name: Set systemd unit to file
+      ansible.builtin.template:
+        src: systemd.service.j2
+        dest: "{{ [podman_generate_systemd.dest, item.key + '.service'] | ansible.builtin.path_join }}"
+      vars:
+        systemd_unit_content: "{{ item.value }}"
+      loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
       when:
         - podman_generate_systemd_respond.json is defined
-      block:
-        - name: Delete systemd unit file in /tmp
-          ansible.builtin.file:
-            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
-            state: absent
-          # https://stackoverflow.com/questions/56508435/how-to-concatenate-with-a-string-each-element-of-a-list-in-ansible
-          loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                    ansible.builtin.product(['.service']) | map('join') | list }}"
-          delegate_to: localhost
-          changed_when: false
 
-        - name: Create systemd unit file in /tmp
-          ansible.builtin.file:
-            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
-            state: touch
-            mode: '0755'
-          loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                    ansible.builtin.product(['.service']) | map('join') | list }}"
-          delegate_to: localhost
-          changed_when: false
-
-        - name: Set systemd unit to file
-          ansible.builtin.blockinfile:
-            path: "{{ ['/tmp', item.key + '.service'] | ansible.builtin.path_join }}"
-            marker: "# {mark} {{ role_name }}"
-            block: "{{ item.value }}"
-            state: present
-          loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
-          delegate_to: localhost
-          changed_when: false
-
-        - name: debug 
-          debug:
-            msg: "ansible_host: {{ ansible_host }}\n podman_host: {{ podman_host }}"
-
-        - name: Copy systemd unit file to dest path
-          ansible.builtin.copy:
-            src: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
-            dest: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
-          loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                    ansible.builtin.product(['.service']) | map('join') | list }}"
-          # https://jinja.palletsprojects.com/en/latest/templates/#if-expression
-          # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#:~:text=assigned%20to%20them-,inventory_hostname,-The%20inventory%20name
-          delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
-
-        - name: Delete systemd unit file in /tmp
-          ansible.builtin.file:
-            path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
-            state: absent
-          loop: "{{ podman_generate_systemd_respond.json.keys() | 
-                    ansible.builtin.product(['.service']) | map('join') | list }}"
-          delegate_to: localhost
-          changed_when: false
-
-    # - name: Detect pod related unit file
-    #   ansible.builtin.stat:
-    #     path: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
+    # - name: Delete systemd unit file in /tmp
+    #   ansible.builtin.file:
+    #     path: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+    #     state: absent
+    #   # https://stackoverflow.com/questions/56508435/how-to-concatenate-with-a-string-each-element-of-a-list-in-ansible
     #   loop: "{{ podman_generate_systemd_respond.json.keys() | 
     #             ansible.builtin.product(['.service']) | map('join') | list }}"
-    #   register: service_unit_to_create            
+    #   delegate_to: localhost
+    #   changed_when: false
+
+    # - name: Copy systemd unit file to dest path
+    #   ansible.builtin.copy:
+    #     src: "{{ ['/tmp', item] | ansible.builtin.path_join }}"
+    #     dest: "{{ [podman_generate_systemd.dest, item] | ansible.builtin.path_join }}"
+    #   loop: "{{ podman_generate_systemd_respond.json.keys() | 
+    #             ansible.builtin.product(['.service']) | map('join') | list }}"
+    #   # https://jinja.palletsprojects.com/en/latest/templates/#if-expression
+    #   # https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#:~:text=assigned%20to%20them-,inventory_hostname,-The%20inventory%20name
+    #   delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
     # https://luiscachog.io/using-the-ansible-stat-module-on-a-loop/
     # https://jinja.palletsprojects.com/en/latest/templates/#if-expression
@@ -104,17 +70,6 @@
     #     state: "{{ 'file' if item.stat.exists else 'touch' }}"
     #     mode: '0755'
     #   loop: "{{ service_unit_to_create.results }}"
-    #   when:
-    #     - podman_generate_systemd.dest is defined
-    #     - podman_generate_systemd_respond.json is defined
-        
-    # - name: Set systemd unit to file
-    #   ansible.builtin.blockinfile:
-    #     path: "{{ [podman_generate_systemd.dest, item.key + '.service'] | ansible.builtin.path_join }}"
-    #     marker: "# {mark} {{ role_name }}"
-    #     block: "{{ item.value }}"
-    #     state: present
-    #   loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
     #   when:
     #     - podman_generate_systemd.dest is defined
     #     - podman_generate_systemd_respond.json is defined
@@ -148,7 +103,7 @@
         # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
         # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
         - item.key.startswith(podman_generate_systemd.generate.query_params.podPrefix | default('pod'))
-      delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
+      # delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
 
 
 - name: Disable pod systemd service when pod not exist

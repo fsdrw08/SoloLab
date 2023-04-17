@@ -2,23 +2,27 @@
 ---
 - name: set kube_file_slurp
   block:
-    - name: slurp yaml file
-      ansible.builtin.slurp:
-        src: "{{ podman_play.kube_file.path }}"
-      register: kube_file_slurp_return
-      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
-      when:
-        - podman_play.kube_file.path is not none
+    # - name: slurp yaml file
+    #   ansible.builtin.slurp:
+    #     src: "{{ podman_play.kube_file.path }}"
+    #   register: kube_file_slurp_return
+    #   delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
+    #   when:
+    #     - podman_play.kube_file.path is not none
 
     - name: extract kube_file_slurp_return.content
       ansible.builtin.set_fact:
-        kube_file_slurp: "{{ kube_file_slurp_return.content }}"
+        # kube_file_slurp: "{{ kube_file_slurp_return.content }}"
+        _kube_file_content: "{{ lookup('ansible.builtin.template', podman_play.kube_file.path) | b64encode }}"
+      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
       when:
         - podman_play.kube_file.path is not none
+        - podman_play.kube_file.content is none
 
     - name: encode kube file content
       ansible.builtin.set_fact:
-        kube_file_slurp: "{{ podman_play.kube_file.content | b64encode }}"
+        _kube_file_content: "{{ podman_play.kube_file.content | b64encode }}"
+      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
       when:
         - podman_play.kube_file.content is defined
         - podman_play.kube_file.content is not none
@@ -54,7 +58,7 @@
           - 500
         timeout: "{{ podman_play.timeout | default(300) }}"
         body_format: json
-        body: "{{ kube_file_slurp | b64decode }}"
+        body: "{{ _kube_file_content | b64decode }}"
       register: podman_kube_play_respond
       changed_when: 
         - podman_kube_play_respond.status == 200
@@ -108,7 +112,7 @@
           - 200
           - 500
         body_format: json
-        body: "{{ kube_file_slurp | b64decode }}"
+        body: "{{ _kube_file_content | b64decode }}"
         return_content: true
       register: podman_kube_down_respond
       changed_when: 
