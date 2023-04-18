@@ -8,24 +8,25 @@
   block:
     - name: Clean up the podman_generate_systemd query params dict
       ansible.builtin.set_fact:
-        podman_generate_systemd_generate_query_params: "{{ {item.key: item.value} }}"
+        _podman_generate_systemd_generate_query_params: "{{ {item.key: item.value} }}"
       loop: "{{ podman_generate_systemd.generate.query_params | dict2items }}"
       when:
         - podman_generate_systemd.generate.query_params is defined
         - item.value is not none
 
+    # https://stackoverflow.com/questions/62239167/how-to-format-a-dict-to-a-string-in-ansible
     - name: Convert query_params from dict to string for podman_generate_systemd
       ansible.builtin.set_fact:
-        podman_generate_systemd_generate_query_params_string: "?{{ podman_generate_systemd_generate_query_params.keys() | 
-                                                          ansible.builtin.zip(podman_generate_systemd_generate_query_params.values()) |
+        _podman_generate_systemd_generate_query_params_string: "?{{ _podman_generate_systemd_generate_query_params.keys() | 
+                                                          ansible.builtin.zip(_podman_generate_systemd_generate_query_params.values()) |
                                                           map('join', '=') |
                                                           join('&') }}"
       when: 
-        - podman_generate_systemd_generate_query_params is defined
+        - _podman_generate_systemd_generate_query_params is defined
 
     - name: Get pod systemd unit content
       ansible.builtin.uri:
-        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/generate/{{ pod_id | default(podman_generate_systemd.generate.path_params.name) }}/systemd{{ podman_generate_systemd_generate_query_params_string | default('')}}"
+        url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/generate/{{ _pod_id | default(podman_generate_systemd.generate.path_params.name) }}/systemd{{ _podman_generate_systemd_generate_query_params_string | default('')}}"
         unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
         method: GET
         status_code: 
@@ -39,6 +40,7 @@
       vars:
         systemd_unit_content: "{{ item.value }}"
       loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      delegate_to: "{{ podman_host }}"
       when:
         - podman_generate_systemd_respond.json is defined
 
@@ -99,6 +101,7 @@
         enabled: "{{ service.podman_pod.user_scope.enabled | default(true) }}"
         scope: user
       loop: "{{ podman_generate_systemd_respond.json | dict2items }}"
+      delegate_to: "{{ podman_host }}"
       when: 
         # https://serverfault.com/questions/960575/ansible-conditionals-wildcard-match-string/985600#985600
         # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#referencing-key-value-dictionary-variables
@@ -107,7 +110,7 @@
 
 
 - name: Disable pod systemd service when pod not exist
-  delegate_to: "{{ podman_host if ansible_host == 'localhost' else inventory_hostname }}"
+  delegate_to: "{{ podman_host }}"
   when:
     - pod_info.json.Hostname is not defined
   block:

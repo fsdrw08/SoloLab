@@ -19,7 +19,7 @@
 
 - name: Detect pod info
   ansible.builtin.uri:
-    url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/pods/{{ pod_id | default(podman_generate_systemd.generate.path_params.name) }}/json"
+    url: "{{ podman_uri.scheme_authority }}/{{ podman_uri.api_version }}/libpod/pods/{{ _pod_id | default(podman_generate_systemd.generate.path_params.name) }}/json"
     unix_socket: "{{ podman_uri.unix_socket | default(omit) }}"
     method: GET
     status_code: 
@@ -36,4 +36,4 @@
   ansible.builtin.include_tasks:
     file: Invoke-PodmanGenerateRequest.yml
   when:
-    - pod_id | default(podman_generate_systemd.generate.path_params.name)  is not none
+    - _pod_id | default(podman_generate_systemd.generate.path_params.name)  is not none

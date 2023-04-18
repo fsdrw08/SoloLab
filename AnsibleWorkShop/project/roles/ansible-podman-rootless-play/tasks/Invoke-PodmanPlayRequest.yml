@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- name: set kube_file_slurp
+- name: get kube_file content
   block:
     # - name: slurp yaml file
     #   ansible.builtin.slurp:
@@ -10,11 +10,11 @@
     #   when:
     #     - podman_play.kube_file.path is not none
 
-    - name: extract kube_file_slurp_return.content
+    - name: get kube_file content from path
       ansible.builtin.set_fact:
         # kube_file_slurp: "{{ kube_file_slurp_return.content }}"
         _kube_file_content: "{{ lookup('ansible.builtin.template', podman_play.kube_file.path) | b64encode }}"
-      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
+      delegate_to: "{{ podman_play.kube_file.host }}"
       when:
         - podman_play.kube_file.path is not none
         - podman_play.kube_file.content is none
@@ -22,7 +22,7 @@
     - name: encode kube file content
       ansible.builtin.set_fact:
         _kube_file_content: "{{ podman_play.kube_file.content | b64encode }}"
-      delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
+      delegate_to: "{{ podman_play.kube_file.host }}"
       when:
         - podman_play.kube_file.content is defined
         - podman_play.kube_file.content is not none
@@ -30,6 +30,7 @@
 - name: podman kube play
   when:
     - podman_play.state == "present"
+    - _kube_file_content is not none
   block:
     - name: Clean up the query params dict
       ansible.builtin.set_fact:
@@ -72,19 +73,20 @@
 
     - name: set pod id
       ansible.builtin.set_fact:
-        pod_id: "{{ podman_kube_play_respond.json.Pods[0].ID }}"
+        _pod_id: "{{ podman_kube_play_respond.json.Pods[0].ID }}"
       when:
         - podman_kube_play_respond.status == 200
 
-    - name: debug pod_id
+    - name: debug _pod_id
       debug:
-        msg: "{{ pod_id }}"
+        msg: "{{ _pod_id }}"
       when:
         - podman_kube_play_respond.status == 200
 
 - name: podman kube down
   when:
     - podman_play.state == "absent"
+    - _kube_file_content is not none
   block:
     - name: Clean up the query params dict
       ansible.builtin.set_fact:
