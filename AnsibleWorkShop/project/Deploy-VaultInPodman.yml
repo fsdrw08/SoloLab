@@ -67,7 +67,11 @@
       ansible.builtin.setup:
       delegate_to: kube-1
       # delegate_facts: true
-      # register: kube1_fact
+      register: kube1_fact
+
+    - name: debug
+      debug:
+        msg: "{{ kube1_fact }}"
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:

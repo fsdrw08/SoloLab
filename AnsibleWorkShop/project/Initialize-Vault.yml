@@ -97,9 +97,47 @@
               key: "{{ item }}"
           loop: "{{ vault_init.json.keys_base64 }}"
 
-    - name: sleep 1 second
-      ansible.builtin.pause:
-        seconds: 1
+    - name: enable and config ldap auth
+      block:
+        # https://developer.hashicorp.com/vault/api-docs/auth/ldap#configure-ldap
+        - name: enable ldap auth
+          ansible.builtin.uri:
+            url: "{{ vault.url }}/v1/sys/auth/ldap"
+            validate_certs: false
+            method: POST
+            headers:
+              X-Vault-Token: "{{ vault_root_token }}"
+            body_format: json
+            body:
+              type: ldap
+            status_code: 204, 400 # 400  path already in use
+          register: sys_auth_ldap
+          changed_when: 
+            - sys_auth_ldap.status == 204
+
+        # https://github.com/drewmullen/ansible-vault-namespaces/blob/4cdf0c74bdeaf6c68347e15f07c9707af966c589/roles/namespace/files/ldap.json
+        # https://github.com/marceloalmeida/vault-ldap-ssh/blob/bacb55f00dc8f2d76877b75388dcef05d080a65c/provisioning/roles/vault/tasks/config_ldap.yml
+        - name: config ldap
+          ansible.builtin.uri:
+            url: "{{ vault.url }}/v1/auth/ldap/config"
+            validate_certs: false
+            method: POST
+            headers:
+              X-Vault-Token: "{{ lookup('env', 'VAULT_TOKEN') }}"
+              X-Vault-Namespace: "{% if ns_name == 'root'%}{% else %}{{ ns_name }}{% endif %}"
+            body_format: json
+            body:
+              url: 
+              binddn:
+              bindpass:
+              userdn:
+              userattr:
+              groupdn:
+              groupattr:
+              insecure_tls: true
+            status_code: 204
+          when: ldap_get.status == 404
+          changed_when: true
 
     - name: Prepare kube_file content
       when:
