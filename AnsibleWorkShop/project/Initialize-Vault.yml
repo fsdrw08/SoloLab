@@ -3,10 +3,96 @@
 - hosts: localhost
   gather_facts: false
   vars:
+    ipa:
+      hostname: ipa.infra.sololab
+
     vault:
       url: https://vault.infra.sololab
+      ldap_config:
+        url: ldaps://ipa.infra.sololab:636
+        starttls: true
+        insecure_tls: false
+        certificate: "{{ RootCACert.stdout }}"
+        # Binding - Authenticated Search
+        # https://developer.hashicorp.com/vault/docs/auth/ldap#binding-authenticated-search
+        binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+        bindpass: P@ssw0rd
+        userdn: cn=users,cn=accounts,dc=infra,dc=sololab
+        userattr: uid
+        # Group Membership Resolution
+        # https://developer.hashicorp.com/vault/docs/auth/ldap#scenario-1
+        # https://stackoverflow.com/questions/32279519/escaping-double-curly-braces-in-ansible
+        groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{ '{{' }}.UserDN{{ '}}' }}))
+        # https://github.com/goharbor/harbor/issues/9110#issuecomment-533676484
+        # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
+        groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
+        groupattr: cn
+      policies:
+        # https://developer.hashicorp.com/vault/tutorials/policies/policies
+        - name: vault-root
+          hcl: |
+            path "secret/*" {
+              capabilities = [ "create", "read", "update", "delete", "list", "patch" ]
+            }
+            
+            path "sys/health"
+            {
+              capabilities = ["read", "sudo"]
+            }
 
-    unseal_script_path: /KubeWorkShop/Vault/unseal-vault.sh
+            # Create and manage ACL policies broadly across Vault
+
+            # List existing policies
+            path "sys/policies/acl"
+            {
+              capabilities = ["list"]
+            }
+
+            # Create and manage ACL policies
+            path "sys/policies/acl/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
+            # Enable and manage authentication methods broadly across Vault
+
+            # Manage auth methods broadly across Vault
+            path "auth/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
+            # Create, update, and delete auth methods
+            path "sys/auth/*"
+            {
+              capabilities = ["create", "update", "delete", "sudo"]
+            }
+
+            # List auth methods
+            path "sys/auth"
+            {
+              capabilities = ["read"]
+            }
+
+            # Enable and manage the key/value secrets engine at `secret/` path
+
+            # List, create, update, and delete key/value secrets
+            path "secret/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
+            # Manage secrets engines
+            path "sys/mounts/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
+            # List existing secrets engines.
+            path "sys/mounts"
+            {
+              capabilities = ["read"]
+            }
 
     kube_file_template: /KubeWorkShop/Vault/aio-vault.yaml
 
@@ -99,6 +185,18 @@
 
     - name: enable and config ldap auth
       block:
+        - name: run openssl s_client -showcerts
+          ansible.builtin.shell:
+            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+            cmd: >
+              echo | 
+              openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
+              tac | 
+              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+              tac
+          changed_when: false
+          register: RootCACert
+
         # https://developer.hashicorp.com/vault/api-docs/auth/ldap#configure-ldap
         - name: enable ldap auth
           ansible.builtin.uri:
@@ -123,21 +221,37 @@
             validate_certs: false
             method: POST
             headers:
-              X-Vault-Token: "{{ lookup('env', 'VAULT_TOKEN') }}"
-              X-Vault-Namespace: "{% if ns_name == 'root'%}{% else %}{{ ns_name }}{% endif %}"
+              X-Vault-Token: "{{ vault_root_token }}"
             body_format: json
-            body:
-              url: 
-              binddn:
-              bindpass:
-              userdn:
-              userattr:
-              groupdn:
-              groupattr:
-              insecure_tls: true
+            body: "{{ vault.ldap_config }}"
+              # url: 
+              # binddn:
+              # bindpass:
+              # userdn:
+              # userattr:
+              # groupdn:
+              # groupattr:
+              # insecure_tls: true
             status_code: 204
-          when: ldap_get.status == 404
+          when: sys_auth_ldap.status == 404
           changed_when: true
+
+        # - name: create vault access control policies
+        #   ansible.builtin.uri:
+        #     url: "{{ vault.url }}/v1/sys/policy/{{ item.key }}"
+        #     validate_certs: false
+        #     method: POST
+        #     headers:
+        #       X-Vault-Token: "{{ vault_root_token }}"
+        #     body_format: json
+        #     body:
+        #       rules: "{{ item.value }}"
+        #     status_code: 204
+        #   with_dict:
+        #     prod_policy: path "secret/ansfestdemo/*" { policy = "write" }
+        #     dev_policy: path "secret/ansfestdemo/*" { policy = "deny" }
+        #   become: no
+        #   delegate_to: localhost
 
     - name: Prepare kube_file content
       when:
@@ -151,9 +265,9 @@
             - "{{ vault_unseal_keys_b64 }}"
             - "{{ vault_root_token }}"
 
-        - name: Set fact unseal_script
-          ansible.builtin.set_fact:
-            unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
+        # - name: Set fact unseal_script
+        #   ansible.builtin.set_fact:
+        #     unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
 
         - name: Set fact kube_file_content
           ansible.builtin.set_fact:

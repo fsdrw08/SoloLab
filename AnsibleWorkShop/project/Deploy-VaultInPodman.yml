@@ -54,9 +54,9 @@
   tasks:
     - name: Prepare kube_file content
       block:
-        - name: Set fact unseal_script
-          ansible.builtin.set_fact:
-            unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
+        # - name: Set fact unseal_script
+        #   ansible.builtin.set_fact:
+        #     unseal_script: "{{ lookup('ansible.builtin.template', unseal_script_path) | b64encode }}"
 
         - name: Set fact rendered
           ansible.builtin.set_fact:
