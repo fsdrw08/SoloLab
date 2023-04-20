@@ -1,4 +1,8 @@
 # code: language=ansible
+# podman run --rm `
+#     -e RUNNER_PLAYBOOK=./debug/Set-NetDNSServer.yml `
+#     -v ../:/runner `
+#     localhost/ansible-ee-aio ansible-runner run /runner -vv
 ---
 - hosts: kube-1
   gather_facts: false

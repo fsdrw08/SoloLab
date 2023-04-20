@@ -334,14 +334,19 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio bash -c 'echo -e "password\npassword" | ansible-vault encrypt /KubeWorkShop/FreeIPA/password.txt'
 
+# debug vault ldap config
+podman run --rm `
+    --dns 192.168.255.31 `
+    -e RUNNER_PLAYBOOK=./debug/Debug-VaultLDAPAuth.yml `
+    -v ../:/runner `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio bash -c 'ansible version'
 
-podman run --rm `
-    -e RUNNER_PLAYBOOK=./debug/Set-NetDNSServer.yml `
-    -v ../:/runner `
-    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
 ```
 
 
