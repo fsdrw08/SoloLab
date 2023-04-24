@@ -14,14 +14,14 @@
     ipa:
       hostname: ipa.infra.sololab
 
-    vault_root_token: hvs.0HUER4GuUYzkeooUBHmSGkJH
+    vault_root_token: hvs.MHxl7Goon18IjZ9soK5mIDco
     vault:
       url: https://vault.infra.sololab
       ldap_config:
         url: ldaps://ipa.infra.sololab:636
         starttls: true
         insecure_tls: false
-        certificate: "{{ RootCACert.stdout }}"
+        certificate: "{{ RootCACert.stdout | default('') }}"
         # Binding - Authenticated Search
         # https://developer.hashicorp.com/vault/docs/auth/ldap#binding-authenticated-search
         binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
@@ -36,6 +36,14 @@
         # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
         groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
         groupattr: cn
+      identity_group:
+        - name: vault-root
+          type: external
+          policies: 
+            - vault-root
+      identity_group_alias:
+        - name: svc-vault-root
+          mount_accessor: "{{ ldap_accessor | default('') }}"
       policies:
         # https://developer.hashicorp.com/vault/tutorials/policies/policies
         - name: vault-root
@@ -44,6 +52,12 @@
               capabilities = [ "create", "read", "update", "delete", "list", "patch" ]
             }
             
+            # Manage identity
+            path "identity/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
             path "sys/health"
             {
               capabilities = ["read", "sudo"]
@@ -179,3 +193,46 @@
         body:
           policies: vault-root
         status_code: 204
+
+    # https://developer.hashicorp.com/vault/api-docs/system/auth
+    # https://github.com/chrisvanmeer/at-hashistack/blob/7911122421de9ef9d9ac12f6d93848e1102ae994/roles/hashicorp/vault/tasks/prep-for-usage.yml#L78
+    - name: Get ldap accessor
+      ansible.builtin.uri:
+        url: "{{ vault.url }}/v1/sys/auth"
+        validate_certs: false
+        method: GET
+        headers:
+          X-Vault-Token: "{{ vault_root_token }}"
+        return_content: true
+        status_code: 200
+      register: accessor_respond
+
+    - name: set fact ldap accessor
+      ansible.builtin.set_fact:
+        ldap_accessor: "{{ accessor_respond['json']['data']['ldap/']['accessor'] }}"
+
+    # https://developer.hashicorp.com/vault/api-docs/secret/identity/group
+    - name: Set identity group
+      ansible.builtin.uri:
+        url: "{{ vault.url }}/v1/identity/group"
+        validate_certs: false
+        method: POST
+        headers:
+          X-Vault-Token: "{{ vault_root_token }}"
+        body_format: json
+        body: "{{ item }}" 
+        status_code: 200, 204
+      loop: "{{ vault.identity_group }}"
+
+    # https://developer.hashicorp.com/vault/api-docs/secret/identity/group-alias
+    - name: Set identity group-alias
+      ansible.builtin.uri:
+        url: "{{ vault.url }}/v1/identity/group-alias"
+        validate_certs: false
+        method: POST
+        headers:
+          X-Vault-Token: "{{ vault_root_token }}"
+        body_format: json
+        body: "{{ item }}" 
+        status_code: 200, 204
+      loop: "{{ vault.identity_group_alias }}"
