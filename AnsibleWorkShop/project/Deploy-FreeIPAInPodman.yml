@@ -66,7 +66,6 @@
             type: ethernet
             dns4:
               - 192.168.255.31
-              - 192.168.255.1
             state: present
           when:
             - podman_rootless_play.vars_podman_play.state == 'present'

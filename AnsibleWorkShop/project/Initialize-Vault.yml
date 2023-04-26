@@ -27,89 +27,88 @@
         # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
         groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
         groupattr: cn
-      group:
-        - vault-root:
-            identity_group:
-              - name: vault-root
-                type: external
-                policies: 
-                  - vault-root
-            identity_group_alias:
-              - name: svc-vault-root
-                mount_accessor: "{{ ldap_accessor | default('') }}"
-                canonical_id: "{{ canonical_id | default('') }}"
-            policies:
-              # https://developer.hashicorp.com/vault/tutorials/policies/policies
-              - name: vault-root
-                hcl: |
-                  path "secret/*" {
-                    capabilities = [ "create", "read", "update", "delete", "list", "patch" ]
-                  }
+      identity_group:
+        - name: vault-root
+          type: external
+          policies: 
+            - vault-root
+      identity_group_alias:
+        - name: svc-vault-root
+          mount_accessor: "{{ ldap_accessor | default('') }}"
+          canonical_id: "{{ canonical_id | default('') }}"
+      policies:
+        # https://developer.hashicorp.com/vault/tutorials/policies/policies
+        - name: vault-root
+          hcl: |
+            path "secret/*" 
+            {
+              capabilities = [ "create", "read", "update", "delete", "list", "patch" ]
+            }
 
-                  # Manage identity
-                  path "identity/*"
-                  {
-                    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-                  }
+            # Manage identity
+            path "identity/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
 
-                  path "sys/health"
-                  {
-                    capabilities = ["read", "sudo"]
-                  }
+            path "sys/health"
+            {
+              capabilities = ["read", "sudo"]
+            }
 
-                  # Create and manage ACL policies broadly across Vault
+            # Create and manage ACL policies broadly across Vault
 
-                  # List existing policies
-                  path "sys/policies/acl"
-                  {
-                    capabilities = ["list"]
-                  }
+            # List existing policies
+            path "sys/policies/acl"
+            {
+              capabilities = ["list"]
+            }
 
-                  # Create and manage ACL policies
-                  path "sys/policies/acl/*"
-                  {
-                    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-                  }
+            # Create and manage ACL policies
+            path "sys/policies/acl/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
 
-                  # Enable and manage authentication methods broadly across Vault
+            # Enable and manage authentication methods broadly across Vault
 
-                  # Manage auth methods broadly across Vault
-                  path "auth/*"
-                  {
-                    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-                  }
+            # Manage auth methods broadly across Vault
+            path "auth/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
 
-                  # Create, update, and delete auth methods
-                  path "sys/auth/*"
-                  {
-                    capabilities = ["create", "update", "delete", "sudo"]
-                  }
+            # Create, update, and delete auth methods
+            path "sys/auth/*"
+            {
+              capabilities = ["create", "update", "delete", "sudo"]
+            }
 
-                  # List auth methods
-                  path "sys/auth"
-                  {
-                    capabilities = ["read"]
-                  }
+            # List auth methods
+            path "sys/auth"
+            {
+              capabilities = ["read"]
+            }
 
-                  # Enable and manage the key/value secrets engine at `secret/` path
+            # Enable and manage the key/value secrets engine at `secret/` path
 
-                  # List, create, update, and delete key/value secrets
-                  path "secret/*"
-                  {
-                    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-                  }
+            # List, create, update, and delete key/value secrets
+            path "secret/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
 
-                  # Manage secrets engines
-                  path "sys/mounts/*"
-                  {
-                    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-                  }
+            # Manage secrets engines
+            path "sys/mounts/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
 
-                  # List existing secrets engines.
-                  path "sys/mounts"
-                  {
-                    capabilities = ["read"]
-                  }
+            # List existing secrets engines.
+            path "sys/mounts"
+            {
+              capabilities = ["read"]
+            }
 
     kube_file_template: /KubeWorkShop/Vault/aio-vault.yaml
 
@@ -213,6 +212,8 @@
           loop: "{{ vault_init.json.keys_base64 }}"
 
     - name: enable and config ldap auth
+      when:
+        - false
       block:
         # https://developer.hashicorp.com/vault/api-docs/auth/ldap#configure-ldap
         - name: enable ldap auth
