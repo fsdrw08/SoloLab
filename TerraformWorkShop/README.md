@@ -1,0 +1,1 @@
+run [Set-TFCLIConfigFile.ps1](Set-TFCLIConfigFile.ps1) to setup `TF_CLI_CONFIG_FILE` env var

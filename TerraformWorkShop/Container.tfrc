@@ -1,0 +1,2 @@
+plugin_cache_dir   = "/TerraformWorkShop/.terraform.d/plugin-cache/"
+disable_checkpoint = true
