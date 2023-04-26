@@ -5,3 +5,4 @@ jsonpatch # required by kubernetes.core.k8s module
 jmespath # required by community.general.json_query module
 dnspython # required by community.general.nsupdate module 
 cryptography # required by community.crypto.get_certificate module
+hvac # required by community.hashi_vault module
