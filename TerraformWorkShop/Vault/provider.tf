@@ -25,7 +25,7 @@ terraform {
 
 locals {
   VAULT_ADDR      = "vault.infra.sololab"
-  token           = "hvs.e2P7f5rvRRxzbRbO8SyUJHpk"
+  token           = "hvs.JubLUPriefDjcAhexm0H3mLv"
   skip_tls_verify = true
 }
 

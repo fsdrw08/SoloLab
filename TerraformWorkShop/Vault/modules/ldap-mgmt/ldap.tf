@@ -1,6 +1,8 @@
 # ldap auth
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/ldap_auth_backend
 resource "vault_ldap_auth_backend" "ldap" {
+  for_each = 
+
   path = var.ldap_path
   # ldap connection
   url          = var.ldap_url

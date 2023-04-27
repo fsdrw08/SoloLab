@@ -77,48 +77,55 @@ variable "ldap_groupfilter" {
   default     = null
 }
 
-## vault_identity_group vault_identity_group_alias
-variable "groups" {
-  description = "Creates an Identity Group for Vault. The Identity secrets engine is the identity management solution for Vault."
+variable "vault_ldap_auth" {
+  description = "Provides a resource for managing an LDAP auth backend within Vault."
   type = map(object({
-    group_type : string
-    group_policies : list(string)
-    group_alias : list(string)
+    # https://developer.hashicorp.com/vault/docs/auth/ldap
+    url                  = string
+    starttls             = optional(string)
+    case_sensitive_names = optional(bool)
+    tls_min_version      = optional(string)
+    tls_max_version      = optional(string)
+    insecure_tls         = optional(bool)
+    certificate          = optional(string)
+    binddn               = optional(string)
+    bindpass             = optional(string)
+    userdn               = optional(string)
+    userattr             = optional(string)
+    userfilter           = optional(string)
+    upndomain            = optional(string)
+    discoverdn           = optional(bool)
+    deny_null_bind       = optional(bool)
+    groupfilter          = optional(string)
+    groupdn              = optional(string)
+    groupattr            = optional(string)
+    username_as_alias    = optional(bool)
+    use_token_groups     = optional(bool)
+    path                 = optional(string)
+    disable_remount      = optional(bool)
+    description          = optional(string)
+    local                = optional(bool)
+
   }))
 }
 
-# variable "group_name" {
-#   description = "(Required, Forces new resource) Name of the identity group to create."
-#   type        = string
-#   default     = null
-# }
-
-# variable "group_type" {
-#   description = "(Optional, Forces new resource) Type of the group, internal or external. Defaults to internal."
-#   type        = string
-#   default     = "internal"
-# }
-
-# variable "group_policies" {
-#   description = "(Optional) A list of policies to apply to the group."
-#   type        = list(string)
-#   default     = null
-# }
-
-# ## vault_identity_group_alias
-# variable "group_alias" {
-#   description = "Group aliases allows entity membership in external groups to be managed semi-automatically."
-#   type = map(object({
-#     name : string
-#     mount_accessor : string
-#   }))
-# }
+## vault_identity_group vault_identity_group_alias
+variable "vault_groups" {
+  description = "Creates an Identity Group for Vault. The Identity secrets engine is the identity management solution for Vault."
+  # https://developer.hashicorp.com/terraform/language/expressions/type-constraints#optional-object-type-attributes
+  type = map(object({
+    type     = optional(string)
+    policies = optional(list(string))
+    metadata = optional(map(any))
+    alias    = list(string)
+  }))
+}
 
 ## vault_policy
 variable "vault_policies" {
   description = "value"
   type = map(object({
-    policy_content : string
+    policy_content = string
   }))
 }
 
