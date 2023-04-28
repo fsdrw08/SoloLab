@@ -1,26 +1,35 @@
 module "ldap_mgmt" {
   source = "./modules/ldap-mgmt"
 
-  ## ldap config
-  # connection
-  ldap_url = "ldaps://ipa.infra.sololab:636"
-  # ldap_starttls     = true
-  ldap_insecure_tls = true
-  # ldap_certificate  = var.certificate
-  # Binding - Authenticated Search
-  ldap_binddn   = "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab"
-  ldap_bindpass = "P@ssw0rd"
-  ldap_userdn   = "cn=users,cn=accounts,dc=infra,dc=sololab"
-  ldap_userattr = "mail"
-  # Group Membership Resolution
-  ldap_groupfilter = "(&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{.UserDN}}))"
-  ldap_groupdn     = "cn=groups,cn=accounts,dc=infra,dc=sololab"
-  ldap_groupattr   = "cn"
+  # ## ldap config
+  # # connection
+  # ldap_url = "ldaps://ipa.infra.sololab:636"
+  # # ldap_starttls     = true
+  # ldap_insecure_tls = true
+  # # ldap_certificate  = var.certificate
+  # # Binding - Authenticated Search
+  # ldap_binddn   = "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab"
+  # ldap_bindpass = "P@ssw0rd"
+  # ldap_userdn   = "cn=users,cn=accounts,dc=infra,dc=sololab"
+  # ldap_userattr = "mail"
+  # # Group Membership Resolution
+  # ldap_groupfilter = "(&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{.UserDN}}))"
+  # ldap_groupdn     = "cn=groups,cn=accounts,dc=infra,dc=sololab"
+  # ldap_groupattr   = "cn"
 
   vault_ldap_auth = {
     sololab = {
-      url
-      
+      path         = "ldap"
+      url          = "ldaps://ipa.infra.sololab:636"
+      insecure_tls = true
+      binddn       = "uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab"
+      bindpass     = "P@ssw0rd"
+      userdn       = "cn=users,cn=accounts,dc=infra,dc=sololab"
+      userattr     = "mail"
+      groupfilter  = "(&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{.UserDN}}))"
+      groupdn      = "cn=groups,cn=accounts,dc=infra,dc=sololab"
+      groupattr    = "cn"
+
     }
   }
 
@@ -93,7 +102,12 @@ module "ldap_mgmt" {
     vault-root = {
       type     = "external"
       policies = ["vault-root"]
-      alias    = ["svc-vault-root"]
+      alias = [
+        {
+          name     = "svc-vault-root"
+          ldap_url = "ldaps://ipa.infra.sololab:636"
+        }
+      ]
     }
   }
 }
