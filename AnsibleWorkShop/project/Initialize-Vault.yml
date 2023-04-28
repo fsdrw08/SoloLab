@@ -364,7 +364,6 @@
     - name: re-deploy vault pod
       delegate_to: kube-1
       when:
-        - false
         - vault_unseal_keys_b64 is defined
         - vault_root_token is defined
       block:
