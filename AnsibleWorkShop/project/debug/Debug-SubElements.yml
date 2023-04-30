@@ -1,0 +1,51 @@
+# code: language=ansible
+# podman run --rm `
+#     -e RUNNER_PLAYBOOK=./debug/Debug-SubElements.yml `
+#     -v ../:/runner `
+#     localhost/ansible-ee-aio ansible-runner run /runner -vv
+---
+- hosts: localhost
+  gather_facts: false
+  vars: 
+    vault:
+      identity_group:
+        - name: vault-root
+          type: external
+          policies: 
+            - vault-root
+          alias:
+            - name: svc-vault-root
+            - name: root
+        - name: vault-default
+          type: external
+          policies: 
+            - vault-default
+          alias:
+            - name: svc-vault-default
+            - name: default
+    Stuff:
+      - Name: DeviceA
+        Info: AInfo
+        Values:
+          - ValueA1
+          - ValueA2
+      - Name: DeviceB
+        Info: BInfo
+        Values:
+          - ValueB1
+          - ValueB2
+          - ValueB3
+  tasks:
+    # https://stackoverflow.com/questions/56086290/how-can-i-traverse-nested-lists-in-ansible
+    - name: debug
+      debug:
+        msg: "alias name: {{ item.0.name }}, group name: {{ item.1.name }}"
+      loop: "{{ vault.identity_group | ansible.builtin.subelements('alias') }}"
+      loop_control:
+        label: "{{ item.1.name }}"
+
+    # - debug:
+    #     msg: "{{ item.0.Name }}, {{ item.0.Info }}, {{ item.1 }}"
+    #   loop: "{{ Stuff|subelements('Values') }}"
+    #   loop_control:
+    #     label: "{{ item.0.Name }}"
