@@ -18,32 +18,36 @@
     vault:
       url: https://vault.infra.sololab
       ldap_config:
-        url: ldaps://ipa.infra.sololab:636
-        starttls: true
-        insecure_tls: false
-        certificate: "{{ RootCACert.stdout | default('') }}"
-        # Binding - Authenticated Search
-        # https://developer.hashicorp.com/vault/docs/auth/ldap#binding-authenticated-search
-        binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
-        bindpass: P@ssw0rd
-        userdn: cn=users,cn=accounts,dc=infra,dc=sololab
-        userattr: uid
-        # Group Membership Resolution
-        # https://developer.hashicorp.com/vault/docs/auth/ldap#scenario-1
-        # https://stackoverflow.com/questions/32279519/escaping-double-curly-braces-in-ansible
-        groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{ '{{' }}.UserDN{{ '}}' }}))
-        # https://github.com/goharbor/harbor/issues/9110#issuecomment-533676484
-        # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
-        groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
-        groupattr: cn
+        - url: ldaps://ipa.infra.sololab:636
+          starttls: true
+          insecure_tls: false
+          certificate: "{{ RootCACert.stdout | default('') }}"
+          # Binding - Authenticated Search
+          # https://developer.hashicorp.com/vault/docs/auth/ldap#binding-authenticated-search
+          binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+          bindpass: P@ssw0rd
+          userdn: cn=users,cn=accounts,dc=infra,dc=sololab
+          userattr: uid
+          # Group Membership Resolution
+          # https://developer.hashicorp.com/vault/docs/auth/ldap#scenario-1
+          # https://stackoverflow.com/questions/32279519/escaping-double-curly-braces-in-ansible
+          groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{ '{{' }}.UserDN{{ '}}' }}))
+          # https://github.com/goharbor/harbor/issues/9110#issuecomment-533676484
+          # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
+          groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
+          groupattr: cn
       identity_group:
         - name: vault-root
           type: external
           policies: 
             - vault-root
+          alias:
+            - name: svc-vault-root
+              
       identity_group_alias:
         - name: svc-vault-root
           mount_accessor: "{{ ldap_accessor | default('') }}"
+          canonical_id: 
       policies:
         # https://developer.hashicorp.com/vault/tutorials/policies/policies
         - name: vault-root
