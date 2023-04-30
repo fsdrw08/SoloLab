@@ -1,3 +1,0 @@
-plugin_cache_dir   = "C:/Users/WindomWu/Source/Repos/SoloLab/TerraformWorkShop/terraform.d/plugins"
-
-disable_checkpoint = true

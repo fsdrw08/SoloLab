@@ -115,7 +115,7 @@ variable "vault_ldap_auth" {
     token_explicit_max_ttl  = optional(number, null)
     token_no_default_policy = optional(bool, null)
     token_num_uses          = optional(number, null)
-    token_type              = optional(string, "")
+    token_type              = optional(string, null)
   }))
 }
 
@@ -130,7 +130,7 @@ variable "vault_groups" {
     # alias    = list(string)
     alias = optional(list(object({
       name     = string
-      ldap_url = string
+      ldap_key = string
     })))
   }))
 }

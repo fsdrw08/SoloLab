@@ -16,6 +16,7 @@ locals {
       for alias in group.alias : {
         alias_name = alias.name
         group_name = key
+        ldap_key   = alias.ldap_key
       }
     ]
   ])
@@ -32,6 +33,6 @@ resource "vault_identity_group_alias" "group_alias" {
   }
 
   name           = each.value.alias_name
-  mount_accessor = vault_ldap_auth_backend.ldap[each.value.ldap_url].accessor
+  mount_accessor = vault_ldap_auth_backend.ldap[each.value.ldap_key].accessor
   canonical_id   = vault_identity_group.group[each.value.group_name].id
 }
