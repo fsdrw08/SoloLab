@@ -2,6 +2,7 @@
 # podman run --rm `
 #     -e RUNNER_PLAYBOOK=./debug/Debug-SubElements.yml `
 #     -v ../:/runner `
+#     localhost/ansible-ee-aio-new ansible-runner run /runner -vv
 #     localhost/ansible-ee-aio ansible-runner run /runner -vv
 ---
 - hosts: localhost

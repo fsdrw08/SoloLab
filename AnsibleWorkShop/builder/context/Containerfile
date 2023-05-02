@@ -1,39 +1,77 @@
-ARG EE_BASE_IMAGE=ghcr.io/ryanmerolle/ansible-runner:stable-2.12
-ARG EE_BUILDER_IMAGE=ghcr.io/ryanmerolle/ansible-builder:latest
+ARG EE_BASE_IMAGE="quay.io/centos/centos:stream9"
+ARG PYCMD="/usr/bin/python3"
+ARG ANSIBLE_INSTALL_REFS="ansible-core ansible-runner"
+ARG PKGMGR="/usr/bin/dnf"
 
-FROM $EE_BASE_IMAGE as galaxy
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=-v
-ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS=
+# Base build stage
+FROM $EE_BASE_IMAGE as base
 USER root
+ARG EE_BASE_IMAGE
+ARG PYCMD
+ARG ANSIBLE_INSTALL_REFS
+ARG PKGMGR
 
-ADD _build /build
+RUN $PYCMD -m ensurepip
+RUN $PYCMD -m pip install --no-cache-dir $ANSIBLE_INSTALL_REFS
+COPY _build/scripts/ /output/scripts/
+
+# Galaxy build stage
+FROM base as galaxy
+ARG EE_BASE_IMAGE
+ARG PYCMD
+ARG ANSIBLE_INSTALL_REFS
+ARG PKGMGR
+
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
+RUN /output/scripts/check_galaxy
+COPY _build /build
 WORKDIR /build
 
 RUN ansible-galaxy role install $ANSIBLE_GALAXY_CLI_ROLE_OPTS -r requirements.yml --roles-path "/usr/share/ansible/roles"
 RUN ANSIBLE_GALAXY_DISABLE_GPG_VERIFY=1 ansible-galaxy collection install $ANSIBLE_GALAXY_CLI_COLLECTION_OPTS -r requirements.yml --collections-path "/usr/share/ansible/collections"
 
-FROM $EE_BUILDER_IMAGE as builder
+# Builder build stage
+FROM base as builder
+ARG EE_BASE_IMAGE
+ARG PYCMD
+ARG ANSIBLE_INSTALL_REFS
+ARG PKGMGR
+
+RUN $PYCMD -m pip install --no-cache-dir bindep pyyaml requirements-parser
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
-ADD _build/requirements.txt requirements.txt
-ADD _build/bindep.txt bindep.txt
-RUN ansible-builder introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
-RUN assemble
+COPY _build/requirements.txt requirements.txt
+COPY _build/bindep.txt bindep.txt
+RUN $PYCMD /output/scripts/introspect.py introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
+RUN /output/scripts/assemble
 
-FROM $EE_BASE_IMAGE
-USER root
+# Final build stage
+FROM base as final
+ARG EE_BASE_IMAGE
+ARG PYCMD
+ARG ANSIBLE_INSTALL_REFS
+ARG PKGMGR
+
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
+RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
+RUN /output/scripts/check_ansible $PYCMD
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
 COPY --from=builder /output/ /output/
-RUN /output/install-from-bindep && rm -rf /output/wheels
+RUN /output/scripts/install-from-bindep && rm -rf /output/wheels
+RUN chmod ug+rw /etc/passwd
+RUN mkdir -p /runner && chgrp 0 /runner && chmod -R ug+rwx /runner
+WORKDIR /runner
+RUN $PYCMD -m pip install --no-cache-dir 'dumb-init==1.2.5'
 ARG PROXY
-ARG TERRAFORM_VERSION=1.3.6
+ARG TERRAFORM_VERSION=1.4.6
 RUN cd /tmp && curl -LO https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && install -o root -g root -m 0755 terraform /usr/local/bin/terraform
-ARG VAULT_VERSION=1.13.1
-RUN cd /tmp && curl -LO https://releases.hashicorp.com/vault/$VAULT_VERSION/vault_${VAULT_VERSION}_linux_amd64.zip && unzip vault_${VAULT_VERSION}_linux_amd64.zip && install -o root -g root -m 0755 vault /usr/local/bin/vault
 RUN curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && ls -al /usr/local/bin/kubectl && chmod 0755 /usr/local/bin/kubectl
 RUN curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm && chmod +x /usr/local/bin/helm
 RUN export HTTPS_PROXY=${PROXY} && export HTTP_PROXY=${PROXY} && export https_proxy=${PROXY} && export http_proxy=${PROXY} && /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff && unset HTTPS_PROXY && unset HTTP_PROXY && unset https_proxy && unset http_proxy
 LABEL ansible-execution-environment=true
+ENTRYPOINT ["/output/scripts/entrypoint", "dumb-init"]
+CMD ["bash"]

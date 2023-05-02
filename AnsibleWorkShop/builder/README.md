@@ -60,6 +60,8 @@ podman build -f .\context\Containerfile.with_full_proxy --build-arg PROXY="$PROX
 $PROXY="http://192.168.255.1:7890"
 $PROXY="http://192.168.255.102:7890"
 podman build -f .\context\Containerfile.with_semi_proxy --build-arg PROXY="$PROXY" --tag ansible-ee-aio  .\context\
+
+podman build -f .\context\Containerfile --build-arg PROXY="$PROXY" --tag ansible-ee-aio-new  .\context\
 # without_proxy
 podman build .\context\ --tag ansible-ee-aio
 ```
