@@ -1,0 +1,62 @@
+# code: language=ansible
+
+# debug vault ldap config
+# podman run --rm `
+#     --dns 192.168.255.31 `
+#     -e RUNNER_PLAYBOOK=./debug/Debug-Attribute.yml `
+#     -v ../:/runner `
+#     -v ../../KubeWorkShop/:/KubeWorkShop/ `
+#     localhost/ansible-ee-aio-new ansible-runner run /runner -vv
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    vault_root_token: hvs.TIUIxx67E7ZhfPgkMIsqiYXk
+    vault:
+      url: https://vault.infra.sololab
+      identity_group:
+        - name: vault-root
+          type: external
+          policies:
+            - vault-root
+          metadata:
+            hello: world
+          alias:
+            - name: svc-vault-root
+
+      identity_group_alias:
+        - name: svc-vault-root
+          mount_accessor: "{{ ldap_accessor | default('') }}"
+          canonical_id:
+
+  tasks:
+    # https://developer.hashicorp.com/vault/api-docs/auth/ldap#create-update-ldap-group
+    # https://github.com/thisdougb/AnsibleFest2017/blob/35657e8030170d99193968cf8555e63c10635c86/roles/hashivault-ldap-backend/tasks/main.yml
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+        # msg: "{{ item | ansible.utils.remove_keys(target=['alias'])  }}"
+      # https://docs.ansible.com/ansible/devel/collections/ansible/utils/remove_keys_filter.html
+      loop: "{{ vault.identity_group | ansible.utils.remove_keys(target=['alias']) }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: debug
+      debug:
+        msg: "{{ lookup('community.hashi_vault.vault_read', 'sys/auth', 
+                          url=vault.url, 
+                          auth_method='token', 
+                          token=vault_root_token, 
+                          validate_certs=false
+                        ).data['ldap/'].accessor }}"
+      when: 
+        - false
+
+    - name: debug
+      debug:
+        msg: "{{ lookup('community.hashi_vault.vault_read', 'identity/group/name/vault-root',
+                          url=vault.url, 
+                          auth_method='token', 
+                          token=vault_root_token,
+                          validate_certs=false
+                        ).data.id }}"

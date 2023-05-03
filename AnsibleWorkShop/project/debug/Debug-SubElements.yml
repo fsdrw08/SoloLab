@@ -40,7 +40,7 @@
     # https://stackoverflow.com/questions/56086290/how-can-i-traverse-nested-lists-in-ansible
     - name: debug
       debug:
-        msg: "alias name: {{ item.0.name }}, group name: {{ item.1.name }}"
+        msg: "alias name: {{ item.1.name }}, group name: {{ item.0.name }}"
       loop: "{{ vault.identity_group | ansible.builtin.subelements('alias') }}"
       loop_control:
         label: "{{ item.1.name }}"
