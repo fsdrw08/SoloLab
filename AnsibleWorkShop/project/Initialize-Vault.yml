@@ -10,113 +10,8 @@
 - hosts: localhost
   gather_facts: false
   vars:
-    ipa:
-      hostname: ipa.infra.sololab
-
     vault:
       url: https://vault.infra.sololab
-      ldap_config:
-        - url: ldaps://ipa.infra.sololab:636
-          starttls: true
-          insecure_tls: false
-          certificate: "{{ RootCACert.stdout }}"
-          # Binding - Authenticated Search
-          # https://developer.hashicorp.com/vault/docs/auth/ldap#binding-authenticated-search
-          binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
-          bindpass: P@ssw0rd
-          userdn: cn=users,cn=accounts,dc=infra,dc=sololab
-          userattr: uid
-          # Group Membership Resolution
-          # https://developer.hashicorp.com/vault/docs/auth/ldap#scenario-1
-          # https://stackoverflow.com/questions/32279519/escaping-double-curly-braces-in-ansible
-          groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:={{ '{{' }}.UserDN{{ '}}' }}))
-          # https://github.com/goharbor/harbor/issues/9110#issuecomment-533676484
-          # groupfilter: (&(objectClass=posixgroup)(cn=svc-vault-*)(member:1.2.840.113556.1.4.1941:={{ '{{' }}.UserDN{{ '}}' }}))
-          groupdn: cn=groups,cn=accounts,dc=infra,dc=sololab
-          groupattr: cn
-      
-      policies:
-        # https://developer.hashicorp.com/vault/tutorials/policies/policies
-        - name: vault-root
-          hcl: |
-            path "secret/*" 
-            {
-              capabilities = [ "create", "read", "update", "delete", "list", "patch" ]
-            }
-
-            # Manage identity
-            path "identity/*"
-            {
-              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-            }
-
-            path "sys/health"
-            {
-              capabilities = ["read", "sudo"]
-            }
-
-            # Create and manage ACL policies broadly across Vault
-
-            # List existing policies
-            path "sys/policies/acl"
-            {
-              capabilities = ["list"]
-            }
-
-            # Create and manage ACL policies
-            path "sys/policies/acl/*"
-            {
-              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-            }
-
-            # Enable and manage authentication methods broadly across Vault
-
-            # Manage auth methods broadly across Vault
-            path "auth/*"
-            {
-              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-            }
-
-            # Create, update, and delete auth methods
-            path "sys/auth/*"
-            {
-              capabilities = ["create", "update", "delete", "sudo"]
-            }
-
-            # List auth methods
-            path "sys/auth"
-            {
-              capabilities = ["read"]
-            }
-
-            # Enable and manage the key/value secrets engine at `secret/` path
-
-            # List, create, update, and delete key/value secrets
-            path "secret/*"
-            {
-              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-            }
-
-            # Manage secrets engines
-            path "sys/mounts/*"
-            {
-              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-            }
-
-            # List existing secrets engines.
-            path "sys/mounts"
-            {
-              capabilities = ["read"]
-            }
-      identity_group:
-        - name: vault-root
-          type: external
-          policies: 
-            - vault-root
-      identity_group_alias:
-        - name: svc-vault-root
-          mount_accessor: "{{ ldap_accessor | default('') }}"
-          canonical_id: "{{ canonical_id | default('') }}"
 
     kube_file_template: /KubeWorkShop/Vault/aio-vault.yaml
 
@@ -134,7 +29,7 @@
           content: "{{ kube_file_content }}"
         absent:
           query_params:
-            force: true
+            force: false
       vars_podman_generate_systemd:
         generate:
           path_params: 
@@ -156,18 +51,6 @@
             force: false
 
   tasks:
-    - name: run openssl s_client -showcerts
-      ansible.builtin.shell:
-        # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
-        cmd: >
-          echo | 
-          openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
-          tac | 
-          sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
-          tac
-      changed_when: false
-      register: RootCACert
-
     # https://developer.hashicorp.com/vault/api-docs/system/health
     # https://github.com/AdamGoldsmith/terraform-lxd/blob/efba7efce88891fcceb008a6bc4b0e188ba4a782/ansible/roles/ansible-role-vault-unseal/tasks/main.yml
     - name: Detect vault status
@@ -184,7 +67,7 @@
 
     - name: Init and unseal vault
       when:
-            - vault_status.status == 501
+        - vault_status.status == 501
       no_log: true
       block:
         - name: init vault
@@ -218,129 +101,6 @@
             body: 
               key: "{{ item }}"
           loop: "{{ vault_init.json.keys_base64 }}"
-
-    - name: enable and config ldap auth
-      when:
-        - false
-      block:
-        # https://developer.hashicorp.com/vault/api-docs/auth/ldap#configure-ldap
-        - name: enable ldap auth
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/sys/auth/ldap"
-            validate_certs: false
-            method: POST
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            body_format: json
-            body:
-              type: ldap
-            status_code: 204, 400 # 400  path already in use
-          register: vault_sys_auth_ldap
-          changed_when: 
-            - vault_sys_auth_ldap.status == 204
-
-        # https://github.com/drewmullen/ansible-vault-namespaces/blob/4cdf0c74bdeaf6c68347e15f07c9707af966c589/roles/namespace/files/ldap.json
-        # https://github.com/marceloalmeida/vault-ldap-ssh/blob/bacb55f00dc8f2d76877b75388dcef05d080a65c/provisioning/roles/vault/tasks/config_ldap.yml
-        - name: config ldap
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/auth/ldap/config"
-            validate_certs: false
-            method: POST
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            body_format: json
-            body: "{{ vault.ldap_config }}"
-            status_code: 204
-            return_content: true
-          when: vault_sys_auth_ldap.status == 204
-          changed_when: true
-
-        # https://developer.hashicorp.com/vault/api-docs/system/auth
-        # https://github.com/chrisvanmeer/at-hashistack/blob/7911122421de9ef9d9ac12f6d93848e1102ae994/roles/hashicorp/vault/tasks/prep-for-usage.yml#L78
-        - name: Get ldap accessor
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/sys/auth"
-            validate_certs: false
-            method: GET
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            status_code: 200
-            return_content: true
-          register: accessor_respond
-
-        # https://developer.hashicorp.com/vault/api-docs/secret/identity/group
-        - name: Set identity group
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/identity/group"
-            validate_certs: false
-            method: POST
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            body_format: json
-            body: "{{ item }}" 
-            status_code: 
-              - 200
-              - 204
-            return_content: true
-          loop: "{{ vault.identity_group }}"
-
-        # https://developer.hashicorp.com/vault/api-docs/secret/identity/group#read-group-by-name
-        - name: Get identity group id
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/identity/group/name/vault-root"
-            validate_certs: false
-            method: GET
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            return_content: true
-            status_code: 200
-          register: group_id
-
-        - name: set fact ldap accessor
-          ansible.builtin.set_fact:
-            ldap_accessor: "{{ accessor_respond['json']['data']['ldap/']['accessor'] }}"
-            canonical_id: "{{ group_id.json.data.id }}"
-
-        # https://developer.hashicorp.com/vault/api-docs/secret/identity/group-alias
-        - name: Set identity group-alias
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/identity/group-alias"
-            validate_certs: false
-            method: POST
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            body_format: json
-            body: "{{ item }}" 
-            status_code: 200, 204
-          loop: "{{ vault.identity_group_alias }}"
-
-        - name: Set policy
-          ansible.builtin.uri:
-            url: "{{ vault.url }}/v1/sys/policy/{{ item.name }}"
-            validate_certs: false
-            method: POST
-            headers:
-              X-Vault-Token: "{{ vault_root_token }}"
-            body_format: json
-            body:
-              name: "{{ item.name }}"
-              policy: "{{ item.hcl }}"
-            status_code: 204
-          loop: "{{ vault.policies }}"
-
-        # https://developer.hashicorp.com/vault/api-docs/auth/ldap#create-update-ldap-group
-        # https://github.com/thisdougb/AnsibleFest2017/blob/35657e8030170d99193968cf8555e63c10635c86/roles/hashivault-ldap-backend/tasks/main.yml
-        # - name: set ldap group to policy mapping
-        #   ansible.builtin.uri:
-        #     url: "{{ vault.url }}/v1/auth/ldap/groups/svc-vault-root"
-        #     validate_certs: false
-        #     method: POST
-        #     headers:
-        #       X-Vault-Token: "{{ vault_root_token }}"
-        #     body_format: json
-        #     body:
-        #       policies: vault-root
-        #     status_code: 204
 
     - name: Prepare kube_file content
       when:
@@ -391,3 +151,6 @@
             vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
             vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
             vars_service: "{{ podman_rootless_play.vars_service }}"
+
+- name: Update vault config
+  ansible.builtin.import_playbook: Update-VaultLDAPMgmt.yml

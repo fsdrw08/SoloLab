@@ -14,7 +14,8 @@
     ipa:
       hostname: ipa.infra.sololab
 
-    vault_root_token: hvs.TIUIxx67E7ZhfPgkMIsqiYXk
+    # vault_root_token: hvs.TIUIxx67E7ZhfPgkMIsqiYXk
+
     vault:
       url: https://vault.infra.sololab
       ldap_auth:
@@ -29,7 +30,7 @@
             binddn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
             bindpass: P@ssw0rd
             userdn: cn=users,cn=accounts,dc=infra,dc=sololab
-            userattr: uid
+            userattr: mail
             # Group Membership Resolution
             # https://developer.hashicorp.com/vault/docs/auth/ldap#scenario-1
             # https://stackoverflow.com/questions/32279519/escaping-double-curly-braces-in-ansible
@@ -67,6 +68,12 @@
 
             # Create and manage ACL policies
             path "sys/policies/acl/*"
+            {
+              capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            }
+
+            # Create and manage ACL policy
+            path "sys/policy/*"
             {
               capabilities = ["create", "read", "update", "delete", "list", "sudo"]
             }
@@ -120,25 +127,26 @@
           alias:
             - name: svc-vault-root
               ldap_path: 'ldap/'
-              # canonical_id: "{{ lookup('community.hashi_vault.vault_read', 'identity/group/name/'+vault.identity_group.name,
-              #                             url=vault.url, 
-              #                             auth_method='token', 
-              #                             token=vault_root_token,
-              #                             validate_certs=false
-              #                         ) }}"
-              # mount_accessor: "{{ lookup('community.hashi_vault.vault_read', 'sys/auth', 
-              #                               url=vault.url, 
-              #                               auth_method='token', 
-              #                               token=vault_root_token,
-              #                               validate_certs=false
-              #                           ).data['ldap/'].accessor }}"
-              
-      identity_group_alias:
-        - name: svc-vault-root
-          mount_accessor: "{{ ldap_accessor | default('') }}"
-          canonical_id: 
       
   tasks:
+    - name: Retrive token
+      when:
+        - vault_root_token is not defined
+      no_log: true
+      block:
+        - name: Login and use the resulting token
+          community.hashi_vault.vault_login:
+            url: "{{ vault.url }}"
+            validate_certs: false
+            auth_method: ldap
+            username: carefree1@infra.sololab
+            password: password
+          register: login_data
+
+        - name: Set fact vault_root_token
+          ansible.builtin.set_fact:
+            vault_root_token: "{{ login_data | community.hashi_vault.vault_login_token }}"
+
     - name: run openssl s_client -showcerts
       ansible.builtin.shell:
         # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
@@ -179,11 +187,10 @@
           X-Vault-Token: "{{ vault_root_token }}"
         body_format: json
         body: "{{ item.config }}"
-        status_code: 204
+        status_code: 200, 204
       loop: "{{ vault.ldap_auth }}"
       loop_control:
         label: "{{ item.path }}"
-      changed_when: true
 
     - name: Set policy
       ansible.builtin.uri:
@@ -198,6 +205,8 @@
           policy: "{{ item.hcl }}"
         status_code: 204
       loop: "{{ vault.policies }}"
+      loop_control:
+        label: "{{ item.name }}"
 
     # https://developer.hashicorp.com/vault/api-docs/auth/ldap#create-update-ldap-group
     # https://github.com/thisdougb/AnsibleFest2017/blob/35657e8030170d99193968cf8555e63c10635c86/roles/hashivault-ldap-backend/tasks/main.yml
@@ -218,36 +227,6 @@
       register: vault_identity_group
       changed_when: 
         - vault_identity_group.status == 200
-
-    # # https://developer.hashicorp.com/vault/api-docs/system/auth
-    # # https://github.com/chrisvanmeer/at-hashistack/blob/7911122421de9ef9d9ac12f6d93848e1102ae994/roles/hashicorp/vault/tasks/prep-for-usage.yml#L78
-    # - name: Get ldap accessor
-    #   ansible.builtin.uri:
-    #     url: "{{ vault.url }}/v1/sys/auth"
-    #     validate_certs: false
-    #     method: GET
-    #     headers:
-    #       X-Vault-Token: "{{ vault_root_token }}"
-    #     return_content: true
-    #     status_code: 200
-    #   register: accessor_respond
-
-    # - name: set fact ldap accessor
-    #   ansible.builtin.set_fact:
-    #     ldap_accessor: "{{ accessor_respond['json']['data']['ldap/']['accessor'] }}"
-
-    # # https://developer.hashicorp.com/vault/api-docs/secret/identity/group
-    # - name: Set identity group
-    #   ansible.builtin.uri:
-    #     url: "{{ vault.url }}/v1/identity/group"
-    #     validate_certs: false
-    #     method: POST
-    #     headers:
-    #       X-Vault-Token: "{{ vault_root_token }}"
-    #     body_format: json
-    #     body: "{{ item }}" 
-    #     status_code: 200, 204
-    #   loop: "{{ vault.identity_group }}"
 
     # https://developer.hashicorp.com/vault/api-docs/secret/identity/group-alias
     - name: Set identity group-alias
@@ -272,5 +251,7 @@
                                         token=vault_root_token,
                                         validate_certs=false
                                     ).data[item.1.ldap_path].accessor }}"
-        status_code: 200, 204
+        status_code: 200, 400 # 400 path already in use
       loop: "{{ vault.identity_group | ansible.builtin.subelements('alias') }}"
+      loop_control:
+        label: "{{ item.1.name }}"
