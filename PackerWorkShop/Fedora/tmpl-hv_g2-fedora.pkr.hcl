@@ -120,7 +120,7 @@ source "hyperv-iso" "vm" {
   secure_boot_template  = "MicrosoftUEFICertificateAuthority"
   generation            = 2
   guest_additions_mode  = "disable"
-  // http_directory        = "./http"
+  http_directory        = "./http"
   iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
   // https://www.packer.io/plugins/builders/hyperv/iso#cd_files

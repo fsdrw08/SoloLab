@@ -1,9 +1,9 @@
 [CmdletBinding()]
 param (
-    [Parameter()]
-    [ValidateSet('36','37')]
-    [int16]
-    $FedoraVersion
+  [Parameter()]
+  [ValidateSet('37', '38')]
+  [int16]
+  $FedoraVersion
 )
 
 #Verify the pre-request
@@ -23,10 +23,10 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2-fedora.pkr.hcl"
-  $var_file="$PSScriptRoot\vars-fedora$FedoraVersion.pkrvars.hcl"
-  $machine="Fedora $FedoraVersion"
-  $packer_log=0
+  $template_file = "$PSScriptRoot\tmpl-hv_g2-fedora.pkr.hcl"
+  $var_file = "$PSScriptRoot\vars-fedora$FedoraVersion.pkrvars.hcl"
+  $machine = "Fedora $FedoraVersion"
+  $packer_log = 0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
     Write-Output "Template and var file found"
@@ -34,7 +34,7 @@ if ($Ready -ne $false) {
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer validate -var-file="$var_file" "$template_file"
     }
     catch {
@@ -53,7 +53,7 @@ if ($Ready -ne $false) {
       #     dos2unix $_
       #   }
       
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer version
       packer build --force -var-file="$var_file" "$template_file"
     }
