@@ -17,8 +17,8 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   #   low_memory_mapped_io_space              = 134217728
   #   lock_on_disconnect                      = "Off"
   memory_maximum_bytes = 4096000000
-  memory_minimum_bytes = 2048000000
-  memory_startup_bytes = 2048000000
+  memory_minimum_bytes = 2148000000
+  memory_startup_bytes = 2148000000
   #   notes                  = ""
   processor_count = 4
   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
@@ -123,7 +123,7 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
     controller_type     = "Scsi"
     controller_number   = "0"
     controller_location = "0"
-    path                = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
+    path                = hyperv_vhd.InfraSvc-Fedora38.path
     # disk_number                     = 4294967295
     # resource_pool_name              = "Primordial"
     # support_persistent_reservations = false
