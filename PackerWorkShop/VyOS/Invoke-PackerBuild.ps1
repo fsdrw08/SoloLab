@@ -66,6 +66,8 @@ if ($Ready -ne $false) {
     Write-Output "Template or var file not found - exiting"
     exit (-1)
   }
+} else {
+  "seems package is not ready"
 }
 
 $endDTM = (Get-Date)
