@@ -1,9 +1,9 @@
 #iso_url="https://download.fedoraproject.org/pub/fedora/linux/releases/38/Server/x86_64/iso/Fedora-Server-dvd-x86_64-38-1.6.iso"
 // https://download.fedoraproject.org/pub/fedora/linux/releases/38/Server/x86_64/iso/Fedora-Server-38-1.6-x86_64-CHECKSUM
-iso_url="../ISO/Fedora-Server-dvd-x86_64-38-1.6.iso"
-iso_checksum="66b52d7cb39386644cd740930b0bef0a5a2f2be569328fef6b1f9b3679fdc54d"
-// iso_url="../ISO/Fedora-Server-netinst-x86_64-38-1.6.iso"
-// iso_checksum="192af621553aa32154697029e34cbe30152a9e23d72d55f31918b166979bbcf5"
+// iso_url="../ISO/Fedora-Server-dvd-x86_64-38-1.6.iso"
+// iso_checksum="66b52d7cb39386644cd740930b0bef0a5a2f2be569328fef6b1f9b3679fdc54d"
+iso_url="../ISO/Fedora-Server-netinst-x86_64-38-1.6.iso"
+iso_checksum="192af621553aa32154697029e34cbe30152a9e23d72d55f31918b166979bbcf5"
 iso_checksum_type="sha256"
 vm_name="packer-fedora38-g2"
 configuration_version="8.0"
