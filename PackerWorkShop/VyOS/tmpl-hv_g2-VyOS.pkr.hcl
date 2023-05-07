@@ -102,14 +102,14 @@ variable "vm_name" {
 }
 
 // https://github.com/hashicorp/packer-plugin-hyperv/issues/65
-packer {
-  required_plugins {
-    hyperv = {
-      version = ">= 1.0.4"
-      source  = "github.com/hashicorp/hyperv"
-    }
-  }
-}
+// packer {
+//   required_plugins {
+//     hyperv = {
+//       version = ">= 1.0.4"
+//       source  = "github.com/hashicorp/hyperv"
+//     }
+//   }
+// }
 
 source "hyperv-iso" "vm" {
   boot_command          = "${var.boot_command}"
@@ -124,16 +124,16 @@ source "hyperv-iso" "vm" {
   enable_secure_boot    = false
   generation            = 2
   guest_additions_mode  = "disable"
-  // iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
-  iso_checksum          = "none"
+  iso_checksum          = "${var.iso_checksum_type}:${var.iso_checksum}"
   iso_url               = "${var.iso_url}"
   // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
   // https://wiki.debian.org/CDDVD
   cd_files              = "${var.cd_files}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
+  skip_export           = true
   // https://www.packer.io/plugins/builders/hyperv/iso#disable_shutdown
-  // shutdown_command      = "sudo shutdown now"
+  shutdown_command      = "sudo shutdown now"
   shutdown_timeout      = "5m"
   // ssh_username          = "${var.ssh_username}"
   // ssh_password          = "${var.ssh_password}"
@@ -154,7 +154,7 @@ source "hyperv-iso" "vm" {
 build {
   sources = ["source.hyperv-iso.vm"]
     post-processor "vagrant" {
-    keep_input_artifact  = false
+    keep_input_artifact  = true
     output               = "${var.output_vagrant}"
     vagrantfile_template = "${var.vagrantfile_template}"
   }

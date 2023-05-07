@@ -1,7 +1,7 @@
 #iso_url=https://github.com/9l/vyos-build-action/releases/download/v1.3.2/vyos-1.3.2-amd64.iso
 iso_url="../ISO/vyos-1.3.2-amd64.iso"
-// iso_checksum_type="sha256"
-// iso_checksum="40F4DAE80C7CB06406B6A866B5F5AD0E226B1B9D4EE110D8FC30148EDB0FFE37"
+iso_checksum_type="sha256"
+iso_checksum="e0c6119e4c0101b0278d67063c2a3e381529bc65922f974bffead3e63c84e7e6"
 vm_name="packer-vyos13x"
 configuration_version="8.0"
 disk_size="128000"
@@ -9,7 +9,7 @@ disk_size="128000"
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
 cd_files=[".\\http\\*"]
 switch_name="Default Switch"
-output_directory="output-vyos13x"
+output_directory="C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/output-vyos13x"
 output_vagrant="../vbox/packer-vyos13x_wan-hv-g2.box"
 vlan_id=""
 vagrantfile_template="./vagrant-VyOS13x.rb"
