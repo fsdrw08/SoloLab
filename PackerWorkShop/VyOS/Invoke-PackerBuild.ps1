@@ -9,7 +9,7 @@ param (
 #Verify the pre-request
 @"
 packer
-mkisofs
+oscdimg
 "@ -split "`r`n" | ForEach-Object {
   if (-not (Get-Command $_)) {
     [bool]$Ready = $false
