@@ -1,0 +1,1 @@
+winget import "%~dp0\winget.json"

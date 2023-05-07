@@ -10,7 +10,7 @@ plugin_cache_dir   = "$projectPath/TerraformWorkShop/terraform.d/plugins"
 disable_checkpoint = true
 "@
     # https://developer.hashicorp.com/terraform/cli/config/config-file#locations
-    $TF_CLI_CONFIG_FILE | Out-File $(Join-Path -Path $env:APPDATA -ChildPath "terraform.rc")
+    $TF_CLI_CONFIG_FILE | Out-File $(Join-Path -Path $env:APPDATA -ChildPath "terraform.rc") -Verbose
 }
 
 # $env:TF_CLI_CONFIG_FILE = "$PSScriptRoot\terraform.rc"

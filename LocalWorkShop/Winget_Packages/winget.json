@@ -37,9 +37,6 @@
 					"PackageIdentifier" : "Hashicorp.Vagrant"
 				},
 				{
-					"PackageIdentifier" : "Microsoft.WindowsInstallationAssistant"
-				},
-				{
 					"PackageIdentifier" : "Microsoft.VisualStudioCode"
 				},
 				{
