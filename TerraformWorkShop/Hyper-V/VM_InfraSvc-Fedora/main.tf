@@ -11,7 +11,7 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   #   automatic_start_action                  = "StartIfRunning"
   #   automatic_start_delay                   = 0
   #   automatic_stop_action                   = "Save"
-  #   checkpoint_type                         = "Standard"
+  checkpoint_type = "Disabled"
   #   guest_controlled_cache_types            = false
   #   high_memory_mapped_io_space             = 536870912
   #   low_memory_mapped_io_space              = 134217728
@@ -19,8 +19,8 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   memory_maximum_bytes = 4096000000
   memory_minimum_bytes = 2148000000
   memory_startup_bytes = 2148000000
-  #   notes                  = ""
-  processor_count = 4
+  notes                = "This VM instance is managed by terraform"
+  processor_count      = 4
   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
   #   snapshot_file_location = "C:/ProgramData/Microsoft/Windows/Hyper-V"
   dynamic_memory = true
