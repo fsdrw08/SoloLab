@@ -1,11 +1,11 @@
-resource "hyperv_vhd" "VyOS-13x" {
-  path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\VyOS-13x\\VyOS-13x.vhdx"
-  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
+resource "hyperv_vhd" "VyOS-LTS" {
+  path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-VyOS_13x\\VyOS-13x.vhdx"
+  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\VyOS\\vyos-1.3.2-amd64-hyperv.vhdx"
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs/resources/machine_instance
-resource "hyperv_machine_instance" "VyOS-13x" {
-  name       = "VyOS-13x"
+resource "hyperv_machine_instance" "VyOS-LTS" {
+  name       = "VyOS-LTS"
   generation = 2
   #   automatic_critical_error_action         = "Pause"
   #   automatic_critical_error_action_timeout = 30
@@ -126,7 +126,7 @@ resource "hyperv_machine_instance" "VyOS-13x" {
     controller_type     = "Scsi"
     controller_number   = "0"
     controller_location = "0"
-    path                = hyperv_vhd.VyOS-13x.path
+    path                = hyperv_vhd.VyOS-LTS.path
     # disk_number                     = 4294967295
     # resource_pool_name              = "Primordial"
     # support_persistent_reservations = false
