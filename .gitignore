@@ -3,5 +3,6 @@ terraform.tfstate*
 .terraform.lock.hcl
 *.key
 *.crt
+*.iso
 venv
 terraform.d

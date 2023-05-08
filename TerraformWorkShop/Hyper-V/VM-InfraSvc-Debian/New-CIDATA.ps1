@@ -1,0 +1,2 @@
+# https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/oscdimg-command-line-options?view=windows-11
+. oscdimg.exe "$PSScriptRoot\cloud-init" "$PSScriptRoot\cloud-init.iso" -j2 -lcidata
