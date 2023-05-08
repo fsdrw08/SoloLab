@@ -14,6 +14,22 @@ resource "null_resource" "cloud-init" {
   provisioner "local-exec" {
     command = "PowerShell -ExecutionPolicy bypass -File ${abspath("New-CIDATA.ps1")}"
   }
+
+  connection {
+    type     = "winrm"
+    host     = var.host
+    user     = var.user
+    password = var.password
+    use_ntlm = true
+    https    = true
+    insecure = true
+    timeout  = "20s"
+  }
+
+  provisioner "file" {
+    source      = "./cloud-init.iso"
+    destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
+  }
 }
 
 resource "hyperv_machine_instance" "InfraSvc-Debian" {
@@ -128,7 +144,7 @@ resource "hyperv_machine_instance" "InfraSvc-Debian" {
     controller_location = "1"
     # https://developer.hashicorp.com/terraform/language/functions/abspath
     # https://developer.hashicorp.com/terraform/language/functions/replace
-    path = replace(abspath("cloud-init.iso"), "/", "\\")
+    path = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
     # resource_pool_name  = ""
   }
 
