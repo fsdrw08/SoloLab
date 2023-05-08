@@ -1,12 +1,19 @@
-Set-Location $PSScriptRoot
-
-$projectPath=git rev-parse --show-toplevel
+$projectPath = git rev-parse --show-toplevel
 
 if ($projectPath) {
+    # plugin_cache_dir   = "$projectPath/TerraformWorkShop/terraform.d/plugins"
     $TF_CLI_CONFIG_FILE = 
-@"
-plugin_cache_dir   = "$projectPath/TerraformWorkShop/terraform.d/plugins"
+    @"
 
+provider_installation {
+    filesystem_mirror {
+      path    = "$projectPath/TerraformWorkShop/terraform.d/plugins"
+      include = ["registry.terraform.io/*/*"]
+    }
+    direct {
+      exclude = ["registry.terraform.io/*/*"]
+    }
+}
 disable_checkpoint = true
 "@
     # https://developer.hashicorp.com/terraform/cli/config/config-file#locations
