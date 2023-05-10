@@ -1,9 +1,9 @@
 [CmdletBinding()]
 param (
-    [Parameter()]
-    [ValidateSet('13x','14x')]
-    [string]
-    $VyOSVersion
+  [Parameter()]
+  [ValidateSet('13x', '14x', '13x-cloudinit')]
+  [string]
+  $VyOSVersion
 )
 
 #Verify the pre-request
@@ -33,10 +33,10 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2-VyOS.pkr.hcl"
-  $var_file="$PSScriptRoot\vars-VyOS$VyOSVersion.pkrvars.hcl"
-  $machine="VyOS$VyOSVersion-g2"
-  $packer_log=0
+  $template_file = "$PSScriptRoot\tmpl-hv_g2-VyOS.pkr.hcl"
+  $var_file = "$PSScriptRoot\vars-VyOS$VyOSVersion.pkrvars.hcl"
+  $machine = "VyOS$VyOSVersion-g2"
+  $packer_log = 0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
     Write-Output "Template and var file found"
@@ -44,7 +44,7 @@ if ($Ready -ne $false) {
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer validate -var-file="$var_file" "$template_file"
     }
     catch {
@@ -52,7 +52,7 @@ if ($Ready -ne $false) {
       exit (-1)
     }
     try {
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer version
       packer build --force -var-file="$var_file" "$template_file"
     }
@@ -66,7 +66,8 @@ if ($Ready -ne $false) {
     Write-Output "Template or var file not found - exiting"
     exit (-1)
   }
-} else {
+}
+else {
   "seems package is not ready"
 }
 
