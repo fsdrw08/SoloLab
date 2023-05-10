@@ -1,7 +1,15 @@
-instance-id: iid-infrasvc-debian
+instance-id: iid-infrasvc-debian_20230509
 local-hostname: InfraSvc-Debian
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: true
+# https://cloudinit.readthedocs.io/en/latest/reference/network-config-format-v2.html#examples
+
+# https://cloudinit.readthedocs.io/en/latest/reference/network-config-format-v1.html#subnet-ip
+# version: 1
+# config:
+#   - type: physical
+#     name: eth0
+#     subnets:
+#       - type: static
+#         address: 192.168.255.12/24
+#         gateway: 192.168.255.1
+#         dns_nameservers:
+#           - 192.168.255.1

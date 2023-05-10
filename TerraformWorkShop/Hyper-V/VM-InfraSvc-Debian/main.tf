@@ -45,9 +45,9 @@ resource "hyperv_machine_instance" "InfraSvc-Debian" {
   #   high_memory_mapped_io_space             = 536870912
   #   low_memory_mapped_io_space              = 134217728
   #   lock_on_disconnect                      = "Off"
-  memory_maximum_bytes = 4096000000
-  memory_minimum_bytes = 2148000000
-  memory_startup_bytes = 2148000000
+  memory_maximum_bytes = 4095737856
+  memory_minimum_bytes = 2147483648
+  memory_startup_bytes = 2147483648
   notes                = "This VM instance is managed by terraform"
   processor_count      = 4
   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
@@ -75,18 +75,18 @@ resource "hyperv_machine_instance" "InfraSvc-Debian" {
   # }
 
   # Configure processor
-  #   vm_processor {
-  #     compatibility_for_migration_enabled               = false
-  #     compatibility_for_older_operating_systems_enabled = false
-  #     hw_thread_count_per_core                          = 0
-  #     maximum                                           = 100
-  #     reserve                                           = 0
-  #     relative_weight                                   = 100
-  #     maximum_count_per_numa_node                       = 0
-  #     maximum_count_per_numa_socket                     = 0
-  #     enable_host_resource_protection                   = false
-  #     expose_virtualization_extensions                  = false
-  #   }
+  vm_processor {
+    compatibility_for_migration_enabled               = false
+    compatibility_for_older_operating_systems_enabled = false
+    enable_host_resource_protection                   = false
+    expose_virtualization_extensions                  = false
+    hw_thread_count_per_core                          = 0
+    maximum                                           = 100
+    maximum_count_per_numa_node                       = 4
+    maximum_count_per_numa_socket                     = 1
+    relative_weight                                   = 100
+    reserve                                           = 0
+  }
 
   # Configure integration services
   integration_services = {
@@ -144,8 +144,8 @@ resource "hyperv_machine_instance" "InfraSvc-Debian" {
     controller_location = "1"
     # https://developer.hashicorp.com/terraform/language/functions/abspath
     # https://developer.hashicorp.com/terraform/language/functions/replace
-    path = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
-    # resource_pool_name  = ""
+    path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
+    resource_pool_name = "Primordial" # default value
   }
 
   # Create a hard disk drive
