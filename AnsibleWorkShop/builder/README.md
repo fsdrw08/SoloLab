@@ -35,8 +35,10 @@ podman run --rm `
    - Install ansible-builder from pip
      - ref: [Chapter 2. Using Ansible Builder](https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.0-ea/html-single/ansible_builder_guide/index)
 
-    ```
+    ```powershell
     pip install ansible-builder --upgrade
+    # or
+    pip install ansible-builder==3.0.0rc2
     ```
 
 2. Prepare container build file (Containerfile, aka dockerfile)
@@ -82,4 +84,6 @@ podman run --rm -v ../:/runner `
 ```powershell
 podman login
 podman push localhost/ansible-ee-aio docker.io/fsdrw08/sololab-ansible-ee
+podman push localhost/ansible-ee-aio docker.io/fsdrw08/sololab-ansible-ee
+podman push localhost/ansible-ee-aio-new docker.io/fsdrw08/sololab-ansible-ee
 ```
