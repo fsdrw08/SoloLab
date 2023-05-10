@@ -1,6 +1,35 @@
 resource "hyperv_vhd" "VyOS-LTS" {
   path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-VyOS_13x\\VyOS-13x.vhdx"
-  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\VyOS\\vyos-1.3.2-amd64-hyperv.vhdx"
+  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
+}
+
+# https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
+# https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
+resource "null_resource" "cloud-init" {
+  triggers = {
+    cloudinit_iso = fileexists("./cloud-init.iso") ? "1" : uuid()
+    dir_sha1      = sha1(join("", [for f in fileset(".", "./cloud-init/*") : filesha1(f)]))
+  }
+
+  provisioner "local-exec" {
+    command = "PowerShell -ExecutionPolicy bypass -File ${abspath("New-CIDATA.ps1")}"
+  }
+
+  connection {
+    type     = "winrm"
+    host     = var.host
+    user     = var.user
+    password = var.password
+    use_ntlm = true
+    https    = true
+    insecure = true
+    timeout  = "20s"
+  }
+
+  provisioner "file" {
+    source      = "./cloud-init.iso"
+    destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-VyOS_13x\\cloud-init.iso"
+  }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs/resources/machine_instance
@@ -17,16 +46,16 @@ resource "hyperv_machine_instance" "VyOS-LTS" {
   #   high_memory_mapped_io_space             = 536870912
   #   low_memory_mapped_io_space              = 134217728
   #   lock_on_disconnect                      = "Off"
-  memory_maximum_bytes = 2148000000
-  memory_minimum_bytes = 1024000000
-  memory_startup_bytes = 1024000000
+  memory_maximum_bytes = 2147483648
+  memory_minimum_bytes = 1023410176
+  memory_startup_bytes = 1023410176
   notes                = "This VM instance is managed by terraform"
   processor_count      = 2
   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
   #   snapshot_file_location = "C:/ProgramData/Microsoft/Windows/Hyper-V"
   dynamic_memory = true
   #   static_memory  = false
-  state = "Running"
+  state = "Off"
 
   # Configure firmware
   vm_firmware {
@@ -43,18 +72,18 @@ resource "hyperv_machine_instance" "VyOS-LTS" {
   }
 
   # Configure processor
-  #   vm_processor {
-  #     compatibility_for_migration_enabled               = false
-  #     compatibility_for_older_operating_systems_enabled = false
-  #     hw_thread_count_per_core                          = 0
-  #     maximum                                           = 100
-  #     reserve                                           = 0
-  #     relative_weight                                   = 100
-  #     maximum_count_per_numa_node                       = 0
-  #     maximum_count_per_numa_socket                     = 0
-  #     enable_host_resource_protection                   = false
-  #     expose_virtualization_extensions                  = false
-  #   }
+  vm_processor {
+    compatibility_for_migration_enabled               = false
+    compatibility_for_older_operating_systems_enabled = false
+    enable_host_resource_protection                   = false
+    expose_virtualization_extensions                  = false
+    hw_thread_count_per_core                          = 0
+    maximum                                           = 100
+    maximum_count_per_numa_node                       = 2
+    maximum_count_per_numa_socket                     = 1
+    relative_weight                                   = 100
+    reserve                                           = 0
+  }
 
   # Configure integration services
   integration_services = {
@@ -71,7 +100,7 @@ resource "hyperv_machine_instance" "VyOS-LTS" {
     name                = "Default Switch"
     switch_name         = "Default Switch"
     dynamic_mac_address = false
-    static_mac_address  = "0000deadbeef"
+    static_mac_address  = "0000DEADBEEF"
   }
   network_adaptors {
     name        = "Internal Switch"
@@ -113,13 +142,14 @@ resource "hyperv_machine_instance" "VyOS-LTS" {
   }
 
   # Create dvd drive
-  #   dvd_drives {
-  #     controller_number   = "0"
-  #     controller_location = "1"
-  #     path                = ""
-  #     #path                = "c:/iso/windows-server-2016.iso"
-  #     resource_pool_name = ""
-  #   }
+  dvd_drives {
+    controller_number   = "0"
+    controller_location = "1"
+    # https://developer.hashicorp.com/terraform/language/functions/abspath
+    # https://developer.hashicorp.com/terraform/language/functions/replace
+    path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-VyOS_13x\\cloud-init.iso"
+    resource_pool_name = "Primordial" # default value
+  }
 
   # Create a hard disk drive
   hard_disk_drives {
