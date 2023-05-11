@@ -58,6 +58,5 @@ boot_command=["<wait3><enter><wait2><enter><wait2><enter>",
 "<wait9>sudo /mnt/provision-equuleus-cloud-init.sh<enter>",
 "<wait40>sudo /mnt/provision-cleanup.sh<enter>",
 "<wait5>sudo umount /mnt<enter>",
-"<wait3>shutdown -r now<enter>",
-"<wait60>",
+"<wait3>sudo poweroff<enter>"
 ]
