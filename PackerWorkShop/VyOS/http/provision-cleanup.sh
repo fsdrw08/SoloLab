@@ -6,6 +6,7 @@ fi
 
 source /opt/vyatta/etc/functions/script-template
 configure
-delete system name-server 223.5.5.5
+load /opt/vyatta/etc/config.boot.default
+
 commit
 save
