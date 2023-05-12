@@ -1,5 +1,5 @@
 #iso_url=https://github.com/9l/vyos-build-action/releases/download/v1.3.2/vyos-1.3.2-amd64.iso
-iso_url="../ISO/vyos-1.3.2-amd64.iso"
+iso_url="C:/Users/Public/Downloads/ISO/vyos-1.3.2-amd64.iso"
 iso_checksum_type="sha256"
 iso_checksum="e0c6119e4c0101b0278d67063c2a3e381529bc65922f974bffead3e63c84e7e6"
 vm_name="packer-vyos13x"
