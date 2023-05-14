@@ -56,7 +56,7 @@ boot_command=["<wait3><enter><wait2><enter><wait2><enter>",
 "<wait3>sudo mount /dev/sr1 /mnt<enter>",
 "<wait3>sudo /mnt/provision-dhcp.sh<enter>",
 "<wait9>sudo /mnt/provision-equuleus-cloud-init.sh<enter>",
-"<wait40>sudo /mnt/provision-cleanup.sh<enter>",
+"<wait70>sudo /mnt/provision-cleanup.sh<enter>",
 "<wait5>sudo umount /mnt<enter>",
 "<wait3>sudo poweroff<enter>"
 ]
