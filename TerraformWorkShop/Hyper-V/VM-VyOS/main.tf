@@ -3,11 +3,13 @@ resource "hyperv_vhd" "VyOS-LTS" {
   source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
 }
 
-resource "local_file" "user-data" {
-  filename = "${path.module}/cloud-init/user-data"
-  content = templatefile("${path.module}/cloud-init/user-data.tmpl.yml", { 
-    install-clash = ${indent(2,${file(${path.module}/cloud-init/install-clash.sh)}")" })
-}
+# resource "local_file" "user-data" {
+#   filename = "${path.module}/cloud-init/user-data"
+#   content = templatefile("${path.module}/cloud-init/user-data.tmpl.yml", {
+#     install-clash = filebase64("${path.module}/cloud-init/install-clash.sh")
+#   })
+# }
+
 # https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
 # https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
 resource "null_resource" "cloud-init" {

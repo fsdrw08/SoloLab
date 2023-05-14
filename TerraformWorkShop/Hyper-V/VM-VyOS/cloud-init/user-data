@@ -44,3 +44,21 @@ vyos_config_commands:
   - set system ntp server 'cn.ntp.org.cn'
   # timezone
   - set system time-zone 'Asia/Shanghai'
+
+write_files:
+  - path: /home/vagrant/finalConfig.sh
+    owner: vagrant:vagrant
+    permissions: '0775'
+    content: |
+      #!/bin/vbash
+      source /opt/vyatta/etc/functions/script-template
+      configure
+      set nat destination rule 10 description 'CLASH FORWARD'
+      set nat destination rule 10 inbound-interface 'eth1'
+      set nat destination rule 10 protocol 'tcp_udp'
+      set nat destination rule 10 destination port 80,443
+      set nat destination rule 10 source address 192.168.255.0/24
+      set nat destination rule 10 translation address 192.168.255.1
+      set nat destination rule 10 translation port 7892
+      commit
+      exit
