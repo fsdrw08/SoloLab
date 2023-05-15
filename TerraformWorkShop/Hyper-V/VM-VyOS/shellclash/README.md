@@ -27,6 +27,7 @@ clash
 - 2 clash功能设置 -> 6 设置本机代理服务:    未开启   ————使本机流量经过clash内核
 - 7 clash进阶设置 -> 8 手动指定相关端口、秘钥 -> 8 自定义本机host地址：...
 
+<!-- 
 5. install shellclash:
 from vyos, run 
 ```shell
@@ -51,9 +52,9 @@ clash
 
 # unset proxy
 unset all_proxy
-```
+``` -->
 
-2. update nat config
+5. update nat config
 ```shell
-bash ~/finalConfig.sh
+bash /tmp/finalConfig.sh
 ```
