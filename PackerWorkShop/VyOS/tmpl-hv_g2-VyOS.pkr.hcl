@@ -145,7 +145,8 @@ source "hyperv-iso" "vm" {
   // if we dont bind the mac address to NIC, the vyos Hyper-V VM (vagrant) instance will have different MAC address each time (when run `vagrant up`)
   // which means the WAN switch will connect to eth1 after the instance get created
   // if you want to change this mac address, also change in ../vagrant-VyOS$version line 20
-  mac_address           = "0000deadbeef"
+  // update: already improved the provision process, now nic hw-id will be reset at the end of the provision process
+  // mac_address           = "0000deadbeef"
   temp_path             = "."
   vlan_id               = "${var.vlan_id}"
   vm_name               = "${var.vm_name}"
