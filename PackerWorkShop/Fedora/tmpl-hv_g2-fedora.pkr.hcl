@@ -110,7 +110,7 @@ variable "vm_name" {
 source "hyperv-iso" "vm" {
   boot_command          = "${var.boot_command}"
   boot_wait             = "5s"
-  communicator          = "ssh"
+  communicator          = "none"
   configuration_version = "${var.configuration_version}"
   cpus                  = "${var.cpus}"
   disk_block_size       = "1"
@@ -134,9 +134,9 @@ source "hyperv-iso" "vm" {
   skip_export           = "true"
   shutdown_command      = "sudo -S shutdown -P now"
   shutdown_timeout      = "30m"
-  ssh_password          = "vagrant"
-  ssh_timeout           = "4h"
-  ssh_username          = "vagrant"
+  // ssh_password          = "vagrant"
+  // ssh_timeout           = "4h"
+  // ssh_username          = "vagrant"
   switch_name           = "${var.switch_name}"
   temp_path             = "."
   vlan_id               = "${var.vlan_id}"
@@ -146,10 +146,10 @@ source "hyperv-iso" "vm" {
 build {
   sources = ["source.hyperv-iso.vm"]
 
-  provisioner "shell" {
-    execute_command = "echo ${var.ssh_password} | sudo -S -E bash {{ .Path }}"
-    script          = "./http/provision.sh"
-  }
+  // provisioner "shell" {
+  //   execute_command = "echo ${var.ssh_password} | sudo -S -E bash {{ .Path }}"
+  //   script          = "./http/provision.sh"
+  // }
 
   post-processor "vagrant" {
     keep_input_artifact  = true

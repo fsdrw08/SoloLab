@@ -1,8 +1,8 @@
 #iso_url="https://download.fedoraproject.org/pub/fedora/linux/releases/38/Server/x86_64/iso/Fedora-Server-dvd-x86_64-38-1.6.iso"
 // https://download.fedoraproject.org/pub/fedora/linux/releases/38/Server/x86_64/iso/Fedora-Server-38-1.6-x86_64-CHECKSUM
-// iso_url="../ISO/Fedora-Server-dvd-x86_64-38-1.6.iso"
+// iso_url="C:/Users/Public/Downloads/ISO/Fedora-Server-dvd-x86_64-38-1.6.iso"
 // iso_checksum="66b52d7cb39386644cd740930b0bef0a5a2f2be569328fef6b1f9b3679fdc54d"
-iso_url="../ISO/Fedora-Server-netinst-x86_64-38-1.6.iso"
+iso_url="C:/Users/Public/Downloads/ISO/Fedora-Server-netinst-x86_64-38-1.6.iso"
 iso_checksum="192af621553aa32154697029e34cbe30152a9e23d72d55f31918b166979bbcf5"
 iso_checksum_type="sha256"
 vm_name="packer-fedora38-g2"
@@ -25,5 +25,5 @@ vagrantfile_template="./vagrant-fedora38.rb"
 
 // https://github.com/brantleyp1/packer-image-builder/blob/dec07815501f30f2f96a653805048af5193ed333/rocky8.pkrvars.hcl
 boot_command=[
-  "c  setparams 'kickstart' <enter> linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=Fedora-S-dvd-x86_64-38 inst.ks=hd:LABEL=cidata:/ks-fedora38.cfg<enter> initrdefi /images/pxeboot/initrd.img<enter> boot<enter>"
+  "c  setparams 'kickstart' <enter> linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=Fedora-S-dvd-x86_64-38 inst.ks=hd:LABEL=cidata:/ks-fedora38.cfg<enter> initrdefi /images/pxeboot/initrd.img<enter> boot<enter><wait30>"
 ]

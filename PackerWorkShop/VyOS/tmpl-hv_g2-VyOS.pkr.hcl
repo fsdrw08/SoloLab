@@ -114,7 +114,6 @@ variable "vm_name" {
 source "hyperv-iso" "vm" {
   boot_command          = "${var.boot_command}"
   boot_wait             = "2s"
-  // communicator          = "ssh"
   communicator          = "none"
   configuration_version = "${var.configuration_version}"
   cpus                  = "${var.cpus}"
