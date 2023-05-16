@@ -1,0 +1,40 @@
+#cloud-config
+timezone: Asia/Shanghai
+
+# https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+users:
+  - name: vagrant
+    gecos: vagrant
+    groups: wheel
+    plain_text_passwd: vagrant
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_import_id: None
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - cockpit
+  - cockpit-pcp
+  - cockpit-podman
+
+# https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+growpart:
+  mode: auto
+  devices: ["/"]
+  ignore_growroot_disabled: false
+resize_rootfs: true
+
+runcmd:
+  - firewall-offline-cmd --set-default-zone=trusted
+  - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
+  - systemctl unmask firewalld
+  - systemctl start firewalld
+  - systemctl enable --now cockpit.socket

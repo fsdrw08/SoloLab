@@ -3,6 +3,35 @@ resource "hyperv_vhd" "InfraSvc-Fedora38" {
   source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-fedora38-base\\Virtual Hard Disks\\packer-fedora38-g2.vhdx"
 }
 
+# https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
+# https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
+resource "null_resource" "cloud-init" {
+  triggers = {
+    cloudinit_iso = fileexists("./cloud-init.iso") ? "1" : uuid()
+    dir_sha1      = sha1(join("", [for f in fileset(".", "./cloud-init/*") : filesha1(f)]))
+  }
+
+  provisioner "local-exec" {
+    command = "oscdimg.exe ${abspath(path.module)}/cloud-init ${abspath(path.module)}/cloud-init.iso -j2 -lcidata"
+  }
+
+  connection {
+    type     = "winrm"
+    host     = var.host
+    user     = var.user
+    password = var.password
+    use_ntlm = true
+    https    = true
+    insecure = true
+    timeout  = "20s"
+  }
+
+  provisioner "file" {
+    source      = "./cloud-init.iso"
+    destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\cloud-init.iso"
+  }
+}
+
 resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   name       = "InfraSvc-Fedora38"
   generation = 2
@@ -16,9 +45,9 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   #   high_memory_mapped_io_space             = 536870912
   #   low_memory_mapped_io_space              = 134217728
   #   lock_on_disconnect                      = "Off"
-  memory_maximum_bytes = 4096000000
-  memory_minimum_bytes = 2148000000
-  memory_startup_bytes = 2148000000
+  memory_maximum_bytes = 4095737856
+  memory_minimum_bytes = 2147483648
+  memory_startup_bytes = 2147483648
   notes                = "This VM instance is managed by terraform"
   processor_count      = 4
   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
@@ -29,35 +58,31 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
 
   # Configure firmware
   vm_firmware {
-    enable_secure_boot   = "On"
-    secure_boot_template = "MicrosoftUEFICertificateAuthority"
-    # preferred_network_boot_protocol = "IPv4"
-    # console_mode                    = "None"
-    # pause_after_boot_failure        = "Off"
+    console_mode                    = "Default"
+    enable_secure_boot              = "On"
+    secure_boot_template            = "MicrosoftUEFICertificateAuthority"
+    pause_after_boot_failure        = "Off"
+    preferred_network_boot_protocol = "IPv4"
     boot_order {
       boot_type           = "HardDiskDrive"
       controller_number   = "0"
       controller_location = "0"
     }
-    boot_order {
-      boot_type            = "NetworkAdapter"
-      network_adapter_name = "Internal Switch"
-    }
   }
 
   # Configure processor
-  #   vm_processor {
-  #     compatibility_for_migration_enabled               = false
-  #     compatibility_for_older_operating_systems_enabled = false
-  #     hw_thread_count_per_core                          = 0
-  #     maximum                                           = 100
-  #     reserve                                           = 0
-  #     relative_weight                                   = 100
-  #     maximum_count_per_numa_node                       = 0
-  #     maximum_count_per_numa_socket                     = 0
-  #     enable_host_resource_protection                   = false
-  #     expose_virtualization_extensions                  = false
-  #   }
+  vm_processor {
+    compatibility_for_migration_enabled               = false
+    compatibility_for_older_operating_systems_enabled = false
+    enable_host_resource_protection                   = false
+    expose_virtualization_extensions                  = false
+    hw_thread_count_per_core                          = 0
+    maximum                                           = 100
+    maximum_count_per_numa_node                       = 4
+    maximum_count_per_numa_socket                     = 1
+    relative_weight                                   = 100
+    reserve                                           = 0
+  }
 
   # Configure integration services
   integration_services = {
@@ -110,14 +135,14 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
   }
 
   # Create dvd drive
-  #   dvd_drives {
-  #     controller_number   = "0"
-  #     controller_location = "1"
-  #     path                = ""
-  #     #path                = "c:/iso/windows-server-2016.iso"
-  #     resource_pool_name = ""
-  #   }
-
+  dvd_drives {
+    controller_number   = "0"
+    controller_location = "1"
+    # https://developer.hashicorp.com/terraform/language/functions/abspath
+    # https://developer.hashicorp.com/terraform/language/functions/replace
+    path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\cloud-init.iso"
+    resource_pool_name = "Primordial" # default value
+  }
   # Create a hard disk drive
   hard_disk_drives {
     controller_type     = "Scsi"
