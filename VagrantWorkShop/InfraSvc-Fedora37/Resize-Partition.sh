@@ -1,3 +1,4 @@
+# https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
 FS=$(df -h | grep mapper | awk '{print $1}')
 echo "resize $FS"
 

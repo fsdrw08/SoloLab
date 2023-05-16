@@ -41,6 +41,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "Set-CNRepo.sh"
   
   # extend root partition
+  # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
   config.vm.provision "shell", path: "Resize-Partition.sh"
   
   # set static ip
