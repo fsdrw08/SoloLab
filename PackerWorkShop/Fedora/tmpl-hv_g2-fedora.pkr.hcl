@@ -133,7 +133,7 @@ source "hyperv-iso" "vm" {
   output_directory      = "${var.output_directory}"
   skip_export           = "true"
   shutdown_command      = "sudo -S shutdown -P now"
-  shutdown_timeout      = "30m"
+  shutdown_timeout      = "60m"
   // ssh_password          = "vagrant"
   // ssh_timeout           = "4h"
   // ssh_username          = "vagrant"
