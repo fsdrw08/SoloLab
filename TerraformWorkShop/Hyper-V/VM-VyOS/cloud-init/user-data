@@ -46,9 +46,10 @@ vyos_config_commands:
   - set system time-zone 'Asia/Shanghai'
 
 write_files:
+  # config after clash setup
   - path: /tmp/finalConfig.sh
     owner: root:vyattacfg
-    permissions: '0775'
+    permissions: "0775"
     content: |
       #!/bin/vbash
       # Ensure that we have the correct group or we'll corrupt the configuration
