@@ -12,7 +12,7 @@ resource "null_resource" "cloud-init" {
   }
 
   provisioner "local-exec" {
-    command = "PowerShell -ExecutionPolicy bypass -File ${abspath("New-CIDATA.ps1")}"
+    command = "oscdimg.exe ${abspath(path.module)}/cloud-init ${abspath(path.module)}/cloud-init.iso -j2 -lcidata"
   }
 
   connection {
