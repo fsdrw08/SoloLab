@@ -1,34 +1,80 @@
+locals {
+  vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\"
+}
+
 resource "hyperv_vhd" "InfraSvc-Fedora38" {
-  path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
+  # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
+  path   = join("", [local.vhd_dir, "InfraSvc-Fedora38.vhdx"])
   source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-fedora38-base\\Virtual Hard Disks\\packer-fedora38-g2.vhdx"
+}
+
+data "terraform_remote_state" "InfraSvc-Data" {
+  backend = "local"
+  config = {
+    path = "${path.module}/../Disk-InfraSvc-Data/terraform.tfstate"
+  }
 }
 
 # https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
 # https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
+# https://github.com/Venafi/terraform-provider-venafi/blob/21f5b40cb5d07202607f4e09581d0243e06d5650/examples/microsoft_iis/iis.tf#L1
 resource "null_resource" "cloud-init" {
   triggers = {
     cloudinit_iso = fileexists("./cloud-init.iso") ? "1" : uuid()
     dir_sha1      = sha1(join("", [for f in fileset(".", "./cloud-init/*") : filesha1(f)]))
+    host          = var.host
+    user          = var.user
+    password      = sensitive(var.password)
+    vhd_dir       = local.vhd_dir
   }
 
   provisioner "local-exec" {
     command = "oscdimg.exe ${abspath(path.module)}/cloud-init ${abspath(path.module)}/cloud-init.iso -j2 -lcidata"
   }
 
-  connection {
-    type     = "winrm"
-    host     = var.host
-    user     = var.user
-    password = var.password
-    use_ntlm = true
-    https    = true
-    insecure = true
-    timeout  = "20s"
-  }
-
   provisioner "file" {
     source      = "./cloud-init.iso"
     destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\cloud-init.iso"
+
+    connection {
+      type     = "winrm"
+      host     = self.triggers.host
+      user     = self.triggers.user
+      password = self.triggers.password
+      use_ntlm = true
+      https    = true
+      insecure = true
+      timeout  = "20s"
+    }
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = <<-EOT
+      if (Test-Path ${abspath(path.module)}/cloud-init.iso) {
+        Remove-Item ${abspath(path.module)}/cloud-init.iso
+      }
+    EOT
+    interpreter = ["Powershell", "-Command"]
+  }
+
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [<<-EOT
+      Powershell -Command "$cloudinit_iso=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath 'cloud-init.iso'); if (Test-Path $cloudinit_iso) { Remove-Item $cloudinit_iso }"
+    EOT
+    ]
+
+    connection {
+      type     = "winrm"
+      host     = self.triggers.host
+      user     = self.triggers.user
+      password = self.triggers.password
+      use_ntlm = true
+      https    = true
+      insecure = true
+      timeout  = "20s"
+    }
   }
 }
 
@@ -140,7 +186,8 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
     controller_location = "1"
     # https://developer.hashicorp.com/terraform/language/functions/abspath
     # https://developer.hashicorp.com/terraform/language/functions/replace
-    path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\cloud-init.iso"
+    # path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\cloud-init.iso"
+    path               = join("", [local.vhd_dir, "cloud-init.iso"])
     resource_pool_name = "Primordial" # default value
   }
   # Create a hard disk drive
@@ -149,6 +196,20 @@ resource "hyperv_machine_instance" "InfraSvc-Fedora38" {
     controller_number   = "0"
     controller_location = "0"
     path                = hyperv_vhd.InfraSvc-Fedora38.path
+    # disk_number                     = 4294967295
+    # resource_pool_name              = "Primordial"
+    # support_persistent_reservations = false
+    # maximum_iops                    = 0
+    # minimum_iops                    = 0
+    # qos_policy_id                   = "00000000-0000-0000-0000-000000000000"
+    # override_cache_attributes       = "Default"
+  }
+
+  hard_disk_drives {
+    controller_type     = "Scsi"
+    controller_number   = "0"
+    controller_location = "2"
+    path                = data.terraform_remote_state.InfraSvc-Data.outputs.path
     # disk_number                     = 4294967295
     # resource_pool_name              = "Primordial"
     # support_persistent_reservations = false
