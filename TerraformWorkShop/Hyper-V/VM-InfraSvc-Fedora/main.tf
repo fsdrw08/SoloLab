@@ -28,6 +28,7 @@ resource "null_resource" "cloud-init" {
     vhd_dir       = local.vhd_dir
   }
 
+  #for create
   provisioner "local-exec" {
     command = "oscdimg.exe ${abspath(path.module)}/cloud-init ${abspath(path.module)}/cloud-init.iso -j2 -lcidata"
   }
@@ -48,6 +49,7 @@ resource "null_resource" "cloud-init" {
     }
   }
 
+  # for destroy
   provisioner "local-exec" {
     when        = destroy
     command     = <<-EOT
