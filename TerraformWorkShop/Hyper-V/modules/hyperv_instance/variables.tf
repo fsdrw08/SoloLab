@@ -1,6 +1,9 @@
-variable "hyperv_machine_instance" {
+variable "vm_instance_count" {
+  type = number
+}
+variable "vm_instance" {
   description = "hyperv vm instance config"
-  type = map(object({
+  type = object({
     name                                    = string
     automatic_critical_error_action         = optional(string, null)
     automatic_critical_error_action_timeout = optional(number, null)
@@ -136,5 +139,5 @@ variable "hyperv_machine_instance" {
       read   = optional(string, null)
       update = optional(string, null)
     }))
-  }))
+  })
 }
