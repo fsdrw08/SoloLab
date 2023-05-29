@@ -1,0 +1,49 @@
+'Everything that starts with a simple quote 'is a comment. You can also put comments on several lines using/'to start and '/to end.
+
+'Start of UML diagram
+' https://plantuml.com/deployment-diagram
+@startuml InfraLayers
+card infra [
+IT 基础设施分层
+----
+                                Data 数据
+----
+                            APP 应用
+----
+                        Container/Runtime 容器/运行时
+....
+                    VM OS 虚拟机系统
+....
+                VM 虚拟机实例
+----
+            Host OS/Hyperversion 主机系统/虚拟化层
+....
+        Bare Matel 裸金属
+....
+    Network 网络
+====
+Data Center Components 动力环境 
+]
+card business [
+对应业务
+----
+DaaS 数据即服务
+----
+SaaS 软件即服务
+----
+PaaS 平台即服务
+....
+
+....
+
+----
+IaaS 基础设施即服务
+....
+Hosting 服务器租用
+....
+Colocation 服务器托管
+====
+机房建设
+]
+@enduml
+' End of UML diagram
