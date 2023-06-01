@@ -17,7 +17,8 @@ Windom
 
 ---
 
-## IT运维的对象 The componenet of IT Opterations
+## IT运维的对象 
+The componenet of IT Opterations
 
 ![](Layers.png)
 
@@ -27,17 +28,21 @@ The cloud architectural evolution from a resource utilization point of view
 ![fit](The-cloud-architectural-evolution-from-a-resource-utilization-point-of-view.png)
 
 ---
-## 机房动力环境监控 Data Center components monitoring
+## 机房动力环境监控 
+Data Center components monitoring
+<br>
 
 动力：市电、电源、蓄电池、UPS、发电机等
 环境：温湿度、烟雾、漏水、门禁、视频等
 监控：遥测、遥信、遥控、遥调
-![auto](DC-Design.webp)
+![bg vertical right w:600](DC-Design.webp)
 
 
 ---
 
-## 网络 Network
+## 网络 
+Network
+<br>
 
 零配置部署 
 Zero Touch Provisioning(ZTP)
@@ -45,10 +50,11 @@ Zero Touch Provisioning(ZTP)
 ![w](ZTP.png)
 ![bg vertical right fit](cisco-ztp.webp)
 
-aka：配置路由器
 
 ---
-## 裸金属 Bare Metal → 主机系统/虚拟化层 Host OS/Hyperversion
+## 裸金属  → 主机系统/虚拟化层 
+Bare Metal → Host OS/Hyperversion
+<br>
 
 ![](MAAS-diagram-grey.svg)
 
@@ -57,9 +63,50 @@ aka：装电脑，把系统镜像写入硬盘
 ---
 
 Ventoy
+![](ventoy_config.png)
 
-![w:330](ventoy.png)
-![w:800](ventoy_config.png)
+
+---
+Ventoy
+代码示例：
+```
+   E:\
+   +--WinOS-Deploy-As-Code
+   |  +--unattendXML
+   |  |  +--unattend-UEFI-512G.xml
+   |  |  \...      
+   |  +--Drivers
+   |  |  \...
+   |  +--oobeSystem
+   |  |  +--Software
+   |  |  |  \--...
+   |  |  \--...
+   |  \--...
+   +--ISO
+   |  \--Windows
+   |     \--Win11_EnglishInternational_x64v1.iso
+   \--ventoy
+          \--ventoy.json  
+```
+ventoy.json  
+```json
+{
+    "control":[
+        { "VTOY_DEFAULT_SEARCH_ROOT": "/ISO" }
+    ],
+    "auto_install":[
+        {
+            "parent": "/ISO/Windows",
+            "template":[
+                "/WinOS-Deploy-As-Code/unattendXML/unattend-UEFI-512G.xml"
+            ]
+        }
+    ]
+}
+```
+
+![bg vertical right w:600](ventoy.png)
+
 
 ---
 
@@ -69,21 +116,100 @@ Canonical MAAS
 ![w:500](maas_config.png)
 
 --- 
-### 虚拟化层 Hyperversion → 虚拟机镜像 VM Image
+### 虚拟化层 → 虚拟机镜像 
+Hyperversion → VM Image
+<br>
+
 Hashicorp Packer
-workflow
-![](packer-workflow-2.png)
+涉及对象
+![w:800](packer-workflow-2.png)
 
 ---
 Hashicorp Packer
-build process
-![auto](packer-workflow-min.png.webp)
+虚拟机镜像构建步骤
+代码示例：
+```hcl
+variable "vm_name" {
+  type    = string
+  default = ""
+}
+
+variable "boot_command" {
+  type    = list(string)
+}
+
+source "hyperv-iso" "vm" {
+  vm_name               = "${var.vm_name}"
+  boot_command          = "${var.boot_command}"
+  boot_wait             = "5s"
+  ...
+}
+
+build {
+  sources = ["source.hyperv-iso.vm"]
+
+  post-processor "vagrant" {
+    keep_input_artifact  = true
+    output               = "${var.output_vagrant}"
+    vagrantfile_template = "${var.vagrantfile_template}"
+  }
+}
+
+```
+
+![bg vertical right w:600](packer-workflow-min.png.webp)
 
 ---
-### 虚拟机镜像 VM Image → 虚拟机实例 VM Instance
+### 虚拟机镜像 → 虚拟机实例
+VM Image → VM Instance
+<br>
+
 Hashicorp Terraform
-![w:700](terraform-packer.png)
+![fit](terraform-packer.png)
+![bg vertical right w:500](terraform-providers.png)
 
 ---
-Terraform workflow
-![](terraform-workflow.webp)
+Hashicorp Terraform
+代码示例：
+```tf
+terraform {
+  required_providers {
+    hyperv = {
+      source  = "taliesins/hyperv"
+      version = ">=1.0.4"
+    }
+  }
+}
+
+
+provider "hyperv" {
+  user     = var.user
+  password = var.password
+  host     = var.host
+  port     = 5986
+  https    = true
+  insecure = true
+  use_ntlm = true
+  script_path = "C:/Temp/terraform_%RAND%.cmd"
+  timeout     = "30s"
+}
+
+variable "user" {
+  type    = string
+  default = null
+}
+...
+
+resource "hyperv_vhd" "InfraSvc-Data" {
+  path       = "\\path\\to\\InfraSvc-Data.vhdx"
+  vhd_type   = "Dynamic"
+  size       = 21474836480 #20GB
+  block_size = 0
+}
+```
+
+![bg vertical right w:620](terraform-architecture-components-workflow-1.jpg)
+
+---
+### 操作系统 → 配置管理
+OS → Configuration Management
