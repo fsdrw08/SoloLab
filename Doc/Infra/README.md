@@ -61,33 +61,145 @@ Bare Metal → Host OS/Hyperversion
 aka：装电脑，把系统镜像写入硬盘
 
 ---
+Windows 
+unattend
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="windowsPE">
+    ...
+     </settings>
+    <settings pass="offlineServicing">
+    </settings>
+    ...
+    <settings pass="specialize">
+    ...
+    </settings>
+    <settings pass="oobeSystem">
+    ...
+    </settings>
+</unattend>
+```
 
+安装命令：
+通过iso进入安装环境，shift+10：
+```cmd
+setup /unattend:\path\to\unattend.xml
+```
+
+![bg vertical right w:500](wsim.jpg)
+![bg vertical right w:600](windows_shift_f10.webp)
+
+---
+RedHat(RHEL, CentOS, Fedora)
+kickstart
+```shell
+keyboard 'us'
+lang en_US.UTF-8
+rootpw root
+timezone Asia/Shanghai
+text
+network --onboot=true --bootproto=dhcp --hostname=fedora
+clearpart --all --initlabel
+autopart
+selinux --permissive
+firewall --enabled --service=ssh
+poweroff
+%packages --excludedocs
+@core
+@cloud-server
+hyperv-daemons
+%end
+```
+安装命令：
+通过iso进入安装环境，c：
+```shell
+setparams 'kickstart'
+linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=xxx inst.ks=hd:LABEL=cidata:/xxx.cfg
+initrdefi /images/pxeboot/initrd.img
+boot
+```
+
+![bg vertical right w:400](kickstart_configurator.webp)
+![bg vertical right w:500](linuxefi.png)
+
+---
+Debian
+preseed
+```shell
+d-i auto-install/enable boolean true
+d-i debian-installer/language string en
+d-i debian-installer/country string CN
+d-i debian-installer/locale string en_US.UTF-8
+d-i keyboard-configuration/xkb-keymap select us
+d-i netcfg/choose_interface select auto
+d-i passwd/root-login boolean false
+
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+d-i apt-setup/services-select multiselect security, updates
+d-i apt-setup/security_host string mirrors.ustc.edu.cn
+
+apt-cdrom-setup apt-setup/cdrom/set-first boolean false
+
+apt-mirror-setup apt-setup/use_mirror boolean true
+```
+安装命令：
+通过iso进入安装环境，c：
+```shell
+linux /install.amd/vmlinuz auto=true file=/cdrom/debian-preseed.cfg ...
+initrd /install.amd/initrd.gz
+boot
+```
+
+![bg vertical right w:600](debian_preseed.png)
+
+---
+Ubuntu
+Cloud-init autoinstall
+```yaml
+#cloud-config
+autoinstall:
+  version: 1
+  updates: security
+  apt:
+    ...
+  identity:
+    hostname: hostname
+    password: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    realname: Admin
+    username: admin
+  refresh-installer:
+    update: no
+  ssh:
+    ...
+  storage:
+    layout:
+      name: lvm
+  late-commands:
+    - |
+      ...
+```
+安装命令：
+通过iso进入安装环境，c：
+```shell
+linux /casper/vmlinuz --- autoinstall ds=nocloud;s=/cidata
+initrd /casper/initrd.gz
+boot
+```
+
+![bg vertical right w:650](cloud-init-overview.svg)
+
+---
 Ventoy
 ![](ventoy_config.png)
 
 
 ---
-Ventoy
-代码示例：
-```
-   E:\
-   +--WinOS-Deploy-As-Code
-   |  +--unattendXML
-   |  |  +--unattend-UEFI-512G.xml
-   |  |  \...      
-   |  +--Drivers
-   |  |  \...
-   |  +--oobeSystem
-   |  |  +--Software
-   |  |  |  \--...
-   |  |  \--...
-   |  \--...
-   +--ISO
-   |  \--Windows
-   |     \--Win11_EnglishInternational_x64v1.iso
-   \--ventoy
-          \--ventoy.json  
-```
+Ventoy：
 ventoy.json  
 ```json
 {
@@ -104,8 +216,29 @@ ventoy.json
     ]
 }
 ```
+U盘目录结构
+```
+   E:\
+   +--WinOS-Deploy-As-Code
+   |  +--unattendXML
+   |  |  +--unattend-UEFI-512G.xml
+   |  |  \...      
+   |  +--Drivers
+   |  |  \...
+   |  +--oobeSystem
+   |  |  \--...
+   |  \--...
+   +--ISO
+   |  \--Windows
+   |     \--Win11_EnglishInternational_x64v1.iso
+   \--ventoy
+          \--ventoy.json  
+```
 
-![bg vertical right w:600](ventoy.png)
+
+![bg vertical right w:400](ventoy.png)
+![bg vertical right w:600](ventoy_autoinstall1.png)
+![bg vertical right w:600](ventoy_autoinstall2.png)
 
 
 ---
@@ -213,3 +346,7 @@ resource "hyperv_vhd" "InfraSvc-Data" {
 ---
 ### 操作系统 → 配置管理
 OS → Configuration Management
+
+Ansible
+![bg vertical right w:400](ansible.jpg)
+<!-- ![bg vertical right w:700](ansible_arch.jpg) -->
