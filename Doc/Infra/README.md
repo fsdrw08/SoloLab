@@ -62,7 +62,7 @@ aka：装电脑，把系统镜像写入硬盘
 
 ---
 Windows 
-unattend
+unattend.xml
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -92,7 +92,7 @@ setup /unattend:\path\to\unattend.xml
 
 ---
 RedHat(RHEL, CentOS, Fedora)
-kickstart
+kickstart.cfg
 ```shell
 keyboard 'us'
 lang en_US.UTF-8
@@ -125,7 +125,7 @@ boot
 
 ---
 Debian
-preseed
+preseed.cfg
 ```shell
 d-i auto-install/enable boolean true
 d-i debian-installer/language string en
@@ -258,9 +258,23 @@ Hashicorp Packer
 ![w:800](packer-workflow-2.png)
 
 ---
+
+<style>
+.container{
+    display: flex;
+}
+.col{
+    flex: 1;
+}
+</style>
+
+<div class="container">
+
+<div class="col">
 Hashicorp Packer
 虚拟机镜像构建步骤
-代码示例：
+代码示例:
+
 ```hcl
 variable "vm_name" {
   type    = string
@@ -287,10 +301,26 @@ build {
     vagrantfile_template = "${var.vagrantfile_template}"
   }
 }
-
 ```
 
-![bg vertical right w:600](packer-workflow-min.png.webp)
+</div>
+
+<div class="col">
+
+<br>
+执行命令：
+
+```powershell
+packer build -var-file="$var_file" "$template_file"
+```
+
+![fit](packer-workflow-min.png.webp)
+
+
+
+
+</div>
+</div>
 
 ---
 ### 虚拟机镜像 → 虚拟机实例
@@ -302,8 +332,23 @@ Hashicorp Terraform
 ![bg vertical right w:500](terraform-providers.png)
 
 ---
+<style>
+.container{
+    display: flex;
+}
+.col{
+    flex: 1;
+}
+
+</style>
+
+<div class="container">
+
+<div class="col">
+
 Hashicorp Terraform
 代码示例：
+main.tf
 ```tf
 terraform {
   required_providers {
@@ -314,16 +359,11 @@ terraform {
   }
 }
 
-
 provider "hyperv" {
   user     = var.user
   password = var.password
   host     = var.host
   port     = 5986
-  https    = true
-  insecure = true
-  use_ntlm = true
-  script_path = "C:/Temp/terraform_%RAND%.cmd"
   timeout     = "30s"
 }
 
@@ -337,16 +377,97 @@ resource "hyperv_vhd" "InfraSvc-Data" {
   path       = "\\path\\to\\InfraSvc-Data.vhdx"
   vhd_type   = "Dynamic"
   size       = 21474836480 #20GB
-  block_size = 0
 }
 ```
+</div>
 
-![bg vertical right w:620](terraform-architecture-components-workflow-1.jpg)
+<div class="col">
+
+<br>
+<br>
+
+执行命令：
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+<br>
+
+![auto](terraform-architecture-components-workflow-1.jpg)
+
+<br>
+<br>
+<br>
+
+
+
+
+</div>
+
+</div>
+
+
+
 
 ---
 ### 操作系统 → 配置管理
 OS → Configuration Management
 
 Ansible
-![bg vertical right w:400](ansible.jpg)
-<!-- ![bg vertical right w:700](ansible_arch.jpg) -->
+![fit](ansible.jpg)
+![bg vertical right w:760](what-ansible-automates.webp)
+
+
+---
+
+ansible 代码示例：
+playbook.yml
+```yaml
+# code: language=ansible
+---
+- hosts: kube-1
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: run terraform
+      community.general.terraform: 
+        project_path: 'project/'
+        state: "{{ state }}"
+        force_init: true
+        backend_config:
+          region: "eu-west-1"
+          bucket: "some-bucket"
+          key: "random.tfstate"
+```
+执行命令：
+```bash
+ansible-playbook /path/to/playbook.yml -e state=present
+```
+![bg vertical right w:650](ansible.webp)
+
+---
+
+Ansible Execution Environment
+
+![w:700](ansible_ee.png)
+![w:800](ansible_ee2.png)
+
+---
+Ansible EE build process
+![w:1250](aap21-ansible-development-workflow-page-3-1-1.webp)
+
+---
+
+Ansible VS Terraform
+
+![fit](ansible_terraform.jpg)
+![bg vertical right w:900](Ansible_terraform2.webp)
+
+---
+### 更多的自动化工具
+chef
+pupet
+cloud-init
+powershell dsc
