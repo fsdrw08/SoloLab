@@ -1,6 +1,6 @@
 resource "hyperv_machine_instance" "vm_instance" {
   count                                   = var.vm_instance_count
-  name                                    = "${var.vm_instance.name}${count.index + 1}"
+  name                                    = var.vm_instance_count <= 1 ? var.vm_instance.name : "${var.vm_instance.name}${count.index + 1}"
   generation                              = var.vm_instance.generation
   automatic_critical_error_action         = var.vm_instance.automatic_critical_error_action
   automatic_critical_error_action_timeout = var.vm_instance.automatic_critical_error_action_timeout
