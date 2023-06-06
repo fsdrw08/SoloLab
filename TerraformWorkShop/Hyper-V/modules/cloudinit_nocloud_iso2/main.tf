@@ -5,19 +5,19 @@ locals {
 }
 
 # output cloud-init content to temp folder
-resource "null_resource" "cloud-init" {
-  for_each = var.cloud_init.content
+resource "null_resource" "cloudinit_temp_file" {
+  for_each = { for cloudinit_config in var.cloudinit_config.part : cloudinit_config.filename => cloudinit_config... }
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(var.cloud_init))
+    manifest_sha1 = sha1(jsonencode(var.cloudinit_config))
   }
 
   provisioner "local-exec" {
     # https://developer.hashicorp.com/terraform/language/expressions/references#path-root
     command     = <<-EOT
     mkdir -p "${path.root}/.terraform/tmp/${local.tempDir}"
-    echo "${each.value}" > "${path.root}/.terraform/tmp/${local.tempDir}/${each.key}"
+    echo "${each.value.content}" > "${path.root}/.terraform/tmp/${local.tempDir}/${each.value.filename}"
     EOT
     interpreter = local.is_windows ? ["PowerShell", "-Command"] : []
   }
@@ -28,20 +28,20 @@ resource "null_resource" "cloud-init" {
 resource "null_resource" "ISOHandler" {
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1      = sha1(jsonencode(var.cloud_init))
+    manifest_sha1      = sha1(jsonencode(var.cloudinit_config))
     is_windows         = local.is_windows
     windows_remove_iso = var.windows_remove_iso
     bash_remove_iso    = var.bash_remove_iso
-    isoPath            = var.cloud_init.path
+    isoPath            = var.cloudinit_config.isoPath
   }
 
   depends_on = [
-    null_resource.cloud-init
+    null_resource.cloudinit_temp_file
   ]
 
   # create iso file
   provisioner "local-exec" {
-    command     = local.is_windows ? join(";", ["$tempDir=\"${local.tempDir}\"", "$isoPath=\"${var.cloud_init.path}\"", var.windows_create_iso]) : join(";", ["tempDir=\"${local.tempDir}\"", "isoPath=\"${var.cloud_init.path}\"", var.bash_create_iso])
+    command     = local.is_windows ? join(";", ["$tempDir=\"${local.tempDir}\"", "$isoPath=\"${var.cloudinit_config.isoPath}\"", var.windows_create_iso]) : join(";", ["tempDir=\"${local.tempDir}\"", "isoPath=\"${var.cloudinit_config.isoPath}\"", var.bash_create_iso])
     interpreter = local.is_windows ? ["Powershell", "-Command"] : []
   }
 
@@ -56,7 +56,7 @@ resource "null_resource" "ISOHandler" {
 # remove temp folder
 resource "null_resource" "deleteLocalFile" {
   triggers = {
-    manifest_sha1 = sha1(jsonencode(var.cloud_init))
+    manifest_sha1 = sha1(jsonencode(var.cloudinit_config))
   }
 
   depends_on = [
