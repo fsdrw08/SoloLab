@@ -6,7 +6,7 @@ locals {
 
 # output cloud-init content to temp folder
 resource "null_resource" "cloudinit_temp_file" {
-  for_each = { for cloudinit_config in var.cloudinit_config.part : cloudinit_config.filename => cloudinit_config... }
+  for_each = { for part in var.cloudinit_config.part : part.filename => part }
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
