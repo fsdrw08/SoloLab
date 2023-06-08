@@ -1,13 +1,13 @@
 locals {
   vm_name = "test"
   vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  count   = "3"
+  count   = "1"
 }
 module "cloudinit_nocloud_iso" {
   source = "../modules/cloudinit_nocloud_iso2"
   count  = local.count
   cloudinit_config = {
-    isoPath = "cloud-init${count.index + 1}.iso"
+    isoPath = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
     part = [
       {
         filename = "user-data"
@@ -23,7 +23,7 @@ module "cloudinit_nocloud_iso" {
         ethernets:
           eth0:
             addresses:
-              - 192.168.255.2${count.index + 1}/255.255.255.0
+              - 192.168.255.1${count.index + 1}/255.255.255.0
             gateway4: 192.168.255.1
             nameservers:
               addresses: 192.168.255.1
@@ -38,7 +38,7 @@ resource "null_resource" "remote" {
   count      = local.count
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].isoPath))
+    manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
     vhd_dir       = local.vhd_dir
     vm_name       = local.count <= 1 ? "${local.vm_name}" : "${local.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
