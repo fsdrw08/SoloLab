@@ -1,6 +1,6 @@
-variable "vm_instance_count" {
-  type = number
-}
+# variable "vm_instance_count" {
+#   type = number
+# }
 variable "vm_instance" {
   description = "hyperv vm instance config"
   type = object({
