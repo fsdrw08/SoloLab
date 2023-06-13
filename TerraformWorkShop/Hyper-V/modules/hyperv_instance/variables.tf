@@ -141,3 +141,24 @@ variable "vm_instance" {
     }))
   })
 }
+
+variable "boot_disk" {
+  type = object({
+    path                 = string
+    block_size           = optional(string, null)
+    logical_sector_size  = optional(number, null)
+    parent_path          = optional(string, null)
+    physical_sector_size = optional(number, null)
+    size                 = optional(number, null)
+    source               = optional(string, null)
+    source_disk          = optional(number, null)
+    source_vm            = optional(string, null)
+    vhd_type             = optional(string, null)
+    timeouts = object({
+      create = optional(string, null)
+      delete = optional(string, null)
+      read   = optional(string, null)
+      update = optional(string, null)
+    })
+  })
+}
