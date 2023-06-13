@@ -132,7 +132,7 @@ module "hyperv_machine_instance" {
       {
         controller_number   = 0
         controller_location = 1
-        path                = "/test/123"
+        path                = local.count <= 1 ? join("${local.vhd_dir}", "${local.vm_name}") : join("${local.vhd_dir}", "${local.vm_name}${count.index + 1}")
       }
     ]
   }
