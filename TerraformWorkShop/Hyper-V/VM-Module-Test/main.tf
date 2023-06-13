@@ -8,7 +8,7 @@ module "cloudinit_nocloud_iso" {
   source = "../modules/cloudinit_nocloud_iso2"
   count  = local.count
   cloudinit_config = {
-    isoPath = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
+    isoName = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
     part = [
       {
         filename = "user-data"
@@ -44,7 +44,7 @@ resource "null_resource" "remote" {
     vhd_dir       = local.vhd_dir
     vm_name       = local.count <= 1 ? "${local.vm_name}" : "${local.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
-    isoName  = module.cloudinit_nocloud_iso[count.index].isoPath
+    isoName  = module.cloudinit_nocloud_iso[count.index].isoName
     host     = var.host
     user     = var.user
     password = sensitive(var.password)
@@ -62,7 +62,7 @@ resource "null_resource" "remote" {
   }
   # copy to remote
   provisioner "file" {
-    source = module.cloudinit_nocloud_iso[count.index].isoPath
+    source = module.cloudinit_nocloud_iso[count.index].isoName
     # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
     destination = join("/", ["${self.triggers.vhd_dir}", "${self.triggers.vm_name}\\${self.triggers.isoName}"])
   }
@@ -132,7 +132,22 @@ module "hyperv_machine_instance" {
       {
         controller_number   = 0
         controller_location = 1
-        path                = local.count <= 1 ? join("${local.vhd_dir}", "${local.vm_name}") : join("${local.vhd_dir}", "${local.vm_name}${count.index + 1}")
+        path                = local.count <= 1 ? join("${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}") : join("${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}")
+      }
+    ]
+
+    hard_disk_drives = [
+      {
+        controller_type     = "Scsi"
+        controller_number   = "0"
+        controller_location = "0"
+        path                = hyperv_vhd.InfraSvc-Fedora38.path
+      },
+      {
+        controller_type     = "Scsi"
+        controller_number   = "0"
+        controller_location = "2"
+        path                = data.terraform_remote_state.InfraSvc-Data.outputs.path
       }
     ]
   }

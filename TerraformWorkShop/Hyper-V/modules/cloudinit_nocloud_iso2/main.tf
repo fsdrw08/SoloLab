@@ -32,7 +32,7 @@ resource "null_resource" "ISOHandler" {
     is_windows         = local.is_windows
     windows_remove_iso = var.windows_remove_iso
     bash_remove_iso    = var.bash_remove_iso
-    isoPath            = var.cloudinit_config.isoPath
+    isoName            = var.cloudinit_config.isoName
   }
 
   depends_on = [
@@ -41,14 +41,14 @@ resource "null_resource" "ISOHandler" {
 
   # create iso file
   provisioner "local-exec" {
-    command     = local.is_windows ? join(";", ["$tempDir=\"${local.tempDir}\"", "$isoPath=\"${var.cloudinit_config.isoPath}\"", var.windows_create_iso]) : join(";", ["tempDir=\"${local.tempDir}\"", "isoPath=\"${var.cloudinit_config.isoPath}\"", var.bash_create_iso])
+    command     = local.is_windows ? join(";", ["$tempDir=\"${local.tempDir}\"", "$isoName=\"${var.cloudinit_config.isoName}\"", var.windows_create_iso]) : join(";", ["tempDir=\"${local.tempDir}\"", "isoName=\"${var.cloudinit_config.isoName}\"", var.bash_create_iso])
     interpreter = local.is_windows ? ["Powershell", "-Command"] : []
   }
 
   # remove iso file
   provisioner "local-exec" {
     when        = destroy
-    command     = self.triggers.is_windows ? join(";", ["$isoPath=\"${self.triggers.isoPath}\"", self.triggers.windows_remove_iso]) : join(";", ["isoPath=\"${self.triggers.isoPath}\"", self.triggers.bash_remove_iso])
+    command     = self.triggers.is_windows ? join(";", ["$isoName=\"${self.triggers.isoName}\"", self.triggers.windows_remove_iso]) : join(";", ["isoName=\"${self.triggers.isoName}\"", self.triggers.bash_remove_iso])
     interpreter = self.triggers.is_windows ? ["Powershell", "-Command"] : []
   }
 }
