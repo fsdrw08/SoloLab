@@ -77,6 +77,19 @@ resource "null_resource" "remote" {
   }
 }
 
+resource "hyperv_vhd" "boot_disk" {
+  # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
+  path   = join("\\", [local.vhd_dir, "InfraSvc-Fedora38.vhdx"])
+  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-fedora38-base\\Virtual Hard Disks\\packer-fedora38-g2.vhdx"
+}
+
+data "terraform_remote_state" "data_disk" {
+  backend = "local"
+  config = {
+    path = "${path.module}/../Disk-InfraSvc-Data/terraform.tfstate"
+  }
+}
+
 module "hyperv_machine_instance" {
   source     = "../modules/hyperv_instance"
   depends_on = [null_resource.remote]
@@ -84,9 +97,15 @@ module "hyperv_machine_instance" {
 
   vm_instance = {
     name                 = local.count <= 1 ? local.vm_name : "${local.vm_name}${count.index + 1}"
+    checkpoint_type      = "Disabled"
+    dynamic_memory       = true
+    generation           = 2
+    memory_maximum_bytes = 4095737856
+    memory_minimum_bytes = 2147483648
+    memory_startup_bytes = 2147483648
+    notes                = "This VM instance is managed by terraform"
+    processor_count      = 4
     state                = "Off"
-    static_memory        = true
-    memory_startup_bytes = 536870912
 
     vm_firmware = {
       console_mode                    = "Default"
@@ -99,11 +118,6 @@ module "hyperv_machine_instance" {
           boot_type           = "HardDiskDrive"
           controller_number   = "0"
           controller_location = "0"
-        },
-        {
-          boot_type           = "HardDiskDrive"
-          controller_number   = "0"
-          controller_location = "1"
         },
       ]
     }
@@ -121,6 +135,15 @@ module "hyperv_machine_instance" {
       reserve                                           = 0
     }
 
+    integration_services = {
+      "Guest Service Interface" = true
+      "Heartbeat"               = true
+      "Key-Value Pair Exchange" = true
+      "Shutdown"                = true
+      "Time Synchronization"    = true
+      "VSS"                     = true
+    }
+
     network_adaptors = [
       {
         name        = "Internal Switch"
@@ -132,7 +155,7 @@ module "hyperv_machine_instance" {
       {
         controller_number   = 0
         controller_location = 1
-        path                = local.count <= 1 ? join("${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}") : join("${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}")
+        path                = local.count <= 1 ? join("\\", ["${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
       }
     ]
 
@@ -141,13 +164,13 @@ module "hyperv_machine_instance" {
         controller_type     = "Scsi"
         controller_number   = "0"
         controller_location = "0"
-        path                = hyperv_vhd.InfraSvc-Fedora38.path
+        path                = hyperv_vhd.boot_disk.path
       },
       {
         controller_type     = "Scsi"
         controller_number   = "0"
         controller_location = "2"
-        path                = data.terraform_remote_state.InfraSvc-Data.outputs.path
+        path                = data.terraform_remote_state.data_disk.outputs.path
       }
     ]
   }
