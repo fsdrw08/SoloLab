@@ -11,6 +11,7 @@ resource "hyperv_machine_instance" "vm_instance" {
   checkpoint_type                         = var.vm_instance.checkpoint_type
   guest_controlled_cache_types            = var.vm_instance.guest_controlled_cache_types
   high_memory_mapped_io_space             = var.vm_instance.high_memory_mapped_io_space
+  integration_services                    = var.vm_instance.integration_services
   lock_on_disconnect                      = var.vm_instance.lock_on_disconnect
   low_memory_mapped_io_space              = var.vm_instance.low_memory_mapped_io_space
   memory_maximum_bytes                    = var.vm_instance.memory_maximum_bytes
@@ -24,6 +25,7 @@ resource "hyperv_machine_instance" "vm_instance" {
   static_memory                           = var.vm_instance.static_memory
   state                                   = var.vm_instance.state
   wait_for_ips_poll_period                = var.vm_instance.wait_for_ips_poll_period
+  # timeouts                                = var.vm_instance.timeouts
 
   dynamic "vm_firmware" {
     # for the unique block
@@ -76,8 +78,6 @@ resource "hyperv_machine_instance" "vm_instance" {
       reserve                                           = var.vm_instance.vm_processor.reserve
     }
   }
-
-  integration_services = var.vm_instance.integration_services
 
   dynamic "network_adaptors" {
     for_each = var.vm_instance.network_adaptors == null ? [] : flatten([var.vm_instance.network_adaptors])
@@ -132,19 +132,19 @@ resource "hyperv_machine_instance" "vm_instance" {
   }
 
   dynamic "hard_disk_drives" {
-    for_each = var.vm_instance.hard_disk_drives == null ? [] : [var.vm_instance.hard_disk_drives]
+    for_each = var.vm_instance.hard_disk_drives == null ? [] : flatten([var.vm_instance.hard_disk_drives])
     content {
-      controller_type                 = hard_disk_drivers.value["controller_type"]
-      controller_number               = hard_disk_drivers.value["controller_number"]
-      controller_location             = hard_disk_drivers.value["controller_location"]
-      path                            = hard_disk_drivers.value["path"]
-      disk_number                     = hard_disk_drivers.value["disk_number"]
-      resource_pool_name              = hard_disk_drivers.value["resource_pool_name"]
-      support_persistent_reservations = hard_disk_drivers.value["support_persistent_reservations"]
-      maximum_iops                    = hard_disk_drivers.value["maximum_iops"]
-      minimum_iops                    = hard_disk_drivers.value["minimum_iops"]
-      qos_policy_id                   = hard_disk_drivers.value["qos_policy_id"]
-      override_cache_attributes       = hard_disk_drivers.value["override_cache_attributes"]
+      controller_type                 = hard_disk_drives.value["controller_type"]
+      controller_number               = hard_disk_drives.value["controller_number"]
+      controller_location             = hard_disk_drives.value["controller_location"]
+      path                            = hard_disk_drives.value["path"]
+      disk_number                     = hard_disk_drives.value["disk_number"]
+      resource_pool_name              = hard_disk_drives.value["resource_pool_name"]
+      support_persistent_reservations = hard_disk_drives.value["support_persistent_reservations"]
+      maximum_iops                    = hard_disk_drives.value["maximum_iops"]
+      minimum_iops                    = hard_disk_drives.value["minimum_iops"]
+      qos_policy_id                   = hard_disk_drives.value["qos_policy_id"]
+      override_cache_attributes       = hard_disk_drives.value["override_cache_attributes"]
     }
   }
 }
