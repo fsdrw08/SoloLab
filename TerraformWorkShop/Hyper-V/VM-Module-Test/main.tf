@@ -11,10 +11,63 @@ module "cloudinit_nocloud_iso" {
     isoName = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
     part = [
       {
+        filename = "meta-data"
+        content  = <<-EOT
+        instance-id: iid-infrasvc-fedora_20230614
+        local-hostname: InfraSvc-Fedora
+        EOT
+      },
+      {
         filename = "user-data"
         content  = <<-EOT
         #cloud-config
         timezone: Asia/Shanghai
+        
+        # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+        users:
+          - name: vagrant
+            gecos: vagrant
+            groups: wheel
+            plain_text_passwd: vagrant
+            lock_passwd: false
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
+        package_update: true
+        package_upgrade: true
+        package_reboot_if_required: true
+        packages:
+          - cockpit
+          - cockpit-pcp
+          - cockpit-podman
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+
+        # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+        growpart:
+          mode: auto
+          devices:
+            - "/dev/sda3"
+          ignore_growroot_disabled: false
+        resize_rootfs: true
+        
+        # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
+        runcmd:
+          - lvextend -l +100%FREE /dev/mapper/fedora_fedora-root
+          - firewall-offline-cmd --set-default-zone=trusted
+          - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
+          - systemctl unmask firewalld
+          - systemctl enable --now firewalld
+          - systemctl enable --now cockpit.socket
+          - sed -i -e "/enabled/c\enabled=0" /etc/yum.repos.d/fedora-cisco-openh264.repo
+          - reboot
+        
         EOT
       },
       {
@@ -79,7 +132,7 @@ resource "null_resource" "remote" {
 
 resource "hyperv_vhd" "boot_disk" {
   # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
-  path   = join("\\", [local.vhd_dir, "InfraSvc-Fedora38.vhdx"])
+  path   = join("\\", [local.vhd_dir, local.vm_name, "InfraSvc-Fedora38.vhdx"])
   source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-fedora38-base\\Virtual Hard Disks\\packer-fedora38-g2.vhdx"
 }
 
