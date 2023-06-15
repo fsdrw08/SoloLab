@@ -15,10 +15,23 @@ resource "null_resource" "cloudinit_temp_file" {
 
   provisioner "local-exec" {
     # https://developer.hashicorp.com/terraform/language/expressions/references#path-root
-    command     = <<-EOT
-    mkdir -p "${path.root}/.terraform/tmp/${local.tempDir}"
-    echo "${each.value.content}" > "${path.root}/.terraform/tmp/${local.tempDir}/${each.value.filename}"
-    EOT
+    # command     = <<-EOT
+    # mkdir -p "${path.root}/.terraform/tmp/${local.tempDir}"
+    # echo "${each.value.content}" > "${path.root}/.terraform/tmp/${local.tempDir}/${each.value.filename}"
+    # EOT
+    command = local.is_windows ? join(
+      ";",
+      ["$tempDir=\"${path.root}/.terraform/tmp/${local.tempDir}\"",
+        "$content=@\"\n${each.value.content}\n\"@",
+        "$filename=\"${each.value.filename}\"",
+        var.windows_create_file
+      ]) : join(";",
+      ["$tempDir=\"${path.root}/.terraform/tmp/${local.tempDir}\"",
+        "$content=\"${each.value.content}\"",
+        "$filename=\"${each.value.filename}\"",
+        var.bash_create_file
+      ]
+    )
     interpreter = local.is_windows ? ["PowerShell", "-Command"] : []
   }
 

@@ -34,6 +34,26 @@ variable "cloudinit_config" {
   }
 }
 
+variable "windows_create_file" {
+  type        = string
+  description = "command in windows powershell to create cloudinit text file"
+  default     = <<-EOT
+  mkdir -p $tempDir
+  $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+  [System.IO.File]::WriteAllLines((Join-Path -Path $tempDir -ChildPath $filename), $content, $Utf8NoBomEncoding)
+  EOT
+  # $content | Out-File -FilePath (Join-Path -Path $tempDir -ChildPath $filename) -Encoding UTF8
+}
+
+variable "bash_create_file" {
+  type        = string
+  description = "command in bash to create cloudinit text file"
+  default     = <<-EOT
+  mkdir -p $tempDir
+  echo $content > "$tempDir/$filename"
+  EOT
+}
+
 variable "windows_create_iso" {
   type        = string
   description = "command in windows powershell to create iso file"
