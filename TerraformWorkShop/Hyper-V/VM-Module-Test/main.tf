@@ -66,7 +66,6 @@ module "cloudinit_nocloud_iso" {
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
           - sed -i -e "/enabled/c\enabled=0" /etc/yum.repos.d/fedora-cisco-openh264.repo
-          - reboot
         
         EOT
       },
