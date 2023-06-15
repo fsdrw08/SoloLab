@@ -98,14 +98,14 @@ variable "vm_name" {
 }
 
 // https://github.com/hashicorp/packer-plugin-hyperv/issues/65
-// packer {
-//   required_plugins {
-//     hyperv = {
-//       version = ">= 1.0.4"
-//       source  = "github.com/hashicorp/hyperv"
-//     }
-//   }
-// }
+packer {
+  required_plugins {
+    hyperv = {
+      version = ">= 1.1.0"
+      source  = "github.com/hashicorp/hyperv"
+    }
+  }
+}
 
 source "hyperv-iso" "vm" {
   boot_command          = "${var.boot_command}"
