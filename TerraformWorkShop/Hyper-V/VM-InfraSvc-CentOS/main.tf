@@ -1,6 +1,6 @@
 locals {
   vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  vm_name = "centos"
+  vm_name = "InfraSvc-CentOS"
   count   = "1"
 }
 
@@ -58,10 +58,12 @@ module "cloudinit_nocloud_iso" {
             filesystem: 'xfs'
             device: '/dev/sdb'
             partition: auto
+
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+        # https://zhuanlan.zhihu.com/p/250658106
         mounts:
           - [ /dev/sdb1, /home/vagrant ]
-        mount_default_fields: [ None, None, "auto", "defaults,nofail", "0", "2" ]
+        mount_default_fields: [ None, None, "auto", "defaults,nofail,user", "0", "2" ]
 
         # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
