@@ -1,3 +1,4 @@
 git
 unzip
 python3-ldap
+sshpass

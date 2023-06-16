@@ -42,10 +42,16 @@ podman run --rm `
     ```
 
 2. Prepare container build file (Containerfile, aka dockerfile)
-   - Generate Containerfile and podman related context with [definition.yml](definition.yml)
+   - Generate Containerfile and podman related context with [definition.yml](definition.yml),  
+   Should better run in wsl
    ```powershell
    . .\venv\Scripts\activate
    ansible-builder create --file .\definition-with_semi_proxy.yml
+   # ansible-builder v3:
+   ansible-builder create --file ./execution-environment.yml
+   ```
+   ```shell
+   PROXY="http://10.20.72.21:9999" && ansible-builder build -t ansible-ee-aio-new:latest -v 3 --build-arg PROXY=$PROXY
    ```
    - Fix some syntax (POIXFX) error in the Containerfile
    - Update the Containerfile, e.g.
@@ -64,6 +70,7 @@ $PROXY="http://192.168.255.102:7890"
 podman build -f .\context\Containerfile.with_semi_proxy --build-arg PROXY="$PROXY" --tag ansible-ee-aio  .\context\
 
 podman build -f .\context\Containerfile --build-arg PROXY="$PROXY" --tag ansible-ee-aio-new  .\context\
+podman build -f .\context\Dockerfile --build-arg PROXY="$PROXY" --tag ansible-ee-aio-new  .\context\
 # without_proxy
 podman build .\context\ --tag ansible-ee-aio
 ```

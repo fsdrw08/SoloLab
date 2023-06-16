@@ -1,4 +1,5 @@
 # https://ansible-builder.readthedocs.io/en/latest/definition/
+# https://ansible.readthedocs.io/projects/builder/en/stable/definition/#version-3-format
 ---
 version: 3
 
@@ -29,18 +30,19 @@ dependencies:
     - git
     - unzip
     - python3-ldap
+    - sshpass
 
 images:
   base_image:
     name: quay.io/centos/centos:stream9
 
 additional_build_steps:
-  prepend_galaxy: |
-    RUN find /output/scripts/ -type f -exec chmod +x {} \;
-  prepend_builder: |
-    RUN find /output/scripts/ -type f -exec chmod +x {} \;
+  # prepend_galaxy: |
+  #   RUN find /output/scripts/ -type f -exec chmod +x {} \;
+  # prepend_builder: |
+  #   RUN find /output/scripts/ -type f -exec chmod +x {} \;
   prepend_final:
-    - RUN find /output/scripts/ -type f -exec chmod +x {} \;
+    # - RUN find /output/scripts/ -type f -exec chmod +x {} \;
     - RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
   append_final:
     - ARG PROXY

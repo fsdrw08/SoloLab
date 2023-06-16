@@ -32,6 +32,7 @@ ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 ARG ANSIBLE_INSTALL_REFS
 ARG PKGMGR
 
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
 RUN /output/scripts/check_galaxy
 COPY _build /build
 WORKDIR /build
@@ -51,6 +52,7 @@ ARG ANSIBLE_INSTALL_REFS
 ARG PKGMGR
 
 RUN $PYCMD -m pip install --no-cache-dir bindep pyyaml requirements-parser
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 
@@ -69,6 +71,7 @@ ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 ARG ANSIBLE_INSTALL_REFS
 ARG PKGMGR
 
+RUN find /output/scripts/ -type f -exec chmod +x {} \;
 RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
 RUN /output/scripts/check_ansible $PYCMD
 
