@@ -27,8 +27,20 @@ podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/runner `
-    localhost/ansible-ee-aio `
+    localhost/ansible-ee-aio-new `
     ansible-runner run /runner -vv
+
+podman run --rm `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/work:z `
+    localhost/ansible-ee-aio-new `
+    ansible-playbook -v -i /work/inventory /work/project/Invoke-PodmanRootlessProvision.yml
+
+podman run --rm `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/runner `
+    localhost/ansible-ee-aio-new `
+    ansible-runner run --directory-isolation-base-path /tmp/runner  run -vv
 
 # deploy pod (run podman play)
 podman run --rm `
