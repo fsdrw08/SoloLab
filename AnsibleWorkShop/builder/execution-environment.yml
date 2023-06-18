@@ -60,12 +60,5 @@ additional_build_steps:
     - RUN curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm &&
       chmod +x /usr/local/bin/helm
 
-    - RUN export HTTPS_PROXY=${PROXY} &&
-      export HTTP_PROXY=${PROXY} &&
-      export https_proxy=${PROXY} &&
-      export http_proxy=${PROXY} &&
-      /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff &&
-      unset HTTPS_PROXY &&
-      unset HTTP_PROXY &&
-      unset https_proxy &&
-      unset http_proxy
+    - RUN /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff
+    
