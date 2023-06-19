@@ -16,6 +16,7 @@ module "remote_state" {
   # 如果指定的OTS Table已经存在，那么需要设置 create_ots_lock_table = false
   backend_ots_lock_table = "terraform_remote_backend_lock_table_root"
 
+  # https://www.alibabacloud.com/help/en/basics-for-beginners/latest/regions-and-zones
   region        = "ap-southeast-1" # means singapore
   state_name    = "root/terraform.tfstate"
   encrypt_state = false

@@ -1,8 +1,14 @@
+data "alicloud_zones" "vswitch" {
+  available_resource_creation = "VSwitch"
+}
+
+# resource group
 resource "alicloud_resource_manager_resource_group" "devops" {
   resource_group_name = "devops"
   display_name        = "DevOps"
 }
 
+# vpc related
 resource "alicloud_vpc" "devops" {
   vpc_name          = "DevOps"
   cidr_block        = "172.16.0.0/12"
@@ -13,22 +19,33 @@ resource "alicloud_vpc" "devops" {
   }
 }
 
-// According to the vswitch cidr blocks to launch several vswitches
-resource "alicloud_vswitch" "vswitches" {
-  # count        = local.create_sub_resources ? length(var.vswitch_cidrs) : 0
+resource "alicloud_vswitch" "devops" {
   vpc_id       = alicloud_vpc.devops.id
-  cidr_block   = var.vswitch_cidrs[count.index]
-  zone_id      = element(var.availability_zones, count.index)
-  vswitch_name = length(var.vswitch_cidrs) > 1 || var.use_num_suffix ? format("%s%03d", var.vswitch_name, count.index + 1) : var.vswitch_name
-  description  = var.vswitch_description
-  tags = merge(
-    {
-      Name = format(
-        "%s%03d",
-        var.vswitch_name,
-        count.index + 1
-      )
-    },
-    var.vswitch_tags,
-  )
+  cidr_block   = "172.16.1.0/24"
+  zone_id      = data.alicloud_zones.vswitch.zones[0].id
+  vswitch_name = "DevOps"
+  description  = "This resource is managed by terraform"
+  tags = {
+    "Name" = "DevOps"
+  }
 }
+
+# security group related
+resource "alicloud_security_group" "devops" {
+  name                = "DevOps"
+  resource_group_id   = alicloud_resource_manager_resource_group.devops.id
+  security_group_type = "normal"
+  vpc_id              = alicloud_vpc.devops.id
+}
+
+resource "alicloud_security_group_rule" "allow_all_tcp" {
+  type              = "ingress"
+  ip_protocol       = "tcp"
+  port_range        = "1/65535"
+  nic_type          = "intranet"
+  policy            = "accept"
+  priority          = 10
+  security_group_id = alicloud_security_group.devops.id
+  cidr_ip           = "0.0.0.0/0"
+}
+

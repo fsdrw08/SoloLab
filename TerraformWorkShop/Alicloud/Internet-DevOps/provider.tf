@@ -7,10 +7,9 @@ terraform {
   }
   backend "oss" {
     profile             = "default"
-    region              = "ap-southeast-1"
     bucket              = "terraform-remote-backend-root"
     prefix              = ""
-    key                 = "devops-test/vpc/terraform.tfstate"
+    key                 = "devops-test/internet/terraform.tfstate"
     acl                 = "private"
     encrypt             = "false"
     tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"
