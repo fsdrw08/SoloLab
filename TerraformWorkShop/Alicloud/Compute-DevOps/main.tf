@@ -117,8 +117,9 @@ resource "alicloud_forward_entry" "ssh" {
   forward_entry_name = "DevOps_DNAT-ssh"
   forward_table_id   = data.terraform_remote_state.internet.outputs.nat_gateway_forward_table_ids
   external_ip        = data.terraform_remote_state.internet.outputs.eip_addresses[1]
-  external_port      = "22"
+  external_port      = "8022"
   ip_protocol        = "tcp"
-  internal_ip        = data.alicloud_ecs_network_interfaces.gitlab_internet_nic.interfaces[0].private_ip
-  internal_port      = "22"
+  # internal_ip        = alicloud_instance.gitlab.private_ip
+  internal_ip   = data.alicloud_ecs_network_interfaces.gitlab_internet_nic.interfaces[0].private_ip
+  internal_port = "22"
 }
