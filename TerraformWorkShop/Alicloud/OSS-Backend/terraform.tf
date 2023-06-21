@@ -1,3 +1,4 @@
+# https://developer.hashicorp.com/terraform/language/settings/backends/oss
 terraform {
   backend "oss" {
     bucket              = "terraform-remote-backend-root"

@@ -1,4 +1,5 @@
 ## to config alicloud oss provider
+
 1. install aliyun cli
 ```powershell
 winget install winget install Alibaba.AlibabaCloudCLI
@@ -13,6 +14,7 @@ Access Key Secret []: ...
 ```
 
 3. put below key word in backend oss config
+ref: https://developer.hashicorp.com/terraform/language/settings/backends/oss
 ```hcl
 terraform {
   backend "oss" {

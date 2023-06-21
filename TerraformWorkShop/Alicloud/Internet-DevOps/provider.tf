@@ -7,6 +7,7 @@ terraform {
   }
   backend "oss" {
     profile             = "default"
+    region              = "ap-southeast-1"
     bucket              = "terraform-remote-backend-root"
     prefix              = ""
     key                 = "devops-test/internet/terraform.tfstate"
