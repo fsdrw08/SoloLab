@@ -78,6 +78,7 @@ resource "alicloud_instance" "gitlab" {
   description   = "This resource is managed by terraform"
   key_name      = alicloud_ecs_key_pair.gitlab_root.key_pair_name
   status        = "Running" # Running / Stopped
+  stopped_mode  = "StopCharging"
 
   image_id                = data.alicloud_images.centos_stream.images[0].id
   system_disk_category    = "cloud_efficiency"
