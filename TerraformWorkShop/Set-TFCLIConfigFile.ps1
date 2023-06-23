@@ -1,19 +1,23 @@
-$projectPath = git rev-parse --show-toplevel
+# https://cloud.tencent.com/developer/article/1987762
 
+$projectPath = git rev-parse --show-toplevel
+$plugin_cache_dir = Join-Path -Path $ENV:USERPROFILE.Replace("\","/") -ChildPath ".terraform.d/terraform-plugin-cache"
+# plugin_cache_dir   = "$projectPath/TerraformWorkShop/terraform.d/plugins"
+# $provider_installation = @"
+# provider_installation {
+#   filesystem_mirror {
+#     path    = "$projectPath/TerraformWorkShop/terraform.d/plugins"
+#     include = ["registry.terraform.io/*/*"]
+#   }
+#   direct {
+#     exclude = ["registry.terraform.io/*/*"]
+#   }
+# }
+# "@
 if ($projectPath) {
-    # plugin_cache_dir   = "$projectPath/TerraformWorkShop/terraform.d/plugins"
     $TF_CLI_CONFIG_FILE = 
     @"
-
-provider_installation {
-    filesystem_mirror {
-      path    = "$projectPath/TerraformWorkShop/terraform.d/plugins"
-      include = ["registry.terraform.io/*/*"]
-    }
-    direct {
-      exclude = ["registry.terraform.io/*/*"]
-    }
-}
+plugin_cache_dir = $plugin_cache_dir
 disable_checkpoint = true
 "@
     # https://developer.hashicorp.com/terraform/cli/config/config-file#locations

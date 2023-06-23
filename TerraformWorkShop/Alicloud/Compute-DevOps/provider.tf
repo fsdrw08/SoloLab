@@ -8,7 +8,12 @@ terraform {
       source  = "hashicorp/tls"
       version = ">=4.0.4"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">=3.5.1"
+    }
   }
+
   backend "oss" {
     profile             = "default"
     region              = "ap-southeast-1"
@@ -23,7 +28,6 @@ terraform {
 }
 
 provider "alicloud" {
-  access_key = var.access_key
-  secret_key = var.secret_key
-  region     = "ap-southeast-1"
+  profile = "default"
+  region  = "ap-southeast-1"
 }

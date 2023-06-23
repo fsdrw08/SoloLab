@@ -1,8 +1,18 @@
-output "private_key" {
-  value     = tls_private_key.gitlab_root.private_key_pem
+output "root_pass" {
+  value     = random_password.root.result
+  sensitive = true
+}
+
+# output "root_private_key" {
+#   value     = tls_private_key.root.private_key_pem
+#   sensitive = true
+# }
+
+output "admin_private_key" {
+  value     = tls_private_key.admin.private_key_pem
   sensitive = true
 }
 
 output "public_ip" {
-  value = data.terraform_remote_state.internet.outputs.eip_addresses[1]
+  value = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
 }

@@ -4,13 +4,17 @@ terraform {
       source  = "aliyun/alicloud"
       version = ">=1.206.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">=4.0.4"
+    }
   }
   backend "oss" {
     profile             = "default"
     region              = "ap-southeast-1"
     bucket              = "terraform-remote-backend-root"
     prefix              = ""
-    key                 = "devops-test/vpc/terraform.tfstate"
+    key                 = "devops-test/compute/ecs-gitlab2/terraform.tfstate"
     acl                 = "private"
     encrypt             = "false"
     tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"

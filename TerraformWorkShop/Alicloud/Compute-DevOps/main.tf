@@ -1,126 +1,184 @@
-data "terraform_remote_state" "vpc" {
-  backend = "oss"
-  config = {
-    region              = "ap-southeast-1"
-    bucket              = "terraform-remote-backend-root"
-    prefix              = ""
-    key                 = "devops-test/vpc/terraform.tfstate"
-    acl                 = "private"
-    encrypt             = "false"
-    tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"
-    tablestore_table    = "terraform_remote_backend_lock_table_root"
-    assume_role         = null
-  }
+data "alicloud_resource_manager_resource_groups" "rg" {
+  name_regex = "^${var.resource_group_name}"
 }
 
-data "terraform_remote_state" "internet" {
-  backend = "oss"
-  config = {
-    region              = "ap-southeast-1"
-    bucket              = "terraform-remote-backend-root"
-    prefix              = ""
-    key                 = "devops-test/internet/terraform.tfstate"
-    acl                 = "private"
-    encrypt             = "false"
-    tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"
-    tablestore_table    = "terraform_remote_backend_lock_table_root"
-    assume_role         = null
-  }
+data "alicloud_vpcs" "vpc" {
+  name_regex        = "^${var.vpc_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
-data "terraform_remote_state" "data_disk" {
-  backend = "oss"
-  config = {
-    bucket              = "terraform-remote-backend-root"
-    prefix              = ""
-    key                 = "devops-test/compute/data_disk/terraform.tfstate"
-    acl                 = "private"
-    region              = "ap-southeast-1"
-    encrypt             = "false"
-    tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"
-    tablestore_table    = "terraform_remote_backend_lock_table_root"
-    assume_role         = null
-  }
+data "alicloud_vswitches" "vsw" {
+  name_regex        = "^${var.vswitch_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
-data "alicloud_images" "centos_stream" {
-  name_regex  = "^centos_stream_9_x64"
+data "alicloud_security_groups" "sg" {
+  name_regex        = "^${var.security_group_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
+}
+
+data "alicloud_ecs_disks" "dd" {
+  name_regex        = "^${var.data_disk_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+}
+
+data "alicloud_nat_gateways" "ngw" {
+  name_regex        = "^${var.nat_gateway_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
+}
+
+data "alicloud_eip_addresses" "eip" {
+  name_regex        = "^${var.eip_address_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+}
+
+data "alicloud_images" "img" {
+  name_regex  = "^${var.ecs_image_name}"
   most_recent = true
   owners      = "system"
   status      = "Available"
 }
 
+resource "random_password" "root" {
+  length      = 10
+  min_lower   = 1
+  min_numeric = 1
+  min_upper   = 1
+  special     = false
 
-# root ssh key pair
-# https://stackoverflow.com/questions/49743220/how-do-i-create-an-ssh-key-in-terraform
-resource "tls_private_key" "gitlab_root" {
+  lifecycle {
+    ignore_changes = [
+      length,
+      special,
+    ]
+  }
+}
+
+# admin ssh key pair
+resource "tls_private_key" "admin" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "alicloud_ecs_key_pair" "gitlab_root" {
-  key_pair_name     = "gitlab_root"
-  resource_group_id = data.terraform_remote_state.vpc.outputs.resource_group_id
-  public_key        = tls_private_key.gitlab_root.public_key_openssh
+resource "alicloud_ecs_key_pair" "admin" {
+  key_pair_name     = "${var.ecs_server_name}_admin"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  public_key        = tls_private_key.admin.public_key_openssh
 }
 
 # https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/instance
-resource "alicloud_instance" "gitlab" {
-  resource_group_id = data.terraform_remote_state.vpc.outputs.resource_group_id
+resource "alicloud_instance" "ecs" {
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 
-  availability_zone = data.terraform_remote_state.vpc.outputs.vswitch_zone_id
-  security_groups   = [data.terraform_remote_state.vpc.outputs.security_group_id]
-  vswitch_id        = data.terraform_remote_state.vpc.outputs.vswitch_id
+  availability_zone = data.alicloud_vswitches.vsw.vswitches.0.zone_id
+  security_groups   = [data.alicloud_security_groups.sg.groups.0.id]
+  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
 
   # https://www.alibabacloud.com/help/zh/elastic-compute-service/latest/instance-family#t6
-  instance_type = "ecs.t6-c1m2.large"
-  instance_name = "DevOps_Compute-gitlab"
+  instance_type = var.ecs_instance_type
+  instance_name = "DevOps_Compute-${var.ecs_server_name}"
   description   = "This resource is managed by terraform"
-  key_name      = alicloud_ecs_key_pair.gitlab_root.key_pair_name
-  status        = "Running" # Running / Stopped
-  stopped_mode  = "StopCharging"
 
-  image_id                = data.alicloud_images.centos_stream.images[0].id
+  status       = "Stopped" # Running / Stopped
+  stopped_mode = "StopCharging"
+
+  image_id                = data.alicloud_images.img.images[0].id
   system_disk_category    = "cloud_efficiency"
-  system_disk_name        = "DevOps_Disk-gitlab_boot"
+  system_disk_name        = "DevOps_Disk-${var.ecs_server_name}_boot"
   system_disk_description = "This resource is managed by terraform"
 
+  host_name = var.ecs_server_name
+  password  = random_password.root.result
+
+  user_data = <<-EOT
+  #cloud-config
+  timezone: Asia/Shanghai
+
+  # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
+  package_update: true
+  package_upgrade: true
+  package_reboot_if_required: true
+  packages:
+    - cockpit
+    - cockpit-pcp
+    - cockpit-podman
+
+  # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
+  # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+  users:
+    - name: admin
+      gecos: admin
+      groups: wheel
+      lock_passwd: true
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      shell: /bin/bash
+      ssh_import_id: None
+      ssh_authorized_keys:
+        - ${tls_private_key.admin.public_key_openssh}
+
+  # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+  disk_setup:
+    /dev/vdb:
+      table_type: gpt
+      layout: True
+      overwrite: False
+
+  fs_setup:
+    - label: Data
+      filesystem: 'xfs'
+      device: '/dev/vdb'
+      partition: auto
+
+  # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+  # https://zhuanlan.zhihu.com/p/250658106
+  mounts:
+    - [ /dev/vdb1, /home/podmgr ]
+  mount_default_fields: [ None, None, "auto", "defaults,nofail,user", "0", "2" ]
+  EOT
 }
 
-resource "alicloud_ecs_disk_attachment" "gitlab_data_attach" {
-  disk_id     = data.terraform_remote_state.data_disk.outputs.gitlab_data_disk_id
-  instance_id = alicloud_instance.gitlab.id
+resource "alicloud_ecs_disk_attachment" "ecs_data_attach" {
+  disk_id = data.alicloud_ecs_disks.dd.disks.0.id
+  # disk_id     = data.terraform_remote_state.data_disk.outputs["${var.ecs_server_name}_data_disk_id"]
+  instance_id = alicloud_instance.ecs.id
 }
 
 # internet NIC
 # https://www.alibabacloud.com/help/zh/nat-gateway/latest/configure-ecs-instances-that-configured-with-dnat-ip-mapping-to-use-the-same-nat-ip-address-to-access-the-internet
-resource "alicloud_ecs_network_interface" "gitlab_internet_nic" {
-  description            = "This resource is managed by terraform"
-  network_interface_name = "DevOps_NIC-gitlab_internet"
-  vswitch_id             = data.terraform_remote_state.vpc.outputs.vswitch_id
-  resource_group_id      = data.terraform_remote_state.vpc.outputs.resource_group_id
-  security_group_ids     = [data.terraform_remote_state.vpc.outputs.security_group_id]
-}
+# !! DO NOT assign 2 NICs in same subnet to the same server
+# ref: 
+# https://access.redhat.com/solutions/30564
+# https://repost.aws/knowledge-center/ec2-ubuntu-secondary-network-interface
 
-// nic attachment
-resource "alicloud_ecs_network_interface_attachment" "gitlab_nic_attach" {
-  instance_id          = alicloud_instance.gitlab.id
-  network_interface_id = alicloud_ecs_network_interface.gitlab_internet_nic.id
-}
+# resource "alicloud_ecs_network_interface" "internet_nic" {
+#   description            = "This resource is managed by terraform"
+#   network_interface_name = "DevOps_NIC-${var.ecs_server_name}_internet"
+#   vswitch_id             = data.terraform_remote_state.vpc.outputs.vswitch_id
+#   resource_group_id      = data.terraform_remote_state.vpc.outputs.resource_group_id
+#   security_group_ids     = [data.terraform_remote_state.vpc.outputs.security_group_id]
+# }
 
-data "alicloud_ecs_network_interfaces" "gitlab_internet_nic" {
-  depends_on        = [alicloud_ecs_disk_attachment.gitlab_data_attach]
-  ids               = [alicloud_ecs_network_interface.gitlab_internet_nic.id]
-  resource_group_id = data.terraform_remote_state.vpc.outputs.resource_group_id
-}
+# nic attachment
+# resource "alicloud_ecs_network_interface_attachment" "internet_nic_attach" {
+#   instance_id          = alicloud_instance.ecs.id
+#   network_interface_id = alicloud_ecs_network_interface.internet_nic.id
+# }
+
+# data "alicloud_ecs_network_interfaces" "internet_nic" {
+#   ids               = [alicloud_ecs_network_interface.internet_nic.id]
+#   resource_group_id = data.terraform_remote_state.vpc.outputs.resource_group_id
+# }
 
 resource "alicloud_forward_entry" "ssh" {
-  forward_entry_name = "DevOps_DNAT-ssh"
-  forward_table_id   = data.terraform_remote_state.internet.outputs.nat_gateway_forward_table_ids
-  external_ip        = data.terraform_remote_state.internet.outputs.eip_addresses[1]
+  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_ssh"
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
   external_port      = "8022"
   ip_protocol        = "tcp"
-  # internal_ip        = alicloud_instance.gitlab.private_ip
-  internal_ip   = data.alicloud_ecs_network_interfaces.gitlab_internet_nic.interfaces[0].private_ip
-  internal_port = "22"
+  internal_ip        = alicloud_instance.ecs.private_ip
+  internal_port      = "22"
+  port_break         = true
 }

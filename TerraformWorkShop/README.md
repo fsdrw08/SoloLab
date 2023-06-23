@@ -3,7 +3,7 @@
 2. go to terraform resources related folder, run below command in 
 ```powershell
 $projectPath = git rev-parse --show-toplevel
-terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\plugins")
+terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\mirror")
 ```
 
 or download from https://releases.hashicorp.com/

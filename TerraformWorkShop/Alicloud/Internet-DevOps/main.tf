@@ -15,11 +15,12 @@ data "terraform_remote_state" "vpc" {
 }
 
 locals {
-  eip_count = 2
+  eip_count = 1
 }
+
 resource "alicloud_eip_address" "devops" {
   count                = local.eip_count
-  address_name         = "Devops_EIP-${count.index + 1}"
+  address_name         = "DevOps_EIP-${count.index + 1}"
   bandwidth            = 5
   description          = "This resource is managed by terraform"
   internet_charge_type = "PayByTraffic"
