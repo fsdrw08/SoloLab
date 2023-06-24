@@ -42,19 +42,23 @@ data "alicloud_images" "img" {
   status      = "Available"
 }
 
-resource "random_password" "root" {
-  length      = 10
-  min_lower   = 1
-  min_numeric = 1
-  min_upper   = 1
-  special     = false
+data "alicloud_instances" "ecs" {
+  name_regex        = "DevOps_Compute-${var.ecs_server_name}"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
+  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
+}
 
-  lifecycle {
-    ignore_changes = [
-      length,
-      special,
-    ]
-  }
+# root ssh key pair
+resource "tls_private_key" "root" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "alicloud_ecs_key_pair" "root" {
+  key_pair_name     = "${var.ecs_server_name}_root"
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  public_key        = tls_private_key.root.public_key_openssh
 }
 
 # admin ssh key pair
@@ -63,10 +67,9 @@ resource "tls_private_key" "admin" {
   rsa_bits  = 4096
 }
 
-resource "alicloud_ecs_key_pair" "admin" {
-  key_pair_name     = "${var.ecs_server_name}_admin"
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  public_key        = tls_private_key.admin.public_key_openssh
+resource "tls_private_key" "podmgr" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 # https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/instance
@@ -82,7 +85,7 @@ resource "alicloud_instance" "ecs" {
   instance_name = "DevOps_Compute-${var.ecs_server_name}"
   description   = "This resource is managed by terraform"
 
-  status       = "Stopped" # Running / Stopped
+  status       = length(data.alicloud_instances.ecs.instances) == 0 ? "Running" : "Stopped" # Running / Stopped
   stopped_mode = "StopCharging"
 
   image_id                = data.alicloud_images.img.images[0].id
@@ -91,7 +94,7 @@ resource "alicloud_instance" "ecs" {
   system_disk_description = "This resource is managed by terraform"
 
   host_name = var.ecs_server_name
-  password  = random_password.root.result
+  key_name  = alicloud_ecs_key_pair.root.key_pair_name
 
   user_data = <<-EOT
   #cloud-config
@@ -100,8 +103,9 @@ resource "alicloud_instance" "ecs" {
   # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
   package_update: true
   package_upgrade: true
-  package_reboot_if_required: true
+  package_reboot_if_required: false
   packages:
+    - podman
     - cockpit
     - cockpit-pcp
     - cockpit-podman
@@ -118,6 +122,14 @@ resource "alicloud_instance" "ecs" {
       ssh_import_id: None
       ssh_authorized_keys:
         - ${tls_private_key.admin.public_key_openssh}
+    - name: podmgr
+      gecos: podmgr
+      lock_passwd: true
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      shell: /bin/bash
+      ssh_import_id: None
+      ssh_authorized_keys:
+        - ${tls_private_key.podmgr.public_key_openssh}
 
   # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
   disk_setup:
@@ -141,8 +153,7 @@ resource "alicloud_instance" "ecs" {
 }
 
 resource "alicloud_ecs_disk_attachment" "ecs_data_attach" {
-  disk_id = data.alicloud_ecs_disks.dd.disks.0.id
-  # disk_id     = data.terraform_remote_state.data_disk.outputs["${var.ecs_server_name}_data_disk_id"]
+  disk_id     = data.alicloud_ecs_disks.dd.disks.0.id
   instance_id = alicloud_instance.ecs.id
 }
 

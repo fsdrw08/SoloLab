@@ -1,7 +1,14 @@
-# variable "access_key" {
-#   type = string
-# }
+variable "resource_group_name" {
+  type    = string
+  default = "devops"
+}
 
-# variable "secret_key" {
-#   type = string
-# }
+variable "vpc_name" {
+  type    = string
+  default = "DevOps"
+}
+
+variable "vswitch_name" {
+  type    = string
+  default = "DevOps"
+}

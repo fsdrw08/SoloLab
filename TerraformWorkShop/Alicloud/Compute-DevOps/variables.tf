@@ -27,6 +27,7 @@ variable "ecs_instance_type" {
   type    = string
   default = "ecs.t6-c1m2.large"
 }
+
 variable "ecs_image_name" {
   type    = string
   default = "centos_stream_9_x64"
@@ -37,6 +38,10 @@ variable "ecs_server_name" {
   default = "gitlab"
 }
 
+variable "ecs_status" {
+  type    = string
+  default = "Stopped"
+}
 
 variable "data_disk_name" {
   type    = string
