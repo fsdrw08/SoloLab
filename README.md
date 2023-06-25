@@ -13,7 +13,13 @@ a lab to build all VMs in one (windows 10+) host
 
 ### to add git sub module
 ```powershell
+cd $(git rev-parse --show-toplevel)
 $url="https://github.com/freeipa/ansible-freeipa.git"
-$path="AnsibleWorkShop/roles/ansible-freeipa"
-git submodule add $url $path
+$submoduleDir="AnsibleWorkShop/runner/project/roles/ansible-freeipa"
+
+# ansible-role-k3s
+$url="https://github.com/PyratLabs/ansible-role-k3s.git"
+$branch="v3_release"
+$submoduleDir="AnsibleWorkShop/runner/project/roles/ansible-role-k3s"
+git submodule add --force -b $branch $url $submoduleDir
 ```
