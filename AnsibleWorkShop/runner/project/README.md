@@ -32,6 +32,13 @@ podman run --rm `
 
 podman run --rm `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ../:/tmp/private `
+    localhost/ansible-ee-aio-new `
+    bash -c "cat /tmp/private/env/ssh.key > /tmp/ssh.key; 
+    chmod 600 /tmp/ssh.key; ls -al /tmp/ssh.key; ansible-runner run -p Invoke-PodmanRootlessProvision.yml /tmp/private -vv "
+
+podman run --rm `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ../:/work:z `
     localhost/ansible-ee-aio-new `
     ansible-playbook -v -i /work/inventory /work/project/Invoke-PodmanRootlessProvision.yml
