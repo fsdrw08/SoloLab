@@ -50,6 +50,7 @@ podman run --rm `
    # ansible-builder v3:
    ansible-builder create --file ./execution-environment.yml
    ```
+   run in wsl
    ```shell
    PROXY="http://10.20.72.21:9999" && ansible-builder build -t ansible-ee-aio-new:latest -v 3 --build-arg PROXY=$PROXY
    ```

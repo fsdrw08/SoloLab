@@ -10,10 +10,10 @@ ref:
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
 $roleName="ansible-podman-rootless-play"
-podman run --rm -v ../:/runner `
+podman run --rm -v ./:/runner `
     localhost/ansible-ee-aio bash -c "cd /runner/project/roles/ && ansible-galaxy init $roleName"
 
-podman run --rm -v ../:/runner `
+podman run --rm -v ./:/runner `
     localhost/ansible-ee-aio bash -c "ansible --version"
 ```
 
@@ -26,26 +26,26 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio-new `
     ansible-runner run /runner -vv
 
 podman run --rm `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/tmp/private `
+    -v ./:/tmp/private `
     localhost/ansible-ee-aio-new `
     bash -c "cat /tmp/private/env/ssh.key > /tmp/ssh.key; 
     chmod 600 /tmp/ssh.key; ls -al /tmp/ssh.key; ansible-runner run -p Invoke-PodmanRootlessProvision.yml /tmp/private -vv "
 
 podman run --rm `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/work:z `
+    -v ./:/work:z `
     localhost/ansible-ee-aio-new `
     ansible-playbook -v -i /work/inventory /work/project/Invoke-PodmanRootlessProvision.yml
 
 podman run --rm `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio-new `
     ansible-runner run --directory-isolation-base-path /tmp/runner  run -vv
 
@@ -53,7 +53,7 @@ podman run --rm `
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessPlay.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -61,7 +61,7 @@ podman run --rm `
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -70,7 +70,7 @@ podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -78,7 +78,7 @@ podman run --rm `
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -86,7 +86,7 @@ podman run --rm `
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-VaultInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -95,7 +95,7 @@ podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Initialize-Vault.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -103,7 +103,7 @@ podman run --rm `
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-KeyCloakInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -112,7 +112,7 @@ podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Update-KeyCloakConfig.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -121,7 +121,7 @@ podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Deploy-MinIOInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -161,7 +161,7 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-xanmanning.k3s.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # have a check of k3s cert
@@ -174,21 +174,21 @@ openssl x509 -in /var/lib/rancher/k3s/server/tls/server-ca.crt -text -noout
 ```powershell
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-KubeResource.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vvvv
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-HelmInfo.yml     
-    -v ../:/runner localhost/ansible-ee-aio
+    -v ./:/runner localhost/ansible-ee-aio
     
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/test.yml `
-    -v ../:/runner localhost/ansible-ee-aio `
+    -v ./:/runner localhost/ansible-ee-aio `
     ansible-runner run /runner -vvvv
 ```
 
@@ -197,82 +197,82 @@ podman run --rm `
 # terraform
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../TerraformWorkShop/:/TerraformWorkShop/ `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Invoke-Terraform.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 # test merge
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Debug-Vars.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # copy item
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Copy-Items.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../TerraformWorkShop/:/TerraformWorkShop/ `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 # test j2 template render and copy to target
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Invoke-Podman.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # test podman socket api
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Invoke-PodmanAPI.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # config podman in target host
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-KernelModules.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # get service
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-Service.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # new podman session
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/New-PodmanSession.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # new podman session
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/New-PodmanNetwork.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # get vyos version 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-VyosInfo.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # Set vyos dhcp ddns
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Set-VyosDhcpDDNS.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # get freeipa root ca cert
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-IPACACert.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 # invoke freeipa request
@@ -280,37 +280,37 @@ podman run --rm `
     --add-host ipa.finra.sololab:192.168.255.31 `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -e RUNNER_PLAYBOOK=./debug/Invoke-IPARequest.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
 # new ldap object
 podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/New-LDAPObject.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Get-Facts.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
 # extra vars
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Debug-ExtraVars.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
 # traefik
 podman run --rm --add-host ipa.finra.sololab:192.168.255.31 `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
 # create pod
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/New-PodmanPod.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
@@ -318,7 +318,7 @@ podman run --rm `
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/Invoke-KeycloakRequest.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vvv
 
@@ -327,7 +327,7 @@ podman run --rm `
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/Debug-Template.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -335,7 +335,7 @@ podman run --rm `
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/Get-RootCACert.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -343,7 +343,7 @@ podman run --rm `
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/Debug-Delegate.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -357,7 +357,7 @@ podman run --rm `
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=./debug/Debug-VaultLDAPAuth.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio ansible-runner run /runner -vv
 
@@ -373,16 +373,16 @@ podman run --rm `
 ```powershell
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-FreeIPA.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 
 podman run --rm `
     -e RUNNER_PLAYBOOK=./debug/Update-Hosts.yml `
-    -v ../:/runner `
+    -v ./:/runner `
     localhost/ansible-ee-k8s ansible-runner run /runner -vvvv
 ```
