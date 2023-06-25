@@ -2,3 +2,7 @@
 	path = HelmWorkShop/helm-charts
 	url = https://github.com/fsdrw08/helm-charts.git
 	branch = gh-pages
+[submodule "AnsibleWorkShop/runner/project/roles/ansible-role-k3s"]
+	path = AnsibleWorkShop/runner/project/roles/ansible-role-k3s
+	url = https://github.com/PyratLabs/ansible-role-k3s.git
+	branch = v3_release
