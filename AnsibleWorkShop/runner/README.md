@@ -5,13 +5,19 @@ ref:
  - [ansible-runner/Dockerfile](https://github.com/ansible/ansible-runner/blob/devel/Dockerfile)
  - [demo](https://github.com/ansible/ansible-runner/tree/devel/demo)
 
+## pull or build the ansible-ee-aio image first
+ref [../builder/README.md](../builder/README.md)
+```powershell
+podman pull docker.io/fsdrw08/sololab-ansible-ee
+podman tag docker.io/fsdrw08/sololab-ansible-ee localhost/ansible-ee-aio 
+```
 
 ## create a role
 ```powershell
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
 $roleName="ansible-podman-rootless-play"
 podman run --rm -v ./:/runner `
-    localhost/ansible-ee-aio bash -c "cd /runner/project/roles/ && ansible-galaxy init $roleName"
+    localhost/ansible-ee-aio-new bash -c "cd /runner/project/roles/ && ansible-galaxy init $roleName"
 
 podman run --rm -v ./:/runner `
     localhost/ansible-ee-aio bash -c "ansible --version"
@@ -19,35 +25,45 @@ podman run --rm -v ./:/runner `
 
 
 ## deploy podman rootless
+powershell:
 ```powershell
-cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\project)
+cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
 podman run --rm `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/runner `
-    localhost/ansible-ee-aio-new `
-    ansible-runner run /runner -vv
-
-podman run --rm `
-    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:/tmp/private `
-    localhost/ansible-ee-aio-new `
-    bash -c "cat /tmp/private/env/ssh.key > /tmp/ssh.key; 
-    chmod 600 /tmp/ssh.key; ls -al /tmp/ssh.key; ansible-runner run -p Invoke-PodmanRootlessProvision.yml /tmp/private -vv "
+    localhost/ansible-ee-aio `
+    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
+    ansible-runner run /tmp/private -vv "
 
 podman run --rm `
+    -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/work:z `
-    localhost/ansible-ee-aio-new `
-    ansible-playbook -v -i /work/inventory /work/project/Invoke-PodmanRootlessProvision.yml
+    -v ./:/tmp/private:z `
+    docker.io/fsdrw08/sololab-ansible-ee `
+    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
+    ansible-runner run /tmp/private -vv "
+```
 
-podman run --rm `
-    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/runner `
-    localhost/ansible-ee-aio-new `
-    ansible-runner run --directory-isolation-base-path /tmp/runner  run -vv
+shell:
+```shell
+cd $(git rev-parse --show-toplevel)/AnsibleWorkShop/runner
+
+podman run --rm \
+    -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml \
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False \
+    -v ./:/tmp/private \
+    localhost/ansible-ee-aio \
+    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
+    ansible-runner run /tmp/private --artifact-dir /tmp/artifacts -vv "
+```
+
+```powershell
 
 # deploy pod (run podman play)
 podman run --rm `
