@@ -16,7 +16,7 @@ sololab:
       ansible_user: vagrant
       ansible_host: localhost
       ansible_python_interpreter: /usr/bin/python3
-      # ansible_ssh_private_key_file: ~/.ssh/vagrant
+      # ansible_ssh_private_key_file: ~/.ssh/ssh.key
     kube-1:
       ansible_user: vagrant
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
@@ -25,12 +25,12 @@ sololab:
       ansible_python_interpreter: /usr/bin/python3
       ansible_ssh_private_key_file: /tmp/ssh.key
     kube-2:
-      ansible_user: vagrant
+      ansible_user: podmgr
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
       # ansible_ssh_pass: vagrant
       ansible_host: 192.168.255.11
       ansible_python_interpreter: /usr/bin/python3
-      ansible_ssh_private_key_file: /tmp/ssh.key
+      ansible_ssh_private_key_file: ~/.ssh/ssh.key
     kube-3:
       ansible_user: vagrant
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
