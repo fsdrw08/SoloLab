@@ -17,7 +17,7 @@ if ($projectPath) {
     $TF_CLI_CONFIG_FILE = 
     @"
 $provider_installation_block
-plugin_cache_dir = $plugin_cache_dir
+plugin_cache_dir = "$plugin_cache_dir"
 disable_checkpoint = true
 "@
     # https://developer.hashicorp.com/terraform/cli/config/config-file#locations
