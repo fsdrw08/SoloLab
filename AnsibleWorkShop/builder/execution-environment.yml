@@ -45,7 +45,6 @@ additional_build_steps:
     # - RUN find /output/scripts/ -type f -exec chmod +x {} \;
     - RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
   append_final:
-    - ARG PROXY
     - ARG TERRAFORM_VERSION=1.4.6
 
     - RUN cd /tmp &&
@@ -61,4 +60,3 @@ additional_build_steps:
       chmod +x /usr/local/bin/helm
 
     - RUN /usr/local/bin/helm plugin install https://github.com/databus23/helm-diff
-    
