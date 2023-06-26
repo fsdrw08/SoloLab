@@ -54,6 +54,8 @@ module "cloudinit_nocloud_iso" {
           - cockpit
           - cockpit-pcp
           - cockpit-podman
+          - podman
+          - git
         
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
         disk_setup:
