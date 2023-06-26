@@ -53,14 +53,14 @@ shell:
 ```shell
 cd $(git rev-parse --show-toplevel)/AnsibleWorkShop/runner
 
-podman run --rm \
+# https://github.com/containers/podman/blob/main/troubleshooting.md#:~:text=In%20cases%20where%20the%20container%20image%20runs%20as%20a%20specific%2C%20non%2Droot%20user
+podman run --rm --userns=keep-id \
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml \
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False \
-    -v ./:/tmp/private \
-    localhost/ansible-ee-aio \
-    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
-    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
-    ansible-runner run /tmp/private --artifact-dir /tmp/artifacts -vv "
+    -v ./:/runner \
+    docker.io/fsdrw08/sololab-ansible-ee \
+    bash -c "ansible-runner run /runner -vv"
+
 ```
 
 ```powershell
