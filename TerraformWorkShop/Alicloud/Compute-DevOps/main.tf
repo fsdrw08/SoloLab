@@ -85,7 +85,7 @@ resource "alicloud_instance" "ecs" {
   instance_name = "DevOps_Compute-${var.ecs_server_name}"
   description   = "This resource is managed by terraform"
 
-  status       = length(data.alicloud_instances.ecs.instances) == 0 ? "Running" : "Stopped" # Running / Stopped
+  status       = "Running" # Running / Stopped
   stopped_mode = "StopCharging"
 
   image_id                = data.alicloud_images.img.images[0].id
@@ -147,7 +147,7 @@ resource "alicloud_instance" "ecs" {
   # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
   # https://zhuanlan.zhihu.com/p/250658106
   mounts:
-    - [ /dev/vdb1, /home/podmgr ]
+    - [ /dev/vdb1, /home/podmgr, auto, "nofail,exec", ]
   mount_default_fields: [ None, None, "auto", "defaults,nofail,user", "0", "2" ]
   EOT
 }
