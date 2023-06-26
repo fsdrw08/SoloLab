@@ -36,6 +36,15 @@ module "cloudinit_nocloud_iso" {
             ssh_import_id: None
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+          - name: podmgr
+            gecos: podmgr
+            plain_text_passwd: podmgr
+            lock_passwd: false
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
         
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
         package_update: true
@@ -62,8 +71,8 @@ module "cloudinit_nocloud_iso" {
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
         # https://zhuanlan.zhihu.com/p/250658106
         mounts:
-          - [ /dev/sdb1, /home/vagrant ]
-        mount_default_fields: [ None, None, "auto", "defaults,nofail,user", "0", "2" ]
+          - [ /dev/sdb1, /home/podmgr, auto, "nofail,exec", ]
+        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
 
         # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
