@@ -6,7 +6,7 @@
     ipa:
       hostname: ipa.infra.sololab
     
-    kube_file_template: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
+    kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
 
     podman_rootless_play:
       vars_podman_host: "{{ ansible_host }}"
@@ -19,7 +19,7 @@
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ rendered }}"
+          content: "{{ lookup('ansible.builtin.template', kube_file_tmpl) }}"
         absent:
           query_params:
             force: true
@@ -38,22 +38,20 @@
 
     ingress_file_tmpl: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
   tasks:
-    - name: Prepare kube_file content
-      when:
-        - Root_CA_Cert is defined
-      block:
-        - name: Render kube file content
-          ansible.builtin.template:
-            src: "{{ kube_file_template }}"
-            dest: /dev/null
-          check_mode: true
-          diff: true
-          no_log: false
-          register: template
+    # - name: Prepare kube_file content
+    #   block:
+    #     - name: Render kube file content
+    #       ansible.builtin.template:
+    #         src: "{{ kube_file_template }}"
+    #         dest: /dev/null
+    #       check_mode: true
+    #       diff: true
+    #       no_log: false
+    #       register: template
 
-        - name: Set fact rendered
-          ansible.builtin.set_fact:
-            rendered: "{{ template.diff[0].after }}"
+    #     - name: Set fact rendered
+    #       ansible.builtin.set_fact:
+    #         rendered: "{{ template.diff[0].after }}"
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
