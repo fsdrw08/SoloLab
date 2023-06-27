@@ -12,3 +12,7 @@ variable "vswitch_name" {
   type    = string
   default = "DevOps"
 }
+
+variable "domain_name" {
+  type = string
+}

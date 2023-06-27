@@ -67,6 +67,12 @@ resource "tls_private_key" "admin" {
   rsa_bits  = 4096
 }
 
+resource "local_sensitive_file" "admin" {
+  filename = "${path.module}/gitlab-admin.key"
+  content  = tls_private_key.admin.private_key_openssh
+}
+
+# podmgr ssh key pair
 resource "tls_private_key" "podmgr" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -85,7 +91,7 @@ resource "alicloud_instance" "ecs" {
   instance_name = "DevOps_Compute-${var.ecs_server_name}"
   description   = "This resource is managed by terraform"
 
-  status       = "Running" # Running / Stopped
+  status       = "Stopped" # Running / Stopped
   stopped_mode = "StopCharging"
 
   image_id                = data.alicloud_images.img.images[0].id
@@ -191,5 +197,27 @@ resource "alicloud_forward_entry" "ssh" {
   ip_protocol        = "tcp"
   internal_ip        = alicloud_instance.ecs.private_ip
   internal_port      = "22"
+  port_break         = true
+}
+
+resource "alicloud_forward_entry" "http" {
+  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+  external_port      = "80"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_instance.ecs.private_ip
+  internal_port      = "80"
+  port_break         = true
+}
+
+resource "alicloud_forward_entry" "https" {
+  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+  external_port      = "443"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_instance.ecs.private_ip
+  internal_port      = "443"
   port_break         = true
 }

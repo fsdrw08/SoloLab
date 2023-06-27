@@ -24,6 +24,7 @@ resource "alicloud_eip_address" "eip" {
   description          = "This resource is managed by terraform"
   internet_charge_type = "PayByTraffic"
   isp                  = "BGP"
+  netmode              = "public"
   payment_type         = "PayAsYouGo"
   resource_group_id    = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
@@ -52,4 +53,24 @@ resource "alicloud_snat_entry" "snat" {
   snat_table_id     = alicloud_nat_gateway.ngw.snat_table_ids
   source_vswitch_id = data.alicloud_vswitches.vsw.vswitches.0.id
   snat_ip           = alicloud_eip_address.eip[0].ip_address
+}
+
+resource "alicloud_alidns_record" "alidnscheck" {
+  domain_name = var.domain_name
+  rr          = "alidnscheck"
+  remark      = "For Proving DNS Ownership"
+  status      = "ENABLE"
+  ttl         = "86400"
+  type        = "TXT"
+  value       = "c76842bdc6ac4e59bffacb1ad8df8f2d"
+}
+
+resource "alicloud_alidns_record" "r-proxy" {
+  domain_name = var.domain_name
+  rr          = "r-proxy"
+  remark      = "reverse proxy traefik mgmt web"
+  status      = "ENABLE"
+  ttl         = "600"
+  type        = "A"
+  value       = alicloud_eip_address.eip[0].ip_address
 }
