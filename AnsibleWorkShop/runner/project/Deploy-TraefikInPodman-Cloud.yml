@@ -3,11 +3,9 @@
 - hosts: gitlab.devops.p2w3 # kube-2
   gather_facts: yes
   vars: 
-    ipa:
+    ca:
       hostname: ipa.infra.sololab
     
-    kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
-
     podman_rootless_play:
       vars_podman_host: "{{ ansible_host }}"
       vars_podman_uri:
@@ -19,7 +17,7 @@
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ lookup('ansible.builtin.template', kube_file_tmpl) }}"
+          content: "{{ lookup('ansible.builtin.template', '/KubeWorkShop/Traefik/aio-traefik-cloud.yaml') }}"
         absent:
           query_params:
             force: true
@@ -38,20 +36,24 @@
 
     ingress_file_tmpl: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
   tasks:
-    # - name: Prepare kube_file content
-    #   block:
-    #     - name: Render kube file content
-    #       ansible.builtin.template:
-    #         src: "{{ kube_file_template }}"
-    #         dest: /dev/null
-    #       check_mode: true
-    #       diff: true
-    #       no_log: false
-    #       register: template
+    - name: Get root ca
+      delegate_to: localhost
+      block:
+        - name: run openssl s_client -showcerts
+          ansible.builtin.shell:
+            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+            cmd: >
+              echo | 
+              openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
+              tac | 
+              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+              tac
+          changed_when: false
+          register: RootCACert
 
-    #     - name: Set fact rendered
-    #       ansible.builtin.set_fact:
-    #         rendered: "{{ template.diff[0].after }}"
+        - name: Set fact Root_CA_Cert
+          ansible.builtin.set_fact:
+            Root_CA_Cert: "{{ RootCACert.stdout }}"
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:

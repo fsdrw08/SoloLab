@@ -45,10 +45,11 @@ data:
             - "0.0.0.0/0"
       websecure:
         address: ":443"
-        http:
-          # https://doc.traefik.io/traefik/routing/entrypoints/#tls
-          tls:
-            certResolver: letsencrypt
+        # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
+        # http:
+        #   # https://doc.traefik.io/traefik/routing/entrypoints/#tls
+        #   tls:
+        #     certResolver: letsencrypt
         # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
         forwardedHeaders:
           trustedIPs:
@@ -64,8 +65,8 @@ data:
     certificatesResolvers:
       letsencrypt:
         acme:
-          caServer: https://acme-v02.api.letsencrypt.org/directory
-          email: {{ ACME_email | default ('')}}
+          caServer: {{ ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
+          email: {{ ACME_email | default('')}}
           storage: /mnt/acmeStorage/acme.json
           httpChallenge:
             # used during the challenge
@@ -97,10 +98,14 @@ spec:
         - name: https
           containerPort: 443
           hostPort: 443
-      # env:
+      env:
       #   # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
       #   - name: LEGO_CA_CERTIFICATES
       #     value: /etc/traefik/root_ca.crt
+        # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/15
+        # https://github.com/go-acme/lego/blob/bc4b57accc090b9c61bde051c99fcb14e952f6e6/lego/client_config.go#L18-L28
+        - name: LEGO_CA_SYSTEM_CERT_POOL
+          value: "true"
       volumeMounts:
         # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
         - name: traefik.yml
@@ -120,7 +125,7 @@ spec:
             path: traefik.yml
     - name: fileProvider
       hostPath:
-        path: /home/podmgr/traefik/
+        path: /home/{{ ansible_user }}/traefik/
         type: Directory
     - name: acmeStorage
       persistentVolumeClaim:

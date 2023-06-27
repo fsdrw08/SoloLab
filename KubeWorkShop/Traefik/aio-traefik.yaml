@@ -5,7 +5,7 @@ metadata:
 spec:
   resources:
     requests:
-      storage: 20Gi
+      storage: 10Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
@@ -39,23 +39,19 @@ data:
       # https://doc.traefik.io/traefik/routing/routers/#configuration-example
       web:
         address: ":80"
-        # https://doc.traefik.io/traefik/routing/entrypoints/#redirection
-        # http:
-        #   redirections:
-        #     entryPoint:
-        #       to: websecure
-        #       scheme: https
         # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
         forwardedHeaders:
           trustedIPs:
             - "0.0.0.0/0"
       websecure:
         address: ":443"
-        http:
-          # https://doc.traefik.io/traefik/routing/entrypoints/#tls
-          tls:
-            certResolver: freeipa
+        # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
+        # http:
+        #   # https://doc.traefik.io/traefik/routing/entrypoints/#tls
+        #   tls:
+        #     certResolver: freeipa
         # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        # https://www.bboy.app/2020/04/16/traefik%E5%90%8E%E7%AB%AF%E5%BA%94%E7%94%A8%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E7%9C%9F%E5%AE%9Eip/
         forwardedHeaders:
           trustedIPs:
             - "0.0.0.0/0"
@@ -76,8 +72,8 @@ data:
     certificatesResolvers:
       freeipa:
         acme:
-          caServer: https://ipa-ca.infra.sololab/acme/directory
-          email: admin@INFRA.SOLOLAB
+          caServer: {{ ACME_URL | default('https://ipa-ca.infra.sololab/acme/directory') }}
+          email: {{ ACME_email | default('')}}
           storage: /mnt/acmeStorage/acme.json
           httpChallenge:
             # used during the challenge
@@ -113,9 +109,13 @@ spec:
           hostIP: 192.168.255.32
           hostPort: 443
       env:
-        # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+        # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients/index.html#traefik
         - name: LEGO_CA_CERTIFICATES
           value: /etc/traefik/root_ca.crt
+        # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/15
+        # https://github.com/go-acme/lego/blob/bc4b57accc090b9c61bde051c99fcb14e952f6e6/lego/client_config.go#L18-L28
+        - name: LEGO_CA_SYSTEM_CERT_POOL
+          value: "true"
       volumeMounts:
         # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
         - name: traefik.yml
@@ -144,7 +144,7 @@ spec:
             path: root_ca.crt
     - name: fileProvider
       hostPath:
-        path: /home/vagrant/traefik/
+        path: /home/{{ ansible_user }}/traefik/
         type: Directory
     - name: acmeStorage
       persistentVolumeClaim:
