@@ -67,16 +67,9 @@
 
     - name: Config reverse proxy
       block:
-        - name: Render route config
-          ansible.builtin.template:
-            src: "{{ ingress_file_tmpl }}"
-            dest: /dev/null
-          delegate_to: localhost
-
-        # need to improve the process to render then copy
-        - name: present route config
+        - name: render and present route config
           ansible.builtin.copy:
-            src: "{{ ingress_file }}"
+            content: "{{ lookup('ansible.builtin.template', ingress_file_tmpl) }}"
             dest: /home/{{ ansible_user }}/traefik/
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'

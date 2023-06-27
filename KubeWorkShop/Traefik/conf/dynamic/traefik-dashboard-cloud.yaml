@@ -2,7 +2,7 @@
 http:
   routers:
     dashboard:
-      rule: Host(`r-proxy.p2w3`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`r-proxy.{{ domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       # https://www.teanote.pub/archives/247
       # https://doc.traefik.io/traefik/routing/routers/#tls
