@@ -63,6 +63,7 @@ podman run --rm --userns=keep-id \
 
 ```
 
+## run podman play 
 ```powershell
 
 # deploy pod (run podman play)
@@ -72,8 +73,11 @@ podman run --rm `
     -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+```
 
-# deploy freeipa in podman
+## deploy FreeIPA by invoke podman rootless play role
+```powershell
+# deploy FreeIPA in podman
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
@@ -81,7 +85,7 @@ podman run --rm `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
 
-# freeipa post-process
+# FreeIPA post-process
 podman run --rm `
     --dns 192.168.255.31 `
     -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
@@ -89,16 +93,20 @@ podman run --rm `
     -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+```
 
-# deploy traefik in podman
+## deploy Traefik by invoke podman rootless play role
+```powershell
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+```
 
-# deploy hashicorp vault in podman
+## deploy hashicorp vault in podman by invoke podman rootless play role
+```powershell
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-VaultInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
