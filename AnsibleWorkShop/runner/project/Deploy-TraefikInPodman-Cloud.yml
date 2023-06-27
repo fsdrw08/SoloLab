@@ -1,0 +1,89 @@
+# code: language=ansible
+---
+- hosts: gitlab.devops.p2w3 # kube-2
+  gather_facts: yes
+  vars: 
+    ipa:
+      hostname: ipa.infra.sololab
+    
+    kube_file_template: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
+
+    podman_rootless_play:
+      vars_podman_host: "{{ ansible_host }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: present # absent / present
+        timeout: 600
+        kube_file: 
+          host: localhost
+          content: "{{ rendered }}"
+        absent:
+          query_params:
+            force: true
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: traefik
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
+    ingress_file_tmpl: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
+  tasks:
+    - name: Prepare kube_file content
+      when:
+        - Root_CA_Cert is defined
+      block:
+        - name: Render kube file content
+          ansible.builtin.template:
+            src: "{{ kube_file_template }}"
+            dest: /dev/null
+          check_mode: true
+          diff: true
+          no_log: false
+          register: template
+
+        - name: Set fact rendered
+          ansible.builtin.set_fact:
+            rendered: "{{ template.diff[0].after }}"
+
+    - name: Invoke podman-rootless-play
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Config reverse proxy
+      block:
+        - name: Render route config
+          ansible.builtin.template:
+            src: "{{ ingress_file_tmpl }}"
+            dest: /dev/null
+          delegate_to: localhost
+
+        # need to improve the process to render then copy
+        - name: present route config
+          ansible.builtin.copy:
+            src: "{{ ingress_file }}"
+            dest: /home/{{ ansible_user }}/traefik/
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: absent route config
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/{{ ingress_file | basename }}
+            state: absent
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'absent'

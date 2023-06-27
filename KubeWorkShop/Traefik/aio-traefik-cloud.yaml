@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik
+data:
+  traefik.yml: |
+    # Static Configuration
+
+    ## Configuration Discovery
+    # https://doc.traefik.io/traefik/providers/overview/
+    providers:
+    # https://doc.traefik.io/traefik/providers/file/#directory
+      file:
+        directory: /etc/traefik/dynamic/
+        watch: true
+
+    # ref: https://www.vtulluru.com/how-to-install-traefik-as-a-container-using-docker-or-podman/
+    # https://doc.traefik.io/traefik/reference/static-configuration/file/
+    global:
+      checkNewVersion: false
+      sendAnonymousUsage: false
+
+    ## Routing & Load Balancing
+    # https://doc.traefik.io/traefik/routing/overview/
+    entryPoints:
+      # https://doc.traefik.io/traefik/routing/entrypoints/#entrypoints
+      # https://doc.traefik.io/traefik/routing/routers/#configuration-example
+      web:
+        address: ":80"
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
+      websecure:
+        address: ":443"
+        http:
+          # https://doc.traefik.io/traefik/routing/entrypoints/#tls
+          tls:
+            certResolver: letsencrypt
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        forwardedHeaders:
+          trustedIPs:
+            - "0.0.0.0/0"
+
+    ## Operations
+    # https://doc.traefik.io/traefik/operations/api/
+    api:
+      dashboard: true
+
+    # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+    # https://doc.traefik.io/traefik/https/acme/#certificate-resolvers
+    certificatesResolvers:
+      letsencrypt:
+        acme:
+          caServer: https://acme-v02.api.letsencrypt.org/directory
+          email: {{ ACME_email | default ('')}}
+          storage: /mnt/acmeStorage/acme.json
+          httpChallenge:
+            # used during the challenge
+            entryPoint: web
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traefik
+  labels:
+    name: traefik
+spec:
+  # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
+  # https://www.traefik.org/page/Docker#traefik_server_containers
+  containers:
+    - name: traefik
+      image: docker.io/library/traefik:latest
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      ports:
+        # https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-official-docker-image
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostPort: 443
+      # env:
+      #   # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
+      #   - name: LEGO_CA_CERTIFICATES
+      #     value: /etc/traefik/root_ca.crt
+      volumeMounts:
+        # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
+        - name: traefik.yml
+          mountPath: /etc/traefik/traefik.yml
+          subPath: traefik.yml
+        - name: fileProvider
+          mountPath: /etc/traefik/dynamic/
+        - name: acmeStorage
+          mountPath: /mnt/acmeStorage
+  volumes:
+    - name: traefik.yml
+      # https://kubernetes.io/docs/concepts/storage/volumes/#configmap
+      configMap:
+        name: traefik
+        items:
+          - key: traefik.yml
+            path: traefik.yml
+    - name: fileProvider
+      hostPath:
+        path: /home/podmgr/traefik/
+        type: Directory
+    - name: acmeStorage
+      persistentVolumeClaim:
+        claimName: traefik
+  restartPolicy: Never

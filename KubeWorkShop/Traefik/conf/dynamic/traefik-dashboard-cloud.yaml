@@ -1,0 +1,17 @@
+# Dynamic Configuration
+http:
+  routers:
+    dashboard:
+      rule: Host(`r-proxy.p2w3`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      # https://www.teanote.pub/archives/247
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # will terminate the TLS request
+      # tls:
+      #   certResolver: freeipa
+# tls:
+#   stores:
+#     default:
+#       defaultCertificate:
+#         certFile: /etc/traefik/dynamic/sololab_infra.crt
+#         keyFile: /etc/traefik/dynamic/sololab_infra.key
