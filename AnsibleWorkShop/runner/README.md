@@ -30,37 +30,30 @@ powershell:
 cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
-podman run --rm `
+$private_data_dir = "/tmp/private"
+podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/tmp/private `
-    localhost/ansible-ee-aio `
-    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
-    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
-    ansible-runner run /tmp/private -vv "
-
-podman run --rm `
-    -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
-    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/tmp/private:z `
-    docker.io/fsdrw08/sololab-ansible-ee `
-    bash -c "mkdir -p ~/.ssh; cat /tmp/private/env/podmgr.key > ~/.ssh/ssh.key; 
-    chmod 600 ~/.ssh/ssh.key; ls -al ~/.ssh/ssh.key; 
-    ansible-runner run /tmp/private -vv "
+    -v ./:$private_data_dir `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
 ```
 
-shell:
+shell(put the key to ssh_key file first):
 ```shell
 cd $(git rev-parse --show-toplevel)/AnsibleWorkShop/runner
 
 # https://github.com/containers/podman/blob/main/troubleshooting.md#:~:text=In%20cases%20where%20the%20container%20image%20runs%20as%20a%20specific%2C%20non%2Droot%20user
+private_data_dir="/tmp/private"
 podman run --rm --userns=keep-id \
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml \
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False \
-    -v ./:/runner \
+    -v ./:$private_data_dir \
     docker.io/fsdrw08/sololab-ansible-ee \
-    bash -c "ansible-runner run /runner -vv"
-
+    bash -c "ansible-runner run $private_data_dir -vv"
 ```
 
 ## run podman play 
@@ -78,6 +71,19 @@ podman run --rm `
 ## deploy FreeIPA by invoke podman rootless play role
 ```powershell
 # deploy FreeIPA in podman
+$private_data_dir = "/tmp/private"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+
+
 podman run --rm `
     -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
