@@ -97,16 +97,30 @@ module "cloudinit_nocloud_iso" {
       },
       {
         filename = "network-config"
-        content  = <<-EOT
-        version: 2
-        ethernets:
-          eth0:
-            addresses:
-              - 192.168.255.1${count.index + 1}/255.255.255.0
-            gateway4: 192.168.255.1
-            nameservers:
-              addresses: 192.168.255.1
+        # https://cloudinit.readthedocs.io/en/latest/reference/network-config.html#network-configuration-outputs
+        content = <<-EOT
+        network:
+          version: 1
+          config:
+            - type: physical
+              name: eth0
+              subnets:
+                - type: static
+                  address: 192.168.255.1${count.index + 1}/24
+                  gateway: 192.168.255.1
+                  dns_nameservers:
+                    - 192.168.255.1
+
         EOT
+        # version: 2
+        # ethernets:
+        #   eth0:
+        #     dhcp4: false
+        #     addresses:
+        #       - 192.168.255.1${count.index + 1}/255.255.255.0
+        #     gateway4: 192.168.255.1
+        #     nameservers:
+        #       addresses: 192.168.255.1
       }
     ]
   }
