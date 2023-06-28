@@ -1,6 +1,17 @@
 # code: language=ansible
 ---
-extra: test
+target_host: kube-2
 
-ACME_email: 
-domain_name: 
+FreeIPA_domain_name: infra.sololab
+FreeIPA_realm: infra.sololab
+FreeIPA_ds_password: P@ssw0rd
+FreeIPA_admin_password: P@ssw0rd
+FreeIPA_dns_forwarder: 192.168.255.1
+FreeIPA_tsig_algorithm: "hmac-sha256"
+FreeIPA_tsig_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+FreeIPA_container_hostname: "ipa.infra.sololab"
+FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.1"
+FreeIPA_container_hostIP: 192.168.255.11
+
+Traefik_ACME_URL: 
+Traefik_ACME_email:

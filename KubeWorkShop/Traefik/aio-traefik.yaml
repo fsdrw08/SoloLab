@@ -43,13 +43,9 @@ data:
         forwardedHeaders:
           trustedIPs:
             - "0.0.0.0/0"
+      # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
       websecure:
         address: ":443"
-        # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
-        # http:
-        #   # https://doc.traefik.io/traefik/routing/entrypoints/#tls
-        #   tls:
-        #     certResolver: freeipa
         # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
         # https://www.bboy.app/2020/04/16/traefik%E5%90%8E%E7%AB%AF%E5%BA%94%E7%94%A8%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E7%9C%9F%E5%AE%9Eip/
         forwardedHeaders:
@@ -58,9 +54,9 @@ data:
 
     # https://doc.traefik.io/traefik/routing/overview/#transport-configuration
     serversTransport:
-      # https://doc.traefik.io/traefik/routing/overview/#rootcas
-      rootCAs:
-        - /etc/traefik/root_ca.crt
+    #   # https://doc.traefik.io/traefik/routing/overview/#rootcas
+    #   rootCAs:
+    #     - /etc/traefik/root_ca.crt
 
     ## Operations
     # https://doc.traefik.io/traefik/operations/api/
@@ -70,10 +66,10 @@ data:
     # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
     # https://doc.traefik.io/traefik/https/acme/#certificate-resolvers
     certificatesResolvers:
-      freeipa:
+      acmeResolver:
         acme:
-          caServer: {{ ACME_URL | default('https://ipa-ca.infra.sololab/acme/directory') }}
-          email: {{ ACME_email | default('')}}
+          caServer: {{ traefik_ACME_URL | default('https://ipa-ca.infra.sololab/acme/directory') }}
+          email: {{ traefik_ACME_email | default('admin@INFRA.SOLOLAB')}}
           storage: /mnt/acmeStorage/acme.json
           httpChallenge:
             # used during the challenge

@@ -19,17 +19,17 @@ data:
   ipa-server-install-options: |
     --unattended
 
-    --domain=infra.sololab
-    --realm=infra.sololab
-    --ds-password=P@ssw0rd
-    --admin-password=P@ssw0rd
-    
+    --domain={{ FreeIPA_domain_name }}
+    --realm={{ FreeIPA_realm }}
+    --ds-password={{ FreeIPA_ds_password }}
+    --admin-password={{ FreeIPA_admin_password }}
+
     --no-ntp
     --no_hbac_allow
 
     --setup-dns
     --no-host-dns
-    --forwarder=192.168.255.1
+    --forwarder={{ FreeIPA_dns_forwarder }}
     --auto-reverse
 
     --debug
@@ -39,8 +39,8 @@ data:
   # tsig-keygen keySololab
   ipa-ext.conf: |
     key "keySololab" {
-            algorithm hmac-sha256;
-            secret "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0=";
+            algorithm {{ FreeIPA_tsig_algorithm }};
+            secret {{ FreeIPA_tsig_secret }};
     };
 ---
 apiVersion: v1
@@ -52,13 +52,10 @@ metadata:
 spec:
   # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
   # https://www.freeipa.org/page/Docker#FreeIPA_server_containers
-  hostname: ipa.infra.sololab
+  hostname: "{{ FreeIPA_container_hostname }}"
   containers:
     - name: freeipa
-      image: quay.io/freeipa/freeipa-server:fedora-37-4.10.1
-      # fedora-37-4.10.0 has bug when stup dirsvc
-      # image: quay.io/freeipa/freeipa-server:fedora-37-4.10.0
-      # image: docker.io/freeipa/freeipa-server:fedora-37-4.10.0
+      image: "{{ FreeIPA_container_image }}"
       imagePullPolicy: IfNotPresent
       resources:
         limits:
@@ -70,24 +67,24 @@ spec:
         # https://github.com/sameersbn/docker-bind/issues/65
         - name: dns_tcp
           containerPort: 53
-          hostIP: 192.168.255.31
+          hostIP: "{{ FreeIPA_container_hostIP }}"
           protocol: TCP
         - name: dns_udp
-          hostIP: 192.168.255.31
+          hostIP: "{{ FreeIPA_container_hostIP }}"
           containerPort: 53
           protocol: UDP
 
         - name: http
           containerPort: 80
-          hostIP: 192.168.255.31
+          hostIP: "{{ FreeIPA_container_hostIP }}"
           hostPort: 80
         - name: https
           containerPort: 443
-          hostIP: 192.168.255.31
+          hostIP: "{{ FreeIPA_container_hostIP }}"
           hostPort: 443
         - name: https-pki
           containerPort: 8443
-          hostIP: 192.168.255.31
+          hostIP: "{{ FreeIPA_container_hostIP }}"
           hostPort: 8443
 
         - name: ldap
@@ -111,9 +108,9 @@ spec:
       env:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container:~:text=Alternatively%2C%20the-,IPA_SERVER_IP,-environment%20variable%20via
         - name: IPA_SERVER_IP
-          value: "192.168.255.31"
+          value: "{{ FreeIPA_container_hostIP }}"
         - name: IPA_SERVER_HOSTNAME
-          value: ipa.infra.sololab
+          value: "{{ FreeIPA_container_hostname }}"
       # https://github.com/freeipa/freeipa-container/issues/516#issuecomment-1431096973
       livenessProbe:
         initialDelaySeconds: 180
@@ -131,7 +128,7 @@ spec:
         - name: ipa-ext.conf
           mountPath: /etc/named/ipa-ext.conf
           subPath: ipa-ext.conf
-        # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
+        # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63
         # - name: dshm
         #   mountPath: /dev/shm
         # - name: cgroups
@@ -155,7 +152,7 @@ spec:
         items:
           - key: ipa-ext.conf
             path: ipa-ext.conf
-    # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63  
+    # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63
     # - name: dshm
     #   emptyDir:
     #     medium: Memory

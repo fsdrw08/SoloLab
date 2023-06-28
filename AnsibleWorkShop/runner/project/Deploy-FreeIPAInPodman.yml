@@ -1,21 +1,21 @@
 # code: language=ansible
 ---
-- hosts: kube-1 # kube-2
+- hosts: "{{ target_host }}" # kube-2
   gather_facts: yes
   vars: 
     podman_rootless_play:
-      vars_podman_host: kube-1
+      vars_podman_host: "{{ target_host }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/1001/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: present # absent / present
+        state: absent # absent / present
         timeout: 600
         kube_file: 
           host: localhost
-          path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
-          # content: "{{ rendered }}"
+          # path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
+          content: "{{ lookup('ansible.builtin.template', '/KubeWorkShop/FreeIPA/aio-freeipa.yaml') }}"
         absent:
           query_params:
             force: true
@@ -65,7 +65,7 @@
             conn_name: eth0
             type: ethernet
             dns4:
-              - 192.168.255.31
+              - "{{ FreeIPA_container_hostIP }}"
             state: present
           when:
             - podman_rootless_play.vars_podman_play.state == 'present'
@@ -75,7 +75,7 @@
             conn_name: eth0
             type: ethernet
             dns4:
-              - 192.168.255.1
+              - "{{ FreeIPA_dns_forwarder }}"
             state: present
           when:
             - podman_rootless_play.vars_podman_play.state == 'absent'
