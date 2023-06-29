@@ -104,6 +104,7 @@ module "cloudinit_nocloud_iso" {
           eth0:
             dhcp4: false
             addresses:
+              - 192.168.255.1${count.index + 0}/255.255.255.0
               - 192.168.255.1${count.index + 1}/255.255.255.0
             gateway4: 192.168.255.1
             nameservers:
