@@ -91,7 +91,7 @@ resource "alicloud_instance" "ecs" {
   instance_name = "DevOps_Compute-${var.ecs_server_name}"
   description   = "This resource is managed by terraform"
 
-  status       = "Stopped" # Running / Stopped
+  status       = "Running" # Running / Stopped
   stopped_mode = "StopCharging"
 
   image_id                = data.alicloud_images.img.images[0].id
