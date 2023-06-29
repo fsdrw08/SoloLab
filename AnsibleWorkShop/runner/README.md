@@ -103,12 +103,33 @@ podman run --rm `
 
 ## deploy Traefik by invoke podman rootless play role
 ```powershell
-podman run --rm `
-    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$private_data_dir = "/tmp/private"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman-Cloud.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/runner `
+    -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
-   localhost/ansible-ee-aio ansible-runner run /runner -vv
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+```
+
+shell(put the key to ssh_key file first):
+```shell
+cd $(git rev-parse --show-toplevel)/AnsibleWorkShop/runner
+
+# https://github.com/containers/podman/blob/main/troubleshooting.md#:~:text=In%20cases%20where%20the%20container%20image%20runs%20as%20a%20specific%2C%20non%2Droot%20user
+private_data_dir="/tmp/private"
+podman run --rm --userns=keep-id \
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman-Cloud.yml \
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False \
+    -v ./:$private_data_dir \
+    -v ../../KubeWorkShop/:/KubeWorkShop/ \
+    docker.io/fsdrw08/sololab-ansible-ee \
+    bash -c "ansible-runner run $private_data_dir -vv"
 ```
 
 ## deploy hashicorp vault in podman by invoke podman rootless play role

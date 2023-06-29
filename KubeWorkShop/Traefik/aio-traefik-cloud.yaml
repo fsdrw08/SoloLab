@@ -75,7 +75,8 @@ data:
             # used during the challenge
             entryPoint: web
   # root_ca.crt: |
-  #   {{ Root_CA_Cert | indent(width=4) }}
+  #   {#{{ Root_CA_Cert | indent(width=4) }}#}
+
 ---
 apiVersion: v1
 kind: Pod
@@ -88,7 +89,7 @@ spec:
   # https://www.traefik.org/page/Docker#traefik_server_containers
   containers:
     - name: traefik
-      image: docker.io/library/traefik:latest
+      image: "{{ Traefik_container_image }}"
       imagePullPolicy: IfNotPresent
       resources:
         limits:

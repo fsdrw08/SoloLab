@@ -8,14 +8,14 @@
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/1001/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/{{ uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: absent # absent / present
+        state: "{{ FreeIPA_pod_state }}"
         timeout: 600
         kube_file: 
           host: localhost
           # path: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
-          content: "{{ lookup('ansible.builtin.template', '/KubeWorkShop/FreeIPA/aio-freeipa.yaml') }}"
+          content: "{{ lookup('ansible.builtin.template', FreeIPA_kube_file) }}"
         absent:
           query_params:
             force: true
@@ -32,6 +32,7 @@
             enabled: true
             state: started
     healthcheck_container_name: freeipa-freeipa
+    connection_id: "cloud-init eth0"
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: Invoke podman-rootless-play
@@ -62,7 +63,7 @@
       block:
         - name: add freeipa dns server to interface
           community.general.nmcli:
-            conn_name: eth0
+            conn_name: "{{ connection_id }}"
             type: ethernet
             dns4:
               - "{{ FreeIPA_container_hostIP }}"
@@ -72,7 +73,7 @@
 
         - name: only keep default dns server to interface
           community.general.nmcli:
-            conn_name: eth0
+            conn_name: "{{ connection_id }}"
             type: ethernet
             dns4:
               - "{{ FreeIPA_dns_forwarder }}"
@@ -83,4 +84,4 @@
         # https://stackoverflow.com/questions/75258022/how-to-bring-up-an-interface-using-ansible-nmcli-module
         - name: bring up interface
           ansible.builtin.shell: 
-            cmd: nmcli con up eth0
+            cmd: nmcli con up "{{ connection_id }}"

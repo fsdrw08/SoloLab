@@ -1,6 +1,10 @@
 # code: language=ansible
 ---
-target_host: kube-2
+target_host: kube-2 # gitlab.devops.p2w3
+uid: 1001
+
+FreeIPA__state: present # absent / present
+FreeIPA_kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
 
 FreeIPA_domain_name: infra.sololab
 FreeIPA_realm: infra.sololab
@@ -13,5 +17,11 @@ FreeIPA_container_hostname: "ipa.infra.sololab"
 FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.1"
 FreeIPA_container_hostIP: 192.168.255.11
 
-Traefik_ACME_URL: 
+Traefik_pod_state: present
+Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
+
+# Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
 Traefik_ACME_email:
+Traefik_container_image: docker.io/library/traefik:v2.10
+Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
+Traefik_domain_name: infra.sololab

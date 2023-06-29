@@ -1,23 +1,23 @@
 # code: language=ansible
 ---
-- hosts: gitlab.devops.p2w3 # kube-2
+- hosts: "{{ target_host }}" # kube-2
   gather_facts: yes
   vars: 
     ca:
       hostname: ipa.infra.sololab
     
     podman_rootless_play:
-      vars_podman_host: "{{ ansible_host }}"
+      vars_podman_host: "{{ target_host }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/{{ uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: present # absent / present
+        state: "{{ Traefik_pod_state }}" # absent / present
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ lookup('ansible.builtin.template', '/KubeWorkShop/Traefik/aio-traefik-cloud.yaml') }}"
+          content: "{{ lookup('ansible.builtin.template', Traefik_kube_file) }}"
         absent:
           query_params:
             force: true
@@ -34,26 +34,31 @@
             enabled: true
             state: started
 
-    ingress_file_tmpl: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
   tasks:
-    - name: Get root ca
-      delegate_to: localhost
-      block:
-        - name: run openssl s_client -showcerts
-          ansible.builtin.shell:
-            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
-            cmd: >
-              echo | 
-              openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
-              tac | 
-              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
-              tac
-          changed_when: false
-          register: RootCACert
+    # - name: Get root ca
+    #   delegate_to: localhost
+    #   block:
+    #     - name: run openssl s_client -showcerts
+    #       ansible.builtin.shell:
+    #         # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+    #         cmd: >
+    #           echo | 
+    #           openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
+    #           tac | 
+    #           sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+    #           tac
+    #       changed_when: false
+    #       register: RootCACert
 
-        - name: Set fact Root_CA_Cert
-          ansible.builtin.set_fact:
-            Root_CA_Cert: "{{ RootCACert.stdout }}"
+    #     - name: Set fact Root_CA_Cert
+    #       ansible.builtin.set_fact:
+    #         Root_CA_Cert: "{{ RootCACert.stdout }}"
+
+    - name: Present traefik file folder
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/traefik
+        state: directory
+        mode: '0755'
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
@@ -69,14 +74,14 @@
       block:
         - name: render and present route config
           ansible.builtin.copy:
-            content: "{{ lookup('ansible.builtin.template', ingress_file_tmpl) }}"
-            dest: /home/{{ ansible_user }}/traefik/
+            content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename }}
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
 
         - name: absent route config
           ansible.builtin.file:
-            path: /home/{{ ansible_user }}/traefik/{{ ingress_file | basename }}
+            path: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename }}
             state: absent
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
