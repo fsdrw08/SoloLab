@@ -129,7 +129,10 @@ podman run --rm --userns=keep-id \
     -v ./:$private_data_dir \
     -v ../../KubeWorkShop/:/KubeWorkShop/ \
     docker.io/fsdrw08/sololab-ansible-ee \
-    bash -c "ansible-runner run $private_data_dir -vv"
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/podmgr.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
 ```
 
 ## deploy hashicorp vault in podman by invoke podman rootless play role
