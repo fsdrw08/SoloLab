@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab_config
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab_logs
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab_data
+spec:
+  resources:
+    requests:
+      storage: 150Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gitlab
+  labels:
+    name: gitlab
+spec:
+  containers:
+    - name: gitlab
+      image: "{{ GitLab_container_image }}"
+      resources:
+        requests:
+          memory: "2560Mi"
+          cpu: "1500m"
+        limits:
+          memory: "3072Mi"
+          cpu: "2000m"
+      ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostPort: 443
+        - name: ssh
+          containerPort: 22
+          hostPort: 2222
+      env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: |
+            external_url '{{ GitLab_external_url }}'
+      volumeMounts:
+        # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
+        - name: config
+          mountPath: /etc/gitlab
+        - name: logs
+          mountPath: /var/log/gitlab
+        - name: data
+          mountPath: /var/opt/gitlab
+        - name: dshm
+          mountPath: /dev/shm
+  volumes:
+    - name: config
+      persistentVolumeClaim:
+        claimName: gitlab_config
+    - name: logs
+      persistentVolumeClaim:
+        claimName: gitlab_logs
+    - name: data
+      persistentVolumeClaim:
+        claimName: gitlab_data
+    - name: dshm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 256Mi
+  restartPolicy: Never
