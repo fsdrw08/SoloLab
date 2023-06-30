@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: stepca
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: stepca
+  labels:
+    name: stepca
+spec:
+  containers:
+    - name: stepca
+      # https://hub.docker.com/r/smallstep/step-ca
+      image: docker.io/smallstep/step-ca:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: stepca
+          containerPort: 9000
+      env:
+        - name: DOCKER_STEPCA_INIT_NAME
+          value: sololab
+        - name: DOCKER_STEPCA_INIT_DNS_NAMES
+          value: localhost,ca.sololab
+        - name: DOCKER_STEPCA_INIT_SSH
+          value: "true"
+        - name: DOCKER_STEPCA_INIT_PASSWORD
+          value: P@ssw0rd
+      volumeMounts:
+        - name: stepca
+          mountPath: /home/step
+  volumes:
+    - name: stepca
+      persistentVolumeClaim:
+        claimName: stepca
