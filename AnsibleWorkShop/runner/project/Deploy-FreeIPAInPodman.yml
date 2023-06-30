@@ -18,7 +18,7 @@
           content: "{{ lookup('ansible.builtin.template', FreeIPA_kube_file) }}"
         absent:
           query_params:
-            force: true
+            force: "{{ FreeIPA_pod_absent_force | bool }}"
       vars_podman_generate_systemd:
         generate:
           path_params: 
@@ -54,7 +54,7 @@
       register: result
       retries: 10
       until: result.json.Status == "healthy"
-      delay: 30
+      delay: 60
       when: 
         - podman_rootless_play.vars_podman_play.state == 'present'
 
