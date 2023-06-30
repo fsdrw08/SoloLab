@@ -2,17 +2,10 @@
 http:
   routers:
     dashboard:
-      rule: Host(`traefik.infra.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`{{ Traefik_subdomain_name }}.{{ Traefik_domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       # https://www.teanote.pub/archives/247
       # https://doc.traefik.io/traefik/routing/routers/#tls
       # will terminate the TLS request
-      # tls: 
-      #   certResolver: freeipa
-
-# tls:
-#   stores:
-#     default:
-#       defaultCertificate:
-#         certFile: /etc/traefik/dynamic/sololab_infra.crt
-#         keyFile: /etc/traefik/dynamic/sololab_infra.key
+      entryPoints:
+        - websecure

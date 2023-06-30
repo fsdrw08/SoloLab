@@ -74,8 +74,8 @@ data:
           httpChallenge:
             # used during the challenge
             entryPoint: web
-  root_ca.crt: |
-    {{ Root_CA_Cert | indent(width=4) }}
+  # root_ca.crt: |
+  #   {{ Root_CA_Cert | indent(width=4) | default('') }}
 ---
 apiVersion: v1
 kind: Pod
