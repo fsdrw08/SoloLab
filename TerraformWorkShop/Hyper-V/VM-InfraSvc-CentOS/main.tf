@@ -69,11 +69,12 @@ module "cloudinit_nocloud_iso" {
             filesystem: 'xfs'
             device: '/dev/sdb'
             partition: auto
+            overwrite: false
 
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
         # https://zhuanlan.zhihu.com/p/250658106
         mounts:
-          - [ /dev/sdb1, /home/podmgr, auto, "nofail,exec", ]
+          - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
         mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
 
         # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
