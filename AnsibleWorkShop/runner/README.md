@@ -9,7 +9,7 @@ ref:
 ref [../builder/README.md](../builder/README.md)
 ```powershell
 podman pull docker.io/fsdrw08/sololab-ansible-ee
-podman tag docker.io/fsdrw08/sololab-ansible-ee localhost/ansible-ee-aio 
+podman tag docker.io/fsdrw08/sololab-ansible-ee localhost/ansible-ee-aio-new
 ```
 
 ## create a role
@@ -73,8 +73,9 @@ podman run --rm `
 ```powershell
 # deploy FreeIPA in podman
 $private_data_dir = "/tmp/private"
+$playbook = "Deploy-FreeIPAInPodman.yml"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
+    -e RUNNER_PLAYBOOK=$playbook `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
@@ -141,9 +142,8 @@ podman run --rm --userns=keep-id \
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $private_data_dir = "/tmp/private"
-$playbook = "Deploy-GitlabInPodman.yml"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=$playbook `
+    -e RUNNER_PLAYBOOK=Deploy-GitlabInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `

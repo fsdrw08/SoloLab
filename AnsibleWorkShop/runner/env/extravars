@@ -1,8 +1,11 @@
 # code: language=ansible
 ---
+# common settings
 target_host: kube-2 # gitlab.devops.p2w3
 uid: 1001
+base_domain_name: infra.sololab
 
+## freeipa
 FreeIPA_pod_state: absent # absent / present
 FreeIPA_pod_absent_force: true # true / false
 FreeIPA_kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
@@ -17,20 +20,34 @@ FreeIPA_container_hostname: "ipa.infra.sololab"
 FreeIPA_container_hostIP: 192.168.255.11
 FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.2"
 
-Traefik_pod_state: absent
-Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik-cloud.yaml
-
-# Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
-Traefik_ACME_email:
+## traefik
+Traefik_pod_state: present # absent / present
+Traefik_pod_absent_force: true # true / false
+Traefik_systemd_service: traefik
+Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
 Traefik_container_image: docker.io/library/traefik:v2.10
-Traefik_domain_name: infra.sololab
-Traefik_subdomain_name: traefik
-Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard-cloud.yaml
+Traefik_container_hostIP:
 
-GitLab_systemd_service: gitlab
-GitLab_pod_state: present # absent / present
+# Root_CA_Cert:
+Traefik_ACME_enabled: false
+Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
+Traefik_ACME_email:
+
+Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
+Traefik_subdomain: traefik
+
+## gitlab
+GitLab_pod_state: absent # absent / present
 GitLab_pod_absent_force: true # true / false
+GitLab_systemd_service: gitlab
 
 GitLab_kube_file: /KubeWorkShop/GitLab/aio-gitlab.yaml
-GitLab_container_image: "docker.io/gitlab/gitlab-ce:16.1.1-ce.0"
+# dont use gitlab-ce:16.1.x
+# https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
+GitLab_container_image: "docker.io/gitlab/gitlab-ce:15.11.9-ce.0"
 GitLab_external_url: http://gitlab.sololab
+
+GitLab_ingress_file: /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
+GitLab_subdomain: git
+
+GitLab_container_name: gitlab-gitlab
