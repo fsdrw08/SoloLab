@@ -1,0 +1,15 @@
+# Dynamic Configuration
+http:
+  routers:
+    dashboard:
+      rule: Host(`{{ Gitea_subdomain_name }}.{{ Gitea_domain_name }}`)
+      service: gitea
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: acmeResolver
+  services:
+    gitea:
+      loadBalancer:
+        servers:
+          - url: "http://gitea:3000/"
