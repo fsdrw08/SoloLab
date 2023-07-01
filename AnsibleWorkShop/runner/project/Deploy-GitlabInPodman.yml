@@ -17,7 +17,7 @@
           content: "{{ lookup('ansible.builtin.template', GitLab_kube_file) }}"
         absent:
           query_params:
-            force: true
+            force: "{{ GitLab_pod_absent_force }}"
       vars_podman_generate_systemd:
         generate:
           path_params:
@@ -30,6 +30,7 @@
             skipped: false
             enabled: true
             state: started
+
   tasks:
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
@@ -40,3 +41,91 @@
         vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
         vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
         vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/2837#note_898446295
+    - name: Disable gitlab public sign-up
+      delegate_to: "{{ target_host }}"
+      block:
+        - name: Test gitlab status 
+          ansible.builtin.uri:
+            url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ GitLab_container_name }}/healthcheck
+            unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
+            method: GET
+            status_code: 200
+          register: result
+          retries: 10
+          until: result.json.Status == "healthy"
+          delay: 60
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: new podman exec session
+          ansible.builtin.uri:
+            url: http://d/{{ api_version }}/libpod/containers/{{ GitLab_container_name }}/exec
+            unix_socket: /run/user/1000/podman/podman.sock
+            method: POST
+            status_code: 201
+            body_format: json
+            body: "{{ exec_create_request_body_dict }}"
+          vars:
+            api_version: v4.4.1
+            container_name: freeipa-freeipa
+            exec_create_request_body_dict:
+              # AttachStderr: true
+              # AttachStdin: true
+              AttachStdout: true
+              Cmd:
+                - bash
+                - -c
+                - "echo 'UPDATE application_settings SET signup_enabled = false' | gitlab-psql"
+              Tty: true
+              Privileged: false
+              User: root
+          register: exec_create_exec_respond
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: start podman exec session
+          ansible.builtin.uri:
+            url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
+            unix_socket: /run/user/1000/podman/podman.sock
+            method: POST
+            status_code: 200
+            body_format: json
+            body: "{{ exec_start_request_body_dict }}"
+            # https://serverfault.com/questions/722852/how-to-check-the-json-response-from-a-uri-request-with-ansible
+            return_content: true
+          vars:
+            exec_start_request_body_dict:
+              Detach: false
+              Tty: true
+          register: exec_start_respond
+          when:
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: debug
+          debug:
+            # var: exec_start_respond.content.stdout_lines
+            msg: "{{ exec_start_respond.content.split('\r\n') }}"
+          when:
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+    - name: Config reverse proxy
+      block:
+        # - name: Ensure dns record is present
+        #   community.general.nsupdate: "{{ dns }}"
+        #   delegate_to: localhost
+
+        - name: present route config
+          ansible.builtin.copy:
+            content: "{{ lookup('ansible.builtin.template', GitLab_ingress_file) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ GitLab_ingress_file | basename | replace('.j2','') }}
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+
+        - name: absent route config
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/{{ GitLab_ingress_file | basename | replace('.j2','') }}
+            state: absent
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'absent'
