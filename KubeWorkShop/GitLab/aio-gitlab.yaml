@@ -44,6 +44,9 @@ spec:
   containers:
     - name: gitlab
       image: "{{ GitLab_container_image }}"
+      # https://www.redhat.com/sysadmin/podman-inside-container
+      securityContext:
+        runAsUser: 1001
       resources:
         requests:
           memory: "2560Mi"
@@ -65,8 +68,8 @@ spec:
         - name: GITLAB_OMNIBUS_CONFIG
           value: |
             external_url '{{ GitLab_external_url }}'
+            gitlab_rails['gitlab_shell_ssh_port'] = 2222
       volumeMounts:
-        # https://github.com/freeipa/freeipa-container#running-freeipa-server-container
         - name: config
           mountPath: /etc/gitlab
         - name: logs
