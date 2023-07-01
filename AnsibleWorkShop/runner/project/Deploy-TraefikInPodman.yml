@@ -1,32 +1,30 @@
 # code: language=ansible
 ---
-- hosts: kube-1 # kube-2
+- hosts: "{{ target_host }}" # kube-2
   gather_facts: yes
   vars: 
-    ipa:
+    ca:
       hostname: ipa.infra.sololab
     
-    # kube_file_template: /KubeWorkShop/Traefik/aio-traefik.yaml
-
     podman_rootless_play:
-      vars_podman_host: kube-1
+      vars_podman_host: "{{ target_host }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/1000/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/{{ uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: present # absent / present
+        state: "{{ Traefik_pod_state }}" # absent / present
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ lookup('ansible.builtin.template', '/KubeWorkShop/Traefik/aio-traefik-cloud.yaml') }}"
+          content: "{{ lookup('ansible.builtin.template', Traefik_kube_file) }}"
         absent:
           query_params:
-            force: true
+            force: "{{ Traefik_pod_absent_force }}"
       vars_podman_generate_systemd:
         generate:
           path_params: 
-            name: traefik
+            name: "{{ Traefik_systemd_service }}"
           query_params:
             useName: true
       vars_service:
@@ -36,54 +34,42 @@
             enabled: true
             state: started
 
-    dns:
-      key_name: "keySololab"
-      key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
-      key_algorithm: "hmac-sha256"
-      server: '192.168.255.31'
-      zone: infra.sololab
-      record: traefik
-      value: '192.168.255.32'
-      type: 'A'
-      state: present
+    # dns:
+    #   key_name: "keySololab"
+    #   key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+    #   key_algorithm: "hmac-sha256"
+    #   server: '192.168.255.31'
+    #   zone: infra.sololab
+    #   record: traefik
+    #   value: '192.168.255.32'
+    #   type: 'A'
+    #   state: present
 
-    ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml
   tasks:
-    - name: Get root ca
-      delegate_to: localhost
-      block:
-        - name: run openssl s_client -showcerts
-          ansible.builtin.shell:
-            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
-            cmd: >
-              echo | 
-              openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
-              tac | 
-              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
-              tac
-          changed_when: false
-          register: RootCACert
-
-        - name: Set fact Root_CA_Cert
-          ansible.builtin.set_fact:
-            Root_CA_Cert: "{{ RootCACert.stdout }}"
-
-    # - name: Prepare kube_file content
-    #   when:
-    #     - Root_CA_Cert is defined
+    # - name: Get root ca
+    #   delegate_to: localhost
     #   block:
-    #     - name: Render kube file content
-    #       ansible.builtin.template:
-    #         src: "{{ kube_file_template }}"
-    #         dest: /dev/null
-    #       check_mode: true
-    #       diff: true
-    #       no_log: false
-    #       register: template
+    #     - name: run openssl s_client -showcerts
+    #       ansible.builtin.shell:
+    #         # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+    #         cmd: >
+    #           echo | 
+    #           openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
+    #           tac | 
+    #           sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+    #           tac
+    #       changed_when: false
+    #       register: RootCACert
 
-    #     - name: Set fact rendered
+    #     - name: Set fact Root_CA_Cert
     #       ansible.builtin.set_fact:
-    #         rendered: "{{ template.diff[0].after }}"
+    #         Root_CA_Cert: "{{ RootCACert.stdout }}"
+
+    - name: Present traefik file folder
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/traefik
+        state: directory
+        mode: '0755'
 
     - name: Invoke podman-rootless-play
       ansible.builtin.include_role:
@@ -97,20 +83,20 @@
 
     - name: Config reverse proxy
       block:
-        - name: Ensure dns record is present
-          community.general.nsupdate: "{{ dns }}"
-          delegate_to: localhost
+        # - name: Ensure dns record is present
+        #   community.general.nsupdate: "{{ dns }}"
+        #   delegate_to: localhost
 
-        - name: present route config
+        - name: render and present route config
           ansible.builtin.copy:
-            src: "{{ ingress_file }}"
-            dest: /home/{{ ansible_user }}/traefik/
+            content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
 
         - name: absent route config
           ansible.builtin.file:
-            path: /home/{{ ansible_user }}/traefik/{{ ingress_file | basename }}
+            path: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
             state: absent
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'

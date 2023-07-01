@@ -2,25 +2,25 @@
 http:
   routers:
     dashboard:
-      rule: Host(`r-proxy.{{ Traefik_domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`{{ Traefik_subdomain }}.{{ base_domain_name }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       # https://www.teanote.pub/archives/247
       # https://doc.traefik.io/traefik/routing/routers/#tls
       # will terminate the TLS request
       entryPoints:
+        - web
         - websecure
       middlewares:
+        - toHttps@file
         - userpass
       tls:
+{% if Traefik_ACME_enabled is defined and Traefik_ACME_enabled is sameas true -%}
         certResolver: acmeResolver
+{% else %}
+        {}
+{% endif %}
   middlewares:
     userpass:
       basicAuth:
         users:
           - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
-# tls:
-#   stores:
-#     default:
-#       defaultCertificate:
-#         certFile: /etc/traefik/dynamic/sololab_infra.crt
-#         keyFile: /etc/traefik/dynamic/sololab_infra.key
