@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
     - name: gitlab
-      image: "{{ GitLab_container_image }}"
+      image: {{ GitLab_container_image }}
       resources:
         requests:
           memory: "2560Mi"
