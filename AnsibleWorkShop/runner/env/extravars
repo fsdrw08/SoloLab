@@ -37,15 +37,15 @@ Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.
 Traefik_subdomain: traefik
 
 ## gitlab
-GitLab_pod_state: absent # absent / present
+GitLab_pod_state: present # absent / present
 GitLab_pod_absent_force: true # true / false
 GitLab_systemd_service: gitlab
 
-GitLab_kube_file: /KubeWorkShop/GitLab/aio-gitlab.yaml
+GitLab_kube_file: /KubeWorkShop/GitLab/aio-gitlab.yaml.j2
 # dont use gitlab-ce:16.1.x
 # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
 GitLab_container_image: "docker.io/gitlab/gitlab-ce:15.11.9-ce.0"
-GitLab_external_url: http://gitlab.sololab
+GitLab_external_url: https://gitlab.sololab
 
 GitLab_ingress_file: /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
 GitLab_subdomain: git

@@ -2,22 +2,22 @@
 # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
 http:
   routers:
-    dashboard:
+    gitlab:
       rule: Host(`{{ GitLab_subdomain }}.{{ base_domain_name }}`)
-      service: gitea
-      # https://doc.traefik.io/traefik/providers/overview/#provider-namespace
-      # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml#L35
+      service: gitlab
       middlewares:
         - toHttps@file
       entryPoints:
         - websecure
-      {% if Traefik_ACME_enabled is defined and Traefik_ACME_enabled is sameas true %}
       tls:
+{% if Traefik_ACME_enabled is defined and Traefik_ACME_enabled is sameas true %}
         certResolver: acmeResolver
-      {% endif %}
+{% else %}
+        {}
+{% endif %}
       
   services:
-    gitea:
+    gitlab:
       loadBalancer:
         servers:
-          - url: "http://gitea:3000/"
+          - url: "http://gitlab/"

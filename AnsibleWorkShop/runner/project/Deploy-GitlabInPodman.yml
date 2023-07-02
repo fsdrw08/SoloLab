@@ -62,7 +62,7 @@
         - name: new podman exec session
           ansible.builtin.uri:
             url: http://d/{{ api_version }}/libpod/containers/{{ GitLab_container_name }}/exec
-            unix_socket: /run/user/1000/podman/podman.sock
+            unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
             method: POST
             status_code: 201
             body_format: json
@@ -77,7 +77,7 @@
               Cmd:
                 - bash
                 - -c
-                - "echo 'UPDATE application_settings SET signup_enabled = false' | gitlab-psql"
+                - "echo 'UPDATE application_settings SET signup_enabled = false' | gitlab-psql; grep 'Password:' /etc/gitlab/initial_root_password"
               Tty: true
               Privileged: false
               User: root
@@ -88,7 +88,7 @@
         - name: start podman exec session
           ansible.builtin.uri:
             url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
-            unix_socket: /run/user/1000/podman/podman.sock
+            unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
             method: POST
             status_code: 200
             body_format: json
