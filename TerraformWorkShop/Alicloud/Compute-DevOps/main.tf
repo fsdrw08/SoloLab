@@ -131,7 +131,7 @@ resource "alicloud_instance" "ecs" {
     - name: podmgr
       gecos: podmgr
       lock_passwd: true
-      sudo: ALL=(ALL) NOPASSWD:ALL
+      sudo: False
       shell: /bin/bash
       ssh_import_id: None
       ssh_authorized_keys:
@@ -200,24 +200,24 @@ resource "alicloud_forward_entry" "ssh" {
   port_break         = true
 }
 
-resource "alicloud_forward_entry" "http" {
-  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
-  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
-  external_port      = "80"
-  ip_protocol        = "tcp"
-  internal_ip        = alicloud_instance.ecs.private_ip
-  internal_port      = "80"
-  port_break         = true
-}
+# resource "alicloud_forward_entry" "http" {
+#   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+#   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+#   external_port      = "80"
+#   ip_protocol        = "tcp"
+#   internal_ip        = alicloud_instance.ecs.private_ip
+#   internal_port      = "80"
+#   port_break         = true
+# }
 
-resource "alicloud_forward_entry" "https" {
-  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
-  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
-  external_port      = "443"
-  ip_protocol        = "tcp"
-  internal_ip        = alicloud_instance.ecs.private_ip
-  internal_port      = "443"
-  port_break         = true
-}
+# resource "alicloud_forward_entry" "https" {
+#   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+#   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+#   external_port      = "443"
+#   ip_protocol        = "tcp"
+#   internal_ip        = alicloud_instance.ecs.private_ip
+#   internal_port      = "443"
+#   port_break         = true
+# }
