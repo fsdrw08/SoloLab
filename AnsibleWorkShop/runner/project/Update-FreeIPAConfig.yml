@@ -17,7 +17,7 @@
         - zone_name: infra.sololab
           record_name: ipa-ca
           record_type: 'A'
-          record_value: '192.168.255.31'
+          record_value: '192.168.255.11'
   tasks:
     - name: Set IPA DNS zone
       ansible.builtin.include_tasks:
@@ -29,12 +29,12 @@
       loop: "{{ dns.zones }}"
 
     - name: Enable FreeIPA ACME
-      delegate_to: kube-1
+      delegate_to: kube-2
       block:
         - name: new podman exec session for freeipa
           ansible.builtin.uri:
             url: http://d/{{ api_version }}/libpod/containers/{{ container_name }}/exec
-            unix_socket: /run/user/1000/podman/podman.sock
+            unix_socket: /run/user/1001/podman/podman.sock
             method: POST
             status_code: 201
             body_format: json
@@ -59,7 +59,7 @@
         - name: start podman exec session for freeipa
           ansible.builtin.uri:
             url: http://d/v4.4.1/libpod/exec/{{ exec_create_exec_respond.json.Id }}/start
-            unix_socket: /run/user/1000/podman/podman.sock
+            unix_socket: /run/user/1001/podman/podman.sock
             method: POST
             status_code: 200
             body_format: json
@@ -124,5 +124,5 @@
         rev_domainname: in-addr.arpa.
         zonename: "{{ domainname }}"
         rev_zonename: "255.168.192.{{ rev_domainname }}"
-        name_server: 192.168.255.31
+        name_server: 192.168.255.11
       delegate_to: vyos

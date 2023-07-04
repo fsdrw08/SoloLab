@@ -6,9 +6,9 @@ uid: 1001
 base_domain_name: infra.sololab
 
 ## freeipa
-FreeIPA_pod_state: absent # absent / present
+FreeIPA_pod_state: present # absent / present
 FreeIPA_pod_absent_force: true # true / false
-FreeIPA_kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml
+FreeIPA_kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
 FreeIPA_domain_name: infra.sololab
 FreeIPA_realm: infra.sololab
 FreeIPA_ds_password: P@ssw0rd
@@ -18,7 +18,8 @@ FreeIPA_tsig_algorithm: "hmac-sha256"
 FreeIPA_tsig_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
 FreeIPA_container_hostname: "ipa.infra.sololab"
 FreeIPA_container_hostIP: 192.168.255.11
-FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.2"
+# FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.2"
+FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream"
 
 ## traefik
 Traefik_pod_state: present # absent / present

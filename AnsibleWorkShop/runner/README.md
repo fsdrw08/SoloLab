@@ -73,9 +73,8 @@ podman run --rm `
 ```powershell
 # deploy FreeIPA in podman
 $private_data_dir = "/tmp/private"
-$playbook = "Deploy-FreeIPAInPodman.yml"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=$playbook `
+    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
@@ -101,6 +100,19 @@ podman run --rm `
     -v ./:/runner `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
    localhost/ansible-ee-aio ansible-runner run /runner -vv
+
+$private_data_dir = "/tmp/private"
+podman run --rm --userns=keep-id `
+    --dns 192.168.255.11 `
+    -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
 ```
 
 ## deploy Traefik by invoke podman rootless play role
