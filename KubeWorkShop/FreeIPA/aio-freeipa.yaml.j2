@@ -31,7 +31,6 @@ data:
     --no-host-dns
     --forwarder={{ FreeIPA_dns_forwarder }}
     --auto-reverse
-
     --ip-address={{ FreeIPA_container_hostIP }}
 
     --debug
@@ -63,9 +62,9 @@ spec:
       # Give `dirsrv` user (id 389) permissions a mounted volume
       # https://github.com/grafana/grafana-docker/blob/master/Dockerfile
       command:
-        - chown
+        - chmod
         - -R
-        - 389:389
+        - "777"
         - /dev/shm
       volumeMounts:
         - name: dshm
@@ -128,10 +127,12 @@ spec:
           protocol: UDP
       env:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container:~:text=Alternatively%2C%20the-,IPA_SERVER_IP,-environment%20variable%20via
-        # - name: IPA_SERVER_IP
-        #   value: "{{ FreeIPA_container_hostIP }}"
+        - name: IPA_SERVER_IP
+          value: "{{ FreeIPA_container_hostIP }}"
         - name: IPA_SERVER_HOSTNAME
           value: "{{ FreeIPA_container_hostname }}"
+        - name: DEBUG_TRACE
+          value: 1
       # https://github.com/freeipa/freeipa-container/issues/516#issuecomment-1431096973
       livenessProbe:
         initialDelaySeconds: 180
@@ -150,7 +151,7 @@ spec:
           mountPath: /etc/named/ipa-ext.conf
           subPath: ipa-ext.conf
         # https://github.com/freeipa/freeipa-container/issues/449
-        # ->
+        # ↓
         # https://github.com/freeipa/freeipa-container/commit/024676573b6a59b4b361e35808f55739bd793e63
         - name: dshm
           mountPath: /dev/shm
@@ -185,8 +186,8 @@ spec:
   dnsConfig:
     nameservers:
       - 127.0.0.1
-  hostAliases:
-    - ip: "{{ FreeIPA_container_hostIP }}"
-      hostnames:
-        - "{{ FreeIPA_container_hostname }}"
+  # hostAliases:
+  #   - ip: "{{ FreeIPA_container_hostIP }}"
+  #     hostnames:
+  #       - "{{ FreeIPA_container_hostname }}"
   restartPolicy: Never
