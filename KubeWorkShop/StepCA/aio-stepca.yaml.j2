@@ -32,25 +32,25 @@ spec:
       env:
         # the name of your CA—this will be the issuer of your CA certificates
         - name: DOCKER_STEPCA_INIT_NAME
-          value: sololab
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_NAME }}
         # create an initial ACME provisioner for the CA
         - name: DOCKER_STEPCA_INIT_ACME
-          value: "true"
+          value: "{{ StepCA.app.DOCKER_STEPCA_INIT_ACME }}"
         # the hostname(s) or IPs that the CA will accept requests on
         - name: DOCKER_STEPCA_INIT_DNS_NAMES
-          value: localhost,ca.sololab
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_DNS_NAMES }}
         # set this to "true" to enable SSH certificate support
         - name: DOCKER_STEPCA_INIT_SSH
-          value: "true"
-        # specify a password for the encrypted CA keys and the default CA provisioner.
-        - name: DOCKER_STEPCA_INIT_PASSWORD
-          value: P@ssw0rd
-        # enable remote provisioner management
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_SSH }}
+        # set this to "true" toenable remote provisioner management
         - name: DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT
-          value: "true"
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT }}
         # a label for the initial admin (JWK) provisioner. Default: "admin"
         - name: DOCKER_STEPCA_INIT_PROVISIONER_NAME
-          value: "admin"
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_PROVISIONER_NAME }}
+        # specify a password for the encrypted CA keys and the default CA provisioner.
+        - name: DOCKER_STEPCA_INIT_PASSWORD
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_PASSWORD }}
       volumeMounts:
         - name: stepca
           mountPath: /home/step

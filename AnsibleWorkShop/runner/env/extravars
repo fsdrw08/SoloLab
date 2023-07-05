@@ -82,20 +82,24 @@ Traefik:
     #   type: 'A'
     #   state: present
 
-# Traefik_pod_state: present # absent / present
-# Traefik_pod_absent_force: true # true / false
-# Traefik_systemd_service: traefik
-# Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
-# Traefik_container_image: docker.io/library/traefik:v2.10
-# Traefik_container_hostIP:
-
-# # Root_CA_Cert:
-# Traefik_ACME_enabled: true
-# Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
-# Traefik_ACME_email:
-
-# Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
-# Traefik_subdomain: traefik
+## StepCA
+StepCA:
+  pod:
+    state: present # absent / present
+    absent_force: false # true / false
+    systemd_service: stepca # name of the systemd service
+    kube_file_host: localhost # tmpl mounted inside podman runner container
+    kube_file_tmpl: /KubeWorkShop/StepCA/aio-stepca.yaml.j2
+    image: docker.io/smallstep/step-ca:latest
+    hostIP: 192.168.255.10
+  app:
+    DOCKER_STEPCA_INIT_NAME: sololab
+    DOCKER_STEPCA_INIT_ACME: true
+    DOCKER_STEPCA_INIT_DNS_NAMES: localhost,ca.sololab
+    DOCKER_STEPCA_INIT_SSH: true
+    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT: true
+    DOCKER_STEPCA_INIT_PROVISIONER_NAME: admin
+    DOCKER_STEPCA_INIT_PASSWORD: P@ssw0rd
 
 ## gitlab
 GitLab_pod_state: present # absent / present
