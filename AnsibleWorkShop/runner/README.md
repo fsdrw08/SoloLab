@@ -84,23 +84,7 @@ podman run --rm --userns=keep-id `
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 
-
-podman run --rm `
-    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman.yml `
-    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/runner `
-    -v ../../KubeWorkShop/:/KubeWorkShop/ `
-   localhost/ansible-ee-aio ansible-runner run /runner -vv
-
 # FreeIPA post-process
-podman run --rm `
-    --dns 192.168.255.31 `
-    -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
-    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-    -v ./:/runner `
-    -v ../../KubeWorkShop/:/KubeWorkShop/ `
-   localhost/ansible-ee-aio ansible-runner run /runner -vv
-
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
     --dns 192.168.255.11 `
@@ -114,13 +98,20 @@ podman run --rm --userns=keep-id `
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 ```
+Ref:
+- [Kerberos kinit: Unknown credential cache type while getting default ccache](https://stackoverflow.com/questions/48836113/kerberos-kinit-unknown-credential-cache-type-while-getting-default-ccache)
+
+After FreeIPA deployed, if need to run `ipa xxx xxx` related command in freeipa container, update `/etc/krb5.conf` first
+```shell
+sudo sed -ri "s/^ default_ccache_name = (.*)/# default_ccache_name = \1/g" /etc/krb5.conf
+```
 
 ## deploy Traefik by invoke podman rootless play role
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman-Cloud.yml `
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `

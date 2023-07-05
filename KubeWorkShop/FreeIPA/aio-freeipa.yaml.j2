@@ -19,19 +19,19 @@ data:
   ipa-server-install-options: |
     --unattended
 
-    --domain={{ FreeIPA_domain_name }}
-    --realm={{ FreeIPA_realm }}
-    --ds-password={{ FreeIPA_ds_password }}
-    --admin-password={{ FreeIPA_admin_password }}
+    --domain={{ FreeIPA.app.domain_name }}
+    --realm={{ FreeIPA.app.realm }}
+    --ds-password={{ FreeIPA.app.ds_password }}
+    --admin-password={{ FreeIPA.app.admin_password }}
 
     --no-ntp
     --no_hbac_allow
 
     --setup-dns
     --no-host-dns
-    --forwarder={{ FreeIPA_dns_forwarder }}
+    --forwarder={{ FreeIPA.app.dns_forwarder }}
     --auto-reverse
-    --ip-address={{ FreeIPA_container_hostIP }}
+    --ip-address={{ FreeIPA.pod.hostIP }}
 
     --debug
     --skip-mem-check
@@ -39,9 +39,9 @@ data:
   # https://unix.stackexchange.com/questions/523565/how-to-generate-tsig-key-for-certbot-plugin-certbot-dns-rfc2136
   # tsig-keygen keySololab
   ipa-ext.conf: |
-    key "keySololab" {
-            algorithm {{ FreeIPA_tsig_algorithm }};
-            secret "{{ FreeIPA_tsig_secret }}";
+    key "{{ FreeIPA.app.tsig_key_name }}" {
+            algorithm {{ FreeIPA.app.tsig_algorithm }};
+            secret "{{ FreeIPA.app.tsig_secret }}";
     };
 ---
 apiVersion: v1
@@ -53,7 +53,7 @@ metadata:
 spec:
   # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
   # https://www.freeipa.org/page/Docker#FreeIPA_server_containers
-  hostname: "{{ FreeIPA_container_hostname }}"
+  hostname: "{{ FreeIPA.pod.hostname }}"
   # https://stackoverflow.com/questions/43544370/kubernetes-how-to-set-volumemount-user-group-and-file-permissions
   initContainers:
     - name: take-data-dir-ownership
@@ -71,7 +71,7 @@ spec:
           mountPath: /dev/shm
   containers:
     - name: freeipa
-      image: "{{ FreeIPA_container_image }}"
+      image: "{{ FreeIPA.pod.image }}"
       imagePullPolicy: IfNotPresent
       resources:
         limits:
@@ -83,28 +83,28 @@ spec:
         # https://github.com/sameersbn/docker-bind/issues/65
         - name: dns_tcp
           containerPort: 53
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           protocol: TCP
         - name: dns_udp
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           containerPort: 53
           protocol: UDP
 
         - name: http
           containerPort: 80
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           hostPort: 80
         - name: https
           containerPort: 443
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           hostPort: 443
         - name: http-pki
           containerPort: 8080
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           hostPort: 8080
         - name: https-pki
           containerPort: 8443
-          hostIP: "{{ FreeIPA_container_hostIP }}"
+          hostIP: "{{ FreeIPA.pod.hostIP }}"
           hostPort: 8443
 
         - name: ldap
@@ -128,9 +128,9 @@ spec:
       env:
         # https://github.com/freeipa/freeipa-container#running-freeipa-server-container:~:text=Alternatively%2C%20the-,IPA_SERVER_IP,-environment%20variable%20via
         - name: IPA_SERVER_IP
-          value: "{{ FreeIPA_container_hostIP }}"
+          value: "{{ FreeIPA.pod.hostIP }}"
         - name: IPA_SERVER_HOSTNAME
-          value: "{{ FreeIPA_container_hostname }}"
+          value: "{{ FreeIPA.pod.hostname }}"
         - name: DEBUG_TRACE
           value: 1
       # https://github.com/freeipa/freeipa-container/issues/516#issuecomment-1431096973
@@ -187,7 +187,7 @@ spec:
     nameservers:
       - 127.0.0.1
   # hostAliases:
-  #   - ip: "{{ FreeIPA_container_hostIP }}"
+  #   - ip: "{{ FreeIPA.pod.hostIP }}"
   #     hostnames:
-  #       - "{{ FreeIPA_container_hostname }}"
+  #       - "{{ FreeIPA.pod.hostname }}"
   restartPolicy: Never

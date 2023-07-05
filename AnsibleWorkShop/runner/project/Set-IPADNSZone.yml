@@ -16,11 +16,11 @@
     # https://github.com/amaelFr/lab_playbook/blob/fc765cdd08ff630f28b227d1b7a6fadaeaff6499/roles/generate_certificate/tasks/main.yml
     - name: Get cookie for service ipa
       ansible.builtin.uri:
-        url: "https://{{ ipa.hostname }}/ipa/session/login_password"
+        url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/login_password"
         validate_certs: false
         method: POST
         headers:
-          Referer: https://{{ ipa.hostname }}/ipa
+          Referer: https://{{ FreeIPA.pod.hostname }}/ipa
           Accept: text/plain
           Content-Type: "application/x-www-form-urlencoded"
         body_format: form-urlencoded
@@ -32,11 +32,11 @@
 
     - name: Detect DNS zone
       ansible.builtin.uri:
-        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/json"
         validate_certs: false
         method: POST
         headers:
-          Referer: https://{{ ipa.hostname }}/ipa
+          Referer: https://{{ FreeIPA.pod.hostname }}/ipa
           Accept: application/json
           Cookie: "{{ ipa_session.set_cookie }}"
         body_format: json
@@ -51,11 +51,11 @@
 
     - name: Add IPA DNS zone
       ansible.builtin.uri:
-        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/json"
         validate_certs: false
         method: POST
         headers:
-          Referer: https://{{ ipa.hostname }}/ipa
+          Referer: https://{{ FreeIPA.pod.hostname }}/ipa
           Accept: application/json
           Cookie: "{{ ipa_session.set_cookie }}"
         body_format: json
@@ -72,11 +72,11 @@
 
     - name: Show IPA DNS zone info
       ansible.builtin.uri:
-        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/json"
         validate_certs: false
         method: POST
         headers:
-          Referer: https://{{ ipa.hostname }}/ipa
+          Referer: https://{{ FreeIPA.pod.hostname }}/ipa
           Accept: application/json
           Cookie: "{{ ipa_session.set_cookie }}"
         body_format: json
@@ -89,13 +89,13 @@
         return_content: true
       register: dnszone_show
 
-    - name: Config IPA DNS reverse zone dynamic update
+    - name: Config IPA DNS zone dynamic update
       ansible.builtin.uri:
-        url: "https://{{ ipa.hostname }}/ipa/session/json"
+        url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/json"
         validate_certs: false
         method: POST
         headers:
-          Referer: https://{{ ipa.hostname }}/ipa
+          Referer: https://{{ FreeIPA.pod.hostname }}/ipa
           Accept: application/json
           Cookie: "{{ ipa_session.set_cookie }}"
         body_format: json
