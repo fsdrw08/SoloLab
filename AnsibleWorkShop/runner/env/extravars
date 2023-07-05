@@ -1,41 +1,101 @@
 # code: language=ansible
 ---
 # common settings
-target_host: kube-2 # gitlab.devops.p2w3
-uid: 1001
+target_host: 
+  name: kube-2 # gitlab.devops.p2w3
+  uid: 1001
+  connection_id: "cloud-init eth0"
+
 base_domain_name: infra.sololab
 
 ## freeipa
-FreeIPA_pod_state: present # absent / present
-FreeIPA_pod_absent_force: true # true / false
-FreeIPA_kube_file: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
-FreeIPA_domain_name: infra.sololab
-FreeIPA_realm: infra.sololab
-FreeIPA_ds_password: P@ssw0rd
-FreeIPA_admin_password: P@ssw0rd
-FreeIPA_dns_forwarder: 192.168.255.1
-FreeIPA_tsig_algorithm: "hmac-sha256"
-FreeIPA_tsig_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
-FreeIPA_container_hostname: "ipa.infra.sololab"
-FreeIPA_container_hostIP: 192.168.255.11
-# FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream-4.10.2"
-FreeIPA_container_image: "quay.io/freeipa/freeipa-server:centos-9-stream"
+FreeIPA:
+  pod:
+    state: present # absent / present
+    absent_force: true # true / false
+    systemd_service: freeipa
+    kube_file_host: localhost # inside podman runner container
+    kube_file_tmpl: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
+    container_name: freeipa-freeipa
+    image: "quay.io/freeipa/freeipa-server:centos-9-stream"
+    hostname: ipa.infra.sololab
+    hostIP: 192.168.255.11
+  app:
+    domain_name: infra.sololab
+    realm: infra.sololab
+    ds_password: P@ssw0rd
+    admin_password: P@ssw0rd
+    admin_dn: uid=admin,cn=users,cn=accounts,dc=infra,dc=sololab
+    sysaccount_dn: uid=system,cn=sysaccounts,cn=etc,dc=infra,dc=sololab
+    sysaccount_uid: system
+    sysaccount_password: P@ssw0rd
+    dns_forwarder: 192.168.255.1
+    tsig_key_name: keySololab
+    tsig_algorithm: hmac-sha256
+    tsig_secret: j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0= # gen by tsig-keygen keySololab
+    dns_zonename: infra.sololab.
+    dns_rev_zonename: 255.168.192.in-addr.arpa.
 
 ## traefik
-Traefik_pod_state: present # absent / present
-Traefik_pod_absent_force: true # true / false
-Traefik_systemd_service: traefik
-Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
-Traefik_container_image: docker.io/library/traefik:v2.10
-Traefik_container_hostIP:
+Traefik:
+  pod:
+    state: present # absent / present
+    absent_force: false # true / false
+    systemd_service: traefik # name of the systemd service
+    kube_file_host: localhost # tmpl mounted inside podman runner container
+    kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
+    image: docker.io/library/traefik:v2.10
+    hostIP: 192.168.255.10
+  app:
+    customize_root_CA: true # true / false
+    Root_CA_hostname: ipa.infra.sololab
+    ACME_enabled: true
+    ACME_URL: https://ipa-ca.infra.sololab/acme/directory
+    ACME_email: admin@INFRA.SOLOLAB
+    log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+  ingress:
+    tmpl: 
+      - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
+      - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
+    dashboard_subdomain: traefik
+    dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+    cockpit_subdomain: cockpit
+    cockpit_address: 192.168.255.11:9090
+  dns:
+    nsupdate: true # true / false
+    configs:
+      - zone: infra.sololab
+        record: traefik
+        value: 192.168.255.10
+      - zone: infra.sololab
+        record: cockpit
+        value: 192.168.255.10
+    # config:
+    #   # nsupdate
+    #   key_name: "{{ FreeIPA.app.tsig_key_name }}"
+    #   key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+    #   key_secret: "{{ FreeIPA.app.tsig_secret }}"
+    #   server: "{{ FreeIPA.pod.hostIP }}"
+    #   zone: "{{ FreeIPA.app.dns_zonename }}"
+    #   record: "{{ Traefik.ingress.dashboard_subdomain }}"
+    #   value: "{{ Traefik.pod.hostIP }}"
+    #   type: 'A'
+    #   state: present
 
-# Root_CA_Cert:
-Traefik_ACME_enabled: false
-Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
-Traefik_ACME_email:
+# Traefik_pod_state: present # absent / present
+# Traefik_pod_absent_force: true # true / false
+# Traefik_systemd_service: traefik
+# Traefik_kube_file: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
+# Traefik_container_image: docker.io/library/traefik:v2.10
+# Traefik_container_hostIP:
 
-Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
-Traefik_subdomain: traefik
+# # Root_CA_Cert:
+# Traefik_ACME_enabled: true
+# Traefik_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
+# Traefik_ACME_email:
+
+# Traefik_ingress_file: /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
+# Traefik_subdomain: traefik
 
 ## gitlab
 GitLab_pod_state: present # absent / present
