@@ -1,30 +1,30 @@
 # code: language=ansible
 ---
-- hosts: "{{ target_host }}" # kube-2
+- hosts: "{{ target_host.name }}" # kube-2
   gather_facts: yes
   vars: 
     ca:
       hostname: ipa.infra.sololab
     
     podman_rootless_play:
-      vars_podman_host: "{{ target_host }}"
+      vars_podman_host: "{{ target_host.name }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/{{ uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: "{{ Traefik_pod_state }}" # absent / present
+        state: "{{ Traefik.pod.state }}" # absent / present
         timeout: 600
         kube_file: 
           host: localhost
-          content: "{{ lookup('ansible.builtin.template', Traefik_kube_file) }}"
+          content: "{{ lookup('ansible.builtin.template', Traefik.pod.kube_file_tmpl) }}"
         absent:
           query_params:
-            force: "{{ Traefik_pod_absent_force }}"
+            force: "{{ Traefik.pod.absent_force }}"
       vars_podman_generate_systemd:
         generate:
           path_params: 
-            name: "{{ Traefik_systemd_service }}"
+            name: "{{ Traefik.pod.systemd_service }}"
           query_params:
             useName: true
       vars_service:
@@ -46,24 +46,28 @@
     #   state: present
 
   tasks:
-    # - name: Get root ca
-    #   delegate_to: localhost
-    #   block:
-    #     - name: run openssl s_client -showcerts
-    #       ansible.builtin.shell:
-    #         # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
-    #         cmd: >
-    #           echo | 
-    #           openssl s_client -showcerts -connect {{ ipa.hostname }}:443 2>&- | 
-    #           tac | 
-    #           sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
-    #           tac
-    #       changed_when: false
-    #       register: RootCACert
+    - name: Get root ca
+      delegate_to: localhost
+      block:
+        - name: run openssl s_client -showcerts
+          ansible.builtin.shell:
+            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+            cmd: >
+              echo | 
+              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_hostname }}:443 2>&- | 
+              tac | 
+              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+              tac
+          changed_when: false
+          register: RootCACert
+          when:
+            - Traefik.app.customize_root_CA | bool
 
-    #     - name: Set fact Root_CA_Cert
-    #       ansible.builtin.set_fact:
-    #         Root_CA_Cert: "{{ RootCACert.stdout }}"
+        - name: Set fact Root_CA_Cert
+          ansible.builtin.set_fact:
+            Root_CA_Cert: "{{ RootCACert.stdout }}"
+          when:
+            - Traefik.app.customize_root_CA | bool
 
     - name: Present traefik file folder
       ansible.builtin.file:
@@ -83,20 +87,41 @@
 
     - name: Config reverse proxy
       block:
-        # - name: Ensure dns record is present
-        #   community.general.nsupdate: "{{ dns }}"
-        #   delegate_to: localhost
+        - name: Ensure dns record is present
+          community.general.nsupdate:
+            key_name: "{{ FreeIPA.app.tsig_key_name }}"
+            key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+            key_secret: "{{ FreeIPA.app.tsig_secret }}"
+            server: "{{ FreeIPA.pod.hostIP }}"
+            zone: "{{ item.zone }}"
+            record: "{{ item.record }}"
+            value: "{{ item.value }}"
+            type: 'A'
+            state: "{{ Traefik.pod.state }}"
+          loop: "{{ Traefik.dns.configs }}"
+          delegate_to: localhost
+          when:
+            - Traefik.dns.nsupdate | bool
+
+        # - name: render and present route config
+        #   ansible.builtin.copy:
+        #     content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
+        #     dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
+        #   when: 
+        #     - podman_rootless_play.vars_podman_play.state == 'present'
 
         - name: render and present route config
           ansible.builtin.copy:
-            content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
-            dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
+            content: "{{ lookup('ansible.builtin.template', item) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+          loop: "{{ Traefik.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
 
         - name: absent route config
           ansible.builtin.file:
-            path: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
+            path: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
             state: absent
+          loop: "{{ Traefik.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'

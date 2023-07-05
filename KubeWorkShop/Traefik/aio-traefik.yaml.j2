@@ -68,8 +68,8 @@ data:
     certificatesResolvers:
       acmeResolver:
         acme:
-          caServer: {{ Traefik_ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
-          email: {{ Traefik_ACME_email | default('')}}
+          caServer: {{ Traefik.app.ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
+          email: {{ Traefik.app.ACME_email | default('')}}
           storage: /mnt/acmeStorage/acme.json
           httpChallenge:
             # used during the challenge
@@ -77,7 +77,7 @@ data:
             
     # https://doc.traefik.io/traefik/observability/logs/
     log:
-      level: DEBUG
+      level: {{ Traefik.app.log_level }}
   shared.yml: |
     # Dynamic Configuration
     http:
@@ -86,7 +86,7 @@ data:
           redirectScheme:
             scheme: https
             permanent: true
-
+    
 {% if Root_CA_Cert is defined and Root_CA_Cert|length %}
   root_ca.crt: |
     {{ Root_CA_Cert | indent(width=4) | default('') }}
@@ -104,7 +104,7 @@ spec:
   # https://www.traefik.org/page/Docker#traefik_server_containers
   containers:
     - name: traefik
-      image: {{ Traefik_container_image }}
+      image: {{ Traefik.pod.image }}
       imagePullPolicy: IfNotPresent
       resources:
         limits:
@@ -114,11 +114,15 @@ spec:
         # https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-official-docker-image
         - name: http
           containerPort: 80
-          hostIP: {{ Traefik_container_hostIP }}
+{% if Traefik.pod.hostIP is defined and Traefik.pod.hostIP|length %}
+          hostIP: {{ Traefik.pod.hostIP }}
+{% endif %}
           hostPort: 80
         - name: https
           containerPort: 443
-          hostIP: {{ Traefik_container_hostIP }}
+{% if Traefik.pod.hostIP is defined and Traefik.pod.hostIP|length %}
+          hostIP: {{ Traefik.pod.hostIP }}
+{% endif %}
           hostPort: 443
       env:
         # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients/index.html#traefik
