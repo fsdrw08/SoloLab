@@ -1,0 +1,21 @@
+# Dynamic Configuration
+tcp:
+  routers:
+    cockpit:
+      rule: HostSNI(`{{ Traefik.ingress.cockpit_subdomain }}.{{ base_domain_name }}`)
+      entryPoints:
+        - websecure
+      service: cockpit
+      # https://doc.traefik.io/traefik/routing/routers/#passthrough
+      tls: 
+        passthrough: true
+  services:
+    cockpit:
+      # https://doc.traefik.io/traefik/routing/services/#servers-load-balancer_1
+      loadBalancer:
+        servers:
+          - address: {{ Traefik.ingress.cockpit_address }}
+        # serversTransport: consul
+  # serversTransports:
+  #   consul:
+  #     insecureSkipVerify: true
