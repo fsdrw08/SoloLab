@@ -30,7 +30,7 @@ variable "ecs_instance_type" {
 
 variable "ecs_image_name" {
   type    = string
-  default = "centos_stream_9_x64"
+  default = "centos_stream_9_uefi_x64"
 }
 
 variable "ecs_server_name" {

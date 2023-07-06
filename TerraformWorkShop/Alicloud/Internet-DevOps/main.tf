@@ -99,7 +99,7 @@ resource "alicloud_ssl_vpn_server" "vss" {
   compress       = "false"
 }
 
-# resource "alicloud_ssl_vpn_client_cert" "vsc" {
-#   name              = "vpn_cert_test"
-#   ssl_vpn_server_id = alicloud_ssl_vpn_server.vss.id
-# }
+resource "alicloud_ssl_vpn_client_cert" "vsc" {
+  name              = "vpn_cert_test"
+  ssl_vpn_server_id = alicloud_ssl_vpn_server.vss.id
+}
