@@ -15,6 +15,7 @@
         enabled: "{{ definitive_service_podman_socket_user_scope.enabled }}"
         state: "{{ definitive_service_podman_socket_user_scope.state }}"
         scope: user
+      become: true
       become_user: "{{ target_user }}"
       when:
         - definitive_service_podman_socket_user_scope.skipped is false
