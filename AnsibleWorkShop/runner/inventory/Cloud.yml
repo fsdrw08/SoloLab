@@ -6,7 +6,14 @@ Cloud:
     ansible_host_key_checking: False
     ansible_ssh_host_key_checking: False
   hosts:
-    gitlab:
+    gitlab_admin:
+      ansible_user: admin
+      # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
+      # ansible_ssh_pass: vagrant
+      ansible_host: gitlab.devops.p2w3
+      ansible_python_interpreter: /usr/bin/python3
+      ansible_ssh_private_key_file: ~/.ssh/ssh.key
+    gitlab_podmgr:
       ansible_user: podmgr
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
       # ansible_ssh_pass: vagrant

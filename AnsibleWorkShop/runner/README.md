@@ -31,13 +31,14 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
 $private_data_dir = "/tmp/private"
+$keyFile = "vagrant.key"
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 ```
@@ -48,12 +49,17 @@ cd $(git rev-parse --show-toplevel)/AnsibleWorkShop/runner
 
 # https://github.com/containers/podman/blob/main/troubleshooting.md#:~:text=In%20cases%20where%20the%20container%20image%20runs%20as%20a%20specific%2C%20non%2Droot%20user
 private_data_dir="/tmp/private"
+keyFile="admin.key"
 podman run --rm --userns=keep-id \
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml \
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False \
     -v ./:$private_data_dir \
     docker.io/fsdrw08/sololab-ansible-ee \
-    bash -c "ansible-runner run $private_data_dir -vv"
+    bash -c  "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+# bash -c "ansible-runner run $private_data_dir -vv"
 ```
 
 ## run podman play 

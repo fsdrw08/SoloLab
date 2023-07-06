@@ -11,6 +11,7 @@ base_domain_name: infra.sololab
 
 ## Podman
 podman:
+  target_user: podmgr
   vars_package:
     podman:
       state: present
