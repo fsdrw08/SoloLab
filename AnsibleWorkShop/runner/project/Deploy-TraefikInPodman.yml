@@ -3,9 +3,6 @@
 - hosts: "{{ target_host.name }}" # kube-2
   gather_facts: yes
   vars: 
-    ca:
-      hostname: ipa.infra.sololab
-    
     podman_rootless_play:
       vars_podman_host: "{{ target_host.name }}"
       vars_podman_uri:
@@ -54,7 +51,7 @@
             # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
             cmd: >
               echo | 
-              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_hostname }}:443 2>&- | 
+              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_socket_address }} 2>&- | 
               tac | 
               sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
               tac
@@ -85,9 +82,9 @@
         vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
         vars_service: "{{ podman_rootless_play.vars_service }}"
 
-    - name: Config reverse proxy
+    - name: Config DNS
       block:
-        - name: Ensure dns record is present
+        - name: Ensure dns record is {{ Traefik.pod.state }}
           community.general.nsupdate:
             key_name: "{{ FreeIPA.app.tsig_key_name }}"
             key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
@@ -101,15 +98,11 @@
           loop: "{{ Traefik.dns.configs }}"
           delegate_to: localhost
           when:
+            - Traefik.dns.nsupdate is defined
             - Traefik.dns.nsupdate | bool
 
-        # - name: render and present route config
-        #   ansible.builtin.copy:
-        #     content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
-        #     dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
-        #   when: 
-        #     - podman_rootless_play.vars_podman_play.state == 'present'
-
+    - name: Config reverse proxy
+      block:
         - name: render and present route config
           ansible.builtin.copy:
             content: "{{ lookup('ansible.builtin.template', item) }}"
@@ -117,6 +110,7 @@
           loop: "{{ Traefik.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
+            - Traefik.ingress.tmpl is defined
 
         - name: absent route config
           ansible.builtin.file:

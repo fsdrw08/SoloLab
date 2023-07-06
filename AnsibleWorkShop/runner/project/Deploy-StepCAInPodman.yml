@@ -53,9 +53,9 @@
         vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
         vars_service: "{{ podman_rootless_play.vars_service }}"
 
-    - name: Config reverse proxy
+    - name: Config DNS
       block:
-        - name: Ensure dns record is present
+        - name: Ensure dns record is {{ StepCA.pod.state }}
           community.general.nsupdate:
             key_name: "{{ FreeIPA.app.tsig_key_name }}"
             key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
@@ -65,19 +65,15 @@
             record: "{{ item.record }}"
             value: "{{ item.value }}"
             type: 'A'
-            state: "{{ Traefik.pod.state }}"
-          loop: "{{ Traefik.dns.configs }}"
+            state: "{{ StepCA.pod.state }}"
+          loop: "{{ StepCA.dns.configs }}"
           delegate_to: localhost
           when:
+            - StepCA.dns.nsupdate is defined
             - StepCA.dns.nsupdate | bool
 
-        # - name: render and present route config
-        #   ansible.builtin.copy:
-        #     content: "{{ lookup('ansible.builtin.template', Traefik_ingress_file) }}"
-        #     dest: /home/{{ ansible_user }}/traefik/{{ Traefik_ingress_file | basename | replace('.j2','') }}
-        #   when: 
-        #     - podman_rootless_play.vars_podman_play.state == 'present'
-
+    - name: Config reverse proxy
+      block:
         - name: render and present route config
           ansible.builtin.copy:
             content: "{{ lookup('ansible.builtin.template', item) }}"
@@ -85,6 +81,7 @@
           loop: "{{ StepCA.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
+            - StepCA.ingress.tmpl is defined
 
         - name: absent route config
           ansible.builtin.file:
@@ -93,3 +90,4 @@
           loop: "{{ StepCA.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
+            - StepCA.ingress.tmpl is defined
