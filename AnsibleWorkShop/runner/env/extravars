@@ -36,11 +36,36 @@ FreeIPA:
     dns_zonename: infra.sololab.
     dns_rev_zonename: 255.168.192.in-addr.arpa.
 
+## StepCA
+StepCA:
+  pod:
+    state: present # absent / present
+    absent_force: true # true / false
+    systemd_service: stepca # name of the systemd service
+    kube_file_host: localhost # tmpl mounted inside podman runner container
+    kube_file_tmpl: /KubeWorkShop/StepCA/aio-stepca.yaml.j2
+    image: docker.io/smallstep/step-ca:latest
+    hostIP: 192.168.255.10
+  app:
+    DOCKER_STEPCA_INIT_NAME: sololab
+    DOCKER_STEPCA_INIT_ACME: true
+    DOCKER_STEPCA_INIT_DNS_NAMES: localhost,step-ca.infra.sololab
+    DOCKER_STEPCA_INIT_SSH: true
+    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT: true
+    DOCKER_STEPCA_INIT_PROVISIONER_NAME: admin
+    DOCKER_STEPCA_INIT_PASSWORD: P@ssw0rd
+  dns:
+    nsupdate: true # true / false
+    configs:
+      - zone: infra.sololab
+        record: step-ca
+        value: 192.168.255.10
+
 ## traefik
 Traefik:
   pod:
-    state: present # absent / present
-    absent_force: false # true / false
+    state: present # present / absent
+    absent_force: true # true / false
     systemd_service: traefik # name of the systemd service
     kube_file_host: localhost # tmpl mounted inside podman runner container
     kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
@@ -48,9 +73,14 @@ Traefik:
     hostIP: 192.168.255.10
   app:
     customize_root_CA: true # true / false
-    Root_CA_hostname: ipa.infra.sololab
+    Root_CA_socket_address: step-ca.infra.sololab:9000
     ACME_enabled: true
-    ACME_URL: https://ipa-ca.infra.sololab/acme/directory
+    # for stepca: https://smallstep.com/blog/private-acme-server/#pointing-clients-at-the-right-acme-directory-url
+    # https://{ca-host}/acme/{provisioner-name}/directory
+    # check provisioner-name by step ca provisioner list
+    # for freeipa:  https://freeipa.org/page/V4/ACME#how-to-use
+    # https://ipa-ca.<domain-name>/acme/directory
+    ACME_URL: https://step-ca.infra.sololab:9000/acme/acme/directory
     ACME_email: admin@INFRA.SOLOLAB
     log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
   ingress:
@@ -60,7 +90,7 @@ Traefik:
     dashboard_subdomain: traefik
     dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
     cockpit_subdomain: cockpit
-    cockpit_address: 192.168.255.11:9090
+    cockpit_address: 192.168.255.10:9090
   dns:
     nsupdate: true # true / false
     configs:
@@ -82,24 +112,6 @@ Traefik:
     #   type: 'A'
     #   state: present
 
-## StepCA
-StepCA:
-  pod:
-    state: present # absent / present
-    absent_force: false # true / false
-    systemd_service: stepca # name of the systemd service
-    kube_file_host: localhost # tmpl mounted inside podman runner container
-    kube_file_tmpl: /KubeWorkShop/StepCA/aio-stepca.yaml.j2
-    image: docker.io/smallstep/step-ca:latest
-    hostIP: 192.168.255.10
-  app:
-    DOCKER_STEPCA_INIT_NAME: sololab
-    DOCKER_STEPCA_INIT_ACME: true
-    DOCKER_STEPCA_INIT_DNS_NAMES: localhost,ca.sololab
-    DOCKER_STEPCA_INIT_SSH: true
-    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT: true
-    DOCKER_STEPCA_INIT_PROVISIONER_NAME: admin
-    DOCKER_STEPCA_INIT_PASSWORD: P@ssw0rd
 
 ## gitlab
 GitLab_pod_state: present # absent / present
