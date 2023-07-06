@@ -8,6 +8,7 @@
       ansible.builtin.include_role:
         name: ansible-podman-rootless-provision
       vars:
+        target_user: "{{ podman.target_user }}"
         vars_package: "{{ podman.vars_package }}"
         vars_cgroups_delegation: "{{ podman.vars_cgroups_delegation }}"
         vars_pam_limits: "{{ podman.vars_pam_limits }}"
