@@ -21,7 +21,7 @@ spec:
   containers:
     - name: stepca
       # https://hub.docker.com/r/smallstep/step-ca
-      image: docker.io/smallstep/step-ca:latest
+      image: {{ StepCA.pod.image | default('docker.io/smallstep/step-ca:latest') }}
       resources:
         limits:
           memory: "128Mi"
@@ -29,13 +29,16 @@ spec:
       ports:
         - name: stepca
           containerPort: 9000
+{% if StepCA.pod.hostIP is defined and StepCA.pod.hostIP|length %}
+          hostIP: {{ StepCA.pod.hostIP }}
+{% endif %}
       env:
         # the name of your CA—this will be the issuer of your CA certificates
         - name: DOCKER_STEPCA_INIT_NAME
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_NAME }}
         # create an initial ACME provisioner for the CA
         - name: DOCKER_STEPCA_INIT_ACME
-          value: "{{ StepCA.app.DOCKER_STEPCA_INIT_ACME }}"
+          value: {{ StepCA.app.DOCKER_STEPCA_INIT_ACME }}
         # the hostname(s) or IPs that the CA will accept requests on
         - name: DOCKER_STEPCA_INIT_DNS_NAMES
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_DNS_NAMES }}

@@ -77,7 +77,7 @@ data:
             
     # https://doc.traefik.io/traefik/observability/logs/
     log:
-      level: {{ Traefik.app.log_level }}
+      level: {{ Traefik.app.log_level | default('INFO') }}
   shared.yml: |
     # Dynamic Configuration
     http:
@@ -104,7 +104,7 @@ spec:
   # https://www.traefik.org/page/Docker#traefik_server_containers
   containers:
     - name: traefik
-      image: {{ Traefik.pod.image }}
+      image: {{ Traefik.pod.image | default('docker.io/library/traefik:latest') }}
       imagePullPolicy: IfNotPresent
       resources:
         limits:
