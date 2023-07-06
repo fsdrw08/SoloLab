@@ -25,6 +25,7 @@
             - path: "{{ app_config.podman.containers_conf.path }}"
               state: touch
               mode: u=rw,g=r,o=r
+          become: true
           become_user: "{{ target_user }}"
           when:
             - podman_containers_conf.stat.exists is defined
