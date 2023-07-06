@@ -10,6 +10,7 @@
 - name: Enable user linger
   ansible.builtin.shell: 
     cmd: loginctl enable-linger {{ target_user }}
+  become: true
   become_user: "{{ target_user }}"
   when: 
     - user_lingering.stat.exists is false
@@ -18,6 +19,7 @@
 - name: Disable user linger
   ansible.builtin.shell: 
     cmd: loginctl disable-linger {{ target_user }}
+  become: true
   become_user: "{{ target_user }}"
   when: 
     - user_lingering.stat.exists is true
