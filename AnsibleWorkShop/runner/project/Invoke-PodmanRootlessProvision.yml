@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: "{{ target_host }}" # kube-2
+- hosts: "{{ target_host.name }}" # kube-2
   gather_facts: yes
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
@@ -8,52 +8,59 @@
       ansible.builtin.include_role:
         name: ansible-podman-rootless-provision
       vars:
-        vars_package:
-          podman:
-            state: present
-            include_cockpit_podman: true
-            dnf:
-              enablerepo:
-              update_cache:
-        vars_cgroups_delegation:
-          all_users:
-            state: present
-            present_override: false
-            resources: cpu cpuset io memory pids
-          per_user:
-            state: skipped
-            resources: io
-        vars_pam_limits:
-          state: present
-        vars_sub_ids:
-          state: present
-          present_override: false
-        vars_kernel_modules:
-          state: present
-          list:
-            - ip_tables
-        vars_app_config:
-          podman:
-            containers_conf:
-              state: present
-              content: |
-                [containers]
-                # log_driver="journald"
-                # log_size_max="10m"
-                shm_size="128m"
-                tz = "Asia/Shanghai"
-        vars_service:
-          podman_socket:
-            user_scope: 
-              skipped: false
-              enabled: true
-              state: started
-            system_scope: 
-              skipped: true
-              enabled: false
-              state: stopped
-          systemd_lingering:
-            state: enable
+        vars_package: "{{ podman.vars_package }}"
+        vars_cgroups_delegation: "{{ podman.vars_cgroups_delegation }}"
+        vars_pam_limits: "{{ podman.vars_pam_limits }}"
+        vars_sub_ids: "{{ podman.vars_sub_ids }}"
+        vars_kernel_modules: "{{ podman.vars_kernel_modules }}"
+        vars_app_config: "{{ podman.vars_app_config }}"
+        vars_service: "{{ podman.vars_service }}"
+        # vars_package:
+        #   podman:
+        #     state: present
+        #     include_cockpit_podman: true
+        #     dnf:
+        #       enablerepo:
+        #       update_cache:
+        # vars_cgroups_delegation:
+        #   all_users:
+        #     state: present
+        #     present_override: false
+        #     resources: cpu cpuset io memory pids
+        #   per_user:
+        #     state: skipped
+        #     resources: io
+        # vars_pam_limits:
+        #   state: present
+        # vars_sub_ids:
+        #   state: present
+        #   present_override: false
+        # vars_kernel_modules:
+        #   state: present
+        #   list:
+        #     - ip_tables
+        # vars_app_config:
+        #   podman:
+        #     containers_conf:
+        #       state: present
+        #       content: |
+        #         [containers]
+        #         # log_driver="journald"
+        #         # log_size_max="10m"
+        #         shm_size="128m"
+        #         tz = "Asia/Shanghai"
+        # vars_service:
+        #   podman_socket:
+        #     user_scope: 
+        #       skipped: false
+        #       enabled: true
+        #       state: started
+        #     system_scope: 
+        #       skipped: true
+        #       enabled: false
+        #       state: stopped
+        #   systemd_lingering:
+        #     state: enable
     # - name: whoami
     #   shell:
     #     cmd: id -u

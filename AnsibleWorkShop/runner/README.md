@@ -31,9 +31,8 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
 $private_data_dir = "/tmp/private"
-$playbook = "Invoke-PodmanRootlessProvision.yml"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=$playbook `
+    -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     localhost/ansible-ee-aio-new `
