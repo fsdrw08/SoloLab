@@ -40,7 +40,6 @@ module "cloudinit_nocloud_iso" {
             gecos: podmgr
             plain_text_passwd: podmgr
             lock_passwd: false
-            sudo: ALL=(ALL) NOPASSWD:ALL
             shell: /bin/bash
             ssh_import_id: None
             ssh_authorized_keys:
@@ -51,11 +50,11 @@ module "cloudinit_nocloud_iso" {
         package_upgrade: true
         package_reboot_if_required: true
         packages:
+          - git
           - cockpit
           - cockpit-pcp
           - cockpit-podman
           - podman
-          - git
         
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
         disk_setup:

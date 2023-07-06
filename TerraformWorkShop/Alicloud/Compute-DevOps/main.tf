@@ -111,6 +111,7 @@ resource "alicloud_instance" "ecs" {
   package_upgrade: true
   package_reboot_if_required: false
   packages:
+    - git
     - podman
     - cockpit
     - cockpit-pcp
@@ -149,12 +150,30 @@ resource "alicloud_instance" "ecs" {
       filesystem: 'xfs'
       device: '/dev/vdb'
       partition: auto
+      overwrite: false
 
   # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
   # https://zhuanlan.zhihu.com/p/250658106
   mounts:
-    - [ /dev/vdb1, /home/podmgr, auto, "nofail,exec", ]
+    - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
   mount_default_fields: [ None, None, "auto", "defaults,nofail,user", "0", "2" ]
+
+  # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+  # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+  growpart:
+    mode: auto
+    devices:
+      - "/dev/sda3"
+    ignore_growroot_disabled: false
+  resize_rootfs: true
+
+  # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
+  runcmd:
+    - firewall-offline-cmd --set-default-zone=trusted
+    - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
+    - systemctl unmask firewalld
+    - systemctl enable --now firewalld
+    - systemctl enable --now cockpit.socket
   EOT
 }
 
