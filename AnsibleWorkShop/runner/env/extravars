@@ -169,7 +169,7 @@ Traefik:
 GitLab:
   pod:
     state: present # present / absent
-    absent_force: true # true / false
+    absent_force: false # true / false
     systemd_service: gitlab # name of the systemd service
     kube_file_host: localhost # tmpl mounted inside podman runner container
     kube_file_tmpl: /KubeWorkShop/GitLab/aio-gitlab.yaml.j2
@@ -177,7 +177,6 @@ GitLab:
     # dont use gitlab-ce:16.1.x
     # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
     image: docker.io/gitlab/gitlab-ce:15.11.9-ce.0 # 
-    hostIP: 192.168.255.10
   app:
     external_url: https://gitlab.infra.sololab
   dns:
