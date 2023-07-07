@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "oss" {
-    profile             = "ap-sg"
+    profile             = "ap_sg"
     region              = "ap-southeast-1"
     bucket              = "terraform-remote-backend-root"
     prefix              = ""
@@ -19,11 +19,5 @@ terraform {
 }
 
 provider "alicloud" {
-  profile = "ap-sg"
-  alias   = "ap_sg"
-}
-
-provider "alicloud" {
-  profile = "cn-gz"
-  alias   = "cn_gz"
+  profile = "ap_sg"
 }
