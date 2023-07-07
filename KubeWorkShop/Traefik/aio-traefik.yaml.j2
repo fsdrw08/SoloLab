@@ -69,11 +69,13 @@ data:
       acmeResolver:
         acme:
           caServer: {{ Traefik.app.ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
+          certificatesDuration: 2160
           email: {{ Traefik.app.ACME_email | default('')}}
           storage: /mnt/acmeStorage/acme.json
-          httpChallenge:
-            # used during the challenge
-            entryPoint: web
+          tlsChallenge: {}
+          # httpChallenge:
+          #  # used during the challenge
+          #  entryPoint: web
             
     # https://doc.traefik.io/traefik/observability/logs/
     log:

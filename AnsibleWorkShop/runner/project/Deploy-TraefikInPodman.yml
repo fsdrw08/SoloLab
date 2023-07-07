@@ -119,3 +119,4 @@
           loop: "{{ Traefik.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
+            - Traefik.ingress.tmpl is defined
