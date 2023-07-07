@@ -31,13 +31,16 @@
           name: "{{ item.name }}"
           dns_update_policy: "{{ item.dns_update_policy }}"
       loop: "{{ dns.zones }}"
+      when:
+        - FreeIPA.pod.state == 'present'
 
     - name: Enable FreeIPA ACME
       delegate_to: "{{ target_host.name }}"
+      when:
+        - FreeIPA.pod.state == 'present'
       block:
         - name: new podman exec session for freeipa
           ansible.builtin.uri:
-            # url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ FreeIPA_container_name }}/exec
             url: "{{ podman_rootless_play.vars_podman_uri.scheme_authority }}/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ FreeIPA.pod.container_name }}/exec"
             unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
             method: POST
@@ -45,8 +48,6 @@
             body_format: json
             body: "{{ exec_create_request_body_dict }}"
           vars:
-            api_version: v4.4.1
-            container_name: freeipa-freeipa
             exec_create_request_body_dict:
               # AttachStderr: true
               # AttachStdin: true
@@ -111,17 +112,38 @@
           passwordExpirationTime: 20380119031407Z
           nsIdleTimeout: 0
         state: present
+        when:
+          - FreeIPA.pod.state == 'present'
 
     - name: Set vyos dhcp ddns
-      vyos.vyos.vyos_config :
-        lines:
-          # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
-          # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
-          - set service dhcp-server dynamic-dns-update
-          - set service dhcp-server shared-network-name LAN shared-network-parameters "key {{ FreeIPA.app.tsig_key_name }} { algorithm {{ FreeIPA.app.tsig_algorithm }}; secret {{ FreeIPA.app.tsig_secret }}; };"
-          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;{{ FreeIPA.app.dns_zonename }}&quot;;"
-          - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-rev-domainname &quot;in-addr.arpa.&quot;;"
-          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
-          - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_rev_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
-        save: True
       delegate_to: vyos
+      block:
+        - name: present vyos dhcp ddns
+          vyos.vyos.vyos_config :
+            lines:
+              # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
+              # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
+              - set service dhcp-server dynamic-dns-update
+              - set service dhcp-server shared-network-name LAN shared-network-parameters "key {{ FreeIPA.app.tsig_key_name }} { algorithm {{ FreeIPA.app.tsig_algorithm }}; secret {{ FreeIPA.app.tsig_secret }}; };"
+              - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;{{ FreeIPA.app.dns_zonename }}&quot;;"
+              - set service dhcp-server shared-network-name LAN shared-network-parameters "ddns-rev-domainname &quot;in-addr.arpa.&quot;;"
+              - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
+              - set service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_rev_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
+            save: True
+          when:
+            - FreeIPA.pod.state == 'present'
+
+        - name: absent vyos dhcp ddns
+          vyos.vyos.vyos_config :
+            lines:
+              # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
+              # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
+              - delete service dhcp-server dynamic-dns-update
+              - delete service dhcp-server shared-network-name LAN shared-network-parameters "key {{ FreeIPA.app.tsig_key_name }} { algorithm {{ FreeIPA.app.tsig_algorithm }}; secret {{ FreeIPA.app.tsig_secret }}; };"
+              - delete service dhcp-server shared-network-name LAN shared-network-parameters "ddns-domainname &quot;{{ FreeIPA.app.dns_zonename }}&quot;;"
+              - delete service dhcp-server shared-network-name LAN shared-network-parameters "ddns-rev-domainname &quot;in-addr.arpa.&quot;;"
+              - delete service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
+              - delete service dhcp-server shared-network-name LAN shared-network-parameters "zone {{ FreeIPA.app.dns_rev_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }"
+            save: True
+          when:
+            - FreeIPA.pod.state == 'absent'
