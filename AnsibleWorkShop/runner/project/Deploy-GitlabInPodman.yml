@@ -1,27 +1,27 @@
 # code: language=ansible
 ---
-- hosts: "{{ target_host }}" # kube-2
+- hosts: "{{ target_host.name }}" # kube-2
   gather_facts: yes
   vars:
     podman_rootless_play:
-      vars_podman_host: "{{ target_host }}"
+      vars_podman_host: "{{ target_host.name }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
-        unix_socket: /run/user/{{ uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
-        state: "{{ GitLab_pod_state }}" # absent / present
+        state: "{{ GitLab.pod.state }}" # absent / present
         timeout: 600
         kube_file:
           host: localhost
-          content: "{{ lookup('ansible.builtin.template', GitLab_kube_file) }}"
+          content: "{{ lookup('ansible.builtin.template', GitLab.pod.kube_file_tmpl) }}"
         absent:
           query_params:
-            force: "{{ GitLab_pod_absent_force }}"
+            force: "{{ GitLab.pod.absent_force }}"
       vars_podman_generate_systemd:
         generate:
           path_params:
-            name: "{{ GitLab_systemd_service }}"
+            name: "{{ GitLab.pod.systemd_service }}"
           query_params:
             useName: true
       vars_service:
@@ -44,11 +44,10 @@
 
     # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/2837#note_898446295
     - name: Disable gitlab public sign-up
-      delegate_to: "{{ target_host }}"
       block:
         - name: Test gitlab status 
           ansible.builtin.uri:
-            url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ GitLab_container_name }}/healthcheck
+            url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ GitLab.pod.container_name }}/healthcheck
             unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
             method: GET
             status_code: 200
@@ -61,7 +60,7 @@
 
         - name: new podman exec session
           ansible.builtin.uri:
-            url: http://d/{{ api_version }}/libpod/containers/{{ GitLab_container_name }}/exec
+            url: http://d/{{ api_version }}/libpod/containers/{{ GitLab.pod.container_name }}/exec
             unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
             method: POST
             status_code: 201
@@ -105,27 +104,45 @@
 
         - name: debug
           debug:
-            # var: exec_start_respond.content.stdout_lines
             msg: "{{ exec_start_respond.content.split('\r\n') }}"
           when:
             - podman_rootless_play.vars_podman_play.state == 'present'
 
+    - name: Config DNS
+      block:
+        - name: Ensure dns record is {{ GitLab.pod.state }}
+          community.general.nsupdate:
+            key_name: "{{ FreeIPA.app.tsig_key_name }}"
+            key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+            key_secret: "{{ FreeIPA.app.tsig_secret }}"
+            server: "{{ FreeIPA.pod.hostIP }}"
+            zone: "{{ item.zone }}"
+            record: "{{ item.record }}"
+            value: "{{ item.value }}"
+            type: 'A'
+            state: "{{ GitLab.pod.state }}"
+          loop: "{{ GitLab.dns.configs }}"
+          delegate_to: localhost
+          when:
+            - GitLab.dns.nsupdate is defined
+            - GitLab.dns.nsupdate | bool
+
     - name: Config reverse proxy
       block:
-        # - name: Ensure dns record is present
-        #   community.general.nsupdate: "{{ dns }}"
-        #   delegate_to: localhost
-
-        - name: present route config
+        - name: render and present route config
           ansible.builtin.copy:
-            content: "{{ lookup('ansible.builtin.template', GitLab_ingress_file) }}"
-            dest: /home/{{ ansible_user }}/traefik/{{ GitLab_ingress_file | basename | replace('.j2','') }}
+            content: "{{ lookup('ansible.builtin.template', item) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+          loop: "{{ GitLab.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'present'
+            - GitLab.ingress.tmpl is defined
 
         - name: absent route config
           ansible.builtin.file:
-            path: /home/{{ ansible_user }}/traefik/{{ GitLab_ingress_file | basename | replace('.j2','') }}
+            path: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
             state: absent
+          loop: "{{ GitLab.ingress.tmpl }}"
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
+            - GitLab.ingress.tmpl is defined

@@ -134,14 +134,6 @@ Traefik:
     ACME_URL: https://step-ca.infra.sololab:9000/acme/acme/directory
     ACME_email: admin@INFRA.SOLOLAB
     log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
-  ingress:
-    tmpl: 
-      - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
-      - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
-    dashboard_subdomain: traefik
-    dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
-    cockpit_subdomain: cockpit
-    cockpit_address: 192.168.255.10:9090
   dns:
     nsupdate: true # true / false
     configs:
@@ -151,6 +143,15 @@ Traefik:
       - zone: infra.sololab
         record: cockpit
         value: 192.168.255.10
+  ingress:
+    tmpl: 
+      - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
+      - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
+    dashboard_subdomain: traefik
+    dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+    cockpit_subdomain: cockpit
+    cockpit_address: 192.168.255.10:9090
+  
     # config:
     #   # nsupdate
     #   key_name: "{{ FreeIPA.app.tsig_key_name }}"
@@ -165,17 +166,27 @@ Traefik:
 
 
 ## gitlab
-GitLab_pod_state: present # absent / present
-GitLab_pod_absent_force: true # true / false
-GitLab_systemd_service: gitlab
-
-GitLab_kube_file: /KubeWorkShop/GitLab/aio-gitlab.yaml.j2
-# dont use gitlab-ce:16.1.x
-# https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
-GitLab_container_image: "docker.io/gitlab/gitlab-ce:15.11.9-ce.0"
-GitLab_external_url: https://gitlab.sololab
-
-GitLab_ingress_file: /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
-GitLab_subdomain: git
-
-GitLab_container_name: gitlab-gitlab
+GitLab:
+  pod:
+    state: present # present / absent
+    absent_force: true # true / false
+    systemd_service: gitlab # name of the systemd service
+    kube_file_host: localhost # tmpl mounted inside podman runner container
+    kube_file_tmpl: /KubeWorkShop/GitLab/aio-gitlab.yaml.j2
+    container_name: gitlab-gitlab
+    # dont use gitlab-ce:16.1.x
+    # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
+    image: docker.io/gitlab/gitlab-ce:15.11.9-ce.0 # 
+    hostIP: 192.168.255.10
+  app:
+    external_url: https://gitlab.infra.sololab
+  dns:
+    nsupdate: true # true / false
+    configs:
+      - zone: infra.sololab
+        record: git
+        value: 192.168.255.10
+  ingress:
+    tmpl: 
+      - /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
+    subdomain: git

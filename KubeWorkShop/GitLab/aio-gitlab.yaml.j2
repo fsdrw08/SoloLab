@@ -43,7 +43,9 @@ metadata:
 spec:
   containers:
     - name: gitlab
-      image: {{ GitLab_container_image }}
+      # dont use gitlab-ce:16.1.x
+      # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
+      image: {{ GitLab.pod.image }}
       resources:
         requests:
           memory: "2560Mi"
@@ -64,7 +66,7 @@ spec:
       env:
         - name: GITLAB_OMNIBUS_CONFIG
           value: |
-            external_url '{{ GitLab_external_url }}'
+            external_url '{{ GitLab.app.external_url }}'
             nginx['listen_https'] = false
             nginx['listen_port'] = 80
             gitlab_rails['gitlab_shell_ssh_port'] = 22

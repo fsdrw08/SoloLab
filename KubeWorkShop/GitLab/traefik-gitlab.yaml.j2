@@ -3,14 +3,14 @@
 http:
   routers:
     gitlab:
-      rule: Host(`{{ GitLab_subdomain }}.{{ base_domain_name }}`)
+      rule: Host(`{{ GitLab.ingress.subdomain }}.{{ base_domain_name }}`)
       service: gitlab
       middlewares:
         - toHttps@file
       entryPoints:
         - websecure
       tls:
-{% if Traefik_ACME_enabled is defined and Traefik_ACME_enabled is sameas true %}
+{% if Traefik.app.ACME_enabled is defined and Traefik.app.ACME_enabled is sameas true %}
         certResolver: acmeResolver
 {% else %}
         {}
