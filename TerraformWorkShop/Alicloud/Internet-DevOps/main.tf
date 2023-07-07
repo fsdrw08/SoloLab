@@ -20,7 +20,7 @@ data "alicloud_vswitches" "vsw" {
 resource "alicloud_eip_address" "eip" {
   count                = local.eip_count
   address_name         = "DevOps_EIP-${count.index + 1}"
-  bandwidth            = 5
+  bandwidth            = 10
   description          = "This resource is managed by terraform"
   internet_charge_type = "PayByTraffic"
   isp                  = "BGP"
