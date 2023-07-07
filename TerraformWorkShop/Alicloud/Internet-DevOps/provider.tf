@@ -21,4 +21,5 @@ terraform {
 provider "alicloud" {
   profile = "default"
   region  = "ap-southeast-1"
+  alias   = "ap-southeast-1"
 }
