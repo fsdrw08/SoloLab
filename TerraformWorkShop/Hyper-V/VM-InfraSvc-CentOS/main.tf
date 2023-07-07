@@ -192,7 +192,7 @@ module "hyperv_machine_instance" {
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
-    memory_maximum_bytes = 4095737856
+    memory_maximum_bytes = 8191475712
     memory_minimum_bytes = 2147483648
     memory_startup_bytes = 2147483648
     notes                = "This VM instance is managed by terraform"
