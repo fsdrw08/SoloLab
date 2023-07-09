@@ -184,6 +184,7 @@ podman run --rm --userns=keep-id \
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $private_data_dir = "/tmp/private"
+$keyFile="vagrant.key"
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Deploy-GitlabInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
@@ -191,7 +192,25 @@ podman run --rm --userns=keep-id `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+```
+
+```powershell
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$private_data_dir = "/tmp/private"
+# $keyFile="vagrant.key"
+$keyFile="podmgr.key"
+podman run --rm --userns=keep-id `
+    --dns 100.100.2.138 `
+    -e RUNNER_PLAYBOOK=Deploy-GitlabInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 ```
