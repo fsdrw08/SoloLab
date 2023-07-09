@@ -35,7 +35,7 @@ variable "ecs_image_name" {
 
 variable "ecs_server_name" {
   type    = string
-  default = "gitlab"
+  default = "git"
 }
 
 variable "ecs_status" {
