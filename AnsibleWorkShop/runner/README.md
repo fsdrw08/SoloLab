@@ -31,7 +31,8 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
 $private_data_dir = "/tmp/private"
-$keyFile = "vagrant.key"
+# $keyFile = "vagrant.key"
+$keyFile = "admin.key"
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `

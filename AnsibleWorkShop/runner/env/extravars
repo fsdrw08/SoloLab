@@ -1,13 +1,19 @@
 # code: language=ansible
 ---
 # common settings
-target_host: 
-  name: kube-2 # gitlab.devops.p2w3
+# target_host:
+#   name: kube-2 # gitlab.devops.p2w3
+#   uid: 1001
+#   connection_id: "cloud-init eth0"
+
+# base_domain_name: infra.sololab
+
+target_host:
+  name: gitlab_podmgr # gitlab_podmgr / gitlab_admin
   uid: 1001
-  connection_id: "cloud-init eth0"
+  connection_id: "System eth0"
 
-base_domain_name: infra.sololab
-
+base_domain_name: devops.p2w3
 
 ## Podman
 podman:
@@ -48,11 +54,11 @@ podman:
           tz = "Asia/Shanghai"
   vars_service:
     podman_socket:
-      user_scope: 
+      user_scope:
         skipped: false
         enabled: true
         state: started
-      system_scope: 
+      system_scope:
         skipped: true
         enabled: false
         state: stopped
@@ -144,14 +150,14 @@ Traefik:
         record: cockpit
         value: 192.168.255.10
   ingress:
-    tmpl: 
+    tmpl:
       - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
       - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
     dashboard_subdomain: traefik
     dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
     cockpit_subdomain: cockpit
     cockpit_address: 192.168.255.10:9090
-  
+
     # config:
     #   # nsupdate
     #   key_name: "{{ FreeIPA.app.tsig_key_name }}"
@@ -176,16 +182,16 @@ GitLab:
     container_name: gitlab-gitlab
     # dont use gitlab-ce:16.1.x
     # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
-    image: docker.io/gitlab/gitlab-ce:15.11.9-ce.0 # 
+    image: docker.io/gitlab/gitlab-ce:15.11.9-ce.0 #
   app:
     external_url: https://gitlab.infra.sololab
   dns:
-    nsupdate: true # true / false
+    nsupdate: false # true / false
     configs:
       - zone: infra.sololab
-        record: git
+        record: gitlab
         value: 192.168.255.10
   ingress:
-    tmpl: 
+    tmpl:
       - /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
-    subdomain: git
+    subdomain: gitlab
