@@ -24,8 +24,9 @@ variable "security_group_name" {
 }
 
 variable "ecs_instance_type" {
-  type    = string
-  default = "ecs.t6-c1m2.large"
+  type        = string
+  description = "https://www.alibabacloud.com/help/zh/elastic-compute-service/latest/instance-family"
+  default     = "ecs.g7a.large" # ecs.t6-c1m2.large
 }
 
 variable "ecs_image_name" {
