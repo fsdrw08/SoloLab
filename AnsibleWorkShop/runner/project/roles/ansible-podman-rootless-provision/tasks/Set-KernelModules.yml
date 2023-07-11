@@ -39,7 +39,7 @@
       loop: "{{ kernel_modules_to_load_list }}"
 
     - name: Temporarily enable "{{ item }}" kernel module
-      ansible.builtin.modprobe:
+      community.general.modprobe:
             name: ip_tables
             state: present
       loop: "{{ kernel_modules_to_load_list }}"
