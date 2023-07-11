@@ -49,6 +49,10 @@ data "alicloud_instances" "ecs" {
   vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
 }
 
+data "alicloud_regions" "current_region_ds" {
+  current = true
+}
+
 # root ssh key pair
 resource "tls_private_key" "root" {
   algorithm = "RSA"
@@ -174,6 +178,7 @@ resource "alicloud_instance" "ecs" {
     - systemctl unmask firewalld
     - systemctl enable --now firewalld
     - systemctl enable --now cockpit.socket
+    - ARGUS_VERSION=3.5.7 /bin/bash -c "$(curl -s https://cms-agent-${data.alicloud_regions.current_region_ds.regions.0.id}.oss-${data.alicloud_regions.current_region_ds.regions.0.id}-internal.aliyuncs.com/Argus/agent_install_ecs-1.7.sh)"
   EOT
 }
 
