@@ -40,7 +40,7 @@ output "message_public" {
   $keyName = "${reverse(split("/", "${local_sensitive_file.admin.filename}"))[0]}"
   $identifyFile = Join-Path -Path $(echo 'abspath(path.root)' | terraform console).replace('"','') -ChildPath $keyName
   @"
-  Host gitlab_public
+  Host git_public
       HostName $publicIP
       User admin
       Port 8022
@@ -52,6 +52,14 @@ output "message_public" {
       LogLevel FATAL
   "@
   code $HOME\.ssh\config
+  # add admin key to ansible
+  terraform output -raw admin_private_key | Out-File -FilePath (Join-Path -Path $(git rev-parse --show-toplevel) -ChildPath AnsibleWorkShop/runner/env/admin.key) -Encoding UTF8NoBOM -Force
+  # add podmgr key to ansible
+  terraform output -raw podmgr_private_key | Out-File -FilePath (Join-Path -Path $(git rev-parse --show-toplevel) -ChildPath AnsibleWorkShop/runner/env/podmgr.key) -Encoding UTF8NoBOM -Force
+  # set podmgr password and login
+  ssh git_public
+  sudo passwd podmgr
+  sudo su podmgr
   ```
   EOT
 }
@@ -73,7 +81,7 @@ output "message_private" {
   $keyName = "${reverse(split("/", "${local_sensitive_file.admin.filename}"))[0]}"
   $identifyFile = Join-Path -Path $(echo 'abspath(path.root)' | terraform console).replace('"','') -ChildPath $keyName
   @"
-  Host gitlab_private
+  Host git_private
       HostName $privateIP
       User admin
       Port 22
@@ -85,6 +93,14 @@ output "message_private" {
       LogLevel FATAL
   "@
   code $HOME\.ssh\config
+  # add admin key to ansible
+  terraform output -raw admin_private_key | Out-File -FilePath (Join-Path -Path $(git rev-parse --show-toplevel) -ChildPath AnsibleWorkShop/runner/env/admin.key) -Encoding UTF8NoBOM -Force
+  # add podmgr key to ansible
+  terraform output -raw podmgr_private_key | Out-File -FilePath (Join-Path -Path $(git rev-parse --show-toplevel) -ChildPath AnsibleWorkShop/runner/env/podmgr.key) -Encoding UTF8NoBOM -Force
+  # set podmgr password and login
+  ssh git_private
+  sudo passwd podmgr
+  sudo su podmgr
   ```
   EOT
 }
