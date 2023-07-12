@@ -66,10 +66,12 @@ spec:
       env:
         - name: GITLAB_OMNIBUS_CONFIG
           value: |
-            external_url '{{ GitLab.app.external_url }}'
-            nginx['listen_https'] = false
-            nginx['listen_port'] = 80
-            gitlab_rails['gitlab_shell_ssh_port'] = 22
+            {{ GITLAB_OMNIBUS_CONFIG | indent(width=12) }}
+          # value: |
+          #   external_url '{{ GitLab.app.external_url }}'
+          #   nginx['listen_https'] = false
+          #   nginx['listen_port'] = 80
+          #   gitlab_rails['gitlab_shell_ssh_port'] = 22
       livenessProbe:
         initialDelaySeconds: 180
         periodSeconds: 60
