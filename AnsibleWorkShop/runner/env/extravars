@@ -1,6 +1,7 @@
 # code: language=ansible
 ---
 # common settings
+host: gitlab_podmgr # kube-2 / gitlab_podmgr / gitlab_admin
 
 ## Podman
 podman:
