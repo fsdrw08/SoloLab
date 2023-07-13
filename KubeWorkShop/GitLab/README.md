@@ -2,11 +2,12 @@
 https://docs.gitlab.com/ee/install/docker.html
 https://hub.docker.com/r/gitlab/gitlab-ce
 
-- gitlab docker image is too big, consider pull it manually first
+- omnibus-gitlab docker image is too big, consider pull it manually first
 ```shell
 version="docker.io/gitlab/gitlab-ce:15.11.11-ce.0"
 podman pull $version
 ```
+related dockerfile: https://gitlab.com/gitlab-org/omnibus-gitlab/-/blob/master/docker/Dockerfile
 
 ### SSO with SAML
 For SSO with SAML (alicloud IDaaS), add below config  
