@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pritunl_data
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pritunl_db
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pritunl
+  labels:
+    name: pritunl
+spec:
+  containers:
+    - name: pritunl
+      # https://hub.docker.com/r/jippi/pritunl/#!
+      image: docker.io/jippi/pritunl:latest
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        privileged: true
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: openvpn_tcp
+          containerPort: 1194
+          protocol: TCP
+          hostPort: 1194
+          hostIP: 192.168.255.10
+        - name: openvpn_udp
+          containerPort: 1194
+          protocol: UDP
+          hostPort: 1194
+          hostIP: 192.168.255.10
+      volumeMounts:
+        - name: pritunl_data
+          mountPath: /var/lib/pritunl
+        - name: pritunl_db
+          mountPath: /var/lib/mongodb
+  volumes:
+    - name: pritunl_data
+      persistentVolumeClaim:
+        claimName: pritunl_data
+    - name: pritunl_db
+      persistentVolumeClaim:
+        claimName: pritunl_db
+  restartPolicy: Never

@@ -1,0 +1,82 @@
+# code: language=ansible
+---
+- hosts: "{{ host }}" # kube-2
+  gather_facts: yes
+  vars:
+    podman_rootless_play:
+      vars_podman_host: "{{ host }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: "{{ Pritunl.pod.state }}" # absent / present
+        timeout: 600
+        kube_file:
+          host: localhost
+          content: "{{ lookup('ansible.builtin.template', Pritunl.pod.kube_file_tmpl) }}"
+        absent:
+          query_params:
+            force: "{{ Pritunl.pod.absent_force }}"
+      vars_podman_generate_systemd:
+        generate:
+          path_params:
+            name: "{{ Pritunl.pod.systemd_service }}"
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
+  tasks:
+    - name: Invoke podman-rootless-play
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Config DNS
+      block:
+        - name: Ensure dns record is {{ Pritunl.pod.state }}
+          community.general.nsupdate:
+            key_name: "{{ FreeIPA.app.tsig_key_name }}"
+            key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+            key_secret: "{{ FreeIPA.app.tsig_secret }}"
+            server: "{{ FreeIPA.pod.hostIP }}"
+            zone: "{{ item.zone }}"
+            record: "{{ item.record }}"
+            value: "{{ item.value }}"
+            type: 'A'
+            state: "{{ Pritunl.pod.state }}"
+          loop: "{{ Pritunl.dns.configs }}"
+          delegate_to: localhost
+          when:
+            - Pritunl.dns.nsupdate is defined
+            - Pritunl.dns.nsupdate | bool
+
+    - name: Config reverse proxy
+      block:
+        - name: render and present route config
+          ansible.builtin.copy:
+            content: "{{ lookup('ansible.builtin.template', item) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+          loop: "{{ Pritunl.ingress.tmpl }}"
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+            - Pritunl.ingress.tmpl is defined
+
+        - name: absent route config
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+            state: absent
+          loop: "{{ Pritunl.ingress.tmpl }}"
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'absent'
+            - Pritunl.ingress.tmpl is defined
