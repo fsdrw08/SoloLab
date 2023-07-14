@@ -10,7 +10,7 @@ terraform {
     region              = "ap-southeast-1"
     bucket              = "terraform-remote-backend-root"
     prefix              = ""
-    key                 = "devops-test/vpc_gz/terraform.tfstate"
+    key                 = "devops-test/internet-cngz/terraform.tfstate"
     acl                 = "private"
     encrypt             = "false"
     tablestore_endpoint = "https://tf-ots-lock.ap-southeast-1.ots.aliyuncs.com"
