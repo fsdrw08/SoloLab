@@ -46,6 +46,7 @@ spec:
       # dont use gitlab-ce:16.1.x
       # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
       image: docker.io/gitlab/gitlab-ce:15.11.9-ce.0
+      imagePullPolicy: IfNotPresent
       resources:
         requests:
           memory: "2560Mi"
