@@ -55,15 +55,15 @@ resource "alicloud_snat_entry" "snat" {
   snat_ip           = alicloud_eip_address.eip[0].ip_address
 }
 
-resource "alicloud_alidns_record" "alidnscheck" {
-  domain_name = var.domain_name
-  rr          = "alidnscheck"
-  remark      = "For Proving DNS Ownership"
-  status      = "ENABLE"
-  ttl         = "86400"
-  type        = "TXT"
-  value       = "c76842bdc6ac4e59bffacb1ad8df8f2d"
-}
+# resource "alicloud_alidns_record" "alidnscheck" {
+#   domain_name = var.domain_name
+#   rr          = "alidnscheck"
+#   remark      = "For Proving DNS Ownership"
+#   status      = "ENABLE"
+#   ttl         = "86400"
+#   type        = "TXT"
+#   value       = "c76842bdc6ac4e59bffacb1ad8df8f2d"
+# }
 
 # resource "alicloud_alidns_record" "r-proxy" {
 #   domain_name = var.domain_name
@@ -92,7 +92,7 @@ resource "alicloud_ssl_vpn_server" "vss" {
   name           = "DevOps_VPN_SSL_Server"
   vpn_gateway_id = alicloud_vpn_gateway.vpn.id
   client_ip_pool = "10.0.0.0/27"
-  local_subnet   = "${data.alicloud_vswitches.vsw.vswitches.0.cidr_block},100.100.2.136/32,100.100.2.138/32"
+  local_subnet   = "${data.alicloud_vswitches.vsw.vswitches.0.cidr_block},100.100.2.136/30"
   protocol       = "TCP"
   cipher         = "AES-128-CBC"
   port           = 1194
