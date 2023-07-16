@@ -1,23 +1,43 @@
 # https://help.aliyun.com/document_detail/145541.html#section-ikv-9za-fsj
 # https://github.com/terraform-alicloud-modules/terraform-alicloud-remote-backend/blob/master/main.tf
-module "remote_state" {
-  source                = "terraform-alicloud-modules/remote-backend/alicloud"
-  version               = "1.2.0"
-  create_backend_bucket = true
-  backend_oss_bucket    = "terraform-remote-backend-root"
 
-  create_ots_lock_instance = true
-  # 注意，为了避免OTS实例名称的冲突，此处需要指定自己的OTS Instance名称
-  # 如果指定的OTS Instance已经存在，那么需要设置 create_ots_lock_instance = false 
-  backend_ots_lock_instance = "tf-ots-lock" # the default one "tf-oss-backend" shows already exist
+data "alicloud_regions" "regions" {
+  current = true
+}
 
-  create_ots_lock_table = true
-  # 注意，如果想要自定义OTS Table或者使用已经存在的Table，可以通过参数backend_ots_lock_table来指定
-  # 如果指定的OTS Table已经存在，那么需要设置 create_ots_lock_table = false
-  backend_ots_lock_table = "terraform_remote_backend_lock_table_root"
+locals {
+  region              = var.region != "" ? var.region : data.alicloud_regions.regions.ids.0
+  lock_table_endpoint = "https://${var.ots_instance_name}.${local.region}.ots.aliyuncs.com"
+}
 
-  # https://www.alibabacloud.com/help/en/basics-for-beginners/latest/regions-and-zones
-  region        = "ap-southeast-1" # means singapore
-  state_name    = "root/terraform.tfstate"
-  encrypt_state = false
+# OSS Bucket to hold state.
+resource "alicloud_oss_bucket" "bucket" {
+  acl    = "private"
+  bucket = var.bucket_name
+
+  tags = {
+    Name      = "TF remote state"
+    Terraform = "true"
+  }
+}
+
+# OTS table store to lock state during applies
+resource "alicloud_ots_instance" "ots_inst" {
+  name        = var.ots_instance_name
+  description = "Terraform remote backend state lock."
+  accessed_by = "Any"
+  tags = {
+    Purpose = "Terraform state lock for state in ${var.bucket_name}"
+  }
+}
+
+resource "alicloud_ots_table" "ots_tbl" {
+  instance_name = alicloud_ots_instance.ots_inst.name
+  max_version   = 1
+  table_name    = var.ots_table_name
+  time_to_live  = -1
+  primary_key {
+    name = "LockID"
+    type = "String"
+  }
 }

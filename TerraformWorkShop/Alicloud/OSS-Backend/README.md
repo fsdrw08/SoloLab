@@ -2,11 +2,12 @@ ref:
 - https://help.aliyun.com/document_detail/145541.html#section-ikv-9za-fsj
 
 ## init OSS backend
-1. set env var for credential:
+1. config aliyun to let it generate profile:
 ```powershell
-$env:ALICLOUD_ACCESS_KEY="xxx"
-$env:ALICLOUD_SECRET_KEY="xxx"
-$env:ALICLOUD_REGION="ap-southeast-1"
+aliyun configure --profile cn_hk
+Access Key Id []: ...
+Access Key Secret []: ...
+Default Region Id []: cn-hongkong
 ```
 
 2. run terraform to create oss and ots
