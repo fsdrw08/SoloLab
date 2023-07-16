@@ -24,7 +24,7 @@ resource "alicloud_ecs_disk" "gitlab_data" {
 }
 
 resource "alicloud_ecs_snapshot" "s-gitlab_data" {
-  resource_group_id = data.alicloud_resource_manager_resource_groups
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   category          = "standard"
   description       = "This resource is managed by terraform"
   disk_id           = alicloud_ecs_disk.gitlab_data.id
