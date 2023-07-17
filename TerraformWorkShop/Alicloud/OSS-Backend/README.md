@@ -18,6 +18,6 @@ terraform approve --auto-approve
 ```
 
 ## migrate tfstate from local to alicloud oss
-1. after oss and ots created, this module will also generate a `terraform.tf.sample` file for the oss backend config, rename this file to `terraform.tf`
+1. after oss and ots created, this module will also output a bock of oss backend config code for the oss backend config, copy and paste it in provider.
 
 2. run `terraform init` again, terraform will migrate `terraform.tfstate` to oss backend

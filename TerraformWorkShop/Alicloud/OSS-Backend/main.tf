@@ -6,7 +6,7 @@ data "alicloud_regions" "regions" {
 }
 
 locals {
-  region              = var.region != "" ? var.region : data.alicloud_regions.regions.ids.0
+  region              = data.alicloud_regions.regions.ids.0
   lock_table_endpoint = "https://${var.ots_instance_name}.${local.region}.ots.aliyuncs.com"
 }
 
@@ -40,4 +40,10 @@ resource "alicloud_ots_table" "ots_tbl" {
     name = "LockID"
     type = "String"
   }
+}
+
+# resource group
+resource "alicloud_resource_manager_resource_group" "rg" {
+  resource_group_name = "DevOps-Root"
+  display_name        = "DevOps-Root"
 }

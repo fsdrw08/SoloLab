@@ -3,11 +3,6 @@ variable "aliyun_profile" {
   default     = "cn_hk"
 }
 
-variable "region" {
-  description = "The region used to launch this module resources."
-  type        = string
-  default     = ""
-}
 
 variable "bucket_name" {
   description = "The name of the bucket"
