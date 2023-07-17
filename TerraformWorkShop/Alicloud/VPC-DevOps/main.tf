@@ -1,65 +1,73 @@
-data "alicloud_zones" "vsw" {
-  available_resource_creation = "VSwitch"
+data "alicloud_resource_manager_resource_groups" "rg" {
+  name_regex = var.resource_group_name_regex
+  status     = "OK"
 }
 
-# resource group
-resource "alicloud_resource_manager_resource_group" "rg" {
-  resource_group_name = "devops"
-  display_name        = "DevOps"
+data "alicloud_zones" "az" {
+  available_instance_type     = "ecs.t6-c1m4.large"
+  available_resource_creation = "Instance"
+  instance_charge_type        = "PostPaid"
+  network_type                = "Vpc"
 }
 
-# vpc related
+# vpc
 # https://mxtoolbox.com/SubnetCalculator.aspx
 resource "alicloud_vpc" "vpc" {
-  vpc_name          = "DevOps_VPC"
-  cidr_block        = "172.16.0.0/12"
-  resource_group_id = alicloud_resource_manager_resource_group.rg.id
+  vpc_name          = var.vpc_name
+  cidr_block        = var.vpc_cidr
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   description       = "This resource is managed by terraform"
   tags = {
-    "Name" = "DevOps"
+    "Name" = var.vpc_name
   }
 }
 
-# vswitch
-resource "alicloud_vswitch" "vsw" {
-  vpc_id       = alicloud_vpc.vpc.id
-  cidr_block   = "172.16.1.0/24"
-  zone_id      = data.alicloud_zones.vsw.zones[0].id
-  vswitch_name = "DevOps_VSwitch"
-  description  = "This resource is managed by terraform"
-  tags = {
-    "Name" = "DevOps"
-  }
+
+## ipv4 gateway
+# https://help.aliyun.com/document_detail/376445.html
+resource "alicloud_vpc_ipv4_gateway" "ipv4gw" {
+  enabled                  = var.ipv4_gateway_enabled
+  vpc_id                   = alicloud_vpc.vpc.id
+  resource_group_id        = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  ipv4_gateway_name        = var.ipv4_gateway_name
+  ipv4_gateway_description = "This_resource_is_managed_by_terraform"
 }
 
-# security group related
-resource "alicloud_security_group" "sg" {
-  name                = "DevOps_SG"
-  resource_group_id   = alicloud_resource_manager_resource_group.rg.id
-  security_group_type = "normal"
-  vpc_id              = alicloud_vpc.vpc.id
+# create ipv4 gateway route table
+# https://help.aliyun.com/document_detail/376499.html#section-pbr-i91-zye
+resource "alicloud_route_table" "ipv4gw_vtb" {
+  vpc_id           = alicloud_vpc.vpc.id
+  route_table_name = var.ipv4_gateway_route_table_name
+  description      = "This resource is managed by terraform"
+  associate_type   = "Gateway"
+}
+
+# bind ipv4 gateway and ipv4 gateway route table together
+# https://help.aliyun.com/document_detail/376499.html#section-8vm-dsm-lb1
+resource "alicloud_vpc_gateway_route_table_attachment" "ipv4gw_vtb_attm" {
+  ipv4_gateway_id = alicloud_vpc_ipv4_gateway.ipv4gw.id
+  route_table_id  = alicloud_route_table.ipv4gw_vtb.id
+}
+
+# add vpc route entry to route traffic to ipv4 gateway
+# https://help.aliyun.com/document_detail/376499.html#section-l0k-okc-3q2
+resource "alicloud_route_entry" "vpc_to_ipv4gw" {
+  route_table_id        = alicloud_vpc.vpc.route_table_id
+  nexthop_id            = alicloud_vpc_ipv4_gateway.ipv4gw.id
+  destination_cidrblock = "0.0.0.0/0"
+  nexthop_type          = "Ipv4Gateway"
 }
 
 
-resource "alicloud_security_group_rule" "sgr_allow_all_in" {
-  type              = "ingress"
-  ip_protocol       = "all"
-  nic_type          = "intranet"
-  policy            = "accept"
-  port_range        = "-1/-1"
-  priority          = 10
-  security_group_id = alicloud_security_group.sg.id
-  cidr_ip           = "0.0.0.0/0"
-}
-
-// Using this data source can open Private Zone service automatically.
+## private zone
+# Using this data source can open Private Zone service automatically.
 # https://github.com/openshift/installer/blob/de6e40773cee904bfea1d2bafae4149d58277d83/data/data/alibabacloud/cluster/dns/privatezone.tf#L5
 data "alicloud_pvtz_service" "pvtz_enable" {
   enable = "On"
 }
 
 resource "alicloud_pvtz_zone" "pvtz" {
-  resource_group_id = alicloud_resource_manager_resource_group.rg.id
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   zone_name         = "devops.p2w3"
   sync_status       = "ON"
 }
