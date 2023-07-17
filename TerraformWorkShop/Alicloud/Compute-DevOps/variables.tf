@@ -54,12 +54,22 @@ variable "ecs_status" {
   default = "Running" # Running / Stopped
 }
 
-variable "eip_address_name" {
+variable "nat_gateway_name_regex" {
   type    = string
-  default = "DevOps"
+  default = "^DevOps-NGw"
+}
+
+variable "eip_address_name_regex" {
+  type    = string
+  default = "^DevOps-1"
 }
 
 variable "eip_index" {
   type    = number
   default = 0
+}
+
+variable "forward_entry_name" {
+  type    = string
+  default = "DevOps-DNAT_git_ssh"
 }
