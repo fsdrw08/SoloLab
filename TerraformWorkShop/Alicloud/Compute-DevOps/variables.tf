@@ -1,26 +1,31 @@
-variable "resource_group_name" {
+variable "resource_group_name_regex" {
   type    = string
-  default = "devops"
+  default = "^DevOps-Root"
 }
 
-variable "vpc_name" {
+variable "vpc_name_regex" {
   type    = string
-  default = "DevOps"
+  default = "^DevOps-VPC"
 }
 
-variable "vswitch_name" {
+variable "vswitch_name_regex" {
   type    = string
-  default = "DevOps"
+  default = "^DevOps-Sub_1_VSw"
 }
 
-variable "nat_gateway_name" {
+variable "security_group_name_regex" {
   type    = string
-  default = "DevOps"
+  default = "^DevOps-Sub_1_SG"
 }
 
-variable "security_group_name" {
+variable "data_disk_name_regex" {
   type    = string
-  default = "DevOps"
+  default = "^DevOps-Root-Disk-gitlab_data"
+}
+
+variable "ecs_image_name_regex" {
+  type    = string
+  default = "^centos_stream_9_uefi_x64"
 }
 
 variable "ecs_instance_type" {
@@ -29,9 +34,14 @@ variable "ecs_instance_type" {
   default     = "ecs.t6-c1m4.large" # ecs.t6-c1m2.large
 }
 
-variable "ecs_image_name" {
+variable "ecs_instance_name" {
   type    = string
-  default = "centos_stream_9_uefi_x64"
+  default = "DevOps-Root-ecs_gitlab"
+}
+
+variable "ecs_system_disk_name" {
+  type    = string
+  default = "DevOps-Root-ecs_gitlab_boot"
 }
 
 variable "ecs_server_name" {
@@ -41,12 +51,7 @@ variable "ecs_server_name" {
 
 variable "ecs_status" {
   type    = string
-  default = "Stopped"
-}
-
-variable "data_disk_name" {
-  type    = string
-  default = "DevOps_Disk-gitlab_data"
+  default = "Running" # Running / Stopped
 }
 
 variable "eip_address_name" {

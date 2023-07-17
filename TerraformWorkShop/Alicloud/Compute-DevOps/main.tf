@@ -1,52 +1,45 @@
 data "alicloud_resource_manager_resource_groups" "rg" {
-  name_regex = "^${var.resource_group_name}"
+  name_regex = var.resource_group_name_regex
 }
 
 data "alicloud_vpcs" "vpc" {
-  name_regex        = "^${var.vpc_name}"
+  name_regex        = var.vpc_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
 data "alicloud_vswitches" "vsw" {
-  name_regex        = "^${var.vswitch_name}"
+  name_regex        = var.vswitch_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
 data "alicloud_security_groups" "sg" {
-  name_regex        = "^${var.security_group_name}"
+  name_regex        = var.security_group_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
 data "alicloud_ecs_disks" "dd" {
-  name_regex        = "^${var.data_disk_name}"
+  name_regex        = var.data_disk_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
-data "alicloud_nat_gateways" "ngw" {
-  name_regex        = "^${var.nat_gateway_name}"
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
-}
+# data "alicloud_nat_gateways" "ngw" {
+#   name_regex        = "^${var.nat_gateway_name}"
+#   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+#   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
+# }
 
-data "alicloud_eip_addresses" "eip" {
-  name_regex        = "^${var.eip_address_name}"
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-}
+# data "alicloud_eip_addresses" "eip" {
+#   name_regex        = "^${var.eip_address_name}"
+#   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+# }
 
 data "alicloud_images" "img" {
-  name_regex  = "^${var.ecs_image_name}"
+  name_regex  = var.ecs_image_name_regex
   most_recent = true
   owners      = "system"
   status      = "Available"
-}
-
-data "alicloud_instances" "ecs" {
-  name_regex        = "DevOps_Compute-${var.ecs_server_name}"
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
-  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
 }
 
 data "alicloud_regions" "current_region_ds" {
@@ -92,15 +85,15 @@ resource "alicloud_instance" "ecs" {
 
   # https://www.alibabacloud.com/help/zh/elastic-compute-service/latest/instance-family#t6
   instance_type = var.ecs_instance_type
-  instance_name = "DevOps_Compute-${var.ecs_server_name}"
+  instance_name = var.ecs_instance_name
   description   = "This resource is managed by terraform"
 
-  status       = "Running" # Running / Stopped
+  status       = var.ecs_status # Running / Stopped
   stopped_mode = "StopCharging"
 
   image_id                = data.alicloud_images.img.images[0].id
   system_disk_category    = "cloud_efficiency"
-  system_disk_name        = "DevOps_Disk-${var.ecs_server_name}_boot"
+  system_disk_name        = var.ecs_system_disk_name
   system_disk_description = "This resource is managed by terraform"
 
   host_name = var.ecs_server_name
@@ -213,16 +206,16 @@ resource "alicloud_ecs_disk_attachment" "ecs_data_attach" {
 #   resource_group_id = data.terraform_remote_state.vpc.outputs.resource_group_id
 # }
 
-resource "alicloud_forward_entry" "ssh" {
-  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_ssh"
-  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
-  external_port      = "8022"
-  ip_protocol        = "tcp"
-  internal_ip        = alicloud_instance.ecs.private_ip
-  internal_port      = "22"
-  port_break         = true
-}
+# resource "alicloud_forward_entry" "ssh" {
+#   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_ssh"
+#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+#   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+#   external_port      = "8022"
+#   ip_protocol        = "tcp"
+#   internal_ip        = alicloud_instance.ecs.private_ip
+#   internal_port      = "22"
+#   port_break         = true
+# }
 
 # resource "alicloud_forward_entry" "http" {
 #   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
