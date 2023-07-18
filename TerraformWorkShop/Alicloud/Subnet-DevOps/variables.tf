@@ -13,6 +13,11 @@ variable "nat_gateway_name_regex" {
   default = "^DevOps-NGw"
 }
 
+variable "zone_available_instance_type" {
+  type    = string
+  default = "ecs.t6-c1m4.large"
+}
+
 variable "subnet_vswitch_name" {
   default = "DevOps-Sub_1_VSw"
 }

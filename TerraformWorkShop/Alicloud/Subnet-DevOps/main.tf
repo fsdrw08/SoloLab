@@ -3,8 +3,8 @@ data "alicloud_resource_manager_resource_groups" "rg" {
 }
 
 data "alicloud_zones" "az" {
-  available_instance_type     = "ecs.t6-c1m4.large"
-  available_resource_creation = "Instance"
+  available_instance_type     = var.zone_available_instance_type
+  available_resource_creation = "VSwitch"
   instance_charge_type        = "PostPaid"
   network_type                = "Vpc"
 }
