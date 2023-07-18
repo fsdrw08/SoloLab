@@ -19,7 +19,7 @@ data "alicloud_security_groups" "sg" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
-data "alicloud_ecs_disks" "dd" {
+data "alicloud_ecs_disks" "d" {
   name_regex        = var.data_disk_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
@@ -117,6 +117,7 @@ resource "alicloud_instance" "ecs" {
         - ${tls_private_key.admin.public_key_openssh}
     - name: podmgr
       gecos: podmgr
+      hashed_passwd: ${var.ecs_podmgr_passwd_hash}
       lock_passwd: true
       sudo: False
       shell: /bin/bash
@@ -155,6 +156,7 @@ resource "alicloud_instance" "ecs" {
 
   # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
   runcmd:
+    - [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
     - firewall-offline-cmd --set-default-zone=trusted
     - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
     - systemctl unmask firewalld
@@ -165,7 +167,7 @@ resource "alicloud_instance" "ecs" {
 }
 
 resource "alicloud_ecs_disk_attachment" "ecs_data_attach" {
-  disk_id     = data.alicloud_ecs_disks.dd.disks.0.id
+  disk_id     = data.alicloud_ecs_disks.d.disks.0.id
   instance_id = alicloud_instance.ecs.id
 }
 
@@ -208,7 +210,7 @@ data "alicloud_eip_addresses" "eip" {
 }
 
 resource "alicloud_forward_entry" "dnat_ssh" {
-  forward_entry_name = var.forward_entry_name
+  forward_entry_name = var.ssh_forward_entry_name
   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
   external_port      = "8022"
@@ -218,16 +220,16 @@ resource "alicloud_forward_entry" "dnat_ssh" {
   port_break         = true
 }
 
-# resource "alicloud_forward_entry" "http" {
-#   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
-#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-#   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
-#   external_port      = "80"
-#   ip_protocol        = "tcp"
-#   internal_ip        = alicloud_instance.ecs.private_ip
-#   internal_port      = "80"
-#   port_break         = true
-# }
+resource "alicloud_forward_entry" "http" {
+  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+  external_port      = "80"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_instance.ecs.private_ip
+  internal_port      = "80"
+  port_break         = true
+}
 
 # resource "alicloud_forward_entry" "https" {
 #   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"

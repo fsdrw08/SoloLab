@@ -20,7 +20,7 @@ variable "security_group_name_regex" {
 
 variable "data_disk_name_regex" {
   type    = string
-  default = "^DevOps-Root-Disk-gitlab_data"
+  default = "^DevOps-D_git_data"
 }
 
 variable "ecs_image_name_regex" {
@@ -36,17 +36,23 @@ variable "ecs_instance_type" {
 
 variable "ecs_instance_name" {
   type    = string
-  default = "DevOps-Root-ecs_gitlab"
+  default = "DevOps-ECS_gitlab"
 }
 
 variable "ecs_system_disk_name" {
   type    = string
-  default = "DevOps-Root-ecs_gitlab_boot"
+  default = "DevOps-D_git_boot"
 }
 
 variable "ecs_server_name" {
   type    = string
   default = "git"
+}
+
+variable "ecs_podmgr_passwd_hash" {
+  type        = string
+  description = "Run this command to gen the hash: PASSWD='xxxx'; mkpasswd --method=SHA-512 --rounds=4096 $PASSWD"
+  default     = "$6$rounds=4096$uELhWMpZ8N89hWdZ$jJcX1.Mjlsk8TdposASIUtAaOxamhkKdSq7V0mt9cJ8FX7coMCiEYtJt0lsX1rpKPoqYlc8gF7OUheZYwis3m0"
 }
 
 variable "ecs_status" {
@@ -69,7 +75,7 @@ variable "eip_index" {
   default = 0
 }
 
-variable "forward_entry_name" {
+variable "ssh_forward_entry_name" {
   type    = string
   default = "DevOps-DNAT_git_ssh"
 }
