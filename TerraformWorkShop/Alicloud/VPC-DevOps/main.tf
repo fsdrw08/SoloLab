@@ -70,6 +70,10 @@ resource "alicloud_pvtz_zone" "pvtz" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   zone_name         = "devops.p2w3"
   sync_status       = "ON"
+  user_info {
+    user_id    = var.private_zone_user_id
+    region_ids = var.private_zone_region_ids
+  }
 }
 
 resource "alicloud_pvtz_zone_attachment" "pvtz_attm" {

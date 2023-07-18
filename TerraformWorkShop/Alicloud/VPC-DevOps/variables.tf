@@ -27,3 +27,13 @@ variable "ipv4_gateway_route_table_name" {
   description = "ipv4 gateway route table name"
   default     = "DevOps-IPV4Gw_VTb"
 }
+
+variable "private_zone_user_id" {
+  type    = string
+  default = "5408086620836608"
+}
+
+variable "private_zone_region_ids" {
+  type    = list(string)
+  default = ["cn-hongkong"]
+}
