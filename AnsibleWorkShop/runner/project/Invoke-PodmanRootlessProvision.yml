@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: "{{ target_host.name }}" # kube-2
+- hosts: "{{ host }}" # kube-2
   gather_facts: yes
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
