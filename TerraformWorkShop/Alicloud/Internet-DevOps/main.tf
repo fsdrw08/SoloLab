@@ -56,12 +56,12 @@ resource "alicloud_nat_gateway" "ngw" {
   nat_gateway_name = var.nat_gateway_name
   description      = "This resource is managed by terraform"
   # fixed params:
-  # https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/nat_gateway#eip_bind_mode
-  # https://help.aliyun.com/document_detail/120219.html
-  eip_bind_mode        = "NAT"
   internet_charge_type = "PayByLcu"
   nat_type             = "Enhanced"
   network_type         = "internet"
+  # https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/nat_gateway#eip_bind_mode
+  # https://help.aliyun.com/document_detail/120219.html
+  eip_bind_mode = "NAT"
 }
 
 # eip

@@ -23,10 +23,10 @@ Access Key Id []: ...
 Access Key Secret []: ...
 Default Region Id []: ap-southeast-1
 
-aliyun configure --profile cn_sz
+aliyun configure --profile cn_hk
 Access Key Id []: ...
 Access Key Secret []: ...
-Default Region Id []: cn-shenzhen
+Default Region Id []: cn-hongkong
 ```
 
 3. put below key word in backend oss config
@@ -53,12 +53,12 @@ terraform init
 ```powershell
 $resourceId = "xxx-xxxx"
 $resourceNewName = "provider_resource.new_name"
-$resourceId = "vss-t4ne5eitvob0ikzj5dvor"
-$resourceNewName = "alicloud_ssl_vpn_server.vss"
+$resourceId = "d-j6c51b8pqwfoicx2x4ek"
+$resourceNewName = "alicloud_ecs_disk.d_data"
 terraform import $resourceNewName $resourceId
 ```
 3. remove the old resource name
 ```powershell
-$resourceOldName = "provider_resource.old_name"
+$resourceOldName = "alicloud_ecs_disk.d_gitlab_data"
 terraform state rm $resourceOldName
 ```
