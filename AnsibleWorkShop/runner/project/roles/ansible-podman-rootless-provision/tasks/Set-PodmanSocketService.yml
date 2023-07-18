@@ -9,17 +9,18 @@
     - ansible_service_mgr == "systemd"
     - ansible_facts.services['podman.service'] is defined
   block:
-    - name: Detect {{ target_user }} uid
-      ansible.builtin.shell: 
-        cmd: id -u
-      become: true
-      become_user: "{{ target_user }}"
-      changed_when: false
-      register: target_user_uid
+    - name: Detect {{ target_user }} info
+      ansible.builtin.user:
+        user: "{{ target_user }}"
+      check_mode: true
+      register: user_info
 
-    - name: set systemd runtime dir
-      set_fact:
-        xdg_runtime_dir: "/run/user/{{ target_user_uid.stdout }}"
+    - name: ensure systemd files directory exists for rootless user
+      ansible.builtin.file:
+        path: "{{ user_info.home }}/.config/systemd/user"
+        state: directory
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
 
     - name: Set systemd user scope podman socket service
       ansible.builtin.systemd:
