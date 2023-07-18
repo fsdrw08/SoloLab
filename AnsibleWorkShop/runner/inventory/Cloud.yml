@@ -27,7 +27,7 @@ Cloud:
       app:
         DOCKER_STEPCA_INIT_NAME: p2w3
         DOCKER_STEPCA_INIT_ACME: true
-        DOCKER_STEPCA_INIT_DNS_NAMES: localhost,step-ca.infra.sololab
+        DOCKER_STEPCA_INIT_DNS_NAMES: localhost,step-ca.devops.p2w3
         DOCKER_STEPCA_INIT_SSH: true
         DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT: true
         DOCKER_STEPCA_INIT_PROVISIONER_NAME: admin
