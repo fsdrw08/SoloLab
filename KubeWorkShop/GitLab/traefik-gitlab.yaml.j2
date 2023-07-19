@@ -3,7 +3,7 @@
 http:
   routers:
     gitlab:
-      rule: Host(`{{ GitLab.ingress.subdomain }}.{{ base_domain_name }}`)
+      rule: Host(`{{ GitLab.ingress.subdomain }}.{{ GitLab.ingress.basedomain }}`)
       service: gitlab
       middlewares:
         - toHttps@file
@@ -20,4 +20,4 @@ http:
     gitlab:
       loadBalancer:
         servers:
-          - url: "http://gitlab/"
+          - url: "{{ GitLab.ingress.backend }}"

@@ -2,7 +2,7 @@
 tcp:
   routers:
     cockpit:
-      rule: HostSNI(`{{ Traefik.ingress.cockpit_subdomain }}.{{ base_domain_name }}`)
+      rule: HostSNI(`{{ Traefik.ingress.cockpit_subdomain }}.{{ Traefik.ingress.cockpit_basedomain }}`)
       entryPoints:
         - websecure
       service: cockpit

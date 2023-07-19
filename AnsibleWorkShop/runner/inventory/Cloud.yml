@@ -6,14 +6,17 @@ Cloud:
     # https://github.com/ansible/ansible/issues/49254
     ansible_host_key_checking: False
     ansible_ssh_host_key_checking: False
+
     # playbook vars:
     # common settings
     target_host:
+      name: "{{ host }}"
       uid: 1001
       connection_id: "System eth0"
 
-    base_domain_name: devops.p2w3
-    
+    internal_basedomain: devops.p2w3
+    external_basedomain: devops.p2w3
+
     ## StepCA
     StepCA:
       pod:
@@ -53,13 +56,14 @@ Cloud:
         customize_root_CA: true # true / false
         Root_CA_socket_address: step-ca.devops.p2w3:9000
         ACME_enabled: true
-        # for stepca: https://smallstep.com/blog/private-acme-server/#pointing-clients-at-the-right-acme-directory-url
+        # for stepca: (ref: https://smallstep.com/blog/private-acme-server/#pointing-clients-at-the-right-acme-directory-url)
         # https://{ca-host}/acme/{provisioner-name}/directory
-        # check provisioner-name by step ca provisioner list
-        # for freeipa:  https://freeipa.org/page/V4/ACME#how-to-use
+        # check provisioner-name by command: step ca provisioner list
+
+        # for freeipa: (ref: https://freeipa.org/page/V4/ACME#how-to-use)
         # https://ipa-ca.<domain-name>/acme/directory
-        ACME_URL: https://step-ca.devops.p2w3:9000/acme/acme/directory
-        ACME_email: admin@devops.p2w3
+        ACME_URL: https://acme-v02.api.letsencrypt.org/directory
+        ACME_email: changeit
         log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       dns:
         nsupdate: false # true / false
@@ -74,8 +78,10 @@ Cloud:
         tmpl:
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
+        dashboard_basedomain: "{{ internal_basedomain }}"
         dashboard_subdomain: traefik
         dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+        cockpit_basedomain: "{{ internal_basedomain }}"
         cockpit_subdomain: cockpit
         cockpit_address: git.devops.p2w3:9090
 
@@ -94,7 +100,7 @@ Cloud:
       app:
         # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
         # https://zhuanlan.zhihu.com/p/61967315#:~:text=%E4%BD%A0%E8%B6%9F%E5%AE%8C%E4%BA%86%E3%80%82-,%E9%85%8D%E7%BD%AE%20GitLab%20Nginx%20%E6%9C%8D%E5%8A%A1,-%E5%9C%A8%E7%BB%99%E5%87%BA
-        # to debug: 
+        # to debug:
         # vi /etc/gitlab/gitlab.rb
         # gitlab-ctl reconfigure
         # tail -n 100 /var/log/gitlab/gitlab-rails/application_json.log
@@ -135,7 +141,9 @@ Cloud:
       ingress:
         tmpl:
           - /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
+        basedomain: "{{ external_basedomain }}"
         subdomain: gitlab
+        backend: http://gitlab/
 
   hosts:
     gitlab_admin:
