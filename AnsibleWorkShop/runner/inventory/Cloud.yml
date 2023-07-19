@@ -15,7 +15,7 @@ Cloud:
       connection_id: "System eth0"
 
     internal_basedomain: devops.p2w3
-    external_basedomain: devops.p2w3
+    external_basedomain: xxxx.com
 
     ## StepCA
     StepCA:
@@ -99,7 +99,7 @@ Cloud:
         container_name: gitlab-gitlab
         # dont use gitlab-ce:16.1.x
         # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
-        image: docker.io/gitlab/gitlab-ee:16.1.2-ee.0
+        image: docker.io/gitlab/gitlab-ee:15.11.12-ee.0
       app:
         # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
         # https://zhuanlan.zhihu.com/p/61967315#:~:text=%E4%BD%A0%E8%B6%9F%E5%AE%8C%E4%BA%86%E3%80%82-,%E9%85%8D%E7%BD%AE%20GitLab%20Nginx%20%E6%9C%8D%E5%8A%A1,-%E5%9C%A8%E7%BB%99%E5%87%BA
@@ -124,10 +124,10 @@ Cloud:
               label: 'AliCloud IDaaS',
               args: {
                 name: 'saml', 
-                assertion_consumer_service_url: 'https://gitlab.devops.p2w3/users/auth/saml/callback',
+                assertion_consumer_service_url: 'https://gitlab.{{ external_basedomain }}/users/auth/saml/callback',
                 idp_cert_fingerprint: '80:47:29:40:BD:9D:B2:C5:5F:A9:75:66:84:FB:41:5B:D4:35:36:E8',
                 idp_sso_target_url: 'https://xxxxxx.cloud-idaas.com/login/app/app_msxgnhonbnuqhcij6gnezx5cca/saml2/sso',
-                issuer: 'https://gitlab.devops.p2w3/users/auth/saml',
+                issuer: 'https://gitlab.{{ external_basedomain }}/users/auth/saml',
                 name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
                 attribute_statements: { 
                   nickname: ['username'],
