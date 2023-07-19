@@ -99,7 +99,7 @@ Cloud:
         container_name: gitlab-gitlab
         # dont use gitlab-ce:16.1.x
         # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
-        image: docker.io/gitlab/gitlab-ce:15.11.11-ce.0
+        image: docker.io/gitlab/gitlab-ee:16.1.2-ee.0
       app:
         # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
         # https://zhuanlan.zhihu.com/p/61967315#:~:text=%E4%BD%A0%E8%B6%9F%E5%AE%8C%E4%BA%86%E3%80%82-,%E9%85%8D%E7%BD%AE%20GitLab%20Nginx%20%E6%9C%8D%E5%8A%A1,-%E5%9C%A8%E7%BB%99%E5%87%BA
@@ -146,6 +146,7 @@ Cloud:
           - /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
         basedomain: "{{ external_basedomain }}"
         subdomain: gitlab
+        acmeResolver: external
         backend: http://gitlab/
 
   hosts:

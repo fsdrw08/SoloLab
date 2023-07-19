@@ -126,7 +126,7 @@ sololab:
         container_name: gitlab-gitlab
         # dont use gitlab-ce:16.1.x
         # https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/7823
-        image: docker.io/gitlab/gitlab-ce:16.1.2-ce.0 # docker.io/gitlab/gitlab-ce:15.11.9-ce.0
+        image: docker.io/gitlab/gitlab-ee:16.1.2-ee.0 # docker.io/gitlab/gitlab-ce:15.11.9-ce.0
       app:
         GITLAB_OMNIBUS_CONFIG: |
           external_url 'https://gitlab.infra.sololab'

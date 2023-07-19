@@ -11,7 +11,7 @@ http:
         - websecure
       tls:
 {% if Traefik.app.ACME_enabled is defined and Traefik.app.ACME_enabled is sameas true %}
-        certResolver: acmeResolver
+        certResolver: {{ GitLab.ingress.acmeResolver }}
 {% else %}
         {}
 {% endif %}
