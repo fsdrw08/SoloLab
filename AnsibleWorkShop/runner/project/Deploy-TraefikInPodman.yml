@@ -51,7 +51,7 @@
             # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
             cmd: >
               echo | 
-              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_socket_address }} 2>&- | 
+              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_socket_address | default('letsencrypt.org:443') }} 2>&- | 
               tac | 
               sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
               tac

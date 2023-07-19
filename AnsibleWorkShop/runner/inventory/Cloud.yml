@@ -53,7 +53,7 @@ Cloud:
         image: docker.io/library/traefik:v2.10
         # hostIP: 192.168.255.10
       app:
-        customize_root_CA: true # true / false
+        customize_root_CA: false # true / false
         Root_CA_socket_address: step-ca.devops.p2w3:9000
         ACME_enabled: true
         # for stepca: (ref: https://smallstep.com/blog/private-acme-server/#pointing-clients-at-the-right-acme-directory-url)
