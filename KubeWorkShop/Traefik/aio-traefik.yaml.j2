@@ -80,6 +80,13 @@ data:
     # https://doc.traefik.io/traefik/observability/logs/
     log:
       level: {{ Traefik.app.log_level | default('INFO') }}
+
+    # https://plugins.traefik.io/plugins/628c9eadffc0cd18356a9799/modsecurity-plugin
+    experimental:
+      plugins:
+        traefik-modsecurity-plugin:
+          moduleName: "github.com/acouvreur/traefik-modsecurity-plugin"
+          version: "v1.3.0"
   shared.yml: |
     # Dynamic Configuration
     http:
@@ -88,7 +95,7 @@ data:
           redirectScheme:
             scheme: https
             permanent: true
-    
+
 {% if Root_CA_Cert is defined and Root_CA_Cert|length %}
   root_ca.crt: |
     {{ Root_CA_Cert | indent(width=4) | default('') }}
