@@ -15,7 +15,7 @@ http:
         - userpass
       tls:
 {% if Traefik.app.ACME_enabled is defined and Traefik.app.ACME_enabled is sameas true %}
-        certResolver: acmeResolver
+        certResolver: {{ dashboard_acmeResolver }}
 {% else %}
         {}
 {% endif %}

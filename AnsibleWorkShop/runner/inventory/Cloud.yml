@@ -53,7 +53,7 @@ Cloud:
         image: docker.io/library/traefik:v2.10
         # hostIP: 192.168.255.10
       app:
-        customize_root_CA: false # true / false
+        customize_root_CA: true # true / false
         Root_CA_socket_address: step-ca.devops.p2w3:9000
         ACME_enabled: true
         # for stepca: (ref: https://smallstep.com/blog/private-acme-server/#pointing-clients-at-the-right-acme-directory-url)
@@ -62,8 +62,10 @@ Cloud:
 
         # for freeipa: (ref: https://freeipa.org/page/V4/ACME#how-to-use)
         # https://ipa-ca.<domain-name>/acme/directory
-        ACME_URL: https://acme-v02.api.letsencrypt.org/directory
-        ACME_email: changeit
+        external_ACME_URL: https://acme-v02.api.letsencrypt.org/directory
+        external_ACME_email: admin@INFRA.SOLOLAB
+        internal_ACME_URL: https://step-ca.devops.p2w3:9000/acme/acme/directory
+        internal_ACME_email: admin@INFRA.SOLOLAB
         log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       dns:
         nsupdate: false # true / false
@@ -80,6 +82,7 @@ Cloud:
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-cockpit.yaml.j2
         dashboard_basedomain: "{{ internal_basedomain }}"
         dashboard_subdomain: traefik
+        dashboard_acmeResolver: internal
         dashboard_basicAuth: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
         cockpit_basedomain: "{{ internal_basedomain }}"
         cockpit_subdomain: cockpit

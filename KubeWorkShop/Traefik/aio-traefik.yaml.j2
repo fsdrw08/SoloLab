@@ -66,17 +66,24 @@ data:
     # https://smallstep.com/docs/tutorials/acme-protocol-acme-clients#traefik
     # https://doc.traefik.io/traefik/https/acme/#certificate-resolvers
     certificatesResolvers:
-      acmeResolver:
+      external:
         acme:
-          caServer: {{ Traefik.app.ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
+          caServer: {{ Traefik.app.external_ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
           certificatesDuration: 2160
           email: {{ Traefik.app.ACME_email | default('')}}
-          storage: /mnt/acmeStorage/acme.json
+          storage: /mnt/acmeStorage/external_acme.json
           tlsChallenge: {}
           # httpChallenge:
           #  # used during the challenge
           #  entryPoint: web
-            
+      internal: 
+        acme:
+          caServer: {{ Traefik.app.internal_ACME_URL | default('https://acme-v02.api.letsencrypt.org/directory') }}
+          certificatesDuration: 2160
+          email: {{ Traefik.app.ACME_email | default('')}}
+          storage: /mnt/acmeStorage/internal_acme.json
+          tlsChallenge: {}           
+
     # https://doc.traefik.io/traefik/observability/logs/
     log:
       level: {{ Traefik.app.log_level | default('INFO') }}
