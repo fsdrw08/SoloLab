@@ -77,5 +77,15 @@ variable "eip_index" {
 
 variable "ssh_forward_entry_name" {
   type    = string
-  default = "DevOps-DNAT_git_ssh"
+  default = "DevOps-fwd_git_ssh"
+}
+
+variable "http_forward_entry_name" {
+  type    = string
+  default = "DevOps-fwd_git_http"
+}
+
+variable "https_forward_entry_name" {
+  type    = string
+  default = "DevOps-fwd_git_https"
 }

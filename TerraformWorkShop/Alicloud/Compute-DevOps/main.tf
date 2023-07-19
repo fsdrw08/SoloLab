@@ -209,7 +209,7 @@ data "alicloud_eip_addresses" "eip" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
-resource "alicloud_forward_entry" "dnat_ssh" {
+resource "alicloud_forward_entry" "fwd_ssh" {
   forward_entry_name = var.ssh_forward_entry_name
   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
@@ -220,8 +220,8 @@ resource "alicloud_forward_entry" "dnat_ssh" {
   port_break         = true
 }
 
-resource "alicloud_forward_entry" "http" {
-  forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
+resource "alicloud_forward_entry" "fwd_http" {
+  forward_entry_name = var.http_forward_entry_name
   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
   external_port      = "80"
@@ -231,13 +231,13 @@ resource "alicloud_forward_entry" "http" {
   port_break         = true
 }
 
-# resource "alicloud_forward_entry" "https" {
-#   forward_entry_name = "DevOps_DNAT-${var.ecs_server_name}_https"
-#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-#   external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
-#   external_port      = "443"
-#   ip_protocol        = "tcp"
-#   internal_ip        = alicloud_instance.ecs.private_ip
-#   internal_port      = "443"
-#   port_break         = true
-# }
+resource "alicloud_forward_entry" "fwd_https" {
+  forward_entry_name = var.https_forward_entry_name
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip.addresses[var.eip_index].ip_address
+  external_port      = "443"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_instance.ecs.private_ip
+  internal_port      = "443"
+  port_break         = true
+}
