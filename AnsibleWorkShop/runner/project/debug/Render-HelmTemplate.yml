@@ -1,0 +1,14 @@
+# code: language=ansible
+---
+- hosts: localhost # kube-2
+  gather_facts: no
+  tasks:
+    - name: Render templates
+      kubernetes.core.helm_template:
+        chart_ref: /HelmWorkShop/helm-charts/charts/Drone
+        release_name:  drone
+      register: result
+
+    - name: debug
+      debug:
+        msg: "{{ result }}"
