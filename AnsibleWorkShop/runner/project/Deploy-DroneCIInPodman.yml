@@ -31,6 +31,34 @@
             enabled: true
             state: started
 
+    podman_rootless_play_drone_runner:
+      vars_podman_host: "{{ host }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.5.0 # v4.0.0 ← (default)
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: "{{ DroneRunner.pod.state }}" # absent / present
+        timeout: 600
+        kube_file:
+          host: "{{ DroneRunner.pod.kube_file_host }}"
+          content: "{{ rendered.stdout }}"
+        absent:
+          query_params:
+            force: "{{ DroneRunner.pod.absent_force }}"
+      vars_podman_generate_systemd:
+        generate:
+          path_params:
+            name: "{{ DroneRunner.pod.systemd_service }}"
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
   tasks:
     - name: Render kube file templates
       delegate_to: "{{ Drone.pod.kube_file_host }}"
@@ -89,3 +117,22 @@
           when: 
             - podman_rootless_play.vars_podman_play.state == 'absent'
             - Drone.ingress.tmpl is defined
+
+    - name: Render kube file templates for Drone Runner
+      delegate_to: "{{ DroneRunner.pod.kube_file_host }}"
+      kubernetes.core.helm_template:
+        chart_ref: "{{ DroneRunner.pod.helm_chart_ref }}"
+        release_name: "{{ DroneRunner.pod.helm_release_name }}"
+        values_files: 
+          - "{{ DroneRunner.pod.helm_value_file }}"
+      register: rendered
+
+    - name: Invoke podman-rootless-play for Drone Runner
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play_drone_runner.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play_drone_runner.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play_drone_runner.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play_drone_runner.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play_drone_runner.vars_service }}"

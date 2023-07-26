@@ -186,7 +186,7 @@ sololab:
     ## Drone CI
     Drone:
       pod: 
-        state: absent # present / absent
+        state: present # present / absent
         absent_force: true # true / false
         systemd_service: drone # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
@@ -206,6 +206,18 @@ sololab:
         subdomain: drone
         acmeResolver: internal
         backend: http://drone/
+
+    ## Drone Runner
+    DroneRunner:
+      pod: 
+        state: absent # present / absent
+        absent_force: true # true / false
+        systemd_service: drone-runner # name of the systemd service
+        kube_file_host: localhost # tmpl mounted inside podman runner container
+        helm_chart_ref: /HelmWorkShop/helm-charts/charts/Drone-Runner
+        helm_value_file: /HelmWorkShop/helm-charts/charts/Drone-Runner/values-sololab.yaml
+        helm_release_name: drone-runner
+
   hosts:
     vyos:
       ansible_host: 192.168.255.1
