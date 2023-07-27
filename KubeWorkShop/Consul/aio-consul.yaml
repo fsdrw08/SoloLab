@@ -15,6 +15,12 @@ kind: ConfigMap
 metadata:
   name: consul
 data:
+  # https://github.com/hashicorp/consul-k8s/blob/main/charts/consul/templates/server-config-configmap.yaml#L17
+  # https://github.com/hashicorp/consul-k8s/blob/main/charts/consul/values.yaml
+  # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_datacenter
+  # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_domain
+  # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_data_dir
+  # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_server
   config.json: |
     {
         "datacenter": "localhost",
@@ -46,9 +52,10 @@ metadata:
 spec:
   # https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html
   # https://github.com/docker-library/docs/tree/master/consul
+  # https://github.com/hashicorp/docker-consul
   containers:
     - name: consul
-      image: docker.io/library/consul:latest
+      image: docker.io/hashicorp/consul:latest
       # env:
       #   - name: TZ
       #     value: Asia/Shanghai
