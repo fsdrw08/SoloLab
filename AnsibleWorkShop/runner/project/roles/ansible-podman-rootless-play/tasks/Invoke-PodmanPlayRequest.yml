@@ -2,14 +2,6 @@
 ---
 - name: get kube_file content
   block:
-    # - name: slurp yaml file
-    #   ansible.builtin.slurp:
-    #     src: "{{ podman_play.kube_file.path }}"
-    #   register: kube_file_slurp_return
-    #   delegate_to: "{{ podman_play.kube_file.host | default(inventory_hostname) }}"
-    #   when:
-    #     - podman_play.kube_file.path is not none
-
     - name: get kube_file content from path
       ansible.builtin.set_fact:
         # kube_file_slurp: "{{ kube_file_slurp_return.content }}"
