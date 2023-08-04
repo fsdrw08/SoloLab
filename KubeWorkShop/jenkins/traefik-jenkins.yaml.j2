@@ -1,0 +1,23 @@
+# Dynamic Configuration
+# https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
+http:
+  routers:
+    drone:
+      rule: Host(`{{ Drone.ingress.subdomain }}.{{ Drone.ingress.basedomain }}`)
+      service: drone
+      middlewares:
+        - toHttps@file
+      entryPoints:
+        - websecure
+      tls:
+{% if Traefik.app.ACME_enabled is defined and Traefik.app.ACME_enabled is sameas true %}
+        certResolver: {{ Drone.ingress.acmeResolver }}
+{% else %}
+        {}
+{% endif %}
+      
+  services:
+    drone:
+      loadBalancer:
+        servers:
+          - url: "{{ Drone.ingress.backend }}"

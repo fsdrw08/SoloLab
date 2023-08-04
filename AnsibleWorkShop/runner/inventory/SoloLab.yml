@@ -160,63 +160,86 @@ sololab:
         #   type: 'A'
         #   state: present
 
+    ## Jenkins
+    Jenkins:
+      pod: 
+      state: present # present / absent
+      absent_force: true # true / false
+      systemd_service: drone # name of the systemd service
+      kube_file_host: localhost # tmpl mounted inside podman runner container
+      helm_chart_ref: /HelmWorkShop/helm-charts/charts/jenkins-server
+      helm_value_file: /HelmWorkShop/helm-charts/charts/jenkins-server/values-sololab.yaml
+      helm_release_name: jenkins
+    dns:
+      nsupdate: true # true / false
+      configs:
+        - zone: infra.sololab
+          record: jenkins
+          value: 192.168.255.10
+    ingress:
+      tmpl:
+        - /KubeWorkShop/jenkins/traefik-jenkins.yaml.j2
+      basedomain: "{{ external_basedomain }}"
+      subdomain: jenkins
+      acmeResolver: internal
+      backend: http://jenkins/
     ## Pritunl
-    Pritunl:
-      pod:
-        state: present # present / absent
-        absent_force: true # true / false
-        systemd_service: pritunl # name of the systemd service
-        kube_file_host: localhost # tmpl mounted inside podman runner container
-        kube_file_tmpl: /KubeWorkShop/Pritunl/aio-pritunl.yaml
-        container_name: pritunl-pritunl
-      dns:
-        nsupdate: true # true / false
-        configs:
-          - zone: infra.sololab
-            record: pritunl
-            value: 192.168.255.10
-      ingress:
-        tmpl:
-          - /KubeWorkShop/Pritunl/traefik-pritunl.yaml.j2
-        basedomain: "{{ external_basedomain }}"
-        subdomain: pritunl
-        acmeResolver: internal
-        backend: http://pritunl/
+    # Pritunl:
+    #   pod:
+    #     state: present # present / absent
+    #     absent_force: true # true / false
+    #     systemd_service: pritunl # name of the systemd service
+    #     kube_file_host: localhost # tmpl mounted inside podman runner container
+    #     kube_file_tmpl: /KubeWorkShop/Pritunl/aio-pritunl.yaml
+    #     container_name: pritunl-pritunl
+    #   dns:
+    #     nsupdate: true # true / false
+    #     configs:
+    #       - zone: infra.sololab
+    #         record: pritunl
+    #         value: 192.168.255.10
+    #   ingress:
+    #     tmpl:
+    #       - /KubeWorkShop/Pritunl/traefik-pritunl.yaml.j2
+    #     basedomain: "{{ external_basedomain }}"
+    #     subdomain: pritunl
+    #     acmeResolver: internal
+    #     backend: http://pritunl/
 
     ## Drone CI
-    Drone:
-      pod: 
-        state: present # present / absent
-        absent_force: true # true / false
-        systemd_service: drone # name of the systemd service
-        kube_file_host: localhost # tmpl mounted inside podman runner container
-        helm_chart_ref: /HelmWorkShop/helm-charts/charts/Drone
-        helm_value_file: /HelmWorkShop/helm-charts/charts/Drone/values-sololab.yaml
-        helm_release_name: drone
-      dns:
-        nsupdate: true # true / false
-        configs:
-          - zone: infra.sololab
-            record: drone
-            value: 192.168.255.10
-      ingress:
-        tmpl:
-          - /KubeWorkShop/Drone/traefik-drone.yaml.j2
-        basedomain: "{{ external_basedomain }}"
-        subdomain: drone
-        acmeResolver: internal
-        backend: http://drone/
+    # Drone:
+    #   pod: 
+    #     state: absent # present / absent
+    #     absent_force: true # true / false
+    #     systemd_service: drone # name of the systemd service
+    #     kube_file_host: localhost # tmpl mounted inside podman runner container
+    #     helm_chart_ref: /HelmWorkShop/helm-charts/charts/drone-server
+    #     helm_value_file: /HelmWorkShop/helm-charts/charts/drone-server/values-sololab.yaml
+    #     helm_release_name: drone
+    #   dns:
+    #     nsupdate: true # true / false
+    #     configs:
+    #       - zone: infra.sololab
+    #         record: drone
+    #         value: 192.168.255.10
+    #   ingress:
+    #     tmpl:
+    #       - /KubeWorkShop/Drone/traefik-drone.yaml.j2
+    #     basedomain: "{{ external_basedomain }}"
+    #     subdomain: drone
+    #     acmeResolver: internal
+    #     backend: http://drone/
 
-    ## Drone Runner
-    DroneRunner:
-      pod: 
-        state: present # present / absent
-        absent_force: true # true / false
-        systemd_service: drone-runner # name of the systemd service
-        kube_file_host: localhost # tmpl mounted inside podman runner container
-        helm_chart_ref: /HelmWorkShop/helm-charts/charts/Drone-Runner
-        helm_value_file: /HelmWorkShop/helm-charts/charts/Drone-Runner/values-sololab.yaml
-        helm_release_name: drone-runner
+    # ## Drone Runner
+    # DroneRunner:
+    #   pod: 
+    #     state: absent # present / absent
+    #     absent_force: true # true / false
+    #     systemd_service: drone-runner # name of the systemd service
+    #     kube_file_host: localhost # tmpl mounted inside podman runner container
+    #     helm_chart_ref: /HelmWorkShop/helm-charts/charts/drone-runner
+    #     helm_value_file: /HelmWorkShop/helm-charts/charts/drone-runner/values-sololab.yaml
+    #     helm_release_name: drone-runner
 
   hosts:
     vyos:
