@@ -3,7 +3,7 @@
 http:
   routers:
     drone:
-      rule: Host(`{{ Drone.ingress.subdomain }}.{{ Drone.ingress.basedomain }}`)
+      rule: Host(`{{ Jenkins.ingress.subdomain }}.{{ Jenkins.ingress.basedomain }}`)
       service: drone
       middlewares:
         - toHttps@file
@@ -11,7 +11,7 @@ http:
         - websecure
       tls:
 {% if Traefik.app.ACME_enabled is defined and Traefik.app.ACME_enabled is sameas true %}
-        certResolver: {{ Drone.ingress.acmeResolver }}
+        certResolver: {{ Jenkins.ingress.acmeResolver }}
 {% else %}
         {}
 {% endif %}
@@ -20,4 +20,4 @@ http:
     drone:
       loadBalancer:
         servers:
-          - url: "{{ Drone.ingress.backend }}"
+          - url: "{{ Jenkins.ingress.backend }}"

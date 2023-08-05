@@ -286,6 +286,25 @@ podman run --rm --userns=keep-id \
     ansible-runner run $private_data_dir -vv"
 ```
 
+
+## deploy Jenkins by invoke podman rootless play role
+```powershell
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$private_data_dir = "/tmp/private"
+$keyFile="vagrant.key"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=Deploy-JenkinsInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+```
+
 ## deploy hashicorp vault in podman by invoke podman rootless play role
 ```powershell
 podman run --rm `

@@ -71,6 +71,7 @@
             - Jenkins.dns.nsupdate | bool
 
     - name: Config reverse proxy
+      delegate_to: "{{ proxy_host }}"
       block:
         - name: render and present route config
           ansible.builtin.copy:
@@ -90,11 +91,3 @@
             - podman_rootless_play.vars_podman_play.state == 'absent'
             - Jenkins.ingress.tmpl is defined
 
-    - name: Render kube file templates for Jenkins Runner
-      delegate_to: "{{ JenkinsRunner.pod.kube_file_host }}"
-      kubernetes.core.helm_template:
-        chart_ref: "{{ JenkinsRunner.pod.helm_chart_ref }}"
-        release_name: "{{ JenkinsRunner.pod.helm_release_name }}"
-        values_files: 
-          - "{{ JenkinsRunner.pod.helm_value_file }}"
-      register: rendered

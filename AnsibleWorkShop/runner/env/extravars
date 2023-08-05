@@ -2,6 +2,7 @@
 ---
 # common settings
 host: kube-2 # kube-2 / gitlab_podmgr / gitlab_admin
+proxy_host: kube-2
 
 ## Podman
 podman:
