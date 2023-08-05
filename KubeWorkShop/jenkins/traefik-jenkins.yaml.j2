@@ -2,9 +2,9 @@
 # https://github.com/realtarget/traefik2-docker-stack/blob/master/gitlab/docker-compose.yml
 http:
   routers:
-    drone:
+    jenkins:
       rule: Host(`{{ Jenkins.ingress.subdomain }}.{{ Jenkins.ingress.basedomain }}`)
-      service: drone
+      service: jenkins
       middlewares:
         - toHttps@file
       entryPoints:
@@ -17,7 +17,7 @@ http:
 {% endif %}
       
   services:
-    drone:
+    jenkins:
       loadBalancer:
         servers:
           - url: "{{ Jenkins.ingress.backend }}"

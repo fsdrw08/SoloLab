@@ -7,7 +7,7 @@
       vars_podman_host: "{{ host }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
-        api_version: v4.5.0 # v4.0.0 ← (default)
+        api_version: v4.6.0 # v4.0.0 ← (default)
         unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
       vars_podman_play:
         state: "{{ Jenkins.pod.state }}" # absent / present
