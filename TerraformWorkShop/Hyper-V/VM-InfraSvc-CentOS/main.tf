@@ -87,6 +87,8 @@ module "cloudinit_nocloud_iso" {
         
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
+          - |
+            [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
           - firewall-offline-cmd --set-default-zone=trusted
           - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
           - systemctl unmask firewalld
@@ -197,7 +199,7 @@ module "hyperv_machine_instance" {
     memory_startup_bytes = 2147483648
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Off"
+    state                = "Running"
 
     vm_firmware = {
       console_mode                    = "Default"

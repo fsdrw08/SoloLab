@@ -156,7 +156,8 @@ resource "alicloud_instance" "ecs" {
 
   # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
   runcmd:
-    - [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
+    - |
+      [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
     - firewall-offline-cmd --set-default-zone=trusted
     - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
     - systemctl unmask firewalld
