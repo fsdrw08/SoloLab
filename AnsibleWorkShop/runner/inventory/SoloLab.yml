@@ -7,6 +7,56 @@ sololab:
     ansible_host_key_checking: False
     ansible_ssh_host_key_checking: False
 
+    ## Podman
+    podman:
+      target_user: podmgr
+      vars_package:
+        podman:
+          state: present
+          include_cockpit_podman: true
+          dnf:
+            enablerepo:
+            update_cache:
+      vars_cgroups_delegation:
+        all_users:
+          state: present
+          present_override: false
+          resources: cpu cpuset io memory pids
+        per_user:
+          state: skipped
+          resources: io
+      vars_pam_limits:
+        state: present
+      vars_sub_ids:
+        state: present
+        present_override: false
+      vars_kernel_modules:
+        state: present
+        list:
+          - ip_tables
+      vars_app_config:
+        podman:
+          containers_conf:
+            state: present
+            content: |
+              [containers]
+              # log_driver="journald"
+              # log_size_max="10m"
+              shm_size="128m"
+              tz = "Asia/Shanghai"
+      vars_service:
+        podman_socket:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+          system_scope:
+            skipped: true
+            enabled: false
+            state: stopped
+        systemd_lingering:
+          state: enable
+
     # playbook vars:
     # common settings
     target_host:
