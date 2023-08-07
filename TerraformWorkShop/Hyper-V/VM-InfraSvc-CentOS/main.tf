@@ -52,6 +52,7 @@ module "cloudinit_nocloud_iso" {
         packages:
           - git
           - python3-pip
+          - python3-jmespath
           - cockpit
           - cockpit-pcp
           - cockpit-podman
@@ -111,7 +112,7 @@ module "cloudinit_nocloud_iso" {
               - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
                 playbook_name: Invoke-PodmanRootlessProvision.yml
                 inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-                extra_vars: "'@/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars'"
+                extra_vars: "'@/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars host=localhost'"
         EOT
       },
       {
