@@ -51,6 +51,7 @@ module "cloudinit_nocloud_iso" {
         package_reboot_if_required: true
         packages:
           - git
+          - python3-pip
           - cockpit
           - cockpit-pcp
           - cockpit-podman
@@ -95,6 +96,22 @@ module "cloudinit_nocloud_iso" {
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
         
+        ansible:
+          install_method: distro
+          package_name: ansible-core
+          run_user: vagrant
+          galaxy:
+            actions:
+              - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+          setup_controller:
+            repositories:
+              - path: /home/vagrant/SoloLab/
+                source: https://github.com/fsdrw08/SoloLab.git
+            run_ansible:
+              - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+                playbook_name: Invoke-PodmanRootlessProvision.yml
+                inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+                extra_vars: "'@/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars'"
         EOT
       },
       {
@@ -199,7 +216,7 @@ module "hyperv_machine_instance" {
     memory_startup_bytes = 2147483648
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Running"
+    state                = "Off"
 
     vm_firmware = {
       console_mode                    = "Default"
