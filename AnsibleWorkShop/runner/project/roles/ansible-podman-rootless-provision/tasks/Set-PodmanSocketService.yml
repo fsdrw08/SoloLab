@@ -21,6 +21,7 @@
         state: directory
         owner: "{{ target_user }}"
         group: "{{ target_user }}"
+      become: true
 
     - name: Set systemd user scope podman socket service
       ansible.builtin.systemd:
@@ -30,8 +31,6 @@
         scope: user
       become: true
       become_user: "{{ target_user }}"
-      environment:
-        XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
       when:
         - definitive_service_podman_socket_user_scope.skipped is false
 
