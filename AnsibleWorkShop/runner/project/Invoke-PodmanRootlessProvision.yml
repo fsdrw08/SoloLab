@@ -2,6 +2,8 @@
 ---
 - hosts: "{{ host }}" # kube-2
   gather_facts: yes
+  vars_files:
+    - "{{ extravars_file }}"
   tasks:
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
     - name: run role ansible-podman-rootless-provision

@@ -3,7 +3,7 @@
 # vars file for ansible-podman-rootless-provision
 
 # podman package state,
-# vars_package.podman_state: present/absent/skipped
+# vars_package.podman.state: present/absent/skipped
 #   present: 
 #     install podman package
 #   absent:
@@ -78,7 +78,7 @@ vars_cgroups_delegation:
 #     for podman rootless according to vars_sysctl_params.list
 #   absent：
 #     delete sysctl conf file /etc/sysctl.d/{{ role_name }}.conf 
-#   skip：
+#   skipped：
 #     skip the implement of sysctl permission config task 
 # note: if podman package is not there, the sysctl conf file create by this role 
 #   will also be delete
