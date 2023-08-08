@@ -112,7 +112,7 @@ module "cloudinit_nocloud_iso" {
               - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
                 playbook_name: Invoke-PodmanRootlessProvision.yml
                 inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-                extra_vars: "'@/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars host=localhost'"
+                extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         EOT
       },
       {
