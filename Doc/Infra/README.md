@@ -6,7 +6,7 @@ size: 16:9
 paginate: true
 ---
 
-## IT运维自动化及其工具介绍
+## IT基础设施自动化及相关开源工具介绍
 
 ### Intrduce of IT Operations Automation and Related Tools
 <br>
