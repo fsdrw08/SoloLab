@@ -214,7 +214,7 @@ sololab:
     Jenkins:
       pod: 
         state: present # present / absent
-        absent_force: true # true / false
+        absent_force: false # true / false
         systemd_service: jenkins # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/jenkins-server
