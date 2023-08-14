@@ -156,11 +156,30 @@ vars_pam_limits:
       limit_item: memlock
       limit_type: soft
       value: -1
+    - comment: add nproc limit to {{ target_user }}
+      limit_item: nproc
+      limit_type: hard
+      value: 6418
 ```
 
 background:
   - [How to run hashicorp vault as rootless container](https://github.com/containers/podman/issues/10051)
   - [How to Use the ulimit Linux Command](https://phoenixnap.com/kb/ulimit-linux-command)
+  - [Cannot enter container – crun: setrlimit RLIMIT_NPROC: Operation not permitted: OCI permission denied](https://github.com/containers/toolbox/issues/1312)
+  - [crun: setrlimit RLIMIT_NPROC: Operation not permitted: OCI permission denied ](https://github.com/fedora-silverblue/issue-tracker/issues/460)
+
+  ```
+  bash-5.1$ podman start gitlab-gitlab
+  ERRO[0000] Starting some container dependencies         
+  ERRO[0000] "crun: setrlimit `RLIMIT_NPROC`: Operation not permitted: OCI permission denied" 
+  Error: unable to start container "5ab3087e1bcb158ddb3423f312db5d32e31f6da9b2d3811c17139e9f87182290": starting   some containers: internal libpod error
+
+  bash-5.1$ podman inspect --format '{{ printf "%+v" .HostConfig.Ulimits }}' gitlab-gitlab
+  [{Name:RLIMIT_NOFILE Soft:524288 Hard:524288} {Name:RLIMIT_NPROC Soft:6471 Hard:6471}]
+
+  bash-5.1$ ulimit -u
+  6418
+  ```
 
 ---
 ### vars_sub_ids
