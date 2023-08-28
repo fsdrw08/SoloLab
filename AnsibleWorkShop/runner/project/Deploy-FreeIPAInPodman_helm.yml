@@ -1,0 +1,93 @@
+# code: language=ansible
+---
+- hosts: "{{ target_host.name }}" # kube-2
+  gather_facts: yes
+  vars: 
+    podman_rootless_play:
+      vars_podman_host: "{{ target_host.name }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.4.1 # v4.0.0 ← (default)
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: "{{ FreeIPA.pod.state }}"
+        timeout: 600
+        kube_file: 
+          host: "{{ FreeIPA.pod.kube_file_host }}"
+          content: "{{ lookup('ansible.builtin.template', FreeIPA.pod.kube_file_tmpl) }}"
+        absent:
+          query_params:
+            force: "{{ FreeIPA.pod.absent_force | bool }}"
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: "{{ FreeIPA.pod.systemd_service }}"
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+  tasks:
+    - name: Render kube file templates
+      delegate_to: "{{ FreeIPA.pod.kube_file_host }}"
+      kubernetes.core.helm_template:
+        chart_ref: "{{ Jenkins.pod.helm_chart_ref }}"
+        release_name: "{{ Jenkins.pod.helm_release_name }}"
+        values_files: 
+          - "{{ Jenkins.pod.helm_value_file }}"
+      register: rendered
+
+     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
+    - name: Invoke podman-rootless-play
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Test freeipa status 
+      ansible.builtin.uri:
+        url: http://d/{{ podman_rootless_play.vars_podman_uri.api_version }}/libpod/containers/{{ FreeIPA.pod.container_name }}/healthcheck
+        unix_socket: "{{ podman_rootless_play.vars_podman_uri.unix_socket }}"
+        method: GET
+        status_code: 200
+      register: result
+      retries: 10
+      until: result.json.Status == "healthy"
+      delay: 60
+      when: 
+        - FreeIPA.pod.state == 'present'
+
+    - name: Update Host DNS setting
+      become: true
+      block:
+        - name: add freeipa dns server to interface
+          community.general.nmcli:
+            conn_name: "{{ target_host.connection_id }}"
+            type: ethernet
+            dns4:
+              - "{{ FreeIPA.pod.hostIP }}"
+            state: present
+          when:
+            - FreeIPA.pod.state == 'present'
+
+        - name: only keep default dns server to interface when uninstall freeipa
+          community.general.nmcli:
+            conn_name: "{{ target_host.connection_id }}"
+            type: ethernet
+            dns4:
+              - "{{ FreeIPA.app.dns_forwarder }}"
+            state: present
+          when:
+            - FreeIPA.pod.state == 'absent'
+        
+        # https://stackoverflow.com/questions/75258022/how-to-bring-up-an-interface-using-ansible-nmcli-module
+        - name: bring up interface
+          ansible.builtin.shell: 
+            cmd: nmcli con up "{{ target_host.connection_id }}"
