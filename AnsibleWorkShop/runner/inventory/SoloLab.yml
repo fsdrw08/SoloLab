@@ -69,24 +69,24 @@ sololab:
 
     ## freeipa
     FreeIPA:
-      pod: 
-        state: present # present / absent
-        absent_force: true # true / false
-        systemd_service: freeipa # name of the systemd service
-        kube_file_host: localhost # tmpl mounted inside podman runner container
-        helm_chart_ref: /HelmWorkShop/helm-charts/charts/freeipa
-        helm_value_file: /HelmWorkShop/helm-charts/charts/freeipa/values-sololab.yaml
-        helm_release_name: freeipa
-      # pod:
-      #   state: present # absent / present
+      # pod: 
+      #   state: absent # present / absent
       #   absent_force: true # true / false
-      #   systemd_service: freeipa
-      #   kube_file_host: localhost # inside podman runner container
-      #   kube_file_tmpl: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
-      #   container_name: freeipa-freeipa
-      #   image: "quay.io/freeipa/freeipa-server:centos-9-stream"
-      #   hostname: ipa.infra.sololab
-      #   hostIP: 192.168.255.11
+      #   systemd_service: freeipa # name of the systemd service
+      #   kube_file_host: localhost # tmpl mounted inside podman runner container
+      #   helm_chart_ref: /HelmWorkShop/helm-charts/charts/freeipa
+      #   helm_value_file: /HelmWorkShop/helm-charts/charts/freeipa/values-sololab.yaml
+      #   helm_release_name: freeipa
+      pod:
+        state: absent # absent / present
+        absent_force: true # true / false
+        systemd_service: freeipa
+        kube_file_host: localhost # inside podman runner container
+        kube_file_tmpl: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
+        container_name: freeipa-freeipa
+        image: "quay.io/freeipa/freeipa-server:centos-9-stream"
+        hostname: ipa.infra.sololab
+        hostIP: 192.168.255.11
       app:
         domain_name: infra.sololab
         realm: infra.sololab
@@ -324,7 +324,7 @@ sololab:
       ansible_ssh_pass: vagrant
       ansible_host: 192.168.255.11
       ansible_python_interpreter: /usr/bin/python3
-      ansible_ssh_private_key_file: ~/.ssh/ssh.key
+      ansible_ssh_private_key_file: ~/.ssh/admin.key
     kube-2:
       ansible_user: podmgr
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
