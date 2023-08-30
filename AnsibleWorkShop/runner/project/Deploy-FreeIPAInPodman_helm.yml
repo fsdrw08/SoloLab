@@ -1,10 +1,10 @@
 # code: language=ansible
 ---
-- hosts: "{{ target_host.name }}" # kube-2
+- hosts: "{{ host }}" # kube-2
   gather_facts: yes
   vars: 
     podman_rootless_play:
-      vars_podman_host: "{{ target_host.name }}"
+      vars_podman_host: "{{ host }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
@@ -14,7 +14,7 @@
         timeout: 600
         kube_file: 
           host: "{{ FreeIPA.pod.kube_file_host }}"
-          content: "{{ lookup('ansible.builtin.template', FreeIPA.pod.kube_file_tmpl) }}"
+          content: "{{ rendered.stdout }}"
         absent:
           query_params:
             force: "{{ FreeIPA.pod.absent_force | bool }}"
@@ -34,10 +34,10 @@
     - name: Render kube file templates
       delegate_to: "{{ FreeIPA.pod.kube_file_host }}"
       kubernetes.core.helm_template:
-        chart_ref: "{{ Jenkins.pod.helm_chart_ref }}"
-        release_name: "{{ Jenkins.pod.helm_release_name }}"
+        chart_ref: "{{ FreeIPA.pod.helm_chart_ref }}"
+        release_name: "{{ FreeIPA.pod.helm_release_name }}"
         values_files: 
-          - "{{ Jenkins.pod.helm_value_file }}"
+          - "{{ FreeIPA.pod.helm_value_file }}"
       register: rendered
 
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse
@@ -65,6 +65,7 @@
         - FreeIPA.pod.state == 'present'
 
     - name: Update Host DNS setting
+      delegate_to: kube-2-admin
       become: true
       block:
         - name: add freeipa dns server to interface

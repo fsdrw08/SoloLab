@@ -95,6 +95,24 @@ podman run --rm --userns=keep-id `
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 
+# use helm chart
+$adminKeyFile = "vagrant.key"
+$userKeyFile = "vagrant.key"
+$private_data_dir = "/tmp/private"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=Deploy-FreeIPAInPodman_helm.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$adminKeyFile > ~/.ssh/admin.key; 
+    chmod 600 ~/.ssh/admin.key;
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+
 # FreeIPA post-process
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
@@ -153,6 +171,7 @@ podman run --rm --userns=keep-id \
 ## deploy Traefik by invoke podman rootless play role
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
@@ -161,7 +180,7 @@ podman run --rm --userns=keep-id `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 ```

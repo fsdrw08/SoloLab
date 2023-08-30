@@ -30,7 +30,6 @@
             skipped: false
             enabled: true
             state: started
-
   tasks:
     - name: Render kube file templates
       delegate_to: "{{ Jenkins.pod.kube_file_host }}"
