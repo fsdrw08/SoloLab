@@ -38,6 +38,8 @@
         release_name: "{{ FreeIPA.pod.helm_release_name }}"
         values_files: 
           - "{{ FreeIPA.pod.helm_value_file }}"
+        set_values:
+          - value: freeipa.hostIP="{{ FreeIPA.pod.hostIP }}"
       register: rendered
 
      # https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#including-roles-dynamic-reuse

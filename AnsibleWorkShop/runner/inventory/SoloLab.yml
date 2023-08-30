@@ -155,7 +155,7 @@ sololab:
         internal_ACME_email: admin@INFRA.SOLOLAB
         log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       dns:
-        nsupdate: true # true / false
+        nsupdate: false # true / false
         configs:
           - zone: infra.sololab
             record: traefik
