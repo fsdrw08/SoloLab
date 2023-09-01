@@ -116,7 +116,7 @@ podman run --rm --userns=keep-id `
 # FreeIPA post-process
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
-    --dns 192.168.255.11 `
+    --dns 192.168.255.10 `
     -e RUNNER_PLAYBOOK=Update-FreeIPAConfig.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `

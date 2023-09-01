@@ -74,21 +74,13 @@ sololab:
         absent_force: true # true / false
         systemd_service: freeipa # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
+        kube_file_tmpl: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/freeipa
         helm_value_file: /HelmWorkShop/helm-charts/charts/freeipa/values-sololab.yaml
         helm_release_name: freeipa
         container_name: freeipa-freeipa
-        hostIP: 192.168.255.11
-      # pod:
-      #   state: absent # absent / present
-      #   absent_force: true # true / false
-      #   systemd_service: freeipa
-      #   kube_file_host: localhost # inside podman runner container
-      #   kube_file_tmpl: /KubeWorkShop/FreeIPA/aio-freeipa.yaml.j2
-      #   container_name: freeipa-freeipa
-      #   image: "quay.io/freeipa/freeipa-server:centos-9-stream"
-      #   hostname: ipa.infra.sololab
-      #   hostIP: 192.168.255.11
+        hostname: ipa.infra.sololab
+        hostIP: 192.168.255.10
       app:
         domain_name: infra.sololab
         realm: infra.sololab
@@ -133,13 +125,13 @@ sololab:
     ## traefik
     Traefik:
       pod:
-        state: absent # present / absent
+        state: present # present / absent
         absent_force: false # true / false
         systemd_service: traefik # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
         image: docker.io/library/traefik:v2.10
-        hostIP: 192.168.255.10
+        hostIP: 192.168.255.11
       app:
         customize_root_CA: true # true / false
         Root_CA_socket_address: step-ca.infra.sololab:9000
@@ -199,7 +191,7 @@ sololab:
         configs:
           - zone: infra.sololab
             record: gitlab
-            value: 192.168.255.10
+            value: 192.168.255.11
       ingress:
         tmpl:
           - /KubeWorkShop/GitLab/traefik-gitlab.yaml.j2
@@ -223,7 +215,7 @@ sololab:
     ## Jenkins
     Jenkins:
       pod: 
-        state: present # present / absent
+        state: absent # present / absent
         absent_force: true # true / false
         systemd_service: jenkins # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
@@ -231,11 +223,11 @@ sololab:
         helm_value_file: /HelmWorkShop/helm-charts/charts/jenkins-server/values-sololab.yaml
         helm_release_name: jenkins
       dns:
-        nsupdate: false # true / false
+        nsupdate: true # true / false
         configs:
           - zone: infra.sololab
             record: jenkins
-            value: 192.168.255.10
+            value: 192.168.255.11
       ingress:
         tmpl:
           - /KubeWorkShop/jenkins/traefik-jenkins.yaml.j2
@@ -302,6 +294,8 @@ sololab:
     #     helm_release_name: drone-runner
 
   hosts:
+    localhost:
+      ansible_connection: local
     vyos:
       ansible_host: 192.168.255.1
       ansible_connection: ansible.netcommon.network_cli

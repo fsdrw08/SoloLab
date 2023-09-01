@@ -112,8 +112,8 @@
           passwordExpirationTime: 20380119031407Z
           nsIdleTimeout: 0
         state: present
-        when:
-          - FreeIPA.pod.state == 'present'
+      when:
+        - FreeIPA.pod.state == 'present'
 
     - name: Set vyos dhcp ddns
       delegate_to: vyos
