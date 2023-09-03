@@ -17,11 +17,6 @@ variable "disk_size" {
   default = "70000"
 }
 
-variable "disk_additional_size" {
-  type    = list(number)
-  default = ["1024"]
-}
-
 variable "memory" {
   type    = string
   default = "1024"

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('stream-9')]
+  [ValidateSet('stream-9','stream-8')]
   [string]
   $CentOSVersion
 )
