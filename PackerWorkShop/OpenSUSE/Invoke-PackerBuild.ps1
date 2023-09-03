@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('Leap','Leap_Micro','Tumbleweed')]
+    [ValidateSet('Leap_15.5','Leap_Micro','Tumbleweed')]
     [string]
     $Distro
 )
@@ -33,14 +33,14 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  if ($Distro = "Tumbleweed") {
+  if ($Distro -eq "Tumbleweed") {
     $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE_Tumbleweed.pkr.hcl"
   }
   else {
     $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
   }
-  $var_file="$PSScriptRoot\vars-openSUSE_$Distro.pkrvars.hcl"
-  $machine="openSUSE_$Distro-g2"
+  $var_file="$PSScriptRoot\vars-openSUSE-$Distro.pkrvars.hcl"
+  $machine="openSUSE-$Distro-g2"
   $packer_log=0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
@@ -68,7 +68,10 @@ if ($Ready -ne $false) {
     Set-Location $currentLocation
   }
   else {
-    Write-Output "Template or var file not found - exiting"
+    Write-Output "
+    $template_file
+    $var_file
+    Template or var file not found - exiting"
     exit (-1)
   }
 }

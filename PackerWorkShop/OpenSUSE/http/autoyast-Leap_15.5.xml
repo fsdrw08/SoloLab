@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns"
+  xmlns:config="http://www.suse.com/1.0/configns">
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Partitioning -->
+  <!-- https://github.com/pief/yast-libvirt-import/blob/59e2bfea2f79333c5920fcfa49d6bb4a1240ea1f/test/autoinst.xml -->
+  <!-- https://github.com/thkukuk/demos/blob/172409e96182ec0119aad320027822eb1bb0f5b8/packer/http/autoyast-microos.xml -->
+  <!-- https://github.com/microsoft/lis-test/blob/022946b67c2d9000fcedbd1195af961caf6470d7/WS2012R2/lisa/Infrastructure/PXE/autoinstGen2.xml -->
+  <bootloader>
+    <global>
+      <!-- <generic_mbr>true</generic_mbr> -->
+      <!-- <gfxmode>auto</gfxmode> -->
+      <hiddenmenu>false</hiddenmenu>
+      <os_prober>false</os_prober>
+      <!-- <terminal>gfxterm</terminal> -->
+      <terminal>console</terminal>
+      <timeout config:type="integer">5</timeout>
+      <update_nvram>true</update_nvram>
+    </global>
+    <loader_type>grub2-efi</loader_type>
+  </bootloader>
+  
+  <!-- https://documentation.suse.com/sles/15-SP1/single-html/SLES-autoyast/index.html#CreateProfile-General-mode -->
+  <!-- https://documentation.suse.com/sles/15-SP3/single-html/SLES-autoyast/index.html#:~:text=COPY-,final_halt,-When%20set%20to -->
+  <general>
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+      <second_stage config:type="boolean">true</second_stage>
+      <final_halt config:type="boolean">true</final_halt>
+    </mode>
+  </general>
+
+  <!-- Locale settings -->
+  <keyboard>
+    <keymap>english-us</keymap>
+  </keyboard>
+  <language>
+    <language>en_US</language>
+    <languages/>
+  </language>
+  <timezone>
+    <hwclock>UTC</hwclock>
+    <timezone>Asia/Shanghai</timezone>
+  </timezone>
+
+  <!-- Partitioning and filesystems -->
+  <!-- https://doc.opensuse.org/projects/autoyast/#CreateProfile-Partitioning -->
+  <!-- <partitioning config:type="list">
+    <drive>
+      <use>all</use>
+      <partitions config:type="list">
+        <partition>
+          <mount>/boot/efi</mount>
+          <size>200mb</size>
+          <partition_id config:type="integer">1</partition_id>
+          <filesystem config:type="symbol">vfat</filesystem>
+        </partition>
+        <partition>
+          <mount>/</mount>
+          <size>8gb</size>
+        </partition>
+        <partition>
+          <filesystem config:type="symbol">btrfs</filesystem>
+          <mount>/var</mount>
+          <size>max</size>
+        </partition>
+      </partitions>
+    </drive>
+  </partitioning> -->
+
+  <!-- Networking configuration -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Network -->
+  <networking>
+    <dhcp_options>
+      <dhclient_client_id/>
+      <dhclient_hostname_option>AUTO</dhclient_hostname_option>
+    </dhcp_options>
+    <dns>
+      <hostname>openSUSE-Leap</hostname>
+      <dhcp_hostname config:type="boolean">true</dhcp_hostname>
+      <resolv_conf_policy>auto</resolv_conf_policy>
+      <write_hostname config:type="boolean">false</write_hostname>
+    </dns>
+    <interfaces config:type="list">
+      <interface>
+        <bootproto>dhcp</bootproto>
+        <device>eth0</device>
+        <dhclient_set_default_route>yes</dhclient_set_default_route>
+        <startmode>auto</startmode>
+      </interface>
+      <interface>
+        <bootproto>static</bootproto>
+        <device>lo</device>
+        <firewall>no</firewall>
+        <ipaddr>127.0.0.1</ipaddr>
+        <netmask>255.0.0.0</netmask>
+        <network>127.0.0.0</network>
+        <prefixlen>8</prefixlen>
+        <startmode>nfsroot</startmode>
+        <usercontrol>no</usercontrol>
+      </interface>
+    </interfaces>
+    <ipv6 config:type="boolean">true</ipv6>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+    <setup_before_proposal config:type="boolean">true</setup_before_proposal>
+    <managed config:type="boolean">false</managed>
+    <routing>
+      <ipv4_forward config:type="boolean">false</ipv4_forward>
+      <ipv6_forward config:type="boolean">false</ipv6_forward>
+    </routing>
+  </networking>
+
+  <!-- repo config? -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#Software-Selections-additional -->
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <name>tuna-backports-update</name>
+        <alias>tuna-backports-update</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/backports/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name>tuna-non-oss</name>
+        <alias>tuna-non-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/non-oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name>tuna-oss</name>
+        <alias>tuna-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name> tuna-sle-update</name>
+        <alias>tuna-sle-update</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/sle/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name>tuna-update</name>
+        <alias>tuna-update</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name>tuna-update-non-oss</name>
+        <alias>tuna-update-non-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/non-oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <!-- <listentry>
+        <name>tuna-tumbleweed-oss</name>
+        <alias>tuna-tumbleweed-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry>
+      <listentry>
+        <name>tuna-tumbleweed-non-oss</name>
+        <alias>tuna-tumbleweed-non-oss</alias>
+        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/</media_url>
+        <priority config:type="integer">30</priority>
+      </listentry> -->
+    </add_on_products>
+  </add-on>
+
+  <!-- Software to install -->
+  <!-- https://doc.opensuse.org/projects/autoyast/#Software-Selections-stage2-update -->
+  <!-- https://github.com/thebridge0491/vm_templates_sh/blob/8e6bb63dae5986f813c3012ad2ae621c6a01d6ba/init/suse/btrfs-autoinst.xml -->
+  <software>
+    <products config:type="list">
+      <product>Leap</product>
+    </products>
+    <install_recommended config:type="boolean">true</install_recommended>
+    <instsource>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/oss/</instsource>
+    <do_online_update config:type="boolean">false</do_online_update>
+    <kernel>kernel-default</kernel>
+    <patterns t="list">
+      <pattern>base</pattern>
+      <pattern>minimal_base</pattern>
+    </patterns>
+    <packages config:type="list">
+      <package>cloud-init</package>
+      <package>hyper-v</package>
+      <package>sudo</package>
+      <package>openssh</package>
+      <package>rsync</package>
+      <package>open-iscsi</package>
+      <package>less</package>
+      <package>curl</package>
+      <package>vim</package>
+    </packages>
+  </software>
+
+  <!-- firewall -->
+  <firewall>
+    <enable_firewall config:type="boolean">false</enable_firewall>
+    <start_firewall config:type="boolean">false</start_firewall>
+  </firewall>
+
+  <!-- service -->
+  <services-manager>
+    <default_target>multi-user</default_target>
+    <services>
+      <!-- <disable config:type="list">
+        <service>purge-kernels</service>
+      </disable> -->
+      <enable config:type="list">
+        <service>sshd</service>
+        <service>cloud-init-local</service>
+        <service>cloud-init</service>
+        <service>cloud-config</service>
+        <service>cloud-final</service>
+      </enable>
+    </services>
+  </services-manager>
+
+  <!-- Root user configuration -->
+  <!-- https://documentation.suse.com/sles/15-SP2/single-html/SLES-autoyast/index.html#Configuration-Security-users-and-groups -->
+  <users config:type="list">
+    <user>
+      <username>root</username>
+      <user_password>root</user_password>
+      <encrypted config:type="boolean">false</encrypted>
+    </user>
+  </users>
+
+
+  <!-- https://www.suse.com/support/kb/doc/?id=000018830 -->
+  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#id-1.3.5.2.21.10 -->
+  <kdump>
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+  </kdump>
+
+  <!-- https://documentation.suse.com/sles/15-SP2/single-html/SLES-autoyast/index.html#createprofile-scripts -->
+  <!-- https://doc.opensuse.org/projects/autoyast/#createprofile-scripts -->
+  <scripts>
+    <init-scripts config:type="list">
+      <script>
+        <filename>config_cloudinit.sh</filename>
+        <source><![CDATA[
+#!/bin/sh
+cat > /etc/cloud/cloud.cfg.d/90_override_renderer.cfg << EOF
+system_info:
+  network:
+    renderers: ['network-manager', 'netplan', 'eni', 'sysconfig', 'freebsd', 'netbsd', 'openbsd']
+    activators: ['network-manager', 'eni', 'netplan', 'networkd']
+EOF
+]]>
+        </source>
+      </script>
+    </init-scripts>
+  </scripts>
+</profile>
