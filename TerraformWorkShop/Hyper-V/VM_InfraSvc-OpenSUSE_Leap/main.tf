@@ -45,7 +45,7 @@ module "cloudinit_nocloud_iso" {
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
         
-        https://cloudinit.readthedocs.io/en/latest/reference/modules.html#zypper-add-repo
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#zypper-add-repo
         # zypper:
         #   repos:
         #     - id: cockpit
@@ -89,7 +89,7 @@ module "cloudinit_nocloud_iso" {
         growpart:
           mode: auto
           devices:
-            - "/dev/sda3"
+            - "/dev/sda2"
           ignore_growroot_disabled: false
         resize_rootfs: true
         
@@ -103,22 +103,22 @@ module "cloudinit_nocloud_iso" {
         #   - systemctl enable --now firewalld
         #   - systemctl enable --now cockpit.socket
         
-        ansible:
-          install_method: distro
-          package_name: ansible
-          run_user: vagrant
-          galaxy:
-            actions:
-              - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
-          setup_controller:
-            repositories:
-              - path: /home/vagrant/SoloLab/
-                source: https://github.com/fsdrw08/SoloLab.git
-            run_ansible:
-              - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
-                playbook_name: Invoke-PodmanRootlessProvision.yml
-                inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-                extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+        # ansible:
+        #   install_method: distro
+        #   package_name: ansible
+        #   run_user: vagrant
+        #   galaxy:
+        #     actions:
+        #       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+        #   setup_controller:
+        #     repositories:
+        #       - path: /home/vagrant/SoloLab/
+        #         source: https://github.com/fsdrw08/SoloLab.git
+        #     run_ansible:
+        #       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+        #         playbook_name: Invoke-PodmanRootlessProvision.yml
+        #         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+        #         extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         EOT
       },
       {
@@ -197,8 +197,14 @@ resource "null_resource" "remote" {
 
 resource "hyperv_vhd" "boot_disk" {
   # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
-  path   = join("\\", [local.vhd_dir, local.vm_name, "InfraSvc-CentOS-Stream-9.vhdx"])
-  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-centos-stream-9-base\\Virtual Hard Disks\\packer-centos-stream-9-g2.vhdx"
+  # path   = join("\\", [local.vhd_dir, local.vm_name, "InfraSvc-openSUSE-leap.vhdx"])
+  path = join("\\", [
+    local.vhd_dir,
+    local.vm_name,
+    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+  source = var.source_disk
 }
 
 data "terraform_remote_state" "data_disk" {

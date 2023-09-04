@@ -1,17 +1,17 @@
 [CmdletBinding()]
 param (
-    [Parameter()]
-    [ValidateSet('Leap_15.5','Leap_Micro','Tumbleweed')]
-    [string]
-    $Distro
+  [Parameter()]
+  [ValidateSet('Leap_15.5', 'Leap_Micro', 'Tumbleweed')]
+  [string]
+  $Distro
 )
 
 #Verify the pre-request
+$Ready = $true
 @"
 packer
-dos2unix
 "@ -split "`r`n" | ForEach-Object {
-  if (!(Get-Command $_)) {
+  if (-not (Get-Command $_)) {
     [bool]$Ready = $false
   }
   $Ready
@@ -19,29 +19,19 @@ dos2unix
 
 # Build images
 if ($Ready -ne $false) {
-  # Convert dos format to unix format
-  "dos2unix"
-  Get-ChildItem -Path $PSScriptRoot -Recurse -Filter "*.sh" `
-    | Select-Object -ExpandProperty VersionInfo `
-    | Select-Object -ExpandProperty filename `
-    | ForEach-Object {
-      #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
-      dos2unix $_
-    }
-
   # Get Start Time
   $startDTM = (Get-Date)
   
   # Variables
   if ($Distro -eq "Tumbleweed") {
-    $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE_Tumbleweed.pkr.hcl"
+    $template_file = "$PSScriptRoot\tmpl-hv_g2-openSUSE_Tumbleweed.pkr.hcl"
   }
   else {
-    $template_file="$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
+    $template_file = "$PSScriptRoot\tmpl-hv_g2-openSUSE.pkr.hcl"
   }
-  $var_file="$PSScriptRoot\vars-openSUSE-$Distro.pkrvars.hcl"
-  $machine="openSUSE-$Distro-g2"
-  $packer_log=0
+  $var_file = "$PSScriptRoot\vars-openSUSE-$Distro.pkrvars.hcl"
+  $machine = "openSUSE-$Distro-g2"
+  $packer_log = 0
   
   if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
     Write-Output "Template and var file found"
@@ -49,7 +39,7 @@ if ($Ready -ne $false) {
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer validate -var-file="$var_file" "$template_file"
     }
     catch {
@@ -57,7 +47,7 @@ if ($Ready -ne $false) {
       exit (-1)
     }
     try {
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer version
       packer build --force -var-file="$var_file" "$template_file"
     }
@@ -77,4 +67,4 @@ if ($Ready -ne $false) {
 }
 
 $endDTM = (Get-Date)
-Write-Host "[INFO]  - Elapsed Time: $(($endDTM-$startDTM).totalseconds) seconds" -ForegroundColor Yellow
+Write-Host "[INFO]  - Elapsed Time: $(($endDTM - $startDTM).TotalSeconds) seconds" -ForegroundColor Yellow

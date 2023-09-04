@@ -69,9 +69,10 @@
   </partitioning> -->
 
   <!-- Networking configuration -->
+  <!-- https://doc.opensuse.org/projects/autoyast/#CreateProfile-Network-Resource -->
   <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Network -->
   <networking>
-    <dhcp_options>
+    <!-- <dhcp_options>
       <dhclient_client_id/>
       <dhclient_hostname_option>AUTO</dhclient_hostname_option>
     </dhcp_options>
@@ -99,15 +100,11 @@
         <startmode>nfsroot</startmode>
         <usercontrol>no</usercontrol>
       </interface>
-    </interfaces>
+    </interfaces> -->
     <ipv6 config:type="boolean">true</ipv6>
-    <keep_install_network config:type="boolean">true</keep_install_network>
+    <keep_install_network config:type="boolean">false</keep_install_network>
     <setup_before_proposal config:type="boolean">true</setup_before_proposal>
-    <managed config:type="boolean">false</managed>
-    <routing>
-      <ipv4_forward config:type="boolean">false</ipv4_forward>
-      <ipv6_forward config:type="boolean">false</ipv6_forward>
-    </routing>
+    <backend>network_manager</backend>
   </networking>
 
   <!-- repo config? -->
@@ -190,6 +187,7 @@
       <package>less</package>
       <package>curl</package>
       <package>vim</package>
+      <package>NetworkManager</package>
     </packages>
   </software>
 
