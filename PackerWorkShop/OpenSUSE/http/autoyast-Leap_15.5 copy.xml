@@ -61,7 +61,7 @@
 
   <!-- repo config? -->
   <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#Software-Selections-additional -->
-  <!-- <add-on>
+  <add-on>
     <add_on_products config:type="list">
       <listentry>
         <name>tuna-backports-update</name>
@@ -99,7 +99,7 @@
         <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/non-oss/</media_url>
         <priority config:type="integer">30</priority>
       </listentry>
-      <listentry>
+      <!-- <listentry>
         <name>tuna-tumbleweed-oss</name>
         <alias>tuna-tumbleweed-oss</alias>
         <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/</media_url>
@@ -110,9 +110,9 @@
         <alias>tuna-tumbleweed-non-oss</alias>
         <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/</media_url>
         <priority config:type="integer">30</priority>
-      </listentry>
+      </listentry> -->
     </add_on_products>
-  </add-on> -->
+  </add-on>
 
   <!-- Software to install -->
   <!-- https://doc.opensuse.org/projects/autoyast/#Software-Selections-stage2-update -->

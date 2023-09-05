@@ -13,8 +13,8 @@ module "cloudinit_nocloud_iso" {
       {
         filename = "meta-data"
         content  = <<-EOT
-        instance-id: iid-infrasvc-CetnOS_20230614
-        local-hostname: InfraSvc-CetnOS
+        instance-id: iid-infrasvc-openSUSE_20230905
+        local-hostname: InfraSvc-openSUSE
         EOT
       },
       {
@@ -160,7 +160,7 @@ resource "null_resource" "remote" {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
     vhd_dir       = local.vhd_dir
-    vm_name       = local.count <= 1 ? "${local.vm_name}" : "${local.vm_name}${count.index + 1}"
+    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
     host     = var.host
@@ -197,10 +197,10 @@ resource "null_resource" "remote" {
 
 resource "hyperv_vhd" "boot_disk" {
   # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
-  # path   = join("\\", [local.vhd_dir, local.vm_name, "InfraSvc-openSUSE-leap.vhdx"])
+  # path   = join("\\", [local.vhd_dir, var.vm_name, "InfraSvc-openSUSE-leap.vhdx"])
   path = join("\\", [
     local.vhd_dir,
-    local.vm_name,
+    var.vm_name,
     element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
     ]
   )
@@ -220,7 +220,7 @@ module "hyperv_machine_instance" {
   count      = local.count
 
   vm_instance = {
-    name                 = local.count <= 1 ? local.vm_name : "${local.vm_name}${count.index + 1}"
+    name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
@@ -279,7 +279,7 @@ module "hyperv_machine_instance" {
       {
         controller_number   = 0
         controller_location = 1
-        path                = local.count <= 1 ? join("\\", ["${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
+        path                = local.count <= 1 ? join("\\", ["${local.vhd_dir}", "${var.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${local.vhd_dir}", "${var.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
       }
     ]
 
