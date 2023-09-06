@@ -14,9 +14,6 @@ sololab:
         podman:
           state: present
           include_cockpit_podman: true
-          dnf:
-            enablerepo:
-            update_cache:
       vars_cgroups_delegation:
         all_users:
           state: present
@@ -70,7 +67,7 @@ sololab:
     ## freeipa
     FreeIPA:
       pod: 
-        state: absent # present / absent
+        state: present # present / absent
         absent_force: true # true / false
         systemd_service: freeipa # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
@@ -100,7 +97,7 @@ sololab:
     ## StepCA
     StepCA:
       pod:
-        state: present # absent / present
+        state: absent # absent / present
         absent_force: true # true / false
         systemd_service: stepca # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
@@ -317,7 +314,7 @@ sololab:
     kube-2-admin:
       ansible_user: vagrant
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
-      ansible_ssh_pass: vagrant
+      # ansible_ssh_pass: vagrant
       ansible_host: 192.168.255.11
       ansible_python_interpreter: /usr/bin/python3
       ansible_ssh_private_key_file: ~/.ssh/admin.key

@@ -121,7 +121,7 @@ defaults_app_config:
         [containers]
         # log_driver="k8s-file"
         # log_size_max="10m"
-        # tz = "Asia/Shanghai"
+        # tz="Asia/Shanghai"
     storage_conf:
       state: skipped
       path: /home/{{ target_user }}/.config/containers/storage.conf

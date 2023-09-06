@@ -31,16 +31,16 @@ cd (Join-Path (git rev-parse --show-toplevel) AnsibleWorkShop\runner\)
 
 # deploy and config podman package
 $private_data_dir = "/tmp/private"
-# $keyFile = "vagrant.key"
-$keyFile = "admin.key"
+$keyFile = "vagrant.key"
+# $keyFile = "admin.key"
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Invoke-PodmanRootlessProvision.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
-    chmod 600 ~/.ssh/ssh.key;
+    cat $private_data_dir/env/$keyFile > ~/.ssh/admin.key; 
+    chmod 600 ~/.ssh/admin.key;
     ansible-runner run $private_data_dir -vv"
 ```
 
@@ -97,6 +97,7 @@ podman run --rm `
 #     ansible-runner run $private_data_dir -vv"
 
 # use helm chart
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $adminKeyFile = "vagrant.key"
 $userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
