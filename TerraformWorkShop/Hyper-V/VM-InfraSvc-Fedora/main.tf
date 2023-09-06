@@ -24,7 +24,7 @@ module "cloudinit_nocloud_iso" {
         timezone: Asia/Shanghai
         
         # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
-        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#including-users-and-groups
         users:
           - name: vagrant
             gecos: vagrant
@@ -46,11 +46,13 @@ module "cloudinit_nocloud_iso" {
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
         
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
+        # https://stackoverflow.com/questions/46352173/ansible-failed-to-set-permissions-on-the-temporary
         package_update: true
         package_upgrade: true
         package_reboot_if_required: true
         packages:
           - git
+          - acl
           - python3-pip
           - python3-jmespath
           - cockpit
@@ -89,6 +91,7 @@ module "cloudinit_nocloud_iso" {
         
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
+          - lvextend -l +100%FREE /dev/mapper/fedora_fedora-root
           - |
             [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
           - firewall-offline-cmd --set-default-zone=trusted

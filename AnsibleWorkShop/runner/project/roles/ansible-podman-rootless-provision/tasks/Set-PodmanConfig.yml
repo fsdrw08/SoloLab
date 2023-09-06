@@ -6,6 +6,7 @@
   when:
     - definitive_app_config_podman_containers_conf.state != "skipped"
   block:
+    # https://stackoverflow.com/questions/46352173/ansible-failed-to-set-permissions-on-the-temporary
     - name: Detect Podman containers.conf
       ansible.builtin.stat:
         path: "{{ app_config.podman.containers_conf.path }}"
