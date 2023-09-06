@@ -95,3 +95,21 @@
         - name: bring up interface
           ansible.builtin.shell: 
             cmd: nmcli con up "{{ target_host.connection_id }}"
+
+    - name: Set vyos dhcp ddns
+      delegate_to: vyos
+      block:
+        - name: absent vyos dhcp ddns
+          vyos.vyos.vyos_config :
+            lines:
+              # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
+              # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
+              - delete service dhcp-server dynamic-dns-update
+              - "delete service dhcp-server shared-network-name LAN shared-network-parameters 'key {{ FreeIPA.app.tsig_key_name }} { algorithm {{ FreeIPA.app.tsig_algorithm }}; secret {{ FreeIPA.app.tsig_secret }}; };'"
+              - "delete service dhcp-server shared-network-name LAN shared-network-parameters 'ddns-domainname &quot;{{ FreeIPA.app.dns_zonename }}&quot;;'"
+              - "delete service dhcp-server shared-network-name LAN shared-network-parameters 'ddns-rev-domainname &quot;in-addr.arpa.&quot;;'"
+              - "delete service dhcp-server shared-network-name LAN shared-network-parameters 'zone {{ FreeIPA.app.dns_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }'"
+              - "delete service dhcp-server shared-network-name LAN shared-network-parameters 'zone {{ FreeIPA.app.dns_rev_zonename }} { primary {{ FreeIPA.pod.hostIP }}; key {{ FreeIPA.app.tsig_key_name }}; }'"
+            save: True
+          when:
+            - FreeIPA.pod.state == 'absent'
