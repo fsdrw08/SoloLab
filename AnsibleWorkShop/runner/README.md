@@ -116,6 +116,8 @@ podman run --rm --userns=keep-id `
     ansible-runner run $private_data_dir -vv"
 
 # FreeIPA post-process
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
 podman run --rm --userns=keep-id `
     --dns 192.168.255.10 `
@@ -125,7 +127,7 @@ podman run --rm --userns=keep-id `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/vagrant.key > ~/.ssh/ssh.key; 
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 ```

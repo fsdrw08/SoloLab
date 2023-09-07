@@ -97,7 +97,7 @@ sololab:
     ## StepCA
     StepCA:
       pod:
-        state: absent # absent / present
+        state: present # absent / present
         absent_force: true # true / false
         systemd_service: stepca # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
@@ -144,14 +144,14 @@ sololab:
         internal_ACME_email: admin@INFRA.SOLOLAB
         log_level: INFO # DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       dns:
-        nsupdate: false # true / false
+        nsupdate: true # true / false
         configs:
           - zone: infra.sololab
             record: traefik
-            value: 192.168.255.10
+            value: 192.168.255.11
           - zone: infra.sololab
             record: cockpit
-            value: 192.168.255.10
+            value: 192.168.255.11
       ingress:
         tmpl:
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
@@ -212,7 +212,7 @@ sololab:
     ## Jenkins
     Jenkins:
       pod: 
-        state: absent # present / absent
+        state: present # present / absent
         absent_force: true # true / false
         systemd_service: jenkins # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container

@@ -2,7 +2,7 @@
 ---
 - hosts: localhost
   gather_facts: false
-  vars: 
+  vars:
     podman_rootless_play:
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/_static/api.html?version=v4.5 or create one https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
@@ -27,7 +27,7 @@
       ansible.builtin.include_tasks:
         file: Set-IPADNSZone.yml
       vars:
-        ipa_dnszone: 
+        ipa_dnszone:
           name: "{{ item.name }}"
           dns_update_policy: "{{ item.dns_update_policy }}"
       loop: "{{ dns.zones }}"
@@ -35,7 +35,7 @@
         - FreeIPA.pod.state == 'present'
 
     - name: Enable FreeIPA ACME
-      delegate_to: "{{ target_host.name }}"
+      delegate_to: "{{ host }}"
       when:
         - FreeIPA.pod.state == 'present'
       block:
@@ -119,7 +119,7 @@
       delegate_to: vyos
       block:
         - name: present vyos dhcp ddns
-          vyos.vyos.vyos_config :
+          vyos.vyos.vyos_config:
             lines:
               # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
               # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
