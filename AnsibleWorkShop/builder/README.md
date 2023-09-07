@@ -55,7 +55,8 @@ podman run --rm `
    ```shell
    export HTTP_PROXY=http://192.168.255.1:7890
    export HTTPS_PROXY=http://192.168.255.1:7890
-   ansible-builder build -t ansible-ee-aio-new:latest -v 3
+   ansible-builder create --file ./execution-environment.yml
+   ansible-builder build --file=./execution-environment.yml -t ansible-ee-aio-new:latest -v 3
    ```
    - Fix some syntax (POIXFX) error in the Containerfile
    - Update the Containerfile, e.g.
@@ -91,7 +92,19 @@ podman run --rm -v ../:/runner `
    localhost/ansible-ee-aio bash -c "ansible --version"
 ```
 
-## Push image to docker hub
+### Save builded image from WSL to Windows
+```shell
+user=WindomWu
+tar=f38
+podman save localhost/ansible-ee-aio-new -o /mnt/c/Users/$user/Downloads/ansible-ee-aio-new-$tar.tar
+```
+### Load builded image from windows
+```powershell
+$tar="f38"
+podman load -i $home\Downloads\ansible-ee-aio-new-$tar.tar
+```
+
+### Push image to docker hub
 ```powershell
 podman login docker.io
 podman push localhost/ansible-ee-aio docker.io/fsdrw08/sololab-ansible-ee
