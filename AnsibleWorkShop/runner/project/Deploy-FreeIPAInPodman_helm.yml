@@ -75,7 +75,6 @@
             conn_name: "{{ target_host.connection_id }}"
             type: ethernet
             dns4:
-              - "{{ FreeIPA.app.dns_forwarder }}"
               - "{{ FreeIPA.pod.hostIP }}"
             state: present
           when:
