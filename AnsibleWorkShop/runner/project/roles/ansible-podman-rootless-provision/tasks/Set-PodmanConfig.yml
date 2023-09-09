@@ -27,7 +27,7 @@
           loop:
             - path: "{{ app_config.podman.containers_conf.path | replace(app_config.podman.containers_conf.path.split('/')[-1],'')}}"
               state: directory
-              mode: u=rwx,g-rwx,o-rwx
+              mode: u=rwx,g=rx,o-rwx
               owner: "{{ target_user }}"
               group: "{{ target_user }}"
               recurse: true
