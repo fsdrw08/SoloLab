@@ -22,7 +22,6 @@
         owner: "{{ target_user }}"
         group: "{{ target_user }}"
       become: true
-      become_user: "{{ target_user }}"
 
     - name: Set systemd user scope podman socket service
       ansible.builtin.systemd:
