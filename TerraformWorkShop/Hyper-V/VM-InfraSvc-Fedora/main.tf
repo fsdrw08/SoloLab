@@ -115,6 +115,13 @@ module "cloudinit_nocloud_iso" {
                 playbook_name: Invoke-PodmanRootlessProvision.yml
                 inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
                 extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+        
+        power_state:
+          delay: now
+          mode: reboot
+          message: reboot
+          timeout: 30
+          condition: true
         EOT
       },
       {
@@ -194,7 +201,7 @@ resource "hyperv_vhd" "boot_disk" {
 data "terraform_remote_state" "data_disk" {
   backend = "local"
   config = {
-    path = "${path.module}/../Disk-InfraSvc-Data/terraform.tfstate"
+    path = "${path.module}/../Disk-InfraSvc-Fedora-Data/terraform.tfstate"
   }
 }
 
