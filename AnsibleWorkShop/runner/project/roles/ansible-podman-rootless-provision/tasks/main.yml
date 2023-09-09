@@ -72,6 +72,13 @@
   when:
     - definitive_kernel_modules.state != "skipped"
 
+# https://access.redhat.com/discussions/6029491#comment-2105481
+- name: Set systemd lingering
+  ansible.builtin.include_tasks:
+    file: Set-SystemdLinger.yml
+  when:
+    - ansible_service_mgr == "systemd"
+    - service.systemd_lingering.state != "skipped"
 
 - name: Set podman configuration files
   vars:
@@ -90,7 +97,6 @@
         and ( definitive_app_config_podman_registries_conf.state is true )
       )
 
-
 - name: Set podman socket service
   vars:
     case_service_podman_socket_user_scope: "{% if not 'podman' in ansible_facts.packages %}case_pkg_absent{% else %}case_other{% endif %}"
@@ -104,11 +110,3 @@
         ( definitive_service_podman_socket_user_scope.skipped is true )
         and ( definitive_service_podman_socket_system_scope.skipped is true )
       )
-
-
-- name: Set systemd lingering
-  ansible.builtin.include_tasks:
-    file: Set-SystemdLinger.yml
-  when:
-    - ansible_service_mgr == "systemd"
-    - service.systemd_lingering.state != "skipped"

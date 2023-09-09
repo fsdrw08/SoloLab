@@ -9,7 +9,7 @@
     - ansible_service_mgr == "systemd"
     - ansible_facts.services['podman.service'] is defined
   block:
-    - name: Detect {{ target_user }} info
+    - name: Detect {{ target_user }} user info
       ansible.builtin.user:
         user: "{{ target_user }}"
       check_mode: true
@@ -33,6 +33,9 @@
       become_user: "{{ target_user }}"
       when:
         - definitive_service_podman_socket_user_scope.skipped is false
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ user_info.uid }}"
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ user_info.uid }}/bus"
 
     - name: Set systemd system scope podman socket service
       ansible.builtin.systemd:
