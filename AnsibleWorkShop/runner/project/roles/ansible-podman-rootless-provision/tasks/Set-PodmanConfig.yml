@@ -21,12 +21,16 @@
             path: "{{ item.path }}"
             state: "{{ item.state }}"
             mode: "{{ item.mode }}"
+            owner: "{{ item.owner }}"
+            group: "{{ item.group }}"
+            recurse: "{{ item.recurse | default(omit) }}"
           loop:
             - path: "{{ app_config.podman.containers_conf.path | replace(app_config.podman.containers_conf.path.split('/')[-1],'')}}"
               state: directory
               mode: u=rwx,g-rwx,o-rwx
               owner: "{{ target_user }}"
               group: "{{ target_user }}"
+              recurse: true
             - path: "{{ app_config.podman.containers_conf.path }}"
               state: touch
               mode: u=rw,g=r,o=r
