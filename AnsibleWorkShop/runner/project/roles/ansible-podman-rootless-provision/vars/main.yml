@@ -174,8 +174,8 @@ vars_kernel_modules:
 #   https://github.com/containers/common/blob/main/pkg/config/testdata/containers_default.conf
 #   https://www.redhat.com/sysadmin/rootless-podman-user-namespace-modes#:~:text=Change%20the%20default%20user%20namespace%20mode
 #   storage.conf
+#   https://github.com/containers/storage/blob/main/docs/containers-storage.conf.5.md#files
 #   https://github.com/containers/podman/blob/main/vendor/github.com/containers/storage/storage.conf
-#   https://github.com/containers/storage/blob/main/docs/containers-storage.conf.5.md
 #   registries.conf
 #   https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md
 #   https://github.com/containers/podman/blob/main/test/registries.conf
