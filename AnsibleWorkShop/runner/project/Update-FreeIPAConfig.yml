@@ -34,6 +34,42 @@
       when:
         - FreeIPA.pod.state == 'present'
 
+    - name: Set IPA DNS server forward policy
+      block:
+        - name: Get cookie for service ipa
+          ansible.builtin.uri:
+            url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/login_password"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ FreeIPA.pod.hostname }}/ipa
+              Accept: text/plain
+              Content-Type: "application/x-www-form-urlencoded"
+            body_format: form-urlencoded
+            body:
+              user: "{{ ipa.admin }}"
+              password: "{{ ipa.admin_password }}"
+            status_code: 200
+          register: ipa_session
+
+        - name: Update DNS server forward policy
+          ansible.builtin.uri:
+            url: "https://{{ FreeIPA.pod.hostname }}/ipa/session/json"
+            validate_certs: false
+            method: POST
+            headers:
+              Referer: https://{{ FreeIPA.pod.hostname }}/ipa
+              Accept: application/json
+              Cookie: "{{ ipa_session.set_cookie }}"
+            body_format: json
+            body:
+              method: dnsserver_mod
+              params:
+                - - "{{ FreeIPA.pod.hostname }}"
+                - idnsforwardpolicy: first
+            status_code: 200
+            return_content: true
+
     - name: Enable FreeIPA ACME
       delegate_to: "{{ host }}"
       when:
