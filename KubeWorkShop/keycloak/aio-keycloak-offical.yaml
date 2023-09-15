@@ -69,7 +69,7 @@ spec:
         - name: postgresql_data
           # https://github.com/docker-library/docs/tree/master/postgres#pgdata
           mountPath: /var/lib/postgresql/data
-          
+
     - name: keycloak
       # https://www.keycloak.org/server/containers#_running_a_standard_keycloak_container
       # https://quay.io/repository/keycloak/keycloak?tab=tags
@@ -106,7 +106,7 @@ spec:
 
         # https://www.keycloak.org/server/all-config#_proxy
         # https://www.keycloak.org/server/reverseproxy#_proxy_modes
-        - name: KC_PROXY # proxy
+        - name: KC_PROXY # --proxy
           value: edge
 
         # https://www.keycloak.org/server/containers#_relevant_options
@@ -119,11 +119,28 @@ spec:
         # production mode need hostname and tls cert
         # hostname will force redirect url to the fqdn of
         # hostname value in browser
+        # https://www.keycloak.org/server/all-config#category-hostname
         # - name: KC_HOSTNAME
         #   value: keycloak
 
+        # ref: https://github.com/codecentric/helm-charts/tree/master/charts/keycloakx
+        # dynamically resolving the hostname from request headers.
+        - name: KC_HOSTNAME_STRICT
+          value: "false"
+
+        # Enables the HTTP listener
+        - name: KC_HTTP_ENABLED
+          value: "true"
+
+        # https://stackoverflow.com/questions/72426072/how-to-configure-keycloak-18-running-http-only-in-production-mode
+        # https://github.com/keycloak/keycloak/issues/13270
+        # When using the hostname option the server is going to resolve the HTTP scheme, port, and path, automatically so that:
+        # https scheme is used unless you set hostname-strict-https=false
+        - name: KC_HOSTNAME_STRICT_HTTPS
+          value: "false"
+
         # - name: KC_HTTPS_CERTIFICATE_FILE
-          # value: /path/to/certfile.pem
+        # value: /path/to/certfile.pem
         # - name: KC_HTTPS_CERTIFICATE_KEY_FILE
         #   value: /path/to/keyfile.pem
 
@@ -134,7 +151,8 @@ spec:
 
         # 2. use --import-realm + data in /opt/keycloak/data/import/
       args:
-        - 'start-dev'
+        - "start"
+        # - "start-dev"
         # https://www.keycloak.org/server/importExport#_importing_a_realm_during_startup
       #   - '--import-realm'
       # volumeMounts:
