@@ -1,6 +1,6 @@
 locals {
   vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  vm_name = "InfraSvc-OpenSUSE_Leap"
+  vm_name = var.vm_name
   count   = "1"
 }
 
@@ -38,6 +38,7 @@ module "cloudinit_nocloud_iso" {
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
           - name: podmgr
             gecos: podmgr
+            groups: podmgr
             plain_text_passwd: podmgr
             lock_passwd: false
             shell: /bin/bash
@@ -46,13 +47,13 @@ module "cloudinit_nocloud_iso" {
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
         
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#zypper-add-repo
-        # zypper:
-        #   repos:
-        #     - id: cockpit
-        #       name: systemsmanagement:cockpit
-        #       baseurl: https://download.opensuse.org/repositories/systemsmanagement:cockpit/15.5/systemsmanagement:cockpit.repo
-        #       enabled: 1
-        #       autorefresh: 1
+        zypper:
+          repos:
+            - id: cockpit
+              baseurl: https://download.opensuse.org/repositories/systemsmanagement:/cockpit/15.5/
+              enabled: 1
+              autorefresh: 0
+              gpgcheck: 0
 
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
         package_update: true
@@ -63,6 +64,11 @@ module "cloudinit_nocloud_iso" {
           - python3-pip
           - python3-jmespath
           - podman
+          - xfsprogs
+          - cockpit
+          - cockpit-pcp
+          - cockpit-podman
+          - cockpit-packagekit
         
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
         disk_setup:
@@ -94,31 +100,30 @@ module "cloudinit_nocloud_iso" {
         resize_rootfs: true
         
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
-        # runcmd:
-        #   - |
-        #     [ $(stat -c "%U" /home/podmgr) != "podmgr" ] && chown -R podmgr:podmgr /home/podmgr
-        #   - firewall-offline-cmd --set-default-zone=trusted
-        #   - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
-        #   - systemctl unmask firewalld
-        #   - systemctl enable --now firewalld
-        #   - systemctl enable --now cockpit.socket
+        runcmd:
+          - chown podmgr:podmgr /home/podmgr
+          - firewall-offline-cmd --set-default-zone=trusted
+          - firewall-offline-cmd --zone=trusted --add-service=cockpit
+          - systemctl unmask firewalld
+          - systemctl enable --now firewalld
+          - systemctl enable --now cockpit.socket
         
-        # ansible:
-        #   install_method: distro
-        #   package_name: ansible
-        #   run_user: vagrant
-        #   galaxy:
-        #     actions:
-        #       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
-        #   setup_controller:
-        #     repositories:
-        #       - path: /home/vagrant/SoloLab/
-        #         source: https://github.com/fsdrw08/SoloLab.git
-        #     run_ansible:
-        #       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
-        #         playbook_name: Invoke-PodmanRootlessProvision.yml
-        #         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-        #         extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+        ansible:
+          install_method: distro
+          package_name: ansible
+          run_user: vagrant
+          galaxy:
+            actions:
+              - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+          setup_controller:
+            repositories:
+              - path: /home/vagrant/SoloLab/
+                source: https://github.com/fsdrw08/SoloLab.git
+            run_ansible:
+              - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+                playbook_name: Invoke-PodmanRootlessProvision.yml
+                inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+                extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         EOT
       },
       {
@@ -130,8 +135,8 @@ module "cloudinit_nocloud_iso" {
           eth0:
             dhcp4: false
             addresses:
-              - 192.168.255.1${count.index + 0}/255.255.255.0
-              - 192.168.255.1${count.index + 1}/255.255.255.0
+              - 192.168.255.2${count.index + 0}/255.255.255.0
+              - 192.168.255.2${count.index + 1}/255.255.255.0
             gateway4: 192.168.255.1
             nameservers:
               addresses: 192.168.255.1
@@ -210,7 +215,7 @@ resource "hyperv_vhd" "boot_disk" {
 data "terraform_remote_state" "data_disk" {
   backend = "local"
   config = {
-    path = "${path.module}/../Disk-InfraSvc-Data/terraform.tfstate"
+    path = "${path.module}/${var.data_disk_ref}"
   }
 }
 
