@@ -54,65 +54,60 @@
   <!-- https://doc.opensuse.org/projects/autoyast/#CreateProfile-Network-Resource -->
   <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#CreateProfile-Network -->
   <networking>
-    <keep_install_network config:type="boolean">false</keep_install_network>
-    <setup_before_proposal config:type="boolean">true</setup_before_proposal>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+    <setup_before_proposal config:type="boolean">false</setup_before_proposal>
     <backend>network_manager</backend>
   </networking>
 
   <!-- repo config? -->
-  <!-- https://documentation.suse.com/sle-micro/5.1/html/SLE-Micro-all/cha-configuration-installation-options.html#Software-Selections-additional -->
-  <!-- <add-on>
-    <add_on_products config:type="list">
-      <listentry>
-        <name>tuna-backports-update</name>
-        <alias>tuna-backports-update</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/backports/</media_url>
+  <!-- https://doc.opensuse.org/projects/autoyast/#Software-Selections-additional -->
+  <add-on t="map">
+    <add_on_others config:type="list">
+      <listentry t="map">
+        <name>ustc-oss</name>
+        <alias>ustc-oss</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/distribution/leap/15.5/repo/oss/</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name>tuna-non-oss</name>
-        <alias>tuna-non-oss</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/non-oss/</media_url>
+      <listentry t="map">
+        <name>ustc-non-oss</name>
+        <alias>ustc-non-oss</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/distribution/leap/15.5/repo/non-oss</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name>tuna-oss</name>
-        <alias>tuna-oss</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/oss/</media_url>
+      <listentry t="map">
+        <name>ustc-update-oss</name>
+        <alias>ustc-update-oss</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/update/leap/15.5/oss</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name> tuna-sle-update</name>
-        <alias>tuna-sle-update</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/sle/</media_url>
+      <listentry t="map">
+        <name>ustc-update-non-oss</name>
+        <alias>ustc-update-non-oss</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/update/leap/15.5/non-oss</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name>tuna-update</name>
-        <alias>tuna-update</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/oss/</media_url>
+      <listentry t="map">
+        <name> ustc-update-sle</name>
+        <alias>ustc-update-sle</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/update/leap/15.5/sle</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name>tuna-update-non-oss</name>
-        <alias>tuna-update-non-oss</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/update/leap/15.5/non-oss/</media_url>
+      <listentry t="map">
+        <name>ustc-update-backports</name>
+        <alias>ustc-update-backports</alias>
+        <media_url>https://mirrors.ustc.edu.cn/opensuse/update/leap/15.5/backports</media_url>
         <priority config:type="integer">30</priority>
+        <product_dir>/</product_dir>
       </listentry>
-      <listentry>
-        <name>tuna-tumbleweed-oss</name>
-        <alias>tuna-tumbleweed-oss</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/oss/</media_url>
-        <priority config:type="integer">30</priority>
-      </listentry>
-      <listentry>
-        <name>tuna-tumbleweed-non-oss</name>
-        <alias>tuna-tumbleweed-non-oss</alias>
-        <media_url>https://mirrors.tuna.tsinghua.edu.cn/opensuse/tumbleweed/repo/non-oss/</media_url>
-        <priority config:type="integer">30</priority>
-      </listentry>
-    </add_on_products>
-  </add-on> -->
+    </add_on_others>
+  </add-on>
+  
 
   <!-- Software to install -->
   <!-- https://doc.opensuse.org/projects/autoyast/#Software-Selections-stage2-update -->
@@ -175,6 +170,10 @@
     </user>
   </users>
 
+  <kdump>
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+  </kdump>
+
   <!-- https://documentation.suse.com/sles/15-SP2/single-html/SLES-autoyast/index.html#createprofile-scripts -->
   <!-- https://doc.opensuse.org/projects/autoyast/#createprofile-scripts -->
   <scripts>
@@ -189,6 +188,7 @@ system_info:
     renderers: ['network-manager', 'netplan', 'eni', 'sysconfig', 'freebsd', 'netbsd', 'openbsd']
     activators: ['network-manager', 'eni', 'netplan', 'networkd']
 EOF
+rm -f /etc/NetworkManager/system-connections/eth0.nmconnection
 ]]>
         </source>
       </script>

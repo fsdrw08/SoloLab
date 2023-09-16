@@ -1,11 +1,11 @@
 #iso_url="https://download.opensuse.org/distribution/leap/15.4/iso/openSUSE-Leap-15.4-DVD-x86_64-Media.iso.meta4"
-// iso_url="C:/Users/Public/Downloads/ISO/openSUSE-Leap-15.5-DVD-x86_64-Media.iso"
-iso_url="C:/Users/Public/Downloads/ISO/openSUSE-Leap-15.5-NET-x86_64-Build491.1-Media.iso"
+iso_url="C:/Users/Public/Downloads/ISO/openSUSE-Leap-15.5-DVD-x86_64-Build491.1-Media.iso"
+iso_checksum="53bcbcb82361c5261c9d0994ab0f94101bf28e61c06fe12d320984601be35a8f"
+// iso_url="C:/Users/Public/Downloads/ISO/openSUSE-Leap-15.5-NET-x86_64-Build491.1-Media.iso"
+// iso_checksum="a2f7f2f1b6b3d3ef96f5c8f804d87ebd01e5cf982357c533f4c39c33cd20ec56"
 iso_checksum_type="sha256"
-// iso_checksum="53bcbcb82361c5261c9d0994ab0f94101bf28e61c06fe12d320984601be35a8f"
-iso_checksum="a2f7f2f1b6b3d3ef96f5c8f804d87ebd01e5cf982357c533f4c39c33cd20ec56"
 vm_name="packer-opensuse-leap-g2"
-configuration_version="8.0"
+configuration_version="11.0"
 cpus="2"
 cd_files=[".\\http\\*"]
 disk_size="70000"
@@ -21,13 +21,14 @@ vagrantfile_template="./vagrant-openSUSE_leap.rb"
 // https://documentation.suse.com/sles/12-SP5/html/SLES-all/Invoking.html#:~:text=autoyast%3Dlabel%3A//LABEL/PATH
 boot_command=[
   "<wait>c<wait>linuxefi /boot/x86_64/loader/linux ",
-  "install=cd:/ ",
-  "netsetup=dhcp lang=en_US textmode=1 autoyast=label://cidata/autoyast-Leap_15.5.xml<enter><wait>",
+  "netsetup=dhcp textmode=1 lang=en_US autoyast=label://cidata/autoyast-Leap_15.5.xml<enter><wait>",
   "initrdefi /boot/x86_64/loader/initrd<enter><wait3>",
   "boot<enter><wait>"
 ]
   // "install=cd:/ ",
+  // "install=http://mirrors.ustc.edu.cn/opensuse/distribution/leap/15.5/repo/oss/ ",
   // "install=https://mirror.sjtu.edu.cn/opensuse/distribution/leap/15.5/repo/oss/ ",
+  // "install=http://mirrors.tuna.tsinghua.edu.cn/opensuse/distribution/leap/15.5/repo/oss/ ",
 //   "initrdefi /boot/x86_64/loader/initrd<enter><wait10>boot<enter><wait10>"
 // boot_command=[
 //   // boot UI
