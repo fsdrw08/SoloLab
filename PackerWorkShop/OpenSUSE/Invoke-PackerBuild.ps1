@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('Leap_15.5', 'Leap_Micro', 'Tumbleweed')]
+  [ValidateSet('Leap_15.5', 'Leap_15.6', 'Leap_Micro', 'Tumbleweed')]
   [string]
   $Distro
 )
