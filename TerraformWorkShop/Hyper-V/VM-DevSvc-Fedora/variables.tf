@@ -23,3 +23,8 @@ variable "source_disk" {
   type    = string
   default = null
 }
+
+variable "data_disk_ref" {
+  type    = string
+  default = "null"
+}

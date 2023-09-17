@@ -13,8 +13,8 @@ module "cloudinit_nocloud_iso" {
       {
         filename = "meta-data"
         content  = <<-EOT
-        instance-id: iid-infrasvc-Fedora_20230905
-        local-hostname: InfraSvc-Fedora
+        instance-id: iid-devsvc-Fedora_20230905
+        local-hostname: DevSvc-Fedora
         EOT
       },
       {
@@ -32,6 +32,14 @@ module "cloudinit_nocloud_iso" {
             plain_text_passwd: vagrant
             lock_passwd: false
             sudo: ALL=(ALL) NOPASSWD:ALL
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+          - name: podmgr
+            gecos: podmgr
+            plain_text_passwd: podmgr
+            lock_passwd: false
             shell: /bin/bash
             ssh_import_id: None
             ssh_authorized_keys:
@@ -87,12 +95,12 @@ module "cloudinit_nocloud_iso" {
                 inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
                 extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         
-        power_state:
-          delay: now
-          mode: reboot
-          message: reboot
-          timeout: 30
-          condition: true
+        # power_state:
+        #   delay: now
+        #   mode: reboot
+        #   message: reboot
+        #   timeout: 30
+        #   condition: true
         EOT
       },
       {
@@ -104,8 +112,8 @@ module "cloudinit_nocloud_iso" {
           eth0:
             dhcp4: false
             addresses:
-              - 192.168.255.1${count.index + 0}/255.255.255.0
-              - 192.168.255.1${count.index + 1}/255.255.255.0
+              - 192.168.255.1${count.index + 2}/255.255.255.0
+              - 192.168.255.1${count.index + 3}/255.255.255.0
             gateway4: 192.168.255.1
             nameservers:
               addresses: 192.168.255.1
@@ -159,7 +167,6 @@ resource "null_resource" "remote" {
 }
 
 resource "hyperv_vhd" "boot_disk" {
-  # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
   path = join("\\", [
     local.vhd_dir,
     var.vm_name,
@@ -172,7 +179,7 @@ resource "hyperv_vhd" "boot_disk" {
 data "terraform_remote_state" "data_disk" {
   backend = "local"
   config = {
-    path = "${path.module}/../Disk-InfraSvc-Fedora-Data/terraform.tfstate"
+    path = "${path.module}/${var.data_disk_ref}"
   }
 }
 
