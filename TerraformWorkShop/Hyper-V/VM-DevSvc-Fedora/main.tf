@@ -176,12 +176,12 @@ resource "hyperv_vhd" "boot_disk" {
   source = var.source_disk
 }
 
-data "terraform_remote_state" "data_disk" {
-  backend = "local"
-  config = {
-    path = "${path.module}/${var.data_disk_ref}"
-  }
-}
+# data "terraform_remote_state" "data_disk" {
+#   backend = "local"
+#   config = {
+#     path = "${path.module}/${var.data_disk_ref}"
+#   }
+# }
 
 module "hyperv_machine_instance" {
   source     = "../modules/hyperv_instance"
