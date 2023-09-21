@@ -1,0 +1,133 @@
+# code: language=ansible
+---
+- hosts: "{{ host }}" # kube-2
+  gather_facts: yes
+  vars: 
+    podman_rootless_play:
+      vars_podman_host: "{{ host }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.6.0 # v4.0.0 ← (default)
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: "{{ Traefik.pod.state }}" # absent / present
+        timeout: 600
+        kube_file: 
+          host: "{{ Traefik.pod.kube_file_host }}"
+          content: "{{ rendered.stdout }}"
+        absent:
+          query_params:
+            force: "{{ Traefik.pod.absent_force | bool }}"
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: "{{ Traefik.pod.systemd_service }}"
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
+    # dns:
+    #   key_name: "keySololab"
+    #   key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+    #   key_algorithm: "hmac-sha256"
+    #   server: '192.168.255.31'
+    #   zone: infra.sololab
+    #   record: traefik
+    #   value: '192.168.255.32'
+    #   type: 'A'
+    #   state: present
+
+  tasks:
+    - name: Get root ca
+      delegate_to: localhost
+      block:
+        - name: run openssl s_client -showcerts
+          ansible.builtin.shell:
+            # https://github.com/hashicorp/terraform-provider-aws/issues/10104#issuecomment-565547413
+            cmd: >
+              echo | 
+              openssl s_client -showcerts -connect {{ Traefik.app.Root_CA_socket_address | default('letsencrypt.org:443') }} 2>&- | 
+              tac | 
+              sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | 
+              tac
+          changed_when: false
+          register: RootCACert
+          when:
+            - Traefik.app.customize_root_CA | bool
+
+        - name: Set fact Root_CA_Cert
+          ansible.builtin.set_fact:
+            Root_CA_Cert: "{{ RootCACert.stdout }}"
+          when:
+            - Traefik.app.customize_root_CA | bool
+
+    - name: Present traefik file folder
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/traefik
+        state: directory
+        mode: '0755'
+
+    - name: Render kube file templates
+      delegate_to: "{{ Traefik.pod.kube_file_host }}"
+      kubernetes.core.helm_template:
+        chart_ref: "{{ Traefik.pod.helm_chart_ref }}"
+        release_name: "{{ Traefik.pod.helm_release_name }}"
+        values_files: 
+          - "{{ Traefik.pod.helm_value_file }}"
+        set_values:
+          - value: traefik.customRootCA="{{ Root_CA_Cert }}"
+      register: rendered
+
+    - name: Invoke podman-rootless-play
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Config DNS
+      block:
+        - name: Ensure dns record is {{ Traefik.pod.state }}
+          community.general.nsupdate:
+            key_name: "{{ FreeIPA.app.tsig_key_name }}"
+            key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+            key_secret: "{{ FreeIPA.app.tsig_secret }}"
+            server: "{{ FreeIPA.pod.hostIP }}"
+            zone: "{{ item.zone }}"
+            record: "{{ item.record }}"
+            value: "{{ item.value }}"
+            type: 'A'
+            state: "{{ Traefik.pod.state }}"
+          loop: "{{ Traefik.dns.configs }}"
+          delegate_to: localhost
+          when:
+            - Traefik.dns.nsupdate is defined
+            - Traefik.dns.nsupdate | bool
+
+    - name: Config reverse proxy
+      block:
+        - name: render and present route config
+          ansible.builtin.copy:
+            content: "{{ lookup('ansible.builtin.template', item) }}"
+            dest: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+          loop: "{{ Traefik.ingress.tmpl }}"
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'present'
+            - Traefik.ingress.tmpl is defined
+
+        - name: absent route config
+          ansible.builtin.file:
+            path: /home/{{ ansible_user }}/traefik/{{ item | basename | replace('.j2','') }}
+            state: absent
+          loop: "{{ Traefik.ingress.tmpl }}"
+          when: 
+            - podman_rootless_play.vars_podman_play.state == 'absent'
+            - Traefik.ingress.tmpl is defined

@@ -187,6 +187,19 @@ podman run --rm --userns=keep-id `
     cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
+
+podman run --rm --userns=keep-id `
+    --dns 192.168.255.10 `
+    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman_helm.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
 ```
 
 shell(put the key to ssh_key file first):

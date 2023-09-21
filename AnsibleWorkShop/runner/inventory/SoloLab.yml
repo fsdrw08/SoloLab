@@ -127,6 +127,9 @@ sololab:
         systemd_service: traefik # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
+        helm_chart_ref: /HelmWorkShop/helm-charts/charts/traefik
+        helm_value_file: /HelmWorkShop/helm-charts/charts/traefik/values-sololab.yaml
+        helm_release_name: traefik
         image: docker.io/library/traefik:v2.10
         hostIP: 192.168.255.11
       app:
