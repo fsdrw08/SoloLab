@@ -1,0 +1,12 @@
+Description=Podman TCP API Service
+After=network.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=exec
+KillMode=process
+Environment=LOGGING="--log-level=info"
+ExecStart=/usr/bin/podman $LOGGING system service tcp://{{ podman_host_tcp_ip }} -t 0
+
+[Install]
+WantedBy=default.target
