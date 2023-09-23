@@ -3,13 +3,12 @@
 // iso_checksum=https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/iso/CentOS-Stream-9-latest-x86_64-boot.iso.SHA256SUM
 // iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-latest-x86_64-dvd1.iso"
 // iso_checksum="a8b4ae4aa0edcd911aa35205f27a4592d361f771d8e68cad34664b15612fb396"
-iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-20230911.1-x86_64-boot.iso"
-iso_checksum="57b3812f2f22e138d11730ee512e8887fd7f8720e3a61a7285a2b55b8cf4e4c9"
+iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-20230918.0-x86_64-boot.iso"
+iso_checksum="bde1302e56ca15870372b5e774243b7a6496e96bb8aaeb62418a0a3e63534ef7"
 iso_checksum_type="sha256"
 vm_name="packer-centos-stream-9-g2"
 configuration_version="11.0"
 disk_size="70000"
-disk_additional_size=["150000"]
 cd_files=[".\\http\\*"]
 cd_label="cidata"
 switch_name="Internal Switch"
