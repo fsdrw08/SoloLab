@@ -51,7 +51,7 @@ additional_build_steps:
   #   # - RUN find /output/scripts/ -type f -exec chmod +x {} \;
   #   - RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
   append_final:
-    - ARG TERRAFORM_VERSION=1.5.5
+    - ARG TERRAFORM_VERSION=1.5.7
 
     - RUN cd /tmp &&
       curl -LO https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_linux_amd64.zip &&
