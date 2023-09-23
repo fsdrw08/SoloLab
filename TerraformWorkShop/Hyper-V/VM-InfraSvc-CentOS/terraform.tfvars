@@ -1,3 +1,6 @@
 host     = "127.0.0.1"
 user     = "root"
 password = "P@ssw0rd"
+vm_name     = "InfraSvc-CentOS"
+source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-centos-stream-9-base\\Virtual Hard Disks\\packer-centos-stream-9-g2.vhdx"
+data_disk_ref = "../Disk-InfraSvc-CentOS-Data/terraform.tfstate"

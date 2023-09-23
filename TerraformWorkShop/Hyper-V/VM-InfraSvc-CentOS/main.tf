@@ -1,6 +1,6 @@
 locals {
   vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  vm_name = "InfraSvc-CentOS"
+  vm_name = var.vm_name
   count   = "1"
 }
 
@@ -111,7 +111,7 @@ module "cloudinit_nocloud_iso" {
               - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
                 playbook_name: Invoke-PodmanRootlessProvision.yml
                 inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-                extra_vars: host=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+                extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         EOT
       },
       {
@@ -190,14 +190,19 @@ resource "null_resource" "remote" {
 
 resource "hyperv_vhd" "boot_disk" {
   # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
-  path   = join("\\", [local.vhd_dir, local.vm_name, "InfraSvc-CentOS-Stream-9.vhdx"])
-  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-centos-stream-9-base\\Virtual Hard Disks\\packer-centos-stream-9-g2.vhdx"
+  path = join("\\", [
+    local.vhd_dir,
+    var.vm_name,
+    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+  source = var.source_disk
 }
 
 data "terraform_remote_state" "data_disk" {
   backend = "local"
   config = {
-    path = "${path.module}/../Disk-InfraSvc-Data/terraform.tfstate"
+    path = "${path.module}/${var.data_disk_ref}"
   }
 }
 
