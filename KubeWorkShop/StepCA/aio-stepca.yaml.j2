@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: stepca
+  name: stepca-pvc
 spec:
   resources:
     requests:
@@ -60,4 +60,4 @@ spec:
   volumes:
     - name: stepca
       persistentVolumeClaim:
-        claimName: stepca
+        claimName: stepca-pvc
