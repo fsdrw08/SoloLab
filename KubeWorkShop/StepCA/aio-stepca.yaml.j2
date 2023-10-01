@@ -45,7 +45,8 @@ spec:
         # set this to "true" to enable SSH certificate support
         - name: DOCKER_STEPCA_INIT_SSH
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_SSH }}
-        # set this to "true" toenable remote provisioner management
+        # set this to "true" to enable remote provisioner management (remote manage the ca)
+        # https://smallstep.com/docs/step-ca/provisioners/#remote-provisioner-management
         - name: DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT }}
         # a label for the initial admin (JWK) provisioner. Default: "admin"

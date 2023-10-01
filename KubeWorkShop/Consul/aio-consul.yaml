@@ -21,6 +21,7 @@ data:
   # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_domain
   # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_data_dir
   # https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_server
+  # https://developer.hashicorp.com/consul/docs/agent/config/config-files
   config.json: |
     {
         "datacenter": "localhost",
