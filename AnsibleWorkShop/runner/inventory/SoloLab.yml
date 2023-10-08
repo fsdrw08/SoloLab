@@ -167,6 +167,23 @@ sololab:
         cockpit_subdomain: cockpit
         cockpit_address: 192.168.255.10:9090
 
+    ## Consul
+    Consul:
+      pod:
+        state: present # present / absent
+        absent_force: true # true / false
+        systemd_service: consul # name of the systemd service
+        kube_file_host: localhost # tmpl mounted inside podman runner container
+        helm_chart_ref: /HelmWorkShop/helm-charts/charts/consul
+        helm_value_file: /HelmWorkShop/helm-charts/charts/consul/values-sololab.yaml
+        helm_release_name: consul
+      dns:
+        nsupdate: true # true / false
+        configs:
+          - zone: infra.sololab
+            record: consul
+            value: 192.168.255.11
+
     ## gitlab
     GitLab:
       pod:
@@ -216,7 +233,7 @@ sololab:
     Jenkins:
       pod: 
         state: present # present / absent
-        absent_force: false # true / false
+        absent_force: true # true / false
         systemd_service: jenkins # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/jenkins-server
@@ -228,13 +245,7 @@ sololab:
           - zone: infra.sololab
             record: jenkins
             value: 192.168.255.11
-      ingress:
-        tmpl:
-          - /KubeWorkShop/jenkins/traefik-jenkins.yaml.j2
-        basedomain: "{{ external_basedomain }}"
-        subdomain: jenkins
-        acmeResolver: internal
-        backend: http://jenkins:8080
+
     ## Pritunl
     # Pritunl:
     #   pod:

@@ -1,0 +1,82 @@
+# code: language=ansible
+---
+- hosts: "{{ host }}" # kube-2
+  gather_facts: yes
+  vars: 
+    podman_rootless_play:
+      vars_podman_host: "{{ host }}"
+      vars_podman_uri:
+        scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
+        api_version: v4.6.0 # v4.0.0 ← (default)
+        unix_socket: /run/user/{{ target_host.uid }}/podman/podman.sock # socket file path for podman, e.g. /run/user/1000/podman/podman.sock
+      vars_podman_play:
+        state: "{{ Consul.pod.state }}" # absent / present
+        timeout: 600
+        kube_file: 
+          host: "{{ Consul.pod.kube_file_host }}"
+          content: "{{ rendered.stdout }}"
+        absent:
+          query_params:
+            force: "{{ Consul.pod.absent_force | bool }}"
+      vars_podman_generate_systemd:
+        generate:
+          path_params: 
+            name: "{{ Consul.pod.systemd_service }}"
+          query_params:
+            useName: true
+      vars_service:
+        podman_pod:
+          user_scope:
+            skipped: false
+            enabled: true
+            state: started
+
+    # dns:
+    #   key_name: "keySololab"
+    #   key_secret: "j/2DR2zkVAyDHL2XjE731sMt9s6cmRhXE6niScAgHA0="
+    #   key_algorithm: "hmac-sha256"
+    #   server: '192.168.255.31'
+    #   zone: infra.sololab
+    #   record: Consul
+    #   value: '192.168.255.32'
+    #   type: 'A'
+    #   state: present
+
+  tasks:
+    - name: Render kube file templates
+      delegate_to: "{{ Consul.pod.kube_file_host }}"
+      kubernetes.core.helm_template:
+        chart_ref: "{{ Consul.pod.helm_chart_ref }}"
+        release_name: "{{ Consul.pod.helm_release_name }}"
+        values_files: 
+          - "{{ Consul.pod.helm_value_file }}"
+      register: rendered
+
+    - name: Invoke podman-rootless-play
+      ansible.builtin.include_role:
+        name: ansible-podman-rootless-play
+      vars: 
+        vars_podman_host: "{{ podman_rootless_play.vars_podman_host }}"
+        vars_podman_uri: "{{ podman_rootless_play.vars_podman_uri }}"
+        vars_podman_play: "{{ podman_rootless_play.vars_podman_play }}"
+        vars_podman_generate_systemd: "{{ podman_rootless_play.vars_podman_generate_systemd }}"
+        vars_service: "{{ podman_rootless_play.vars_service }}"
+
+    - name: Config DNS
+      block:
+        - name: Ensure dns record is {{ Consul.pod.state }}
+          community.general.nsupdate:
+            key_name: "{{ FreeIPA.app.tsig_key_name }}"
+            key_algorithm: "{{ FreeIPA.app.tsig_algorithm }}"
+            key_secret: "{{ FreeIPA.app.tsig_secret }}"
+            server: "{{ FreeIPA.pod.hostIP }}"
+            zone: "{{ item.zone }}"
+            record: "{{ item.record }}"
+            value: "{{ item.value }}"
+            type: 'A'
+            state: "{{ Consul.pod.state }}"
+          loop: "{{ Consul.dns.configs }}"
+          delegate_to: localhost
+          when:
+            - Consul.dns.nsupdate is defined
+            - Consul.dns.nsupdate | bool

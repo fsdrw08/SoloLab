@@ -225,6 +225,23 @@ podman run --rm --userns=keep-id \
 ```
 
 
+## deploy Consul by invoke podman rootless play role
+```powershell
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$private_data_dir = "/tmp/private"
+$keyFile="vagrant.key"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=Deploy-ConsulInPodman.yml `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+```
+
 ## deploy GitLab by invoke podman rootless play role
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
