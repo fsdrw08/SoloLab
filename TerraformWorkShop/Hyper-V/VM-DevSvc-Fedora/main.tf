@@ -69,6 +69,23 @@ module "cloudinit_nocloud_iso" {
           ignore_growroot_disabled: false
         resize_rootfs: true
         
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+        write_files:
+          # Set-CgroupConfig
+          - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
+            content: |
+              # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
+              [Service]
+              Delegate=cpu cpuset io memory pids
+              # END ansible-podman-rootless-provision systemd_cgroup_delegate
+            owner: root:root
+          # Set-SysctlParams
+          - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
+            content: |
+              net.ipv4.ping_group_range=0 2000000
+              net.ipv4.ip_unprivileged_port_start=53
+            owner: root:root
+
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
           - lvextend -l +100%FREE /dev/mapper/fedora_fedora-root
@@ -77,23 +94,25 @@ module "cloudinit_nocloud_iso" {
           - systemctl unmask firewalld
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
-        
-        ansible:
-          install_method: distro
-          package_name: ansible-core
-          run_user: vagrant
-          galaxy:
-            actions:
-              - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
-          setup_controller:
-            repositories:
-              - path: /home/vagrant/SoloLab/
-                source: https://github.com/fsdrw08/SoloLab.git
-            run_ansible:
-              - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
-                playbook_name: Invoke-PodmanRootlessProvision.yml
-                inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-                extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+          - loginctl enable-linger podmgr
+
+        # ansible:
+        #   install_method: distro
+        #   package_name: ansible-core
+        #   run_user: vagrant
+        #   galaxy:
+        #     actions:
+        #       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+        #   setup_controller:
+        #     repositories:
+        #       - path: /home/vagrant/SoloLab/
+        #         source: https://github.com/fsdrw08/SoloLab.git
+        #     run_ansible:
+        #       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+        #         playbook_name: Invoke-PodmanRootlessProvision.yml
+        #         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+        #         extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
         
         # power_state:
         #   delay: now

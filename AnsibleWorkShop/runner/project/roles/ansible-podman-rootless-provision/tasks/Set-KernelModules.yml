@@ -21,6 +21,10 @@
       when:
         - module_detected is defined
 
+    - name: debug
+      debug:
+        msg: "{{ kernel_modules_to_load_list }}"
+
     - name: Detect /etc/modules-load.d/{{ role_name }}.conf file state
       ansible.builtin.stat:
         path: /etc/modules-load.d/{{ role_name }}.conf
@@ -40,8 +44,8 @@
 
     - name: Temporarily enable "{{ item }}" kernel module
       community.general.modprobe:
-            name: ip_tables
-            state: present
+        name: item
+        state: present
       loop: "{{ kernel_modules_to_load_list }}"
 
     - name: Create /etc/modules-load.d/{{ role_name }}.conf
