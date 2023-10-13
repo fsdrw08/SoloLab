@@ -1,0 +1,52 @@
+# code: language=ansible
+# cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+# $private_data_dir = "/tmp/private"
+# podman run --rm --userns=keep-id `
+#   -v ./:$private_data_dir `
+#   -e RUNNER_PLAYBOOK=./debug/Invoke-ConsulRequest.yml `
+#   -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+#   localhost/ansible-ee-aio-new `
+#   bash -c "ansible-runner run $private_data_dir -vv"
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: catalog - register
+      ansible.builtin.uri:
+        url: "https://consul.infra.sololab/v1/catalog/register"
+        method: PUT
+        headers:
+          X-Consul-Token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+        body_format: json
+        body: 
+          Node: "consul"
+          Address: "{{ consul_node_address }}"
+          NodeMeta:
+            external-node: "true"
+            external-probe: "true"
+          Service:
+            Service: "{{ consul_service_name }}"
+            Address: "{{ consul_service_address }}"
+            Port: "{{ consul_service_port }}"
+            Tags:
+              - external
+              - metrics
+              - metrics_path={{ consul_service_metrics_path }}
+              - metrics_scheme={{ consul_service_metrics_scheme }}
+          Check:
+            Node: "{{ consul_node_name }}"
+            Name: http-check
+            status: passing
+            Definition:
+              http: "{{ consul_service_metrics_scheme }}://{{ consul_node_address }}"
+              interval: 30s
+    # - name: test
+    #   community.general.consul:
+    #     host: consul.infra.sololab
+    #     scheme: https
+    #     validate_certs: false
+    #     service_name: ipa
+    #     tcp: ipa.infra.sololab:443
+    #     state: present
+    #     tags:
+    #       - traefik.enable=true
