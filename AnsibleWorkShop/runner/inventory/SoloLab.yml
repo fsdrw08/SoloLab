@@ -66,7 +66,7 @@ sololab:
 
     ## freeipa
     FreeIPA:
-      pod: 
+      pod:
         state: present # present / absent
         absent_force: true # true / false
         systemd_service: freeipa # name of the systemd service
@@ -171,7 +171,7 @@ sololab:
     Consul:
       pod:
         state: present # present / absent
-        absent_force: true # true / false
+        absent_force: false # true / false
         systemd_service: consul # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/consul
@@ -231,7 +231,7 @@ sololab:
 
     ## Jenkins
     Jenkins:
-      pod: 
+      pod:
         state: present # present / absent
         absent_force: true # true / false
         systemd_service: jenkins # name of the systemd service
@@ -271,7 +271,7 @@ sololab:
 
     ## Drone CI
     # Drone:
-    #   pod: 
+    #   pod:
     #     state: absent # present / absent
     #     absent_force: true # true / false
     #     systemd_service: drone # name of the systemd service
@@ -295,7 +295,7 @@ sololab:
 
     # ## Drone Runner
     # DroneRunner:
-    #   pod: 
+    #   pod:
     #     state: absent # present / absent
     #     absent_force: true # true / false
     #     systemd_service: drone-runner # name of the systemd service

@@ -37,6 +37,7 @@ module "cloudinit_nocloud_iso" {
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
           - name: podmgr
+            uid: 1001
             gecos: podmgr
             plain_text_passwd: podmgr
             lock_passwd: false
@@ -44,7 +45,17 @@ module "cloudinit_nocloud_iso" {
             ssh_import_id: None
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
-                 
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#yum-add-repo
+        # https://github.com/AlmaLinux/cloud-images/blob/88cbbae32e5cd7f19f435b8ba5ec48d9024aa20b/build-tools-on-ec2-userdata.yml#L12
+        yum_repos:
+          hashicorp:
+            name: HashiCorp Stable - $basearch
+            baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+            enabled: true
+            gpgcheck: true
+            gpgkey: https://rpm.releases.hashicorp.com/gpg
+
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
         # https://stackoverflow.com/questions/46352173/ansible-failed-to-set-permissions-on-the-temporary
         package_update: true
@@ -59,6 +70,7 @@ module "cloudinit_nocloud_iso" {
           - cockpit-pcp
           - cockpit-podman
           - podman
+          - consul
         
         # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
@@ -72,6 +84,7 @@ module "cloudinit_nocloud_iso" {
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
         write_files:
           # Set-CgroupConfig
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
           - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
             content: |
               # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
@@ -80,11 +93,14 @@ module "cloudinit_nocloud_iso" {
               # END ansible-podman-rootless-provision systemd_cgroup_delegate
             owner: root:root
           # Set-SysctlParams
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
           - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
             content: |
               net.ipv4.ping_group_range=0 2000000
               net.ipv4.ip_unprivileged_port_start=53
             owner: root:root
+          # New-ConsulService
+          - path: 
 
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
@@ -97,29 +113,13 @@ module "cloudinit_nocloud_iso" {
           - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
           - loginctl enable-linger podmgr
 
-        # ansible:
-        #   install_method: distro
-        #   package_name: ansible-core
-        #   run_user: vagrant
-        #   galaxy:
-        #     actions:
-        #       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
-        #   setup_controller:
-        #     repositories:
-        #       - path: /home/vagrant/SoloLab/
-        #         source: https://github.com/fsdrw08/SoloLab.git
-        #     run_ansible:
-        #       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
-        #         playbook_name: Invoke-PodmanRootlessProvision.yml
-        #         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
-        #         extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
-        
-        # power_state:
-        #   delay: now
-        #   mode: reboot
-        #   message: reboot
-        #   timeout: 30
-        #   condition: true
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#power-state-change
+        power_state:
+          delay: 1
+          mode: reboot
+          message: reboot
+          timeout: 30
+          condition: true
         EOT
       },
       {
