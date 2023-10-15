@@ -55,6 +55,8 @@ podman run --rm `
    ```shell
    export HTTP_PROXY=http://192.168.255.1:7890
    export HTTPS_PROXY=http://192.168.255.1:7890
+   export HTTP_PROXY=http://10.20.72.21:9999
+   export HTTPS_PROXY=http://10.20.72.21:9999
    ansible-builder create --file ./execution-environment.yml
    ansible-builder build --file=./execution-environment.yml -t ansible-ee-aio-new:latest -v 3
    ```
@@ -96,12 +98,14 @@ podman run --rm -v ../:/runner `
 ```shell
 user=WindomWu
 tar=f38
-podman save localhost/ansible-ee-aio-new -o /mnt/c/Users/$user/Downloads/ansible-ee-aio-new-$tar.tar
+date=202310
+podman save localhost/ansible-ee-aio-new -o /mnt/c/Users/$user/Downloads/ansible-ee-aio-new-$tar-$date.tar
 ```
 ### Load builded image from windows
 ```powershell
 $tar="f38"
-podman load -i $home\Downloads\ansible-ee-aio-new-$tar.tar
+$date="202310"
+podman load -i $home\Downloads\ansible-ee-aio-new-$tar-$date.tar
 ```
 
 ### Push image to docker hub

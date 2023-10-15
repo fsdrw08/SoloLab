@@ -26,6 +26,8 @@ dependencies:
     - dnspython # required by community.general.nsupdate module
     - cryptography # required by community.crypto.get_certificate module
     - hvac # required by community.hashi_vault module
+    - python-consul # required by community.consul
+    - requests # required by community.consul
   system:
     - git
     - unzip
@@ -37,7 +39,6 @@ images:
     name: registry.fedoraproject.org/fedora:38
     # ref: https://github.com/ansible/ansible-builder/blob/devel/docs/definition.rst
     # Other available base images:
-    #   - quay.io/centos/centos:stream9
     #   - quay.io/rockylinux/rockylinux:9
     #   - quay.io/centos/centos:stream9
     #   - registry.fedoraproject.org/fedora:38
@@ -51,7 +52,7 @@ additional_build_steps:
   #   # - RUN find /output/scripts/ -type f -exec chmod +x {} \;
   #   - RUN dnf install 'dnf-command(config-manager)' -y && dnf config-manager --set-enabled crb && dnf install epel-release epel-next-release -y
   append_final:
-    - ARG TERRAFORM_VERSION=1.5.7
+    - ARG TERRAFORM_VERSION=1.6.1
 
     - RUN cd /tmp &&
       curl -LO https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_${TERRAFORM_VERSION}_linux_amd64.zip &&

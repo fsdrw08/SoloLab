@@ -6,3 +6,5 @@ jmespath
 dnspython
 cryptography
 hvac
+python-consul
+requests
