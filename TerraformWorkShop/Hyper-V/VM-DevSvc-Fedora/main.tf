@@ -27,6 +27,7 @@ module "cloudinit_nocloud_iso" {
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#including-users-and-groups
         users:
           - name: vagrant
+            uid: 1000
             gecos: vagrant
             groups: wheel
             plain_text_passwd: vagrant
@@ -40,6 +41,15 @@ module "cloudinit_nocloud_iso" {
             uid: 1001
             gecos: podmgr
             plain_text_passwd: podmgr
+            lock_passwd: false
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+          - name: consul
+            uid: 1002
+            gecos: consul
+            plain_text_passwd: consul
             lock_passwd: false
             shell: /bin/bash
             ssh_import_id: None
@@ -86,21 +96,45 @@ module "cloudinit_nocloud_iso" {
           # Set-CgroupConfig
           # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
           - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
+            owner: root:root
             content: |
               # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
               [Service]
               Delegate=cpu cpuset io memory pids
               # END ansible-podman-rootless-provision systemd_cgroup_delegate
-            owner: root:root
           # Set-SysctlParams
           # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
           - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
+            owner: root:root
             content: |
               net.ipv4.ping_group_range=0 2000000
               net.ipv4.ip_unprivileged_port_start=53
-            owner: root:root
           # New-ConsulService
-          - path: 
+          # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
+          - path: /etc/systemd/system/consul.service
+            owner: root:root
+            content: |
+              [Unit]
+              Description="HashiCorp Consul - A service mesh solution"
+              Documentation=https://www.consul.io/
+              Requires=network-online.target
+              After=network-online.target
+              ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+
+              [Service]
+              User=consul
+              Group=consul
+              ExecStart=/usr/bin/consul agent -config-dir=/home/consul/consul.d/
+              ExecReload=/usr/local/bin/consul reload
+              KillMode=process
+              KillSignal=SIGTERM
+              Restart=on-failure
+              LimitNOFILE=65536
+
+              [Install]
+              WantedBy=multi-user.target
+          # Set-ConsulConfig
+
 
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
