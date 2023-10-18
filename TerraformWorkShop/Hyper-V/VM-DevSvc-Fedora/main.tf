@@ -23,6 +23,25 @@ module "cloudinit_nocloud_iso" {
         #cloud-config
         timezone: Asia/Shanghai
         
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+        write_files:
+          # Set-CgroupConfig
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
+          - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
+              [Service]
+              Delegate=cpu cpuset io memory pids
+              # END ansible-podman-rootless-provision systemd_cgroup_delegate
+          # Set-SysctlParams
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
+          - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              net.ipv4.ping_group_range=0 2000000
+              net.ipv4.ip_unprivileged_port_start=53
+
         # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#including-users-and-groups
         users:
@@ -46,16 +65,7 @@ module "cloudinit_nocloud_iso" {
             ssh_import_id: None
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
-          - name: consul
-            uid: 1002
-            gecos: consul
-            plain_text_passwd: consul
-            lock_passwd: false
-            shell: /bin/bash
-            ssh_import_id: None
-            ssh_authorized_keys:
-              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
-        
+
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#yum-add-repo
         # https://github.com/AlmaLinux/cloud-images/blob/88cbbae32e5cd7f19f435b8ba5ec48d9024aa20b/build-tools-on-ec2-userdata.yml#L12
         yum_repos:
@@ -82,6 +92,35 @@ module "cloudinit_nocloud_iso" {
           - podman
           - consul
         
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+        # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/disk-partitions_managing-storage-devices
+        disk_setup:
+          /dev/sdb:
+            table_type: gpt
+            layout: 
+              - 90
+              - 10
+            overwrite: False
+
+        fs_setup:
+          - label: podmgr
+            filesystem: 'xfs'
+            device: '/dev/sdb1'
+            partition: auto
+            overwrite: false
+          - label: consul
+            filesystem: 'xfs'
+            device: '/dev/sdb2'
+            partition: auto
+            overwrite: false
+
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+        # https://zhuanlan.zhihu.com/p/250658106
+        mounts:
+          - [ /dev/disk/by-label/podmgr, /home/podmgr, auto, "nofail,exec", ]
+          - [ /dev/disk/by-label/consul, /home/consul, auto, "nofail,exec", ]
+        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
         # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
         growpart:
@@ -91,51 +130,6 @@ module "cloudinit_nocloud_iso" {
           ignore_growroot_disabled: false
         resize_rootfs: true
         
-        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
-        write_files:
-          # Set-CgroupConfig
-          # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
-          - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
-            owner: root:root
-            content: |
-              # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
-              [Service]
-              Delegate=cpu cpuset io memory pids
-              # END ansible-podman-rootless-provision systemd_cgroup_delegate
-          # Set-SysctlParams
-          # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
-          - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
-            owner: root:root
-            content: |
-              net.ipv4.ping_group_range=0 2000000
-              net.ipv4.ip_unprivileged_port_start=53
-          # New-ConsulService
-          # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
-          - path: /etc/systemd/system/consul.service
-            owner: root:root
-            content: |
-              [Unit]
-              Description="HashiCorp Consul - A service mesh solution"
-              Documentation=https://www.consul.io/
-              Requires=network-online.target
-              After=network-online.target
-              ConditionFileNotEmpty=/etc/consul.d/consul.hcl
-
-              [Service]
-              User=consul
-              Group=consul
-              ExecStart=/usr/bin/consul agent -config-dir=/home/consul/consul.d/
-              ExecReload=/usr/local/bin/consul reload
-              KillMode=process
-              KillSignal=SIGTERM
-              Restart=on-failure
-              LimitNOFILE=65536
-
-              [Install]
-              WantedBy=multi-user.target
-          # Set-ConsulConfig
-
-
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
           - lvextend -l +100%FREE /dev/mapper/fedora_fedora-root
@@ -144,6 +138,7 @@ module "cloudinit_nocloud_iso" {
           - systemctl unmask firewalld
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
+          # https://access.redhat.com/solutions/4661741
           - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
           - loginctl enable-linger podmgr
 

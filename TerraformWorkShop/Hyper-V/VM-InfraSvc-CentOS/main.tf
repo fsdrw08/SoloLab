@@ -23,6 +23,25 @@ module "cloudinit_nocloud_iso" {
         #cloud-config
         timezone: Asia/Shanghai
         
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+        write_files:
+          # Set-CgroupConfig
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
+          - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
+              [Service]
+              Delegate=cpu cpuset io memory pids
+              # END ansible-podman-rootless-provision systemd_cgroup_delegate
+          # Set-SysctlParams
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
+          - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              net.ipv4.ping_group_range=0 2000000
+              net.ipv4.ip_unprivileged_port_start=53
+
         # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
         users:
@@ -37,6 +56,7 @@ module "cloudinit_nocloud_iso" {
             ssh_authorized_keys:
               - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
           - name: podmgr
+            uid: 1001
             gecos: podmgr
             plain_text_passwd: podmgr
             lock_passwd: false
@@ -95,6 +115,8 @@ module "cloudinit_nocloud_iso" {
           - systemctl unmask firewalld
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
+          # https://access.redhat.com/solutions/4661741
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
         
         ansible:
           install_method: distro
