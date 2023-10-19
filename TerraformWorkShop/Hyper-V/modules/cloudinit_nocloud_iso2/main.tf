@@ -22,7 +22,7 @@ resource "null_resource" "cloudinit_temp_file" {
     command = local.is_windows ? join(
       ";",
       ["$tempDir=\"${path.root}/.terraform/tmp/${local.tempDir}\"",
-        "$content=@\"\n${each.value.content}\n\"@",
+        "$content=@'\n${each.value.content}\n'@",
         "$filename=\"${each.value.filename}\"",
         var.windows_create_file
       ]) : join(";",
