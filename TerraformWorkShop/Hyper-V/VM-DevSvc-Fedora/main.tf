@@ -21,7 +21,7 @@ module "cloudinit_nocloud_iso" {
         filename = "user-data"
         content  = <<-EOT
         #cloud-config
-        timezone: Asia/Shanghai
+        # https://github.com/canonical/cloud-init/blob/main/config/cloud.cfg.tmpl#L112
         
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
         write_files:
@@ -42,6 +42,45 @@ module "cloudinit_nocloud_iso" {
               net.ipv4.ping_group_range=0 2000000
               net.ipv4.ip_unprivileged_port_start=53
 
+        # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+        growpart:
+          mode: auto
+          devices:
+            - "/dev/sda3"
+            - "/dev/sdb1"
+          ignore_growroot_disabled: false
+        resize_rootfs: true
+
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+        # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/disk-partitions_managing-storage-devices
+        disk_setup:
+          /dev/sdb:
+            table_type: gpt
+            layout: 
+              - 90
+              - 10
+            overwrite: False
+
+        fs_setup:
+          - label: podmgr
+            filesystem: 'xfs'
+            device: '/dev/sdb1'
+            partition: auto
+            overwrite: false
+          - label: consul
+            filesystem: 'xfs'
+            device: '/dev/sdb2'
+            partition: auto
+            overwrite: false
+
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+        # https://zhuanlan.zhihu.com/p/250658106
+        mounts:
+          - [ /dev/disk/by-label/podmgr, /home/podmgr, auto, "nofail,exec", ]
+          - [ /dev/disk/by-label/consul, /home/consul, auto, "nofail,exec", ]
+        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
         # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#including-users-and-groups
         users:
@@ -60,6 +99,15 @@ module "cloudinit_nocloud_iso" {
             uid: 1001
             gecos: podmgr
             plain_text_passwd: podmgr
+            lock_passwd: false
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+          - name: consul
+            uid: 1002
+            gecos: consul
+            plain_text_passwd: consul
             lock_passwd: false
             shell: /bin/bash
             ssh_import_id: None
@@ -92,43 +140,7 @@ module "cloudinit_nocloud_iso" {
           - podman
           - consul
         
-        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
-        # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/disk-partitions_managing-storage-devices
-        disk_setup:
-          /dev/sdb:
-            table_type: gpt
-            layout: 
-              - 90
-              - 10
-            overwrite: False
-
-        fs_setup:
-          - label: podmgr
-            filesystem: 'xfs'
-            device: '/dev/sdb1'
-            partition: auto
-            overwrite: false
-          - label: consul
-            filesystem: 'xfs'
-            device: '/dev/sdb2'
-            partition: auto
-            overwrite: false
-
-        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
-        # https://zhuanlan.zhihu.com/p/250658106
-        mounts:
-          - [ /dev/disk/by-label/podmgr, /home/podmgr, auto, "nofail,exec", ]
-          - [ /dev/disk/by-label/consul, /home/consul, auto, "nofail,exec", ]
-        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
-
-        # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
-        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
-        growpart:
-          mode: auto
-          devices:
-            - "/dev/sda3"
-          ignore_growroot_disabled: false
-        resize_rootfs: true
+        timezone: Asia/Shanghai
         
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
@@ -224,12 +236,12 @@ resource "hyperv_vhd" "boot_disk" {
   source = var.source_disk
 }
 
-# data "terraform_remote_state" "data_disk" {
-#   backend = "local"
-#   config = {
-#     path = "${path.module}/${var.data_disk_ref}"
-#   }
-# }
+data "terraform_remote_state" "data_disk" {
+  backend = "local"
+  config = {
+    path = "${path.module}/${var.data_disk_ref}"
+  }
+}
 
 module "hyperv_machine_instance" {
   source     = "../modules/hyperv_instance"
@@ -314,6 +326,12 @@ module "hyperv_machine_instance" {
         controller_number   = "0"
         controller_location = "0"
         path                = hyperv_vhd.boot_disk.path
+      },
+      {
+        controller_type     = "Scsi"
+        controller_number   = "0"
+        controller_location = "2"
+        path                = data.terraform_remote_state.data_disk.outputs.path
       }
     ]
   }
