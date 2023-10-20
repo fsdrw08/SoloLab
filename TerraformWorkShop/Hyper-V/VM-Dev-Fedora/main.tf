@@ -48,18 +48,16 @@ module "cloudinit_nocloud_iso" {
           mode: auto
           devices:
             - "/dev/sda3"
-            - "/dev/sdb1"
           ignore_growroot_disabled: false
         resize_rootfs: true
 
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
         # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_storage_devices/disk-partitions_managing-storage-devices
         disk_setup:
           /dev/sdb:
             table_type: gpt
-            layout: 
-              - 90
-              - 10
+            layout: true
             overwrite: False
 
         fs_setup:
@@ -68,17 +66,11 @@ module "cloudinit_nocloud_iso" {
             device: '/dev/sdb1'
             partition: auto
             overwrite: false
-          - label: consul
-            filesystem: 'xfs'
-            device: '/dev/sdb2'
-            partition: auto
-            overwrite: false
 
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
         # https://zhuanlan.zhihu.com/p/250658106
         mounts:
           - [ /dev/disk/by-label/podmgr, /home/podmgr, auto, "nofail,exec", ]
-          - [ /dev/disk/by-label/consul, /home/consul, auto, "nofail,exec", ]
         mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
 
         # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
@@ -99,15 +91,6 @@ module "cloudinit_nocloud_iso" {
             uid: 1001
             gecos: podmgr
             plain_text_passwd: podmgr
-            lock_passwd: false
-            shell: /bin/bash
-            ssh_import_id: None
-            ssh_authorized_keys:
-              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
-          - name: consul
-            uid: 1002
-            gecos: consul
-            plain_text_passwd: consul
             lock_passwd: false
             shell: /bin/bash
             ssh_import_id: None
@@ -144,14 +127,15 @@ module "cloudinit_nocloud_iso" {
         
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
+          - chown podmgr:podmgr /home/podmgr
+          # https://access.redhat.com/solutions/4661741
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
           - lvextend -l +100%FREE /dev/mapper/fedora_fedora-root
           - firewall-offline-cmd --set-default-zone=trusted
-          - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
+          - firewall-offline-cmd --zone=trusted --add-service=cockpit
           - systemctl unmask firewalld
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
-          # https://access.redhat.com/solutions/4661741
-          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
           - loginctl enable-linger podmgr
 
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#power-state-change
