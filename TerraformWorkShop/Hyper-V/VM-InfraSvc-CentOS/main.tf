@@ -110,13 +110,13 @@ module "cloudinit_nocloud_iso" {
         # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
         runcmd:
           - chown podmgr:podmgr /home/podmgr
+          # https://access.redhat.com/solutions/4661741
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
           - firewall-offline-cmd --set-default-zone=trusted
-          - firewall-offline-cmd --zone=trusted --add-service=cockpit --permanent
+          - firewall-offline-cmd --zone=trusted --add-service=cockpit
           - systemctl unmask firewalld
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
-          # https://access.redhat.com/solutions/4661741
-          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
         
         ansible:
           install_method: distro
