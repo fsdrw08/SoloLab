@@ -12,7 +12,7 @@
 - hosts: localhost
   gather_facts: no
   tasks:
-    - name: test
+    - name: consul service
       community.general.consul:
         host: consul.infra.sololab
         port: 443
@@ -27,31 +27,35 @@
         state: present
         tags:
           - traefik.enable=true
-    # - name: catalog - register
-    #   ansible.builtin.uri:
-    #     # url: "https://consul.infra.sololab/v1/agent/service/register"
-    #     url: "https://consul.infra.sololab/v1/agent/service/deregister/ipa.infra.sololab"
-    #     validate_certs: false
-    #     method: PUT
-    #     headers:
-    #       X-Consul-Token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-        # body_format: json
-        # # https://github.com/eclipse-slm/slm-ansible-role-consul/blob/e166a70be3dd7706635a3f87e46057a283f75929/consul/tasks/helper/restore_node_and_services.yml#L13
-        # body: 
-        #   Name: ipa.infra.sololab
-        #   Address: ipa.infra.sololab
-        #   Port: 443
-          # Service:
-          #   Service: "ipa.infra.sololab"
-          #   Address: "ipa.infra.sololab"
-          #   Port: 443
-          #   Tags:
-          #     - traefik.enable=true
-          # Check:
-          #   Node: "{{ consul_node_name }}"
-          #   Name: http-check
-          #   status: passing
-          #   Definition:
-          #     http: "{{ consul_service_metrics_scheme }}://{{ consul_node_address }}"
-          #     interval: 30s
-  
+      when: false
+    
+    - name: consul kv
+      community.general.consul_kv:
+        host: consul.infra.sololab
+        port: 443
+        scheme: https
+        validate_certs: false
+        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+
+        key: config/service_unit
+        value: |
+          [Unit]
+          Description="HashiCorp Consul - A service mesh solution"
+          Documentation=https://www.consul.io/
+          Requires=network-online.target
+          After=network-online.target
+          ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+
+          [Service]
+          EnvironmentFile=-/etc/consul.d/consul.env
+          ExecStart=/usr/bin/consul agent -config-dir=/etc/consul.d/
+          ExecReload=/bin/kill --signal HUP $MAINPID
+          KillMode=process
+          KillSignal=SIGTERM
+          Restart=on-failure
+          LimitNOFILE=65536
+
+          [Install]
+          WantedBy=multi-user.target
+        state: present
+    

@@ -1,0 +1,29 @@
+# code: language=ansible
+# cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+# $private_data_dir = "/tmp/private"
+# podman run --rm --userns=keep-id `
+#   --dns 192.168.255.10 `
+#   -v ./:$private_data_dir `
+#   -e RUNNER_PLAYBOOK=./debug/Invoke-ConsulRequest.yml `
+#   -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+#   localhost/ansible-ee-aio-new `
+#   bash -c "ansible-runner run $private_data_dir -vv"
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: test
+      community.general.consul:
+        host: consul.infra.sololab
+        port: 443
+        scheme: https
+        validate_certs: false
+        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        service_name: ipa
+        service_address: 192.168.255.10
+        service_port: 443
+        tcp: ipa.infra.sololab:443
+        interval: 2m
+        state: present
+        tags:
+          - traefik.enable=true
