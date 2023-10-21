@@ -15,6 +15,9 @@
         kube_file: 
           host: "{{ Consul.pod.kube_file_host }}"
           content: "{{ rendered.stdout }}"
+        present:
+          query_params:
+            network: host
         absent:
           query_params:
             force: "{{ Consul.pod.absent_force | bool }}"
