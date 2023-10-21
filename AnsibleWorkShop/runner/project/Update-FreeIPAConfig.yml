@@ -157,6 +157,7 @@
         - name: present vyos dhcp ddns
           vyos.vyos.vyos_config:
             lines:
+              - "set service dns forwarding domain sololab server 192.168.255.10"
               # https://forum.vyos.io/t/how-to-configure-dhcp-server-to-update-dns-zone/6231/6
               # https://kb.isc.org/docs/isc-dhcp-41-manual-pages-dhcpdconf#:~:text=ddns%2Ddomainname%20name%3B
               - set service dhcp-server dynamic-dns-update
