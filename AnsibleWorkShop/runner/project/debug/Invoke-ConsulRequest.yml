@@ -36,26 +36,39 @@
         scheme: https
         validate_certs: false
         token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-
-        key: config/service_unit
-        value: |
-          [Unit]
-          Description="HashiCorp Consul - A service mesh solution"
-          Documentation=https://www.consul.io/
-          Requires=network-online.target
-          After=network-online.target
-          ConditionFileNotEmpty=/etc/consul.d/consul.hcl
-
-          [Service]
-          EnvironmentFile=-/etc/consul.d/consul.env
-          ExecStart=/usr/bin/consul agent -config-dir=/etc/consul.d/
-          ExecReload=/bin/kill --signal HUP $MAINPID
-          KillMode=process
-          KillSignal=SIGTERM
-          Restart=on-failure
-          LimitNOFILE=65536
-
-          [Install]
-          WantedBy=multi-user.target
+        key: "{{ item.key }}"
+        value: "{{ item.value }}"
         state: present
-    
+      loop:
+        - key: config/client_dev
+          # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#advanced-playbook-syntax
+          value: !unsafe |
+            bind_addr = "{{ GetInterfaceIP `eth0` }}"
+            datacenter = "dc1"
+            data_dir = "/home/podmgr/consul/data"
+            encrypt = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
+            node_name = "client_dev"
+            retry_join = [
+              "consul.infra.sololab"
+            ]
+
+        - key: config/systemd
+          value: |
+            [Unit]
+            Description="HashiCorp Consul - A service mesh solution"
+            Documentation=https://www.consul.io/
+            Wants=network-online.target
+            After=network-online.target
+            ConditionFileNotEmpty=/home/podmgr/consul/config/consul.hcl
+
+            [Service]
+            EnvironmentFile=-/home/podmgr/consul/config/consul.env
+            ExecStart=/usr/bin/consul agent -config-dir=/home/podmgr/consul/config/
+            ExecReload=/bin/kill --signal HUP $MAINPID
+            KillMode=process
+            KillSignal=SIGTERM
+            Restart=on-failure
+            LimitNOFILE=65536
+
+            [Install]
+            WantedBy=default.target
