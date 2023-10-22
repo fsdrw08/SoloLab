@@ -29,25 +29,42 @@
           - traefik.enable=true
       when: false
     
-    - name: consul kv
-      community.general.consul_kv:
-        host: consul.infra.sololab
-        port: 443
-        scheme: https
+    - name: consul service
+      uri:
+        url: "https://consul.infra.sololab/v1/agent/service/register"
         validate_certs: false
-        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-        key: "{{ item.key }}"
-        value: "{{ item.value }}"
-        state: present
+        method: PUT # DELETE
+        headers:
+          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        body_format: json
+        body: 
+          ID:
+          Name:
+          Address:
+          Port:
+          Tags:
+
+    - name: consul kv
+      uri:
+        url: "https://consul.infra.sololab/v1/kv/{{ item.key }}"
+        validate_certs: false
+        method: PUT # DELETE
+        headers:
+          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        body: "{{ item.value }}"
       loop:
         - key: config/client_dev
           # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#advanced-playbook-syntax
           value: !unsafe |
+            acl {
+              tokens {
+                agent = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+              }
+            }
             bind_addr = "{{ GetInterfaceIP `eth0` }}"
             datacenter = "dc1"
             data_dir = "/home/podmgr/consul/data"
             encrypt = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
-            node_name = "client_dev"
             retry_join = [
               "consul.infra.sololab"
             ]
@@ -55,7 +72,7 @@
         - key: config/systemd
           value: |
             [Unit]
-            Description="HashiCorp Consul - A service mesh solution"
+            Description="HashiCorp Consul - A service mesh solution - 123"
             Documentation=https://www.consul.io/
             Wants=network-online.target
             After=network-online.target
@@ -72,3 +89,22 @@
 
             [Install]
             WantedBy=default.target
+
+        - key: config/script
+          value: !unsafe |
+            #! /bin/bash
+            mkdir -p /home/podmgr/consul/config/ /home/podmgr/consul/data/
+            
+            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' -X GET -k https://consul.infra.sololab/v1/kv/config/client_dev | \
+              jq -r .[0].Value | \
+              base64 --decode > /home/podmgr/consul/config/consul.hcl
+            
+            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' \
+              -X GET -k https://consul.infra.sololab/v1/kv/config/systemd | \
+              jq -r .[0].Value | \
+              base64 --decode > /home/podmgr/.config/systemd/user/consul.service
+
+            systemctl daemon-reload --user
+
+            systemctl enable --now --user consul
+            
