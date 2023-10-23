@@ -1,7 +1,7 @@
-#iso_url=https://github.com/9l/vyos-build-action/releases/download/v1.3.2/vyos-1.3.2-amd64.iso
+#iso_url=https://github.com/eliseomartelli/linux-based-router-distro/releases/download/v1.3.3b/linux-based-router-distro-v1.3.3b-amd64.iso
 iso_url="C:/Users/Public/Downloads/ISO/vyos-1.3.3-amd64.iso"
 iso_checksum_type="sha256"
-iso_checksum="e0c6119e4c0101b0278d67063c2a3e381529bc65922f974bffead3e63c84e7e6"
+iso_checksum="1803F55692B6025F306E7F664EC94E328D4941BB48D6EEA865EF78B01CE6E472"
 vm_name="packer-vyos133"
 configuration_version="8.0"
 disk_size="128000"
@@ -55,8 +55,8 @@ boot_command=["<wait3><enter><wait2><enter><wait2><enter>",
 "<wait3>vyos<enter>",
 "<wait3>sudo mount /dev/sr1 /mnt<enter>",
 "<wait3>sudo /mnt/provision-dhcp.sh<enter>",
-"<wait9>sudo /mnt/provision-equuleus-cloud-init.sh<enter>",
-"<wait70>sudo /mnt/provision-cleanup.sh<enter>",
-"<wait5>sudo umount /mnt<enter>",
-"<wait3>sudo poweroff<enter>"
+"<wait9>sudo /mnt/provision-equuleus-cloud-init.sh && sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
+// "<wait70>sudo /mnt/provision-cleanup.sh<enter>",
+// "<wait5>sudo umount /mnt<enter>",
+// "<wait3>sudo poweroff<enter>"
 ]

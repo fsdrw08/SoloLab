@@ -5,6 +5,8 @@ ref:
 1. copy files to vyos
 ```powershell
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\*"
+# or 
+$debPath = "$env:USERPROFILE\OneDrive - Company Ltd\Software\Network\shellclash-linux\*"
 scp $debPath vyos:/tmp/
 ```
 2. install shellclash in vyos
