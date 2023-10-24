@@ -1,7 +1,19 @@
 locals {
-  vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  vm_name = var.vm_name
   count   = "1"
+  vm_name = var.vm_name
+  boot_disk_path = join("\\", [
+    var.vhd_dir,
+    var.vm_name,
+    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+}
+
+data "terraform_remote_state" "data_disk" {
+  backend = "local"
+  config = {
+    path = "${path.module}/${var.data_disk_ref}"
+  }
 }
 
 
@@ -71,6 +83,66 @@ module "cloudinit_nocloud_iso" {
           - set system time-zone 'Asia/Shanghai'
 
         write_files:
+          - path: /opt/vyatta/etc/config/scripts/vyos-preconfig-bootup.script
+            owner: root:vyattacfg
+            permissions: "0775"
+            content: |
+              #!/usr/bin/bash
+              # Check if disk exists
+              # https://linuxize.com/post/regular-expressions-in-grep/
+              if ! lsblk | grep '^sdb.*disk'; then
+                echo "Disk /dev/sdb not found"
+                exit 1
+              fi
+
+              # Check if GPT partition table exists
+              partition_table=$(parted /dev/sdb print | grep 'Partition Table:')
+              if [[ $partition_table != *gpt* ]]; then
+                echo "Creating GPT partition table on /dev/sdb"
+                sgdisk -g /dev/sdb
+              fi
+
+              # Check if data partition exists
+              if lsblk | grep 'sdb1.*part'; then
+                echo "Partition /dev/sdb1 already exists"
+              else
+                echo "Creating data partition on /dev/sdb"
+                sgdisk -n 1 /dev/sdb
+              fi
+
+              # Check if file system exists
+              if ! lsblk -f | grep 'sdb1.*ext4'; then
+                echo "Creating ext4 file system on /dev/sdb1"
+                mkfs.ext4 /dev/sdb1
+              fi
+
+              # Check if label exists
+              if ! sudo blkid -s LABEL -o value /dev/sdb; then
+                echo "Labeling /dev/sdb1 as data"
+                e2label /dev/sdb1 data
+              fi
+
+              # Mount the partition on boot
+              if ! grep "/dev/sdb1 /mnt/data ext4 defaults 0 2" /etc/fstab; then
+                echo "Mounting /dev/sdb1 to /mnt/data on boot"
+                echo "/dev/sdb1 /mnt/data ext4 defaults 0 2" >> /etc/fstab
+              fi
+
+              # Create mount point if it doesn't exist
+              if [ ! -d "/mnt/data" ]; then
+                echo "Creating /mnt/data directory"
+                mkdir -p /mnt/data
+              fi
+
+              # Mount the partition manually
+              # https://man7.org/linux/man-pages/man8/mount.8.html
+              if ! mountpoint -q /mnt/data; then
+                echo "Mounting /dev/sdb1 to /mnt/data"
+                mount /mnt/data
+              fi
+
+              echo "Disk configuration complete"
+
           # config after clash setup
           - path: /tmp/finalConfig.sh
             owner: root:vyattacfg
@@ -106,8 +178,8 @@ resource "null_resource" "remote" {
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
-    vhd_dir       = local.vhd_dir
-    vm_name       = local.count <= 1 ? "${local.vm_name}" : "${local.vm_name}${count.index + 1}"
+    vhd_dir       = var.vhd_dir
+    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
     host     = var.host
@@ -129,7 +201,11 @@ resource "null_resource" "remote" {
   provisioner "file" {
     source = module.cloudinit_nocloud_iso[count.index].isoName
     # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
-    destination = join("/", ["${self.triggers.vhd_dir}", "${self.triggers.vm_name}\\${self.triggers.isoName}"])
+    destination = join("/", [
+      "${self.triggers.vhd_dir}",
+      "${self.triggers.vm_name}\\${self.triggers.isoName}"
+      ]
+    )
   }
 
   # for destroy
@@ -142,36 +218,50 @@ resource "null_resource" "remote" {
   }
 }
 
-resource "hyperv_vhd" "boot_disk" {
-  path = join("\\", [
-    local.vhd_dir,
-    var.vm_name,
-    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
-    ]
-  )
-  source = var.source_disk
-}
 
 module "hyperv_machine_instance" {
-  source     = "../modules/hyperv_instance"
+  source     = "../modules/hyperv_instance2"
   depends_on = [null_resource.remote]
   count      = local.count
 
+  boot_disk = {
+    path   = local.boot_disk_path
+    source = var.source_disk
+  }
+
+  boot_disk_drive = [
+    {
+      controller_type     = "Scsi"
+      controller_number   = "0"
+      controller_location = "0"
+      path                = local.boot_disk_path
+    }
+  ]
+
+  additional_disk_drives = [
+    {
+      controller_type     = "Scsi"
+      controller_number   = "0"
+      controller_location = "2"
+      path                = data.terraform_remote_state.data_disk.outputs.path
+    }
+  ]
+
   vm_instance = {
-    name                 = local.count <= 1 ? local.vm_name : "${local.vm_name}${count.index + 1}"
+    name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
-    memory_maximum_bytes = 2147483648
-    memory_minimum_bytes = 1023410176
-    memory_startup_bytes = 1023410176
+    memory_maximum_bytes = var.memory_maximum_bytes
+    memory_minimum_bytes = var.memory_minimum_bytes
+    memory_startup_bytes = var.memory_startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
     state                = "Off"
 
     vm_firmware = {
       console_mode                    = "Default"
-      enable_secure_boot              = "Off"
+      enable_secure_boot              = var.enable_secure_boot
       secure_boot_template            = "MicrosoftUEFICertificateAuthority"
       pause_after_boot_failure        = "Off"
       preferred_network_boot_protocol = "IPv4"
@@ -206,173 +296,15 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    network_adaptors = [
-      {
-        name        = "Default Switch"
-        switch_name = "Default Switch"
-      },
-      {
-        name        = "Internal Switch"
-        switch_name = "Internal Switch"
-      }
-    ]
+    network_adaptors = var.network_adaptors
 
     dvd_drives = [
       {
         controller_number   = 0
         controller_location = 1
-        path                = local.count <= 1 ? join("\\", ["${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
+        path                = local.count <= 1 ? join("\\", ["${var.vhd_dir}", "${var.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${var.vhd_dir}", "${var.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
       }
     ]
 
-    hard_disk_drives = [
-      {
-        controller_type     = "Scsi"
-        controller_number   = "0"
-        controller_location = "0"
-        path                = hyperv_vhd.boot_disk.path
-      },
-      {
-        controller_type     = "Scsi"
-        controller_number   = "0"
-        controller_location = "2"
-        path                = data.terraform_remote_state.data_disk.outputs.path
-      }
-    ]
   }
 }
-
-# https://registry.terraform.io/providers/taliesins/hyperv/latest/docs/resources/machine_instance
-# resource "hyperv_machine_instance" "VyOS-LTS" {
-#   name       = "VyOS-LTS-133"
-#   generation = 2
-#   #   automatic_critical_error_action         = "Pause"
-#   #   automatic_critical_error_action_timeout = 30
-#   #   automatic_start_action                  = "StartIfRunning"
-#   #   automatic_start_delay                   = 0
-#   #   automatic_stop_action                   = "Save"
-#   checkpoint_type = "Disabled"
-#   #   guest_controlled_cache_types            = false
-#   #   high_memory_mapped_io_space             = 536870912
-#   #   low_memory_mapped_io_space              = 134217728
-#   #   lock_on_disconnect                      = "Off"
-#   memory_maximum_bytes = 2147483648
-#   memory_minimum_bytes = 1023410176
-#   memory_startup_bytes = 1023410176
-#   notes                = "This VM instance is managed by terraform"
-#   processor_count      = 2
-#   #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
-#   #   snapshot_file_location = "C:/ProgramData/Microsoft/Windows/Hyper-V"
-#   dynamic_memory = true
-#   #   static_memory  = false
-#   state = "Off"
-
-#   # Configure firmware
-#   vm_firmware {
-#     enable_secure_boot = "Off"
-#     # secure_boot_template            = "MicrosoftUEFICertificateAuthority"
-#     # preferred_network_boot_protocol = "IPv4"
-#     # console_mode                    = "None"
-#     # pause_after_boot_failure        = "Off"
-#     boot_order {
-#       boot_type           = "HardDiskDrive"
-#       controller_number   = "0"
-#       controller_location = "0"
-#     }
-#   }
-
-#   # Configure processor
-#   vm_processor {
-#     compatibility_for_migration_enabled               = false
-#     compatibility_for_older_operating_systems_enabled = false
-#     enable_host_resource_protection                   = false
-#     expose_virtualization_extensions                  = false
-#     hw_thread_count_per_core                          = 0
-#     maximum                                           = 100
-#     maximum_count_per_numa_node                       = 2
-#     maximum_count_per_numa_socket                     = 1
-#     relative_weight                                   = 100
-#     reserve                                           = 0
-#   }
-
-#   # Configure integration services
-#   integration_services = {
-#     "Guest Service Interface" = true
-#     "Heartbeat"               = true
-#     "Key-Value Pair Exchange" = true
-#     "Shutdown"                = true
-#     "Time Synchronization"    = true
-#     "VSS"                     = true
-#   }
-
-#   # Create a network adaptor
-#   network_adaptors {
-#     name                = "Default Switch"
-#     switch_name         = "Default Switch"
-#     dynamic_mac_address = false
-#     static_mac_address  = "0000DEADBEEF"
-#   }
-#   network_adaptors {
-#     name        = "Internal Switch"
-#     switch_name = "Internal Switch"
-#     # management_os                              = false
-#     # is_legacy                                  = false
-#     # dynamic_mac_address                        = true
-#     # static_mac_address                         = ""
-#     # mac_address_spoofing                       = "Off"
-#     # dhcp_guard                                 = "Off"
-#     # router_guard                               = "Off"
-#     # port_mirroring                             = "None"
-#     # ieee_priority_tag                          = "Off"
-#     # vmq_weight                                 = 100
-#     # iov_queue_pairs_requested                  = 1
-#     # iov_interrupt_moderation                   = "Off"
-#     # iov_weight                                 = 100
-#     # ipsec_offload_maximum_security_association = 512
-#     # maximum_bandwidth                          = 0
-#     # minimum_bandwidth_absolute                 = 0
-#     # minimum_bandwidth_weight                   = 0
-#     # mandatory_feature_id                       = []
-#     # resource_pool_name                         = ""
-#     # test_replica_pool_name                     = ""
-#     # test_replica_switch_name                   = ""
-#     # virtual_subnet_id                          = 0
-#     # allow_teaming                              = "On"
-#     # not_monitored_in_cluster                   = false
-#     # storm_limit                                = 0
-#     # dynamic_ip_address_limit                   = 0
-#     # device_naming                              = "Off"
-#     # fix_speed_10g                              = "Off"
-#     # packet_direct_num_procs                    = 0
-#     # packet_direct_moderation_count             = 0
-#     # packet_direct_moderation_interval          = 0
-#     # vrss_enabled                               = true
-#     # vmmq_enabled                               = false
-#     # vmmq_queue_pairs                           = 16
-#   }
-
-#   # Create dvd drive
-#   dvd_drives {
-#     controller_number   = "0"
-#     controller_location = "1"
-#     # https://developer.hashicorp.com/terraform/language/functions/abspath
-#     # https://developer.hashicorp.com/terraform/language/functions/replace
-#     path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-VyOS_13x\\cloud-init.iso"
-#     resource_pool_name = "Primordial" # default value
-#   }
-
-#   # Create a hard disk drive
-#   hard_disk_drives {
-#     controller_type     = "Scsi"
-#     controller_number   = "0"
-#     controller_location = "0"
-#     path                = hyperv_vhd.VyOS-LTS.path
-#     # disk_number                     = 4294967295
-#     # resource_pool_name              = "Primordial"
-#     # support_persistent_reservations = false
-#     # maximum_iops                    = 0
-#     # minimum_iops                    = 0
-#     # qos_policy_id                   = "00000000-0000-0000-0000-000000000000"
-#     # override_cache_attributes       = "Default"
-#   }
-# }
