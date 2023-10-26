@@ -9,6 +9,11 @@ terraform {
       version = ">=3.2.1"
     }
   }
+  backend "consul" {
+    address = "192.168.255.1:8500"
+    scheme  = "http"
+    path    = "tfstate/VM-Dev-Fedora"
+  }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs

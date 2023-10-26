@@ -181,12 +181,12 @@ module "cloudinit_nocloud_iso" {
               set container name consul volume 'consul_data' destination '/bitnami'
               # https://gist.github.com/peterkeen/97c566131af6f085628b5e4f1c4a8e1b
               # https://www.reddit.com/r/vyos/comments/vkfuoo/dns_container_vyos/
-              set nat destination rule 10 description 'consul forward'
-              set nat destination rule 10 inbound-interface 'eth1'
-              set nat destination rule 10 protocol 'tcp_udp'
-              set nat destination rule 10 destination port 8500
-              set nat destination rule 10 source address 192.168.255.0/24
-              set nat destination rule 10 translation address 172.16.0.10
+              set nat destination rule 20 description 'consul forward'
+              set nat destination rule 20 inbound-interface 'eth1'
+              set nat destination rule 20 protocol 'tcp_udp'
+              set nat destination rule 20 destination port 8500
+              set nat destination rule 20 source address 192.168.255.0/24
+              set nat destination rule 20 translation address 172.16.0.10
 
               commit
               save

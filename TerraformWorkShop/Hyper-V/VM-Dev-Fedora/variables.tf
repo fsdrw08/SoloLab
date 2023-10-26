@@ -24,7 +24,7 @@ variable "source_disk" {
   default = null
 }
 
-variable "data_disk_ref" {
+variable "data_disk_path" {
   type    = string
-  default = "null"
+  default = "value"
 }

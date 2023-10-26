@@ -77,7 +77,6 @@ module "cloudinit_nocloud_iso" {
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#including-users-and-groups
         users:
           - name: vagrant
-            uid: 1000
             gecos: vagrant
             groups: wheel
             plain_text_passwd: vagrant
@@ -137,7 +136,9 @@ module "cloudinit_nocloud_iso" {
           - systemctl enable --now firewalld
           - systemctl enable --now cockpit.socket
           - loginctl enable-linger podmgr
-          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' -X GET -k https://consul.infra.sololab/v1/kv/config/script | jq -r .[0].Value | base64 --decode | bash"
+          # https://rakhesh.com/linux-bsd/failed-to-shellify-error-in-cloud-init/
+          - 'TOKEN="X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19"'
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/curl -s -H $TOKEN -X GET -k https://consul.infra.sololab/v1/kv/config/script | jq -r .[0].Value | base64 --decode | bash"
 
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#power-state-change
         power_state:
@@ -219,13 +220,6 @@ resource "hyperv_vhd" "boot_disk" {
     ]
   )
   source = var.source_disk
-}
-
-data "terraform_remote_state" "data_disk" {
-  backend = "local"
-  config = {
-    path = "${path.module}/${var.data_disk_ref}"
-  }
 }
 
 module "hyperv_machine_instance" {
@@ -316,7 +310,7 @@ module "hyperv_machine_instance" {
         controller_type     = "Scsi"
         controller_number   = "0"
         controller_location = "2"
-        path                = data.terraform_remote_state.data_disk.outputs.path
+        path                = var.data_disk_path
       }
     ]
   }
