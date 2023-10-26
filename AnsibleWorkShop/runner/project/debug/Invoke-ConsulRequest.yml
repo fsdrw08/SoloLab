@@ -43,6 +43,7 @@
           Address:
           Port:
           Tags:
+      when: false
 
     - name: consul kv
       uri:
@@ -53,7 +54,7 @@
           X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
         body: "{{ item.value }}"
       loop:
-        - key: config/client_dev
+        - key: config/client
           # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html#advanced-playbook-syntax
           value: !unsafe |
             acl {
@@ -95,7 +96,7 @@
             #! /bin/bash
             mkdir -p /home/podmgr/consul/config/ /home/podmgr/consul/data/
             
-            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' -X GET -k https://consul.infra.sololab/v1/kv/config/client_dev | \
+            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' -X GET -k https://consul.infra.sololab/v1/kv/config/client | \
               jq -r .[0].Value | \
               base64 --decode > /home/podmgr/consul/config/consul.hcl
             

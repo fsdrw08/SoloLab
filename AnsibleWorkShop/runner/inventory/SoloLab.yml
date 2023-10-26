@@ -175,7 +175,7 @@ sololab:
         systemd_service: consul # name of the systemd service
         kube_file_host: localhost # tmpl mounted inside podman runner container
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/consul
-        helm_value_file: /HelmWorkShop/helm-charts/charts/consul/values-sololab.yaml
+        helm_value_file: /HelmWorkShop/helm-charts/charts/consul/values-sololab-server.yaml
         helm_release_name: consul
       dns:
         nsupdate: true # true / false
