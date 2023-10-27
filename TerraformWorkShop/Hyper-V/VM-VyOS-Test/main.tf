@@ -28,8 +28,8 @@ module "cloudinit_nocloud_iso" {
       {
         filename = "meta-data"
         content  = <<-EOT
-        instance-id: iid-infrasvc-CetnOS_20230614
-        local-hostname: InfraSvc-CetnOS
+        instance-id: iid-vyos_20230614
+        local-hostname: VyOS-LTS
         EOT
       },
       {
@@ -84,7 +84,8 @@ module "cloudinit_nocloud_iso" {
 
         write_files:
           # config external disk
-          - path: /opt/vyatta/etc/config/scripts/vyos-preconfig-bootup.script
+          # - path: /opt/vyatta/etc/config/scripts/vyos-preconfig-bootup.script
+          - path: /tmp/Set-ExternalDisk.sh
             owner: root:vyattacfg
             permissions: "0775"
             content: |
@@ -147,7 +148,8 @@ module "cloudinit_nocloud_iso" {
               echo "Disk configuration complete"
 
           # add container
-          - path: /opt/vyatta/etc/config/scripts/vyos-postconfig-bootup.script
+          # - path: /opt/vyatta/etc/config/scripts/vyos-postconfig-bootup.script
+          - path: /tmp/Add-Container.sh
             owner: root:vyattacfg
             permissions: '0775'
             content: |
@@ -157,7 +159,7 @@ module "cloudinit_nocloud_iso" {
                   exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
               fi
               source /opt/vyatta/etc/functions/script-template
-              add container image docker.io/bitnami/consul:latest
+              run add container image docker.io/bitnami/consul:latest
               configure
               # Container networks
               set container network containers prefix '172.16.0.0/24'

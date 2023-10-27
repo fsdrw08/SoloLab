@@ -29,6 +29,9 @@ clash
 - 2 clash功能设置 -> 6 设置本机代理服务:    未开启   ————使本机流量经过clash内核
 - 7 clash进阶设置 -> 8 手动指定相关端口、秘钥 -> 8 自定义本机host地址：...
 
+v1.8.0
+- 7 clash进阶设置 ->  6 配置内置DNS服务 -> 7 禁用DNS劫持：已禁用
+- 7 clash进阶设置 ->  6 配置内置DNS服务 ->  4 一键配置加密DNS
 -
 <!-- 
 5. install shellclash:
