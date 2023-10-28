@@ -13,8 +13,8 @@ module "cloudinit_nocloud_iso" {
       {
         filename = "meta-data"
         content  = <<-EOT
-        instance-id: iid-devsvc-Fedora_20230905
-        local-hostname: DevSvc-Fedora
+        instance-id: iid-dev-Fedora_20231028
+        local-hostname: Dev-Fedora
         EOT
       },
       {
