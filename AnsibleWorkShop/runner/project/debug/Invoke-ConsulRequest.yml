@@ -31,21 +31,21 @@
     
     - name: consul service
       uri:
-        url: "https://consul.infra.sololab/v1/agent/service/register"
+        url: "https://192.168.255.12:8500/v1/agent/service/register"
         validate_certs: false
         method: PUT # DELETE
         headers:
           X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
         body_format: json
         body: 
-          ID:
-          Name:
-          Address:
-          Port:
+          ID: dev-traefik
+          Name: dev-traefik
+          Port: 443
           Tags:
       when: false
 
     - name: consul kv
+      when: true
       uri:
         url: "https://consul.infra.sololab/v1/kv/{{ item.key }}"
         validate_certs: false
@@ -69,6 +69,12 @@
             retry_join = [
               "consul.infra.sololab"
             ]
+            ports {
+              grpc  = 8502
+              http  = 8500
+              https = 8443
+              dns   = 8600
+            }
 
         - key: config/systemd
           value: |

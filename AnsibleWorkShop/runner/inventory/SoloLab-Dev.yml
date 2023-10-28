@@ -64,7 +64,6 @@ sololab:
     internal_basedomain: infra.sololab
     external_basedomain: infra.sololab
 
-    ## freeipa
     FreeIPA:
       pod:
         state: present # present / absent
@@ -94,31 +93,6 @@ sololab:
         dns_zonename: infra.sololab.
         dns_rev_zonename: 255.168.192.in-addr.arpa.
 
-    ## StepCA
-    StepCA:
-      pod:
-        state: present # absent / present
-        absent_force: true # true / false
-        systemd_service: stepca # name of the systemd service
-        kube_file_host: localhost # tmpl mounted inside podman runner container
-        kube_file_tmpl: /KubeWorkShop/StepCA/aio-stepca.yaml.j2
-        image: docker.io/smallstep/step-ca:latest
-        hostIP: 192.168.255.11
-      app:
-        DOCKER_STEPCA_INIT_NAME: sololab
-        DOCKER_STEPCA_INIT_ACME: true
-        DOCKER_STEPCA_INIT_DNS_NAMES: localhost,step-ca.infra.sololab
-        DOCKER_STEPCA_INIT_SSH: true
-        DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT: true
-        DOCKER_STEPCA_INIT_PROVISIONER_NAME: admin
-        DOCKER_STEPCA_INIT_PASSWORD: P@ssw0rd
-      dns:
-        nsupdate: true # true / false
-        configs:
-          - zone: infra.sololab
-            record: step-ca
-            value: 192.168.255.11
-
     ## traefik
     Traefik:
       pod:
@@ -128,10 +102,9 @@ sololab:
         kube_file_host: localhost # tmpl mounted inside podman runner container
         kube_file_tmpl: /KubeWorkShop/Traefik/aio-traefik.yaml.j2
         helm_chart_ref: /HelmWorkShop/helm-charts/charts/traefik
-        helm_value_file: /HelmWorkShop/helm-charts/charts/traefik/values-sololab.yaml
+        helm_value_file: /HelmWorkShop/helm-charts/charts/traefik/values-sololab-others.yaml
         helm_release_name: traefik
         image: docker.io/library/traefik:v2.10
-        hostIP: 192.168.255.11
       app:
         customize_root_CA: true # true / false
         Root_CA_socket_address: step-ca.infra.sololab:9000
@@ -150,11 +123,8 @@ sololab:
         nsupdate: true # true / false
         configs:
           - zone: infra.sololab
-            record: traefik
-            value: 192.168.255.11
-          - zone: infra.sololab
-            record: cockpit
-            value: 192.168.255.11
+            record: dev-traefik
+            value: 192.168.255.12
       ingress:
         tmpl:
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
@@ -313,29 +283,10 @@ sololab:
       ansible_network_os: vyos.vyos.vyos
       ansible_user: vagrant
       ansible_password: vagrant
-    kube-0:
-      ansible_user: vagrant
-      ansible_host: localhost
-      ansible_python_interpreter: /usr/bin/python3
-      # ansible_ssh_private_key_file: ~/.ssh/ssh.key
-    kube-1:
-      ansible_user: vagrant
-      # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
-      # ansible_ssh_pass: vagrant
-      ansible_host: 192.168.255.31
-      ansible_python_interpreter: /usr/bin/python3
-      ansible_ssh_private_key_file: /tmp/ssh.key
-    kube-2-admin:
-      ansible_user: vagrant
-      # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
-      # ansible_ssh_pass: vagrant
-      ansible_host: 192.168.255.11
-      ansible_python_interpreter: /usr/bin/python3
-      ansible_ssh_private_key_file: ~/.ssh/admin.key
-    kube-2:
+    dev:
       ansible_user: podmgr
       # https://riptutorial.com/ansible/example/5733/inventory-with-username-and-password
       ansible_ssh_pass: podmgr
-      ansible_host: 192.168.255.11
+      ansible_host: 192.168.255.12
       ansible_python_interpreter: /usr/bin/python3
       ansible_ssh_private_key_file: ~/.ssh/ssh.key

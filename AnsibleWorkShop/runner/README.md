@@ -203,6 +203,28 @@ podman run --rm --userns=keep-id `
     cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
+
+# other node
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$userKeyFile = "vagrant.key"
+$private_data_dir = "/tmp/private"
+$inventory = "$private_data_dir/inventory/Sololab-Dev.yml"
+$playbook = "$private_data_dir/project/Deploy-TraefikInPodman_helm.yml"
+podman run --rm --userns=keep-id `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -v ./:$private_data_dir `
+    -v ../../KubeWorkShop/:/KubeWorkShop/ `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    pwd;
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
+    chmod 0600 ~/.ssh/ssh.key;
+    ls -al ~/.ssh/ssh.key;
+    ansible-playbook --private-key ~/.ssh/ssh.key \
+    --inventory-file $inventory \
+    --extra-vars host=dev \
+    $playbook -vv"
 ```
 
 shell(put the key to ssh_key file first):
