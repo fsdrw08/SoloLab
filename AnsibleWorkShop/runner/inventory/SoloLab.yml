@@ -57,7 +57,7 @@ sololab:
     # playbook vars:
     # common settings
     target_host:
-      name: "{{ host }}"
+      name: "{{ lookup('env', 'TARGET') }}"
       uid: 1001
       connection_id: "cloud-init eth0"
 

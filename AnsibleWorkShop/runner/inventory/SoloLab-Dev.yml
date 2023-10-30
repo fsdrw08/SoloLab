@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-sololab:
+sololab_dev:
   vars:
     # https://9to5answer.com/can-i-bypass-host-key-checking-in-ansible
     # https://github.com/ansible/ansible/issues/49254
@@ -57,7 +57,7 @@ sololab:
     # playbook vars:
     # common settings
     target_host:
-      name: "{{ host }}"
+      name: "{{ lookup('env', 'TARGET') }}"
       uid: 1001
       connection_id: "cloud-init eth0"
 

@@ -142,10 +142,13 @@ sudo sed -ri "s/^ default_ccache_name = (.*)/# default_ccache_name = \1/g" /etc/
 ## deploy StepCA by invoke podman rootless play role
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$target = "kube-2" # sd, dev, idm
 $private_data_dir = "/tmp/private"
+$playBook="Deploy-StepCAInPodman.yml"
 $keyFile = "vagrant.key"
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=Deploy-StepCAInPodman.yml `
+    -e RUNNER_PLAYBOOK=$playBook `
+    -e TARGET=$target `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
@@ -191,9 +194,11 @@ podman run --rm --userns=keep-id \
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
+$target = "dev" # sd, dev, idm
 podman run --rm --userns=keep-id `
     --dns 192.168.255.10 `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman_helm.yml `
+    -e TARGET=$target `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
     -v ../../KubeWorkShop/:/KubeWorkShop/ `
@@ -204,7 +209,7 @@ podman run --rm --userns=keep-id `
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
 
-# other node
+# with playbook command node
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
@@ -251,17 +256,55 @@ podman run --rm --userns=keep-id \
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $private_data_dir = "/tmp/private"
-$keyFile="vagrant.key"
+$userKeyFile="vagrant.key"
+$target = "kube-2" # sd, dev, idm
 podman run --rm --userns=keep-id `
     -e RUNNER_PLAYBOOK=Deploy-ConsulInPodman.yml `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -e TARGET=$target `
     -v ./:$private_data_dir `
     -v ../../HelmWorkShop/:/HelmWorkShop/ `
     localhost/ansible-ee-aio-new `
     bash -c "mkdir -p ~/.ssh; 
-    cat $private_data_dir/env/$keyFile > ~/.ssh/ssh.key; 
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
     chmod 600 ~/.ssh/ssh.key;
     ansible-runner run $private_data_dir -vv"
+```
+
+Create DNS policy  
+ref: 
+- [Create the DNS policy](https://developer.hashicorp.com/consul/tutorials/security/access-control-setup-production#create-the-dns-policy)
+- [Additional ACL configuration](https://developer.hashicorp.com/consul/tutorials/day-0/access-control-setup#additional-acl-configuration)
+
+prepare dns-request-policy.hcl
+```powershell
+$dns_request_policy=@"
+node_prefix "" {
+  policy = "read"
+}
+service_prefix "" {
+  policy = "read"
+}
+"@
+$policyName = "dns-requests"
+
+consul acl policy create -name $policyName -rules $dns_request_policy
+
+consul acl token update -id 00000000-0000-0000-0000-000000000002 `
+    --merge-policies `
+    -description "Anonymous Token - Can query DNS" `
+    -policy-name $policyName
+```
+
+```powershell
+consul acl policy create -name 'list-all-nodes' -rules 'node_prefix "" { policy = "read" }'
+
+$policyName = "dns-requests"
+consul acl policy create -name "dns-requests" -rules @dns-request-policy.hcl
+consul acl token update -id 00000000-0000-0000-0000-000000000002 `
+    --merge-policies `
+    -description "Anonymous Token - Can List Nodes" `
+    -policy-name $policyName
 ```
 
 ## deploy GitLab by invoke podman rootless play role

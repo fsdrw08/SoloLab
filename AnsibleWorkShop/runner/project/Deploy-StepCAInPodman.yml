@@ -1,10 +1,10 @@
 # code: language=ansible
 ---
-- hosts: "{{ host }}" # kube-2
+- hosts: "{{ lookup('env', 'TARGET') }}" # kube-2
   gather_facts: yes
   vars: 
     podman_rootless_play:
-      vars_podman_host: "{{ host }}"
+      vars_podman_host: "{{ lookup('env', 'TARGET') }}"
       vars_podman_uri:
         scheme_authority: http://d # http://d/ ← (default), https://docs.podman.io/en/latest/markdown/podman-system-service.1.html
         api_version: v4.4.1 # v4.0.0 ← (default)
