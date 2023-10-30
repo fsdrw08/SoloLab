@@ -50,6 +50,8 @@ spec:
         - name: DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT }}
         # a label for the initial admin (JWK) provisioner. Default: "admin"
+        # note, this is the name of the JWK provisioner, not the default admin name
+        # default admin name is "step"
         - name: DOCKER_STEPCA_INIT_PROVISIONER_NAME
           value: {{ StepCA.app.DOCKER_STEPCA_INIT_PROVISIONER_NAME }}
         # specify a password for the encrypted CA keys and the default CA provisioner.
