@@ -183,6 +183,10 @@ sololab:
           - zone: infra.sololab
             record: consul
             value: 192.168.255.11
+      app: 
+        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        fqdn: consul.infra.sololab
+
 
     ## gitlab
     GitLab:

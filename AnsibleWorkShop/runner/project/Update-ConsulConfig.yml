@@ -11,105 +11,47 @@
 ---
 - hosts: localhost
   gather_facts: no
-  vars: 
-    service:
-      ID: dev-traefik
-      Name: dev-traefik
-      Port: 443
-      Tags:
+  vars:
   tasks:
-    - name: consul service
-      community.general.consul:
-        host: consul.infra.sololab
-        port: 443
-        scheme: https
-        validate_certs: false
-        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-        service_name: ipa
-        service_address: 192.168.255.10
-        service_port: 443
-        tcp: ipa.infra.sololab:443
-        interval: 2m
-        state: present
-        tags:
-          - traefik.enable=true
-      when: false
-    
-    - name: consul service register
-      uri:
-        url: "http://192.168.255.12:8500/v1/agent/service/register"
-        validate_certs: false
-        method: PUT # DELETE
-        headers:
-          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-        body_format: json
-        body: "{{ service }}"
-      when: false
-
-    - name: consul service deregister
-      uri:
-        url: "http://192.168.255.12:8500/v1/agent/service/deregister/{{ service.ID }}"
-        validate_certs: false
-        method: PUT # DELETE
-        headers:
-          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-      vars:
-        id: dev-traefik
-      when: false
-
-    - name: create consul policy for dns
-      ansible.builtin.uri:
-        url: https://consul.infra.sololab/v1/acl/policy
-        validate_certs: false
-        method: PUT # DELETE
-        headers:
-          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
-        body_format: json
-        body:
-          Name: DNS
-          Description: Allow anonymous query DNS
-          Rules: node_prefix "" { policy = "read" } service_prefix "" { policy = "read" }
-      when: false
-
     - name: create consul policy for dns
       community.general.consul_policy:
-        host: consul.infra.sololab
+        host: "{{ Consul.app.fqdn }}"
         port: 443
         scheme: https
         validate_certs: false
-        token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        token: "{{ Consul.app.token }}"
         state: present
         name: DNS
         description: Allow anonymous query DNS
         rules: |
-            node_prefix "" {
-                policy = "read"
-            }
-            service_prefix "" {
-                policy = "read"
-            }
+          node_prefix "" {
+              policy = "read"
+          }
+          service_prefix "" {
+              policy = "read"
+          }
 
     - name: assign consul policy to anonymous token
       ansible.builtin.uri:
-        url: https://consul.infra.sololab/v1/acl/token/00000000-0000-0000-0000-000000000002
+        url: https://{{ Consul.app.fqdn }}/v1/acl/token/00000000-0000-0000-0000-000000000002
         validate_certs: false
         method: PUT # DELETE
         headers:
-          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          X-Consul-Token: "{{ Consul.app.token }}"
         body_format: json
-        body: 
+        body:
           Description: Consul Agent Token
-          Policies: 
+          Policies:
             - Name: DNS
 
     - name: consul kv
       when: false
       uri:
-        url: "https://consul.infra.sololab/v1/kv/{{ item.key }}"
+        url: "https://{{ Consul.app.fqdn }}/v1/kv/{{ item.key }}"
         validate_certs: false
         method: PUT # DELETE
         headers:
-          X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          X-Consul-Token: "{{ Consul.app.token }}"
         body: "{{ item.value }}"
       loop:
         - key: config/client
@@ -117,7 +59,8 @@
           value: !unsafe |
             acl {
               tokens {
-                agent = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+                # https://developer.hashicorp.com/consul/docs/agent/config/config-files#acl_tokens_default
+                default = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
               }
             }
             bind_addr = "{{ GetInterfaceIP `eth0` }}"
@@ -131,7 +74,7 @@
         - key: config/systemd
           value: |
             [Unit]
-            Description="HashiCorp Consul - A service mesh solution - 123"
+            Description="HashiCorp Consul - A service mesh solution"
             Documentation=https://www.consul.io/
             Wants=network-online.target
             After=network-online.target
@@ -150,15 +93,15 @@
             WantedBy=default.target
 
         - key: config/script
-          value: !unsafe |
+          value: |
             #! /bin/bash
             mkdir -p /home/podmgr/consul/config/ /home/podmgr/consul/data/
-            
-            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' -X GET -k https://consul.infra.sololab/v1/kv/config/client | \
+
+            /usr/bin/curl -s -H 'X-Consul-Token: "{{ Consul.app.token }}"' -X GET -k https://consul.infra.sololab/v1/kv/config/client | \
               jq -r .[0].Value | \
               base64 --decode > /home/podmgr/consul/config/consul.hcl
-            
-            /usr/bin/curl -s -H 'X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19' \
+
+            /usr/bin/curl -s -H 'X-Consul-Token: "{{ Consul.app.token }}"' \
               -X GET -k https://consul.infra.sololab/v1/kv/config/systemd | \
               jq -r .[0].Value | \
               base64 --decode > /home/podmgr/.config/systemd/user/consul.service
@@ -166,4 +109,3 @@
             systemctl daemon-reload --user
 
             systemctl enable --now --user consul
-            
