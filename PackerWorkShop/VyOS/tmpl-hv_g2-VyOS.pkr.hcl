@@ -133,7 +133,7 @@ source "hyperv-iso" "vm" {
   skip_export           = true
   // https://www.packer.io/plugins/builders/hyperv/iso#disable_shutdown
   shutdown_command      = "sudo shutdown now"
-  shutdown_timeout      = "5m"
+  shutdown_timeout      = "30m"
   // ssh_username          = "${var.ssh_username}"
   // ssh_password          = "${var.ssh_password}"
   // ssh_timeout           = "4h"

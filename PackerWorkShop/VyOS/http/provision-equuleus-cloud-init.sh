@@ -5,7 +5,7 @@ touch /etc/apt/sources.list.d/debian.list
 cat <<EOF >>/etc/apt/sources.list.d/debian.list
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
-deb https://security.debian.org/debian-security buster/updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
 deb http://dev.packages.vyos.net/repositories/equuleus equuleus main
 EOF
 
