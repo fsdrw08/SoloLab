@@ -139,6 +139,8 @@ module "cloudinit_nocloud_iso" {
           # https://rakhesh.com/linux-bsd/failed-to-shellify-error-in-cloud-init/
           - 'TOKEN=$(echo \"X-Consul-Token: e95b599e-166e-7d80-08ad-aee76e7ddf19\")'
           - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/curl -s -H $TOKEN -X GET -k https://consul.infra.sololab/v1/kv/config/script | jq -r .[0].Value | base64 --decode | bash"
+          # - 'TOKEN=e95b599e-166e-7d80-08ad-aee76e7ddf19'
+          # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/curl -s -H "X-Consul-Token: $TOKEN" -X GET -k https://consul.infra.sololab/v1/kv/config/script | jq -r .[0].Value | base64 --decode | bash"
 
         # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#power-state-change
         power_state:

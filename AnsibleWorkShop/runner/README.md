@@ -194,9 +194,8 @@ podman run --rm --userns=keep-id \
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
 $userKeyFile = "vagrant.key"
 $private_data_dir = "/tmp/private"
-$target = "dev" # sd, dev, idm
+$target = "kube-2" # sd, dev, idm
 podman run --rm --userns=keep-id `
-    --dns 192.168.255.10 `
     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman_helm.yml `
     -e TARGET=$target `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `

@@ -275,7 +275,7 @@ sololab_dev:
     #     helm_release_name: drone-runner
 
   hosts:
-    localhost:
+    localhost-dev:
       ansible_connection: local
     vyos:
       ansible_host: 192.168.255.1
