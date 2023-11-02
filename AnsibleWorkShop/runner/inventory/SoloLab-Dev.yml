@@ -124,7 +124,7 @@ sololab_dev:
         configs:
           - zone: infra.sololab
             record: dev-traefik
-            value: 192.168.255.12
+            value: 192.168.255.11
       ingress:
         tmpl:
           - /KubeWorkShop/Traefik/conf/dynamic/traefik-dashboard.yaml.j2
