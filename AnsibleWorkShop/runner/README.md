@@ -177,28 +177,13 @@ podman run --rm --userns=keep-id \
 
 ## deploy Traefik by invoke podman rootless play role
 ```powershell
-# cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
-# $userKeyFile = "vagrant.key"
-# $private_data_dir = "/tmp/private"
-# podman run --rm --userns=keep-id `
-#     -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman.yml `
-#     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
-#     -v ./:$private_data_dir `
-#     -v ../../KubeWorkShop/:/KubeWorkShop/ `
-#     localhost/ansible-ee-aio-new `
-#     bash -c "mkdir -p ~/.ssh; 
-#     cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
-#     chmod 600 ~/.ssh/ssh.key;
-#     ansible-runner run $private_data_dir -vv"
-
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
-$userKeyFile = "vagrant.key"
+$playbook = "Deploy-TraefikInPodman_helm.yml"
+$target = "kube-2" # sd, dev, idm
 $private_data_dir = "/tmp/private"
-$target = "dev" # sd, dev, idm
-$dns = "192.168.255.10"
+$userKeyFile = "vagrant.key"
 podman run --rm --userns=keep-id `
-    --dns $dns `
-    -e RUNNER_PLAYBOOK=Deploy-TraefikInPodman_helm.yml `
+    -e RUNNER_PLAYBOOK=$playbook `
     -e TARGET=$target `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -v ./:$private_data_dir `
@@ -256,11 +241,32 @@ podman run --rm --userns=keep-id \
 ## deploy Consul by invoke podman rootless play role
 ```powershell
 cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$playbook = "Deploy-ConsulInPodman.yml"
+$target = "kube-2" # sd, dev, idm
 $private_data_dir = "/tmp/private"
 $userKeyFile="vagrant.key"
-$target = "kube-2" # sd, dev, idm
 podman run --rm --userns=keep-id `
-    -e RUNNER_PLAYBOOK=Deploy-ConsulInPodman.yml `
+    -e RUNNER_PLAYBOOK=$playbook `
+    -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
+    -e TARGET=$target `
+    -v ./:$private_data_dir `
+    -v ../../HelmWorkShop/:/HelmWorkShop/ `
+    localhost/ansible-ee-aio-new `
+    bash -c "mkdir -p ~/.ssh; 
+    cat $private_data_dir/env/$userKeyFile > ~/.ssh/ssh.key; 
+    chmod 600 ~/.ssh/ssh.key;
+    ansible-runner run $private_data_dir -vv"
+```
+
+### update consul dns policy
+```powershell
+cd "$(git rev-parse --show-toplevel)\AnsibleWorkShop\runner"
+$playbook = "Update-ConsulConfig.yml"
+$target = "localhost" # sd, dev, idm, localhost
+$private_data_dir = "/tmp/private"
+$userKeyFile="vagrant.key"
+podman run --rm --userns=keep-id `
+    -e RUNNER_PLAYBOOK=$playbook `
     -e ANSIBLE_DISPLAY_SKIPPED_HOSTS=False `
     -e TARGET=$target `
     -v ./:$private_data_dir `

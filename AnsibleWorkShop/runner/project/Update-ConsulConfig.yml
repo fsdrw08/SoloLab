@@ -8,7 +8,7 @@
 #   localhost/ansible-ee-aio-new `
 #   bash -c "ansible-runner run $private_data_dir -vv"
 ---
-- hosts: localhost
+- hosts: "{{ lookup('env', 'TARGET') }}"
   gather_facts: no
   vars:
   tasks:

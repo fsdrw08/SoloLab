@@ -1,6 +1,6 @@
 # code: language=ansible
 ---
-- hosts: "{{ lookup('env', 'TARGET') }}" # kube-2
+- hosts: "{{ lookup('env', 'TARGET') }}"
   gather_facts: yes
   vars: 
     podman_rootless_play:
