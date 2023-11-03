@@ -8,16 +8,16 @@ terraform {
   backend "consul" {
     address = "192.168.255.1:8500"
     scheme  = "http"
-    path    = "tfstate/Dev-Fedora-DataDisk"
+    path    = "tfstate/Dev-Fedora-Data"
   }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.user
-  password = var.password
-  host     = var.host
-  port     = 5986
+  user     = var.provider_hyperv.user
+  password = var.provider_hyperv.password
+  host     = var.provider_hyperv.host
+  port     = var.provider_hyperv.port
   https    = true
   insecure = true
   use_ntlm = true
