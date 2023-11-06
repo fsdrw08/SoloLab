@@ -15,6 +15,10 @@
         kube_file: 
           host: "{{ Traefik.pod.kube_file_host }}"
           content: "{{ rendered.stdout }}"
+        # need to have a test
+        # present:
+        #   query_params:
+        #     network: pasta:--ipv4-only,-a,10.0.2.0,-n,24,-g,10.0.2.2,--dns-forward,10.0.2.3,-m,1500,--no-ndp,--no-dhcpv6,--no-dhcp
         absent:
           query_params:
             force: "{{ Traefik.pod.absent_force | bool }}"
