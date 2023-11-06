@@ -12,6 +12,13 @@
   gather_facts: no
   vars:
   tasks:
+    - name: update vyos dns forward
+      delegate_to: vyos
+      vyos.vyos.vyos_config:
+        lines:
+          - "set service dns forwarding domain consul server 192.168.255.11"
+        save: True
+        
     - name: create consul policy for dns
       community.general.consul_policy:
         host: "{{ Consul.app.fqdn }}"
