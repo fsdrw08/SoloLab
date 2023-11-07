@@ -50,6 +50,3 @@ variable "nat_gateway_eip_internet_charge_type" {
   default = "PayByTraffic"
 }
 
-# variable "domain_name" {
-#   type = string
-# }
