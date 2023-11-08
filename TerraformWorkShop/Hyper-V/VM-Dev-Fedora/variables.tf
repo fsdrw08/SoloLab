@@ -1,18 +1,15 @@
-variable "provider_hyperv" {
-  type = object({
-    user     = string
-    password = string
-    host     = string
-    port     = number
-  })
-  # default = {
-  #   user     = "root"
-  #   password = "P@ssw0rd"
-  #   host     = "127.0.0.1"
-  #   port     = 5986
-  # }
+variable "hyperv_host" {
+  type    = string
+  default = "127.0.0.1"
 }
 
+variable "hyperv_user" {
+  type = string
+}
+
+variable "hyperv_password" {
+  type = string
+}
 
 variable "vm_name" {
   type    = string

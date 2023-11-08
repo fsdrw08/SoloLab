@@ -1,15 +1,15 @@
-variable "user" {
+variable "hyperv_user" {
   type    = string
   default = null
 }
 
-variable "password" {
+variable "hyperv_password" {
   type      = string
   default   = null
   sensitive = true
 }
 
-variable "host" {
+variable "hyperv_host" {
   type    = string
   default = null
 }

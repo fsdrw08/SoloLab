@@ -209,9 +209,9 @@ resource "null_resource" "remote" {
     vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
-    host     = var.host
-    user     = var.user
-    password = sensitive(var.password)
+    host     = var.hyperv_host
+    user     = var.hyperv_user
+    password = sensitive(var.hyperv_password)
   }
 
   connection {

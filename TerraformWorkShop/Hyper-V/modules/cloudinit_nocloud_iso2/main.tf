@@ -39,6 +39,7 @@ resource "null_resource" "cloudinit_temp_file" {
 
 
 resource "null_resource" "ISOHandler" {
+  # The triggers argument allows specifying an arbitrary set of values that, when changed, will cause the resource to be replaced.
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1      = sha1(jsonencode(var.cloudinit_config))
