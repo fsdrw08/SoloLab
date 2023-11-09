@@ -12,7 +12,7 @@ terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWo
 ```
 3. run terraform init
 ```powershell
-terraform init --plugin-dir (Join-Path -Path $ENV:USERPROFILE -ChildPath ".terraform.d/terraform-plugin-cache")
+terraform init --plugin-dir (Join-Path -Path $projectPath -ChildPath ".terraform.d/mirror/registry.terraform.io/")
 ```
 
 or download from https://releases.hashicorp.com/
