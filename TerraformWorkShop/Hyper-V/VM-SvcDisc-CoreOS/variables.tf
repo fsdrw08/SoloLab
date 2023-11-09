@@ -3,6 +3,11 @@ variable "hyperv_host" {
   default = "127.0.0.1"
 }
 
+variable "hyperv_port" {
+  type    = string
+  default = 5986
+}
+
 variable "hyperv_user" {
   type = string
 }
@@ -16,6 +21,11 @@ variable "vm_name" {
   default = null
 }
 
+variable "vhd_dir" {
+  type    = string
+  default = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+}
+
 variable "source_disk" {
   type    = string
   default = null
@@ -23,5 +33,5 @@ variable "source_disk" {
 
 variable "data_disk_path" {
   type    = string
-  default = "value"
+  default = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\"
 }
