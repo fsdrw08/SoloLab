@@ -1,3 +1,13 @@
+variable "hyperv_host" {
+  type    = string
+  default = "127.0.0.1"
+}
+
+variable "hyperv_port" {
+  type    = string
+  default = 5985
+}
+
 variable "hyperv_user" {
   type    = string
   default = null
@@ -7,11 +17,6 @@ variable "hyperv_password" {
   type      = string
   default   = null
   sensitive = true
-}
-
-variable "hyperv_host" {
-  type    = string
-  default = null
 }
 
 variable "vm_name" {

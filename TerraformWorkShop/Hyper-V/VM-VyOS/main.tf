@@ -210,6 +210,7 @@ resource "null_resource" "remote" {
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
     host     = var.hyperv_host
+    port     = var.hyperv_port
     user     = var.hyperv_user
     password = sensitive(var.hyperv_password)
   }

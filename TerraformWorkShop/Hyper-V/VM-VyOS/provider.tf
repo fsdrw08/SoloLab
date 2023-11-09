@@ -13,10 +13,10 @@ terraform {
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.user
-  password = var.password
-  host     = var.host
-  port     = 5986
+  host     = var.hyperv_host
+  port     = var.hyperv_port
+  user     = var.hyperv_user
+  password = var.hyperv_password
   https    = true
   insecure = true
   use_ntlm = true
