@@ -13,11 +13,11 @@ data "ignition_config" "ignition" {
     data.ignition_user.podmgr.rendered
   ]
   files = [
-    data.ignition_file.hostname.rendered,
+    data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.eth0[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered
   ]
-  links = [data.ignition_link.timezone]
+  links = [data.ignition_link.timezone.rendered]
 }
 
 # https://docs.fedoraproject.org/en-US/fedora-coreos/hostname/
