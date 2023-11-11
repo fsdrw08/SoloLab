@@ -15,8 +15,8 @@ data "alicloud_vswitches" "vsw" {
 
 # ref: https://github.com/alibabacloud-automation/terraform-alicloud-slb-rule/blob/74bbe668feb57f61661cf38e6ef8f5bde8ac03df/main.tf
 resource "alicloud_slb_load_balancer" "slb_inst" {
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.id
-  vswitch_id        = data.alicloud_vswitches.vsw.id
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
 
   load_balancer_name   = var.slb_load_balancer_name
   load_balancer_spec   = var.slb_load_balancer_spec
@@ -25,8 +25,8 @@ resource "alicloud_slb_load_balancer" "slb_inst" {
   instance_charge_type = "PayBySpec"
 }
 
-resource "alicloud_slb_listener" "slb_listener" {
-  load_balancer_id = alicloud_slb_load_balancer.slb_inst.id
-  frontend_port    = 443
-  protocol         = "https"
-}
+# resource "alicloud_slb_listener" "slb_listener" {
+#   load_balancer_id = alicloud_slb_load_balancer.slb_inst.id
+#   frontend_port    = 443
+#   protocol         = "https"
+# }

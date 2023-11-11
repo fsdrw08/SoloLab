@@ -3,16 +3,6 @@ variable "resource_group_name_regex" {
   default = "^DevOps-Root"
 }
 
-variable "vpc_name_regex" {
-  type    = string
-  default = "^DevOps-VPC"
-}
-
-variable "vswitch_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_VSw"
-}
-
 variable "acme_reg_email" {
   description = "E-mail associated with certificate generation."
   type        = string
