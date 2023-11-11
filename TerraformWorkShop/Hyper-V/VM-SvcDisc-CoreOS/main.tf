@@ -6,7 +6,10 @@ data "ignition_config" "ignition" {
   count       = local.count
   disks       = [data.ignition_disk.data.rendered]
   filesystems = [data.ignition_filesystem.data.rendered]
-  systemd     = [data.ignition_systemd_unit.data.rendered]
+  systemd = [
+    data.ignition_systemd_unit.data.rendered,
+    data.ignition_systemd_unit.rpm-ostree.rendered
+  ]
   directories = [data.ignition_directory.podmgr.rendered]
   users = [
     data.ignition_user.admin.rendered,
@@ -15,7 +18,8 @@ data "ignition_config" "ignition" {
   files = [
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.eth0[count.index].rendered,
-    data.ignition_file.disable_dhcp.rendered
+    data.ignition_file.disable_dhcp.rendered,
+    data.ignition_file.rpms.rendered
   ]
   links = [data.ignition_link.timezone.rendered]
 }
@@ -64,8 +68,7 @@ data "ignition_filesystem" "data" {
 data "ignition_systemd_unit" "data" {
   # mind the unit name, The .mount file must be named based on the path (e.g. /var/mnt/data = var-mnt-data.mount)
   # https://docs.fedoraproject.org/en-US/fedora-coreos/storage/#_configuring_nfs_mounts
-  name = "var-home-podmgr.mount"
-
+  name    = "var-home-podmgr.mount"
   content = <<EOT
 [Unit]
 Description=Mount data disk
@@ -148,6 +151,39 @@ gateway=192.168.255.1
 dns=192.168.255.1
 EOT
   }
+}
+
+# https://github.com/coreos/fedora-coreos-tracker/issues/681
+data "ignition_file" "rpms" {
+  path = "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf"
+  mode = 420 # oct 644
+  content {
+    content = <<EOT
+[Service]
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
+EOT
+  }
+}
+
+data "ignition_systemd_unit" "rpm-ostree" {
+  name    = "rpm-ostree-install.service"
+  enabled = true
+  content = <<EOT
+[Unit]
+Description=Layer additional rpms
+Wants=network-online.target
+After=network-online.target
+# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+Before=zincati.service
+ConditionPathExists=!/var/lib/%N.stamp
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS
+ExecStart=/bin/touch /var/lib/%N.stamp
+[Install]
+WantedBy=multi-user.target
+EOT
 }
 
 # copy ignition file to remote
