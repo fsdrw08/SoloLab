@@ -16,8 +16,7 @@ variable "vswitch_name_regex" {
 variable "data_disks_name" {
   type = list(string)
   default = [
-    "DevOps-D_gitlab_data",
-    "DevOps-D_agent_data"
+    "DevOps-D_gitlab_data"
   ]
 }
 

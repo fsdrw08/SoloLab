@@ -20,7 +20,7 @@ variable "security_group_name_regex" {
 
 variable "data_disk_name_regex" {
   type    = string
-  default = "^DevOps-D_git_data"
+  default = "^DevOps-D_gitlab_data"
 }
 
 variable "ecs_image_name_regex" {
