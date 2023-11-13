@@ -3,13 +3,6 @@ data "alicloud_resource_manager_resource_groups" "rg" {
   status     = "OK"
 }
 
-data "alicloud_zones" "az" {
-  available_instance_type     = "ecs.t6-c1m4.large"
-  available_resource_creation = "Instance"
-  instance_charge_type        = "PostPaid"
-  network_type                = "Vpc"
-}
-
 # vpc
 # https://mxtoolbox.com/SubnetCalculator.aspx
 resource "alicloud_vpc" "vpc" {
