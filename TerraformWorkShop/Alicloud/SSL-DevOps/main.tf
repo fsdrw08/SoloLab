@@ -8,33 +8,15 @@ resource "tls_private_key" "key" {
   rsa_bits  = 2048
 }
 
-# self sign cert
-resource "tls_self_signed_cert" "cert" {
-  private_key_pem = tls_private_key.key.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-  ]
-}
-
+# acme cert
 resource "acme_registration" "reg" {
   account_key_pem = tls_private_key.key.private_key_pem
   email_address   = var.acme_reg_email
 }
 
-# acme cert
 # https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate
 # https://github.com/iits-consulting/terraform-opentelekomcloud-project-factory/blob/bd4df54ef38def4ed7c6455fa1536e8d81a6f960/modules/acme/certificate.tf
-resource "acme_certificate" "cert" {
+resource "acme_certificate" "alidns" {
   for_each                  = var.domains
   account_key_pem           = acme_registration.reg.account_key_pem
   key_type                  = 2048 # RSA key of 2048 bits
@@ -55,8 +37,8 @@ resource "acme_certificate" "cert" {
   }
 }
 
-resource "alicloud_ssl_certificates_service_certificate" "ssl" {
-  for_each = acme_certificate.cert
+resource "alicloud_ssl_certificates_service_certificate" "acme" {
+  for_each = acme_certificate.alidns
 
   certificate_name = each.value.common_name
   # https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate#certificate_pem
@@ -64,10 +46,35 @@ resource "alicloud_ssl_certificates_service_certificate" "ssl" {
   key  = each.value.private_key_pem
 }
 
-resource "alicloud_slb_server_certificate" "ssl" {
-  for_each           = acme_certificate.cert
+resource "alicloud_slb_server_certificate" "acme" {
+  for_each           = acme_certificate.alidns
   resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   name               = each.value.common_name
   server_certificate = "${each.value.certificate_pem}${each.value.issuer_pem}"
   private_key        = each.value.private_key_pem
+}
+
+# self sign cert
+resource "tls_self_signed_cert" "default" {
+  private_key_pem = tls_private_key.key.private_key_pem
+
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
+resource "alicloud_slb_server_certificate" "default" {
+  resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  name               = "default"
+  server_certificate = tls_self_signed_cert.default.cert_pem
+  private_key        = tls_self_signed_cert.default.private_key_pem
 }
