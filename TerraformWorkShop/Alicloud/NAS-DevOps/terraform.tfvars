@@ -1,0 +1,6 @@
+resource_group_name_regex = "^DevOps-Root"
+vpc_name_regex = "^DevOps-VPC"
+vswitch_name_regex = "^DevOps-Sub_1_VSw"
+nas_fs_type = "standard"
+nas_fs_storage_type = "Performance"
+nas_fs_protocol_type = "NFS"
