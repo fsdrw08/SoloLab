@@ -19,7 +19,7 @@ resource "alicloud_vpc" "vpc" {
 ## ipv4 gateway
 # https://help.aliyun.com/document_detail/376445.html
 resource "alicloud_vpc_ipv4_gateway" "ipv4gw" {
-  enabled                  = var.ipv4_gateway_enabled
+  enabled                  = true
   vpc_id                   = alicloud_vpc.vpc.id
   resource_group_id        = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   ipv4_gateway_name        = var.ipv4_gateway_name

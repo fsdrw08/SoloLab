@@ -13,10 +13,6 @@ variable "vpc_cidr" {
   default = "172.16.0.0/12"
 }
 
-variable "ipv4_gateway_enabled" {
-  type    = bool
-  default = true
-}
 variable "ipv4_gateway_name" {
   type    = string
   default = "DevOps-IPV4Gw"

@@ -1,0 +1,10 @@
+resource_group_name_regex            = "^DevOps-Root"
+vpc_name_regex                       = "^DevOps-VPC"
+ipv4_gateway_name_regex              = "^DevOps-IPV4Gw"
+nat_gateway_vswitch_name             = "DevOps-NGw_VSw"
+nat_gateway_vswitch_cidr             = "172.16.1.0/24"
+nat_gateway_vswitch_route_table_name = "DevOps-NGw_VSw_VTb"
+nat_gateway_name                     = "DevOps-NGw"
+nat_gateway_eip_address_name         = "DevOps"
+nat_gateway_eip_bandwidth            = 50
+nat_gateway_eip_internet_charge_type = "PayByTraffic"
