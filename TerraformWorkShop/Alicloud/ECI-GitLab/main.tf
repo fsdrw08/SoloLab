@@ -19,6 +19,31 @@ data "alicloud_security_groups" "sg" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
+# https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/db_instance#create-a-serverless-rds-postgresql-instance
+data "alicloud_db_instance_classes" "pgsql" {
+  zone_id                  = data.alicloud_vswitches.vsw.vswitches.0.zone_id
+  engine                   = "PostgreSQL"
+  engine_version           = var.rds_pgsql_version
+  category                 = var.rds_pgsql_category
+  instance_charge_type     = var.rds_pgsql_charge_type
+  db_instance_storage_type = var.rds_pgsql_storage
+}
+
+# https://github.com/uktrade/data-workspace/blob/6173179e2902700c7f1ee09b31718e23ac896e64/infra/ecs_main_gitlab.tf#L17
+resource "alicloud_db_instance" "gitlab" {
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  zone_id           = data.alicloud_vswitches.vsw.vswitches.0.zone_id
+  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
+
+  instance_name            = "gitlab"
+  engine                   = "PostgreSQL"
+  engine_version           = var.rds_pgsql_version
+  instance_type            = data.alicloud_db_instance_classes.pgsql.instance_classes.0.instance_class
+  instance_charge_type     = var.rds_pgsql_charge_type
+  instance_storage         = data.alicloud_db_instance_classes.pgsql.instance_classes.0.storage_range.min
+  db_instance_storage_type = var.rds_pgsql_storage
+  security_group_ids       = [data.alicloud_security_groups.sg.groups.0.id]
+}
 
 resource "alicloud_eci_container_group" "default" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
