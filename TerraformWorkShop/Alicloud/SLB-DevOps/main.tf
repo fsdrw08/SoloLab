@@ -13,11 +13,44 @@ data "alicloud_vswitches" "vsw" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
-data "alicloud_slb_server_certificates" "default" {
-  name_regex        = "default"
+data "alicloud_nat_gateways" "ngw" {
+  name_regex        = var.nat_gateway_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
+# self sign cert as slb listener default cert
+resource "tls_private_key" "default" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+# self sign cert
+resource "tls_self_signed_cert" "default_blue" {
+  private_key_pem = tls_private_key.default.private_key_pem
+
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 43800
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
+resource "alicloud_slb_server_certificate" "default_blue" {
+  resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  name               = "default_blue"
+  server_certificate = tls_self_signed_cert.default_blue.cert_pem
+  private_key        = tls_self_signed_cert.default_blue.private_key_pem
+}
+
+# slb instance
 # ref: https://github.com/alibabacloud-automation/terraform-alicloud-slb-rule/blob/74bbe668feb57f61661cf38e6ef8f5bde8ac03df/main.tf
 resource "alicloud_slb_load_balancer" "slb_inst" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
@@ -37,5 +70,17 @@ resource "alicloud_slb_listener" "slb_listener" {
   listener_forward      = "on"
   protocol              = "https"
   bandwidth             = -1
-  server_certificate_id = data.alicloud_slb_server_certificates.default.certificates.0.id
+  server_certificate_id = alicloud_slb_server_certificate.default_blue.id
+}
+
+# nat forward entry to forward request from nat to slb
+resource "alicloud_forward_entry" "fwd_http" {
+  forward_entry_name = var.slb_load_balancer_name
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
+  external_port      = "443"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_slb_load_balancer.slb_inst.address
+  internal_port      = "443"
+  port_break         = true
 }

@@ -13,6 +13,11 @@ variable "vswitch_name_regex" {
   default = "^DevOps-Sub_1_VSw"
 }
 
+variable "nat_gateway_name_regex" {
+  type    = string
+  default = "^DevOps-NGw"
+}
+
 variable "slb_load_balancer_name" {
   description = "The name of a new load balancer."
   type        = string

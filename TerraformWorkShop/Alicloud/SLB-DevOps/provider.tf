@@ -4,6 +4,10 @@ terraform {
       source  = "aliyun/alicloud"
       version = ">=1.212.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">=4.0.4"
+    }
   }
   backend "oss" {
     profile             = "cn_hk"
