@@ -37,44 +37,19 @@ resource "acme_certificate" "alidns" {
   }
 }
 
-resource "alicloud_ssl_certificates_service_certificate" "acme" {
+resource "alicloud_ssl_certificates_service_certificate" "acme_blue" {
   for_each = acme_certificate.alidns
 
-  certificate_name = each.value.common_name
+  certificate_name = "${each.value.common_name}_blue"
   # https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate#certificate_pem
   cert = "${each.value.certificate_pem}${each.value.issuer_pem}"
   key  = each.value.private_key_pem
 }
 
-resource "alicloud_slb_server_certificate" "acme" {
+resource "alicloud_slb_server_certificate" "acme_blue" {
   for_each           = acme_certificate.alidns
   resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  name               = each.value.common_name
+  name               = "${each.value.common_name}_blue"
   server_certificate = "${each.value.certificate_pem}${each.value.issuer_pem}"
   private_key        = each.value.private_key_pem
-}
-
-# self sign cert
-resource "tls_self_signed_cert" "default" {
-  private_key_pem = tls_private_key.key.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-  ]
-}
-
-resource "alicloud_slb_server_certificate" "default" {
-  resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  name               = "default"
-  server_certificate = tls_self_signed_cert.default.cert_pem
-  private_key        = tls_self_signed_cert.default.private_key_pem
 }

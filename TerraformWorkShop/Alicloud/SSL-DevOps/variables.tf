@@ -11,6 +11,9 @@ variable "acme_reg_email" {
 variable "domains" {
   description = "Map of common names to alternative names to create ACME certificates. Module supports wildcard certificates, common name does not need to be included in alternative names."
   type        = map(list(string))
+  # default = {
+  #   "example.com" = ["*.example.com"]
+  # }
 }
 
 variable "acme_min_days_remaining" {
