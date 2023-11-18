@@ -26,7 +26,7 @@ resource "tls_private_key" "default" {
 }
 
 # self sign cert
-resource "tls_self_signed_cert" "default_blue" {
+resource "tls_self_signed_cert" "default" {
   private_key_pem = tls_private_key.default.private_key_pem
 
   subject {
@@ -43,11 +43,11 @@ resource "tls_self_signed_cert" "default_blue" {
   ]
 }
 
-resource "alicloud_slb_server_certificate" "default_blue" {
+resource "alicloud_slb_server_certificate" "default" {
   resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  name               = "default_blue"
-  server_certificate = tls_self_signed_cert.default_blue.cert_pem
-  private_key        = tls_self_signed_cert.default_blue.private_key_pem
+  name               = "default"
+  server_certificate = tls_self_signed_cert.default.cert_pem
+  private_key        = tls_self_signed_cert.default.private_key_pem
 }
 
 # slb instance
@@ -66,15 +66,15 @@ resource "alicloud_slb_load_balancer" "slb_inst" {
 resource "alicloud_slb_listener" "slb_listener" {
   load_balancer_id      = alicloud_slb_load_balancer.slb_inst.id
   frontend_port         = 443
-  backend_port          = 80
+  backend_port          = 8080
   listener_forward      = "on"
   protocol              = "https"
   bandwidth             = -1
-  server_certificate_id = alicloud_slb_server_certificate.default_blue.id
+  server_certificate_id = alicloud_slb_server_certificate.default.id
 }
 
 # nat forward entry to forward request from nat to slb
-resource "alicloud_forward_entry" "fwd_http" {
+resource "alicloud_forward_entry" "fwd_https" {
   forward_entry_name = var.slb_load_balancer_name
   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
   external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
