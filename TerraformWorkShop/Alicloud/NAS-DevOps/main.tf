@@ -22,7 +22,7 @@ resource "alicloud_nas_file_system" "nas_fs" {
   file_system_type = var.nas_fs_type
   storage_type     = var.nas_fs_storage_type
   protocol_type    = var.nas_fs_protocol_type
-  description      = "this resource managed by terraform"
+  description      = var.nas_fs_desc
 }
 
 # https://github.com/kwoodson/terraform-openshift-alibaba/blob/5eb55f2baa7d4894f7e9b99c4664e33807715df5/nas/nas.tf#L1

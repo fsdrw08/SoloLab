@@ -14,6 +14,15 @@ variable "vswitch_name_regex" {
   default = "^DevOps-Sub_1_VSw"
 }
 
+variable "nas_fs_desc" {
+  type        = string
+  description = <<-EOT
+  The description must be 2 to 128 characters in length
+  The description must start with a letter and cannot start with http:// or https://.
+  The description can contain letters, digits, colons (:), underscores (_), and hyphens (-).
+  EOT
+}
+
 variable "nas_fs_type" {
   description = "The type of the file system. Valid values: standard # 通用型NAS, extreme, cpfs."
   type        = string
