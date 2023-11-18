@@ -56,12 +56,11 @@ variable "eci_image_uri" {
   default     = "ghcr.io/traefik/whoami:v1.10.1"
 }
 
-variable "FQDN" {
-  description = "Domain name of the forwarding rule. It can contain letters a-z, numbers 0-9, hyphens (-), and periods (.), and wildcard characters. "
-  type        = string
+variable "subdomain" {
+  type = string
 }
 
-variable "domain_name" {
+variable "root_domain" {
   description = "value"
   type        = string
 }
