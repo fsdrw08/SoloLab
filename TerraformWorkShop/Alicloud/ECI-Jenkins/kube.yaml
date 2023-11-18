@@ -1,0 +1,542 @@
+---
+# Source: jenkins/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: release-name-jenkins-sec
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+type: Opaque
+data:
+  jenkins-admin-password: "UEBzc3cwcmQ="
+  jenkins-admin-user: "YWRtaW4="
+---
+# Source: jenkins/templates/configmap-jcasc.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-jenkins-cm-jcasc
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+data:
+  jcasc-default-config.yaml: |-
+    jenkins:
+      authorizationStrategy:
+        loggedInUsersCanDoAnything:
+          allowAnonymousRead: false
+      crumbIssuer:
+        standard:
+          excludeClientIPFromCrumb: true
+      securityRealm:
+        local:
+          allowsSignup: false
+          enableCaptcha: false
+          users:
+          - id: ${jenkins-admin-user}
+            name: Jenkins Admin
+            password: ${jenkins-admin-password}
+    unclassified:
+      location:
+        adminAddress: null
+        url: 'https://jenkins.infra.sololab'
+  docker.yaml: |-
+    jenkins:
+      clouds:
+        - docker:
+            name: "docker"
+            dockerApi:
+              dockerHost:
+                uri: "unix:///var/run/docker.sock"
+            templates:
+              - labelString: "docker-agent"
+                connector:
+                  jnlp:
+                    jenkinsUrl: "http://jenkins:8080/"
+                    jnlpLauncher:
+                      workDirSettings:
+                        disabled: false
+                        failIfWorkDirIsMissing: false
+                        internalDir: "remoting"
+                    user: root
+                dockerTemplateBase:
+                  image: "docker.io/jenkins/jnlp-agent-docker:latest"
+                  dnsHosts:
+                    - "10.89.0.1"
+                    - "192.168.255.10"
+                  environment:
+                    - "TZ=Asia/Shanghai"
+                  mounts:
+                    - "type=tmpfs,destination=/run"
+                    - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
+                    - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+                  user: "root"
+                pullStrategy: PULL_NEVER
+                remoteFs: "/home/jenkins"
+                instanceCapStr: "10"
+                retentionStrategy:
+                  idleMinutes: 1
+        - docker:
+            name: "docker-dev"
+            dockerApi:
+              dockerHost:
+                uri: "tcp://192.168.255.12:8888"
+            templates:
+              - labelString: "dev-docker-agent"
+                pullStrategy: PULL_NEVER
+                connector: "attach"
+                dockerTemplateBase:
+                  image: "docker.io/jenkins/jnlp-agent-docker:latest"
+                  dnsHosts:
+                    - "192.168.255.10"
+                  environment:
+                    - "TZ=Asia/Shanghai"
+                  mounts:
+                    - "type=tmpfs,destination=/run"
+                    - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
+                    - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+                  user: "root"
+                remoteFs: "/home/jenkins"
+                instanceCapStr: "10"
+                retentionStrategy:
+                  idleMinutes: 1
+  fix-agent-port.yaml: |-
+    jenkins:
+      slaveAgentPort: 50000
+  job-dsl.yaml: |-
+    jobs:
+      - script: |
+          pipelineJob('test'){
+            definition{
+              cpsScm{
+                scm{
+                  git{
+                    remote {
+                      url('https://github.com/fsdrw08/packto-samples.git')
+                    }
+                    branches("refs/heads/main")
+                    extensions {
+                      cloneOptions {
+                        depth(1)
+                        shallow(true)
+                      }
+                    }
+                  }
+                  scriptPath('java/maven/Jenkinsfile')
+                }
+              }
+            }
+          }
+
+      - script: |
+          pipelineJob('test2') {
+            definition {
+              cps {
+                sandbox()
+                script("""\
+          pipeline {
+            agent {
+              label "dev-docker-agent"
+            }
+            stages {
+              stage("checkout") {
+                // https://www.jenkins.io/doc/pipeline/steps/
+                steps {
+                  // https://plugins.jenkins.io/git/
+                  // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
+                  // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
+                  // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
+                  checkout scmGit(
+                    userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
+                    branches: [[name:'*/main']],
+                    extensions: [cloneOption(depth: 1, shallow: true)]
+                  )
+                  sh 'pwd'
+                }
+              }
+              stage("build") {
+                steps {
+                  // https://buildpacks.io/docs/tools/pack/cli/pack_build/
+                  script {
+                    sh '''
+                      docker run \
+                        --rm \
+                        --tmpfs /tmp:rw \
+                        --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock \  
+                        --volume jenkins-workspace:/workspace:rw \
+                        --workdir /workspace \
+                        --env HOME="/workspace" \
+                        docker.io/buildpacksio/pack:latest build \
+                          --trust-builder \
+                          --docker-host unix:///run/user/1001/podman/podman.sock \
+                          paketo-demo-app \
+                          --path ./workspace/test2/java/maven/ \
+                          --builder docker.io/paketobuildpacks/builder:base \
+                          --buildpack docker.io/paketobuildpacks/java-azure:10
+                    '''
+                  }
+                }
+              }
+            }
+          }
+                """)
+              }
+            }
+          }
+  welcome-message.yaml: |-
+    jenkins:
+      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+---
+# Source: jenkins/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-name-jenkins-cm
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+data:
+  apply_config.sh: |-
+    set -e
+    # Prevent Setup Wizard when JCasC is enabled
+    echo "disable Setup Wizard"
+    echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state
+    echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion  
+    # remove all plugins from shared volume
+    echo "remove all plugins from shared volume"
+    rm -rf /var/jenkins_home/plugins/*
+    # Install missing plugins
+    echo "download plugins"
+    echo "cp"
+    cp /var/jenkins_config/plugins.txt /var/jenkins_home;
+    echo "rm"
+    rm -rf /usr/share/jenkins/ref/plugins/*.lock
+    echo "version"
+    version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }     
+    echo "plugin-cli"
+    if [ -f "/usr/share/jenkins/jenkins.war" ] && [ -n "$(command -v jenkins-plugin-cli)" 2>/dev/null ] && [ $(version $(jenkins-plugin-cli --version)) -ge $(version "2.1.1") ]; then
+      jenkins-plugin-cli --verbose \
+        --war "/usr/share/jenkins/jenkins.war" \
+        --plugin-file "/var/jenkins_home/plugins.txt" \
+        --latest true \
+        --latest-specified;
+    else
+      /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;       
+    fi
+
+    # Copy plugins to shared volume
+    echo "copy plugins to shared volume"
+    yes n | cp -i /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
+
+    # finished initialization
+    echo "finished initialization"
+
+  plugins.txt: |-
+    commons-text-api:latest
+    configuration-as-code:latest
+    authentication-tokens:latest
+    cloud-stats:latest
+    credentials:latest
+    credentials-binding:latest
+    cloudbees-folder:latest
+    display-url-api:latest
+    docker-plugin:latest
+    docker-commons:latest
+    git:latest
+    instance-identity:latest
+    mailer:latest
+    pipeline-build-step:latest
+    pipeline-input-step:latest
+    pipeline-milestone-step:latest
+    pipeline-model-api:latest
+    pipeline-model-definition:latest
+    pipeline-model-extensions:latest
+    pipeline-stage-step:latest
+    script-security:latest
+    scm-api
+    ssh-slaves:latest
+    ssh-credentials:latest
+    sshd:latest
+    token-macro:latest
+    workflow-aggregator:latest
+    workflow-api:latest
+    workflow-basic-steps:latest
+    workflow-cps:latest
+    workflow-durable-task-step:latest
+    workflow-job:latest
+    workflow-multibranch:latest
+    workflow-scm-step
+    job-dsl:latest
+    docker-workflow:latest
+---
+# Source: jenkins/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: release-name-jenkins-pvc
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"
+---
+# Source: jenkins/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: release-name-jenkins-pvc-plugins
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"
+---
+# Source: jenkins/templates/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: release-name-jenkins-pvc-plugin-dir
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"
+---
+# Source: jenkins/templates/pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: release-name-jenkins
+  labels:
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-0.1.0
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: jenkins-controller
+    traefik.enable: true
+    traefik.http.routers.jenkins.entryPoints: websecure
+    traefik.http.routers.jenkins.rule: Host(`jenkins.infra.sololab`)
+    traefik.http.routers.jenkins.tls.certresolver: internal
+    traefik.http.services.jenkins.loadbalancer.server.port: 8080
+spec:
+  securityContext:
+    runAsUser: 0
+  initContainers:
+    - name: volume-permissions
+      image: docker.io/bitnami/os-shell:11-debian-11
+      imagePullPolicy: "IfNotPresent"
+      command:
+        - /bin/bash
+        - -ec
+        - |
+          chown -R 0:0 /var/jenkins_home
+      securityContext:
+        runAsUser: 0
+      resources:
+        limits: {}
+        requests: {}
+      volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+    - name: provision
+      image: docker.io/jenkins/jenkins:lts-jdk11
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        allowPrivilegeEscalation: true
+        readOnlyRootFilesystem: false
+        runAsGroup: 0
+        runAsUser: 0
+      command:
+        - sh
+        - /var/jenkins_config/apply_config.sh
+      env:
+        - name: JENKINS_UC
+          value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+        - name: JENKINS_UC_DOWNLOAD
+          value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+        - name: http_proxy
+          value: http://192.168.255.1:7890
+        - name: https_proxy
+          value: http://192.168.255.1:7890
+      envFrom:
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 3072Mi
+        requests: {}
+      volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        - name: jenkins-config
+          mountPath: /var/jenkins_config
+        - name: plugins
+          mountPath: /usr/share/jenkins/ref/plugins
+        - name: plugin-dir
+          mountPath: /var/jenkins_plugins
+        - name: tmp-volume
+          mountPath: /tmp
+  containers:
+    - name: controller
+      image: docker.io/jenkins/jenkins:lts-jdk11
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        allowPrivilegeEscalation: true
+        readOnlyRootFilesystem: false
+        runAsGroup: 0
+        runAsUser: 0
+      args:
+        - --httpPort=8080
+      env:
+        - name: JENKINS_UC
+          value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+        - name: JENKINS_UC_DOWNLOAD
+          value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+        - name: http_proxy
+          value: http://192.168.255.1:7890
+        - name: https_proxy
+          value: http://192.168.255.1:7890
+        - name: no_proxy
+          value: localhost
+        - name: SECRETS
+          value: /run/secrets/additional
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CASC_RELOAD_TOKEN
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: JAVA_OPTS
+          value: >-
+        - name: JENKINS_OPTS
+          value: >-
+            --webroot=/var/jenkins_cache/war
+        - name: JENKINS_SLAVE_AGENT_PORT
+          value: ""
+        - name: CASC_JENKINS_CONFIG
+          value: >-
+            /var/jenkins_home/casc_configs
+      envFrom:
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 3072Mi
+        requests: {}
+
+      ports:
+        - name: agent-listener
+          containerPort: 50000
+          hostPort: 50000
+      livenessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: '/login'
+          port: 8080
+        initialDelaySeconds: 60
+        periodSeconds: 120
+        successThreshold: 1
+        timeoutSeconds: 10
+      volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+        - name: jenkins-config
+          mountPath: /var/jenkins_config
+          readOnly: true
+        - name: jenkins-config-jcasc
+          mountPath: /var/jenkins_home/casc_configs
+        - name: plugin-dir
+          mountPath: /usr/share/jenkins/ref/plugins/
+          readOnly: false
+        - name: jenkins-secrets
+          mountPath: /run/secrets/additional
+          readOnly: true
+        - name: jenkins-cache
+          mountPath: /var/jenkins_cache
+        - name: tmp-volume
+          mountPath: /tmp
+        - mountPath: /var/run/docker.sock
+          name: docker-socket
+    - name: reload-JCasC
+      image: docker.io/dockerpinata/inotify-tools:2.1
+      imagePullPolicy: "IfNotPresent"
+      env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+      command:
+        - /bin/sh
+        - -c
+          # while true; do
+          #   inotifywait -r --event modify create delete /var/jenkins_home/casc_configs;  
+          #   wget --post-data casc-reload-token=$(POD_NAME) http://localhost:8080/reload-configuration-as-code/
+          # done
+      args:
+        - |-
+          inotifywait -mr -e modify /var/jenkins_home/casc_configs | while read MODIFY     
+          do
+            wget --post-data casc-reload-token=$POD_NAME http://localhost:8080/reload-configuration-as-code/
+          done
+      volumeMounts:
+        - name: jenkins-config-jcasc
+          mountPath: /var/jenkins_home/casc_configs
+  volumes:
+    - name: plugins
+      persistentVolumeClaim:
+        claimName: release-name-jenkins-pvc-plugins
+    - name: jenkins-config
+      configMap:
+        name: release-name-jenkins-cm
+    - name: jenkins-config-jcasc
+      configMap:
+        name: release-name-jenkins-cm-jcasc
+    - name: plugin-dir
+      persistentVolumeClaim:
+        claimName: release-name-jenkins-pvc-plugin-dir
+    - name: jenkins-secrets
+      secret:
+        secretName: release-name-jenkins-sec
+    - name: jenkins-cache
+      emptyDir: {}
+    - name: jenkins-home
+      persistentVolumeClaim:
+        claimName: release-name-jenkins-pvc
+    - name: tmp-volume
+      emptyDir: {}
+    - hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
+      name: docker-socket
+  restartPolicy: Never

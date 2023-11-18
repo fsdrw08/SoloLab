@@ -1,0 +1,19 @@
+jenkins:
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+      - id: $${jenkins-admin-user}
+        name: Jenkins Admin
+        password: $${jenkins-admin-password}
+unclassified:
+  location:
+    adminAddress: null
+    url: 'https://${subdomain}.${root_domain}'
