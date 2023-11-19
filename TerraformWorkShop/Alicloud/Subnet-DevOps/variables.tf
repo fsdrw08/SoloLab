@@ -18,6 +18,15 @@ variable "zone_available_instance_type" {
   default = "ecs.t6-c1m4.large"
 }
 
+# variable "vswitches" {
+#   type = list(object({
+#     name                = string
+#     cidr                = string
+#     route_table_name    = string
+#     security_group_name = string
+#   }))
+# }
+
 variable "subnet_vswitch_name" {
   default = "DevOps-Sub_1_VSw"
 }
