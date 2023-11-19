@@ -18,23 +18,31 @@ variable "nat_gateway_name_regex" {
   default = "^DevOps-NGw"
 }
 
-variable "slb_load_balancer_name" {
+variable "slb_lb_name" {
   description = "The name of a new load balancer."
   type        = string
   default     = "DevOps-SLB"
 }
 
-variable "slb_load_balancer_spec" {
-  description = "The specification of the SLB instance."
+variable "slb_lb_instance_charge_type" {
+  description = <<-EOT
+  Support PayBySpec and PayByCLCU, 
+  This parameter takes effect when the value of payment_type (instance payment mode) is PayAsYouGo (pay-as-you-go).
+  EOT
+  type        = string
+  default     = "PayByCLCU"
+}
+variable "slb_lb_spec" {
+  description = "The specification of the SLB instance. Only take effect when instance_charge_type = PayBySpec"
   type        = string
   default     = "slb.s1.small"
 }
 
-# variable "slb_listener_backend_port" {
-#   description = "Port used by the Server Load Balancer instance backend. Valid value range: [1-65535]."
-#   type        = number
-#   default     = 8080
-# }
+variable "slb_listener_backend_port" {
+  description = "Port used by the Server Load Balancer instance backend. Valid value range: [1-65535]."
+  type        = number
+  default     = 8080
+}
 
 # variable "slb_listener_sticky_session" {
 #   description = "Whether to enable session persistence, Valid values are `on` and `off`. Default to `off`. This parameter is required and takes effect only when ListenerSync is set to `off`."

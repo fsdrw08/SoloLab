@@ -56,31 +56,55 @@ resource "alicloud_slb_load_balancer" "slb_inst" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
 
-  load_balancer_name   = var.slb_load_balancer_name
-  load_balancer_spec   = var.slb_load_balancer_spec
+  load_balancer_name   = var.slb_lb_name
   address_type         = "intranet"
   payment_type         = "PayAsYouGo"
-  instance_charge_type = "PayBySpec"
+  instance_charge_type = var.slb_lb_instance_charge_type
+  load_balancer_spec   = var.slb_lb_spec
 }
 
 resource "alicloud_slb_listener" "slb_listener" {
-  load_balancer_id      = alicloud_slb_load_balancer.slb_inst.id
-  frontend_port         = 443
-  backend_port          = 8080
-  listener_forward      = "on"
-  protocol              = "https"
-  bandwidth             = -1
-  server_certificate_id = alicloud_slb_server_certificate.default.id
+  load_balancer_id          = alicloud_slb_load_balancer.slb_inst.id
+  protocol                  = "https"
+  description               = "https_443"
+  frontend_port             = 443
+  backend_port              = var.slb_listener_backend_port
+  listener_forward          = "on"
+  bandwidth                 = -1
+  health_check              = "off"
+  proxy_protocol_v2_enabled = true
+  health_check_connect_port = var.slb_listener_backend_port
+  server_certificate_id     = alicloud_slb_server_certificate.default.id
+}
+
+resource "alicloud_slb_listener" "slb_listener_http" {
+  load_balancer_id = alicloud_slb_load_balancer.slb_inst.id
+  protocol         = "http"
+  description      = "http_80"
+  frontend_port    = 80
+  listener_forward = "on"
+  forward_port     = alicloud_slb_listener.slb_listener.frontend_port
 }
 
 # nat forward entry to forward request from nat to slb
 resource "alicloud_forward_entry" "fwd_https" {
-  forward_entry_name = var.slb_load_balancer_name
+  forward_entry_name = var.slb_lb_name
   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
   external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
   external_port      = "443"
   ip_protocol        = "tcp"
   internal_ip        = alicloud_slb_load_balancer.slb_inst.address
   internal_port      = "443"
+  port_break         = true
+}
+
+resource "alicloud_forward_entry" "fwd_http" {
+  forward_entry_name = var.slb_lb_name
+  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
+  external_port      = "80"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_slb_load_balancer.slb_inst.address
+  internal_port      = "80"
   port_break         = true
 }

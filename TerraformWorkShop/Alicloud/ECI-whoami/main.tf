@@ -53,7 +53,7 @@ resource "alicloud_eci_container_group" "whoami" {
 
   containers {
     image             = var.eci_image_uri
-    name              = "whoami"
+    name              = var.eci_group_name
     image_pull_policy = "IfNotPresent"
 
     ports {
