@@ -79,12 +79,19 @@ variable "jenkins_admin_password" {
   type = string
 }
 
-variable "jenkins_casc" {
+variable "jenkins_casc_default" {
+  description = "default jenkins config as code file"
+  type        = string
+  default     = "jcasc-default-config.yaml"
+}
+
+variable "jenkins_casc_addition" {
   type = list(object({
-    name    = string
-    content = string
-    path    = string
+    file = string
   }))
+  default = [{
+    file = ""
+  }]
 }
 
 variable "subdomain" {

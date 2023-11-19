@@ -25,6 +25,11 @@ data "alicloud_slb_load_balancers" "slb" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
+data "alicloud_slb_listeners" "slb_listener" {
+  load_balancer_id = data.alicloud_slb_load_balancers.slb.balancers.0.id
+  frontend_port    = 443
+}
+
 data "alicloud_slb_server_certificates" "slb_cert" {
   name_regex        = var.slb_cert_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
@@ -124,7 +129,7 @@ resource "alicloud_eci_container_group" "eci" {
     image             = var.eci_image_uri
     image_pull_policy = "IfNotPresent"
     args = [
-      "--httpPort=${var.eci_port}"
+      "--httpPort=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
     ]
 
     environment_vars {
@@ -149,7 +154,7 @@ resource "alicloud_eci_container_group" "eci" {
     }
 
     ports {
-      port     = var.eci_port
+      port     = data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port
       protocol = "TCP"
     }
     ports {
@@ -260,13 +265,22 @@ resource "alicloud_eci_container_group" "eci" {
   volumes {
     name = "jenkins-cm-jcasc"
     type = "ConfigFileVolume"
+    config_file_volume_config_file_to_paths {
+      content = base64encode(templatefile(var.jenkins_casc_default, {
+        subdomain   = var.subdomain,
+        root_domain = var.root_domain
+      }))
+      path = var.jenkins_casc_default
+    }
     dynamic "config_file_volume_config_file_to_paths" {
+      # https://stackoverflow.com/questions/59161749/loop-over-a-map-and-skip-empty-items
       for_each = {
-        for casc in var.jenkins_casc : casc.name => casc
+        for casc in var.jenkins_casc_addition :
+        casc.file => casc if casc.file != ""
       }
       content {
-        content = base64encode(config_file_volume_config_file_to_paths.value.content)
-        path    = config_file_volume_config_file_to_paths.value.path
+        content = base64encode(file(config_file_volume_config_file_to_paths.value.file))
+        path    = config_file_volume_config_file_to_paths.value.file
       }
     }
   }
@@ -314,7 +328,7 @@ resource "alicloud_slb_server_group" "slb_svr_group" {
 resource "alicloud_slb_server_group_server_attachment" "slb_attach" {
   server_group_id = alicloud_slb_server_group.slb_svr_group.id
   server_id       = alicloud_eci_container_group.eci.id
-  port            = var.eci_port
+  port            = data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port
 }
 
 resource "alicloud_slb_rule" "slb_rule" {
@@ -327,7 +341,6 @@ resource "alicloud_slb_rule" "slb_rule" {
 }
 
 resource "alicloud_slb_domain_extension" "slb_dext" {
-  depends_on            = [alicloud_slb_listener.slb_listener]
   load_balancer_id      = data.alicloud_slb_load_balancers.slb.balancers.0.id
   frontend_port         = 443
   domain                = "${var.subdomain}.${var.root_domain}"
