@@ -19,7 +19,9 @@ data "ignition_config" "ignition" {
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.eth0[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
-    data.ignition_file.rpms.rendered
+    data.ignition_file.rpms.rendered,
+    data.ignition_file.enable_password_auth.rendered,
+    data.ignition_file.cockpit.rendered,
   ]
   links = [data.ignition_link.timezone.rendered]
 }
@@ -93,8 +95,7 @@ data "ignition_directory" "podmgr" {
 }
 
 data "ignition_user" "admin" {
-  name = "admin"
-  uid  = 1002
+  name = "core"
   groups = [
     "wheel",
     "sudo"
@@ -161,6 +162,44 @@ data "ignition_file" "rpms" {
     content = <<EOT
 [Service]
 Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
+EOT
+  }
+}
+
+# By default, Fedora CoreOS does not allow password authentication via SSH.
+# But it's much more convenient for testing and playing with the tools, so
+# enable it.
+#
+# Source: https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_enabling_ssh_password_authentication
+data "ignition_file" "enable_password_auth" {
+  path = "/etc/ssh/sshd_config.d/20-enable-passwords.conf"
+  mode = 420 # oct 644
+  content {
+    content = <<EOT
+# Fedora CoreOS disables SSH password login by default.
+# Enable it.
+# This file must sort before 40-disable-passwords.conf.
+PasswordAuthentication yes
+EOT
+  }
+}
+
+data "ignition_file" "cockpit" {
+  path = "/etc/containers/systemd/cockpit-ws.container"
+  mode = 420 # oct 644
+  content {
+    # https://github.com/ublue-os/ucore/blob/9a109992e01c2a13f2d083e1a1bf858988a1bc44/main/usr/lib/systemd/system/cockpit.service#L10
+    content = <<EOT
+[Unit]
+Description=Cockpit container
+After=local-fs.target
+
+[Container]
+Image=quay.io/cockpit/ws
+PublishPort=9090:9090
+
+[Install]
+WantedBy=multi-user.target default.target
 EOT
   }
 }
