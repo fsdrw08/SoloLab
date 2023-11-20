@@ -5,7 +5,7 @@ variable "hyperv_host" {
 
 variable "hyperv_port" {
   type    = string
-  default = 5985
+  default = 5986
 }
 
 variable "hyperv_user" {

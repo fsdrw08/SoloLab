@@ -84,7 +84,6 @@ module "cloudinit_nocloud_iso" {
 
         write_files:
           # config external disk
-          # - path: /opt/vyatta/etc/config/scripts/vyos-preconfig-bootup.script
           - path: /tmp/Set-ExternalDisk.sh
             owner: root:vyattacfg
             permissions: "0775"
@@ -148,7 +147,6 @@ module "cloudinit_nocloud_iso" {
               echo "Disk configuration complete"
 
           # add container
-          # - path: /opt/vyatta/etc/config/scripts/vyos-postconfig-bootup.script
           - path: /tmp/Add-Container.sh
             owner: root:vyattacfg
             permissions: '0775'
@@ -190,6 +188,31 @@ module "cloudinit_nocloud_iso" {
               set nat destination rule 20 source address 192.168.255.0/24
               set nat destination rule 20 translation address 172.16.0.10
 
+              commit
+              save
+          - path: /tmp/finalConfig.sh
+            owner: root:vyattacfg
+            permissions: '0775'
+            content: |
+              #!/bin/vbash
+              # Ensure that we have the correct group or we'll corrupt the configuration
+              if [ "$(id -g -n)" != 'vyattacfg' ] ; then
+                  exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
+              fi
+              
+              source /opt/vyatta/etc/functions/script-template
+              configure
+              
+              # https://minbx.com/tipslab/27/
+              # https://forum.tinyserve.com/d/6-build-a-gateway-dns-server-with-v2ray-on-vyos-to-across-gfw
+              set nat destination rule 10 description 'CLASH FORWARD'
+              set nat destination rule 10 inbound-interface 'eth1'
+              set nat destination rule 10 protocol 'tcp_udp'
+              set nat destination rule 10 destination port 80,443
+              set nat destination rule 10 source address 192.168.255.0/24
+              set nat destination rule 10 translation address 192.168.255.1
+              set nat destination rule 10 translation port 7892
+              
               commit
               save
 

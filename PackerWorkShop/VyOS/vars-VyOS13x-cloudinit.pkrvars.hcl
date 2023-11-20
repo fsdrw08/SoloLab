@@ -1,9 +1,9 @@
-#iso_url=https://github.com/eliseomartelli/linux-based-router-distro/releases/download/v1.3.3b/linux-based-router-distro-v1.3.3b-amd64.iso
-iso_url="C:/Users/Public/Downloads/ISO/vyos-1.3.3-amd64.iso"
+#iso_url=https://github.com/patrickli/build-vyos/releases/download/1.3.4/vyos-1.3.4-amd64.iso
+iso_url="C:/Users/Public/Downloads/ISO/vyos-1.3.4-amd64.iso"
 iso_checksum_type="sha256"
-iso_checksum="dd97e1a1faf065efb2f751a34d6ff89a1c3ba88aaf7307af009cbe6cb542fcb0"
-vm_name="packer-vyos133"
-configuration_version="8.0"
+iso_checksum="A2E541B9218BF65BFE10509AA663796DDAA140909E23609FAF591DA16B96AC5F"
+vm_name="packer-vyos134"
+configuration_version="11.0"
 disk_size="128000"
 // disk_additional_size=["150000"]
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
