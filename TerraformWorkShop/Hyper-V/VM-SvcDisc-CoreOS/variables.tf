@@ -35,3 +35,7 @@ variable "data_disk_path" {
   type    = string
   default = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\"
 }
+
+variable "fcos_timezone" {
+  type = string
+}

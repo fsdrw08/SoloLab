@@ -1,0 +1,201 @@
+# https://docs.fedoraproject.org/en-US/fedora-coreos/hostname/
+data "ignition_file" "hostname" {
+  count = local.count
+  path  = "/etc/hostname"
+  mode  = 420 # OCT: 0644
+  content {
+    content = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}" # 
+  }
+}
+
+# https://docs.fedoraproject.org/en-US/fedora-coreos/time-zone/
+data "ignition_link" "timezone" {
+  path   = "/etc/localtime"
+  target = "../usr/share/zoneinfo/${var.fcos_timezone}"
+}
+
+data "ignition_disk" "data" {
+  device     = "/dev/sdb"
+  wipe_table = false
+  partition {
+    number  = 1
+    label   = "data"
+    sizemib = 0
+  }
+}
+
+data "ignition_filesystem" "data" {
+  device          = "/dev/disk/by-partlabel/data"
+  format          = "xfs"
+  wipe_filesystem = false
+  label           = "data"
+  path            = "/var/home/podmgr"
+}
+
+# the ignition provider does not provide filesystems.with_mount_unit like butane
+# https://coreos.github.io/butane/config-fcos-v1_5/
+# had to create the systemd mount unit manually
+# to debug, run journalctl --unit var-home-podmgr.mount -b-boot
+# https://github.com/getamis/terraform-ignition-etcd/blob/6526ce743d36f7950e097dabbff4ccfb41655de7/volume.tf#L28
+# https://github.com/meyskens/vagrant-coreos-baremetal/blob/5470c582fa42f499bc17eb501d3e592cf85caaf1/terraform/modules/ignition/systemd/files/data.mount.tpl
+# https://unix.stackexchange.com/questions/225401/how-to-see-full-log-from-systemctl-status-service/225407#225407
+data "ignition_systemd_unit" "data" {
+  # mind the unit name, The .mount file must be named based on the path (e.g. /var/mnt/data = var-mnt-data.mount)
+  # https://docs.fedoraproject.org/en-US/fedora-coreos/storage/#_configuring_nfs_mounts
+  name    = "var-home-podmgr.mount"
+  content = <<EOT
+[Unit]
+Description=Mount data disk
+Before=local-fs.target
+
+[Mount]
+What=/dev/disk/by-partlabel/data
+Where=/var/home/podmgr
+Type=xfs
+DirectoryMode=0700
+
+[Install]
+RequiredBy=local-fs.target
+EOT
+}
+
+data "ignition_directory" "podmgr" {
+  path = "/var/home/podmgr"
+  mode = 448 # 700 -> 448
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_user" "admin" {
+  name = "core"
+  groups = [
+    "wheel",
+    "sudo"
+  ]
+  # to gen password hash
+  # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
+  password_hash = "$y$j9T$cDLwsV9ODTV31Dt4SuVGa.$FU0eRT9jawPhIV3IV24W7obZ3PaJuBCVp7C9upDCcgD"
+  ssh_authorized_keys = [
+    "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+  ]
+}
+
+data "ignition_user" "podmgr" {
+  name          = "podmgr"
+  uid           = 1001
+  password_hash = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
+  ssh_authorized_keys = [
+    "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+  ]
+}
+
+# https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/#_disabling_automatic_configuration_of_ethernet_devices
+data "ignition_file" "disable_dhcp" {
+  path      = "/etc/NetworkManager/conf.d/noauto.conf"
+  mode      = 420
+  overwrite = true
+  content {
+    content = <<EOT
+[main]
+# Do not do automatic (DHCP/SLAAC) configuration on ethernet devices
+# with no other matching connections.
+no-auto-default=*
+EOT
+  }
+}
+
+# https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/#_configuring_a_static_ip
+data "ignition_file" "eth0" {
+  count     = local.count
+  path      = "/etc/NetworkManager/system-connections/eth0.nmconnection"
+  mode      = 384
+  overwrite = true
+  content {
+    content = <<EOT
+[connection]
+id=eth0
+type=ethernet
+interface-name=eth0
+
+[ipv4]
+method=manual
+addresses=192.168.255.2${count.index + 0}
+gateway=192.168.255.1
+dns=192.168.255.1
+EOT
+  }
+}
+
+# https://github.com/coreos/fedora-coreos-tracker/issues/681
+data "ignition_file" "rpms" {
+  path = "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf"
+  mode = 420 # oct 644
+  content {
+    content = <<EOT
+[Service]
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
+EOT
+  }
+}
+
+# By default, Fedora CoreOS does not allow password authentication via SSH.
+# But it's much more convenient for testing and playing with the tools, so
+# enable it.
+#
+# Source: https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_enabling_ssh_password_authentication
+data "ignition_file" "enable_password_auth" {
+  path = "/etc/ssh/sshd_config.d/20-enable-passwords.conf"
+  mode = 420 # oct 644
+  content {
+    content = <<EOT
+# Fedora CoreOS disables SSH password login by default.
+# Enable it.
+# This file must sort before 40-disable-passwords.conf.
+PasswordAuthentication yes
+EOT
+  }
+}
+
+data "ignition_file" "cockpit" {
+  # generate podman container and related systemd config with quadlet
+  path = "/etc/containers/systemd/cockpit-ws.container"
+  mode = 420 # oct 644
+  content {
+    # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+    # https://github.com/miabbott/fcos-cockpit/blob/3b0e432582f5513d8b5c9bfcf85a39b2d46fbd5c/etc/containers/systemd/cockpit.container#L6
+    content = <<EOT
+[Unit]
+Description=Cockpit container
+After=local-fs.target
+
+[Container]
+Environment=TZ=${var.fcos_timezone}
+Image=quay.io/cockpit/ws
+PublishPort=9090:9090
+
+[Install]
+WantedBy=multi-user.target default.target
+EOT
+  }
+}
+
+data "ignition_systemd_unit" "rpm-ostree" {
+  name    = "rpm-ostree-install.service"
+  enabled = true
+  content = <<EOT
+[Unit]
+Description=Layer additional rpms
+Wants=network-online.target
+After=network-online.target
+# We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+Before=zincati.service
+ConditionPathExists=!/var/lib/%N.stamp
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/rpm-ostree install --apply-live --allow-inactive $RPMS
+ExecStart=/bin/touch /var/lib/%N.stamp
+[Install]
+WantedBy=multi-user.target
+EOT
+}
