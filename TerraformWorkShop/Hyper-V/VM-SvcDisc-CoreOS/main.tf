@@ -8,22 +8,31 @@ data "ignition_config" "ignition" {
   filesystems = [data.ignition_filesystem.data.rendered]
   systemd = [
     data.ignition_systemd_unit.data.rendered,
-    data.ignition_systemd_unit.rpm-ostree.rendered
+    data.ignition_systemd_unit.rpm_ostree.rendered
   ]
-  directories = [data.ignition_directory.podmgr.rendered]
+  directories = [
+    data.ignition_directory.podmgr.rendered,
+    data.ignition_directory.rootless_default_target_wants.rendered,
+  ]
   users = [
-    data.ignition_user.admin.rendered,
+    data.ignition_user.core.rendered,
     data.ignition_user.podmgr.rendered
   ]
   files = [
     data.ignition_file.hostname[count.index].rendered,
-    data.ignition_file.eth0[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
+    data.ignition_file.eth0[count.index].rendered,
     data.ignition_file.rpms.rendered,
+    data.ignition_file.rootless_podman_socket_tcp.rendered,
+    data.ignition_file.rootless_linger.rendered,
     data.ignition_file.enable_password_auth.rendered,
-    # data.ignition_file.cockpit.rendered,
   ]
-  links = [data.ignition_link.timezone.rendered]
+  links = [
+    data.ignition_link.timezone.rendered,
+    data.ignition_link.rootless_podman_socket_unix.rendered,
+    # if dont want to expose podman tcp socket, just comment below line
+    data.ignition_link.rootless_podman_socket_tcp.rendered,
+  ]
 }
 
 # present ignition file to local
