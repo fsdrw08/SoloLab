@@ -1,0 +1,46 @@
+#!/bin/sh
+set -eu
+
+# This is the startup script for cockpit-ws.
+
+cd /
+PATH="/bin:/sbin"
+
+# When run in a privileged container, the host file system must be mounted at /host.
+if [ -d /host ]; then
+    # Run the install command just to be sure
+    /container/label-install || exit $?
+
+    set +x
+
+    /bin/mount --bind /host/usr/share/pixmaps /usr/share/pixmaps
+    /bin/mount --bind /host/var /var
+    /bin/mount --bind /host/etc/ssh /etc/ssh
+
+    # Make the container think it's the host OS version
+    if ! mountpoint -q /etc/os-release; then
+        rm -f /etc/os-release /usr/lib/os-release
+        ln -sv /host/etc/os-release /etc/os-release
+        ln -sv /host/usr/lib/os-release /usr/lib/os-release
+    fi
+
+    # And run cockpit-ws
+    TARGET_NS=/host/proc/1/ns
+    exec /usr/bin/nsenter --net=$TARGET_NS/net --uts=$TARGET_NS/uts -- /usr/libexec/cockpit-ws --local-ssh "$@"
+else
+    # unprivileged mode
+
+    # branding can be set from outside; if it's not, don't show any branding
+    if ! mountpoint --quiet /etc/os-release; then
+        rm /etc/os-release
+        printf 'NAME=default\nID=default\n' > /etc/os-release
+    fi
+
+    # config can be customized, but provide a default suitable for a bastion host
+    mountpoint --quiet /etc/cockpit || mountpoint --quiet /etc/cockpit/cockpit.conf || ln -s /container/default-bastion.conf /etc/cockpit/cockpit.conf
+
+    /usr/libexec/cockpit-certificate-ensure
+
+    eval $(ssh-agent)
+    exec /usr/libexec/cockpit-ws --local-ssh "$@"
+fi
