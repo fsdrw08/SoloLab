@@ -26,7 +26,7 @@ resource "alicloud_vpc_ipv4_gateway" "ipv4gw" {
   ipv4_gateway_description = "This_resource_is_managed_by_terraform"
 }
 
-# create ipv4 gateway route table
+# create ipv4 gateway route table 创建网关路由表
 # https://help.aliyun.com/document_detail/376499.html#section-pbr-i91-zye
 resource "alicloud_route_table" "ipv4gw_vtb" {
   vpc_id           = alicloud_vpc.vpc.id
@@ -42,7 +42,7 @@ resource "alicloud_vpc_gateway_route_table_attachment" "ipv4gw_vtb_attm" {
   route_table_id  = alicloud_route_table.ipv4gw_vtb.id
 }
 
-# add vpc route entry to route traffic to ipv4 gateway
+# add vpc route entry to route traffic to ipv4 gateway 为VPC路由表添加指向IPv4网关的路由条目
 # https://help.aliyun.com/document_detail/376499.html#section-l0k-okc-3q2
 resource "alicloud_route_entry" "vpc_to_ipv4gw" {
   route_table_id        = alicloud_vpc.vpc.route_table_id

@@ -59,6 +59,23 @@ terraform import $resourceNewName $resourceId
 ```
 3. remove the old resource name
 ```powershell
-$resourceOldName = "alicloud_ecs_disk.d_gitlab_data"
+$resourceOldName = "alicloud_eip_address.ngw_eip"
 terraform state rm $resourceOldName
 ```
+
+## resource create procedure
+1. Create OSS to store terraform state file, then move local tf state to OSS
+2. Create VPC(with IPV4 Gateway), see [VPC-DevOps](./VPC-DevOps/)
+3. Create Internet relate stuff, see [VPC-DevOps](./VPC-DevOps/):
+  - VSwitch for NAT Gateway
+  - NAT Gateway
+  - EIP (bind to NAT Gateway)
+  - Vswitch route table
+    - route entry(route all next hop traffic to nat gateway)
+4. Enable CDT(cloud data transfer 云数据传输CDT, no terraform resource currently 2023.11) to reduce the internet cost https://cdt.console.aliyun.com/, ref: [什么是云数据传输CDT](https://www.alibabacloud.com/help/zh/cdt/product-overview/what-is-cdt)
+5. Enable cloud filewall control policy, 访问控制-互联网边界-入向 https://yundun.console.aliyun.com
+4. Create Subnet related stuff, see [Subnet-DevOps](./Subnet-DevOps/)
+5. Create SSL cert, then upload to slb cert manager, see [SSL-DevOps](./SSL-DevOps/)
+6. Create Server Load Balancer related stuff
+7. Create NAS related stuff
+8. Create compute related resources
