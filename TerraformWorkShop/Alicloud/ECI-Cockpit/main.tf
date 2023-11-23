@@ -63,13 +63,12 @@ resource "alicloud_eci_container_group" "eci" {
       key   = "XDG_CONFIG_DIRS"
       value = "/mnt/.config"
     }
-    # https://github.com/cockpit-project/cockpit/blob/c05f1bc8fda75e7c3e1a6b4716a0be24ce5da8c7/containers/ws/label-run#L45
+    # https://github.com/cockpit-project/cockpit/blob/c05f1bc8fda75e7c3e1a6b4716a0be24ce5da8c7/containers/ws/Dockerfile
     commands = [
-      "/usr/libexec/cockpit-ws"
+      "/container/label-run"
     ]
     # https://cockpit-project.org/guide/latest/cockpit-ws.8
     args = [
-      "--local-ssh",
       "--for-tls-proxy",
       "--port=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
     ]
@@ -79,18 +78,18 @@ resource "alicloud_eci_container_group" "eci" {
       protocol = "TCP"
     }
 
-    # liveness_probe {
-    #   period_seconds        = "120"
-    #   initial_delay_seconds = "60"
-    #   success_threshold     = "1"
-    #   failure_threshold     = "5"
-    #   timeout_seconds       = "10"
-    #   http_get {
-    #     scheme = "HTTP"
-    #     port   = var.eci_port
-    #     path   = "login"
-    #   }
-    # }
+    liveness_probe {
+      period_seconds        = "120"
+      initial_delay_seconds = "60"
+      success_threshold     = "1"
+      failure_threshold     = "5"
+      timeout_seconds       = "10"
+      http_get {
+        scheme = "HTTP"
+        port   = data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port
+        path   = "/"
+      }
+    }
 
     volume_mounts {
       name       = "cockpit-cm-conf"
