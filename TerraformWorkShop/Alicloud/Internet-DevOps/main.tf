@@ -22,6 +22,11 @@ data "alicloud_vpc_ipv4_gateways" "ipv4gw" {
   name_regex = var.ipv4_gateway_name_regex
 }
 
+data "alicloud_eip_addresses" "ngw_eip" {
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  isp               = "BGP"
+}
+
 # nat gateway vswitch
 resource "alicloud_vswitch" "ngw_vsw" {
   vpc_id       = data.alicloud_vpcs.vpc.vpcs.0.id
@@ -65,22 +70,22 @@ resource "alicloud_nat_gateway" "ngw" {
 }
 
 # eip
-resource "alicloud_eip_address" "ngw_eip" {
-  count                = local.eip_count
-  resource_group_id    = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  address_name         = "${var.nat_gateway_eip_address_name}-${count.index + 1}"
-  bandwidth            = var.nat_gateway_eip_bandwidth
-  internet_charge_type = var.nat_gateway_eip_internet_charge_type
-  description          = "This resource is managed by terraform"
-  # fixed params:
-  isp          = "BGP"
-  netmode      = "public"
-  payment_type = "PayAsYouGo"
-}
+# resource "alicloud_eip_address" "ngw_eip" {
+#   count                = local.eip_count
+#   resource_group_id    = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+#   address_name         = "${var.nat_gateway_eip_address_name}-EIP-${count.index + 1}"
+#   bandwidth            = var.nat_gateway_eip_bandwidth
+#   internet_charge_type = var.nat_gateway_eip_internet_charge_type
+#   description          = "This resource is managed by terraform"
+#   # fixed params:
+#   isp          = "BGP"
+#   netmode      = "public"
+#   payment_type = "PayAsYouGo"
+# }
 
 resource "alicloud_eip_association" "ngw_eip_assn" {
   count         = local.eip_count
-  allocation_id = alicloud_eip_address.ngw_eip.*.id[count.index]
+  allocation_id = data.alicloud_eip_addresses.ngw_eip.addresses[count.index].allocation_id
   instance_id   = alicloud_nat_gateway.ngw.id
 }
 
@@ -89,7 +94,7 @@ resource "alicloud_snat_entry" "snat" {
   depends_on        = [alicloud_eip_association.ngw_eip_assn]
   snat_table_id     = alicloud_nat_gateway.ngw.snat_table_ids
   source_vswitch_id = alicloud_vswitch.ngw_vsw.id
-  snat_ip           = alicloud_eip_address.ngw_eip[0].ip_address
+  snat_ip           = data.alicloud_eip_addresses.ngw_eip.addresses[0].ip_address
 }
 
 
