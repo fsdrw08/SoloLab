@@ -8,15 +8,29 @@ data "alicloud_vpcs" "vpc" {
 }
 
 data "alicloud_vswitches" "vsw" {
-  name_regex        = var.vswitch_name_regex
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  name_regex        = each.value.vswitch_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
 data "alicloud_nat_gateways" "ngw" {
-  name_regex        = var.nat_gateway_name_regex
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  name_regex        = each.value.nat_gateway_name_regex
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
+}
+
+data "alicloud_eip_addresses" "example" {
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  name_regex        = each.value.eip_name_regex
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
 # self sign cert as slb listener default cert
@@ -52,59 +66,70 @@ resource "alicloud_slb_server_certificate" "default" {
 
 # slb instance
 # ref: https://github.com/alibabacloud-automation/terraform-alicloud-slb-rule/blob/74bbe668feb57f61661cf38e6ef8f5bde8ac03df/main.tf
-resource "alicloud_slb_load_balancer" "slb_inst" {
+resource "alicloud_slb_load_balancer" "lb" {
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  vswitch_id        = data.alicloud_vswitches.vsw.vswitches.0.id
+  vswitch_id        = data.alicloud_vswitches.vsw[each.key].vswitches.0.id
 
-  load_balancer_name   = var.slb_lb_name
+  load_balancer_name   = each.key
   address_type         = "intranet"
   payment_type         = "PayAsYouGo"
-  instance_charge_type = var.slb_lb_instance_charge_type
-  load_balancer_spec   = var.slb_lb_spec
+  instance_charge_type = each.value.instance_charge_type
+  load_balancer_spec   = each.value.load_balancer_spec
 }
 
-resource "alicloud_slb_listener" "slb_listener" {
-  load_balancer_id          = alicloud_slb_load_balancer.slb_inst.id
+resource "alicloud_slb_listener" "lb_listener_https" {
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  load_balancer_id          = alicloud_slb_load_balancer.lb[each.key].id
   protocol                  = "https"
   description               = "https_443"
   frontend_port             = 443
-  backend_port              = var.slb_listener_backend_port
+  backend_port              = each.value.listener_backend_port
   listener_forward          = "on"
   bandwidth                 = -1
   health_check              = "off"
   proxy_protocol_v2_enabled = true
-  health_check_connect_port = var.slb_listener_backend_port
   server_certificate_id     = alicloud_slb_server_certificate.default.id
 }
 
-resource "alicloud_slb_listener" "slb_listener_http" {
-  load_balancer_id = alicloud_slb_load_balancer.slb_inst.id
+resource "alicloud_slb_listener" "lb_listener_http" {
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  load_balancer_id = alicloud_slb_load_balancer.lb[each.key].id
   protocol         = "http"
   description      = "http_80"
   frontend_port    = 80
   listener_forward = "on"
-  forward_port     = alicloud_slb_listener.slb_listener.frontend_port
+  forward_port     = alicloud_slb_listener.lb_listener_https[each.key].frontend_port
 }
 
 # nat forward entry to forward request from nat to slb
 resource "alicloud_forward_entry" "fwd_https" {
-  forward_entry_name = var.slb_lb_name
-  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-  external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
+  for_each = {
+    for lb in var.slb_web_internal : lb.name => lb
+  }
+  forward_entry_name = each.key
+  forward_table_id   = data.alicloud_nat_gateways.ngw[each.key].gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_nat_gateways.ngw[each.key].gateways.0.ip_lists.0
   external_port      = "443"
   ip_protocol        = "tcp"
-  internal_ip        = alicloud_slb_load_balancer.slb_inst.address
+  internal_ip        = alicloud_slb_load_balancer.lb[each.key].address
   internal_port      = "443"
   port_break         = true
 }
 
-resource "alicloud_forward_entry" "fwd_http" {
-  forward_entry_name = var.slb_lb_name
-  forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-  external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
-  external_port      = "80"
-  ip_protocol        = "tcp"
-  internal_ip        = alicloud_slb_load_balancer.slb_inst.address
-  internal_port      = "80"
-  port_break         = true
-}
+# resource "alicloud_forward_entry" "fwd_http" {
+#   forward_entry_name = var.slb_name
+#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
+#   external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
+#   external_port      = "80"
+#   ip_protocol        = "tcp"
+#   internal_ip        = alicloud_slb_load_balancer.lb.address
+#   internal_port      = "80"
+#   port_break         = true
+# }

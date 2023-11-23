@@ -1,48 +1,55 @@
 variable "resource_group_name_regex" {
-  type    = string
-  default = "^DevOps-Root"
+  type = string
 }
 
 variable "vpc_name_regex" {
-  type    = string
-  default = "^DevOps-VPC"
+  type = string
 }
 
-variable "vswitch_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_VSw"
+# variable "vswitch_name_regex" {
+#   type = string
+# }
+
+# variable "nat_gateway_name_regex" {
+#   type = string
+# }
+
+variable "slb_web_internal" {
+  type = list(object({
+    vswitch_name_regex     = string
+    name                   = string
+    instance_charge_type   = string
+    load_balancer_spec     = optional(string)
+    listener_backend_port  = number
+    nat_gateway_name_regex = optional(string)
+    eip_name_regex         = optional(string)
+  }))
 }
 
-variable "nat_gateway_name_regex" {
-  type    = string
-  default = "^DevOps-NGw"
-}
+# variable "slb_name" {
+#   description = "The name of a new load balancer."
+#   type        = string
+# }
 
-variable "slb_lb_name" {
-  description = "The name of a new load balancer."
-  type        = string
-  default     = "DevOps-SLB"
-}
+# variable "slb_instance_charge_type" {
+#   description = <<-EOT
+#   Support PayBySpec and PayByCLCU, 
+#   This parameter takes effect when the value of payment_type (instance payment mode) is PayAsYouGo (pay-as-you-go).
+#   EOT
+#   type        = string
+#   default     = "PayByCLCU"
+# }
 
-variable "slb_lb_instance_charge_type" {
-  description = <<-EOT
-  Support PayBySpec and PayByCLCU, 
-  This parameter takes effect when the value of payment_type (instance payment mode) is PayAsYouGo (pay-as-you-go).
-  EOT
-  type        = string
-  default     = "PayByCLCU"
-}
-variable "slb_lb_spec" {
-  description = "The specification of the SLB instance. Only take effect when instance_charge_type = PayBySpec"
-  type        = string
-  default     = "slb.s1.small"
-}
+# variable "slb_spec" {
+#   description = "The specification of the SLB instance. Only take effect when instance_charge_type = PayBySpec"
+#   type        = string
+#   default     = "slb.s1.small"
+# }
 
-variable "slb_listener_backend_port" {
-  description = "Port used by the Server Load Balancer instance backend. Valid value range: [1-65535]."
-  type        = number
-  default     = 8080
-}
+# variable "slb_listener_backend_port" {
+#   description = "Port used by the Server Load Balancer instance backend. Valid value range: [1-65535]."
+#   type        = number
+# }
 
 # variable "slb_listener_sticky_session" {
 #   description = "Whether to enable session persistence, Valid values are `on` and `off`. Default to `off`. This parameter is required and takes effect only when ListenerSync is set to `off`."
