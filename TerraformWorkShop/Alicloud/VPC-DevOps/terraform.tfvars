@@ -7,3 +7,13 @@ private_zone_region_ids = [
   "cn-hongkong"
 ]
 private_zone_user_id = "5408086620836608"
+eip = {
+  "DevOps-EIP_HK1" = {
+    address_name         = "DevOps-EIP_HK1"
+    payment_type         = "PayAsYouGo"
+    internet_charge_type = "PayByTraffic"
+    isp                  = "BGP"
+    bandwidth            = 50
+    description          = "This resource is managed by terraform"
+  }
+}

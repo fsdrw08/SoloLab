@@ -1,7 +1,7 @@
 resource_group_name_regex = "^DevOps-Root"
 vpc_name_regex            = "^DevOps-VPC"
 nat_gateway_name_regex    = "^DevOps-NGw"
-eip_address_name_regex    = "^DevOps-1"
+eip_address_name_regex    = "^DevOps-EIP_HK1"
 eip_index                 = 0
 vswitch_name_regex        = "^DevOps-Sub_1_VSw"
 security_group_name_regex = "^DevOps-Sub_1_SG"

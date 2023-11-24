@@ -51,6 +51,19 @@ resource "alicloud_route_entry" "vpc_to_ipv4gw" {
   nexthop_type          = "Ipv4Gateway"
 }
 
+## eip
+# https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/eip_address
+resource "alicloud_eip_address" "eip" {
+  for_each             = var.eip
+  resource_group_id    = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+  address_name         = each.value.address_name
+  payment_type         = each.value.payment_type
+  internet_charge_type = each.value.internet_charge_type
+  auto_pay             = each.value.auto_pay
+  isp                  = each.value.isp
+  bandwidth            = each.value.bandwidth
+  description          = each.value.description
+}
 
 ## private zone
 # Using this data source can open Private Zone service automatically.
