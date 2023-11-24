@@ -51,8 +51,8 @@ terraform init
 1. rename it from tf file, save
 2. import the exist resource to new name
 ```powershell
-$resourceId = "xxx-xxxx"
-$resourceNewName = "provider_resource.new_name"
+$resourceId = "eip-j6cbv9bwhvf9e0aewm1a1"
+$resourceNewName = 'alicloud_eip_address.eip["DevOps-EIP_HK1"]'
 $resourceId = "d-j6c51b8pqwfoicx2x4ek"
 $resourceNewName = "alicloud_ecs_disk.d_data"
 terraform import $resourceNewName $resourceId

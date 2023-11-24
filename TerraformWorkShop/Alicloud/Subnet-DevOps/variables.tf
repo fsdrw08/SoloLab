@@ -19,8 +19,7 @@ variable "zone_available_instance_type" {
 }
 
 variable "subnet_vswitches" {
-  type = list(object({
-    # https://www.alibabacloud.com/help/en/eci/product-overview/regions-and-zones
+  type = map(object({
     zone_id             = string
     name                = string
     cidr_block          = string

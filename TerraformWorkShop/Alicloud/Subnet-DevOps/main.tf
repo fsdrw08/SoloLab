@@ -22,9 +22,7 @@ data "alicloud_nat_gateways" "ngw" {
 
 # subnet vswitch
 resource "alicloud_vswitch" "sub_vsw" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each     = var.subnet_vswitches
   vpc_id       = data.alicloud_vpcs.vpc.vpcs.0.id
   zone_id      = each.value.zone_id
   vswitch_name = each.value.name
@@ -32,21 +30,8 @@ resource "alicloud_vswitch" "sub_vsw" {
   description  = "This resource is managed by terraform"
 }
 
-# resource "alicloud_vswitch" "sub_vsw" {
-#   vpc_id       = data.alicloud_vpcs.vpc.vpcs.0.id
-#   zone_id      = data.alicloud_zones.az.zones[0].id
-#   vswitch_name = var.subnet_vswitch_name
-#   cidr_block   = var.subnet_vswitch_cidr
-#   description  = "This resource is managed by terraform"
-#   tags = {
-#     "Name" = var.subnet_vswitch_name
-#   }
-# }
-
 resource "alicloud_route_table" "sub_vsw_vtb" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each         = var.subnet_vswitches
   vpc_id           = data.alicloud_vpcs.vpc.vpcs.0.id
   route_table_name = each.value.route_table_name
   description      = "This resource is managed by terraform"
@@ -54,17 +39,13 @@ resource "alicloud_route_table" "sub_vsw_vtb" {
 }
 
 resource "alicloud_route_table_attachment" "sub_vsw_vtb_attm" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each       = var.subnet_vswitches
   vswitch_id     = alicloud_vswitch.sub_vsw[each.key].id
   route_table_id = alicloud_route_table.sub_vsw_vtb[each.key].id
 }
 
 resource "alicloud_route_entry" "sub_to_ngw" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each              = var.subnet_vswitches
   route_table_id        = alicloud_route_table.sub_vsw_vtb[each.key].id
   nexthop_id            = data.alicloud_nat_gateways.ngw.gateways.0.id
   destination_cidrblock = "0.0.0.0/0"
@@ -80,9 +61,7 @@ resource "alicloud_route_entry" "sub_to_ngw" {
 
 # security group
 resource "alicloud_security_group" "sub_sg" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each            = var.subnet_vswitches
   vpc_id              = data.alicloud_vpcs.vpc.vpcs.0.id
   resource_group_id   = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   name                = each.value.security_group_name
@@ -90,9 +69,7 @@ resource "alicloud_security_group" "sub_sg" {
 }
 
 resource "alicloud_security_group_rule" "sub_sgr_allow_all_in" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each          = var.subnet_vswitches
   type              = "ingress"
   ip_protocol       = "all"
   nic_type          = "intranet"
@@ -106,9 +83,7 @@ resource "alicloud_security_group_rule" "sub_sgr_allow_all_in" {
 
 # subnet snat
 resource "alicloud_snat_entry" "sub_snat" {
-  for_each = {
-    for vsw in var.subnet_vswitches : vsw.name => vsw
-  }
+  for_each          = var.subnet_vswitches
   depends_on        = [alicloud_vswitch.sub_vsw]
   snat_table_id     = data.alicloud_nat_gateways.ngw.gateways.0.snat_table_ids.0
   snat_ip           = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0

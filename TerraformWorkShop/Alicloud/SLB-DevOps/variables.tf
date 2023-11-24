@@ -15,7 +15,7 @@ variable "vpc_name_regex" {
 # }
 
 variable "slb_web_internal" {
-  type = list(object({
+  type = map(object({
     vswitch_name_regex     = string
     name                   = string
     instance_charge_type   = string
