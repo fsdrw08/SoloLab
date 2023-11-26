@@ -1,6 +1,6 @@
 resource_group_name_regex = "^DevOps-Root"
 vpc_name_regex            = "^DevOps-VPC"
-nat_gateway_name_regex    = "^DevOps-NGw"
+nat_gateway_name_regex    = "^DevOps-NGw_HKB_1"
 
 subnet_vswitches = {
   "DevOps-VSw_HKB1_Sub" = {

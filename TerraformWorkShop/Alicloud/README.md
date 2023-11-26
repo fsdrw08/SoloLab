@@ -59,7 +59,7 @@ terraform import $resourceNewName $resourceId
 ```
 3. remove the old resource name
 ```powershell
-$resourceOldName = "alicloud_eip_address.ngw_eip"
+$resourceOldName = 'alicloud_eip_address.eip["DevOps-EIP_HK1"]'
 terraform state rm $resourceOldName
 ```
 
