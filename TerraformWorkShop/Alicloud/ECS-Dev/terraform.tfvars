@@ -1,0 +1,15 @@
+resource_group_name_regex = "^DevOps-Root"
+vpc_name_regex            = "^DevOps-VPC"
+nat_gateway_name_regex    = "^DevOps-NGw_HKB_1"
+eip_address_name_regex    = "^DevOps-EIP_HK1"
+vswitch_name_regex        = "^DevOps-VSw_HKB1_Sub"
+security_group_name_regex = "^DevOps-SG_HKB1_Sub"
+ecs_image_name_regex      = "^centos_stream_9_uefi_x64"
+ecs_image_id      = "m-j6c7z1rznxwycwmihvoe"
+
+ecs_instance_type        = "ecs.t6-c1m2.large" # ecs.t6-c1m2.large
+ecs_instance_name        = "DevOps-ECS_dev"
+ecs_system_disk_name     = "DevOps-D_git_boot"
+ecs_server_name          = "dev"
+ecs_status               = "Running"
+fcos_timezone   = "Asia/Shanghai"
