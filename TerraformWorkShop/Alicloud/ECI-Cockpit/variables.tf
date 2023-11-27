@@ -4,32 +4,31 @@ variable "resource_group_name_regex" {
 }
 
 variable "vpc_name_regex" {
-  type    = string
-  default = "^DevOps-VPC"
+  type = string
 }
 
 variable "vswitch_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_VSw"
+  type = string
 }
 
 variable "security_group_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_SG"
+  type = string
 }
 
 variable "load_balancer_name_regex" {
-  type    = string
-  default = "^DevOps-SLB$"
+  type = string
 }
 
 variable "slb_cert_name_regex" {
   description = "A regex string to filter results by server certificate name."
   type        = string
-  default     = "^default"
 }
 
 variable "nat_gateway_name_regex" {
+  type = string
+}
+
+variable "domain_name_regex" {
   type = string
 }
 
@@ -71,7 +70,7 @@ variable "subdomain" {
   default = "jenkins"
 }
 
-variable "root_domain" {
-  description = "value"
-  type        = string
-}
+# variable "root_domain" {
+#   description = "value"
+#   type        = string
+# }

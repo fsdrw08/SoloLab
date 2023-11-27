@@ -41,6 +41,10 @@ data "alicloud_nat_gateways" "ngw" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
+data "alicloud_alidns_domains" "domain" {
+  domain_name_regex = var.domain_name_regex
+}
+
 resource "alicloud_eci_container_group" "eci" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   zone_id           = data.alicloud_vswitches.vsw.vswitches.0.zone_id
@@ -63,13 +67,15 @@ resource "alicloud_eci_container_group" "eci" {
       key   = "XDG_CONFIG_DIRS"
       value = "/mnt/.config"
     }
+
     # https://github.com/cockpit-project/cockpit/blob/c05f1bc8fda75e7c3e1a6b4716a0be24ce5da8c7/containers/ws/Dockerfile
     commands = [
+      # "cp /mnt/cockpit/..data/cockpit.conf /etc/cockpit/cockpit.conf",
       "/container/label-run"
     ]
     # https://cockpit-project.org/guide/latest/cockpit-ws.8
     args = [
-      "--for-tls-proxy",
+      "--no-tls",
       "--port=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
     ]
 
@@ -101,8 +107,12 @@ resource "alicloud_eci_container_group" "eci" {
     name = "cockpit-cm-conf"
     type = "ConfigFileVolume"
     config_file_volume_config_file_to_paths {
-      content = base64encode(file("cockpit.conf"))
-      path    = "cockpit.conf"
+      content = base64encode(
+        templatefile("cockpit.conf", {
+          FQDN = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+        })
+      )
+      path = "cockpit.conf"
     }
   }
 }
@@ -124,19 +134,19 @@ resource "alicloud_slb_rule" "slb_rule" {
   load_balancer_id = data.alicloud_slb_load_balancers.slb.balancers.0.id
   frontend_port    = 443
   name             = var.eci_group_name
-  domain           = "${var.subdomain}.${var.root_domain}"
+  domain           = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
   server_group_id  = alicloud_slb_server_group.slb_svr_group.id
 }
 
 resource "alicloud_slb_domain_extension" "slb_dext" {
   load_balancer_id      = data.alicloud_slb_load_balancers.slb.balancers.0.id
   frontend_port         = 443
-  domain                = "${var.subdomain}.${var.root_domain}"
+  domain                = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
   server_certificate_id = data.alicloud_slb_server_certificates.slb_cert.certificates.0.id
 }
 
 resource "alicloud_alidns_record" "record" {
-  domain_name = var.root_domain
+  domain_name = data.alicloud_alidns_domains.domain.domains.0.domain_name
   rr          = var.subdomain
   type        = "A"
   value       = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
