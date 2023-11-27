@@ -40,7 +40,7 @@ resource "acme_certificate" "alidns" {
 resource "alicloud_ssl_certificates_service_certificate" "acme_blue" {
   for_each = acme_certificate.alidns
 
-  certificate_name = "${each.value.common_name}_blue"
+  certificate_name = each.value.common_name
   # https://registry.terraform.io/providers/vancluever/acme/latest/docs/resources/certificate#certificate_pem
   cert = "${each.value.certificate_pem}${each.value.issuer_pem}"
   key  = each.value.private_key_pem
@@ -49,7 +49,7 @@ resource "alicloud_ssl_certificates_service_certificate" "acme_blue" {
 resource "alicloud_slb_server_certificate" "acme_blue" {
   for_each           = acme_certificate.alidns
   resource_group_id  = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-  name               = "${each.value.common_name}_blue"
+  name               = each.value.common_name
   server_certificate = "${each.value.certificate_pem}${each.value.issuer_pem}"
   private_key        = each.value.private_key_pem
 }
