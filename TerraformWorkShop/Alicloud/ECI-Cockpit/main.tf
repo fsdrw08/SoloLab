@@ -63,21 +63,25 @@ resource "alicloud_eci_container_group" "eci" {
     # Cockpit can be configured via /etc/cockpit/cockpit.conf. 
     # If $XDG_CONFIG_DIRS is set, then the first path containing a ../cockpit/cockpit.conf is used instead. 
     # https://cockpit-project.org/guide/latest/cockpit.conf.5.html
-    environment_vars {
-      key   = "XDG_CONFIG_DIRS"
-      value = "/mnt/.config"
-    }
+    # environment_vars {
+    #   key   = "XDG_CONFIG_DIRS"
+    #   value = "/mnt/.config"
+    # }
 
     # https://github.com/cockpit-project/cockpit/blob/c05f1bc8fda75e7c3e1a6b4716a0be24ce5da8c7/containers/ws/Dockerfile
     commands = [
-      # "cp /mnt/cockpit/..data/cockpit.conf /etc/cockpit/cockpit.conf",
-      "/container/label-run"
+      "/bin/bash",
+      "-c",
+      <<-EOT
+      cp /mnt/cockpit/..data/cockpit.conf /container/default-bastion.conf;
+      /container/label-run --no-tls --port=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port};
+      EOT
     ]
     # https://cockpit-project.org/guide/latest/cockpit-ws.8
-    args = [
-      "--no-tls",
-      "--port=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
-    ]
+    # args = [
+    #   "--no-tls",
+    #   "--port=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
+    # ]
 
     ports {
       port     = data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port
@@ -114,6 +118,14 @@ resource "alicloud_eci_container_group" "eci" {
       )
       path = "cockpit.conf"
     }
+  }
+
+  # https://help.aliyun.com/document_detail/65415.html
+  dns_config {
+    name_servers = [
+      "100.100.2.136",
+      "100.100.2.138",
+    ]
   }
 }
 
