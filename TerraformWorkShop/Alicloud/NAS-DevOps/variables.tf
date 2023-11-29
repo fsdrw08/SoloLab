@@ -1,18 +1,31 @@
 # https://registry.terraform.io/providers/aliyun/alicloud/latest/docs/resources/nas_file_system#file_system_type
 variable "resource_group_name_regex" {
-  type    = string
-  default = "^DevOps-Root"
+  type = string
 }
 
 variable "vpc_name_regex" {
-  type    = string
-  default = "^DevOps-VPC"
+  type = string
 }
 
 variable "vswitch_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_VSw"
+  type = string
 }
+
+# variable "nas" {
+#   type = map(object({
+#     vpc_name_regex     = optional(string)
+#     vswitch_name_regex = optional(string)
+#     description        = string
+#     file_system_type   = string
+#     storage_type       = string
+#     protocol_type      = string
+#     access_group = map(object({
+#       name           = string
+#       type           = string
+#       rw_access_type = optional(string)
+#     }))
+#   }))
+# }
 
 variable "nas_fs_desc" {
   type        = string
@@ -54,7 +67,6 @@ variable "nas_fs_protocol_type" {
 variable "nas_ag_name" {
   description = "A Name of one Access Group."
   type        = string
-  default     = "DevOps-NAS_AG"
 }
 
 variable "nas_ar_rw_access_type" {
