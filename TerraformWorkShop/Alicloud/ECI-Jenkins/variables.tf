@@ -1,32 +1,30 @@
 variable "resource_group_name_regex" {
-  type    = string
-  default = "^DevOps-Root"
+  type = string
 }
 
 variable "vpc_name_regex" {
-  type    = string
-  default = "^DevOps-VPC"
+  type = string
 }
 
 variable "vswitch_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_VSw"
+  type = string
 }
 
 variable "security_group_name_regex" {
-  type    = string
-  default = "^DevOps-Sub_1_SG"
+  type = string
 }
 
 variable "load_balancer_name_regex" {
-  type    = string
-  default = "^DevOps-SLB$"
+  type = string
+}
+
+variable "domain_name_regex" {
+  type = string
 }
 
 variable "slb_cert_name_regex" {
   description = "A regex string to filter results by server certificate name."
   type        = string
-  default     = "^default"
 }
 
 variable "nat_gateway_name_regex" {
@@ -34,6 +32,10 @@ variable "nat_gateway_name_regex" {
 }
 
 variable "nas_file_system_desc_regex" {
+  type = string
+}
+
+variable "agent_ecs_name_regex" {
   type = string
 }
 
@@ -45,7 +47,7 @@ variable "eci_group_name" {
 variable "ecs_instance_type" {
   description = "The type of the ECS instance to run the ECI. https://www.alibabacloud.com/help/zh/elastic-compute-service/latest/instance-family"
   type        = string
-  # default     = "ecs.t6-c4m1.large" # https://www.alibabacloud.com/help/zh/ecs/user-guide/overview-of-instance-families#e
+  # default     = "ecs.t6-c1m2.large" # https://www.alibabacloud.com/help/zh/ecs/user-guide/overview-of-instance-families#e
 }
 
 variable "eci_restart_policy" {
@@ -85,6 +87,12 @@ variable "jenkins_casc_default" {
   default     = "jcasc-default-config.yaml"
 }
 
+variable "jenkins_casc_cloud_docker" {
+  description = "jenkins config as code file for docker cloud"
+  type        = string
+  default     = "jcasc-cloud-docker.yaml"
+}
+
 variable "jenkins_casc_addition" {
   type = list(object({
     file = string
@@ -97,9 +105,4 @@ variable "jenkins_casc_addition" {
 variable "subdomain" {
   type    = string
   default = "jenkins"
-}
-
-variable "root_domain" {
-  description = "value"
-  type        = string
 }

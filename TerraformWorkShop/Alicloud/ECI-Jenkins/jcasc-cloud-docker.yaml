@@ -1,0 +1,26 @@
+jenkins:
+  clouds:
+    - docker:
+        name: "docker-dev"
+        dockerApi:
+          dockerHost:
+            uri: "tcp://${DEV_IP}:${DEV_PORT}"
+        templates:
+          - labelString: "dev-docker-agent"
+            pullStrategy: PULL_NEVER
+            connector: "attach"
+            dockerTemplateBase:
+              image: "docker.io/jenkins/jnlp-agent-docker:latest"
+              dnsHosts:
+                - "${DNS}"
+              environment:
+                - "TZ=Asia/Shanghai"
+              mounts:
+                - "type=tmpfs,destination=/run"
+                - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
+                - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+              user: "root"
+            remoteFs: "/home/jenkins"
+            instanceCapStr: "10"
+            retentionStrategy:
+              idleMinutes: 1

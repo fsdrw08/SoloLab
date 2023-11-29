@@ -41,6 +41,10 @@ data "alicloud_nat_gateways" "ngw" {
   vpc_id            = data.alicloud_vpcs.vpc.vpcs.0.id
 }
 
+data "alicloud_alidns_domains" "domain" {
+  domain_name_regex = var.domain_name_regex
+}
+
 data "alicloud_nas_file_systems" "nas_fs" {
   description_regex = var.nas_file_system_desc_regex
 }
@@ -49,6 +53,11 @@ data "alicloud_nas_mount_targets" "nas_mnt" {
   file_system_id = data.alicloud_nas_file_systems.nas_fs.systems.0.id
   vpc_id         = data.alicloud_vpcs.vpc.vpcs.0.id
   vswitch_id     = data.alicloud_vswitches.vsw.vswitches.0.id
+}
+
+data "alicloud_instances" "agent" {
+  name_regex        = var.agent_ecs_name_regex
+  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
 }
 
 resource "alicloud_eci_container_group" "eci" {
@@ -62,27 +71,32 @@ resource "alicloud_eci_container_group" "eci" {
   restart_policy         = var.eci_restart_policy
   auto_match_image_cache = var.eci_auto_img_cache
 
-  init_containers {
-    name = "mkdir"
-    # https://hub.docker.com/r/bitnami/os-shell/tags
-    image             = "docker.io/library/alpine:latest"
-    image_pull_policy = "IfNotPresent"
-    commands = [
-      "/bin/sh",
-      "-c",
-      <<-EOT
-      mkdir -p /mnt/jenkins/plugins-loading/ /mnt/jenkins/home/ /mnt/jenkins/plugins-storage/ && \
-      id && \
-      chown 1000:1000 /mnt/jenkins/plugins-loading/ && \
-      chown 1000:1000 /mnt/jenkins/home/ && \
-      chown 1000:1000 /mnt/jenkins/plugins-storage/
-      EOT
-    ]
-    volume_mounts {
-      name       = "nfs-root"
-      mount_path = "/mnt"
-    }
-  }
+  # error happens in this init_containers ": not found"
+  # init_containers {
+  #   name = "mkdir"
+  #   # https://hub.docker.com/r/bitnami/os-shell/tags
+  #   image             = "docker.io/library/alpine:latest"
+  #   image_pull_policy = "IfNotPresent"
+  #   commands = [
+  #     "/bin/sh",
+  #     "-c",
+  #   ]
+  #   args = [
+  #     <<-EOT
+  #     mkdir -p /mnt/jenkins/plugins-loading/ /mnt/jenkins/home/ /mnt/jenkins/plugins-storage/;
+  #     id;
+  #     chown 1000:1000 /mnt/jenkins/plugins-loading/;
+  #     chown 1000:1000 /mnt/jenkins/home/;
+  #     chown 1000:1000 /mnt/jenkins/plugins-storage/;
+  #     ls -al /mnt/jenkins;
+  #     EOT
+  #   ]
+  #   volume_mounts {
+  #     name       = "nfs-root"
+  #     mount_path = "/mnt"
+  #   }
+  # }
+
   init_containers {
     name              = "provision"
     image             = var.eci_image_uri
@@ -267,8 +281,15 @@ resource "alicloud_eci_container_group" "eci" {
     type = "ConfigFileVolume"
     config_file_volume_config_file_to_paths {
       content = base64encode(templatefile(var.jenkins_casc_default, {
-        subdomain   = var.subdomain,
-        root_domain = var.root_domain
+        FQDN = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+      }))
+      path = var.jenkins_casc_default
+    }
+    config_file_volume_config_file_to_paths {
+      content = base64encode(templatefile(var.jenkins_casc_cloud_docker, {
+        DEV_IP   = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+        DEV_PORT = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+        DNS      = ""
       }))
       path = var.jenkins_casc_default
     }
@@ -336,19 +357,19 @@ resource "alicloud_slb_rule" "slb_rule" {
   load_balancer_id = data.alicloud_slb_load_balancers.slb.balancers.0.id
   frontend_port    = 443
   name             = var.eci_group_name
-  domain           = "${var.subdomain}.${var.root_domain}"
+  domain           = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
   server_group_id  = alicloud_slb_server_group.slb_svr_group.id
 }
 
 resource "alicloud_slb_domain_extension" "slb_dext" {
   load_balancer_id      = data.alicloud_slb_load_balancers.slb.balancers.0.id
   frontend_port         = 443
-  domain                = "${var.subdomain}.${var.root_domain}"
+  domain                = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
   server_certificate_id = data.alicloud_slb_server_certificates.slb_cert.certificates.0.id
 }
 
 resource "alicloud_alidns_record" "record" {
-  domain_name = var.root_domain
+  domain_name = data.alicloud_alidns_domains.domain.domains.0.domain_name
   rr          = var.subdomain
   type        = "A"
   value       = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0

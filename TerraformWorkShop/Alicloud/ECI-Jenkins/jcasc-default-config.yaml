@@ -10,10 +10,10 @@ jenkins:
       allowsSignup: false
       enableCaptcha: false
       users:
-      - id: $${jenkins-admin-user}
-        name: Jenkins Admin
-        password: $${jenkins-admin-password}
+        - id: $${jenkins-admin-user}
+          name: Jenkins Admin
+          password: $${jenkins-admin-password}
 unclassified:
   location:
     adminAddress: null
-    url: 'https://${subdomain}.${root_domain}'
+    url: "https://${FQDN}"
