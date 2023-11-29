@@ -120,13 +120,17 @@ resource "alicloud_forward_entry" "fwd_https" {
   port_break         = true
 }
 
-# resource "alicloud_forward_entry" "fwd_http" {
-#   forward_entry_name = var.slb_name
-#   forward_table_id   = data.alicloud_nat_gateways.ngw.gateways[0].forward_table_ids[0]
-#   external_ip        = data.alicloud_nat_gateways.ngw.gateways.0.ip_lists.0
-#   external_port      = "80"
-#   ip_protocol        = "tcp"
-#   internal_ip        = alicloud_slb_load_balancer.lb.address
-#   internal_port      = "80"
-#   port_break         = true
-# }
+resource "alicloud_forward_entry" "fwd_http" {
+  for_each = {
+    for k, v in var.slb_web_internal :
+    k => v if v.nat_gateway_name_regex != null && v.eip_name_regex != null
+  }
+  forward_entry_name = "${each.value.name}_http"
+  forward_table_id   = data.alicloud_nat_gateways.ngw[each.key].gateways[0].forward_table_ids[0]
+  external_ip        = data.alicloud_eip_addresses.eip[each.key].addresses[0].ip_address
+  external_port      = "80"
+  ip_protocol        = "tcp"
+  internal_ip        = alicloud_slb_load_balancer.lb[each.key].address
+  internal_port      = "80"
+  port_break         = true
+}
