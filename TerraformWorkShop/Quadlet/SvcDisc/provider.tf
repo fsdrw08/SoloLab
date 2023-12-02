@@ -28,3 +28,11 @@ terraform {
     skip_requesting_account_id  = true
   }
 }
+
+provider "minio" {
+  // required
+  minio_server   = "192.168.255.1:9000"
+  minio_user     = "minio"
+  minio_password = "miniosecret"
+
+}
