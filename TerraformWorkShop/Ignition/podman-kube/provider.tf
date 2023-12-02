@@ -4,19 +4,27 @@ terraform {
       source  = "hashicorp/helm"
       version = ">=2.11.0"
     }
-    consul = {
-      source  = "hashicorp/consul"
-      version = ">=2.20.0"
+    minio = {
+      source  = "aminueza/minio"
+      version = ">=2.0.1"
     }
   }
-  backend "consul" {
-    address = "192.168.255.1:8500"
-    scheme  = "http"
-    path    = "tfstate/Helm-Podman"
-  }
-}
+  backend "s3" {
+    bucket = "tfstate"      # Name of the S3 bucket
+    key    = "quadlet/test" # Name of the tfstate file
 
-provider "consul" {
-  address    = "192.168.255.1:8500"
-  datacenter = "dc1"
+    endpoints = {
+      s3 = "http://192.168.255.1:9000" # Minio endpoint
+    }
+
+    access_key = "minio" # Access and secret keys
+    secret_key = "miniosecret"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    force_path_style            = true
+    skip_requesting_account_id  = true
+  }
 }

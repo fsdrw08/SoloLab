@@ -16,16 +16,22 @@ data "helm_template" "podman_consul" {
   ]
 }
 
-resource "consul_keys" "podman_traefik" {
-  key {
-    path  = "ignition/kube/podman-traefik"
-    value = data.helm_template.podman_consul.manifest
-  }
+resource "minio_s3_bucket" "bucket" {
+  bucket = "quadlet"
+  acl    = "public"
 }
 
-resource "consul_keys" "podman_consul" {
-  key {
-    path  = "ignition/kube/podman-consul-server"
-    value = data.helm_template.podman_consul.manifest
-  }
+resource "minio_s3_object" "SvcDisc_Traefik_kube" {
+  bucket_name  = minio_s3_bucket.bucket.bucket
+  object_name  = "SvcDisc/traefik.kube"
+  content      = data.helm_template.podman_traefik.manifest
+  content_type = "text/plain"
+}
+
+resource "minio_s3_object" "SvcDisc_Consul_kube" {
+  bucket_name  = minio_s3_bucket.bucket.bucket
+  object_name  = "SvcDisc/consul.kube"
+  content      = data.helm_template.podman_consul.manifest
+  content_type = "text/plain"
+
 }
