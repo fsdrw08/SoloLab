@@ -237,9 +237,9 @@ resource "alicloud_eci_container_group" "eci" {
     # https://www.reddit.com/r/Terraform/comments/y0d6os/how_to_write_list_of_multiline_string/
     args = [
       <<-EOT
-        inotifywait -mr -e modify /var/jenkins_home/casc_configs | while read MODIFY     
-          do
-            wget --post-data casc-reload-token=$POD_NAME http://localhost:8080/reload-configuration-as-code/
+        inotifywait -mr -e modify /var/jenkins_home/casc_configs | while read MODIFY; 
+          do \
+            wget --post-data casc-reload-token=$POD_NAME http://localhost:8080/reload-configuration-as-code/;
           done
       EOT
       ,
@@ -287,9 +287,7 @@ resource "alicloud_eci_container_group" "eci" {
     }
     config_file_volume_config_file_to_paths {
       content = base64encode(templatefile(var.jenkins_casc_cloud_docker, {
-        DEV_IP   = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
-        DEV_PORT = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
-        DNS      = ""
+        DEV_IP = data.alicloud_instances.agent.instances.0.private_ip
       }))
       path = var.jenkins_casc_default
     }

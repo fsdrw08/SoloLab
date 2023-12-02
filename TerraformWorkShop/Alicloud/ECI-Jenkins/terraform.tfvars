@@ -7,14 +7,14 @@ nat_gateway_name_regex     = "^DevOps-NGw_HKB1$"
 load_balancer_name_regex   = "^DevOps-SLB_HKB1_Int$"
 slb_cert_name_regex        = "9.com$"
 domain_name_regex          = "9.com$"
-agent_ecs_name_regex           = "^DevOps-ECS_HKB_Dev$"
+agent_ecs_name_regex       = "^DevOps-ECS_HKB_Dev$"
 
 ecs_instance_type         = "ecs.t6-c1m2.large"
 eci_group_name            = "jenkins"
 eci_image_uri             = "docker.io/jenkins/jenkins:lts-jdk17"
 eci_port                  = 8080
 eci_restart_policy        = "Never"
-jenkins_admin_password    = "P@ssw0rd"
+jenkins_agent_listener    = 50000
 jenkins_casc_default      = "jcasc-default-config.yaml"
 jenkins_casc_cloud_docker = "jcasc-cloud-docker.yaml"
 # jenkins_casc_addition = [{

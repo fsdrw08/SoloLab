@@ -4,7 +4,7 @@ jenkins:
         name: "docker-dev"
         dockerApi:
           dockerHost:
-            uri: "tcp://${DEV_IP}:${DEV_PORT}"
+            uri: "tcp://${DEV_IP}:2375"
         templates:
           - labelString: "dev-docker-agent"
             pullStrategy: PULL_NEVER
@@ -12,7 +12,8 @@ jenkins:
             dockerTemplateBase:
               image: "docker.io/jenkins/jnlp-agent-docker:latest"
               dnsHosts:
-                - "${DNS}"
+                - "100.100.2.136"
+                - "100.100.2.138"
               environment:
                 - "TZ=Asia/Shanghai"
               mounts:

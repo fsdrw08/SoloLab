@@ -92,6 +92,10 @@ resource "alicloud_slb_listener" "lb_listener_https" {
   health_check              = "off"
   proxy_protocol_v2_enabled = true
   server_certificate_id     = alicloud_slb_server_certificate.default.id
+  # https://stackoverflow.com/questions/42267602/why-does-jenkins-say-my-reverse-proxy-setup-is-broken
+  x_forwarded_for {
+    retrive_slb_proto = true
+  }
 }
 
 resource "alicloud_slb_listener" "lb_listener_http" {
