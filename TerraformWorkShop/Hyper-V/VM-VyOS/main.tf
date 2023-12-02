@@ -244,6 +244,7 @@ module "cloudinit_nocloud_iso" {
               # consul
               set container name minio network containers address 172.16.0.40
               set container name minio image docker.io/bitnami/minio:latest
+              set container name minio memory 1024
               set container name minio port minio_http source 9000
               set container name minio port minio_http destination 9000
               set container name minio port minio_console source 9001
