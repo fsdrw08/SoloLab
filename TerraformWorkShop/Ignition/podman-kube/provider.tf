@@ -12,6 +12,11 @@ terraform {
   backend "consul" {
     address = "192.168.255.1:8500"
     scheme  = "http"
-    path    = "tfstate/Helm-Podman-Traefik"
+    path    = "tfstate/Helm-Podman"
   }
+}
+
+provider "consul" {
+  address    = "192.168.255.1:8500"
+  datacenter = "dc1"
 }
