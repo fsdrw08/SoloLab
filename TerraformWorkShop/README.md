@@ -5,11 +5,13 @@ ref: [解决Terraform初始化慢~配置本地离线源](https://cloud.tencent.c
 $projectPath = git rev-parse --show-toplevel
 . $(Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\Set-TFCLIConfigFile.ps1")
 ```
+
 2. go to terraform resources related folder, run below command
 ```powershell
 $projectPath = git rev-parse --show-toplevel
 terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\mirror")
 ```
+
 3. run terraform init
 ```powershell
 terraform init --plugin-dir (Join-Path -Path $projectPath -ChildPath ".terraform.d/mirror/registry.terraform.io/")

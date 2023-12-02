@@ -201,6 +201,25 @@ data "ignition_file" "rootless_linger" {
 }
 
 # install packages
+# prepare yum repo
+data "ignition_file" "hashicorp_repo" {
+  path = "/etc/yum.repos.d/hashicorp.repo"
+  mode = 420 # oct 644
+  # source {
+  #   source = "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
+  # }
+  # or
+  content {
+    content = <<EOT
+[hashicorp]
+name=Hashicorp Stable - $basearch
+baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://rpm.releases.hashicorp.com/gpg
+  EOT
+  }
+}
 # https://cockpit-project.org/running.html#coreos
 # https://github.com/coreos/fedora-coreos-tracker/issues/681
 data "ignition_file" "rpms" {
@@ -209,7 +228,7 @@ data "ignition_file" "rpms" {
   content {
     content = <<EOT
 [Service]
-Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager consul-template"
 EOT
   }
 }
