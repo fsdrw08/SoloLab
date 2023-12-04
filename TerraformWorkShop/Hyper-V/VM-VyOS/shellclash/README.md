@@ -24,7 +24,9 @@ source ~/.bashrc
 clash
 ```
 4. config clash
-- 1 路由设备配置局域网透明代理
+- 1 路由设备配置局域网透明代理 -> 是否开启公网访问Dashboard面板及socks服务？ 0 
+    -> 是否导入配置文件？0 -> 立即启动clash服务？0 -> 发现可用的内核文件： /tmp/clash-linux-amd64-pre 
+    是否加载？ 1
 - 2 clash功能设置 -> 1 切换Clash运行模式: -> 7 Nft混合：使用nft_tproxy转发
 - 2 clash功能设置 -> 6 设置本机代理服务:    未开启   ————使本机流量经过clash内核
 - 7 clash进阶设置 -> 8 手动指定相关端口、秘钥 -> 8 自定义本机host地址：...
@@ -34,7 +36,7 @@ v1.8.0
 - 7 clash进阶设置 ->  6 配置内置DNS服务 ->  4 一键配置加密DNS
 -
 <!-- 
-5. install shellclash:
+1. install shellclash:
 from vyos, run 
 ```shell
 sudo su

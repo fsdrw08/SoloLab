@@ -68,6 +68,12 @@ module "cloudinit_nocloud_iso" {
           - set service dns forwarding name-server '223.6.6.6'
           # ssh
           - set service ssh port '22'
+          # api
+          - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
+          - set service https virtual-host vyos listen-address '192.168.255.1'
+          - set service https virtual-host vyos listen-port '8443'
+          - set service https api-restrict virtual-host 'vyos'
+          - set service https certificates system-generated-certificate
           # System
           # hostname
           - set system host-name 'vyos-lts'
@@ -81,6 +87,7 @@ module "cloudinit_nocloud_iso" {
           - set system ntp server 'cn.ntp.org.cn'
           # timezone
           - set system time-zone 'Asia/Shanghai'
+          
 
         write_files:
           # config external disk
@@ -141,11 +148,6 @@ module "cloudinit_nocloud_iso" {
                 echo "Mounting /dev/sdb1 to /mnt/data"
                 mount /mnt/data
               fi
-              mkdir -p /mnt/data/consul/data /mnt/data/consul/config
-              chmod 777 /mnt/data/consul/data
-              chmod 777 /mnt/data/consul/config
-              mkdir -p /mnt/bitnami/minio/data
-              chmod 777 /mnt/bitnami/minio/data
               echo "Disk configuration complete"
 
           # add container Consul
@@ -159,6 +161,8 @@ module "cloudinit_nocloud_iso" {
                   exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
               fi
               source /opt/vyatta/etc/functions/script-template
+              sudo mkdir -p /mnt/data/consul/data
+              sudo chmod 777 /mnt/data/consul/data
               run add container image docker.io/bitnami/consul:latest
               configure
               # Container networks
@@ -166,6 +170,7 @@ module "cloudinit_nocloud_iso" {
               # consul
               set container name consul network containers address 172.16.0.20
               set container name consul image docker.io/bitnami/consul:latest
+              set container name consul memory 1024
               set container name consul port consul_rpc source 8300
               set container name consul port consul_rpc destination 8300
               set container name consul port consul_serf source 8301
@@ -238,6 +243,8 @@ module "cloudinit_nocloud_iso" {
               fi
               source /opt/vyatta/etc/functions/script-template
               run add container image docker.io/bitnami/minio:latest
+              sudo mkdir -p /mnt/data/bitnami/minio/data
+              sudo chmod 777 /mnt/data/bitnami/minio/data
               configure
               # Container networks
               set container network containers prefix '172.16.0.0/24'
@@ -251,7 +258,7 @@ module "cloudinit_nocloud_iso" {
               set container name minio port minio_console destination 9001
               set container name minio environment 'TZ' value 'Asia/Shanghai'
               # https://github.com/bitnami/containers/tree/main/bitnami/minio#persisting-your-database
-              set container name minio volume 'minio_data' source '/mnt/bitnami/minio/data'
+              set container name minio volume 'minio_data' source '/mnt/data/bitnami/minio/data'
               set container name minio volume 'minio_data' destination '/bitnami/minio/data'
               # https://gist.github.com/peterkeen/97c566131af6f085628b5e4f1c4a8e1b
               # https://www.reddit.com/r/vyos/comments/vkfuoo/dns_container_vyos/
@@ -343,6 +350,7 @@ resource "null_resource" "remote" {
 
   # for destroy
   provisioner "remote-exec" {
+    # https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax#destroy-time-provisioners
     when = destroy
     inline = [<<-EOT
       Powershell -Command "$cloudinit_iso=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.isoName}'); if (Test-Path $cloudinit_iso) { Remove-Item $cloudinit_iso }"
