@@ -10,8 +10,8 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "tfstate"      # Name of the S3 bucket
-    key    = "quadlet/test" # Name of the tfstate file
+    bucket = "tfstate"                      # Name of the S3 bucket
+    key    = "tfstate/Quadlet/SvcDisc-FCOS" # Name of the tfstate file
 
     endpoints = {
       s3 = "http://192.168.255.1:9000" # Minio endpoint

@@ -35,3 +35,17 @@ resource "minio_s3_object" "SvcDisc_Consul_yaml" {
   content_type = "text/plain"
 
 }
+
+resource "minio_s3_object" "SvcDisc_Consul_kube" {
+  bucket_name = minio_s3_bucket.bucket.bucket
+  object_name = "SvcDisc/consul.kube"
+  # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
+  content = <<-EOT
+[Install]
+WantedBy=default.target
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=consul.yaml
+EOT
+}
