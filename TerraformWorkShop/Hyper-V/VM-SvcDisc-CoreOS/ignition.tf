@@ -123,6 +123,7 @@ data "ignition_user" "podmgr" {
   ]
 }
 
+# set rootless user home dir to external disk
 data "ignition_directory" "podmgr" {
   path = "/var/home/podmgr"
   mode = 448 # oct 700 -> dec 448
@@ -132,6 +133,36 @@ data "ignition_directory" "podmgr" {
 
 # enable podman socket (used by podman remote) for the user (rootless)
 # https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
+# create user level default.target.wants dir for service auto start
+# https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
+data "ignition_directory" "rootless_config" {
+  path = "/home/podmgr/.config/"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "rootless_systemd" {
+  path = "/home/podmgr/.config/systemd/"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "rootless_systemd_user" {
+  path = "/home/podmgr/.config/systemd/user/"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "rootless_default_target_wants" {
+  path = "/home/podmgr/.config/systemd/user/default.target.wants/"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
 data "ignition_link" "rootless_podman_socket_unix" {
   # the link
   path = "/home/podmgr/.config/systemd/user/sockets.target.wants/podman.socket"
@@ -140,15 +171,6 @@ data "ignition_link" "rootless_podman_socket_unix" {
   overwrite = true
   uid       = 1001
   gid       = 1001
-}
-
-# create user level default.target.wants dir for service auto start
-# https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
-data "ignition_directory" "rootless_default_target_wants" {
-  path = "/home/podmgr/.config/systemd/user/default.target.wants"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
 }
 
 # create user level systemd service to expose podman socket to external tcp port
@@ -204,7 +226,7 @@ data "ignition_file" "rootless_linger" {
 # prepare yum repo
 data "ignition_file" "hashicorp_repo" {
   path = "/etc/yum.repos.d/hashicorp.repo"
-  mode = 420 # oct 644
+  mode = 420 # oct 644 -> dec 420
   # source {
   #   source = "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
   # }
@@ -224,11 +246,11 @@ gpgkey=https://rpm.releases.hashicorp.com/gpg
 # https://github.com/coreos/fedora-coreos-tracker/issues/681
 data "ignition_file" "rpms" {
   path = "/etc/systemd/system/rpm-ostree-install.service.d/rpms.conf"
-  mode = 420 # oct 644
+  mode = 420 # oct 644 -> dec 420
   content {
     content = <<EOT
 [Service]
-Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager consul-template"
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager rclone"
 EOT
   }
 }
@@ -260,7 +282,7 @@ EOT
 # Source: https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_enabling_ssh_password_authentication
 data "ignition_file" "enable_password_auth" {
   path = "/etc/ssh/sshd_config.d/20-enable-passwords.conf"
-  mode = 420 # oct 644
+  mode = 420 # oct 644 -> dec 420
   content {
     content = <<EOT
 # Fedora CoreOS disables SSH password login by default.
@@ -269,6 +291,51 @@ data "ignition_file" "enable_password_auth" {
 PasswordAuthentication yes
 EOT
   }
+}
+
+# config rclone config
+data "ignition_directory" "rclone_conf_dir" {
+  path = "/home/podmgr/.config/rclone"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_file" "rclone_conf" {
+  path      = "/home/podmgr/.config/rclone/rclone.conf"
+  mode      = 420 # oct 644 -> dec 420
+  overwrite = true
+  uid       = 1001
+  gid       = 1001
+  content {
+    content = <<EOT
+[minio]
+type = s3
+provider = Minio
+env_auth = false
+access_key_id = minio
+secret_access_key = miniosecret
+region = main
+endpoint = http://192.168.255.1:9000
+location_constraint =
+server_side_encryption =
+EOT
+  }
+}
+
+# https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+data "ignition_directory" "quadlet_conf_dir" {
+  path = "/home/podmgr/.config/containers"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "quadlet_conf_systemd_dir" {
+  path = "/home/podmgr/.config/containers/systemd"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
 }
 
 # generate podman container and related systemd config with quadlet

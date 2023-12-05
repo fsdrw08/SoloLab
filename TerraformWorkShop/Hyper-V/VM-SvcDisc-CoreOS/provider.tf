@@ -19,7 +19,7 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate"                 # Name of the S3 bucket
-    key    = "Hyper-V/VM-SvcDisc-FCOS" # Name of the tfstate file
+    key    = "Hyper-V/SvcDisc-FCOS-VM" # Name of the tfstate file
 
     endpoints = {
       s3 = "http://192.168.255.1:9000" # Minio endpoint
