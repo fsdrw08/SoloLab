@@ -4,9 +4,13 @@ terraform {
       source  = "hashicorp/helm"
       version = ">=2.11.0"
     }
-    minio = {
-      source  = "aminueza/minio"
-      version = ">=2.0.1"
+    # minio = {
+    #   source  = "aminueza/minio"
+    #   version = ">=2.0.1"
+    # }
+    system = {
+      source  = "neuspaces/system"
+      version = ">=0.4.0"
     }
   }
   backend "s3" {
@@ -29,10 +33,19 @@ terraform {
   }
 }
 
-provider "minio" {
-  // required
-  minio_server   = "192.168.255.1:9000"
-  minio_user     = "minio"
-  minio_password = "miniosecret"
+# provider "minio" {
+#   // required
+#   minio_server   = "192.168.255.1:9000"
+#   minio_user     = "minio"
+#   minio_password = "miniosecret"
 
+# }
+
+provider "system" {
+  ssh {
+    host     = var.server.host
+    port     = var.server.port
+    user     = var.server.user
+    password = var.server.password
+  }
 }
