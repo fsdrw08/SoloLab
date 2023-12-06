@@ -114,7 +114,7 @@ data "ignition_user" "core" {
 }
 
 # set rootless user password and ssh key
-data "ignition_user" "podmgr" {
+data "ignition_user" "user" {
   name          = "podmgr"
   uid           = 1001
   password_hash = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
@@ -124,46 +124,47 @@ data "ignition_user" "podmgr" {
 }
 
 # set rootless user home dir to external disk
-data "ignition_directory" "podmgr" {
+data "ignition_directory" "user_home" {
   path = "/var/home/podmgr"
   mode = 448 # oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }
 
-# enable podman socket (used by podman remote) for the user (rootless)
-# https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
+data "ignition_directory" "user_config" {
+  path = "/home/podmgr/.config"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "user_config_systemd" {
+  path = "/home/podmgr/.config/systemd"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "user_config_systemd_user" {
+  path = "/home/podmgr/.config/systemd/user"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
 # create user level default.target.wants dir for service auto start
 # https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
-data "ignition_directory" "rootless_config" {
-  path = "/home/podmgr/.config/"
+data "ignition_directory" "user_config_systemd_user_defaultTargetWants" {
+  path = "/home/podmgr/.config/systemd/user/default.target.wants"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
   gid  = 1001
 }
 
-data "ignition_directory" "rootless_systemd" {
-  path = "/home/podmgr/.config/systemd/"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
-
-data "ignition_directory" "rootless_systemd_user" {
-  path = "/home/podmgr/.config/systemd/user/"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
-
-data "ignition_directory" "rootless_default_target_wants" {
-  path = "/home/podmgr/.config/systemd/user/default.target.wants/"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
-
-data "ignition_link" "rootless_podman_socket_unix" {
+# enable podman socket (used by podman remote) for the user (rootless)
+# link the socket in this dir for socket auto start when user login
+# https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
+data "ignition_link" "rootless_podman_socket_unix_autostart" {
   # the link
   path = "/home/podmgr/.config/systemd/user/sockets.target.wants/podman.socket"
   # the source
@@ -175,7 +176,7 @@ data "ignition_link" "rootless_podman_socket_unix" {
 
 # create user level systemd service to expose podman socket to external tcp port
 # https://github.com/openstack/tripleo-ansible/blob/e281ae7624774d71f22fbb993af967ed1ec08780/tripleo_ansible/roles/tripleo_podman/templates/podman.service.j2#L11
-data "ignition_file" "rootless_podman_socket_tcp" {
+data "ignition_file" "rootless_podman_socket_tcp_service" {
   path      = "/home/podmgr/.config/systemd/user/podman-socket-tcp.service"
   mode      = 420 # oct 644 -> dec 420
   overwrite = true
@@ -203,10 +204,10 @@ EOT
   }
 }
 
-# link the user level podman tcp socket service to default.target.wants
-data "ignition_link" "rootless_podman_socket_tcp" {
+# link the user level podman tcp socket service to default.target.wants for service auto start when login
+data "ignition_link" "rootless_podman_socket_tcp_autostart" {
   path      = "/home/podmgr/.config/systemd/user/default.target.wants/podman-socket-tcp.service"
-  target    = data.ignition_file.rootless_podman_socket_tcp.path
+  target    = data.ignition_file.rootless_podman_socket_tcp_service.path
   overwrite = true
   hard      = false
   uid       = 1001
@@ -293,6 +294,32 @@ EOT
   }
 }
 
+# low down the unprivilege port
+data "ignition_file" "sysctl_unprivileged_port" {
+  path = "/etc/sysctl.d/90-unprivileged_port_start.conf"
+  content {
+    content = <<-EOT
+      net.ipv4.ip_unprivileged_port_start = 53
+    EOT
+  }
+}
+
+# config podman quadlet
+# https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+data "ignition_directory" "user_config_containers" {
+  path = "/home/podmgr/.config/containers"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
+data "ignition_directory" "user_config_containers_systemd" {
+  path = "/home/podmgr/.config/containers/systemd"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1001
+  gid  = 1001
+}
+
 # config rclone config
 data "ignition_directory" "rclone_conf_dir" {
   path = "/home/podmgr/.config/rclone"
@@ -323,20 +350,6 @@ EOT
   }
 }
 
-# https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
-data "ignition_directory" "quadlet_conf_dir" {
-  path = "/home/podmgr/.config/containers"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
-
-data "ignition_directory" "quadlet_conf_systemd_dir" {
-  path = "/home/podmgr/.config/containers/systemd"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
 
 # generate podman container and related systemd config with quadlet
 # data "ignition_file" "cockpit" {

@@ -11,27 +11,33 @@ data "ignition_config" "ignition" {
     data.ignition_systemd_unit.rpm_ostree.rendered
   ]
   directories = [
-    data.ignition_directory.podmgr.rendered,
-    data.ignition_directory.rootless_default_target_wants.rendered,
+    data.ignition_directory.user_home.rendered,
+    data.ignition_directory.user_config.rendered,
+    data.ignition_directory.user_config_systemd.rendered,
+    data.ignition_directory.user_config_systemd_user.rendered,
+    data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
+    data.ignition_directory.user_config_containers.rendered,
+    data.ignition_directory.user_config_containers_systemd.rendered,
   ]
   users = [
     data.ignition_user.core.rendered,
-    data.ignition_user.podmgr.rendered
+    data.ignition_user.user.rendered
   ]
   files = [
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
     data.ignition_file.eth0[count.index].rendered,
     data.ignition_file.rpms.rendered,
-    data.ignition_file.rootless_podman_socket_tcp.rendered,
     data.ignition_file.rootless_linger.rendered,
+    data.ignition_file.rootless_podman_socket_tcp_service.rendered,
     data.ignition_file.enable_password_auth.rendered,
+    data.ignition_file.sysctl_unprivileged_port.rendered,
   ]
   links = [
     data.ignition_link.timezone.rendered,
-    data.ignition_link.rootless_podman_socket_unix.rendered,
+    data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
     # if dont want to expose podman tcp socket, just comment below line
-    data.ignition_link.rootless_podman_socket_tcp.rendered,
+    data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
   ]
 }
 
