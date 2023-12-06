@@ -4,6 +4,10 @@ terraform {
       source  = "neuspaces/system"
       version = ">=0.4.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = ">=3.2.1"
+    }
   }
   backend "oss" {
     profile             = "cn_hk"

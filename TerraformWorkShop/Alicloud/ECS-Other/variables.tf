@@ -10,6 +10,7 @@ variable "server" {
 variable "user" {
   type = map(object({
     name     = string
-    password = string
+    password = optional(string)
+    sudo     = optional(bool)
   }))
 }
