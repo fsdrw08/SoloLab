@@ -9,10 +9,23 @@ terraform {
       version = ">=3.2.1"
     }
   }
-  backend "consul" {
-    address = "192.168.255.1:8500"
-    scheme  = "http"
-    path    = "tfstate/Dev-Fedora-VM"
+  backend "s3" {
+    bucket = "tfstate"               # Name of the S3 bucket
+    key    = "Hyper-V/Dev-Fedora-VM" # Name of the tfstate file
+
+    endpoints = {
+      s3 = "http://192.168.255.1:9000" # Minio endpoint
+    }
+
+    access_key = "minio" # Access and secret keys
+    secret_key = "miniosecret"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
   }
 }
 
