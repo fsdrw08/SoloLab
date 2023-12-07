@@ -150,54 +150,6 @@ module "cloudinit_nocloud_iso" {
               fi
               echo "Disk configuration complete"
 
-          # add container Consul
-          - path: /tmp/Add-ContainerConsul.sh
-            owner: root:vyattacfg
-            permissions: '0775'
-            content: |
-              #!/bin/vbash
-              # Ensure that we have the correct group or we'll corrupt the configuration
-              if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-                  exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
-              fi
-              source /opt/vyatta/etc/functions/script-template
-              sudo mkdir -p /mnt/data/consul/data
-              sudo chmod 777 /mnt/data/consul/data
-              run add container image docker.io/bitnami/consul:latest
-              configure
-              # Container networks
-              set container network containers prefix '172.16.0.0/24'
-              # consul
-              set container name consul network containers address 172.16.0.20
-              set container name consul image docker.io/bitnami/consul:latest
-              set container name consul memory 1024
-              set container name consul port consul_rpc source 8300
-              set container name consul port consul_rpc destination 8300
-              set container name consul port consul_serf source 8301
-              set container name consul port consul_serf destination 8301
-              set container name consul port consul_http source 8500
-              set container name consul port consul_http destination 8500
-              set container name consul port consul_dns source 8600
-              set container name consul port consul_dns destination 8600
-              set container name consul environment 'TZ' value 'Asia/Shanghai'
-              # https://github.com/bitnami/containers/blob/main/bitnami/consul/1/debian-11/rootfs/opt/bitnami/scripts/consul/run.sh
-              # https://github.com/bitnami/containers/issues/14525
-              # set container name consul environment 'CONSUL_BIND_ADDR' value '127.0.0.1'
-              # https://github.com/bitnami/containers/tree/main/bitnami/consul#persisting-your-application
-              set container name consul volume 'consul_data' source '/mnt/data/consul/data'
-              set container name consul volume 'consul_data' destination '/bitnami'
-              # https://gist.github.com/peterkeen/97c566131af6f085628b5e4f1c4a8e1b
-              # https://www.reddit.com/r/vyos/comments/vkfuoo/dns_container_vyos/
-              set nat destination rule 20 description 'consul forward'
-              set nat destination rule 20 inbound-interface 'eth1'
-              set nat destination rule 20 protocol 'tcp_udp'
-              set nat destination rule 20 destination port 8500
-              set nat destination rule 20 source address 192.168.255.0/24
-              set nat destination rule 20 translation address 172.16.0.20
-
-              commit
-              save
-
           # add container Cockpit-WS
           - path: /tmp/Add-ContainerCockpitWS.sh
             owner: root:vyattacfg
