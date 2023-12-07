@@ -12,7 +12,7 @@ data "helm_template" "podman_consul" {
   chart = "${path.module}/../../../HelmWorkShop/helm-charts/charts/consul"
 
   values = [
-    "${file("${path.module}/../../../HelmWorkShop/helm-charts/charts/consul/values-sololab-server-socket.yaml")}"
+    "${file("${path.module}/values-consul-server-socket.yaml")}"
   ]
 }
 
@@ -32,7 +32,7 @@ WantedBy=default.target
 Yaml=consul-aio.yaml
 # Use the host network
 Network=host
-UserNS=keep-id
+UserNS=keep-id:uid=100,gid=1000
 EOT
 }
 

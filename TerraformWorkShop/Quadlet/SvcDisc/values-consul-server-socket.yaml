@@ -1,0 +1,246 @@
+## %%MAIN_CONTAINER/POD_DESCRIPTION%%
+##
+consul:
+  ## @param consul.containerPorts %%MAIN_CONTAINER_NAME%% container port to expose to host
+  ## containerPorts:
+  ##   - name: server
+  ##     containerPort: 8300
+  ##     hostIP: 192.168.255.11
+  ##     protocol: TCP
+  ##   - name: serf_lan
+  ##     containerPort: 8301
+  ##     hostIP: 192.168.255.11
+  ##     protocol: TCP
+  ##   - name: web
+  ##     containerPort: 8500
+  ##   - name: dns
+  ##     containerPort: 8600
+  ##     protocol: UDP
+  # containerPorts:
+  # - name: server
+  #   containerPort: 8300
+  #   # hostIP: 192.168.255.11
+  #   protocol: TCP
+  # - name: serf_lan
+  #   containerPort: 8301
+  #   # hostIP: 192.168.255.11
+  #   protocol: TCP
+  # - name: dns
+  #   containerPort: 8600
+  #   protocol: UDP
+  ## @param consul.configFiles config file to start consul, the sub config block will convert to json and injected as ConfigMap
+  ## You can add whatever sub items under this block
+  ## ref: https://developer.hashicorp.com/consul/docs/agent/config/config-files
+  configFiles:
+    common:
+      ## @param consul.configFiles.common.addresses This is a nested object that allows setting bind addresses.
+      ## In Consul 1.0 and later these can be set to a space-separated list of addresses to bind to, or a [go-sockaddr] template that can potentially resolve to multiple addresses.
+      ## This address must be set when ui is enabled
+      ## ref: https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-acl-policy/server1.json#L7
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/config-files#addresses
+      addresses:
+        # http: "unix:///home/consul/socket/http.sock"
+        # grpc: "unix:///home/consul/socket/grpc.sock"
+        dns: "192.168.255.20" # Defaults to client_addr
+      ## @param consul.configFiles.common.client_addr The address to which Consul will bind client interfaces, including the HTTP and DNS servers.
+      ## By default, this is "127.0.0.1", allowing only loopback connections.
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_client
+      client_addr: "0.0.0.0"
+      ## @param consul.configFiles.common.bind_addr The address that should be bound to for internal cluster communications
+      ## This is an IP address that should be reachable by all other nodes in the cluster.
+      ## By default, this is "0.0.0.0", meaning Consul will bind to all addresses on the local machine and will advertise the private IPv4 address to the rest of the cluster.
+      ## If there are multiple private IPv4 addresses available, Consul will exit with an error at startup.
+      bind_addr: "192.168.255.20"
+      ## @param consul.configFiles.common.encrypt Specifies the secret key to use for encryption of Consul network traffic.
+      ## The easiest way to create an encryption key is to use consul keygen.
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_encrypt
+      encrypt: qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0=
+      ports:
+        dns: 53
+    server:
+      ## @param consul.configFiles.server.bootstrap_expect This flag provides the number of expected servers in the datacenter.
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_bootstrap_expect
+      bootstrap_expect: 1
+      ## @param consul.configFiles.server.server This flag is used to control if an agent is in server or client mode. When provided, an agent will act as a Consul server.
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/config-files#server-1
+      ## ref: https://developer.hashicorp.com/consul/docs/agent/config/cli-flags#_server
+      server: true
+    ## ref: https://github.com/hashicorp/learn-consul-docker/blob/v0.3/datacenter-deploy-auto-config/vault/consul/server1.json
+    acl:
+      acl:
+        enabled: true
+        default_policy: deny
+        enable_token_persistence: true
+        tokens:
+          initial_management: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
+
+  ## @param consul.existingConfigmap The name of an existing ConfigMap with your custom configuration for %%MAIN_CONTAINER_NAME%%
+  ##
+  existingConfigmap:
+  ## @param consul.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param consul.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param consul.hostAliases %%MAIN_CONTAINER_NAME%% pods host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  ## @param consul.podLabels Extra labels for %%MAIN_CONTAINER_NAME%% pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.consul.rule: "Host(`consul.infra.sololab`)"
+  #   traefik.http.routers.consul.entryPoints: websecure
+  #   traefik.http.routers.consul.tls.certresolver: internal
+  #   traefik.http.services.consul.loadbalancer.server.port: 8500
+  ## @param consul.podAnnotations Annotations for %%MAIN_CONTAINER_NAME%% pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  ## @param consul.autoscaling.enabled Enable autoscaling for consul
+  ## @param consul.autoscaling.minReplicas Minimum number of consul replicas
+  ## @param consul.autoscaling.maxReplicas Maximum number of consul replicas
+  ## @param consul.autoscaling.targetCPU Target CPU utilization percentage
+  ## @param consul.autoscaling.targetMemory Target Memory utilization percentage
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: ""
+    maxReplicas: ""
+    targetCPU: ""
+    targetMemory: ""
+
+  ## @param consul.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for %%MAIN_CONTAINER_NAME%% nodes
+  ##
+  extraEnvVarsCM: ""
+  ## @param consul.extraEnvVarsSecret Name of existing Secret containing extra env vars for %%MAIN_CONTAINER_NAME%% nodes
+  ##
+  extraEnvVarsSecret: ""
+  ## @param consul.extraVolumes Optionally specify extra list of additional volumes for the %%MAIN_CONTAINER_NAME%% pod(s)
+  ##
+  extraVolumes:
+    - name: consul-socket
+      hostPath:
+        path: /home/podmgr/consul/
+        type: Directory
+  extraVolumeMounts:
+    - name: consul-socket
+      mountPath: "/home/consul/socket"
+  ## @param consul.sidecars Add additional sidecar containers to the %%MAIN_CONTAINER_NAME%% pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param consul.initContainers Add additional init containers to the %%MAIN_CONTAINER_NAME%% pod(s)
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'echo "hello world"']
+  ##
+  initContainers: []
+
+## @section Persistence Parameters
+##
+
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: true
+  ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+  ##
+  subPath: ""
+  ## @param persistence.storageClass Storage class of backing PVC
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ##
+  annotations: {}
+  ## @param persistence.accessModes Persistent Volume Access Modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Size of data volume
+  ##
+  size: 8Gi
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+## @section Init Container Parameters
+##
+
+## 'volumePermissions' init container parameters
+## Changes the owner and group of the persistent volume mount point to runAsUser:fsGroup values
+##   based on the *podSecurityContext/*containerSecurityContext parameters
+##
+volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes the owner/group of the PV mount point to `runAsUser:fsGroup`
+  ##
+  enabled: false
+  ## OS Shell + Utility image
+  ## ref: https://hub.docker.com/r/bitnami/os-shell/tags/
+  ## @param volumePermissions.image.registry OS Shell + Utility image registry
+  ## @param volumePermissions.image.repository OS Shell + Utility image repository
+  ## @param volumePermissions.image.tag OS Shell + Utility image tag (immutable tags are recommended)
+  ## @param volumePermissions.image.pullPolicy OS Shell + Utility image pull policy
+  ## @param volumePermissions.image.pullSecrets OS Shell + Utility image pull secrets
+  ##
+  image:
+    registry: docker.io
+    repository: bitnami/os-shell
+    tag: 11-debian-11-r%%IMAGE_REVISION%%
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## e.g:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+  ## Init container's resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param volumePermissions.resources.limits The resources limits for the init container
+  ## @param volumePermissions.resources.requests The requested resources for the init container
+  ##
+  resources:
+    limits: {}
+    requests: {}
+  ## Init container Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param volumePermissions.containerSecurityContext.runAsUser Set init container's Security Context runAsUser
+  ## NOTE: when runAsUser is set to special value "auto", init container will try to chown the
+  ##   data folder to auto-determined user&group, using commands: `id -u`:`id -G | cut -d" " -f2`
+  ##   "auto" is especially useful for OpenShift which has scc with dynamic user ids (and 0 is not allowed)
+  ##
+  # containerSecurityContext:
+  #   runAsUser: 0
+## @section Other Parameters
+##
+
