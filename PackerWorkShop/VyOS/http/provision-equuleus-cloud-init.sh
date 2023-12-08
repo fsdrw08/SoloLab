@@ -13,7 +13,7 @@ EOF
 apt-get update
 
 # Install cloud-init
-apt-get install -t equuleus -y --force-yes cloud-init cloud-utils ifupdown jq
+apt-get install -t equuleus -y --force-yes cloud-init cloud-utils ifupdown jq nfs-ganesha nfs-ganesha-vfs
 
 # apt-get clean
 apt-get clean
