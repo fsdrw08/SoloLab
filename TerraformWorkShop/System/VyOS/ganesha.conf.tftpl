@@ -1,0 +1,32 @@
+###################################################
+#
+# EXPORT
+#
+# To function, all that is required is an EXPORT
+#
+# Define the absolute minimal export
+#
+###################################################
+
+EXPORT
+{
+        Protocols = 3, 4;
+        
+        # Export Id (mandatory, each EXPORT must have a unique Export_Id)
+        Export_Id = 77;
+
+        # Exported path (mandatory)
+        Path = ${export_path};
+
+        # Pseudo Path (required for NFS v4)
+        Pseudo = ${export_path};
+
+        # Required for access (default is None)
+        # Could use CLIENT blocks instead
+        Access_Type = RW;
+
+        # Exporting FSAL
+        FSAL {
+                Name = VFS;
+        }
+}
