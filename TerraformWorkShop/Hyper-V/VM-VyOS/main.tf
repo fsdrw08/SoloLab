@@ -88,12 +88,10 @@ module "cloudinit_nocloud_iso" {
           # timezone
           - set system time-zone 'Asia/Shanghai'
           
-
         write_files:
-          # config external disk
-          - path: /tmp/Set-ExternalDisk.sh
+          - path: /home/vyos/Set-ExternalDisk.sh
             owner: root:vyattacfg
-            permissions: "0775"
+            permissions: '0775'
             content: |
               #!/usr/bin/bash
               # Check if disk exists
@@ -148,88 +146,15 @@ module "cloudinit_nocloud_iso" {
                 echo "Mounting /dev/sdb1 to /mnt/data"
                 mount /mnt/data
               fi
+
+              # Create NFS dir if it doesn't exist
+              if [ ! -d "/mnt/data/nfs" ]; then
+              echo "Perpare /mnt/data/nfs"
+              mkdir -p /mnt/data/nfs
+              chmod 777 /mnt/data/nfs
+              fi
+
               echo "Disk configuration complete"
-
-          # add container Cockpit-WS
-          - path: /tmp/Add-ContainerCockpitWS.sh
-            owner: root:vyattacfg
-            permissions: '0775'
-            content: |
-              #!/bin/vbash
-              # Ensure that we have the correct group or we'll corrupt the configuration
-              if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-                  exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
-              fi
-              source /opt/vyatta/etc/functions/script-template
-              run add container image quay.io/cockpit/ws:latest
-              configure
-              # Container networks
-              set container network containers prefix '172.16.0.0/24'
-              # consul
-              set container name cockpitws network containers address 172.16.0.30
-              set container name cockpitws image quay.io/cockpit/ws:latest
-              set container name cockpitws port cockpitws_http source 9090
-              set container name cockpitws port cockpitws_http destination 9090
-              set container name cockpitws environment 'TZ' value 'Asia/Shanghai'
-              # https://gist.github.com/peterkeen/97c566131af6f085628b5e4f1c4a8e1b
-              # https://www.reddit.com/r/vyos/comments/vkfuoo/dns_container_vyos/
-              set nat destination rule 30 description 'cockpitws forward'
-              set nat destination rule 30 inbound-interface 'eth1'
-              set nat destination rule 30 protocol 'tcp_udp'
-              set nat destination rule 30 destination port 9090
-              set nat destination rule 30 source address 192.168.255.0/24
-              set nat destination rule 30 translation address 172.16.0.30
-
-              commit
-              save
-
-          # add container MinIO
-          - path: /tmp/Add-ContainerMinIO.sh
-            owner: root:vyattacfg
-            permissions: '0775'
-            content: |
-              #!/bin/vbash
-              # Ensure that we have the correct group or we'll corrupt the configuration
-              if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-                  exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
-              fi
-              source /opt/vyatta/etc/functions/script-template
-              run add container image docker.io/bitnami/minio:latest
-              sudo mkdir -p /mnt/data/bitnami/minio/data
-              sudo chmod 777 /mnt/data/bitnami/minio/data
-              configure
-              # Container networks
-              set container network containers prefix '172.16.0.0/24'
-              # consul
-              set container name minio network containers address 172.16.0.40
-              set container name minio image docker.io/bitnami/minio:latest
-              set container name minio memory 1024
-              set container name minio port minio_http source 9000
-              set container name minio port minio_http destination 9000
-              set container name minio port minio_console source 9001
-              set container name minio port minio_console destination 9001
-              set container name minio environment 'TZ' value 'Asia/Shanghai'
-              # https://github.com/bitnami/containers/tree/main/bitnami/minio#persisting-your-database
-              set container name minio volume 'minio_data' source '/mnt/data/bitnami/minio/data'
-              set container name minio volume 'minio_data' destination '/bitnami/minio/data'
-              # https://gist.github.com/peterkeen/97c566131af6f085628b5e4f1c4a8e1b
-              # https://www.reddit.com/r/vyos/comments/vkfuoo/dns_container_vyos/
-              set nat destination rule 40 description 'minio http forward'
-              set nat destination rule 40 inbound-interface 'eth1'
-              set nat destination rule 40 protocol 'tcp_udp'
-              set nat destination rule 40 destination port 9000
-              set nat destination rule 40 source address 192.168.255.0/24
-              set nat destination rule 40 translation address 172.16.0.40
-
-              set nat destination rule 41 description 'minio console forward'
-              set nat destination rule 41 inbound-interface 'eth1'
-              set nat destination rule 41 protocol 'tcp_udp'
-              set nat destination rule 41 destination port 9001
-              set nat destination rule 41 source address 192.168.255.0/24
-              set nat destination rule 41 translation address 172.16.0.40
-              
-              commit
-              save
 
           - path: /tmp/finalConfig.sh
             owner: root:vyattacfg
@@ -273,10 +198,10 @@ resource "null_resource" "remote" {
     vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
-    host     = var.hyperv_host
-    port     = var.hyperv_port
-    user     = var.hyperv_user
-    password = sensitive(var.hyperv_password)
+    host     = var.hyperv.host
+    port     = var.hyperv.port
+    user     = var.hyperv.user
+    password = sensitive(var.hyperv.password)
   }
 
   connection {
@@ -350,7 +275,7 @@ module "hyperv_machine_instance" {
     memory_startup_bytes = var.memory_startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Off"
+    state                = "Running"
 
     vm_firmware = {
       console_mode                    = "Default"
@@ -399,5 +324,18 @@ module "hyperv_machine_instance" {
       }
     ]
 
+  }
+}
+
+resource "null_resource" "ext_disk" {
+  depends_on = [module.hyperv_machine_instance]
+  connection {
+    type     = "ssh"
+    host     = var.vm_conn.host
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  provisioner "remote-exec" {
+    inline = ["sudo bash /home/vyos/Set-ExternalDisk.sh"]
   }
 }

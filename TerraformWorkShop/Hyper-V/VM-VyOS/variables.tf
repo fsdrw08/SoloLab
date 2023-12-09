@@ -1,22 +1,25 @@
-variable "hyperv_host" {
-  type    = string
-  default = "127.0.0.1"
+variable "hyperv" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
+  default = {
+    host     = "127.0.0.1"
+    port     = 5986
+    user     = "root"
+    password = "P@ssw0rd"
+  }
 }
 
-variable "hyperv_port" {
-  type    = string
-  default = 5986
-}
-
-variable "hyperv_user" {
-  type    = string
-  default = null
-}
-
-variable "hyperv_password" {
-  type      = string
-  default   = null
-  sensitive = true
+variable "vm_conn" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
 }
 
 variable "vm_name" {
@@ -65,5 +68,3 @@ variable "memory_minimum_bytes" {
   type    = number
   default = 1023410176
 }
-
-
