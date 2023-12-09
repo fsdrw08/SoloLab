@@ -15,6 +15,9 @@ apt-get update
 # Install cloud-init
 apt-get install -t equuleus -y --force-yes cloud-init cloud-utils ifupdown jq nfs-ganesha nfs-ganesha-vfs
 
+# stop and disable nfs-ganesha
+systemctl disable nfs-ganesha
+
 # apt-get clean
 apt-get clean
 
