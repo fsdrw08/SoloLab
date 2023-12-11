@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/null"
       version = ">= 3.2.1"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = ">=2.4.0"
+    }
     system = {
       source  = "neuspaces/system"
       version = ">=0.4.0"
