@@ -17,12 +17,22 @@ source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
 network_adaptors = [
   {
-    name        = "Default Switch"
+    name        = "WAN"
     switch_name = "Default Switch"
+    dynamic_mac_address = false
+    static_mac_address = "0000DEADBEEF"
   },
   {
-    name        = "Internal Switch"
+    name        = "LAN1-P1"
     switch_name = "Internal Switch"
+    dynamic_mac_address = false
+    static_mac_address = "0000FEE1900D"
+  },
+  {
+    name        = "LAN1-P2"
+    switch_name = "Internal Switch"
+    dynamic_mac_address = false
+    static_mac_address = "DECAFEC0FFEE"
   },
 
 ]

@@ -49,6 +49,8 @@ module "cloudinit_nocloud_iso" {
           - set interfaces ethernet eth0 description 'WAN'
           - set interfaces ethernet eth1 address '192.168.255.1/24'
           - set interfaces ethernet eth1 description 'LAN'
+          - set interfaces ethernet eth2 address '192.168.255.2/24'
+          - set interfaces ethernet eth2 description 'SVC'
           # Service
           # DHCP server for local network
           - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start '192.168.255.100'
@@ -78,9 +80,9 @@ module "cloudinit_nocloud_iso" {
           # hostname
           - set system host-name 'vyos-lts'
           # auth config
-          - set system login user vagrant authentication plaintext-password 'vagrant'
-          - set system login user vagrant authentication public-keys vagrant key 'AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=='
-          - set system login user vagrant authentication public-keys vagrant type 'ssh-rsa'
+          - set system login user vyos authentication plaintext-password 'vyos'
+          - set system login user vyos authentication public-keys vagrant key 'AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=='
+          - set system login user vyos authentication public-keys vagrant type 'ssh-rsa'
           # name server
           - set system name-server '192.168.255.1'
           # ntp

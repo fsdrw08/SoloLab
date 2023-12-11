@@ -44,8 +44,10 @@ variable "data_disk_ref" {
 
 variable "network_adaptors" {
   type = list(object({
-    name        = string
-    switch_name = string
+    name                = string
+    switch_name         = string
+    dynamic_mac_address = optional(bool)
+    static_mac_address  = optional(string)
   }))
 }
 
