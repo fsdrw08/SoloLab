@@ -1,46 +1,19 @@
-locals {
-  # https://stackoverflow.com/questions/52628749/set-terraform-default-interpreter-for-local-exec
-  is_windows = substr(pathexpand("~"), 0, 1) == "/" ? false : true
-}
-
 # minio
-resource "null_resource" "minio_bin" {
-  # source = "https://dl.min.io/server/minio/release/linux-amd64/minio"
-  provisioner "local-exec" {
-    interpreter = local.is_windows ? ["PowerShell", "-Command"] : []
-    command = local.is_windows ? join(";",
-      [
-        "curl.exe -s -o ${path.module}/minio.bin https://dl.min.io/server/minio/release/linux-amd64/minio"
-      ]
-      ) : join(";",
-      [
-        "curl -s -o ${path.module}/minio.bin https://dl.min.io/server/minio/release/linux-amd64/minio"
-      ]
-    )
-  }
-}
-
-data "null_data_source" "minio_bin" {
-  inputs = {
-    file = "${path.module}/minio.bin"
-  }
-}
-
 resource "system_file" "minio_bin" {
-  depends_on = [null_resource.minio_bin]
-  path       = "/usr/local/bin/minio"
-  source     = data.null_data_source.minio_bin.outputs.file
-  mode       = 755
+  path   = "/usr/local/bin/minio"
+  source = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+  mode   = 755
 }
 
 resource "system_file" "minio_service" {
   depends_on = [system_file.minio_bin]
   path       = "/usr/lib/systemd/system/minio.service"
-  content = templatefile("${path.module}/minio.service.tftpl", {
-    user  = "vyos",
-    group = "users",
-  })
-  # source = "${path.module}/minio.service"
+  content = templatefile("${path.module}/minio.service.tftpl",
+    {
+      user  = "vyos",
+      group = "users",
+    }
+  )
   connection {
     type     = "ssh"
     host     = var.vm_conn.host

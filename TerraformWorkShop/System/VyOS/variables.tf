@@ -7,13 +7,18 @@ variable "vm_conn" {
   })
 }
 
-variable "windows_download_consul" {
+variable "consul_conn" {
+  type = object({
+    address    = string
+    datacenter = string
+    scheme     = optional(string)
+  })
+}
+variable "consul_version" {
   type    = string
-  default = <<-EOT
-  if (-not (Test-Path $consulBin)) {
-    curl.exe -s -o "$env:userprofile\AppData\Local\Temp\consul.zip" https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip
-    tar.exe -x -f "$env:userprofile\AppData\Local\Temp\consul.zip"
-    mv "$env:userprofile\AppData\Local\Temp\consul" $consulBin
-  }
-  EOT
+  default = "1.17.0"
+}
+
+variable "consul_token_mgmt" {
+  type = string
 }

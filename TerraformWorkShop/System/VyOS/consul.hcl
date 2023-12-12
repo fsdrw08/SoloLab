@@ -17,14 +17,19 @@ datacenter = "dc1"
 # cluster state. Additionally, the directory must support the use of filesystem
 # locking, meaning some types of mounted folders (e.g. VirtualBox shared folders) may
 # not be suitable.
-data_dir = "/mnt/data/consul"
+data_dir = "${data_dir}"
 
 # client_addr
 # The address to which Consul will bind client interfaces, including the HTTP and DNS
 # servers. By default, this is "127.0.0.1", allowing only loopback connections. In
 # Consul 1.0 and later this can be set to a space-separated list of addresses to bind
 # to, or a go-sockaddr template that can potentially resolve to multiple addresses.
-client_addr = "0.0.0.0"
+// addresses{
+//   // http = "unix:///mnt/data/consul/http.sock"
+//   // grpc = "unix:///mnt/data/consul/grpc.sock"
+//   dns = "127.0.0.1"
+// }
+client_addr = "192.168.255.2"
 
 # ui
 # Enables the built-in web UI server and the required HTTP routes. This eliminates

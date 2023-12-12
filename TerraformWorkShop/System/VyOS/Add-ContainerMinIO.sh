@@ -35,7 +35,6 @@ set nat destination rule 41 description 'minio console forward'
 set nat destination rule 41 inbound-interface 'eth1'
 set nat destination rule 41 protocol 'tcp_udp'
 set nat destination rule 41 destination port 9001
-set nat destination rule 41 source address 192.168.255.0/24
 set nat destination rule 41 translation address 172.16.0.40
               
 commit
