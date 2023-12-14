@@ -29,7 +29,11 @@ data_dir = "${data_dir}"
 //   // grpc = "unix:///mnt/data/consul/grpc.sock"
 //   dns = "127.0.0.1"
 // }
-client_addr = "192.168.255.2"
+client_addr = "${client_addr}"
+
+ports{
+  dns = 53
+}
 
 # ui
 # Enables the built-in web UI server and the required HTTP routes. This eliminates
@@ -53,7 +57,7 @@ server = true
 # Bind addr
 # You may use IPv4 or IPv6 but if you have multiple interfaces you must be explicit.
 #bind_addr = "[::]" # Listen on all IPv6
-bind_addr = "192.168.255.2" # Listen on all IPv4
+bind_addr = "${bind_addr}" # 0.0.0.0 Listen on all IPv4
 #
 # Advertise addr - if you want to point clients to a different address than bind or LB.
 #advertise_addr = "127.0.0.1"
