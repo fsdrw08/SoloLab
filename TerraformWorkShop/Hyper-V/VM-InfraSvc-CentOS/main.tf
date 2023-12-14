@@ -78,6 +78,7 @@ module "cloudinit_nocloud_iso" {
           - cockpit-podman
           - podman
         
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
         disk_setup:
           /dev/sdb:

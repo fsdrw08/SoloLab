@@ -77,6 +77,8 @@
               "consul.infra.sololab"
             ]
 
+        # https://developer.hashicorp.com/consul/tutorials/get-started-vms/virtual-machine-gs-service-discovery#modify-service-definition-tags
+        # we can put consul service definition filei in consul config dir, it will automatic registry the service
         - key: config/systemd
           value: |
             [Unit]
