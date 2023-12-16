@@ -48,7 +48,7 @@ resource "system_file" "stepcli_tar" {
 
 # extract and put it to /usr/bin/
 resource "null_resource" "stepcli_bin" {
-  depends_on = [system_file.step_tar]
+  depends_on = [system_file.stepcli_tar]
   triggers = {
     stepcli_version = var.stepcli_version
     host            = var.vm_conn.host
@@ -78,25 +78,34 @@ resource "null_resource" "stepcli_bin" {
   }
 }
 
-resource "system_folder" "stepca" {
+resource "system_link" "stepca_path" {
   depends_on = [
     null_resource.stepca_bin,
     null_resource.stepcli_bin
   ]
-  path = "/etc/step-ca/"
+  path   = "/etc/step-ca/"
+  target = "/mnt/data/step-ca/"
+  connection {
+    type     = "ssh"
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mkdir -p /mnt/data/step-ca",
+      "sudo chown vyos:users /mnt/data/step-ca",
+    ]
+  }
 }
 
-resource "system_file" "stepca_password" {
-  depends_on = [system_folder.stepca]
-  path       = "/etc/step-ca/password"
-  content    = var.stepca_password
-}
-
-resource "system_file" "stepca_init" {
-  depends_on = [system_file.stepca_password]
-  path       = "/etc/step-ca/step-ca.env"
-  source     = <<-EOT
+resource "system_file" "stepca_init_env" {
+  depends_on = [system_link.stepca_path]
+  path       = "/home/vyos/step-ca.env"
+  content    = <<-EOT
     # https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=
+    STEPPATH=/etc/step-ca/
     DOCKER_STEPCA_INIT_NAME=sololab
     DOCKER_STEPCA_INIT_ACME=true
     DOCKER_STEPCA_INIT_DNS_NAMES=localhost,step-ca.service.consul
@@ -107,18 +116,27 @@ resource "system_file" "stepca_init" {
   EOT
 }
 
-resource "system_file" "stepca_entrypoint" {
-  depends_on = [
-    null_resource.stepca_bin,
-    null_resource.stepcli_bin,
-    system_file.stepca_password,
-    system_file.stepca_init,
-  ]
+resource "system_file" "stepca_init_script" {
+  depends_on = [system_file.stepca_init_env]
+  path       = "/home/vyos/step-ca_entrypoint.sh"
+  content    = file("${path.module}/step-ca/entrypoint.sh")
+  connection {
+    type     = "ssh"
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "bash -c \"source ${system_file.stepca_init_env.path}; . ${system_file.stepca_init_script.path}\"",
+    ]
+  }
 }
 
 # persist step-ca systemd unit file
 resource "system_file" "stepca_service" {
-  depends_on = [system_file.stepca_init]
+  depends_on = [system_file.stepca_init_env]
   path       = "/etc/systemd/system/step-ca.service"
   content = templatefile("${path.module}/step-ca/step-ca.service.tftpl", {
     user  = "vyos",

@@ -8,7 +8,7 @@ resource "system_file" "minio_bin" {
 resource "system_file" "minio_service" {
   depends_on = [system_file.minio_bin]
   path       = "/usr/lib/systemd/system/minio.service"
-  content = templatefile("${path.module}/minio.service.tftpl",
+  content = templatefile("${path.module}/minio/minio.service.tftpl",
     {
       user  = "vyos",
       group = "users",

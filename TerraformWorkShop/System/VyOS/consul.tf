@@ -48,7 +48,7 @@ resource "system_folder" "consul_config" {
 resource "system_file" "consul_config" {
   depends_on = [system_folder.consul_config]
   path       = "/etc/consul.d/consul.hcl"
-  content = templatefile("${path.module}/consul.hcl", {
+  content = templatefile("${path.module}/consul/consul.hcl", {
     data_dir    = "${var.consul_conf.data_dir}",
     client_addr = "${var.consul_conf.client_addr}",
     bind_addr   = "${var.consul_conf.bind_addr}",
@@ -92,7 +92,7 @@ resource "system_file" "consul_config" {
 resource "system_file" "consul_service" {
   depends_on = [system_file.consul_config]
   path       = "/etc/systemd/system/consul.service"
-  content = templatefile("${path.module}/consul.service.tftpl", {
+  content = templatefile("${path.module}/consul/consul.service.tftpl", {
     user  = "vyos",
     group = "users",
   })
