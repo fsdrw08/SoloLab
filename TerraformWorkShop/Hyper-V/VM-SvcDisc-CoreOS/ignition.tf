@@ -41,7 +41,7 @@ data "ignition_filesystem" "data" {
 # https://github.com/meyskens/vagrant-coreos-baremetal/blob/5470c582fa42f499bc17eb501d3e592cf85caaf1/terraform/modules/ignition/systemd/files/data.mount.tpl
 # https://unix.stackexchange.com/questions/225401/how-to-see-full-log-from-systemctl-status-service/225407#225407
 data "ignition_systemd_unit" "data" {
-  # mind the unit name, The .mount file must be named based on the path (e.g. /var/mnt/data = var-mnt-data.mount)
+  # mind the unit name, The .mount file must be named based on the mount point path (e.g. /var/mnt/data = var-mnt-data.mount)
   # https://docs.fedoraproject.org/en-US/fedora-coreos/storage/#_configuring_nfs_mounts
   name    = "var-home-podmgr.mount"
   content = <<EOT

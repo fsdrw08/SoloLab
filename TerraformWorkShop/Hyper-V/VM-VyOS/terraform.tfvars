@@ -6,9 +6,9 @@ hyperv = {
 }
 
 vm_conn = {
-  host = "192.168.255.1"
-  port = 22
-  user = "vyos"
+  host     = "192.168.255.1"
+  port     = 22
+  user     = "vyos"
   password = "vyos"
 }
 
@@ -17,22 +17,22 @@ source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
 network_adaptors = [
   {
-    name        = "WAN"
-    switch_name = "Default Switch"
+    name                = "WAN"
+    switch_name         = "Default Switch"
     dynamic_mac_address = false
-    static_mac_address = "0000DEADBEEF"
+    static_mac_address  = "0000DEADBEEF"
   },
   {
-    name        = "LAN1-P1"
-    switch_name = "Internal Switch"
+    name                = "LAN1-P1"
+    switch_name         = "Internal Switch"
     dynamic_mac_address = false
-    static_mac_address = "0000FEE1900D"
+    static_mac_address  = "0000FEE1600D"
   },
   {
-    name        = "LAN1-P2"
-    switch_name = "Internal Switch"
+    name                = "LAN1-P2"
+    switch_name         = "Internal Switch"
     dynamic_mac_address = false
-    static_mac_address = "DECAFEC0FFEE"
+    static_mac_address  = "0000FEE1900D"
   },
 
 ]

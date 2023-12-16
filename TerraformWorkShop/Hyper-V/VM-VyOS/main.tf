@@ -38,6 +38,25 @@ module "cloudinit_nocloud_iso" {
         #cloud-config
         # https://github.com/ahpnils/lab-as-code/blob/be47a0d8aabf66b38f718de35546411eb60c879b/cloud-init/isp1router1/user-data#L4
         # https://docs.vyos.io/en/stable/automation/cloud-init.html
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+        disk_setup:
+          /dev/sdb:
+            table_type: gpt
+            layout: True
+            overwrite: False
+        fs_setup:
+          - label: data
+            filesystem: 'ext4'
+            device: '/dev/sdb'
+            partition: auto
+            overwrite: false
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+        # https://zhuanlan.zhihu.com/p/250658106
+        mounts:
+          - [ /dev/disk/by-label/data, /mnt, auto, "nofail,exec", ]
+        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
         # !!! one command per line
         # !!! if command ends in a value, it must be inside single quotes
         # !!! a single-quote symbol is not allowed inside command or value
@@ -329,15 +348,15 @@ module "hyperv_machine_instance" {
   }
 }
 
-resource "null_resource" "ext_disk" {
-  depends_on = [module.hyperv_machine_instance]
-  connection {
-    type     = "ssh"
-    host     = var.vm_conn.host
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
-  }
-  provisioner "remote-exec" {
-    inline = ["sudo bash /home/vyos/Set-ExternalDisk.sh"]
-  }
-}
+# resource "null_resource" "ext_disk" {
+#   depends_on = [module.hyperv_machine_instance]
+#   connection {
+#     type     = "ssh"
+#     host     = var.vm_conn.host
+#     user     = var.vm_conn.user
+#     password = var.vm_conn.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = ["sudo bash /home/vyos/Set-ExternalDisk.sh"]
+#   }
+# }
