@@ -33,8 +33,8 @@ cat <<EOF >>/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 datasource_list: [ NoCloud, ConfigDrive, None ]
 EOF
 
-# Update 10_vyos.cfg
-cp /mnt/09_vyos.cfg /etc/cloud/cloud.cfg.d/10_vyos.cfg
+# Update 09_vyos.cfg
+cp /mnt/09_vyos.cfg /etc/cloud/cloud.cfg.d/09_vyos.cfg
 
 # run dpkg-reconfigure cloud-init
 dpkg-reconfigure -f noninteractive cloud-init
