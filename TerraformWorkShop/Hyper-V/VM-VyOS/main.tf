@@ -48,13 +48,13 @@ module "cloudinit_nocloud_iso" {
         fs_setup:
           - label: data
             filesystem: 'ext4'
-            device: '/dev/sdb'
+            device: '/dev/sdb1'
             partition: auto
             overwrite: false
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
         # https://zhuanlan.zhihu.com/p/250658106
         mounts:
-          - [ /dev/disk/by-label/data, /mnt, auto, "nofail,exec", ]
+          - [ /dev/disk/by-label/data, /mnt/data, auto, "nofail,exec", ]
         mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
 
         # !!! one command per line
