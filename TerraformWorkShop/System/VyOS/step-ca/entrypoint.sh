@@ -6,7 +6,7 @@ set -eo pipefail
 # https://github.com/influxdata/influxdata-docker/blob/0d341f18067c4652dfa8df7dcb24d69bf707363d/influxdb/2.0/entrypoint.sh
 # (a repo with no LICENSE.md)
 
-# export STEPPATH=$(step path)
+# export STEPPATH=/etc/step-ca
 
 # List of env vars required for step ca init
 declare -ra REQUIRED_INIT_VARS=(DOCKER_STEPCA_INIT_NAME DOCKER_STEPCA_INIT_DNS_NAMES)

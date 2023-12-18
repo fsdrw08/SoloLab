@@ -26,8 +26,9 @@ resource "null_resource" "stepca_bin" {
   }
   provisioner "remote-exec" {
     inline = [
+      # https://smallstep.com/docs/step-ca/installation/#linux-binaries
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.stepca_tar.path} --directory=/usr/bin/ --overwrite",
+      "sudo tar --extract --file=${system_file.stepca_tar.path} --directory=/usr/bin/ --strip-components=1 --verbose --overwrite step-ca_linux_amd64/step-ca",
       "sudo chmod 755 /usr/bin/step-ca",
     ]
   }
@@ -66,7 +67,8 @@ resource "null_resource" "stepcli_bin" {
   provisioner "remote-exec" {
     inline = [
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.stepcli_tar.path} --directory=/usr/bin/ --overwrite",
+      # https://askubuntu.com/questions/45349/how-to-extract-files-to-another-directory-using-tar-command/470266#470266
+      "sudo tar --extract --file=${system_file.stepcli_tar.path} --directory=/usr/bin/ --strip-components=2 --verbose --overwrite step_linux_amd64/bin/step",
       "sudo chmod 755 /usr/bin/step",
     ]
   }
@@ -83,7 +85,7 @@ resource "system_link" "stepca_path" {
     null_resource.stepca_bin,
     null_resource.stepcli_bin
   ]
-  path   = "/etc/step-ca/"
+  path   = "/etc/step-ca"
   target = "/mnt/data/step-ca/"
   connection {
     type     = "ssh"
@@ -105,14 +107,15 @@ resource "system_file" "stepca_init_env" {
   path       = "/home/vyos/step-ca.env"
   content    = <<-EOT
     # https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=
-    STEPPATH=/etc/step-ca/
-    DOCKER_STEPCA_INIT_NAME=sololab
-    DOCKER_STEPCA_INIT_ACME=true
-    DOCKER_STEPCA_INIT_DNS_NAMES=localhost,step-ca.service.consul
-    DOCKER_STEPCA_INIT_SSH=true
-    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT=true
-    DOCKER_STEPCA_INIT_PROVISIONER_NAME=admin
-    DOCKER_STEPCA_INIT_PASSWORD_FILE=/etc/step-ca/password
+    STEPPATH="/etc/step-ca"
+    PWDPATH="/etc/step-ca/secrets/password"
+    DOCKER_STEPCA_INIT_NAME="sololab"
+    DOCKER_STEPCA_INIT_ACME="true"
+    DOCKER_STEPCA_INIT_DNS_NAMES="localhost,step-ca.service.consul"
+    DOCKER_STEPCA_INIT_SSH="true"
+    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT="true"
+    DOCKER_STEPCA_INIT_PROVISIONER_NAME="admin"
+    DOCKER_STEPCA_INIT_PASSWORD=${var.stepca_password}
   EOT
 }
 
@@ -129,7 +132,9 @@ resource "system_file" "stepca_init_script" {
   }
   provisioner "remote-exec" {
     inline = [
-      "bash -c \"source ${system_file.stepca_init_env.path}; . ${system_file.stepca_init_script.path}\"",
+      "mkdir -p /etc/step-ca/secrets",
+      "export  $(grep -v '^#' ${system_file.stepca_init_env.path} | xargs)",
+      "bash \"${system_file.stepca_init_script.path}\"",
     ]
   }
 }

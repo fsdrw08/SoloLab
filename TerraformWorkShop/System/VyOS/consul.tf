@@ -122,7 +122,17 @@ resource "system_service_systemd" "consul" {
   provisioner "remote-exec" {
     inline = [
       "/usr/bin/sleep 5",
+      #  [[ ! $(consul acl policy list -http-addr=http://192.168.255.2:8500 -token="e95b599e-166e-7d80-08ad-aee76e7ddf19" -format json | jq '.[] | .Name') =~ "anonymous" ]] && \
+      # consul acl policy create -http-addr=http://192.168.255.2:8500 -token="e95b599e-166e-7d80-08ad-aee76e7ddf19" -name anonymous -rules - <<'EOF'
+      # node_prefix "" {
+      #   policy = "read"
+      # }
+      # service_prefix "" {
+      #   policy = "read"
+      # }
+      # EOF
       <<-EOT
+      if [[ ! $(consul acl policy list -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
       consul acl policy create -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -name anonymous -rules - <<'EOF'
       node_prefix "" {
         policy = "read"
@@ -131,11 +141,10 @@ resource "system_service_systemd" "consul" {
         policy = "read"
       }
       EOF
+      fi;
       EOT
       ,
-      <<-EOT
-      consul acl token update -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description "Anonymous Token"
-      EOT
+      "consul acl token update -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
     ]
   }
 }
