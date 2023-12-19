@@ -43,10 +43,26 @@ variable "stepcli_version" {
   default     = "0.25.2"
 }
 
-variable "stepca_password" {
-  type = string
+variable "stepca_conf" {
+  type = object({
+    data_dir = string
+    init = object({
+      name             = string
+      acme             = bool
+      dns_names        = string
+      ssh              = bool
+      remote_mgmt      = bool
+      provisioner_name = string
+    })
+    password    = string
+    pwd_subpath = string
+  })
 }
 
 variable "traefik_version" {
   type = string
+}
+
+variable "minio_conf" {
+
 }

@@ -86,7 +86,7 @@ resource "system_link" "stepca_path" {
     null_resource.stepcli_bin
   ]
   path   = "/etc/step-ca"
-  target = "/mnt/data/step-ca/"
+  target = var.stepca_conf.data_dir
   connection {
     type     = "ssh"
     host     = var.vm_conn.host
@@ -96,8 +96,8 @@ resource "system_link" "stepca_path" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /mnt/data/step-ca",
-      "sudo chown vyos:users /mnt/data/step-ca",
+      "sudo mkdir -p ${var.stepca_conf.data_dir}",
+      "sudo chown vyos:users ${var.stepca_conf.data_dir}",
     ]
   }
 }
@@ -107,15 +107,16 @@ resource "system_file" "stepca_init_env" {
   path       = "/home/vyos/step-ca.env"
   content    = <<-EOT
     # https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=
+    # https://github.com/smallstep/certificates/blob/master/docker/entrypoint.sh
     STEPPATH="/etc/step-ca"
-    PWDPATH="/etc/step-ca/secrets/password"
-    DOCKER_STEPCA_INIT_NAME="sololab"
-    DOCKER_STEPCA_INIT_ACME="true"
-    DOCKER_STEPCA_INIT_DNS_NAMES="localhost,step-ca.service.consul"
-    DOCKER_STEPCA_INIT_SSH="true"
-    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT="true"
-    DOCKER_STEPCA_INIT_PROVISIONER_NAME="admin"
-    DOCKER_STEPCA_INIT_PASSWORD=${var.stepca_password}
+    PWDPATH="/etc/step-ca/${var.stepca_conf.pwd_subpath}"
+    DOCKER_STEPCA_INIT_NAME="${var.stepca_conf.init.name}"
+    DOCKER_STEPCA_INIT_ACME="${var.stepca_conf.init.acme}"
+    DOCKER_STEPCA_INIT_DNS_NAMES="${var.stepca_conf.init.dns_names}"
+    DOCKER_STEPCA_INIT_SSH="${var.stepca_conf.init.ssh}"
+    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT="${var.stepca_conf.init.remote_mgmt}"
+    DOCKER_STEPCA_INIT_PROVISIONER_NAME="${var.stepca_conf.init.provisioner_name}"
+    DOCKER_STEPCA_INIT_PASSWORD=${var.stepca_conf.password}
   EOT
 }
 
@@ -148,3 +149,7 @@ resource "system_file" "stepca_service" {
     group = "users",
   })
 }
+
+# resource "system_service_systemd" "stepca_service" {
+
+# }

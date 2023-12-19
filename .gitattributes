@@ -1,4 +1,6 @@
-*       text=lf
+# Automatically normalize line endings (to LF) for all text-based files.
+*       text=auto eol=lf
+
 *.sh    text eol=lf
 *.ps1   text eol=crlf
 *.yaml  text eol=lf
