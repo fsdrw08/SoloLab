@@ -7,28 +7,24 @@ variable "vm_conn" {
   })
 }
 
-variable "consul_conn" {
+variable "consul" {
   type = object({
-    address    = string
-    datacenter = string
-    scheme     = optional(string)
+    bin_file_source    = string
+    init_script_source = optional(string)
+    config_file_source = string
+    config_file_vars = object({
+      data_dir        = string
+      client_addr     = string
+      token_init_mgmt = string
+    })
+    config_file_vars_others = optional(map(string))
+    systemd_file_source     = string
+    systemd_file_vars = object({
+      user  = string
+      group = string
+    })
+    systemd_file_vars_others = optional(map(string))
   })
-}
-variable "consul_version" {
-  type    = string
-  default = "1.17.0"
-}
-
-variable "consul_conf" {
-  type = object({
-    data_dir    = string
-    client_addr = string
-    bind_addr   = string
-  })
-}
-
-variable "consul_token_mgmt" {
-  type = string
 }
 
 variable "stepca_version" {
@@ -63,6 +59,10 @@ variable "traefik_version" {
   type = string
 }
 
-variable "minio_conf" {
-
+variable "minio" {
+  type = object({
+    bin_file_source     = string
+    systemd_file_source = string
+    config_file_source  = string
+  })
 }

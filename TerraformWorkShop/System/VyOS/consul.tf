@@ -2,18 +2,18 @@
 # download consul zip
 resource "system_file" "consul_zip" {
   path   = "/home/vyos/consul.zip" # "/usr/bin/consul"
-  source = "https://releases.hashicorp.com/consul/${var.consul_version}/consul_${var.consul_version}_linux_amd64.zip"
+  source = var.consul.bin_file_source
 }
 
 # unzip and put it to /usr/bin/
 resource "null_resource" "consul_bin" {
   depends_on = [system_file.consul_zip]
   triggers = {
-    consul_version = var.consul_version
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
+    bin_file_source = var.consul.bin_file_source
+    host            = var.vm_conn.host
+    port            = var.vm_conn.port
+    user            = var.vm_conn.user
+    password        = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -48,11 +48,7 @@ resource "system_folder" "consul_config" {
 resource "system_file" "consul_config" {
   depends_on = [system_folder.consul_config]
   path       = "/etc/consul.d/consul.hcl"
-  content = templatefile("${path.module}/consul/consul.hcl", {
-    data_dir    = "${var.consul_conf.data_dir}",
-    client_addr = "${var.consul_conf.client_addr}",
-    bind_addr   = "${var.consul_conf.bind_addr}",
-  })
+  content    = templatefile("${var.consul.config_file_source}", merge(var.consul.config_file_vars, var.consul.config_file_vars_others))
   connection {
     type     = "ssh"
     host     = var.vm_conn.host
@@ -62,8 +58,8 @@ resource "system_file" "consul_config" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p ${var.consul_conf.data_dir}",
-      "sudo chown vyos:users ${var.consul_conf.data_dir}",
+      "sudo mkdir -p ${var.consul.config_file_vars.data_dir}",
+      "sudo chown ${var.consul.systemd_file_vars.user}:${var.consul.systemd_file_vars.group} ${var.consul.config_file_vars.data_dir}",
     ]
   }
 }
@@ -89,13 +85,11 @@ resource "system_file" "consul_config" {
 # }
 
 # persist consul systemd unit file
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
 resource "system_file" "consul_service" {
   depends_on = [system_file.consul_config]
   path       = "/etc/systemd/system/consul.service"
-  content = templatefile("${path.module}/consul/consul.service.tftpl", {
-    user  = "vyos",
-    group = "users",
-  })
+  content    = templatefile(var.consul.systemd_file_source, var.consul.systemd_file_vars)
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled
@@ -132,8 +126,8 @@ resource "system_service_systemd" "consul" {
       # }
       # EOF
       <<-EOT
-      if [[ ! $(consul acl policy list -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
-      consul acl policy create -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -name anonymous -rules - <<'EOF'
+      if [[ ! $(consul acl policy list -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
+      consul acl policy create -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -name anonymous -rules - <<'EOF'
       node_prefix "" {
         policy = "read"
       }
@@ -144,7 +138,7 @@ resource "system_service_systemd" "consul" {
       fi;
       EOT
       ,
-      "consul acl token update -http-addr=http://${var.consul_conf.client_addr}:8500 -token=${var.consul_token_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
+      "consul acl token update -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
     ]
   }
 }

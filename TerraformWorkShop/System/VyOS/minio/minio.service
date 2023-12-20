@@ -8,8 +8,8 @@ AssertFileIsExecutable=/usr/local/bin/minio
 [Service]
 WorkingDirectory=/usr/local
 
-User=${user}
-Group=${group}
+User=vyos
+Group=users
 # ProtectProc=invisible
 
 EnvironmentFile=-/etc/default/minio

@@ -1,3 +1,4 @@
+# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
 [Unit]
 Description="HashiCorp Consul - A service mesh solution"
 Documentation=https://www.consul.io/
@@ -12,6 +13,7 @@ Group=${group}
 TimeoutStartSec=infinity
 ExecStartPre=/usr/bin/sleep 5
 ExecStart=/usr/bin/consul agent -config-dir=/etc/consul.d/
+# ExecStartPost=
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGTERM

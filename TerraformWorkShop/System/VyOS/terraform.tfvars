@@ -5,18 +5,22 @@ vm_conn = {
   password = "vyos"
 }
 
-consul_conn = {
-  address    = "192.168.255.2:8500"
-  datacenter = "dc1"
-  scheme     = "http"
-}
-
-consul_version    = "1.17.0"
-consul_token_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-consul_conf = {
-  bind_addr   = "192.168.255.2"
-  client_addr = "192.168.255.2"
-  data_dir    = "/mnt/data/consul"
+consul = {
+  bin_file_source    = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
+  config_file_source = "./consul/consul.hcl"
+  config_file_vars = {
+    client_addr     = "192.168.255.2"
+    data_dir        = "/mnt/data/consul"
+    token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+  }
+  config_file_vars_others = {
+    bind_addr = "192.168.255.2"
+  }
+  systemd_file_source = "./consul/consul.service"
+  systemd_file_vars = {
+    user  = "vyos"
+    group = "users"
+  }
 }
 
 stepca_version  = "0.25.2"
@@ -36,3 +40,9 @@ stepca_conf = {
 }
 
 traefik_version = "v2.10.7"
+
+minio = {
+  bin_file_source     = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+  config_file_source  = "./minio/minio.conf"
+  systemd_file_source = "./minio/minio.service"
+}
