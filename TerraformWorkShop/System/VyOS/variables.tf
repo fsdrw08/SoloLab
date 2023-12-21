@@ -9,8 +9,19 @@ variable "vm_conn" {
 
 variable "consul" {
   type = object({
-    bin_file_source    = string
-    init_script_source = optional(string)
+    install = object({
+      zip_file_source = string
+      zip_file_path   = string
+      bin_file_path   = string
+    })
+    init_script = object({
+      file_source = string
+      params      = string
+    })
+    config = object({
+      file_source = string
+      vars        = optional(map(string))
+    })
     config_file_source = string
     config_file_vars = object({
       data_dir        = string

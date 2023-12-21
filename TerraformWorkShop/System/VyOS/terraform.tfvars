@@ -6,7 +6,20 @@ vm_conn = {
 }
 
 consul = {
-  bin_file_source    = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
+  install = {
+    zip_file_source = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
+    zip_file_path   = "/home/vyos/consul.zip"
+    bin_file_path   = "/usr/bin/consul"
+  }
+  config = {
+    file_source = "./consul/consul.hcl"
+    vars = {
+      bind_addr       = "192.168.255.2"
+      client_addr     = "192.168.255.2"
+      data_dir        = "/mnt/data/consul"
+      token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    }
+  }
   config_file_source = "./consul/consul.hcl"
   config_file_vars = {
     client_addr     = "192.168.255.2"
