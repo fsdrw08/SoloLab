@@ -12,32 +12,56 @@ variable "consul" {
     install = object({
       zip_file_source = string
       zip_file_path   = string
-      bin_file_path   = string
+      bin_file_dir    = string
     })
     init_script = object({
       file_source = string
-      params      = string
+      arguments   = optional(map(string))
     })
     config = object({
-      file_source = string
-      vars        = optional(map(string))
+      file_source   = string
+      file_path_dir = string
+      vars          = optional(map(string))
     })
-    config_file_source = string
-    config_file_vars = object({
-      data_dir        = string
-      client_addr     = string
-      token_init_mgmt = string
+    service = object({
+      status  = string
+      enabled = bool
+      systemd = object({
+        file_source = string
+        file_path   = string
+        vars        = optional(map(string))
+      })
     })
-    config_file_vars_others = optional(map(string))
-    systemd_file_source     = string
-    systemd_file_vars = object({
-      user  = string
-      group = string
-    })
-    systemd_file_vars_others = optional(map(string))
   })
 }
 
+variable "stepca" {
+  type = object({
+    install = object({
+      tar_file_source = string
+      tar_file_path   = string
+      bin_file_dir    = string
+    })
+    init_script = object({
+      file_source = string
+      arguments   = optional(map(string))
+    })
+    config = object({
+      file_source   = string
+      file_path_dir = string
+      vars          = optional(map(string))
+    })
+    service = object({
+      status  = string
+      enabled = bool
+      systemd = object({
+        file_source = string
+        file_path   = string
+        vars        = optional(map(string))
+      })
+    })
+  })
+}
 variable "stepca_version" {
   type        = string
   description = "https://github.com/smallstep/certificates/releases"

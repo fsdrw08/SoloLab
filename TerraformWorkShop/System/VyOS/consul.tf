@@ -1,19 +1,19 @@
 # consul
 # download consul zip
 resource "system_file" "consul_zip" {
-  path   = "/home/vyos/consul.zip" # "/usr/bin/consul"
-  source = var.consul.bin_file_source
+  source = var.consul.install.zip_file_source
+  path   = var.consul.install.zip_file_path # "/usr/bin/consul"
 }
 
 # unzip and put it to /usr/bin/
 resource "null_resource" "consul_bin" {
   depends_on = [system_file.consul_zip]
   triggers = {
-    bin_file_source = var.consul.bin_file_source
-    host            = var.vm_conn.host
-    port            = var.vm_conn.port
-    user            = var.vm_conn.user
-    password        = sensitive(var.vm_conn.password)
+    bin_file_dir = var.consul.install.bin_file_dir
+    host         = var.vm_conn.host
+    port         = var.vm_conn.port
+    user         = var.vm_conn.user
+    password     = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -24,16 +24,16 @@ resource "null_resource" "consul_bin" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo unzip ${system_file.consul_zip.path} -d /usr/bin/ -o",
-      "sudo chmod 755 /usr/bin/consul",
+      "sudo unzip ${system_file.consul_zip.path} -d ${var.consul.install.bin_file_dir} -o",
+      "sudo chmod 755 ${var.consul.install.bin_file_dir}consul",
       # https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443
-      "sudo setcap CAP_NET_BIND_SERVICE=+eip /usr/bin/consul"
+      "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.consul.install.bin_file_dir}consul"
     ]
   }
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo rm -f /usr/bin/consul",
+      "sudo rm -f ${self.triggers.bin_file_dir}consul",
     ]
   }
 }
@@ -41,14 +41,17 @@ resource "null_resource" "consul_bin" {
 # prepare consul config dir
 resource "system_folder" "consul_config" {
   depends_on = [null_resource.consul_bin]
-  path       = "/etc/consul.d/"
+  path       = var.consul.config.file_path_dir
 }
 
 # persist consul config file in dir
 resource "system_file" "consul_config" {
   depends_on = [system_folder.consul_config]
-  path       = "/etc/consul.d/consul.hcl"
-  content    = templatefile("${var.consul.config_file_source}", merge(var.consul.config_file_vars, var.consul.config_file_vars_others))
+  path       = format("${var.consul.config.file_path_dir}%s", basename("${var.consul.config.file_source}"))
+  content    = templatefile(var.consul.config.file_source, var.consul.config.vars)
+}
+
+resource "null_resource" "consul_init" {
   connection {
     type     = "ssh"
     host     = var.vm_conn.host
@@ -57,10 +60,7 @@ resource "system_file" "consul_config" {
     password = var.vm_conn.password
   }
   provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p ${var.consul.config_file_vars.data_dir}",
-      "sudo chown ${var.consul.systemd_file_vars.user}:${var.consul.systemd_file_vars.group} ${var.consul.config_file_vars.data_dir}",
-    ]
+    inline = templatefile(var.consul.init_script.file_source, var.consul.init_script.arguments)
   }
 }
 
@@ -88,8 +88,8 @@ resource "system_file" "consul_config" {
 # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
 resource "system_file" "consul_service" {
   depends_on = [system_file.consul_config]
-  path       = "/etc/systemd/system/consul.service"
-  content    = templatefile(var.consul.systemd_file_source, var.consul.systemd_file_vars)
+  path       = var.consul.service.systemd.file_path
+  content    = templatefile(var.consul.service.systemd.file_source, var.consul.service.systemd.vars)
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled
@@ -99,9 +99,9 @@ resource "system_service_systemd" "consul" {
   depends_on = [
     system_file.consul_service,
   ]
-  name    = "consul"
-  status  = "started"
-  enabled = "true"
+  name    = trimsuffix(system_file.consul_service.basename, ".service")
+  status  = var.consul.service.status
+  enabled = var.consul.service.enabled
   connection {
     type     = "ssh"
     host     = var.vm_conn.host
@@ -126,8 +126,8 @@ resource "system_service_systemd" "consul" {
       # }
       # EOF
       <<-EOT
-      if [[ ! $(consul acl policy list -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
-      consul acl policy create -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -name anonymous -rules - <<'EOF'
+      if [[ ! $(consul acl policy list -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
+      consul acl policy create -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -name anonymous -rules - <<'EOF'
       node_prefix "" {
         policy = "read"
       }
@@ -138,7 +138,7 @@ resource "system_service_systemd" "consul" {
       fi;
       EOT
       ,
-      "consul acl token update -http-addr=http://${var.consul.config_file_vars.client_addr}:8500 -token=${var.consul.config_file_vars.token_init_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
+      "consul acl token update -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
     ]
   }
 }

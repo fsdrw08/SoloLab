@@ -9,7 +9,14 @@ consul = {
   install = {
     zip_file_source = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
     zip_file_path   = "/home/vyos/consul.zip"
-    bin_file_path   = "/usr/bin/consul"
+    bin_file_dir    = "/usr/bin/"
+  }
+  init_script = {
+    file_source = "./consul/init.sh"
+    arguments = {
+      data_dir   = "/mnt/data/consul"
+      user_group = "vyos:users"
+    }
   }
   config = {
     file_source = "./consul/consul.hcl"
@@ -19,20 +26,19 @@ consul = {
       data_dir        = "/mnt/data/consul"
       token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     }
+    file_path_dir = "/etc/consul.d/"
   }
-  config_file_source = "./consul/consul.hcl"
-  config_file_vars = {
-    client_addr     = "192.168.255.2"
-    data_dir        = "/mnt/data/consul"
-    token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-  }
-  config_file_vars_others = {
-    bind_addr = "192.168.255.2"
-  }
-  systemd_file_source = "./consul/consul.service"
-  systemd_file_vars = {
-    user  = "vyos"
-    group = "users"
+  service = {
+    status  = "started"
+    enabled = true
+    systemd = {
+      file_source = "./consul/consul.service"
+      file_path   = "/etc/systemd/system/consul.service"
+      vars = {
+        user  = "vyos"
+        group = "users"
+      }
+    }
   }
 }
 
