@@ -14,15 +14,23 @@ variable "consul" {
       zip_file_path   = string
       bin_file_dir    = string
     })
-    init_script = object({
-      file_source = string
-      arguments   = optional(map(string))
+    runas = object({
+      user  = string
+      group = string
+    })
+    storage = object({
+      dir_target = string
+      dir_link   = string
     })
     config = object({
       file_source   = string
       file_path_dir = string
       vars          = optional(map(string))
     })
+    init_script = optional(object({
+      file_source = string
+      vars        = optional(map(string))
+    }))
     service = object({
       status  = string
       enabled = bool
@@ -42,53 +50,34 @@ variable "stepca" {
       tar_file_path   = string
       bin_file_dir    = string
     })
-    init_script = object({
-      file_source = string
-      arguments   = optional(map(string))
+    runas = object({
+      user  = string
+      group = string
     })
+    storage = object({
+      dir_target = string
+      dir_link   = string
+    })
+    init_script = optional(object({
+      file_source = string
+    }))
     config = object({
       file_source   = string
-      file_path_dir = string
       vars          = optional(map(string))
+      file_path_dir = string
     })
     service = object({
       status  = string
       enabled = bool
       systemd = object({
         file_source = string
-        file_path   = string
         vars        = optional(map(string))
+        file_path   = string
       })
     })
   })
 }
-variable "stepca_version" {
-  type        = string
-  description = "https://github.com/smallstep/certificates/releases"
-  default     = "0.25.2"
-}
 
-variable "stepcli_version" {
-  type        = string
-  description = "https://github.com/smallstep/cli/releases"
-  default     = "0.25.2"
-}
-
-variable "stepca_conf" {
-  type = object({
-    data_dir = string
-    init = object({
-      name             = string
-      acme             = bool
-      dns_names        = string
-      ssh              = bool
-      remote_mgmt      = bool
-      provisioner_name = string
-    })
-    password    = string
-    pwd_subpath = string
-  })
-}
 
 variable "traefik_version" {
   type = string

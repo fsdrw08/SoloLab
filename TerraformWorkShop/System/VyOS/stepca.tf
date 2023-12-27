@@ -11,7 +11,7 @@ resource "system_file" "stepca_tar" {
 resource "null_resource" "stepca_bin" {
   depends_on = [system_file.stepca_tar]
   triggers = {
-    stepca_version = var.stepca_version
+    stepca_version = var.stepca.install.tar_file_source
     host           = var.vm_conn.host
     port           = var.vm_conn.port
     user           = var.vm_conn.user
@@ -40,7 +40,6 @@ resource "null_resource" "stepca_bin" {
   }
 }
 
-
 resource "system_file" "stepcli_tar" {
   path   = "/home/vyos/step_linux_amd64.tar.gz"
   source = "https://dl.smallstep.com/cli/docs-cli-install/latest/step_linux_amd64.tar.gz"
@@ -51,11 +50,12 @@ resource "system_file" "stepcli_tar" {
 resource "null_resource" "stepcli_bin" {
   depends_on = [system_file.stepcli_tar]
   triggers = {
-    stepcli_version = var.stepcli_version
-    host            = var.vm_conn.host
-    port            = var.vm_conn.port
-    user            = var.vm_conn.user
-    password        = sensitive(var.vm_conn.password)
+    file_source = var.stepca.install.tar_file_source
+    file_dir    = var.stepca.install.bin_file_dir
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -68,25 +68,53 @@ resource "null_resource" "stepcli_bin" {
     inline = [
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
       # https://askubuntu.com/questions/45349/how-to-extract-files-to-another-directory-using-tar-command/470266#470266
-      "sudo tar --extract --file=${system_file.stepcli_tar.path} --directory=/usr/bin/ --strip-components=2 --verbose --overwrite step_linux_amd64/bin/step",
-      "sudo chmod 755 /usr/bin/step",
+      "sudo tar --extract --file=${system_file.stepcli_tar.path} --directory=${self.triggers.file_dir} --strip-components=2 --verbose --overwrite step_linux_amd64/bin/step",
+      "sudo chmod 755 ${self.triggers.file_dir}/step",
     ]
   }
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo rm -f /usr/bin/step",
+      "sudo rm -f ${self.triggers.file_dir}/step",
     ]
   }
 }
 
-resource "system_link" "stepca_path" {
+# prepare step-ca data dir
+resource "system_link" "stepca_data" {
+  path   = var.stepca.storage.dir_link
+  target = var.stepca.storage.dir_target
+  user   = var.stepca.runas.user
+  group  = var.stepca.runas.group
+  connection {
+    type     = "ssh"
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mkdir -p ${var.stepca.storage.dir_target}",
+      "sudo chown ${var.stepca.runas.user}:${var.stepca.runas.group} ${var.stepca.storage.dir_target}",
+    ]
+  }
+}
+
+# prepare step-ca init related env config
+resource "system_file" "stepca_config" {
+  path    = format("${var.stepca.config.file_path_dir}/%s", basename("${var.stepca.config.file_source}"))
+  content = templatefile(var.stepca.config.file_source, var.stepca.config.vars)
+}
+
+# run step-ca init
+resource "null_resource" "stepca_init" {
   depends_on = [
-    null_resource.stepca_bin,
-    null_resource.stepcli_bin
+    null_resource.stepcli_bin,
+    system_link.stepca_data,
+    system_file.stepca_config
   ]
-  path   = "/etc/step-ca"
-  target = var.stepca_conf.data_dir
+  count = var.stepca.init_script == null ? 0 : 1
   connection {
     type     = "ssh"
     host     = var.vm_conn.host
@@ -96,60 +124,45 @@ resource "system_link" "stepca_path" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p ${var.stepca_conf.data_dir}",
-      "sudo chown vyos:users ${var.stepca_conf.data_dir}",
+      "export  $(grep -v '^#' ${system_file.stepca_config.path} | xargs)",
+      file(var.stepca.init_script.file_source)
     ]
   }
 }
 
-resource "system_file" "stepca_init_env" {
-  depends_on = [system_link.stepca_path]
-  path       = "/home/vyos/step-ca.env"
-  content    = <<-EOT
-    # https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#EnvironmentFile=
-    # https://github.com/smallstep/certificates/blob/master/docker/entrypoint.sh
-    STEPPATH="/etc/step-ca"
-    PWDPATH="/etc/step-ca/${var.stepca_conf.pwd_subpath}"
-    DOCKER_STEPCA_INIT_NAME="${var.stepca_conf.init.name}"
-    DOCKER_STEPCA_INIT_ACME="${var.stepca_conf.init.acme}"
-    DOCKER_STEPCA_INIT_DNS_NAMES="${var.stepca_conf.init.dns_names}"
-    DOCKER_STEPCA_INIT_SSH="${var.stepca_conf.init.ssh}"
-    DOCKER_STEPCA_INIT_REMOTE_MANAGEMENT="${var.stepca_conf.init.remote_mgmt}"
-    DOCKER_STEPCA_INIT_PROVISIONER_NAME="${var.stepca_conf.init.provisioner_name}"
-    DOCKER_STEPCA_INIT_PASSWORD=${var.stepca_conf.password}
-  EOT
-}
-
-resource "system_file" "stepca_init_script" {
-  depends_on = [system_file.stepca_init_env]
-  path       = "/home/vyos/step-ca_entrypoint.sh"
-  content    = file("${path.module}/step-ca/entrypoint.sh")
-  connection {
-    type     = "ssh"
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /etc/step-ca/secrets",
-      "export  $(grep -v '^#' ${system_file.stepca_init_env.path} | xargs)",
-      "bash \"${system_file.stepca_init_script.path}\"",
-    ]
-  }
-}
+# resource "system_file" "stepca_init_script" {
+#   depends_on = [system_file.stepca_init_env]
+#   path       = "/home/vyos/step-ca_entrypoint.sh"
+#   content    = file("${path.module}/step-ca/entrypoint.sh")
+#   connection {
+#     type     = "ssh"
+#     host     = var.vm_conn.host
+#     port     = var.vm_conn.port
+#     user     = var.vm_conn.user
+#     password = var.vm_conn.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "mkdir -p /etc/step-ca/secrets",
+#       "export  $(grep -v '^#' ${system_file.stepca_config.path} | xargs)",
+#       "bash \"${system_file.stepca_init_script.path}\"",
+#     ]
+#   }
+# }
 
 # persist step-ca systemd unit file
 resource "system_file" "stepca_service" {
-  depends_on = [system_file.stepca_init_env]
-  path       = "/etc/systemd/system/step-ca.service"
-  content = templatefile("${path.module}/step-ca/step-ca.service.tftpl", {
-    user  = "vyos",
-    group = "users",
-  })
+  path    = var.stepca.service.systemd.file_path
+  content = templatefile(var.stepca.service.systemd.file_source, var.stepca.service.systemd.vars)
 }
 
-# resource "system_service_systemd" "stepca_service" {
-
-# }
+resource "system_service_systemd" "stepca" {
+  depends_on = [
+    null_resource.stepca_bin,
+    null_resource.stepca_init,
+    system_file.stepca_service,
+  ]
+  name    = trimsuffix(system_file.stepca_service.basename, ".service")
+  status  = var.stepca.service.status
+  enabled = var.stepca.service.enabled
+}
