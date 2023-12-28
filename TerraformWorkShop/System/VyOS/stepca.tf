@@ -166,3 +166,12 @@ resource "system_service_systemd" "stepca" {
   status  = var.stepca.service.status
   enabled = var.stepca.service.enabled
 }
+
+# https://developer.hashicorp.com/consul/tutorials/get-started-vms/virtual-machine-gs-service-discovery#modify-service-definition-tags
+resource "system_file" "stepca_consul" {
+  depends_on = [system_service_systemd.stepca]
+  path       = "${system_folder.consul_config.path}/stepca.hcl"
+  content    = file("./step-ca/step-ca_consul.hcl")
+  user       = "vyos"
+  group      = "users"
+}

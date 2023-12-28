@@ -164,28 +164,3 @@ resource "system_service_systemd" "consul" {
     ]
   }
 }
-
-# enable consul dns query for anonymous
-# create consul policy for dns
-# https://discuss.hashicorp.com/t/consul-service-dns-resolution-not-working/21706
-# https://developer.hashicorp.com/consul/tutorials/security/access-control-setup-production#token-for-dns
-# resource "consul_acl_policy" "dns" {
-#   depends_on  = [system_service_systemd.consul]
-#   name        = "DNS"
-#   datacenters = ["dc1"]
-#   rules       = <<-EOT
-#   node_prefix "" {
-#     policy = "read"
-#   }
-#   service_prefix "" {
-#     policy = "read"
-#   }
-#   EOT
-# }
-
-# # assign consul dns policy to anonymous token
-# # after apply, debug in remote: dig @127.0.0.1 -p 8600 vyos-lts.node.consul
-# resource "consul_acl_token_policy_attachment" "dns" {
-#   token_id = "00000000-0000-0000-0000-000000000002"
-#   policy   = consul_acl_policy.dns.name
-# }

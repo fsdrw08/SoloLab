@@ -106,6 +106,9 @@ encrypt = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
 #retry_join = ["provider=azure tag_name=... tag_value=... tenant_id=... client_id=... subscription_id=... secret_access_key=..."]
 #retry_join = ["provider=gce project_name=... tag_value=..."]
 
+# general
+auto_reload_config = true
+
 # acl
 acl {
   enabled = true
