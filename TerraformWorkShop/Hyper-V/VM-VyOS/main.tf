@@ -288,7 +288,7 @@ module "hyperv_machine_instance" {
 
   vm_instance = {
     name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
-    checkpoint_type      = "Disabled"
+    checkpoint_type      = "Standard"
     dynamic_memory       = true
     generation           = 2
     memory_maximum_bytes = var.memory_maximum_bytes
