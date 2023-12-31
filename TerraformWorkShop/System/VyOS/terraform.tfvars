@@ -43,10 +43,32 @@ consul = {
   }
 }
 
+consul_post_process = {
+  Config-ConsulDNS = {
+    script_path = "./consul/Config-ConsulDNS.sh"
+    vars = {
+      client_addr     = "192.168.255.2:8500"
+      token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    }
+  }
+  Update-vyOSDNS = {
+    script_path = "./consul/Update-vyOSDNS.sh"
+    vars = {
+      domain = "consul"
+      ip     = "192.168.255.2"
+    }
+  }
+}
+
 stepca = {
   install = {
     tar_file_source = "https://dl.smallstep.com/certificates/docs-ca-install/latest/step-ca_linux_amd64.tar.gz"
     tar_file_path   = "/home/vyos/step-ca_linux_amd64.tar.gz"
+    bin_file_dir    = "/usr/bin"
+  }
+  install_cli = {
+    tar_file_source = "https://dl.smallstep.com/cli/docs-cli-install/latest/step_linux_amd64.tar.gz"
+    tar_file_path   = "/home/vyos/step_linux_amd64.tar.gz"
     bin_file_dir    = "/usr/bin"
   }
   runas = {
@@ -89,7 +111,36 @@ stepca = {
   }
 }
 
-traefik_version = "v2.10.7"
+traefik = {
+  install = {
+    tar_file_source = "https://github.com/traefik/traefik/releases/download/v2.10.7/traefik_v2.10.7_linux_amd64.tar.gz"
+    tar_file_path   = "/home/vyos/traefik.tar.gz"
+    bin_file_dir    = "/usr/bin"
+  }
+  runas = {
+    user  = "vyos"
+    group = "users"
+  }
+  config = {
+    file_source = "./traefik/traefik.yaml"
+    vars = {
+      consul_client_addr   = "192.168.255.2:8500"
+      consul_datacenter    = "dc1"
+      rootCA               = "/etc/step-ca/certs/root_ca.crt"
+      entrypoint_traefik   = "192.168.255.2:8080"
+      entrypoint_web       = "192.168.255.2:80"
+      entrypoint_websecure = "192.168.255.2:443"
+      acme_ext_storage     = "/etc/traefik/acme/external.json"
+      acme_int_storage     = "/etc/traefik/acme/internal.json"
+    }
+    file_path_dir = "/etc/traefik"
+  }
+  storage = {
+    dir_target = "/mnt/data/traefik"
+    dir_link   = "/etc/traefik/acme"
+  }
+}
+
 
 minio = {
   bin_file_source     = "https://dl.min.io/server/minio/release/linux-amd64/minio"
