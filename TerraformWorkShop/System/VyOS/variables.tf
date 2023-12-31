@@ -43,9 +43,21 @@ variable "consul" {
   })
 }
 
+variable "consul_post_process" {
+  type = map(object({
+    script_path = string
+    vars        = optional(map(string))
+  }))
+}
+
 variable "stepca" {
   type = object({
     install = object({
+      tar_file_source = string
+      tar_file_path   = string
+      bin_file_dir    = string
+    })
+    install_cli = object({
       tar_file_source = string
       tar_file_path   = string
       bin_file_dir    = string
@@ -78,9 +90,40 @@ variable "stepca" {
   })
 }
 
-
-variable "traefik_version" {
-  type = string
+variable "traefik" {
+  type = object({
+    install = object({
+      tar_file_source = string
+      tar_file_path   = string
+      bin_file_dir    = string
+    })
+    runas = object({
+      user  = string
+      group = string
+    })
+    storage = object({
+      dir_target = string
+      dir_link   = string
+    })
+    config = object({
+      file_source   = string
+      vars          = optional(map(string))
+      file_path_dir = string
+    })
+    init_script = optional(object({
+      file_source = string
+      vars        = optional(map(string))
+    }))
+    service = object({
+      status  = string
+      enabled = bool
+      systemd = object({
+        file_source = string
+        vars        = optional(map(string))
+        file_path   = string
+      })
+    })
+  })
 }
 
 variable "minio" {

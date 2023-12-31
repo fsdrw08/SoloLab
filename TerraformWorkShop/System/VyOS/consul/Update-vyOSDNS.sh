@@ -6,8 +6,7 @@ fi
 
 source /opt/vyatta/etc/functions/script-template
 configure
-set service dns forwarding domain consul server 192.168.255.2
+set service dns forwarding domain ${domain} server ${ip}
 
-set system name-server 223.5.5.5
 commit
 save

@@ -34,7 +34,7 @@ resource "null_resource" "consul_bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo rm -f ${self.triggers.file_source}/consul",
+      "sudo rm -f ${self.triggers.file_dir}/consul",
     ]
   }
 }
@@ -124,43 +124,34 @@ resource "system_service_systemd" "consul" {
   name    = trimsuffix(system_file.consul_service.basename, ".service")
   status  = var.consul.service.status
   enabled = var.consul.service.enabled
+}
+
+resource "null_resource" "consul_post_process" {
+  depends_on = [system_service_systemd.consul]
+  for_each   = var.consul_post_process
+  triggers = {
+    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
+  }
   connection {
     type     = "ssh"
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
   }
-  # enable consul dns query for anonymous
-  # https://github.com/CGamesPlay/infra/blob/dff38bddd883b659d01a11c4b463a201dc4304cb/ansible/templates/consul/initial-setup.sh#L16
-  # https://discuss.hashicorp.com/t/consul-service-dns-resolution-not-working/21706
-  # https://developer.hashicorp.com/consul/tutorials/security/access-control-setup-production#token-for-dns
   provisioner "remote-exec" {
     inline = [
-      "/usr/bin/sleep 5",
-      #  [[ ! $(consul acl policy list -http-addr=http://192.168.255.2:8500 -token="e95b599e-166e-7d80-08ad-aee76e7ddf19" -format json | jq '.[] | .Name') =~ "anonymous" ]] && \
-      # consul acl policy create -http-addr=http://192.168.255.2:8500 -token="e95b599e-166e-7d80-08ad-aee76e7ddf19" -name anonymous -rules - <<'EOF'
-      # node_prefix "" {
-      #   policy = "read"
-      # }
-      # service_prefix "" {
-      #   policy = "read"
-      # }
-      # EOF
-      <<-EOT
-      if [[ ! $(consul acl policy list -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -format json | jq '.[] | .Name') =~ 'anonymous' ]]; then
-      consul acl policy create -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -name anonymous -rules - <<'EOF'
-      node_prefix "" {
-        policy = "read"
-      }
-      service_prefix "" {
-        policy = "read"
-      }
-      EOF
-      fi;
-      EOT
-      ,
-      "consul acl token update -http-addr=http://${var.consul.config.vars.client_addr}:8500 -token=${var.consul.config.vars.token_init_mgmt} -id 00000000-0000-0000-0000-000000000002 -policy-name anonymous -description 'Anonymous Token'",
+      templatefile("${each.value.script_path}", "${each.value.vars}")
     ]
   }
+  # provisioner "remote-exec" {
+  #   when = destroy
+  #   inline = [
+  #     "sudo rm -f ${self.triggers.file_source}/consul",
+  #   ]
+  # }
 }
