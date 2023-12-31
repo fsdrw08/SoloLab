@@ -1,7 +1,7 @@
 service {
-  id      = "stepca"
-  name    = "stepca"
-  address = "stepca.service.consul"
+  id      = "step-ca"
+  name    = "step-ca"
+  address = "step-ca.service.consul"
 
   checks = [
     {
