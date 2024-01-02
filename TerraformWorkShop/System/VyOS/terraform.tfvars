@@ -34,11 +34,11 @@ consul = {
     enabled = true
     systemd = {
       file_source = "./consul/consul.service"
-      file_path   = "/etc/systemd/system/consul.service"
       vars = {
         user  = "vyos"
         group = "users"
       }
+      file_path = "/etc/systemd/system/consul.service"
     }
   }
 }
@@ -122,22 +122,56 @@ traefik = {
     group = "users"
   }
   config = {
-    file_source = "./traefik/traefik.yaml"
-    vars = {
-      consul_client_addr   = "192.168.255.2:8500"
-      consul_datacenter    = "dc1"
-      rootCA               = "/etc/step-ca/certs/root_ca.crt"
-      entrypoint_traefik   = "192.168.255.2:8080"
-      entrypoint_web       = "192.168.255.2:80"
-      entrypoint_websecure = "192.168.255.2:443"
-      acme_ext_storage     = "/etc/traefik/acme/external.json"
-      acme_int_storage     = "/etc/traefik/acme/internal.json"
+    static = {
+      file_source = "./traefik/traefik.yaml"
+      vars = {
+        consul_client_addr   = "192.168.255.2:8500"
+        consul_datacenter    = "dc1"
+        rootCA               = "/etc/step-ca/certs/root_ca.crt"
+        entrypoint_traefik   = "192.168.255.2:8080"
+        entrypoint_web       = "192.168.255.2:80"
+        entrypoint_websecure = "192.168.255.2:443"
+        acme_ext_storage     = "/etc/traefik/acme/external.json"
+        acme_int_storage     = "/etc/traefik/acme/internal.json"
+      }
+      file_path_dir = "/etc/traefik"
     }
-    file_path_dir = "/etc/traefik"
+    dynamic = {
+      file_contents = [
+        {
+          file_source = "./traefik/dyn-traefik_dashboard.yaml"
+          vars = {
+            sub_domain  = "traefik"
+            base_domain = "service.consul"
+            userpass    = "admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"
+          }
+        },
+        {
+          file_source = "./traefik/dyn-toHttps.yaml"
+          vars = {
+            permanent = "true"
+          }
+        },
+      ]
+      file_path_dir = "/etc/traefik/dynamic"
+    }
   }
   storage = {
     dir_target = "/mnt/data/traefik"
     dir_link   = "/etc/traefik/acme"
+  }
+  service = {
+    status  = "started"
+    enabled = true
+    systemd = {
+      file_source = "./traefik/traefik.service"
+      vars = {
+        user                 = "vyos"
+        group                = "users"
+        LEGO_CA_CERTIFICATES = "/etc/step-ca/certs/root_ca.crt"
+      }
+      file_path = "/etc/systemd/system/traefik.service"
+    }
   }
 }
 

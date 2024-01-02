@@ -1,0 +1,7 @@
+# Dynamic Configuration
+http:
+  middlewares:
+    toHttps:
+      redirectScheme:
+        scheme: https
+        permanent: ${permanent}

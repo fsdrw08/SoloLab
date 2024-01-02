@@ -1,0 +1,24 @@
+# Dynamic Configuration
+http:
+  routers:
+    dashboard:
+      # rule: Host(`traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`${sub_domain}.${base_domain}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      # https://www.teanote.pub/archives/247
+      # https://doc.traefik.io/traefik/routing/routers/#tls
+      # will terminate the TLS request
+      entryPoints:
+        - web
+        - websecure
+      middlewares:
+        - toHttps@file
+        - userpass
+      tls:
+        certResolver: internal
+        # {}
+  middlewares:
+    userpass:
+      basicAuth:
+        users:
+          - ${userpass}

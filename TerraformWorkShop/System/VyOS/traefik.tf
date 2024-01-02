@@ -40,19 +40,37 @@ resource "null_resource" "traefik_bin" {
 }
 
 # prepare traefik config dir
-resource "system_folder" "traefik_config" {
-  path = var.traefik.config.file_path_dir
+resource "system_folder" "traefik_config_static" {
+  path = var.traefik.config.static.file_path_dir
 }
 
-# persist consul config file in dir
-resource "system_file" "traefik_config" {
-  depends_on = [system_folder.traefik_config]
-  path       = format("${var.traefik.config.file_path_dir}/%s", basename("${var.consul.config.file_source}"))
-  content    = templatefile(var.traefik.config.file_source, var.consul.config.vars)
+# persist traefik static config file in dir
+resource "system_file" "traefik_config_static" {
+  depends_on = [system_folder.traefik_config_static]
+  path       = format("${var.traefik.config.static.file_path_dir}/%s", basename("${var.traefik.config.static.file_source}"))
+  content    = templatefile(var.traefik.config.static.file_source, var.traefik.config.static.vars)
 }
 
+# presist traefik dynamic config dir
+resource "system_folder" "traefik_config_dynamic" {
+  depends_on = [system_folder.traefik_config_static]
+  count      = var.traefik.config.dynamic == null ? 0 : 1
+  path       = var.traefik.config.dynamic.file_path_dir
+}
+
+# persist traefik dynamic config file in dir
+resource "system_file" "traefik_config_dynamic" {
+  depends_on = [system_folder.traefik_config_dynamic]
+  for_each = {
+    for content in var.traefik.config.dynamic.file_contents : content.file_source => content
+  }
+  path    = format("${var.traefik.config.dynamic.file_path_dir}/%s", basename("${each.value.file_source}"))
+  content = templatefile(each.value.file_source, each.value.vars)
+}
+
+# create and link traefik storage dir
 resource "system_link" "traefik_data" {
-  depends_on = [system_folder.traefik_config]
+  depends_on = [system_folder.traefik_config_static]
   path       = var.traefik.storage.dir_link
   target     = var.traefik.storage.dir_target
   user       = var.traefik.runas.user
@@ -73,7 +91,55 @@ resource "system_link" "traefik_data" {
 }
 
 # persist traefik systemd unit file
-resource "system_file" "consul_service" {
-  path    = var.consul.service.systemd.file_path
-  content = templatefile(var.consul.service.systemd.file_source, var.consul.service.systemd.vars)
+resource "system_file" "traefik_service" {
+  path    = var.traefik.service.systemd.file_path
+  content = templatefile(var.traefik.service.systemd.file_source, var.traefik.service.systemd.vars)
+}
+
+# debug service: journalctl -u traefik.service
+# sudo netstat -apn | grep 80
+resource "system_service_systemd" "traefik" {
+  depends_on = [
+    system_service_systemd.stepca,
+    null_resource.traefik_bin,
+    system_file.traefik_config_static,
+    system_file.traefik_service,
+    null_resource.traefik_systemd_daemon_reload
+  ]
+  name    = trimsuffix(system_file.traefik_service.basename, ".service")
+  status  = var.traefik.service.status
+  enabled = var.traefik.service.enabled
+}
+
+resource "null_resource" "traefik_systemd_daemon_reload" {
+  depends_on = [
+    system_service_systemd.traefik,
+  ]
+  triggers = {
+    traefik_service = base64sha256(system_file.traefik_service.content)
+    traefik_config  = base64sha256(system_file.traefik_config_static.content)
+  }
+  connection {
+    type     = "ssh"
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 5",
+      "sudo systemctl daemon-reload",
+      "sudo systemctl reload-or-restart ${system_file.traefik_service.basename}.service"
+    ]
+  }
+}
+
+# https://developer.hashicorp.com/consul/tutorials/get-started-vms/virtual-machine-gs-service-discovery#modify-service-definition-tags
+resource "system_file" "traefik_consul" {
+  depends_on = [system_service_systemd.traefik]
+  path       = "${system_folder.consul_config.path}/traefik.hcl"
+  content    = file("./traefik/traefik_consul.hcl")
+  user       = "vyos"
+  group      = "users"
 }

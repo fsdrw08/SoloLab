@@ -1,9 +1,9 @@
 ## ref: https://doc.traefik.io/traefik/providers/overview/
 providers:
-  # docker:
-  #   endpoint: "unix:///var/run/docker.sock"
-  #   useBindPortIP: false
-  #   exposedByDefault: false
+  # https://doc.traefik.io/traefik/providers/file/
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
   # https://doc.traefik.io/traefik/providers/consul-catalog/#traefik-consul-catalog
   consulCatalog:
     endpoint:
@@ -71,6 +71,6 @@ certificatesResolvers:
 ##
 log:
   ## Alternative logging levels are DEBUG, INFO, WARN, ERROR, FATAL, and PANIC.
-  level: INFO
+  level: DEBUG
 ## ref: https://doc.traefik.io/traefik/observability/access-logs/
-accessLog: {}
+# accessLog: {}

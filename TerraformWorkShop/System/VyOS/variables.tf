@@ -106,9 +106,18 @@ variable "traefik" {
       dir_link   = string
     })
     config = object({
-      file_source   = string
-      vars          = optional(map(string))
-      file_path_dir = string
+      static = object({
+        file_source   = string
+        vars          = optional(map(string))
+        file_path_dir = string
+      })
+      dynamic = object({
+        file_contents = list(object({
+          file_source = string
+          vars        = map(string)
+        }))
+        file_path_dir = string
+      })
     })
     init_script = optional(object({
       file_source = string
