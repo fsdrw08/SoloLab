@@ -35,7 +35,7 @@ resource "null_resource" "stepca_bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo rm -f ${var.stepca.install.bin_file_dir}/step-ca",
+      "sudo rm -f ${self.triggers.file_dir}/step-ca",
     ]
   }
 }
