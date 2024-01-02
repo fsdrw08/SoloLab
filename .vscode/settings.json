@@ -1,3 +1,22 @@
 {
-    "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe"
+    "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe",
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true
+    },
+    "editor.formatOnSave": true,
+    "[terraform]": {
+      "editor.defaultFormatter": "hashicorp.terraform",
+      "editor.formatOnSave": false,
+      "editor.codeActionsOnSave": {
+        "source.formatAll.terraform": true
+      },
+    },
+    "[terraform-vars]": {
+      "editor.defaultFormatter": "hashicorp.terraform",
+      "editor.formatOnSave": false,
+      "editor.codeActionsOnSave": {
+        "source.formatAll.terraform": true
+      },
+    }
 }
