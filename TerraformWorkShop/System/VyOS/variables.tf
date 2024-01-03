@@ -124,12 +124,23 @@ variable "traefik" {
       vars        = optional(map(string))
     }))
     service = object({
-      status  = string
-      enabled = bool
-      systemd = object({
-        file_source = string
-        vars        = optional(map(string))
-        file_path   = string
+      traefik_restart = object({
+        status  = string
+        enabled = bool
+        systemd = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
+      })
+      traefik = object({
+        status  = string
+        enabled = bool
+        systemd = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
       })
     })
   })

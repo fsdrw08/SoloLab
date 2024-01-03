@@ -1,0 +1,15 @@
+# https://github.com/lyzeo/rivet/blob/64219c2c43ea6fbcecdc885d9259c713edb9ceee/infra/salt/salt/traefik/files/traefik.service#L11
+# See https://doc.traefik.io/traefik-enterprise/installing/on-premise/#systemd-linux-only
+
+[Unit]
+Description="Restart Traefik service when static config modified"
+Documentation=https://docs.traefik.io
+After=network-online.target
+AssertPathExists=${traefik_service_file}
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart traefik.service
+
+[Install]
+WantedBy=multi-user.target

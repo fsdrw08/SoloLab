@@ -161,16 +161,29 @@ traefik = {
     dir_link   = "/etc/traefik/acme"
   }
   service = {
-    status  = "started"
-    enabled = true
-    systemd = {
-      file_source = "./traefik/traefik.service"
-      vars = {
-        user                 = "vyos"
-        group                = "users"
-        LEGO_CA_CERTIFICATES = "/etc/step-ca/certs/root_ca.crt"
+    traefik_restart = {
+      status  = "started"
+      enabled = true
+      systemd = {
+        file_source = "./traefik/traefik_restart.service"
+        vars = {
+          traefik_service_file = "/etc/systemd/system/traefik.service"
+        }
+        file_path = "/etc/systemd/system/traefik_restart.service"
       }
-      file_path = "/etc/systemd/system/traefik.service"
+    }
+    traefik = {
+      status  = "started"
+      enabled = true
+      systemd = {
+        file_source = "./traefik/traefik.service"
+        vars = {
+          user                 = "vyos"
+          group                = "users"
+          LEGO_CA_CERTIFICATES = "/etc/step-ca/certs/root_ca.crt"
+        }
+        file_path = "/etc/systemd/system/traefik.service"
+      }
     }
   }
 }

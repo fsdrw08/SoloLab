@@ -1,0 +1,11 @@
+# ref: https://superuser.com/questions/1171751/restart-systemd-service-automatically-whenever-a-directory-changes-any-file-ins#1276457
+
+[Unit]
+Description="Restart Traefik service when static config modified"
+Documentation=https://docs.traefik.io
+
+[Path]
+PathModified=${static_config_path}
+
+[Install]
+WantedBy=multi-user.target
