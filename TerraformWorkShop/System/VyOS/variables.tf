@@ -127,7 +127,12 @@ variable "traefik" {
       traefik_restart = object({
         status  = string
         enabled = bool
-        systemd = object({
+        systemd_unit_service = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
+        systemd_unit_path = object({
           file_source = string
           vars        = optional(map(string))
           file_path   = string
@@ -136,7 +141,7 @@ variable "traefik" {
       traefik = object({
         status  = string
         enabled = bool
-        systemd = object({
+        systemd_unit_service = object({
           file_source = string
           vars        = optional(map(string))
           file_path   = string

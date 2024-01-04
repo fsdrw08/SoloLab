@@ -92,8 +92,11 @@ resource "system_link" "traefik_data" {
 
 # persist traefik systemd unit file
 resource "system_file" "traefik_service" {
-  path    = var.traefik.service.systemd.file_path
-  content = templatefile(var.traefik.service.systemd.file_source, var.traefik.service.systemd.vars)
+  path = var.traefik.service.traefik.systemd_unit_service.file_path
+  content = templatefile(
+    var.traefik.service.traefik.systemd_unit_service.file_source,
+    var.traefik.service.traefik.systemd_unit_service.vars
+  )
 }
 
 # debug service: journalctl -u traefik.service
@@ -104,33 +107,69 @@ resource "system_service_systemd" "traefik" {
     null_resource.traefik_bin,
     system_file.traefik_config_static,
     system_file.traefik_service,
-    null_resource.traefik_systemd_daemon_reload
   ]
   name    = trimsuffix(system_file.traefik_service.basename, ".service")
-  status  = var.traefik.service.status
-  enabled = var.traefik.service.enabled
+  status  = var.traefik.service.traefik.status
+  enabled = var.traefik.service.traefik.enabled
 }
 
-resource "null_resource" "traefik_systemd_daemon_reload" {
+# persist traefik restart systemd service unit file
+resource "system_file" "traefik_restart_service" {
+  path = var.traefik.service.traefik_restart.systemd_unit_service.file_path
+  content = templatefile(
+    var.traefik.service.traefik_restart.systemd_unit_service.file_source,
+    var.traefik.service.traefik_restart.systemd_unit_service.vars
+  )
+}
+
+resource "system_service_systemd" "traefik_restart_service" {
   depends_on = [
-    system_service_systemd.traefik,
+    null_resource.traefik_bin,
+    system_file.traefik_config_static,
+    system_file.traefik_restart_service
+  ]
+  # name = split(".", system_file.traefik_restart_service[each.key].basename)[0]
+  name    = trimsuffix(system_file.traefik_restart_service.basename, ".service")
+  enabled = var.traefik.service.traefik_restart.enabled
+}
+
+# persist traefik restart systemd path unit file
+resource "system_file" "traefik_restart_path" {
+  path = var.traefik.service.traefik_restart.systemd_unit_path.file_path
+  content = templatefile(
+    var.traefik.service.traefik_restart.systemd_unit_path.file_source,
+    var.traefik.service.traefik_restart.systemd_unit_path.vars
+  )
+}
+
+resource "null_resource" "traefik_restart_path" {
+  depends_on = [
+    system_file.traefik_restart_path,
   ]
   triggers = {
-    traefik_service = base64sha256(system_file.traefik_service.content)
-    traefik_config  = base64sha256(system_file.traefik_config_static.content)
+    unit_name = system_file.traefik_restart_path.basename
+    host      = var.vm_conn.host
+    port      = var.vm_conn.port
+    user      = var.vm_conn.user
+    password  = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
   }
   provisioner "remote-exec" {
     inline = [
       "sleep 5",
-      "sudo systemctl daemon-reload",
-      "sudo systemctl reload-or-restart ${system_file.traefik_service.basename}.service"
+      "sudo systemctl enable ${self.triggers.unit_name} --now",
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "sudo systemctl disable ${self.triggers.unit_name} --now",
     ]
   }
 }
@@ -140,6 +179,14 @@ resource "system_file" "traefik_consul" {
   depends_on = [system_service_systemd.traefik]
   path       = "${system_folder.consul_config.path}/traefik.hcl"
   content    = file("./traefik/traefik_consul.hcl")
+  user       = "vyos"
+  group      = "users"
+}
+
+resource "system_file" "consul-ui_consul" {
+  depends_on = [system_service_systemd.traefik]
+  path       = "${system_folder.consul_config.path}/consul-ui.hcl"
+  content    = file("./consul/consul_consul.hcl")
   user       = "vyos"
   group      = "users"
 }

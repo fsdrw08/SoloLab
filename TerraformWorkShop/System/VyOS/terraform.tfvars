@@ -164,18 +164,25 @@ traefik = {
     traefik_restart = {
       status  = "started"
       enabled = true
-      systemd = {
+      systemd_unit_service = {
         file_source = "./traefik/traefik_restart.service"
         vars = {
           traefik_service_file = "/etc/systemd/system/traefik.service"
         }
         file_path = "/etc/systemd/system/traefik_restart.service"
       }
+      systemd_unit_path = {
+        file_source = "./traefik/traefik_restart.path"
+        vars = {
+          static_config_path = "/etc/traefik/traefik.yaml"
+        }
+        file_path = "/etc/systemd/system/traefik_restart.path"
+      }
     }
     traefik = {
       status  = "started"
       enabled = true
-      systemd = {
+      systemd_unit_service = {
         file_source = "./traefik/traefik.service"
         vars = {
           user                 = "vyos"
