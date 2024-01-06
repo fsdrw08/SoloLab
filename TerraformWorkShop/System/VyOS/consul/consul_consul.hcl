@@ -1,7 +1,7 @@
 service {
   id      = "consul-ui"
   name    = "consul-ui"
-  address = "consul-ui.service.consul"
+  address = "192.168.255.2"
 
   checks = [
     {
@@ -16,10 +16,10 @@ service {
    tags = [
     "traefik.enable=true",
     "traefik.http.routers.consul-ui.rule=Host(`consul-ui.service.consul`)",
-    "traefik.http.routers.consul-ui.entrypoints: websecure",
-    "traefik.http.routers.consul-ui.middlewares: tohttps@file",
-    "traefik.http.routers.consul-ui.tls.certresolver: internal",
+    "traefik.http.routers.consul-ui.entrypoints=websecure",
+    "traefik.http.routers.consul-ui.middlewares=toHttps@file",
+    "traefik.http.routers.consul-ui.tls.certresolver=internal",
     "traefik.http.services.consul-ui.loadbalancer.server.scheme=http",
-    "traefik.http.services.consul-ui.loadbalancer.server.port=80"
+    "traefik.http.services.consul-ui.loadbalancer.server.port=8500"
   ]
 }
