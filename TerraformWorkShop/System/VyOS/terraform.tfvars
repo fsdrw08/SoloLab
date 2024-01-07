@@ -133,6 +133,7 @@ traefik = {
         entrypoint_websecure = "192.168.255.2:443"
         acme_ext_storage     = "/etc/traefik/acme/external.json"
         acme_int_storage     = "/etc/traefik/acme/internal.json"
+        access_log_path      = "/mnt/data/traefik/access.log"
       }
       file_path_dir = "/etc/traefik"
     }

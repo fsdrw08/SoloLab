@@ -73,4 +73,6 @@ log:
   ## Alternative logging levels are DEBUG, INFO, WARN, ERROR, FATAL, and PANIC.
   level: DEBUG
 ## ref: https://doc.traefik.io/traefik/observability/access-logs/
-# accessLog: {}
+accessLog:
+  filePath: ${access_log_path}
+  bufferingSize: 100

@@ -122,16 +122,16 @@ resource "system_file" "traefik_restart_service" {
   )
 }
 
-resource "system_service_systemd" "traefik_restart_service" {
-  depends_on = [
-    null_resource.traefik_bin,
-    system_file.traefik_config_static,
-    system_file.traefik_restart_service
-  ]
-  # name = split(".", system_file.traefik_restart_service[each.key].basename)[0]
-  name    = trimsuffix(system_file.traefik_restart_service.basename, ".service")
-  enabled = var.traefik.service.traefik_restart.enabled
-}
+# resource "system_service_systemd" "traefik_restart_service" {
+#   depends_on = [
+#     null_resource.traefik_bin,
+#     system_file.traefik_config_static,
+#     system_file.traefik_restart_service
+#   ]
+#   # name = split(".", system_file.traefik_restart_service[each.key].basename)[0]
+#   name    = trimsuffix(system_file.traefik_restart_service.basename, ".service")
+#   enabled = var.traefik.service.traefik_restart.enabled
+# }
 
 # persist traefik restart systemd path unit file
 resource "system_file" "traefik_restart_path" {
