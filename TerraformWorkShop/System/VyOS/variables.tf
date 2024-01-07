@@ -153,8 +153,31 @@ variable "traefik" {
 
 variable "minio" {
   type = object({
-    bin_file_source     = string
-    systemd_file_source = string
-    config_file_source  = string
+    install = object({
+      bin_file_source = string
+      bin_file_dir    = string
+    })
+    runas = object({
+      user  = string
+      group = string
+    })
+    storage = object({
+      dir_target = string
+      dir_link   = string
+    })
+    config = object({
+      file_source   = string
+      file_path_dir = string
+      vars          = optional(map(string))
+    })
+    service = object({
+      status  = string
+      enabled = bool
+      systemd_unit_service = object({
+        file_source = string
+        vars        = optional(map(string))
+        file_path   = string
+      })
+    })
   })
 }
