@@ -62,7 +62,7 @@ certificatesResolvers:
       tlsChallenge: {}
   internal:
     acme:
-      caServer: https://step-ca.service.consul:9000/acme/acme/directory
+      caServer: ${acme_int_caserver}
       certificatesDuration: 2160
       email: ""
       storage: ${acme_int_storage}

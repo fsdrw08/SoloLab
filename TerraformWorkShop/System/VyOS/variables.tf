@@ -34,7 +34,7 @@ variable "consul" {
     service = object({
       status  = string
       enabled = bool
-      systemd = object({
+      systemd_unit_service = object({
         file_source = string
         file_path   = string
         vars        = optional(map(string))
@@ -163,12 +163,11 @@ variable "minio" {
     })
     storage = object({
       dir_target = string
-      dir_link   = string
     })
     config = object({
-      file_source   = string
-      file_path_dir = string
-      vars          = optional(map(string))
+      file_source = string
+      vars        = optional(map(string))
+      file_path   = string
     })
     service = object({
       status  = string

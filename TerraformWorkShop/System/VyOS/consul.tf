@@ -108,8 +108,8 @@ resource "null_resource" "consul_init" {
 # persist consul systemd unit file
 # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-the-consul-process
 resource "system_file" "consul_service" {
-  path    = var.consul.service.systemd.file_path
-  content = templatefile(var.consul.service.systemd.file_source, var.consul.service.systemd.vars)
+  path    = var.consul.service.systemd_unit_service.file_path
+  content = templatefile(var.consul.service.systemd_unit_service.file_source, var.consul.service.systemd_unit_service.vars)
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled

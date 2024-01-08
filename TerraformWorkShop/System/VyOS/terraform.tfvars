@@ -32,7 +32,7 @@ consul = {
   service = {
     status  = "started"
     enabled = true
-    systemd = {
+    systemd_unit_service = {
       file_source = "./consul/consul.service"
       vars = {
         user  = "vyos"
@@ -84,6 +84,7 @@ stepca = {
     vars = {
       STEPPATH               = "/etc/step-ca"
       PWD_SUBPATH            = "password.txt"
+      INIT_ADDRESS           = "192.168.255.2:8443"
       INIT_NAME              = "sololab"
       INIT_ACME              = true
       INIT_DNS_NAMES         = "localhost,step-ca.service.consul"
@@ -132,6 +133,7 @@ traefik = {
         entrypoint_web       = "192.168.255.2:80"
         entrypoint_websecure = "192.168.255.2:443"
         acme_ext_storage     = "/etc/traefik/acme/external.json"
+        acme_int_caserver    = "https://step-ca.service.consul:8443/acme/acme/directory"
         acme_int_storage     = "/etc/traefik/acme/internal.json"
         access_log_path      = "/mnt/data/traefik/access.log"
       }
@@ -198,7 +200,37 @@ traefik = {
 
 
 minio = {
-  bin_file_source     = "https://dl.min.io/server/minio/release/linux-amd64/minio"
-  config_file_source  = "./minio/minio.conf"
-  systemd_file_source = "./minio/minio.service"
+  install = {
+    bin_file_source = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+    bin_file_dir    = "/usr/local/bin"
+  }
+  runas = {
+    user  = "vyos"
+    group = "users"
+  }
+  storage = {
+    dir_target = "/mnt/data/minio"
+  }
+  config = {
+    file_source = "./minio/minio.conf"
+    vars = {
+      MINIO_OPTS                 = "--address \"127.0.0.1:9000\" --console-address \"127.0.0.1:9001\""
+      MINIO_VOLUMES              = "/mnt/data/minio"
+      MINIO_SERVER_URL           = "https://minio.service.consul"
+      MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul/ui/"
+    }
+    file_path = "/etc/default/minio"
+  }
+  service = {
+    status  = "started"
+    enabled = true
+    systemd_unit_service = {
+      file_source = "./minio/minio.service"
+      vars = {
+        user  = "vyos"
+        group = "users"
+      }
+      file_path = "/usr/lib/systemd/system/minio.service"
+    }
+  }
 }
