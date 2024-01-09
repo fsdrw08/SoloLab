@@ -28,7 +28,7 @@ resource "null_resource" "consul_bin" {
       "sudo unzip ${system_file.consul_zip.path} -d ${var.consul.install.bin_file_dir} -o",
       "sudo chmod 755 ${var.consul.install.bin_file_dir}/consul",
       # https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443
-      "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.consul.install.bin_file_dir}/consul"
+      # "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.consul.install.bin_file_dir}/consul"
     ]
   }
   provisioner "remote-exec" {
