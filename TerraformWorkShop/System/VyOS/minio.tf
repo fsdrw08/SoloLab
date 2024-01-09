@@ -21,26 +21,6 @@ resource "null_resource" "minio_data" {
   }
 }
 
-# resource "system_link" "minio_data" {
-#   path   = var.minio.storage.dir_link
-#   target = var.minio.storage.dir_target
-#   user   = var.minio.runas.user
-#   group  = var.minio.runas.group
-#   connection {
-#     type     = "ssh"
-#     host     = var.vm_conn.host
-#     port     = var.vm_conn.port
-#     user     = var.vm_conn.user
-#     password = var.vm_conn.password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo mkdir -p ${var.minio.storage.dir_target}",
-#       "sudo chown ${var.minio.runas.user}:${var.minio.runas.group} ${var.minio.storage.dir_target}",
-#     ]
-#   }
-# }
-
 # https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#create-the-systemd-service-file
 resource "system_file" "minio_conf" {
   path    = var.minio.config.file_path
@@ -59,6 +39,7 @@ resource "system_file" "minio_service" {
 resource "system_service_systemd" "minio" {
   depends_on = [
     system_file.minio_bin,
+    system_file.minio_conf,
     system_file.minio_service,
   ]
   name    = trimsuffix(system_file.minio_service.basename, ".service")
@@ -66,3 +47,12 @@ resource "system_service_systemd" "minio" {
   enabled = var.minio.service.enabled
 }
 
+resource "system_file" "minio_consul" {
+  depends_on = [
+    system_service_systemd.minio,
+  ]
+  path    = "${system_folder.consul_config.path}/minio.hcl"
+  content = file("./minio/minio_consul.hcl")
+  user    = "vyos"
+  group   = "users"
+}
