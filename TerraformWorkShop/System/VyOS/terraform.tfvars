@@ -23,7 +23,8 @@ consul = {
     file_source = "./consul/consul.hcl"
     vars = {
       bind_addr       = "192.168.255.2"
-      client_addr     = "192.168.255.2"
+      dns_addr        = "192.168.255.2"
+      client_addr     = "127.0.0.1"
       data_dir        = "/opt/consul"
       token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     }
@@ -47,7 +48,7 @@ consul_post_process = {
   Config-ConsulDNS = {
     script_path = "./consul/Config-ConsulDNS.sh"
     vars = {
-      client_addr     = "192.168.255.2:8500"
+      client_addr     = "127.0.0.1:8500"
       token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     }
   }
@@ -126,7 +127,7 @@ traefik = {
     static = {
       file_source = "./traefik/traefik.yaml"
       vars = {
-        consul_client_addr   = "192.168.255.2:8500"
+        consul_client_addr   = "127.0.0.1:8500"
         consul_datacenter    = "dc1"
         rootCA               = "/etc/step-ca/certs/root_ca.crt"
         entrypoint_traefik   = "192.168.255.2:8080"

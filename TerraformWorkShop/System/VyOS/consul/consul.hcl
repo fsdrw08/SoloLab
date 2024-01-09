@@ -24,11 +24,9 @@ data_dir = "${data_dir}"
 # servers. By default, this is "127.0.0.1", allowing only loopback connections. In
 # Consul 1.0 and later this can be set to a space-separated list of addresses to bind
 # to, or a go-sockaddr template that can potentially resolve to multiple addresses.
-// addresses{
-//   // http = "unix:///mnt/data/consul/http.sock"
-//   // grpc = "unix:///mnt/data/consul/grpc.sock"
-//   dns = "127.0.0.1"
-// }
+addresses{
+  dns = "${dns_addr}"
+}
 client_addr = "${client_addr}"
 
 ports{

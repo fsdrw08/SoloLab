@@ -1,13 +1,13 @@
-service {
-  id      = "consul-ui"
-  name    = "consul-ui"
-  address = "192.168.255.2"
+services {
+  id      = "consul-internal"
+  name    = "consul-internal"
+  address = "127.0.0.1"
 
   checks = [
     {
       id       = "consul-tcp-check-8500"
       name     = "consul-tcp-check-8500"
-      tcp      = "192.168.255.2:8500"
+      tcp      = "127.0.0.1:8500"
       interval = "20s"
       timeout  = "2s"
     }
@@ -22,4 +22,10 @@ service {
     "traefik.http.services.consul-ui.loadbalancer.server.scheme=http",
     "traefik.http.services.consul-ui.loadbalancer.server.port=8500"
   ]
+}
+
+services {
+  id      = "consul-external"
+  name    = "consul-ui"
+  address = "192.168.255.2"
 }
