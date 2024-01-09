@@ -7,7 +7,7 @@ service {
     {
       id       = "stepca-tcp-check-443"
       name     = "stepca-tcp-check-443"
-      tcp      = "192.168.255.2:9000"
+      tcp      = "192.168.255.2:8443"
       interval = "20s"
       timeout  = "2s"
     }

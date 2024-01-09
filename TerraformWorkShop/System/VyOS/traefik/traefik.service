@@ -4,7 +4,6 @@
 [Unit]
 Description="Traefik Proxy"
 Documentation=https://docs.traefik.io
-Requires=step-ca.service
 After=network-online.target step-ca.service
 AssertFileIsExecutable=/usr/bin/traefik
 
@@ -17,6 +16,7 @@ Environment=LEGO_CA_CERTIFICATES=${LEGO_CA_CERTIFICATES}
 # https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Type=
 Type=notify
 AmbientCapabilities=CAP_NET_BIND_SERVICE
+ExecStartPre=/usr/bin/sleep 5
 # https://doc.traefik.io/traefik/getting-started/configuration-overview/#configuration-file
 ExecStart=/usr/bin/traefik
 
