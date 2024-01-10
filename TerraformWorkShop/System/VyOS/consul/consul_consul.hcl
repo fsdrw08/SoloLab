@@ -1,7 +1,9 @@
+// https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference
 services {
   id      = "consul-internal"
   name    = "consul-internal"
   address = "127.0.0.1"
+  port    = 8500
 
   checks = [
     {
@@ -15,12 +17,14 @@ services {
 
    tags = [
     "traefik.enable=true",
-    "traefik.http.routers.consul-ui.rule=Host(`consul-ui.service.consul`)",
-    "traefik.http.routers.consul-ui.entrypoints=websecure",
-    "traefik.http.routers.consul-ui.middlewares=toHttps@file",
-    "traefik.http.routers.consul-ui.tls.certresolver=internal",
-    "traefik.http.services.consul-ui.loadbalancer.server.scheme=http",
-    "traefik.http.services.consul-ui.loadbalancer.server.port=8500"
+    "traefik.http.routers.consul-redirect.rule=Host(`consul-ui.service.consul`)",
+    "traefik.http.routers.consul-redirect.entrypoints=web",
+    "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.consul.rule=Host(`consul-ui.service.consul`)",
+    "traefik.http.routers.consul.entrypoints=websecure",
+    "traefik.http.routers.consul.tls.certresolver=internal",
+    "traefik.http.services.consul.loadbalancer.server.scheme=http",
+    // "traefik.http.services.consul.loadbalancer.server.port=8500"
   ]
 }
 
