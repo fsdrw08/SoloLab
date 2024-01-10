@@ -9,7 +9,7 @@ AssertPathExists=${traefik_service_file}
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/systemctl restart traefik.service
+ExecStart=/usr/bin/systemctl reload-or-restart traefik.service
 
 [Install]
 WantedBy=multi-user.target

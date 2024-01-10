@@ -1,7 +1,7 @@
 service {
   id      = "traefik"
   name    = "traefik"
-  address = "traefik.service.consul"
+  port    = 443
 
   checks = [
     {
