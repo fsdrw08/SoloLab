@@ -63,14 +63,16 @@ consul_post_process = {
 
 stepca = {
   install = {
-    tar_file_source = "https://dl.smallstep.com/certificates/docs-ca-install/latest/step-ca_linux_amd64.tar.gz"
-    tar_file_path   = "/home/vyos/step-ca_linux_amd64.tar.gz"
-    bin_file_dir    = "/usr/bin"
-  }
-  install_cli = {
-    tar_file_source = "https://dl.smallstep.com/cli/docs-cli-install/latest/step_linux_amd64.tar.gz"
-    tar_file_path   = "/home/vyos/step_linux_amd64.tar.gz"
-    bin_file_dir    = "/usr/bin"
+    server = {
+      tar_file_source = "https://dl.smallstep.com/certificates/docs-ca-install/latest/step-ca_linux_amd64.tar.gz"
+      tar_file_path   = "/home/vyos/step-ca_linux_amd64.tar.gz"
+      bin_file_dir    = "/usr/bin"
+    }
+    client = {
+      tar_file_source = "https://dl.smallstep.com/cli/docs-cli-install/latest/step_linux_amd64.tar.gz"
+      tar_file_path   = "/home/vyos/step_linux_amd64.tar.gz"
+      bin_file_dir    = "/usr/bin"
+    }
   }
   runas = {
     user  = "vyos"
@@ -202,8 +204,10 @@ traefik = {
 
 minio = {
   install = {
-    bin_file_source = "https://dl.min.io/server/minio/release/linux-amd64/minio"
-    bin_file_dir    = "/usr/local/bin"
+    server = {
+      bin_file_source = "https://dl.min.io/server/minio/release/linux-amd64/minio"
+      bin_file_dir    = "/usr/local/bin"
+    }
   }
   runas = {
     user  = "vyos"
@@ -215,23 +219,55 @@ minio = {
   config = {
     file_source = "./minio/minio.conf"
     vars = {
-      MINIO_OPTS                 = "--address \"127.0.0.1:9000\" --console-address \"127.0.0.1:9001\""
+      MINIO_OPTS                 = <<EOT
+      --address 127.0.0.1:9000 \
+      --console-address 127.0.0.1:9001 \
+      --certs-dir /opt/minio_certs
+      EOT
       MINIO_VOLUMES              = "/mnt/data/minio"
       MINIO_SERVER_URL           = "https://minio.service.consul"
-      MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul/ui/"
+      MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul/ui"
+      MINIO_ROOT_USER            = "admin"
+      MINIO_ROOT_PASSWORD        = "P@ssw0rd"
     }
     file_path = "/etc/default/minio"
   }
   service = {
-    status  = "started"
-    enabled = true
-    systemd_unit_service = {
-      file_source = "./minio/minio.service"
-      vars = {
-        user  = "vyos"
-        group = "users"
+    minio_restart = {
+      status  = "started"
+      enabled = true
+      systemd_unit_service = {
+        file_source = "./minio/minio_restart.service"
+        vars = {
+          minio_service_file = "/usr/lib/systemd/system/minio.service"
+        }
+        file_path = "/usr/lib/systemd/system/minio_restart.service"
       }
-      file_path = "/usr/lib/systemd/system/minio.service"
+      systemd_unit_path = {
+        file_source = "./minio/minio_restart.path"
+        vars = {
+          config_path = "/etc/default/minio"
+        }
+        file_path = "/usr/lib/systemd/system/minio_restart.path"
+      }
+    }
+    minio = {
+      status  = "started"
+      enabled = true
+      systemd_unit_service = {
+        file_source = "./minio/minio.service"
+        vars = {
+          user  = "vyos"
+          group = "users"
+        }
+        file_path = "/usr/lib/systemd/system/minio.service"
+      }
     }
   }
+}
+
+minio_certs = {
+  dir            = "/opt/minio_certs"
+  CAs_dir_link   = "/opt/minio_certs/CAs"
+  CAs_dir_target = "/etc/step-ca/certs"
 }

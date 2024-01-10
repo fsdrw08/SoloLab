@@ -53,14 +53,16 @@ variable "consul_post_process" {
 variable "stepca" {
   type = object({
     install = object({
-      tar_file_source = string
-      tar_file_path   = string
-      bin_file_dir    = string
-    })
-    install_cli = object({
-      tar_file_source = string
-      tar_file_path   = string
-      bin_file_dir    = string
+      server = object({
+        tar_file_source = string
+        tar_file_path   = string
+        bin_file_dir    = string
+      })
+      client = object({
+        tar_file_source = string
+        tar_file_path   = string
+        bin_file_dir    = string
+      })
     })
     runas = object({
       user  = string
@@ -154,8 +156,10 @@ variable "traefik" {
 variable "minio" {
   type = object({
     install = object({
-      bin_file_source = string
-      bin_file_dir    = string
+      server = object({
+        bin_file_source = string
+        bin_file_dir    = string
+      })
     })
     runas = object({
       user  = string
@@ -170,13 +174,37 @@ variable "minio" {
       file_path   = string
     })
     service = object({
-      status  = string
-      enabled = bool
-      systemd_unit_service = object({
-        file_source = string
-        vars        = optional(map(string))
-        file_path   = string
+      minio_restart = object({
+        status  = string
+        enabled = bool
+        systemd_unit_service = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
+        systemd_unit_path = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
+      })
+      minio = object({
+        status  = string
+        enabled = bool
+        systemd_unit_service = object({
+          file_source = string
+          vars        = optional(map(string))
+          file_path   = string
+        })
       })
     })
+  })
+}
+
+variable "minio_certs" {
+  type = object({
+    dir            = string
+    CAs_dir_link   = string
+    CAs_dir_target = string
   })
 }

@@ -2,16 +2,16 @@
 # download stepca 
 # https://smallstep.com/docs/step-ca/installation/#linux-binaries
 resource "system_file" "stepca_tar" {
-  source = var.stepca.install.tar_file_source
-  path   = var.stepca.install.tar_file_path
+  source = var.stepca.install.server.tar_file_source
+  path   = var.stepca.install.server.tar_file_path
 }
 
 # extract and put it to /usr/bin/
 resource "null_resource" "stepca_bin" {
   depends_on = [system_file.stepca_tar]
   triggers = {
-    file_source = var.stepca.install.tar_file_source
-    file_dir    = var.stepca.install.bin_file_dir
+    file_source = var.stepca.install.server.tar_file_source
+    file_dir    = var.stepca.install.server.bin_file_dir
     host        = var.vm_conn.host
     port        = var.vm_conn.port
     user        = var.vm_conn.user
@@ -28,8 +28,8 @@ resource "null_resource" "stepca_bin" {
     inline = [
       # https://smallstep.com/docs/step-ca/installation/#linux-binaries
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --extract --file=${system_file.stepca_tar.path} --directory=${var.stepca.install.bin_file_dir} --strip-components=1 --verbose --overwrite step-ca_linux_amd64/step-ca",
-      "sudo chmod 755 ${var.stepca.install.bin_file_dir}/step-ca",
+      "sudo tar --extract --file=${system_file.stepca_tar.path} --directory=${var.stepca.install.server.bin_file_dir} --strip-components=1 --verbose --overwrite step-ca_linux_amd64/step-ca",
+      "sudo chmod 755 ${var.stepca.install.server.bin_file_dir}/step-ca",
     ]
   }
   provisioner "remote-exec" {
@@ -41,16 +41,16 @@ resource "null_resource" "stepca_bin" {
 }
 
 resource "system_file" "stepcli_tar" {
-  source = var.stepca.install_cli.tar_file_source
-  path   = var.stepca.install_cli.tar_file_path
+  source = var.stepca.install.client.tar_file_source
+  path   = var.stepca.install.client.tar_file_path
 }
 
 # extract and put it to /usr/bin/
 resource "null_resource" "stepcli_bin" {
   depends_on = [system_file.stepcli_tar]
   triggers = {
-    file_source = var.stepca.install_cli.tar_file_source
-    file_dir    = var.stepca.install_cli.bin_file_dir
+    file_source = var.stepca.install.client.tar_file_source
+    file_dir    = var.stepca.install.client.bin_file_dir
     host        = var.vm_conn.host
     port        = var.vm_conn.port
     user        = var.vm_conn.user
