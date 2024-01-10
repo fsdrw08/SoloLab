@@ -23,5 +23,8 @@
       "editor.codeActionsOnSave": {
         "source.formatAll.terraform": "explicit"
       }
+    },
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
     }
 }

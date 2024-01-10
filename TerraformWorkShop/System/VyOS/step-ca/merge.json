@@ -1,0 +1,9 @@
+{
+    "authority": {
+        "claims": {
+            "minTLSCertDuration": "720h",
+            "maxTLSCertDuration": "17520h",
+            "defaultTLSCertDuration": "8660h"
+        }
+    }
+}
