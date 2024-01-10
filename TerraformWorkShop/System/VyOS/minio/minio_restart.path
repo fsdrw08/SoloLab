@@ -1,0 +1,11 @@
+# ref: https://superuser.com/questions/1171751/restart-systemd-service-automatically-whenever-a-directory-changes-any-file-ins#1276457
+
+[Unit]
+Description="Restart MinIO service when static config modified"
+Documentation=https://min.io/docs/minio/linux/reference/minio-server/settings/core.html#id3
+
+[Path]
+PathModified=${config_path}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+# https://github.com/lyzeo/rivet/blob/64219c2c43ea6fbcecdc885d9259c713edb9ceee/infra/salt/salt/traefik/files/traefik.service#L11
+# See https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#
+
+[Unit]
+Description="Restart MinIO service when env config modified"
+Documentation=https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#
+After=network-online.target
+AssertPathExists=${minio_service_file}
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl reload-or-restart minio.service
+
+[Install]
+WantedBy=multi-user.target
