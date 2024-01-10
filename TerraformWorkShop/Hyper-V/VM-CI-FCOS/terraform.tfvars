@@ -1,0 +1,6 @@
+hyperv_user     = "root"
+hyperv_password = "P@ssw0rd"
+vm_name         = "SvcDisc-FCOS"
+source_disk     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\fedora-coreos-39.20231101.3.0-hyperv.x86_64.vhdx"
+data_disk_path  = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\SvcDisc-FCOS-Data.vhdx"
+fcos_timezone   = "Asia/Shanghai"
