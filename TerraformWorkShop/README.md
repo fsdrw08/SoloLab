@@ -9,10 +9,11 @@ $projectPath = git rev-parse --show-toplevel
 2. go to terraform resources related folder, run below command
 ```powershell
 $projectPath = git rev-parse --show-toplevel
-terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\mirror")
+# terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\mirror")
+terraform providers mirror (Join-Path -Path $env:PUBLIC -ChildPath "Downloads\terraform.d\mirror")
 ```
 
-3. run terraform init
+1. run terraform init
 ```powershell
 terraform init --plugin-dir (Join-Path -Path $projectPath -ChildPath ".terraform.d/mirror/registry.terraform.io/")
 ```

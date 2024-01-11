@@ -310,6 +310,7 @@ data "ignition_directory" "user_config_containers_systemd" {
 # https://discussion.fedoraproject.org/t/installing-and-running-consul-on-coreos/72526
 data "ignition_file" "consul_bin" {
   path = "/usr/local/bin/consul"
+  mode = 493 # oct 755 -> 493
   source {
     source = "tftp://192.168.255.1/bin/consul"
   }

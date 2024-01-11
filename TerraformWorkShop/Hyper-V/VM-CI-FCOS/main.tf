@@ -3,13 +3,11 @@ locals {
 }
 
 data "ignition_config" "ignition" {
-  count       = local.count
-  disks       = [data.ignition_disk.data.rendered]
-  filesystems = [data.ignition_filesystem.data.rendered]
+  count = local.count
   systemd = [
     data.ignition_systemd_unit.data.rendered,
     data.ignition_systemd_unit.rpm_ostree.rendered,
-    data.ignition_systemd_unit.rpm_ostree.consul
+    data.ignition_systemd_unit.consul.rendered
   ]
   directories = [
     data.ignition_directory.mnt_nfs.rendered,
