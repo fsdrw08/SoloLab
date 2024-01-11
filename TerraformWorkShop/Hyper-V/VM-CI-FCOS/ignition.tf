@@ -14,49 +14,34 @@ data "ignition_link" "timezone" {
   target = "../usr/share/zoneinfo/${var.fcos_timezone}"
 }
 
-# setup external disk
-data "ignition_disk" "data" {
-  device     = "/dev/sdb"
-  wipe_table = false
-  partition {
-    number  = 1
-    label   = "data"
-    sizemib = 0
-  }
+# mount nfs
+data "ignition_directory" "mnt_nfs" {
+  path = "/var/mnt/data"
 }
 
-data "ignition_filesystem" "data" {
-  device          = "/dev/disk/by-partlabel/data"
-  format          = "xfs"
-  wipe_filesystem = false
-  label           = "data"
-  path            = "/var/home/podmgr"
-}
-
-# the ignition provider does not provide filesystems.with_mount_unit like butane
+# this ignition terraform provider does not provide filesystems.with_mount_unit like butane
 # https://coreos.github.io/butane/config-fcos-v1_5/
 # had to create the systemd mount unit manually
-# to debug, run journalctl --unit var-home-podmgr.mount -b-boot
+# to debug, run journalctl --unit var-mnt-data.mount -b-boot
 # https://github.com/getamis/terraform-ignition-etcd/blob/6526ce743d36f7950e097dabbff4ccfb41655de7/volume.tf#L28
 # https://github.com/meyskens/vagrant-coreos-baremetal/blob/5470c582fa42f499bc17eb501d3e592cf85caaf1/terraform/modules/ignition/systemd/files/data.mount.tpl
 # https://unix.stackexchange.com/questions/225401/how-to-see-full-log-from-systemctl-status-service/225407#225407
 data "ignition_systemd_unit" "data" {
   # mind the unit name, The .mount file must be named based on the mount point path (e.g. /var/mnt/data = var-mnt-data.mount)
   # https://docs.fedoraproject.org/en-US/fedora-coreos/storage/#_configuring_nfs_mounts
-  name    = "var-home-podmgr.mount"
+  name    = "var-mnt-data.mount"
   content = <<EOT
 [Unit]
-Description=Mount data disk
+Description=Mount nfs share
 Before=local-fs.target
 
 [Mount]
-What=/dev/disk/by-partlabel/data
-Where=/var/home/podmgr
-Type=xfs
-DirectoryMode=0700
+What=192.168.255.1:/mnt/data/nfs
+Where=/var/mnt/data
+Type=nfs4
 
 [Install]
-RequiredBy=local-fs.target
+WantedBy=multi-user.target
 EOT
 }
 
@@ -91,7 +76,7 @@ interface-name=eth0
 
 [ipv4]
 method=manual
-addresses=192.168.255.2${count.index + 0}
+addresses=192.168.255.1${count.index + 0}
 gateway=192.168.255.1
 dns=192.168.255.1
 EOT
@@ -123,7 +108,7 @@ data "ignition_user" "user" {
   ]
 }
 
-# set rootless user home dir to external disk
+# set rootless user home dir
 data "ignition_directory" "user_home" {
   path = "/var/home/podmgr"
   mode = 448 # oct 700 -> dec 448
@@ -225,24 +210,24 @@ data "ignition_file" "rootless_linger" {
 
 # install packages
 # prepare yum repo
-data "ignition_file" "hashicorp_repo" {
-  path = "/etc/yum.repos.d/hashicorp.repo"
-  mode = 420 # oct 644 -> dec 420
-  # source {
-  #   source = "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
-  # }
-  # or
-  content {
-    content = <<EOT
-[hashicorp]
-name=Hashicorp Stable - $basearch
-baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
-enabled=1
-gpgcheck=1
-gpgkey=https://rpm.releases.hashicorp.com/gpg
-  EOT
-  }
-}
+# data "ignition_file" "hashicorp_repo" {
+#   path = "/etc/yum.repos.d/hashicorp.repo"
+#   mode = 420 # oct 644 -> dec 420
+#   # source {
+#   #   source = "https://rpm.releases.hashicorp.com/fedora/hashicorp.repo"
+#   # }
+#   # or
+#   content {
+#     content = <<EOT
+# [hashicorp]
+# name=Hashicorp Stable - $basearch
+# baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+# enabled=1
+# gpgcheck=1
+# gpgkey=https://rpm.releases.hashicorp.com/gpg
+#   EOT
+#   }
+# }
 
 # https://cockpit-project.org/running.html#coreos
 # https://github.com/coreos/fedora-coreos-tracker/issues/681
@@ -252,7 +237,7 @@ data "ignition_file" "rpms" {
   content {
     content = <<EOT
 [Service]
-Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager rclone consul"
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
 EOT
   }
 }
@@ -323,23 +308,33 @@ data "ignition_directory" "user_config_containers_systemd" {
 
 # config consul
 # https://discussion.fedoraproject.org/t/installing-and-running-consul-on-coreos/72526
+data "ignition_file" "consul_bin" {
+  path = "/usr/local/bin/consul"
+  source {
+    source = "tftp://192.168.255.1/bin/consul"
+  }
+}
+
 data "ignition_user" "consul" {
   name     = "consul"
   system   = true
   home_dir = "/etc/consul.d"
   shell    = "/bin/false"
   uid      = 1002
-  gid      = 1002
 }
 
 data "ignition_directory" "consul_config" {
   path = "/etc/consul.d"
+  mode = 493 # oct 755 -> 493
   uid  = 1002
   gid  = 1002
 }
 
 data "ignition_file" "consul_config" {
   path = "/etc/consul.d/consul.hcl"
+  mode = 483 # oct 666 -> 483
+  uid  = 1002
+  gid  = 1002
   content {
     content = <<-EOT
     acl {
@@ -351,13 +346,20 @@ data "ignition_file" "consul_config" {
     auto_reload_config = true
     bind_addr = "{{ GetInterfaceIP `eth0` }}"
     datacenter = "dc1"
-    data_dir = "/home/podmgr/consul/data"
+    data_dir = "/opt/consul"
     encrypt = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
     retry_join = [
       "consul.service.consul"
     ]
     EOT
   }
+}
+
+data "ignition_directory" "consul_data" {
+  path = "/opt/consul"
+  mode = 493 # oct 755 -> dec 493
+  uid  = 1002
+  gid  = 1002
 }
 
 data "ignition_systemd_unit" "consul" {
@@ -372,6 +374,8 @@ data "ignition_systemd_unit" "consul" {
     ConditionFileNotEmpty=/etc/consul.d/consul.hcl
 
     [Service]
+    User=consul
+    Group=consul
     Type=notify
     ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/
     ExecReload=/bin/kill --signal HUP $MAINPID
@@ -386,25 +390,25 @@ data "ignition_systemd_unit" "consul" {
 }
 
 # generate podman container and related systemd config with quadlet
-# data "ignition_file" "cockpit" {
-#   path = "/etc/containers/systemd/cockpit-ws.container"
-#   mode = 420 # oct 644
-#   content {
-#     # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
-#     # https://github.com/miabbott/fcos-cockpit/blob/3b0e432582f5513d8b5c9bfcf85a39b2d46fbd5c/etc/containers/systemd/cockpit.container#L6
-#     content = <<EOT
-# [Unit]
-# Description=Cockpit container
-# After=local-fs.target
+data "ignition_file" "cockpit" {
+  path = "/etc/containers/systemd/cockpit-ws.container"
+  mode = 420 # oct 644
+  content {
+    # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+    # https://github.com/miabbott/fcos-cockpit/blob/3b0e432582f5513d8b5c9bfcf85a39b2d46fbd5c/etc/containers/systemd/cockpit.container#L6
+    content = <<EOT
+[Unit]
+Description=Cockpit container
+After=local-fs.target
 
-# [Container]
-# Environment=TZ=${var.fcos_timezone}
-# Image=quay.io/cockpit/ws
-# PublishPort=9090:9090
+[Container]
+Environment=TZ=${var.fcos_timezone}
+Image=quay.io/cockpit/ws
+PublishPort=9090:9090
 
-# [Install]
-# WantedBy=multi-user.target default.target
-# EOT
-#   }
-# }
+[Install]
+WantedBy=multi-user.target default.target
+EOT
+  }
+}
 

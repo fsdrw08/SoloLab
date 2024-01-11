@@ -8,9 +8,11 @@ data "ignition_config" "ignition" {
   filesystems = [data.ignition_filesystem.data.rendered]
   systemd = [
     data.ignition_systemd_unit.data.rendered,
-    data.ignition_systemd_unit.rpm_ostree.rendered
+    data.ignition_systemd_unit.rpm_ostree.rendered,
+    data.ignition_systemd_unit.rpm_ostree.consul
   ]
   directories = [
+    data.ignition_directory.mnt_nfs.rendered,
     data.ignition_directory.user_home.rendered,
     data.ignition_directory.user_config.rendered,
     data.ignition_directory.user_config_systemd.rendered,
@@ -18,20 +20,26 @@ data "ignition_config" "ignition" {
     data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
     data.ignition_directory.user_config_containers.rendered,
     data.ignition_directory.user_config_containers_systemd.rendered,
+    data.ignition_directory.consul_config.rendered,
+    data.ignition_directory.consul_data.rendered
   ]
   users = [
     data.ignition_user.core.rendered,
-    data.ignition_user.user.rendered
+    data.ignition_user.user.rendered,
+    data.ignition_user.consul.rendered
   ]
   files = [
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
     data.ignition_file.eth0[count.index].rendered,
-    data.ignition_file.rpms.rendered,
-    data.ignition_file.rootless_linger.rendered,
     data.ignition_file.rootless_podman_socket_tcp_service.rendered,
+    data.ignition_file.rootless_linger.rendered,
+    data.ignition_file.rpms.rendered,
     data.ignition_file.enable_password_auth.rendered,
     data.ignition_file.sysctl_unprivileged_port.rendered,
+    data.ignition_file.consul_bin.rendered,
+    data.ignition_file.consul_config.rendered,
+    data.ignition_file.cockpit.rendered,
   ]
   links = [
     data.ignition_link.timezone.rendered,
@@ -121,15 +129,6 @@ module "hyperv_machine_instance" {
         join("", ["${var.vm_name}", ".vhdx"])
         ]
       )
-    }
-  ]
-
-  additional_disk_drives = [
-    {
-      controller_type     = "Scsi"
-      controller_number   = "0"
-      controller_location = "2"
-      path                = local.count <= 1 ? var.data_disk_path : var.data_disk_path[count.index]
     }
   ]
 
