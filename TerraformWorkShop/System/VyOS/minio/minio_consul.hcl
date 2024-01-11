@@ -1,6 +1,6 @@
 services {
   id      = "minio-internal-api"
-  name    = "minio-internal-api"
+  name    = "minio"
   address = "127.0.0.1"
   port    = 9000
 
@@ -29,7 +29,7 @@ services {
 
 services {
   id      = "minio-internal-console"
-  name    = "minio-internal-console"
+  name    = "minio"
   address = "127.0.0.1"
   port    = 9001
 
@@ -61,7 +61,6 @@ services {
 }
 
 services {
-  id      = "minio"
+  id      = "minio-external"
   name    = "minio"
-  address = "192.168.255.2"
 }
