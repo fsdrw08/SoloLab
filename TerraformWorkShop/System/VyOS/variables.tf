@@ -7,6 +7,19 @@ variable "vm_conn" {
   })
 }
 
+variable "tftp" {
+  type = object({
+    address = string
+    dir = object({
+      path = string
+      own_by = object({
+        user  = string
+        group = string
+      })
+    })
+  })
+}
+
 variable "consul" {
   type = object({
     install = object({

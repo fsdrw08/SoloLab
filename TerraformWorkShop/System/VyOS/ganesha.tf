@@ -1,6 +1,6 @@
 resource "system_file" "nfs_ganesha" {
   path = "/etc/ganesha/ganesha.conf.new"
-  content = templatefile("${path.module}/ganesha.conf.tftpl", {
+  content = templatefile("${path.module}/ganesha/ganesha.conf.tftpl", {
     export_path = "/mnt/data/nfs",
   })
   connection {

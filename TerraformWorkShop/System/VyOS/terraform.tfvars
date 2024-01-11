@@ -5,6 +5,17 @@ vm_conn = {
   password = "vyos"
 }
 
+tftp = {
+  address = "192.168.255.1"
+  dir = {
+    path = "/mnt/data/tftp"
+    own_by = {
+      user  = "vyos"
+      group = "users"
+    }
+  }
+}
+
 consul = {
   install = {
     zip_file_source = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
