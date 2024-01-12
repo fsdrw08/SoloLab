@@ -1,0 +1,217 @@
+## %%MAIN_CONTAINER/POD_DESCRIPTION%%
+##
+traefik:
+  ## @param traefik.containerPorts traefik container port to expose to host
+  ## containerPorts:
+  ##   - name: http
+  ##     containerPort: 80
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##   - name: https
+  ##     containerPort: 443
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##
+  containerPorts:
+    - name: http
+      containerPort: 80
+      hostPort: 80
+      protocol: TCP
+    - name: https
+      containerPort: 443
+      hostPort: 443
+      protocol: TCP
+  ## traefik resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param traefik.resources.limits The resources limits for the traefik containers
+  ## @param traefik.resources.requests The requested resources for the traefik containers
+  ##
+  resources:
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+    requests: {}
+
+  ## %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+
+  ## @param traefik.staticConfiguration
+  # https://doc.traefik.io/traefik/getting-started/configuration-overview/#the-static-configuration
+  staticConfiguration:
+    ## @param traefik.staticConfiguration.providers
+    ## ref: https://doc.traefik.io/traefik/providers/overview/
+    ##
+    providers:
+      docker:
+        endpoint: "unix:///var/run/docker.sock"
+        useBindPortIP: false
+        exposedByDefault: false
+    ## @param traefik.staticConfiguration.serversTransport
+    ## ref: https://doc.traefik.io/traefik/routing/overview/#transport-configuration
+    serversTransport:
+      rootCAs:
+        - /etc/traefik/root_ca.crt
+    ## @param traefik.staticConfiguration.globalArguments global arguments
+    ## e.g.
+    ## globalArguments:
+    ##   checkNewVersion: false
+    ##   sendAnonymousUsage: false
+    ##
+    globalArguments: {}
+    ## @param traefik.staticConfiguration.entryPoints
+    ## ref: # https://doc.traefik.io/traefik/routing/overview/
+    ##
+    entryPoints:
+      traefik:
+        address: ":8080"
+      web:
+        address: ":80"
+        forwardedHeaders:
+          trustedIPs: []
+      # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
+      websecure:
+        address: ":443"
+        # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+        # https://community.traefik.io/t/how-to-get-real-ip-from-the-client/8239
+        # https://www.bboy.app/2020/04/16/traefik%E5%90%8E%E7%AB%AF%E5%BA%94%E7%94%A8%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E7%9C%9F%E5%AE%9Eip/
+        forwardedHeaders:
+          trustedIPs: []
+    ## @param traefik.staticConfiguration.api
+    ## Traefik exposes a number of information through an API handler
+    ##
+    api:
+      dashboard: true
+    ## @param traefik.staticConfiguration.certificatesResolvers
+    ## ref: https://doc.traefik.io/traefik/https/acme/
+    ## e.g.
+    ## certificatesResolvers:
+    ##   external:
+    ##     acme:
+    ##       caServer: https://acme-v02.api.letsencrypt.org/directory
+    ##       certificatesDuration: 2160
+    ##       email:
+    ##       storage: /mnt/acmeStorage/external_acme.json
+    ##       tlsChallenge: {}
+    ##   internal:
+    ##     acme:
+    ##       caServer:
+    ##       certificatesDuration: 2160
+    ##       email:
+    ##       storage: /mnt/acmeStorage/internal_acme.json
+    ##       tlsChallenge: {}
+    ##
+    certificatesResolvers:
+      external:
+        acme:
+          caServer: https://acme-v02.api.letsencrypt.org/directory
+          certificatesDuration: 2160
+          email:
+          storage: /mnt/acmeStorage/external_acme.json
+          tlsChallenge: {}
+      internal:
+        acme:
+          caServer: https://step-ca.service.consul:8443/acme/acme/directory
+          certificatesDuration: 2160
+          email:
+          storage: /mnt/acmeStorage/internal_acme.json
+          tlsChallenge: {}
+    ## @param traefik.staticConfiguration.log
+    ## ref: https://doc.traefik.io/traefik/observability/logs/
+    ##
+    log:
+      ## @param traefik.staticConfiguration.log.level
+      ## Alternative logging levels are DEBUG, INFO, WARN, ERROR, FATAL, and PANIC.
+      level: DEBUG
+    ## @param traefik.staticConfiguration.accessLog
+    ## ref: https://doc.traefik.io/traefik/observability/access-logs/
+    accessLog: {}
+  ## @param traefik.customRootCA set up a custom root CA to trust (for private ACME)
+  ## ref: https://smallstep.com/docs/tutorials/acme-protocol-acme-clients/index.html#traefik-v2
+  customRootCA: ""
+  ## @param traefik.podLabels Extra labels for traefik pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels:
+    traefik.enable: true
+    traefik.http.middlewares.userpass.basicauth.users: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+    traefik.http.middlewares.toHttps.redirectscheme.scheme: https
+    traefik.http.middlewares.toHttps.redirectscheme.permanent: true
+    traefik.http.routers.dashboard-redirect.entryPoints: web
+    traefik.http.routers.dashboard-redirect.rule: "Host(`ci-traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard-redirect.middlewares: toHttps@docker
+    traefik.http.routers.dashboard.entryPoints: websecure
+    traefik.http.routers.dashboard.rule: "Host(`dev-traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard.service: api@internal
+    traefik.http.routers.dashboard.tls.certresolver: internal
+  ## @param traefik.extraEnvVars Array with extra environment variables to add to traefik nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: 
+    - name: TZ
+      value: Asia/Shanghai
+  ## @param traefik.extraVolumes Optionally specify extra list of additional volumes for the traefik pod(s)
+  ## e.g.
+  ## extraVolumes:
+  ##   - name: acmeStorage
+  ##     persistentVolumeClaim:
+  ##       claimName: traefik-pvc
+  extraVolumes:
+    - name: docker-socket
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
+  ## @param traefik.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the traefik container(s)
+  ## e.g.
+  ## extraVolumeMounts:
+  ##   - name: acmeStorage
+  ##     mountPath: /mnt/acmeStorage
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock"
+
+## @section Persistence Parameters
+##
+
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: true
+  ## @param persistence.mountPath Path to mount the volume at.
+  ##
+  mountPath: /mnt/acmeStorage
+  ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+  ##
+  subPath: ""
+  ## @param persistence.storageClass Storage class of backing PVC
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ##
+  annotations: 
+    volume.podman.io/type: bind
+    volume.podman.io/device: /mnt/data/jenkins
+  ## @param persistence.accessModes Persistent Volume Access Modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Size of data volume
+  ##
+  size: 8Gi
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+## @section Init Container Parameters
+##
