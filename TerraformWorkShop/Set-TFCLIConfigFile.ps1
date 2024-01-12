@@ -2,7 +2,8 @@
 
 $projectPath = git rev-parse --show-toplevel
 # $mirrorPath = "$projectPath/TerraformWorkShop/terraform.d/mirror" 
-$mirrorPath = "C:/Users/Public/Downloads/terraform.d/mirror" 
+# "C:/Users/Public/Downloads/terraform.d/mirror" 
+$mirrorPath = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/mirror").Replace("\","/")
 
 $provider_installation_block = @"
 provider_installation {
@@ -16,7 +17,7 @@ provider_installation {
 }
 "@
 
-$plugin_cache_dir = $(Join-Path -Path $ENV:USERPROFILE -ChildPath ".terraform.d/terraform-plugin-cache").Replace("\", "/")
+$plugin_cache_dir = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache").Replace("\", "/")
 
 $TF_CLI_CONFIG_FILE = 
 @"
