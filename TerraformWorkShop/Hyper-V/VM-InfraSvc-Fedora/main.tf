@@ -198,12 +198,12 @@ resource "hyperv_vhd" "boot_disk" {
   source = var.source_disk
 }
 
-data "terraform_remote_state" "data_disk" {
-  backend = "local"
-  config = {
-    path = "${path.module}/../Disk-InfraSvc-Fedora-Data/terraform.tfstate"
-  }
-}
+# data "terraform_remote_state" "data_disk" {
+#   backend = "local"
+#   config = {
+#     path = "${path.module}/../Disk-InfraSvc-Fedora-Data/terraform.tfstate"
+#   }
+# }
 
 module "hyperv_machine_instance" {
   source     = "../modules/hyperv_instance"
@@ -293,7 +293,12 @@ module "hyperv_machine_instance" {
         controller_type     = "Scsi"
         controller_number   = "0"
         controller_location = "2"
-        path                = data.terraform_remote_state.data_disk.outputs.path
+        path = join("\\", [
+          local.vhd_dir,
+          "Data_Disk",
+          var.data_disk
+          ]
+        )
       }
     ]
   }
