@@ -191,8 +191,11 @@ module "hyperv_machine_instance" {
 
 # execute kvpctl to put ignition file content to hyper-v kv
 resource "null_resource" "kvpctl" {
-  depends_on = [module.hyperv_machine_instance]
-  count      = local.count
+  depends_on = [
+    null_resource.remote,
+    module.hyperv_machine_instance
+  ]
+  count = local.count
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
