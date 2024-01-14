@@ -23,7 +23,7 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file = "$PSScriptRoot\tmpl-hv_g2-centos.pkr.hcl"
+  # $template_file = "$PSScriptRoot\tmpl-hv_g2-centos.pkr.hcl"
   $var_file = "$PSScriptRoot\vars-centos-$CentOSVersion.pkrvars.hcl"
   $machine = "CentOS $CentOSVersion"
   $packer_log = 0
@@ -35,7 +35,7 @@ if ($Ready -ne $false) {
     Set-Location $PSScriptRoot
     try {
       $env:PACKER_LOG = $packer_log
-      packer validate -var-file="$var_file" "$template_file"
+      packer validate -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer validation failed, exiting."
@@ -55,7 +55,7 @@ if ($Ready -ne $false) {
       
       $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force -var-file="$var_file" "$template_file"
+      packer build --force -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer build failed, exiting."

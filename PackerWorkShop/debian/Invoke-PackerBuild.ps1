@@ -1,17 +1,17 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('1130','1150','1160')]
+    [ValidateSet('1130','1150','1160','1240')]
     [int16]
     $DebianVersion
 )
 
 #Verify the pre-request
+$Ready = $true
 @"
 packer
-dos2unix
 "@ -split "`r`n" | ForEach-Object {
-  if (!(Get-Command $_)) {
+  if (-not (Get-Command $_)) {
     [bool]$Ready = $false
   }
   $Ready
@@ -34,8 +34,8 @@ if ($Ready -ne $false) {
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
-      $env:PACKER_LOG=$packer_log
-      packer validate -var-file="$var_file" "$template_file"
+      $env:PACKER_LOG = $packer_log
+      packer validate -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer validation failed, exiting."
@@ -43,19 +43,21 @@ if ($Ready -ne $false) {
     }
     try {
       # Convert dos format to unix format
-      "dos2unix"
-      Get-ChildItem -Path $PSScriptRoot -Recurse `
-        | Where-Object {$_.Name -like "*.sh" -or $_.Name -eq "answers"} `
-        | Select-Object -ExpandProperty VersionInfo `
-        | Select-Object -ExpandProperty filename `
-        | ForEach-Object {
-          #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
-          dos2unix $_
-        }
+      # "dos2unix"
+      # Get-ChildItem -Path $PSScriptRoot -Recurse `
+      #   | Where-Object {$_.Name -like "*.sh" -or $_.Name -eq "answers"} `
+      #   | Select-Object -ExpandProperty VersionInfo `
+      #   | Select-Object -ExpandProperty filename `
+      #   | ForEach-Object {
+      #     #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
+      #     dos2unix $_
+      #   }
       
-      $env:PACKER_LOG=$packer_log
+      $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force -var-file="$var_file" "$template_file"
+      packer build --force `
+        -var-file="$var_file" `
+        .
     }
     catch {
       Write-Output "Packer build failed, exiting."
@@ -70,4 +72,4 @@ if ($Ready -ne $false) {
 }
 
 $endDTM = (Get-Date)
-Write-Host "[INFO]  - Elapsed Time: $(($endDTM-$startDTM).totalseconds) seconds" -ForegroundColor Yellow
+Write-Host "[INFO]  - Elapsed Time: $(($endDTM - $startDTM).TotalSeconds) seconds" -ForegroundColor Yellow
