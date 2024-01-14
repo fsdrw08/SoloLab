@@ -127,6 +127,11 @@ traefik:
   ## @param traefik.customRootCA set up a custom root CA to trust (for private ACME)
   ## ref: https://smallstep.com/docs/tutorials/acme-protocol-acme-clients/index.html#traefik-v2
   customRootCA: ""
+  ## Configure Container Security Context
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions:
+      type: spc_t
   ## @param traefik.podLabels Extra labels for traefik pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
@@ -139,7 +144,7 @@ traefik:
     traefik.http.routers.dashboard-redirect.rule: "Host(`ci-traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
     traefik.http.routers.dashboard-redirect.middlewares: toHttps@docker
     traefik.http.routers.dashboard.entryPoints: websecure
-    traefik.http.routers.dashboard.rule: "Host(`dev-traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard.rule: "Host(`ci-traefik.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
     traefik.http.routers.dashboard.service: api@internal
     traefik.http.routers.dashboard.tls.certresolver: internal
   ## @param traefik.extraEnvVars Array with extra environment variables to add to traefik nodes
@@ -169,7 +174,7 @@ traefik:
   ##     mountPath: /mnt/acmeStorage
   extraVolumeMounts:
     - name: docker-socket
-      mountPath: "/var/run/docker.sock"
+      mountPath: "/var/run/docker.sock:Z"
 
 ## @section Persistence Parameters
 ##

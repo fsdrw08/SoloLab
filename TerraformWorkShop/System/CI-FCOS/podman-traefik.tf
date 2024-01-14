@@ -42,6 +42,34 @@ Yaml=traefik-aio.yaml
 EOT
 }
 
+resource "null_resource" "podman_traefik_service" {
+  depends_on = [
+    system_file.podman_traefik_kube
+  ]
+  triggers = {
+    status       = "stop"
+    service_name = "traefik"
+    yaml         = data.helm_template.podman_traefik.manifest
+    host         = var.vm_conn.host
+    port         = var.vm_conn.port
+    user         = var.vm_conn.user
+    password     = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "systemctl --user daemon-reload",
+      "systemctl --user ${self.triggers.status} ${self.triggers.service_name}",
+    ]
+  }
+}
+
 # resource "system_service_systemd" "podman_traefik" {
 #   depends_on = [
 #     system_file.podman_traefik_kube,
@@ -51,3 +79,8 @@ EOT
 #   status = "started"
 #   scope  = "user"
 # }
+
+resource "system_file" "podman_traefik_consul" {
+  path    = "/etc/consul.d/traefik_consul.hcl"
+  content = file("./podman-traefik/traefik_consul.hcl")
+}

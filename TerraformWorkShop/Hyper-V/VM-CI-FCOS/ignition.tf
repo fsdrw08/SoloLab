@@ -34,6 +34,8 @@ data "ignition_systemd_unit" "data" {
 [Unit]
 Description=Mount nfs share
 Before=local-fs.target
+Requires=network-online.service
+After=network-online.service
 
 [Mount]
 What=192.168.255.1:/mnt/data/nfs

@@ -1,0 +1,232 @@
+## %%MAIN_CONTAINER/POD_DESCRIPTION%%
+##
+controller:
+  ## @param controller.additionalPlugins List of plugins to install in addition to those listed in controller.installPlugins
+  additionalPlugins:
+    - job-dsl:latest
+    - docker-workflow:latest
+  ## @param controller.provision initContainer settings for jenkins controller provision
+  provision:
+    ##
+    ## @param controller.provision.extraEnvVars Environment variables that get added to the provision init container (useful for e.g. http_proxy)
+    ## e.g.
+    ## extraEnvVars:
+    ##   - name: http_proxy
+    ##     value: "http://192.168.64.1:3128"
+    extraEnvVars:
+      - name: JENKINS_UC
+        value: "https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates"
+      - name: JENKINS_UC_DOWNLOAD
+        value: "https://mirrors.tuna.tsinghua.edu.cn/jenkins"
+      - name: http_proxy
+        value: "http://192.168.255.1:7890"
+      - name: https_proxy
+        value: "http://192.168.255.1:7890"
+  # need to set to runas root to make jenkins communicate with docker.sock and make jcasc reload success
+  podSecurityContext:
+    enabled: true
+    runAsUser: 0
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 0
+    runAsGroup: 0
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: true
+  ## @param controller.jenkinsUrl If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
+  ##
+  jenkinsUrl: "https://jenkins.service.consul"
+  ## @param controller.adminSecret Create secret for admin user
+  ## The default configuration uses this secret to configure an admin user
+  ## If you don't need that user or use a different security realm then you can disable it
+  ##
+  adminSecret: true
+  ## @param controller.adminUser Admin username (and password) created as a secret if adminSecret is true
+  ## When enabling LDAP or another non-Jenkins identity source, the built-in admin account will no longer exist.
+  ## If you disable the non-Jenkins identity store and instead use the Jenkins internal one,
+  ## you should revert controller.adminUser to your preferred admin user:
+  ##
+  adminUser: "admin"
+  ## @param controller.adminPassword Admin password (and user) created as a secret if adminSecret is true
+  ## Defaults to a random 10-character alphanumeric string if not set
+  ##
+  adminPassword: "P@ssw0rd"
+  ## @param controller.extraEnvVars Array with extra environment variables to add to jenkins nodes
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars:
+    - name: JENKINS_UC
+      value: "https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates"
+    - name: JENKINS_UC_DOWNLOAD
+      value: "https://mirrors.tuna.tsinghua.edu.cn/jenkins"
+    - name: http_proxy
+      value: "http://192.168.255.1:7890"
+    - name: https_proxy
+      value: "http://192.168.255.1:7890"
+    - name: no_proxy
+      value: "localhost"
+  extraVolumes:
+    - name: docker-socket
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock:Z"
+  ## @param controller.podLabels Extra labels for jenkins pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.jenkins.rule: "Host(`jenkins.service.consul`)"
+    traefik.http.routers.jenkins.entryPoints: websecure
+    traefik.http.routers.jenkins.tls.certresolver: internal
+    traefik.http.services.jenkins.loadbalancer.server.port: 8080
+  ## @section Jenkins config as code
+  ## @param controller.JCasC config of Jenkins Config as Code
+  ## Below is the implementation of Jenkins Configuration as Code.
+  ## Each key (prior to | character) is just a label, and can be any value.
+  ## Keys are only used to give the section a meaningful name.  The only restriction is they may only contain RFC 1123 \ DNS label
+  ## characters: lowercase letters, numbers, and hyphens.  The keys become the name of a configuration yaml file on the controller in
+  ## /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin.  The lines after each |
+  ## become the content of the configuration yaml file.  The first line after this is a JCasC root element, eg jenkins, credentials,
+  ## etc.
+  JCasC:
+    ## @param JCasC.enabled Enable configuration as code.
+    ##
+    enabled: true
+    ## @param configAsCode.extraConfigFiles List of additional configuration-as-code files to be mounted
+    ## E.g.:
+    ##  welcome-message.yaml: |-
+    ##    jenkins:
+    ##      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+    ##
+    extraConfigFiles:
+      welcome-message.yaml: |-
+        jenkins:
+          systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+
+      fix-agent-port.yaml: |-
+        jenkins:
+          slaveAgentPort: 50000
+
+      # https://github.com/Zsomx/devops-course-szte/blob/c04caad7793f4899f8ea7614ed191de831ef03d3/jenkins/docker/config/docker.yml#L46
+      docker.yaml: |-
+        jenkins:
+          clouds:
+            - docker:
+                name: "docker"
+                dockerApi:
+                  dockerHost:
+                    uri: "unix:///var/run/docker.sock"
+                templates:
+                  - labelString: "docker-agent"
+                    connector:
+                      jnlp:
+                        jenkinsUrl: "http://jenkins:8080/"
+                        jnlpLauncher:
+                          workDirSettings:
+                            disabled: false
+                            failIfWorkDirIsMissing: false
+                            internalDir: "remoting"
+                        user: root
+                    dockerTemplateBase:
+                      image: "docker.io/jenkins/jnlp-agent-docker:latest"
+                      dnsHosts:
+                        - "10.89.0.1"
+                        - "192.168.255.1"
+                      environment: 
+                        - "TZ=Asia/Shanghai"
+                      mounts:
+                        - "type=tmpfs,destination=/run"
+                        - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
+                        - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+                      user: "root"
+                    pullStrategy: PULL_NEVER
+                    remoteFs: "/home/jenkins"
+                    instanceCapStr: "10"
+                    retentionStrategy:
+                      idleMinutes: 1
+
+      job-dsl.yaml: |-
+        jobs:
+          - script: |
+              pipelineJob('test'){
+                definition{
+                  cpsScm{
+                    scm{
+                      git{
+                        remote {
+                          url('https://github.com/fsdrw08/packto-samples.git')
+                        }
+                        branches("refs/heads/main")
+                        extensions {
+                          cloneOptions {
+                            depth(1)
+                            shallow(true)
+                          }
+                        }
+                      }
+                      scriptPath('java/maven/Jenkinsfile')
+                    }
+                  }
+                }
+              }
+              
+          - script: |
+              pipelineJob('test2') {
+                definition {
+                  cps {
+                    sandbox()
+                    script("""\
+              pipeline {
+                agent {
+                  label "dev-docker-agent"
+                }
+                stages {
+                  stage("checkout") {
+                    // https://www.jenkins.io/doc/pipeline/steps/
+                    steps {
+                      // https://plugins.jenkins.io/git/
+                      // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
+                      // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
+                      // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
+                      checkout scmGit(
+                        userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
+                        branches: [[name:'*/main']],
+                        extensions: [cloneOption(depth: 1, shallow: true)]
+                      )
+                      sh 'pwd'
+                    }
+                  }
+                  stage("build") {
+                    steps {
+                      // https://buildpacks.io/docs/tools/pack/cli/pack_build/
+                      script {
+                        sh '''
+                          docker run \
+                            --rm \
+                            --tmpfs /tmp:rw \
+                            --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock \
+                            --volume jenkins-workspace:/workspace:rw \
+                            --workdir /workspace \
+                            --env HOME="/workspace" \
+                            docker.io/buildpacksio/pack:latest build \
+                              --trust-builder \
+                              --docker-host unix:///run/user/1001/podman/podman.sock \
+                              paketo-demo-app \
+                              --path ./workspace/test2/java/maven/ \
+                              --builder docker.io/paketobuildpacks/builder:base \
+                              --buildpack docker.io/paketobuildpacks/java-azure:10
+                        '''
+                      }
+                    }
+                  }
+                }
+              }
+                    """)
+                  }
+                }
+              }

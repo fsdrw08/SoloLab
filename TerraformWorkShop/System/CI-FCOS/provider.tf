@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/tls"
       version = ">=4.0.5"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.2"
+    }
     helm = {
       source  = "hashicorp/helm"
       version = ">=2.11.0"
@@ -36,9 +40,9 @@ terraform {
 
 provider "system" {
   ssh {
-    host     = var.server.host
-    port     = var.server.port
-    user     = var.server.user
-    password = var.server.password
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
   }
 }

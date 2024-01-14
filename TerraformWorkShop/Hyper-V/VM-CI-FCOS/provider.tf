@@ -17,6 +17,8 @@ terraform {
       version = ">=2.4.1"
     }
   }
+
+  # https://ruben-rodriguez.github.io/posts/minio-s3-terraform-backend/
   backend "s3" {
     bucket = "tfstate"            # Name of the S3 bucket
     key    = "Hyper-V/CI-FCOS-VM" # Name of the tfstate file
