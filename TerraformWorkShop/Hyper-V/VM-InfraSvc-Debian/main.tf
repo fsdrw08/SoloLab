@@ -1,165 +1,317 @@
-resource "hyperv_vhd" "InfraSvc-Debian" {
-  path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\InfraSvc-Debian.vhdx"
-  source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\debian\\debian-10-genericcloud-amd64.vhdx"
+locals {
+  vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+  vm_name = var.vm_name
+  count   = "1"
 }
 
-# https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
-# https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
-resource "null_resource" "cloud-init" {
-  triggers = {
-    cloudinit_iso = fileexists("./cloud-init.iso") ? "1" : uuid()
-    dir_sha1      = sha1(join("", [for f in fileset(".", "./cloud-init/*") : filesha1(f)]))
-  }
 
-  provisioner "local-exec" {
-    command = "oscdimg.exe ${abspath(path.module)}/cloud-init ${abspath(path.module)}/cloud-init.iso -j2 -lcidata"
+module "cloudinit_nocloud_iso" {
+  source = "../modules/cloudinit_nocloud_iso2"
+  count  = local.count
+  cloudinit_config = {
+    isoName = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
+    part = [
+      {
+        filename = "meta-data"
+        content  = <<-EOT
+        instance-id: iid-infrasvc-Debian_202401
+        local-hostname: InfraSvc-Debian
+        EOT
+      },
+      {
+        filename = "user-data"
+        content  = <<-EOT
+        #cloud-config
+        timezone: Asia/Shanghai
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+        write_files:
+          # Set-CgroupConfig
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
+          - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              # BEGIN ansible-podman-rootless-provision systemd_cgroup_delegate
+              [Service]
+              Delegate=cpu cpuset io memory pids
+              # END ansible-podman-rootless-provision systemd_cgroup_delegate
+          # Set-SysctlParams
+          # https://github.com/containers/podman/blob/main/troubleshooting.md#5-rootless-containers-cannot-ping-hosts
+          - path: /etc/sysctl.d/ansible-podman-rootless-provision.conf
+            owner: root:root
+            content: |
+              net.ipv4.ping_group_range=0 2000000
+              net.ipv4.ip_unprivileged_port_start=53
+
+        # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+        users:
+          - name: vagrant
+            gecos: vagrant
+            groups: wheel
+            plain_text_passwd: vagrant
+            lock_passwd: false
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+          - name: podmgr
+            uid: 1001
+            gecos: podmgr
+            plain_text_passwd: podmgr
+            lock_passwd: false
+            shell: /bin/bash
+            ssh_import_id: None
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#package-update-upgrade-install
+        package_update: true
+        package_upgrade: true
+        package_reboot_if_required: true
+        packages:
+          - git
+          - python3-pip
+          - python3-jmespath
+          - cockpit
+          - cockpit-pcp
+          - cockpit-podman
+          - podman
+        
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+        # disk_setup:
+        #   /dev/sdb:
+        #     table_type: gpt
+        #     layout: True
+        #     overwrite: False
+
+        # fs_setup:
+        #   - label: Data
+        #     filesystem: 'xfs'
+        #     device: '/dev/sdb'
+        #     partition: auto
+        #     overwrite: false
+
+        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+        # https://zhuanlan.zhihu.com/p/250658106
+        # mounts:
+        #   - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
+        # mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
+        # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+        # growpart:
+        #   mode: auto
+        #   devices:
+        #     - "/dev/sda3"
+        #   ignore_growroot_disabled: false
+        resize_rootfs: true
+        
+        # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
+        runcmd:
+          - chown podmgr:podmgr /home/podmgr
+          # https://access.redhat.com/solutions/4661741
+          - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+          - firewall-offline-cmd --set-default-zone=trusted
+          - firewall-offline-cmd --zone=trusted --add-service=cockpit
+          - systemctl unmask firewalld
+          - systemctl enable --now firewalld
+          - systemctl enable --now cockpit.socket
+        
+        # ansible:
+        #   install_method: distro
+        #   package_name: ansible-core
+        #   run_user: vagrant
+        #   galaxy:
+        #     actions:
+        #       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+        #   setup_controller:
+        #     repositories:
+        #       - path: /home/vagrant/SoloLab/
+        #         source: https://github.com/fsdrw08/SoloLab.git
+        #     run_ansible:
+        #       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+        #         playbook_name: Invoke-PodmanRootlessProvision.yml
+        #         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+        #         extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars
+        EOT
+      },
+      {
+        filename = "network-config"
+        # https://cloudinit.readthedocs.io/en/latest/reference/network-config.html#network-configuration-outputs
+        content = <<-EOT
+        version: 2
+        ethernets:
+          eth0:
+            dhcp4: false
+            addresses:
+              - 192.168.255.3${count.index + 0}/255.255.255.0
+              - 192.168.255.3${count.index + 1}/255.255.255.0
+            gateway4: 192.168.255.1
+            nameservers:
+              addresses: 192.168.255.1
+        EOT
+        # network:
+        #   version: 1
+        #   config:
+        #     - type: physical
+        #       name: eth0
+        #       subnets:
+        #         - type: static
+        #           address: 192.168.255.1${count.index + 1}/24
+        #           gateway: 192.168.255.1
+        #           dns_nameservers:
+        #             - 192.168.255.1
+      }
+    ]
+  }
+}
+
+
+resource "null_resource" "remote" {
+  depends_on = [module.cloudinit_nocloud_iso]
+  count      = local.count
+  triggers = {
+    # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
+    manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
+    vhd_dir       = local.vhd_dir
+    vm_name       = local.count <= 1 ? "${local.vm_name}" : "${local.vm_name}${count.index + 1}"
+    # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
+    isoName  = module.cloudinit_nocloud_iso[count.index].isoName
+    host     = var.host
+    user     = var.user
+    password = sensitive(var.password)
   }
 
   connection {
     type     = "winrm"
-    host     = var.host
-    user     = var.user
-    password = var.password
+    host     = self.triggers.host
+    user     = self.triggers.user
+    password = self.triggers.password
     use_ntlm = true
     https    = true
     insecure = true
     timeout  = "20s"
   }
-
+  # copy to remote
   provisioner "file" {
-    source      = "./cloud-init.iso"
-    destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
+    source = module.cloudinit_nocloud_iso[count.index].isoName
+    # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
+    destination = join("/", ["${self.triggers.vhd_dir}", "${self.triggers.vm_name}\\${self.triggers.isoName}"])
+  }
+
+  # for destroy
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [<<-EOT
+      Powershell -Command "$cloudinit_iso=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.isoName}'); if (Test-Path $cloudinit_iso) { Remove-Item $cloudinit_iso }"
+    EOT
+    ]
   }
 }
 
-resource "hyperv_machine_instance" "InfraSvc-Debian" {
-  name       = "InfraSvc-Debian"
-  generation = 1
-  #   automatic_critical_error_action         = "Pause"
-  #   automatic_critical_error_action_timeout = 30
-  #   automatic_start_action                  = "StartIfRunning"
-  #   automatic_start_delay                   = 0
-  #   automatic_stop_action                   = "Save"
-  checkpoint_type = "Disabled"
-  #   guest_controlled_cache_types            = false
-  #   high_memory_mapped_io_space             = 536870912
-  #   low_memory_mapped_io_space              = 134217728
-  #   lock_on_disconnect                      = "Off"
-  memory_maximum_bytes = 4095737856
-  memory_minimum_bytes = 2147483648
-  memory_startup_bytes = 2147483648
-  notes                = "This VM instance is managed by terraform"
-  processor_count      = 4
-  #   smart_paging_file_path = "C:/ProgramData/Microsoft/Windows/Hyper-V"
-  #   snapshot_file_location = "C:/ProgramData/Microsoft/Windows/Hyper-V"
-  dynamic_memory = true
-  #   static_memory  = false
-  state = "Off"
+resource "hyperv_vhd" "boot_disk" {
+  # path   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Fedora38\\InfraSvc-Fedora38.vhdx"
+  path = join("\\", [
+    local.vhd_dir,
+    var.vm_name,
+    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+  source = var.source_disk
+}
 
-  # Configure firmware
-  # vm_firmware {
-  #   enable_secure_boot   = "On"
-  #   secure_boot_template = "MicrosoftUEFICertificateAuthority"
-  #   # preferred_network_boot_protocol = "IPv4"
-  #   # console_mode                    = "None"
-  #   # pause_after_boot_failure        = "Off"
-  #   boot_order {
-  #     boot_type           = "HardDiskDrive"
-  #     controller_number   = "0"
-  #     controller_location = "0"
-  #   }
-  #   boot_order {
-  #     boot_type            = "NetworkAdapter"
-  #     network_adapter_name = "Internal Switch"
-  #   }
-  # }
+# data "terraform_remote_state" "data_disk" {
+#   backend = "local"
+#   config = {
+#     path = "${path.module}/${var.data_disk_ref}"
+#   }
+# }
 
-  # Configure processor
-  vm_processor {
-    compatibility_for_migration_enabled               = false
-    compatibility_for_older_operating_systems_enabled = false
-    enable_host_resource_protection                   = false
-    expose_virtualization_extensions                  = false
-    hw_thread_count_per_core                          = 0
-    maximum                                           = 100
-    maximum_count_per_numa_node                       = 4
-    maximum_count_per_numa_socket                     = 1
-    relative_weight                                   = 100
-    reserve                                           = 0
-  }
+module "hyperv_machine_instance" {
+  source     = "../modules/hyperv_instance"
+  depends_on = [null_resource.remote]
+  count      = local.count
 
-  # Configure integration services
-  integration_services = {
-    "Guest Service Interface" = true
-    "Heartbeat"               = true
-    "Key-Value Pair Exchange" = true
-    "Shutdown"                = true
-    "Time Synchronization"    = true
-    "VSS"                     = true
-  }
+  vm_instance = {
+    name                 = local.count <= 1 ? local.vm_name : "${local.vm_name}${count.index + 1}"
+    checkpoint_type      = "Disabled"
+    dynamic_memory       = true
+    generation           = 2
+    memory_maximum_bytes = 8191475712
+    memory_minimum_bytes = 2147483648
+    memory_startup_bytes = 2147483648
+    notes                = "This VM instance is managed by terraform"
+    processor_count      = 4
+    state                = "Off"
 
-  # Create a network adaptor
-  network_adaptors {
-    name        = "Internal Switch"
-    switch_name = "Internal Switch"
-    # management_os                              = false
-    # is_legacy                                  = false
-    # dynamic_mac_address                        = true
-    # static_mac_address                         = ""
-    # mac_address_spoofing                       = "Off"
-    # dhcp_guard                                 = "Off"
-    # router_guard                               = "Off"
-    # port_mirroring                             = "None"
-    # ieee_priority_tag                          = "Off"
-    # vmq_weight                                 = 100
-    # iov_queue_pairs_requested                  = 1
-    # iov_interrupt_moderation                   = "Off"
-    # iov_weight                                 = 100
-    # ipsec_offload_maximum_security_association = 512
-    # maximum_bandwidth                          = 0
-    # minimum_bandwidth_absolute                 = 0
-    # minimum_bandwidth_weight                   = 0
-    # mandatory_feature_id                       = []
-    # resource_pool_name                         = ""
-    # test_replica_pool_name                     = ""
-    # test_replica_switch_name                   = ""
-    # virtual_subnet_id                          = 0
-    # allow_teaming                              = "On"
-    # not_monitored_in_cluster                   = false
-    # storm_limit                                = 0
-    # dynamic_ip_address_limit                   = 0
-    # device_naming                              = "Off"
-    # fix_speed_10g                              = "Off"
-    # packet_direct_num_procs                    = 0
-    # packet_direct_moderation_count             = 0
-    # packet_direct_moderation_interval          = 0
-    # vrss_enabled                               = true
-    # vmmq_enabled                               = false
-    # vmmq_queue_pairs                           = 16
-  }
+    vm_firmware = {
+      console_mode                    = "Default"
+      enable_secure_boot              = "On"
+      secure_boot_template            = "MicrosoftUEFICertificateAuthority"
+      pause_after_boot_failure        = "Off"
+      preferred_network_boot_protocol = "IPv4"
+      boot_order = [
+        {
+          boot_type           = "HardDiskDrive"
+          controller_number   = "0"
+          controller_location = "0"
+        },
+      ]
+    }
 
-  # Create dvd drive
-  dvd_drives {
-    controller_number   = "0"
-    controller_location = "1"
-    # https://developer.hashicorp.com/terraform/language/functions/abspath
-    # https://developer.hashicorp.com/terraform/language/functions/replace
-    path               = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\InfraSvc-Debian\\cloud-init.iso"
-    resource_pool_name = "Primordial" # default value
-  }
+    vm_processor = {
+      compatibility_for_migration_enabled               = false
+      compatibility_for_older_operating_systems_enabled = false
+      enable_host_resource_protection                   = false
+      expose_virtualization_extensions                  = false
+      hw_thread_count_per_core                          = 0
+      maximum                                           = 100
+      maximum_count_per_numa_node                       = 4
+      maximum_count_per_numa_socket                     = 1
+      relative_weight                                   = 100
+      reserve                                           = 0
+    }
 
-  # Create a hard disk drive
-  hard_disk_drives {
-    controller_type     = "Ide"
-    controller_number   = "0"
-    controller_location = "0"
-    path                = hyperv_vhd.InfraSvc-Debian.path
-    # disk_number                     = 4294967295
-    # resource_pool_name              = "Primordial"
-    # support_persistent_reservations = false
-    # maximum_iops                    = 0
-    # minimum_iops                    = 0
-    # qos_policy_id                   = "00000000-0000-0000-0000-000000000000"
-    # override_cache_attributes       = "Default"
+    integration_services = {
+      "Guest Service Interface" = true
+      "Heartbeat"               = true
+      "Key-Value Pair Exchange" = true
+      "Shutdown"                = true
+      "Time Synchronization"    = true
+      "VSS"                     = true
+    }
+
+    network_adaptors = [
+      {
+        name        = "Internal Switch"
+        switch_name = "Internal Switch"
+      }
+    ]
+
+    dvd_drives = [
+      {
+        controller_number   = 0
+        controller_location = 1
+        path                = local.count <= 1 ? join("\\", ["${local.vhd_dir}", "${local.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${local.vhd_dir}", "${local.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
+      }
+    ]
+
+    hard_disk_drives = [
+      {
+        controller_type     = "Scsi"
+        controller_number   = "0"
+        controller_location = "0"
+        path                = hyperv_vhd.boot_disk.path
+      },
+      # {
+      #   controller_type     = "Scsi"
+      #   controller_number   = "0"
+      #   controller_location = "2"
+      #   path                = data.terraform_remote_state.data_disk.outputs.path
+      # }
+    ]
   }
 }
