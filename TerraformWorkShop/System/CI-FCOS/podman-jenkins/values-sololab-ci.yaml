@@ -22,16 +22,9 @@ controller:
         value: "http://192.168.255.1:7890"
       - name: https_proxy
         value: "http://192.168.255.1:7890"
-  # need to set to runas root to make jenkins communicate with docker.sock and make jcasc reload success
-  podSecurityContext:
-    enabled: true
-    runAsUser: 0
   containerSecurityContext:
-    enabled: true
-    runAsUser: 0
-    runAsGroup: 0
-    readOnlyRootFilesystem: false
-    allowPrivilegeEscalation: true
+    seLinuxOptions:
+      type: spc_t
   ## @param controller.jenkinsUrl If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
   ##
   jenkinsUrl: "https://jenkins.service.consul"
@@ -67,14 +60,14 @@ controller:
       value: "http://192.168.255.1:7890"
     - name: no_proxy
       value: "localhost"
-  extraVolumes:
-    - name: docker-socket
-      hostPath:
-        path: /run/user/1001/podman/podman.sock
-        type: Socket
-  extraVolumeMounts:
-    - name: docker-socket
-      mountPath: "/var/run/docker.sock:Z"
+  # extraVolumes:
+  #   - name: docker-socket
+  #     hostPath:
+  #       path: /run/user/1001/podman/podman.sock
+  #       type: Socket
+  # extraVolumeMounts:
+  #   - name: docker-socket
+  #     mountPath: "/var/run/docker.sock:Z"
   ## @param controller.podLabels Extra labels for jenkins pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
@@ -113,42 +106,43 @@ controller:
           slaveAgentPort: 50000
 
       # https://github.com/Zsomx/devops-course-szte/blob/c04caad7793f4899f8ea7614ed191de831ef03d3/jenkins/docker/config/docker.yml#L46
-      docker.yaml: |-
-        jenkins:
-          clouds:
-            - docker:
-                name: "docker"
-                dockerApi:
-                  dockerHost:
-                    uri: "unix:///var/run/docker.sock"
-                templates:
-                  - labelString: "docker-agent"
-                    connector:
-                      jnlp:
-                        jenkinsUrl: "http://jenkins:8080/"
-                        jnlpLauncher:
-                          workDirSettings:
-                            disabled: false
-                            failIfWorkDirIsMissing: false
-                            internalDir: "remoting"
-                        user: root
-                    dockerTemplateBase:
-                      image: "docker.io/jenkins/jnlp-agent-docker:latest"
-                      dnsHosts:
-                        - "10.89.0.1"
-                        - "192.168.255.1"
-                      environment: 
-                        - "TZ=Asia/Shanghai"
-                      mounts:
-                        - "type=tmpfs,destination=/run"
-                        - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
-                        - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
-                      user: "root"
-                    pullStrategy: PULL_NEVER
-                    remoteFs: "/home/jenkins"
-                    instanceCapStr: "10"
-                    retentionStrategy:
-                      idleMinutes: 1
+      # https://github.com/jenkinsci/docker-plugin/issues/1032
+      # docker.yaml: |-
+      #   jenkins:
+      #     clouds:
+      #       - docker:
+      #           name: "docker"
+      #           dockerApi:
+      #             dockerHost:
+      #               uri: "unix:///var/run/docker.sock"
+      #           templates:
+      #             - labelString: "docker-agent"
+      #               connector:
+      #                 jnlp:
+      #                   jenkinsUrl: "http://jenkins:8080/"
+      #                   jnlpLauncher:
+      #                     workDirSettings:
+      #                       disabled: false
+      #                       failIfWorkDirIsMissing: false
+      #                       internalDir: "remoting"
+      #                   user: root
+      #               dockerTemplateBase:
+      #                 image: "docker.io/jenkins/jnlp-agent-docker:latest"
+      #                 dnsHosts:
+      #                   - "10.89.0.1"
+      #                   - "192.168.255.1"
+      #                 environment: 
+      #                   - "TZ=Asia/Shanghai"
+      #                 mounts:
+      #                   - "type=tmpfs,destination=/run"
+      #                   - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
+      #                   - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+      #                 user: "root"
+      #               pullStrategy: PULL_NEVER
+      #               remoteFs: "/home/jenkins"
+      #               instanceCapStr: "10"
+      #               retentionStrategy:
+      #                 idleMinutes: 1
 
       job-dsl.yaml: |-
         jobs:
@@ -230,3 +224,50 @@ controller:
                   }
                 }
               }
+
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: true
+  ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+  ##
+  subPath: ""
+  ## @param persistence.storageClass Storage class of backing PVC
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
+  ## @param persistence.pvc-home-annotations Persistent Volume Claim annotations
+  ##
+  pvcHomeAnnotations: 
+    volume.podman.io/type: bind
+    volume.podman.io/device: /mnt/data/jenkins/home
+  ## @param persistence.pvc-plugins-loading-annotations Persistent Volume Claim annotations
+  ##
+  pvcPluginsLoadingAnnotations: 
+    volume.podman.io/type: bind
+    volume.podman.io/device: /mnt/data/jenkins/plugins-loading
+  ## @param persistence.pvc-plugins-storage-annotations Persistent Volume Claim annotations
+  ##
+  pvcPluginsStorageAnnotations: 
+    volume.podman.io/type: bind
+    volume.podman.io/device: /mnt/data/jenkins/plugins-storage
+  ## @param persistence.accessModes Persistent Volume Access Modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Size of data volume
+  ##
+  size: 8Gi
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+
+volumePermissions:
+  enabled: false

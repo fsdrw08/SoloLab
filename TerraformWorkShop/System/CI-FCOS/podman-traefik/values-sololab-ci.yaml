@@ -89,14 +89,14 @@ traefik:
     ##       caServer: https://acme-v02.api.letsencrypt.org/directory
     ##       certificatesDuration: 2160
     ##       email:
-    ##       storage: /mnt/acmeStorage/external_acme.json
+    ##       storage: /mnt/traefik/external_acme.json
     ##       tlsChallenge: {}
     ##   internal:
     ##     acme:
     ##       caServer:
     ##       certificatesDuration: 2160
     ##       email:
-    ##       storage: /mnt/acmeStorage/internal_acme.json
+    ##       storage: /mnt/traefik/internal_acme.json
     ##       tlsChallenge: {}
     ##
     certificatesResolvers:
@@ -105,14 +105,14 @@ traefik:
           caServer: https://acme-v02.api.letsencrypt.org/directory
           certificatesDuration: 2160
           email:
-          storage: /mnt/acmeStorage/external_acme.json
+          storage: /mnt/traefik/external_acme.json
           tlsChallenge: {}
       internal:
         acme:
           caServer: https://step-ca.service.consul:8443/acme/acme/directory
           certificatesDuration: 2160
           email:
-          storage: /mnt/acmeStorage/internal_acme.json
+          storage: /mnt/traefik/internal_acme.json
           tlsChallenge: {}
     ## @param traefik.staticConfiguration.log
     ## ref: https://doc.traefik.io/traefik/observability/logs/
@@ -171,7 +171,7 @@ traefik:
   ## e.g.
   ## extraVolumeMounts:
   ##   - name: acmeStorage
-  ##     mountPath: /mnt/acmeStorage
+  ##     mountPath: /mnt/traefik
   extraVolumeMounts:
     - name: docker-socket
       mountPath: "/var/run/docker.sock:Z"
@@ -188,7 +188,7 @@ persistence:
   enabled: true
   ## @param persistence.mountPath Path to mount the volume at.
   ##
-  mountPath: /mnt/acmeStorage
+  mountPath: /mnt/traefik
   ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
   ##
   subPath: ""
@@ -204,7 +204,7 @@ persistence:
   ##
   annotations: 
     volume.podman.io/type: bind
-    volume.podman.io/device: /mnt/data/jenkins
+    volume.podman.io/device: /mnt/data/ci-traefik
   ## @param persistence.accessModes Persistent Volume Access Modes
   ##
   accessModes:

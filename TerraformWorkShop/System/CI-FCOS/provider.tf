@@ -18,8 +18,8 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "tfstate"                # Name of the S3 bucket
-    key    = "tfstate/System/CI-FCOS" # Name of the tfstate file
+    bucket = "tfstate"        # Name of the S3 bucket
+    key    = "System/CI-FCOS" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio.service.consul" # Minio endpoint

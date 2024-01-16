@@ -47,9 +47,10 @@ resource "null_resource" "podman_traefik_service" {
     system_file.podman_traefik_kube
   ]
   triggers = {
-    status       = "stop"
+    status       = "start"
     service_name = "traefik"
     yaml         = data.helm_template.podman_traefik.manifest
+    kube         = system_file.podman_traefik_kube.content
     host         = var.vm_conn.host
     port         = var.vm_conn.port
     user         = var.vm_conn.user
@@ -66,6 +67,13 @@ resource "null_resource" "podman_traefik_service" {
     inline = [
       "systemctl --user daemon-reload",
       "systemctl --user ${self.triggers.status} ${self.triggers.service_name}",
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "systemctl --user daemon-reload",
+      "systemctl --user stop ${self.triggers.service_name}",
     ]
   }
 }
