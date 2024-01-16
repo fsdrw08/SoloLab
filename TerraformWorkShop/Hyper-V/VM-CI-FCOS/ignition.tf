@@ -34,8 +34,8 @@ data "ignition_systemd_unit" "data" {
 [Unit]
 Description=Mount nfs share
 Before=local-fs.target
-Requires=network-online.service
-After=network-online.service
+After=network-online.target
+Requires=network-online.target
 
 [Mount]
 What=192.168.255.1:/mnt/data/nfs
@@ -161,45 +161,45 @@ data "ignition_link" "rootless_podman_socket_unix_autostart" {
   gid       = 1001
 }
 
-# create user level systemd service to expose podman socket to external tcp port
-# https://github.com/openstack/tripleo-ansible/blob/e281ae7624774d71f22fbb993af967ed1ec08780/tripleo_ansible/roles/tripleo_podman/templates/podman.service.j2#L11
-data "ignition_file" "rootless_podman_socket_tcp_service" {
-  path      = "/home/podmgr/.config/systemd/user/podman-socket-tcp.service"
-  mode      = 420 # oct 644 -> dec 420
-  overwrite = true
-  uid       = 1001
-  gid       = 1001
-  content {
-    content = <<EOT
-[Unit]
-Description=Podman API Service (TCP)
-Requires=podman.socket
-After=podman.socket
-Documentation=man:podman-system-service(1)
-StartLimitIntervalSec=0
+# # create user level systemd service to expose podman socket to external tcp port
+# # https://github.com/openstack/tripleo-ansible/blob/e281ae7624774d71f22fbb993af967ed1ec08780/tripleo_ansible/roles/tripleo_podman/templates/podman.service.j2#L11
+# data "ignition_file" "rootless_podman_socket_tcp_service" {
+#   path      = "/home/podmgr/.config/systemd/user/podman-socket-tcp.service"
+#   mode      = 420 # oct 644 -> dec 420
+#   overwrite = true
+#   uid       = 1001
+#   gid       = 1001
+#   content {
+#     content = <<EOT
+# [Unit]
+# Description=Podman API Service (TCP)
+# Requires=podman.socket
+# After=podman.socket
+# Documentation=man:podman-system-service(1)
+# StartLimitIntervalSec=0
 
-[Service]
-Delegate=true
-Type=exec
-KillMode=process
-Environment=LOGGING="--log-level=info"
-ExecStart=/usr/bin/podman $LOGGING system service --time=0 tcp://0.0.0.0:2375
+# [Service]
+# Delegate=true
+# Type=exec
+# KillMode=process
+# Environment=LOGGING="--log-level=info"
+# ExecStart=/usr/bin/podman $LOGGING system service --time=0 tcp://0.0.0.0:2375
 
-[Install]
-WantedBy=default.target
-EOT
-  }
-}
+# [Install]
+# WantedBy=default.target
+# EOT
+#   }
+# }
 
-# link the user level podman tcp socket service to default.target.wants for service auto start when login
-data "ignition_link" "rootless_podman_socket_tcp_autostart" {
-  path      = "/home/podmgr/.config/systemd/user/default.target.wants/podman-socket-tcp.service"
-  target    = data.ignition_file.rootless_podman_socket_tcp_service.path
-  overwrite = true
-  hard      = false
-  uid       = 1001
-  gid       = 1001
-}
+# # link the user level podman tcp socket service to default.target.wants for service auto start when login
+# data "ignition_link" "rootless_podman_socket_tcp_autostart" {
+#   path      = "/home/podmgr/.config/systemd/user/default.target.wants/podman-socket-tcp.service"
+#   target    = data.ignition_file.rootless_podman_socket_tcp_service.path
+#   overwrite = true
+#   hard      = false
+#   uid       = 1001
+#   gid       = 1001
+# }
 
 # enable lingering to make user level service able to auto start on boot
 data "ignition_file" "rootless_linger" {
@@ -239,7 +239,7 @@ data "ignition_file" "rpms" {
   content {
     content = <<EOT
 [Service]
-Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager"
+Environment=RPMS="cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-storaged cockpit-selinux"
 EOT
   }
 }
@@ -328,16 +328,14 @@ data "ignition_user" "consul" {
 
 data "ignition_directory" "consul_config" {
   path = "/etc/consul.d"
-  mode = 493 # oct 755 -> 493
+  mode = 511 # oct 777 -> 511
   uid  = 1002
-  gid  = 1002
 }
 
 data "ignition_file" "consul_config" {
   path = "/etc/consul.d/consul.hcl"
   mode = 483 # oct 666 -> 483
   uid  = 1002
-  gid  = 1002
   content {
     content = <<-EOT
     acl {
@@ -362,7 +360,6 @@ data "ignition_directory" "consul_data" {
   path = "/opt/consul"
   mode = 493 # oct 755 -> dec 493
   uid  = 1002
-  gid  = 1002
 }
 
 data "ignition_systemd_unit" "consul" {

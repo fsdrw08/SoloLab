@@ -30,7 +30,7 @@ data "ignition_config" "ignition" {
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
     data.ignition_file.eth0[count.index].rendered,
-    data.ignition_file.rootless_podman_socket_tcp_service.rendered,
+    # data.ignition_file.rootless_podman_socket_tcp_service.rendered,
     data.ignition_file.rootless_linger.rendered,
     data.ignition_file.rpms.rendered,
     data.ignition_file.enable_password_auth.rendered,
@@ -43,7 +43,7 @@ data "ignition_config" "ignition" {
     data.ignition_link.timezone.rendered,
     data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
     # if dont want to expose podman tcp socket, just comment below line
-    data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
+    # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
   ]
 }
 
