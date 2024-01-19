@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sshd-cm-keys
+data:
+  ssh_host_dsa_key: |
+    -----BEGIN DSA PRIVATE KEY-----
+    MIIBvAIBAAKBgQDOmF+AyaXTScMw284+dnPAMjETTxMk7me7w/EXIr5svTu6AraU
+    8fLnSsJheDv+quCLOkQGbyKI9JgzVIT7GyGFthFQf5k1/IrP484JC7VKBX0NM4/g
+    TIWzGVPI/chMfyPde2SIIHIbeefGi9is8ft240Zh7Uk8kWyrIGlXN6z6awIVAKZk
+    vb8SDhrjWdseOFJA3uoHX9UPAoGBAJh953Mge2SHl/U5oYUAUdG3/hWCoMrarYsq
+    asLmO+hco6Za5SaVwgmSmxfntUhdP2rwRwx3VKRq7LwO3WTW5Qljs4fuPBcLVGRy
+    DwxYqdQC+ow67iviTpCUJt30RqIFhqWsCiifUTFoXyX9ZQkRI/spkj6AKyesvEdq
+    bMwFVmmJAoGBAJhhyhNpph4P94acF0H+whv7XdnavyjSGRzBowKfsN2jXMAQGE7q
+    hQBvmVZ4szFIMDnmS/k+uTxGs/565ygoq/54lcn45NGMwZavQRmFx1mJLepAuMAp
+    MR5is10QF2niZAY/XsM5e21W/SOtsTEVc8Hb3DnWv4Ct60SRFyhoEWarAhQODC4u
+    b28V7d7pZi+RejNLtnkgTg==
+    -----END DSA PRIVATE KEY-----
+  ssh_host_dsa_key.pub: |
+    ssh-dss AAAAB3NzaC1kc3MAAACBAM6YX4DJpdNJwzDbzj52c8AyMRNPEyTuZ7vD8Rcivmy9O7oCtpTx8udKwmF4O/6q4Is6RAZvIoj0mDNUhPsbIYW2EVB/mTX8is/jzgkLtUoFfQ0zj+BMhbMZU8j9yEx/I917ZIggcht558aL2Kzx+3bjRmHtSTyRbKsgaVc3rPprAAAAFQCmZL2/Eg4a41nbHjhSQN7qB1/VDwAAAIEAmH3ncyB7ZIeX9TmhhQBR0bf+FYKgytqtiypqwuY76FyjplrlJpXCCZKbF+e1SF0/avBHDHdUpGrsvA7dZNblCWOzh+48FwtUZHIPDFip1AL6jDruK+JOkJQm3fRGogWGpawKKJ9RMWhfJf1lCREj+ymSPoArJ6y8R2pszAVWaYkAAACBAJhhyhNpph4P94acF0H+whv7XdnavyjSGRzBowKfsN2jXMAQGE7qhQBvmVZ4szFIMDnmS/k+uTxGs/565ygoq/54lcn45NGMwZavQRmFx1mJLepAuMApMR5is10QF2niZAY/XsM5e21W/SOtsTEVc8Hb3DnWv4Ct60SRFyhoEWar
+  # ssh_host_ecdsa_key: |
+  #   -----BEGIN EC PRIVATE KEY-----
+  #   MHcCAQEEIMUAdJp+GvPIn+6KuxrF02yWE9EE5jgnnc0HRrLQmqz3oAoGCCqGSM49
+  #   AwEHoUQDQgAExsNlYqWGXCyOYeY5rIMFBCU9i4epxrQZPRGLJg0/bnxN4JBMA/EQ
+  #   c9voWoYSitLYFLectIHe3grko0Hq5pCCqg==
+  #   -----END EC PRIVATE KEY-----
+  # ssh_host_ecdsa_key.pub: |
+  #   ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMbDZWKlhlwsjmHmOayDBQQlPYuHqca0GT0RiyYNP258TeCQTAPxEHPb6FqGEorS2BS3nLSB3t4K5KNB6uaQgqo=
+  authorized_keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sshd
+  labels:
+    name: sshd
+spec:
+  containers:
+    - name: sshd
+      # https://hub.docker.com/r/tunathu/sshd/tags
+      # https://github.com/tuna/docker-images/blob/master/sshd/Dockerfile
+      image: docker.io/testcontainers/sshd:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: ssh
+          containerPort: 22
+      env:
+        - name: USER
+          value: user
+      volumeMounts:
+        - name: keys
+          mountPath: /config
+  volumes:
+    - name: keys
+      configMap:
+        name: sshd-cm-keys
+  restartPolicy: Never

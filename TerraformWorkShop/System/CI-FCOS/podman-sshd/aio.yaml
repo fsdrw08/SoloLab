@@ -1,0 +1,98 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sshd-cm-keys
+data:
+  ssh_host_dsa_key: |
+    -----BEGIN DSA PRIVATE KEY-----
+    MIIBvAIBAAKBgQDOmF+AyaXTScMw284+dnPAMjETTxMk7me7w/EXIr5svTu6AraU
+    8fLnSsJheDv+quCLOkQGbyKI9JgzVIT7GyGFthFQf5k1/IrP484JC7VKBX0NM4/g
+    TIWzGVPI/chMfyPde2SIIHIbeefGi9is8ft240Zh7Uk8kWyrIGlXN6z6awIVAKZk
+    vb8SDhrjWdseOFJA3uoHX9UPAoGBAJh953Mge2SHl/U5oYUAUdG3/hWCoMrarYsq
+    asLmO+hco6Za5SaVwgmSmxfntUhdP2rwRwx3VKRq7LwO3WTW5Qljs4fuPBcLVGRy
+    DwxYqdQC+ow67iviTpCUJt30RqIFhqWsCiifUTFoXyX9ZQkRI/spkj6AKyesvEdq
+    bMwFVmmJAoGBAJhhyhNpph4P94acF0H+whv7XdnavyjSGRzBowKfsN2jXMAQGE7q
+    hQBvmVZ4szFIMDnmS/k+uTxGs/565ygoq/54lcn45NGMwZavQRmFx1mJLepAuMAp
+    MR5is10QF2niZAY/XsM5e21W/SOtsTEVc8Hb3DnWv4Ct60SRFyhoEWarAhQODC4u
+    b28V7d7pZi+RejNLtnkgTg==
+    -----END DSA PRIVATE KEY-----
+  ssh_host_dsa_key.pub: |
+    ssh-dss AAAAB3NzaC1kc3MAAACBAM6YX4DJpdNJwzDbzj52c8AyMRNPEyTuZ7vD8Rcivmy9O7oCtpTx8udKwmF4O/6q4Is6RAZvIoj0mDNUhPsbIYW2EVB/mTX8is/jzgkLtUoFfQ0zj+BMhbMZU8j9yEx/I917ZIggcht558aL2Kzx+3bjRmHtSTyRbKsgaVc3rPprAAAAFQCmZL2/Eg4a41nbHjhSQN7qB1/VDwAAAIEAmH3ncyB7ZIeX9TmhhQBR0bf+FYKgytqtiypqwuY76FyjplrlJpXCCZKbF+e1SF0/avBHDHdUpGrsvA7dZNblCWOzh+48FwtUZHIPDFip1AL6jDruK+JOkJQm3fRGogWGpawKKJ9RMWhfJf1lCREj+ymSPoArJ6y8R2pszAVWaYkAAACBAJhhyhNpph4P94acF0H+whv7XdnavyjSGRzBowKfsN2jXMAQGE7qhQBvmVZ4szFIMDnmS/k+uTxGs/565ygoq/54lcn45NGMwZavQRmFx1mJLepAuMApMR5is10QF2niZAY/XsM5e21W/SOtsTEVc8Hb3DnWv4Ct60SRFyhoEWar
+  ssh_host_ecdsa_key: |
+    -----BEGIN EC PRIVATE KEY-----
+    MHcCAQEEIMUAdJp+GvPIn+6KuxrF02yWE9EE5jgnnc0HRrLQmqz3oAoGCCqGSM49
+    AwEHoUQDQgAExsNlYqWGXCyOYeY5rIMFBCU9i4epxrQZPRGLJg0/bnxN4JBMA/EQ
+    c9voWoYSitLYFLectIHe3grko0Hq5pCCqg==
+    -----END EC PRIVATE KEY-----
+  ssh_host_ecdsa_key.pub: |
+    ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMbDZWKlhlwsjmHmOayDBQQlPYuHqca0GT0RiyYNP258TeCQTAPxEHPb6FqGEorS2BS3nLSB3t4K5KNB6uaQgqo=
+  ssh_host_rsa_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEAz5Qorw397hlI792VGlEHou7lbGPWrKog9LWgTsH5ZndSqZk4
+    6X9iOdBZ8Zl2OZPWTyYftUu9uX7/1M2V3SQyuTQ+DV4A3k9s45tbymeqhACF7H3v
+    cYGY/xdjALRuoTpwQCy7oZubazO22vWXPfksnKONL3kbfryw5H+J9MZOJfjlTjzt
+    2I6o1ni4kB/vqtdiinT/eIvpwXnfoTE7ZsEy318s3y2p/iHhBVLRQfXhfID+vB9g
+    SkU6ul6TsgoVQKIJEWGhQAfBicamf49QR7Wze3JbhQDGqHgSXp6kPSqDim3On7gg
+    K13LbofD4nTi2de5IDxVThtnPlCfTz3e+3drEQIDAQABAoIBAGbkNKpY0CaGR/4F
+    opOx2IwtyHDKqC1cAwvpP3XqdloRCVthxLEQ4DpyCTNVcyGlIxSGfC8cRQW+ascr
+    xH4iJDZjK+LqVpnbWskTSBNzATV/IOMRpW9o4tKG4B8IUNIAKoXU5oh7njUsJBYy
+    p+4jJbba5u/CIxvWIgSRJ2u6JCBzcu1C2pGW7wAJNORAwoV7COtE16WuSJsWaiNR
+    1pdQqvkOoixsgL3eDKKGBxaS1DhsISkDztGvJrQTRejry4DqxmRgoOEqgrbHXbfM
+    MK0mQZVDgEsCMhPQMVmrw/1/+DGuXgKqXPvBNyqccN1A+3U2gCAbITC4lU1AQpcC
+    5eOb6jECgYEA98/ayzAw5q7ExKErmM0b1BlpwVk9GRxpcCVBOLew2XY7XxxUSNjx
+    EmxnYyhPtMwLEbV2HdHJJcWwPOahovYAK3/A6CQsPgu2e40kc3ep+S5AueVbzFhm
+    JX4DrdPs1oxzxbFqS8SyAUrDl3FTcLzM71XPaKDnmmbkDUZ3ecs/Yh0CgYEA1m/8
+    vtTE7RKm/293KpFPerDEnCAYsmt/Hb29i0jFq7muqlBc55u9VEdVueQDwgIXtY25
+    8bDm4EvNAJ59un7YwEycFlhom674ItIfpZE49toG1eQvin7UxVd3hr3QvsP4qoWB
+    YRN1ahO5fd/IZc9zUjrfBlpE5JZBXNKVm4VUmoUCgYBPsZSXS4Qua330DjDLDwso
+    BpQwDdbMQIrX+eMjrk89X/xv9dhVJQ9B8YK+LLSVXBkjNMwrgs/BSfYHX9QTaDFd
+    y9Pp09g2i+W/jgBu8cjDzdAa+FuxN6yB2iisuj6sMLb6mLeqbjMgnz6PcW54Dv+I
+    6HuvFi/lQ7mLW2II1QgpMQKBgEmBb9D2XF6rsyUCT4X+85CqAWtHMVAPuy41uUCC
+    fIfmCXKGQ6J850R5g3BKMeOSFhB8+Y1Yx3uBYE9jBNQl4STh3etm+MzNCG/fOUvm
+    4PD1QbyWEJnX6hWPawB8Fo8d3CKPyw68vdXT1xTH3gjQOMaqOYMS9GSrANLRuMjr
+    xlmFAoGBAMzFUm/yyuCSxBJHZr1HQNKbYQqycP/DoxzIsaqNivbrOP9W4A8CFa7I
+    Q6rulpepTQG/QQ3Cl8saXTOGD7OLII7/9kQ2HYDytjTM2WMoNLW5+/qJKoPoOkiE
+    O40SQ0HORZUQQa6iMRRTy1h3G/jRV6E8bzl8LGyP4LgYSFl/XHJE
+    -----END RSA PRIVATE KEY-----
+  ssh_host_rsa_key.pub: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPlCivDf3uGUjv3ZUaUQei7uVsY9asqiD0taBOwflmd1KpmTjpf2I50FnxmXY5k9ZPJh+1S725fv/UzZXdJDK5ND4NXgDeT2zjm1vKZ6qEAIXsfe9xgZj/F2MAtG6hOnBALLuhm5trM7ba9Zc9+Syco40veRt+vLDkf4n0xk4l+OVOPO3YjqjWeLiQH++q12KKdP94i+nBed+hMTtmwTLfXyzfLan+IeEFUtFB9eF8gP68H2BKRTq6XpOyChVAogkRYaFAB8GJxqZ/j1BHtbN7cluFAMaoeBJenqQ9KoOKbc6fuCArXctuh8PidOLZ17kgPFVOG2c+UJ9PPd77d2sR
+  authorized_keys: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+  # test: |
+  #   123
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sshd
+  labels:
+    name: sshd
+spec:
+  containers:
+    - name: sshd
+      # https://hub.docker.com/r/tunathu/sshd/tags
+      # https://github.com/tuna/docker-images/blob/master/sshd/Dockerfile
+      image: docker.io/tunathu/sshd:latest
+      securityContext:
+        seLinuxOptions:
+          type: spc_t
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: ssh
+          containerPort: 22
+      env:
+        - name: USER
+          value: user
+      volumeMounts:
+        - name: keys
+          mountPath: /config
+  volumes:
+    - name: keys
+      configMap:
+        name: sshd-cm-keys
+        defaultMode: 0600
+  restartPolicy: Never
