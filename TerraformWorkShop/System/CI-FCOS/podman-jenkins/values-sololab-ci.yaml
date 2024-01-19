@@ -77,6 +77,12 @@ controller:
     traefik.http.routers.jenkins.entryPoints: websecure
     traefik.http.routers.jenkins.tls.certresolver: internal
     traefik.http.services.jenkins.loadbalancer.server.port: 8080
+  ## @param controller.podAnnotations Annotations for jenkins pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=1000,gid=1000
+    io.podman.annotations.label: disable
   ## @section Jenkins config as code
   ## @param controller.JCasC config of Jenkins Config as Code
   ## Below is the implementation of Jenkins Configuration as Code.
@@ -97,9 +103,9 @@ controller:
     ##      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
     ##
     extraConfigFiles:
-      welcome-message.yaml: |-
-        jenkins:
-          systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+      # welcome-message.yaml: |-
+      #   jenkins:
+      #     systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
 
       fix-agent-port.yaml: |-
         jenkins:
@@ -131,7 +137,7 @@ controller:
       #                 dnsHosts:
       #                   - "10.89.0.1"
       #                   - "192.168.255.1"
-      #                 environment: 
+      #                 environment:
       #                   - "TZ=Asia/Shanghai"
       #                 mounts:
       #                   - "type=tmpfs,destination=/run"
@@ -144,86 +150,86 @@ controller:
       #               retentionStrategy:
       #                 idleMinutes: 1
 
-      job-dsl.yaml: |-
-        jobs:
-          - script: |
-              pipelineJob('test'){
-                definition{
-                  cpsScm{
-                    scm{
-                      git{
-                        remote {
-                          url('https://github.com/fsdrw08/packto-samples.git')
-                        }
-                        branches("refs/heads/main")
-                        extensions {
-                          cloneOptions {
-                            depth(1)
-                            shallow(true)
-                          }
-                        }
-                      }
-                      scriptPath('java/maven/Jenkinsfile')
-                    }
-                  }
-                }
-              }
-              
-          - script: |
-              pipelineJob('test2') {
-                definition {
-                  cps {
-                    sandbox()
-                    script("""\
-              pipeline {
-                agent {
-                  label "dev-docker-agent"
-                }
-                stages {
-                  stage("checkout") {
-                    // https://www.jenkins.io/doc/pipeline/steps/
-                    steps {
-                      // https://plugins.jenkins.io/git/
-                      // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
-                      // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
-                      // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
-                      checkout scmGit(
-                        userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
-                        branches: [[name:'*/main']],
-                        extensions: [cloneOption(depth: 1, shallow: true)]
-                      )
-                      sh 'pwd'
-                    }
-                  }
-                  stage("build") {
-                    steps {
-                      // https://buildpacks.io/docs/tools/pack/cli/pack_build/
-                      script {
-                        sh '''
-                          docker run \
-                            --rm \
-                            --tmpfs /tmp:rw \
-                            --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock \
-                            --volume jenkins-workspace:/workspace:rw \
-                            --workdir /workspace \
-                            --env HOME="/workspace" \
-                            docker.io/buildpacksio/pack:latest build \
-                              --trust-builder \
-                              --docker-host unix:///run/user/1001/podman/podman.sock \
-                              paketo-demo-app \
-                              --path ./workspace/test2/java/maven/ \
-                              --builder docker.io/paketobuildpacks/builder:base \
-                              --buildpack docker.io/paketobuildpacks/java-azure:10
-                        '''
-                      }
-                    }
-                  }
-                }
-              }
-                    """)
-                  }
-                }
-              }
+      # job-dsl.yaml: |-
+      #   jobs:
+      #     - script: |
+      #         pipelineJob('test'){
+      #           definition{
+      #             cpsScm{
+      #               scm{
+      #                 git{
+      #                   remote {
+      #                     url('https://github.com/fsdrw08/packto-samples.git')
+      #                   }
+      #                   branches("refs/heads/main")
+      #                   extensions {
+      #                     cloneOptions {
+      #                       depth(1)
+      #                       shallow(true)
+      #                     }
+      #                   }
+      #                 }
+      #                 scriptPath('java/maven/Jenkinsfile')
+      #               }
+      #             }
+      #           }
+      #         }
+
+      #     - script: |
+      #         pipelineJob('test2') {
+      #           definition {
+      #             cps {
+      #               sandbox()
+      #               script("""\
+      #         pipeline {
+      #           agent {
+      #             label "dev-docker-agent"
+      #           }
+      #           stages {
+      #             stage("checkout") {
+      #               // https://www.jenkins.io/doc/pipeline/steps/
+      #               steps {
+      #                 // https://plugins.jenkins.io/git/
+      #                 // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
+      #                 // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
+      #                 // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
+      #                 checkout scmGit(
+      #                   userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
+      #                   branches: [[name:'*/main']],
+      #                   extensions: [cloneOption(depth: 1, shallow: true)]
+      #                 )
+      #                 sh 'pwd'
+      #               }
+      #             }
+      #             stage("build") {
+      #               steps {
+      #                 // https://buildpacks.io/docs/tools/pack/cli/pack_build/
+      #                 script {
+      #                   sh '''
+      #                     docker run \
+      #                       --rm \
+      #                       --tmpfs /tmp:rw \
+      #                       --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock \
+      #                       --volume jenkins-workspace:/workspace:rw \
+      #                       --workdir /workspace \
+      #                       --env HOME="/workspace" \
+      #                       docker.io/buildpacksio/pack:latest build \
+      #                         --trust-builder \
+      #                         --docker-host unix:///run/user/1001/podman/podman.sock \
+      #                         paketo-demo-app \
+      #                         --path ./workspace/test2/java/maven/ \
+      #                         --builder docker.io/paketobuildpacks/builder:base \
+      #                         --buildpack docker.io/paketobuildpacks/java-azure:10
+      #                   '''
+      #                 }
+      #               }
+      #             }
+      #           }
+      #         }
+      #               """)
+      #             }
+      #           }
+      #         }
 
 persistence:
   ## @param persistence.enabled Enable persistence using Persistent Volume Claims
@@ -242,19 +248,19 @@ persistence:
   storageClass: ""
   ## @param persistence.pvc-home-annotations Persistent Volume Claim annotations
   ##
-  pvcHomeAnnotations: 
+  pvcHomeAnnotations:
     volume.podman.io/type: bind
     volume.podman.io/device: /mnt/data/jenkins/home
   ## @param persistence.pvc-plugins-loading-annotations Persistent Volume Claim annotations
   ##
-  pvcPluginsLoadingAnnotations: 
+  pvcPluginsLoadingAnnotations:
     volume.podman.io/type: bind
     volume.podman.io/device: /mnt/data/jenkins/plugins-loading
   ## @param persistence.pvc-plugins-storage-annotations Persistent Volume Claim annotations
   ##
-  pvcPluginsStorageAnnotations: 
-    volume.podman.io/type: bind
-    volume.podman.io/device: /mnt/data/jenkins/plugins-storage
+  # pvcPluginsStorageAnnotations:
+  #   volume.podman.io/type: bind
+  #   volume.podman.io/device: /mnt/data/jenkins/plugins-storage
   ## @param persistence.accessModes Persistent Volume Access Modes
   ##
   accessModes:

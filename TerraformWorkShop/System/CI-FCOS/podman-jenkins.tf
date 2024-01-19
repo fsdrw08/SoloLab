@@ -12,6 +12,7 @@ resource "system_file" "podman_jenkins_yaml" {
   content = data.helm_template.podman_jenkins.manifest
 }
 
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
 resource "system_file" "podman_jenkins_kube" {
   path    = "/home/podmgr/.config/containers/systemd/jenkins.kube"
   content = <<-EOT
@@ -22,6 +23,8 @@ WantedBy=default.target
 # Point to the yaml file in the same directory
 Yaml=jenkins-aio.yaml
 # user namespace mapping, need to point out the uid and gid which using in container
+# should able to use annotation io.podman.annotations.userns: keep-id:uid=1000,gid=1000 
+# instead in podman v4.9+ (maybe)
 UserNS=keep-id:uid=1000,gid=1000
 EOT
 }
@@ -34,12 +37,12 @@ resource "null_resource" "podman_jenkins_service" {
   triggers = {
     status       = "start"
     service_name = "jenkins"
-    yaml         = data.helm_template.podman_jenkins.manifest
-    kube         = system_file.podman_jenkins_kube.content
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
+    # yaml         = data.helm_template.podman_jenkins.manifest
+    kube     = system_file.podman_jenkins_kube.content
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
