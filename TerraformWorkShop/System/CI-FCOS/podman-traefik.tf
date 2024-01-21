@@ -3,54 +3,71 @@ data "tls_certificate" "rootCA" {
   verify_chain = false
 }
 
-data "helm_template" "podman_traefik" {
+data "helm_template" "podman_kube_traefik" {
   name  = "traefik"
-  chart = "${path.module}/../../../HelmWorkShop/helm-charts/charts/traefik"
+  chart = var.podman_kube_traefik.helm.chart
 
   set {
     name  = "traefik.customRootCA"
     value = data.tls_certificate.rootCA.certificates[0].cert_pem
   }
   values = [
-    "${file("./podman-traefik/values-sololab-ci.yaml")}"
+    "${file(var.podman_kube_traefik.helm.values)}"
   ]
 }
 
 # output "yaml" {
-#   value = data.helm_template.podman_traefik.manifest
+#   value = data.helm_template.podman_kube_traefik.manifest
 # }
 
-resource "system_file" "podman_traefik_yaml" {
-  path    = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
-  content = data.helm_template.podman_traefik.manifest
+resource "system_file" "podman_kube_traefik" {
+  path    = "${var.podman_kube_traefik.yaml_file_dir}/traefik-aio.yaml"
+  content = data.helm_template.podman_kube_traefik.manifest
 }
 
-resource "system_file" "podman_traefik_kube" {
-  path    = "/home/podmgr/.config/containers/systemd/traefik.kube"
-  content = <<-EOT
-[Unit]
-Description="Traefik Proxy"
-Documentation=https://docs.traefik.io
-Requires=var-mnt-data.mount
+# resource "null_resource" "podman_volume_traefik" {
+#   triggers = {
+#     storage_dir = var.podman_traefik.storage_dir
+#   }
+#   connection {
+#     type     = "ssh"
+#     host     = var.vm_conn.host
+#     port     = var.vm_conn.port
+#     user     = var.vm_conn.user
+#     password = var.vm_conn.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "mkdir -p ${var.podman_traefik.storage_dir}",
+#     ]
+#   }
+# }
 
-[Install]
-WantedBy=default.target
-
-[Kube]
-# Point to the yaml file in the same directory
-Yaml=traefik-aio.yaml
-EOT
+data "system_command" "podman_volume_traefik" {
+  # command = "mkdir -p ${var.podman_traefik.storage_dir}"
+  command = "if [ ! -d ${var.podman_kube_traefik.ext_vol_dir} ]; then mkdir -p ${var.podman_kube_traefik.ext_vol_dir}; fi"
 }
 
-resource "null_resource" "podman_traefik_service" {
+resource "system_file" "podman_quadlet_traefik" {
+  for_each = {
+    for content in var.podman_quadlet_traefik.quadlet.file_contents : content.file_source => content
+  }
+  path = format("${var.podman_quadlet_traefik.quadlet.file_path_dir}/%s", basename("${each.value.file_source}"))
+  content = templatefile(
+    each.value.file_source,
+    each.value.vars
+  )
+}
+
+resource "null_resource" "podman_quadlet_traefik" {
   depends_on = [
-    system_file.podman_traefik_kube
+    system_file.podman_quadlet_traefik
   ]
   triggers = {
     status       = "start"
     service_name = "traefik"
-    yaml         = data.helm_template.podman_traefik.manifest
-    kube         = system_file.podman_traefik_kube.content
+    yaml         = data.helm_template.podman_kube_traefik.manifest
+    quadlet      = join(",", (values(tomap(system_file.podman_quadlet_traefik)).*.md5sum))
     host         = var.vm_conn.host
     port         = var.vm_conn.port
     user         = var.vm_conn.user
@@ -80,8 +97,8 @@ resource "null_resource" "podman_traefik_service" {
 
 # resource "system_service_systemd" "podman_traefik" {
 #   depends_on = [
-#     system_file.podman_traefik_kube,
-#     system_file.podman_traefik_yaml
+#     system_file.podman_quadlet_traefik,
+#     system_file.podman_kube_traefik
 #   ]
 #   name   = "traefik"
 #   status = "started"
