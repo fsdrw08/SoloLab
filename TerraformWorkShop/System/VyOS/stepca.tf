@@ -10,12 +10,13 @@ resource "system_file" "stepca_tar" {
 resource "null_resource" "stepca_bin" {
   depends_on = [system_file.stepca_tar]
   triggers = {
-    file_source = var.stepca.install.server.tar_file_source
-    file_dir    = var.stepca.install.server.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
+    file_source      = var.stepca.install.server.tar_file_source
+    file_dir         = var.stepca.install.server.bin_file_dir
+    strip_components = index(split("/", var.stepca.install.server.tar_file_bin_path), "step-ca")
+    host             = var.vm_conn.host
+    port             = var.vm_conn.port
+    user             = var.vm_conn.user
+    password         = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -28,8 +29,9 @@ resource "null_resource" "stepca_bin" {
     inline = [
       # https://smallstep.com/docs/step-ca/installation/#linux-binaries
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --extract --file=${system_file.stepca_tar.path} --directory=${var.stepca.install.server.bin_file_dir} --strip-components=1 --verbose --overwrite step-ca_linux_amd64/step-ca",
-      "sudo chmod 755 ${var.stepca.install.server.bin_file_dir}/step-ca",
+      "sudo tar --extract --file=${system_file.stepca_tar.path} --directory=${var.stepca.install.server.bin_file_dir} --strip-components=${self.triggers.strip_components} --verbose --overwrite ${var.stepca.install.server.tar_file_bin_path}",
+      "sudo chown 0:0 ${self.triggers.file_dir}/step-ca",
+      "sudo chmod 755 ${self.triggers.file_dir}/step-ca",
     ]
   }
   provisioner "remote-exec" {
@@ -49,12 +51,13 @@ resource "system_file" "stepcli_tar" {
 resource "null_resource" "stepcli_bin" {
   depends_on = [system_file.stepcli_tar]
   triggers = {
-    file_source = var.stepca.install.client.tar_file_source
-    file_dir    = var.stepca.install.client.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
+    file_source      = var.stepca.install.client.tar_file_source
+    file_dir         = var.stepca.install.client.bin_file_dir
+    strip_components = index(split("/", var.stepca.install.client.tar_file_bin_path), "step")
+    host             = var.vm_conn.host
+    port             = var.vm_conn.port
+    user             = var.vm_conn.user
+    password         = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -67,7 +70,8 @@ resource "null_resource" "stepcli_bin" {
     inline = [
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
       # https://askubuntu.com/questions/45349/how-to-extract-files-to-another-directory-using-tar-command/470266#470266
-      "sudo tar --extract --file=${system_file.stepcli_tar.path} --directory=${self.triggers.file_dir} --strip-components=2 --verbose --overwrite step_linux_amd64/bin/step",
+      "sudo tar --extract --file=${system_file.stepcli_tar.path} --directory=${self.triggers.file_dir} --strip-components=${self.triggers.strip_components} --verbose --overwrite ${var.stepca.install.client.tar_file_bin_path}",
+      "sudo chown 0:0 ${self.triggers.file_dir}/step",
       "sudo chmod 755 ${self.triggers.file_dir}/step",
     ]
   }

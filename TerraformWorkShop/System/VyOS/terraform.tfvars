@@ -75,14 +75,16 @@ consul_post_process = {
 stepca = {
   install = {
     server = {
-      tar_file_source = "https://dl.smallstep.com/certificates/docs-ca-install/latest/step-ca_linux_amd64.tar.gz"
-      tar_file_path   = "/home/vyos/step-ca_linux_amd64.tar.gz"
-      bin_file_dir    = "/usr/bin"
+      tar_file_source   = "https://dl.smallstep.com/gh-release/certificates/gh-release-header/v0.25.2/step-ca_linux_0.25.2_amd64.tar.gz"
+      tar_file_path     = "/home/vyos/step-ca_linux_amd64.tar.gz"
+      tar_file_bin_path = "step-ca"
+      bin_file_dir      = "/usr/bin"
     }
     client = {
-      tar_file_source = "https://dl.smallstep.com/cli/docs-cli-install/latest/step_linux_amd64.tar.gz"
-      tar_file_path   = "/home/vyos/step_linux_amd64.tar.gz"
-      bin_file_dir    = "/usr/bin"
+      tar_file_source   = "https://dl.smallstep.com/gh-release/cli/gh-release-header/v0.25.2/step_linux_0.25.2_amd64.tar.gz"
+      tar_file_path     = "/home/vyos/step_linux_amd64.tar.gz"
+      tar_file_bin_path = "step_0.25.2/bin/step"
+      bin_file_dir      = "/usr/bin"
     }
   }
   runas = {
@@ -113,7 +115,7 @@ stepca = {
     file_source = "./step-ca/entrypoint.sh"
   }
   service = {
-    status  = "started"
+    status  = "stopped"
     enabled = true
     systemd = {
       file_source = "./step-ca/step-ca.service"

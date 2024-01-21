@@ -67,14 +67,16 @@ variable "stepca" {
   type = object({
     install = object({
       server = object({
-        tar_file_source = string
-        tar_file_path   = string
-        bin_file_dir    = string
+        tar_file_source   = string
+        tar_file_path     = string
+        tar_file_bin_path = string
+        bin_file_dir      = string
       })
       client = object({
-        tar_file_source = string
-        tar_file_path   = string
-        bin_file_dir    = string
+        tar_file_source   = string
+        tar_file_path     = string
+        tar_file_bin_path = string
+        bin_file_dir      = string
       })
     })
     runas = object({

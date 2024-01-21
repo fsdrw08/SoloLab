@@ -64,8 +64,11 @@ resource "system_file" "traefik_config_dynamic" {
   for_each = {
     for content in var.traefik.config.dynamic.file_contents : content.file_source => content
   }
-  path    = format("${var.traefik.config.dynamic.file_path_dir}/%s", basename("${each.value.file_source}"))
-  content = templatefile(each.value.file_source, each.value.vars)
+  path = format("${var.traefik.config.dynamic.file_path_dir}/%s", basename("${each.value.file_source}"))
+  content = templatefile(
+    each.value.file_source,
+    each.value.vars
+  )
 }
 
 # create and link traefik storage dir
