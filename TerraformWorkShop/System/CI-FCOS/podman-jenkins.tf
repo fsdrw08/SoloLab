@@ -1,70 +1,72 @@
-# data "helm_template" "podman_jenkins" {
-#   name  = "jenkins"
-#   chart = "${path.module}/../../../HelmWorkShop/helm-charts/charts/jenkins-server"
+data "helm_template" "podman_kube_jenkins" {
+  name  = "jenkins"
+  chart = var.podman_kube_jenkins.helm.chart
 
-#   values = [
-#     "${file("./podman-jenkins/values-sololab-ci.yaml")}"
-#   ]
-# }
+  values = [
+    "${file(var.podman_kube_jenkins.helm.values)}"
+  ]
+}
 
-# resource "system_file" "podman_jenkins_yaml" {
-#   path    = "/home/podmgr/.config/containers/systemd/jenkins-aio.yaml"
-#   content = data.helm_template.podman_jenkins.manifest
-# }
+resource "system_file" "podman_kube_jenkins" {
+  path    = "${var.podman_kube_jenkins.yaml_file_dir}/jenkins-aio.yaml"
+  content = data.helm_template.podman_kube_jenkins.manifest
+}
+
+data "system_command" "podman_volume_jenkins" {
+  for_each = {
+    for k, v in var.podman_kube_jenkins.ext_vol_dir :
+    k => v
+  }
+  command = "if [ ! -d ${each.value} ]; then mkdir -p ${each.value}; fi"
+}
 
 # # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
-# resource "system_file" "podman_jenkins_kube" {
-#   path    = "/home/podmgr/.config/containers/systemd/jenkins.kube"
-#   content = <<-EOT
-# [Install]
-# WantedBy=default.target
+resource "system_file" "podman_quadlet_jenkins" {
+  for_each = {
+    for content in var.podman_quadlet_jenkins.quadlet.file_contents : content.file_source => content
+  }
+  path = format("${var.podman_quadlet_jenkins.quadlet.file_path_dir}/%s", basename("${each.value.file_source}"))
+  content = templatefile(
+    each.value.file_source,
+    each.value.vars
+  )
+}
 
-# [Kube]
-# # Point to the yaml file in the same directory
-# Yaml=jenkins-aio.yaml
-# # user namespace mapping, need to point out the uid and gid which using in container
-# # should able to use annotation io.podman.annotations.userns: keep-id:uid=1000,gid=1000 
-# # instead in podman v4.9+ (maybe)
-# UserNS=keep-id:uid=1000,gid=1000
-# EOT
-# }
-
-# resource "null_resource" "podman_jenkins_service" {
-#   depends_on = [
-#     system_file.podman_jenkins_yaml,
-#     system_file.podman_jenkins_kube
-#   ]
-#   triggers = {
-#     status       = "start"
-#     service_name = "jenkins"
-#     # yaml         = data.helm_template.podman_jenkins.manifest
-#     kube     = system_file.podman_jenkins_kube.content
-#     host     = var.vm_conn.host
-#     port     = var.vm_conn.port
-#     user     = var.vm_conn.user
-#     password = sensitive(var.vm_conn.password)
-#   }
-#   connection {
-#     type     = "ssh"
-#     host     = self.triggers.host
-#     port     = self.triggers.port
-#     user     = self.triggers.user
-#     password = self.triggers.password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "systemctl --user daemon-reload",
-#       "systemctl --user ${self.triggers.status} ${self.triggers.service_name}",
-#     ]
-#   }
-#   provisioner "remote-exec" {
-#     when = destroy
-#     inline = [
-#       "systemctl --user daemon-reload",
-#       "systemctl --user stop ${self.triggers.service_name}",
-#     ]
-#   }
-# }
+resource "null_resource" "podman_quadlet_jenkins" {
+  depends_on = [
+    system_file.podman_quadlet_jenkins
+  ]
+  triggers = {
+    service_status = var.podman_quadlet_jenkins.service.status
+    service_name   = var.podman_quadlet_jenkins.service.name
+    yaml           = data.helm_template.podman_kube_jenkins.manifest
+    quadlet        = join(",", (values(tomap(system_file.podman_quadlet_jenkins)).*.md5sum))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "systemctl --user daemon-reload",
+      "systemctl --user ${self.triggers.service_status} ${self.triggers.service_name}",
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "systemctl --user daemon-reload",
+      "systemctl --user stop ${self.triggers.service_name}",
+    ]
+  }
+}
 
 # # resource "system_service_systemd" "podman_jenkins" {
 # #   depends_on = [
@@ -76,7 +78,7 @@
 # #   scope  = "user"
 # # }
 
-# resource "system_file" "podman_jenkins_consul" {
-#   path    = "/etc/consul.d/jenkins_consul.hcl"
-#   content = file("./podman-jenkins/jenkins_consul.hcl")
-# }
+resource "system_file" "podman_jenkins_consul" {
+  path    = "/etc/consul.d/jenkins_consul.hcl"
+  content = file("./podman-jenkins/jenkins_consul.hcl")
+}

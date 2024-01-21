@@ -64,14 +64,14 @@ resource "null_resource" "podman_quadlet_traefik" {
     system_file.podman_quadlet_traefik
   ]
   triggers = {
-    status       = "start"
-    service_name = "traefik"
-    yaml         = data.helm_template.podman_kube_traefik.manifest
-    quadlet      = join(",", (values(tomap(system_file.podman_quadlet_traefik)).*.md5sum))
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
+    service_status = var.podman_quadlet_traefik.service.status
+    service_name   = var.podman_quadlet_traefik.service.name
+    yaml           = data.helm_template.podman_kube_traefik.manifest
+    quadlet        = join(",", (values(tomap(system_file.podman_quadlet_traefik)).*.md5sum))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -83,7 +83,7 @@ resource "null_resource" "podman_quadlet_traefik" {
   provisioner "remote-exec" {
     inline = [
       "systemctl --user daemon-reload",
-      "systemctl --user ${self.triggers.status} ${self.triggers.service_name}",
+      "systemctl --user ${self.triggers.service_status} ${self.triggers.service_name}",
     ]
   }
   provisioner "remote-exec" {

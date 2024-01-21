@@ -1,0 +1,14 @@
+[Unit]
+Description="Traefik Proxy"
+Documentation=https://docs.traefik.io
+Requires=${requires[0]}
+%{ for path in assert_path_exists ~}
+AssertPathExists=${path}
+%{ endfor ~}
+
+[Install]
+WantedBy=default.target
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml[0]}
