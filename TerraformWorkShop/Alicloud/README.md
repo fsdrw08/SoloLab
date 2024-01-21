@@ -79,3 +79,62 @@ terraform state rm $resourceOldName
 6. Create Server Load Balancer related stuff
 7. Create NAS related stuff
 8. Create compute related resources
+
+```yaml
+EIP:
+  count: 1
+  configs:
+    - ...
+    - address_name: ...
+    - payment_type: ...
+    - internet_charge_type: ...
+    - auto_pay: ...
+    - isp: ...
+    - bandwidth: ...
+    - description: ...
+
+Res_VPC:
+  Res_IPv4-GW:
+    Before:
+      Res_VSW-For-NAT:
+        Configs:
+          - cidr: "172.16.0.0/28"
+          - route_table:
+              route_entry:
+                nexthop: Ipv4Gateway
+        Before:
+          Res_NAT-GW:
+            Configs: 
+              - Link_to: EIP...
+              - snat:
+                - IP: EIP..
+              
+  Res_VSW-For-OThers(internal):
+    Configs:
+      - nexthop: NAT-GW
+      # apply after SLB
+      - forward_entry: 
+          https:
+            - external_ip:
+            - external_port: 443
+            - internl_ip: slb_ip
+            - internal_port: 443
+          http:
+            - external_ip:
+            - external_port: 80
+            - internl_ip: slb_ip
+            - internal_port: 80
+    Before:
+      Res_SLB:
+        Configs:
+          - Certs: ACME
+          - Listener-HTTPS: 
+              FE: 443
+              BE: 8080
+          - Listener-HTTP:
+              FE: 80
+              listener_forward: on
+              forward_port: 443
+      Res_ECI-Jenkins:
+      Res_ECS-Dev:
+```

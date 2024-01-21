@@ -2,6 +2,10 @@ data "alicloud_resource_manager_resource_groups" "rg" {
   name_regex = var.resource_group_name_regex
 }
 
+data "alicloud_alidns_domains" "domain" {
+  domain_name_regex = var.domain_name_regex
+}
+
 # private key
 resource "tls_private_key" "key" {
   algorithm = "RSA"
@@ -36,6 +40,31 @@ resource "acme_certificate" "alidns" {
     }
   }
 }
+
+# resource "acme_certificate" "alidns" {
+#   for_each = {
+#     for k, v in data.alicloud_alidns_domains.domain.names :
+#     v => k
+#   }
+#   account_key_pem = acme_registration.reg.account_key_pem
+#   key_type        = 2048 # RSA key of 2048 bits
+#   pre_check_delay = 10
+#   common_name     = each.key
+#   # subject_alternative_names = toset(concat([each.key], each.value))
+#   subject_alternative_names = ["*.${each.key}"]
+#   min_days_remaining        = var.acme_min_days_remaining
+#   dns_challenge {
+#     provider = "alidns"
+#     config = {
+#       ALICLOUD_ACCESS_KEY          = var.ALICLOUD_ACCESS_KEY
+#       ALICLOUD_SECRET_KEY          = var.ALICLOUD_SECRET_KEY
+#       ALICLOUD_PROPAGATION_TIMEOUT = 600
+#       ALICLOUD_POLLING_INTERVAL    = 5
+#       ALICLOUD_TTL                 = 86400
+#       ALICLOUD_HTTP_TIMEOUT        = 10
+#     }
+#   }
+# }
 
 resource "alicloud_ssl_certificates_service_certificate" "acme_blue" {
   for_each = acme_certificate.alidns

@@ -8,6 +8,10 @@ variable "acme_reg_email" {
   type        = string
 }
 
+variable "domain_name_regex" {
+  type = string
+}
+
 variable "domains" {
   description = "Map of common names to alternative names to create ACME certificates. Module supports wildcard certificates, common name does not need to be included in alternative names."
   type        = map(list(string))

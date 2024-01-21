@@ -1,4 +1,4 @@
-eci_image_uri = "docker.io/gitlab/gitlab-ee:16.5.1-ee.0"
+eci_image_uri      = "docker.io/gitlab/gitlab-ee:16.5.1-ee.0"
 eci_restart_policy = "Never"
 # https://github.com/laradock/laradock/blob/b75d8ba0bd6527ff2a5ad879f111fa592e677c59/docker-compose.yml#L1498C39-L1498C39
 GITLAB_OMNIBUS_CONFIG = <<-EOT
