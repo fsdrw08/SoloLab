@@ -1,6 +1,6 @@
 [Unit]
-Description="Traefik Proxy"
-Documentation=https://docs.traefik.io
+Description="Jenkins Continuous Integration Server"
+Documentation=https://www.jenkins.io/doc/book/system-administration/systemd-services/
 Requires=${requires[0]}
 %{ for path in assert_path_exists ~}
 AssertPathExists=${path}
@@ -12,3 +12,4 @@ WantedBy=default.target
 [Kube]
 # Point to the yaml file in the same directory
 Yaml=${yaml[0]}
+UserNS=keep-id:uid=1000,gid=1000

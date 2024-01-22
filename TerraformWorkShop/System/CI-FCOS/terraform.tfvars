@@ -58,14 +58,14 @@ podman_quadlet_jenkins = {
             "/mnt/data/jenkins/home",
             "/mnt/data/jenkins/plugins-loading"
           ]
-          yaml = ["traefik-aio.yaml"]
+          yaml = ["jenkins-aio.yaml"]
         }
       }
     ]
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }
   service = {
-    name   = "traefik"
+    name   = "jenkins"
     status = "start"
   }
 }
