@@ -98,6 +98,7 @@ resource "alicloud_eci_container_group" "eci" {
   # }
 
   init_containers {
+    # containers {
     name              = "provision"
     image             = var.eci_image_uri
     image_pull_policy = "IfNotPresent"
@@ -145,6 +146,10 @@ resource "alicloud_eci_container_group" "eci" {
     args = [
       "--httpPort=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
     ]
+
+    # security_context {
+    #   run_as_user = 0
+    # }
 
     # https://github.com/jenkinsci/configuration-as-code-plugin/blob/810dc950b514b9f3542defa22fc7e36eb077c18f/demos/kubernetes-secrets/README.md
     # With the help of SECRETS environment variable

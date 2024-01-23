@@ -45,6 +45,16 @@ data "alicloud_alidns_domains" "domain" {
   domain_name_regex = var.domain_name_regex
 }
 
+data "alicloud_nas_file_systems" "nas_fs" {
+  description_regex = var.nas_file_system_desc_regex
+}
+
+data "alicloud_nas_mount_targets" "nas_mnt" {
+  file_system_id = data.alicloud_nas_file_systems.nas_fs.systems.0.id
+  vpc_id         = data.alicloud_vpcs.vpc.vpcs.0.id
+  vswitch_id     = data.alicloud_vswitches.vsw.vswitches.0.id
+}
+
 resource "alicloud_eci_container_group" "eci" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
   zone_id           = data.alicloud_vswitches.vsw.vswitches.0.zone_id
@@ -105,6 +115,11 @@ resource "alicloud_eci_container_group" "eci" {
       name       = "cockpit-cm-conf"
       mount_path = "/mnt/cockpit"
     }
+
+    volume_mounts {
+      name       = "nfs-root"
+      mount_path = "/mnt"
+    }
   }
 
   volumes {
@@ -118,6 +133,13 @@ resource "alicloud_eci_container_group" "eci" {
       )
       path = "cockpit.conf"
     }
+  }
+
+  volumes {
+    name              = "nfs-root"
+    type              = "NFSVolume"
+    nfs_volume_path   = "/"
+    nfs_volume_server = data.alicloud_nas_mount_targets.nas_mnt.targets.0.mount_target_domain
   }
 
   # https://help.aliyun.com/document_detail/65415.html

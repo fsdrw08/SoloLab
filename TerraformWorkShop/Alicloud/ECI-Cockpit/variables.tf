@@ -15,6 +15,10 @@ variable "security_group_name_regex" {
   type = string
 }
 
+variable "nas_file_system_desc_regex" {
+  type = string
+}
+
 variable "load_balancer_name_regex" {
   type = string
 }
