@@ -146,6 +146,12 @@ resource "alicloud_eci_container_group" "eci" {
       "--httpPort=${data.alicloud_slb_listeners.slb_listener.slb_listeners.0.backend_port}"
     ]
 
+    # https://github.com/jenkinsci/configuration-as-code-plugin/blob/810dc950b514b9f3542defa22fc7e36eb077c18f/demos/kubernetes-secrets/README.md
+    # With the help of SECRETS environment variable
+    # we point Jenkins Configuration as Code plugin the location of the secrets
+    # JCasC read the config yaml, find the var key(e.g. pattern with ${xxx}),
+    # then go to the dir set in env var $SECRETS,
+    # find related var key files content as key value
     environment_vars {
       key   = "SECRETS"
       value = "/run/secrets/additional"
@@ -162,6 +168,8 @@ resource "alicloud_eci_container_group" "eci" {
       key   = "JENKINS_OPTS"
       value = "--webroot=/var/jenkins_cache/war"
     }
+    # https://github.com/jenkinsci/configuration-as-code-plugin/blob/810dc950b514b9f3542defa22fc7e36eb077c18f/demos/kubernetes-secrets/README.md
+    # Read the configuration-as-code from the ConfigMap
     environment_vars {
       key   = "CASC_JENKINS_CONFIG"
       value = "/var/jenkins_home/casc_configs"
@@ -255,6 +263,7 @@ resource "alicloud_eci_container_group" "eci" {
   volumes {
     name = "jenkins-sec-secrets"
     type = "ConfigFileVolume"
+    # the path "jenkins-admin-user", aka the variable key set in jcasc yaml file
     config_file_volume_config_file_to_paths {
       content = base64encode(var.jenkins_admin_user)
       path    = "jenkins-admin-user"
@@ -283,9 +292,7 @@ resource "alicloud_eci_container_group" "eci" {
     # default jcasc yaml
     config_file_volume_config_file_to_paths {
       content = base64encode(templatefile(var.jenkins_casc_default, {
-        FQDN                   = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
-        jenkins_admin_user     = var.jenkins_admin_user
-        jenkins_admin_password = var.jenkins_admin_password
+        FQDN = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
       }))
       path = var.jenkins_casc_default
     }

@@ -77,10 +77,6 @@ variable "jenkins_agent_listener" {
   default = 50000
 }
 
-variable "jenkins_admin_password" {
-  type = string
-}
-
 variable "jenkins_casc_default" {
   description = "default jenkins config as code file"
   type        = string
