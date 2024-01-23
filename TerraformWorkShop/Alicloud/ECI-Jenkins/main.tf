@@ -283,7 +283,9 @@ resource "alicloud_eci_container_group" "eci" {
     # default jcasc yaml
     config_file_volume_config_file_to_paths {
       content = base64encode(templatefile(var.jenkins_casc_default, {
-        FQDN = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+        FQDN                   = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
+        jenkins_admin_user     = var.jenkins_admin_user
+        jenkins_admin_password = var.jenkins_admin_password
       }))
       path = var.jenkins_casc_default
     }

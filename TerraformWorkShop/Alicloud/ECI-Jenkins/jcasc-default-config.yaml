@@ -10,9 +10,9 @@ jenkins:
       allowsSignup: false
       enableCaptcha: false
       users:
-        - id: $${jenkins-admin-user}
+        - id: $${jenkins_admin_user}
           name: Jenkins Admin
-          password: $${jenkins-admin-password}
+          password: $${jenkins_admin_password}
 unclassified:
   location:
     adminAddress: null

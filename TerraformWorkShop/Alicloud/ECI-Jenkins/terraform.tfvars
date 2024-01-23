@@ -18,7 +18,8 @@ jenkins_agent_listener = 50000
 jenkins_casc_default   = "jcasc-default-config.yaml"
 # jenkins_casc_admin_user = 
 # jenkins_casc_admin_password = 
-jenkins_casc_cloud_docker = "jcasc-cloud-docker.yaml"
+
+# jenkins_casc_cloud_docker = "jcasc-cloud-docker.yaml"
 # jenkins_casc_addition = [{
 #   file = "value"
 # }]
