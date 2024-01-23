@@ -279,18 +279,24 @@ resource "alicloud_eci_container_group" "eci" {
   volumes {
     name = "jenkins-cm-jcasc"
     type = "ConfigFileVolume"
+
+    # default jcasc yaml
     config_file_volume_config_file_to_paths {
       content = base64encode(templatefile(var.jenkins_casc_default, {
         FQDN = "${var.subdomain}.${data.alicloud_alidns_domains.domain.domains.0.domain_name}"
       }))
       path = var.jenkins_casc_default
     }
-    config_file_volume_config_file_to_paths {
-      content = base64encode(templatefile(var.jenkins_casc_cloud_docker, {
-        DEV_IP = data.alicloud_instances.agent.instances.0.private_ip
-      }))
-      path = var.jenkins_casc_default
-    }
+
+    # jcasc yaml for docker cloud, no need for now
+    # config_file_volume_config_file_to_paths {
+    #   content = base64encode(templatefile(var.jenkins_casc_cloud_docker, {
+    #     DEV_IP = data.alicloud_instances.agent.instances.0.private_ip
+    #   }))
+    #   path = var.jenkins_casc_cloud_docker
+    # }
+
+    # additional jcasc yaml
     dynamic "config_file_volume_config_file_to_paths" {
       # https://stackoverflow.com/questions/59161749/loop-over-a-map-and-skip-empty-items
       for_each = {

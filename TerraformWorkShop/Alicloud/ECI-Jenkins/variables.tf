@@ -87,6 +87,16 @@ variable "jenkins_casc_default" {
   default     = "jcasc-default-config.yaml"
 }
 
+variable "jenkins_casc_admin_user" {
+  description = "default jenkins admin user name"
+  type        = string
+}
+
+variable "jenkins_casc_admin_password" {
+  description = "default jenkins admin user password"
+  type        = string
+}
+
 variable "jenkins_casc_cloud_docker" {
   description = "jenkins config as code file for docker cloud"
   type        = string
