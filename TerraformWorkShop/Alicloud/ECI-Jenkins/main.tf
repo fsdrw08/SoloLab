@@ -55,10 +55,10 @@ data "alicloud_nas_mount_targets" "nas_mnt" {
   vswitch_id     = data.alicloud_vswitches.vsw.vswitches.0.id
 }
 
-data "alicloud_instances" "agent" {
-  name_regex        = var.agent_ecs_name_regex
-  resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
-}
+# data "alicloud_instances" "agent" {
+#   name_regex        = var.agent_ecs_name_regex
+#   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
+# }
 
 resource "alicloud_eci_container_group" "eci" {
   resource_group_id = data.alicloud_resource_manager_resource_groups.rg.groups.0.id
