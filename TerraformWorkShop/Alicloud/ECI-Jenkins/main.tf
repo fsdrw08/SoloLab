@@ -256,7 +256,7 @@ resource "alicloud_eci_container_group" "eci" {
     name = "jenkins-sec-secrets"
     type = "ConfigFileVolume"
     config_file_volume_config_file_to_paths {
-      content = base64encode("admin")
+      content = base64encode(var.jenkins_admin_user)
       path    = "jenkins-admin-user"
     }
     config_file_volume_config_file_to_paths {
