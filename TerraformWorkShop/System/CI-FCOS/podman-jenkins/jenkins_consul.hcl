@@ -29,3 +29,19 @@ services {
     }
   ]
 }
+
+// services {
+//   id      = "jenkins"
+//   name    = "jenkins"
+//   port    = 80
+
+//   checks = [
+//     {
+//       id       = "podman-healthcheck-jenkins"
+//       name     = "podman-healthcheck-jenkins"
+//       args      = ["/usr/bin/podman", "healthcheck", "run", "jenkins-jenkins"]
+//       interval = "20s"
+//       timeout  = "2s"
+//     }
+//   ]
+// }

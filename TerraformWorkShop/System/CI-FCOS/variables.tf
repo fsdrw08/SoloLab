@@ -9,7 +9,7 @@ variable "vm_conn" {
 
 variable "podman_kube_traefik" {
   type = object({
-    ext_vol_dir = optional(string)
+    ext_vol_dir = optional(list(string))
     helm = object({
       chart  = string
       values = string

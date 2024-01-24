@@ -25,30 +25,36 @@ resource "system_file" "podman_kube_traefik" {
   content = data.helm_template.podman_kube_traefik.manifest
 }
 
-# resource "null_resource" "podman_volume_traefik" {
-#   triggers = {
-#     storage_dir = var.podman_traefik.storage_dir
-#   }
-#   connection {
-#     type     = "ssh"
-#     host     = var.vm_conn.host
-#     port     = var.vm_conn.port
-#     user     = var.vm_conn.user
-#     password = var.vm_conn.password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "mkdir -p ${var.podman_traefik.storage_dir}",
-#     ]
-#   }
-# }
-
-data "system_command" "podman_volume_traefik" {
-  # command = "mkdir -p ${var.podman_traefik.storage_dir}"
-  command = "if [ ! -d ${var.podman_kube_traefik.ext_vol_dir} ]; then mkdir -p ${var.podman_kube_traefik.ext_vol_dir}; fi"
+resource "null_resource" "podman_volume_traefik" {
+  triggers = {
+    storage_dir = join(" ", var.podman_kube_traefik.ext_vol_dir)
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "for i in \"${self.triggers.storage_dir}\"; do if [ ! -d $i ]; then mkdir -p $i; fi; done"
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "systemctl --user daemon-reload",
+    ]
+  }
 }
 
 resource "system_file" "podman_quadlet_traefik" {
+  depends_on = [null_resource.podman_volume_traefik]
   for_each = {
     for content in var.podman_quadlet_traefik.quadlet.file_contents : content.file_source => content
   }
@@ -61,12 +67,13 @@ resource "system_file" "podman_quadlet_traefik" {
 
 resource "null_resource" "podman_quadlet_traefik" {
   depends_on = [
+    system_file.podman_kube_traefik,
     system_file.podman_quadlet_traefik
   ]
   triggers = {
     service_status = var.podman_quadlet_traefik.service.status
     service_name   = var.podman_quadlet_traefik.service.name
-    yaml           = data.helm_template.podman_kube_traefik.manifest
+    yaml           = sha256(data.helm_template.podman_kube_traefik.manifest)
     quadlet        = join(",", (values(tomap(system_file.podman_quadlet_traefik)).*.md5sum))
     host           = var.vm_conn.host
     port           = var.vm_conn.port
@@ -89,7 +96,6 @@ resource "null_resource" "podman_quadlet_traefik" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "systemctl --user daemon-reload",
       "systemctl --user stop ${self.triggers.service_name}",
     ]
   }

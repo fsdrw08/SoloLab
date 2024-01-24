@@ -6,7 +6,7 @@ vm_conn = {
 }
 
 podman_kube_traefik = {
-  ext_vol_dir = "/mnt/data/ci-traefik"
+  ext_vol_dir = ["/mnt/data/ci-traefik"]
   helm = {
     chart  = "../../../HelmWorkShop/helm-charts/charts/traefik"
     values = "./podman-traefik/values-sololab-ci.yaml"
