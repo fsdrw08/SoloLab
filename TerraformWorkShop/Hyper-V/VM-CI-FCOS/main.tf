@@ -5,45 +5,45 @@ locals {
 data "ignition_config" "ignition" {
   count = local.count
   systemd = [
-    data.ignition_systemd_unit.data.rendered,
+    data.ignition_systemd_unit.nfs_mount.rendered,
     data.ignition_systemd_unit.rpm_ostree.rendered,
     data.ignition_systemd_unit.consul.rendered
   ]
   directories = [
-    data.ignition_directory.mnt_nfs.rendered,
+    data.ignition_directory.nfs_mount.rendered,
     data.ignition_directory.user_home.rendered,
-    data.ignition_directory.user_config.rendered,
-    data.ignition_directory.user_config_systemd.rendered,
-    data.ignition_directory.user_config_systemd_user.rendered,
-    data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
-    data.ignition_directory.user_config_containers.rendered,
-    data.ignition_directory.user_config_containers_systemd.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME_systemd.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME_systemd_user.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME_containers.rendered,
+    data.ignition_directory.user_XDG_CONFIG_HOME_containers_systemd.rendered,
     data.ignition_directory.consul_config.rendered,
     data.ignition_directory.consul_data.rendered
   ]
   users = [
     data.ignition_user.core.rendered,
     data.ignition_user.user.rendered,
-    data.ignition_user.consul.rendered
+    # data.ignition_user.consul.rendered
   ]
   files = [
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
     data.ignition_file.eth0[count.index].rendered,
-    # data.ignition_file.rootless_podman_socket_tcp_service.rendered,
-    data.ignition_file.rootless_linger.rendered,
+    # data.ignition_file.user_XDG_CONFIG_HOME_systemd_user_podmanSocketTcpService.rendered,
+    data.ignition_file.user_linger.rendered,
     data.ignition_file.rpms.rendered,
     data.ignition_file.enable_password_auth.rendered,
     data.ignition_file.sysctl_unprivileged_port.rendered,
     data.ignition_file.consul_bin.rendered,
     data.ignition_file.consul_config.rendered,
-    data.ignition_file.cockpit.rendered,
+    data.ignition_file.cockpit_container.rendered,
   ]
   links = [
     data.ignition_link.timezone.rendered,
-    data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
+    data.ignition_link.user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants_podmanSocket.rendered,
     # if dont want to expose podman tcp socket, just comment below line
-    # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
+    # data.ignition_link.user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants_podmanSocketTcpService.rendered,
   ]
 }
 

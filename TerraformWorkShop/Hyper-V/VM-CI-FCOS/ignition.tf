@@ -15,7 +15,7 @@ data "ignition_link" "timezone" {
 }
 
 # mount nfs
-data "ignition_directory" "mnt_nfs" {
+data "ignition_directory" "nfs_mount" {
   path = "/var/mnt/data"
 }
 
@@ -26,7 +26,7 @@ data "ignition_directory" "mnt_nfs" {
 # https://github.com/getamis/terraform-ignition-etcd/blob/6526ce743d36f7950e097dabbff4ccfb41655de7/volume.tf#L28
 # https://github.com/meyskens/vagrant-coreos-baremetal/blob/5470c582fa42f499bc17eb501d3e592cf85caaf1/terraform/modules/ignition/systemd/files/data.mount.tpl
 # https://unix.stackexchange.com/questions/225401/how-to-see-full-log-from-systemctl-status-service/225407#225407
-data "ignition_systemd_unit" "data" {
+data "ignition_systemd_unit" "nfs_mount" {
   # mind the unit name, The .mount file must be named based on the mount point path (e.g. /var/mnt/data = var-mnt-data.mount)
   # https://docs.fedoraproject.org/en-US/fedora-coreos/storage/#_configuring_nfs_mounts
   name    = "var-mnt-data.mount"
@@ -118,21 +118,21 @@ data "ignition_directory" "user_home" {
   gid  = 1001
 }
 
-data "ignition_directory" "user_config" {
+data "ignition_directory" "user_XDG_CONFIG_HOME" {
   path = "/home/podmgr/.config"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
   gid  = 1001
 }
 
-data "ignition_directory" "user_config_systemd" {
+data "ignition_directory" "user_XDG_CONFIG_HOME_systemd" {
   path = "/home/podmgr/.config/systemd"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
   gid  = 1001
 }
 
-data "ignition_directory" "user_config_systemd_user" {
+data "ignition_directory" "user_XDG_CONFIG_HOME_systemd_user" {
   path = "/home/podmgr/.config/systemd/user"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
@@ -141,7 +141,7 @@ data "ignition_directory" "user_config_systemd_user" {
 
 # create user level default.target.wants dir for service auto start
 # https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
-data "ignition_directory" "user_config_systemd_user_defaultTargetWants" {
+data "ignition_directory" "user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants" {
   path = "/home/podmgr/.config/systemd/user/default.target.wants"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
@@ -151,7 +151,7 @@ data "ignition_directory" "user_config_systemd_user_defaultTargetWants" {
 # enable podman socket (used by podman remote) for the user (rootless)
 # link the socket in this dir for socket auto start when user login
 # https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
-data "ignition_link" "rootless_podman_socket_unix_autostart" {
+data "ignition_link" "user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants_podmanSocket" {
   # the link
   path = "/home/podmgr/.config/systemd/user/sockets.target.wants/podman.socket"
   # the source
@@ -163,7 +163,7 @@ data "ignition_link" "rootless_podman_socket_unix_autostart" {
 
 # # create user level systemd service to expose podman socket to external tcp port
 # # https://github.com/openstack/tripleo-ansible/blob/e281ae7624774d71f22fbb993af967ed1ec08780/tripleo_ansible/roles/tripleo_podman/templates/podman.service.j2#L11
-# data "ignition_file" "rootless_podman_socket_tcp_service" {
+# data "ignition_file" "user_XDG_CONFIG_HOME_systemd_user_podmanSocketTcpService" {
 #   path      = "/home/podmgr/.config/systemd/user/podman-socket-tcp.service"
 #   mode      = 420 # oct 644 -> dec 420
 #   overwrite = true
@@ -192,9 +192,9 @@ data "ignition_link" "rootless_podman_socket_unix_autostart" {
 # }
 
 # # link the user level podman tcp socket service to default.target.wants for service auto start when login
-# data "ignition_link" "rootless_podman_socket_tcp_autostart" {
+# data "ignition_link" "user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants_podmanSocketTcpService" {
 #   path      = "/home/podmgr/.config/systemd/user/default.target.wants/podman-socket-tcp.service"
-#   target    = data.ignition_file.rootless_podman_socket_tcp_service.path
+#   target    = data.ignition_file.user_XDG_CONFIG_HOME_systemd_user_podman_socket_tcp_service.path
 #   overwrite = true
 #   hard      = false
 #   uid       = 1001
@@ -202,7 +202,7 @@ data "ignition_link" "rootless_podman_socket_unix_autostart" {
 # }
 
 # enable lingering to make user level service able to auto start on boot
-data "ignition_file" "rootless_linger" {
+data "ignition_file" "user_linger" {
   path = "/var/lib/systemd/linger/podmgr"
   mode = 420 # oct 644 -> 420
   content {
@@ -294,14 +294,14 @@ data "ignition_file" "sysctl_unprivileged_port" {
 
 # config podman quadlet
 # https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
-data "ignition_directory" "user_config_containers" {
+data "ignition_directory" "user_XDG_CONFIG_HOME_containers" {
   path = "/home/podmgr/.config/containers"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
   gid  = 1001
 }
 
-data "ignition_directory" "user_config_containers_systemd" {
+data "ignition_directory" "user_XDG_CONFIG_HOME_containers_systemd" {
   path = "/home/podmgr/.config/containers/systemd"
   mode = 493 # oct 755 -> dec 493
   uid  = 1001
@@ -318,24 +318,24 @@ data "ignition_file" "consul_bin" {
   }
 }
 
-data "ignition_user" "consul" {
-  name     = "consul"
-  system   = true
-  home_dir = "/etc/consul.d"
-  shell    = "/bin/false"
-  uid      = 1002
-}
+# data "ignition_user" "consul" {
+#   name     = "consul"
+#   system   = true
+#   home_dir = "/etc/consul.d"
+#   shell    = "/bin/false"
+#   uid      = 1002
+# }
 
 data "ignition_directory" "consul_config" {
   path = "/etc/consul.d"
-  mode = 511 # oct 777 -> 511
-  uid  = 1002
+  mode = 511  # oct 777 -> 511
+  uid  = 1001 # podmgr
 }
 
 data "ignition_file" "consul_config" {
   path = "/etc/consul.d/consul.hcl"
-  mode = 483 # oct 666 -> 483
-  uid  = 1002
+  mode = 483  # oct 666 -> 483
+  uid  = 1001 # podmgr
   content {
     content = <<-EOT
     acl {
@@ -352,14 +352,15 @@ data "ignition_file" "consul_config" {
     retry_join = [
       "consul.service.consul"
     ]
+    enable_local_script_checks = true
     EOT
   }
 }
 
 data "ignition_directory" "consul_data" {
   path = "/opt/consul"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1002
+  mode = 493  # oct 755 -> dec 493
+  uid  = 1001 # podmgr
 }
 
 data "ignition_systemd_unit" "consul" {
@@ -374,8 +375,8 @@ data "ignition_systemd_unit" "consul" {
     ConditionFileNotEmpty=/etc/consul.d/consul.hcl
 
     [Service]
-    User=consul
-    Group=consul
+    User=podmgr
+    Group=podmgr
     Type=notify
     ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/
     ExecReload=/bin/kill --signal HUP $MAINPID
@@ -390,7 +391,7 @@ data "ignition_systemd_unit" "consul" {
 }
 
 # generate podman container and related systemd config with quadlet
-data "ignition_file" "cockpit" {
+data "ignition_file" "cockpit_container" {
   path = "/etc/containers/systemd/cockpit-ws.container"
   mode = 420 # oct 644
   content {
