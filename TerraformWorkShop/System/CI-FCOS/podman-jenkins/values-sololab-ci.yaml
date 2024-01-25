@@ -1,10 +1,17 @@
 ## %%MAIN_CONTAINER/POD_DESCRIPTION%%
 ##
 controller:
+  image:
+    registry: docker.io
+    repository: jenkins/jenkins
+    tag: jdk17
   ## @param controller.additionalPlugins List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
-    - job-dsl:latest
-    - docker-workflow:latest
+    - docker-workflow:latest # aka: Docker Pipeline
+    - job-dsl:latest # aka: job dsl
+    - role-strategy:latest
+    - sshd:latest # aka: ssh server
+    - swarm:latest
   ## @param controller.provision initContainer settings for jenkins controller provision
   provision:
     ##
@@ -77,6 +84,7 @@ controller:
     traefik.http.routers.jenkins.entryPoints: websecure
     traefik.http.routers.jenkins.tls.certresolver: internal
     traefik.http.services.jenkins.loadbalancer.server.port: 8080
+    traefik.http.services.jenkins.loadbalancer.passhostheader: true
   ## @param controller.podAnnotations Annotations for jenkins pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##
