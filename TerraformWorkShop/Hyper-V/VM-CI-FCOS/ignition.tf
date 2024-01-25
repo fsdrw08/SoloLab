@@ -33,7 +33,7 @@ data "ignition_systemd_unit" "nfs_mount" {
   content = <<EOT
 [Unit]
 Description=Mount nfs share
-Before=local-fs.target
+# Before=local-fs.target
 After=network-online.target
 Requires=network-online.target
 
