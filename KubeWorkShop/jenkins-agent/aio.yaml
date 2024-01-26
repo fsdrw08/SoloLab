@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-agent-pvc
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+
+---
+# https://github.com/HariSekhon/Kubernetes-configs/blob/623d697ac7ece8436503b4e08e58b0d23f67a7ff/jenkins/base/jenkins-agent.statefulset-DooD.yaml#L150
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-agent
+  labels:
+    name: jenkins-agent
+spec:
+  # initContainers:
+  #   - name: getSecret
+  #     image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+  #     imagePullPolicy: IfNotPresent
+  #     command:
+  #       - sh
+  #     args:
+  #       - -c
+  #       # find latest version of the JENKINS_SECRET in GCP Secret Manager secret called 'jenkins-agent-N-token' and download it to /secrets/token to be picked up by the main jenkins-agent container
+  #       # Workload Identity - auth for this is done by linking k8s service account to external GCP service account which must be granted GCP IAM permission to read secrets from GCP Secret Manager
+  #       # this requires GCP jenkins-agent@$PROJECT_ID.iam.gserviceaccount.com (bound by jenkins-agent k8s serviceaccount above) to be granted IAM roles:
+  #       #
+  #       #   Secret Manager Secret Accessor
+  #       #   Secret Manager Secret Version Manager  # to list the latest secret version
+  #       #
+  #       - gcloud secrets versions access $(gcloud secrets versions list "${JENKINS_AGENT_NAME}-token" --filter='state=enabled' --format='value(name)' | sort -k1nr | head -n1) --secret="${JENKINS_AGENT_NAME}-token" > /secret/token
+  #     env:
+  #       - name: CLOUDSDK_CORE_PROJECT
+  #         # XXX: set PROJECT_ID to your GCP project containing your Secrets Manager secrets: jenkins-agent-N-token
+  #         value: PROJECT_ID
+  #       - name: JENKINS_AGENT_NAME
+  #         valueFrom:
+  #           fieldRef:
+  #             fieldPath: metadata.name
+  #     volumeMounts:
+  #       - name: secret
+  #         mountPath: /secret
+  #         readOnly: false
+
+  containers:
+    - name: jenkins-agent-inbound
+      image: docker.io/jenkins/inbound-agent:jdk17
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      # ports:
+      #   - name: agent
+      #     containerPort: 50001
+      # command:
+      #   # use shell in order to late eval contents of /secret/token into an arg
+      #   - sh
+      # args:
+      #   - -c
+      #   # not feeding as args that that behaviour is much more buggy and dependent on entrypoint positional arg parsing which doesn't work as documented
+      #   - "JENKINS_SECRET=$(cat /secret/token; rm -f /secret/token) jenkins-agent"
+      env:
+        - name: JENKINS_SECRET
+          value: 0e75231aeca3f8236edc245f656f1c0111d6ceca368630f2dcd77ccfa6b59bf1
+        # the name of the agent, it should match the name you specified when creating the agent on the controller
+        - name: JENKINS_AGENT_NAME
+          value: ctr-jnlp
+        - name: JENKINS_URL
+          value: http://jenkins:8080
+        - name: JENKINS_TUNNEL
+          value: jenkins:50000
+        - name: JENKINS_AGENT_WORKDIR
+          # XXX: this path should match the Jenkins Server "Remote root directory" config option
+          value: /home/jenkins/agent
+      volumeMounts:
+        - name: workspace
+          # XXX: this path should match the Jenkins Server "Remote root directory" config option
+          mountPath: /home/jenkins/agent
+          readOnly: false
+        # - name: secret
+        #   mountPath: /secret
+        #   readOnly: false
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+  volumes:
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: jenkins-agent-pvc
+    # - name: secret
+    #   emptyDir: {}
+    - name: docker-sock
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
