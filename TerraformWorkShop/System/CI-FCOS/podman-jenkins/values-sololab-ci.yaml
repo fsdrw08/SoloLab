@@ -7,11 +7,43 @@ controller:
     tag: jdk17
   ## @param controller.additionalPlugins List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
+    - docker-plugin:latest # aka: Docker Plugin
     - docker-workflow:latest # aka: Docker Pipeline
     - job-dsl:latest # aka: job dsl
     - role-strategy:latest
     - sshd:latest # aka: ssh server
     - swarm:latest
+    # dependency
+    - apache-httpcomponents-client-5-api:latest # aka: Apache HttpComponents Client 5.x API; need by: Docker plugin
+    - authentication-tokens:latest # aka: Authentication Tokens API Plugin; need by: Docker Commons Plugin
+    - commons-text-api:latest # aka: commons-text API Plugin; need by: Font Awesome API Plugin, Bootstrap 5 API Plugin, ...Configuration as Code plugin
+    - cloud-stats:latest # aka: Cloud Statistics Plugin; need by: Docker plugin
+    - credentials:latest # aka: Credentials Plugin; need by: many..
+    - credentials-binding:latest # aka: Credentials Binding Plugin; need by: Docker Commons Plugin, Pipeline: Declarative Extension Points API, Git plugin, Pipeline: Declarative
+    - cloudbees-folder:latest # need by docker pipeline, job dsl, pipeline: groovy libraries, branch api plugin, pipeline: multibranch
+    - display-url-api:latest
+    - docker-commons:latest # aka: Docker Commons Plugin; need by: Docker Pipeline, Docker Plugin
+    - instance-identity:latest # aka: Instance Identity; need by: many...
+    - mailer:latest # aka: Mailer Plugin; need by: Git plugin, Pipeline: Declarative, Pipeline: Basic Steps
+    - pipeline-build-step:latest # aka: Pipeline: Build Step, need by: Pipeline
+    - pipeline-input-step:latest # aka: Pipeline: Input Step; need by: Pipeline, Pipeline: Declarative
+    - pipeline-milestone-step:latest # aka: Pipeline: Milestone Step; need by: Pipeline
+    - pipeline-model-api:latest # aka: Pipeline: Model API; need by: Pipeline: Declarative Extension Points API, Pipeline: Declarative
+    - pipeline-model-definition:latest # aka: Pipeline: Declarative; need by Docker Pipeline, pipeline
+    - pipeline-model-extensions:latest # aka: Pipeline: Declarative Extension Points API; need by: pipeline: declarative
+    - pipeline-stage-step:latest # aka: Pipeline: Stage Step; need by: Pipeline: Declarative Extension Points API, Pipeline, Pipeline: Declarative
+    - script-security:latest # aka: Script Security Plugin; need by: pipeline related, git related
+    - scm-api # aka: SCM API Plugin; need by: many...
+    - ssh-slaves:latest # aka: SSH Build Agents plugin; need by: Docker Plugin
+    - ssh-credentials:latest # aka: SSH Credentials Plugin; need by: Credentials Binding Plugin, Git plugin, Git client plugin
+    - token-macro:latest # aka: Token Macro Plugin; need by: Docker Plugin
+    - workflow-api:latest # aka: Pipeline: API; need by: many...
+    - workflow-basic-steps:latest # aka: Pipeline: Basic Steps, need by: Docker Pipeline, Pipeline, Pipeline: Declarative
+    - workflow-cps:latest # aka: Pipeline: Groovy; need by: many...
+    - workflow-durable-task-step:latest # aka: Pipeline: Nodes and Processes; need by: pipeline related
+    - workflow-job:latest #aka: Pipeline: Job; need by: pipeline related
+    - workflow-multibranch:latest # aka: Pipeline: Multibranch; need by: pipeline related
+    - workflow-scm-step:latest # aka: Pipeline: SCM Step; need by: pipeline related
   ## @param controller.provision initContainer settings for jenkins controller provision
   provision:
     ##
@@ -67,14 +99,14 @@ controller:
       value: "http://192.168.255.1:7890"
     - name: no_proxy
       value: "localhost"
-  # extraVolumes:
-  #   - name: docker-socket
-  #     hostPath:
-  #       path: /run/user/1001/podman/podman.sock
-  #       type: Socket
-  # extraVolumeMounts:
-  #   - name: docker-socket
-  #     mountPath: "/var/run/docker.sock:Z"
+  extraVolumes:
+    - name: docker-socket
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock"
   ## @param controller.podLabels Extra labels for jenkins pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
@@ -104,6 +136,48 @@ controller:
     ## @param JCasC.enabled Enable configuration as code.
     ##
     enabled: true
+    ## @param JCasC.default default config content for configuration as code
+    default:
+      jenkins:
+        ## @param controller.JCasC.default.jenkins.authorizationStrategy Jenkins Config as Code for Authorization Strategy
+        authorizationStrategy:
+          roleBased:
+            roles:
+              global:
+                - name: "admin"
+                  description: "Jenkins administrators"
+                  permissions:
+                    - "Overall/Administer"
+                  entries:
+                    - user: "admin"
+                - name: "agent"
+                  description: "Jenkins agent manager"
+                  permissions:
+                    - "Agent/Provision"
+                    - "Agent/Create"
+                    - "Agent/Configure"
+                    - "Agent/Build"
+                    - "Agent/Connect"
+                    - "Agent/Delete"
+                    - "Agent/Disconnect"
+                  entries:
+                    - user: "agent"
+                  pattern: ".*"
+                - name: "readonly"
+                  description: "Read-only users"
+                  permissions:
+                    - "Overall/Read"
+                    - "Job/Read"
+                  entries:
+                    - user: "authenticated"
+        securityRealm:
+          local:
+            users:
+              - id: "${jenkins-admin-user}"
+                name: "Jenkins Admin"
+                password: "${jenkins-admin-password}"
+              - id: "agent"
+                password: "agent"
     ## @param configAsCode.extraConfigFiles List of additional configuration-as-code files to be mounted
     ## E.g.:
     ##  welcome-message.yaml: |-
@@ -119,6 +193,20 @@ controller:
         jenkins:
           slaveAgentPort: 50000
 
+      nodes.yaml: |-
+        jenkins:
+          nodes:
+            - permanent:
+                name: "ctr-jnlp"
+                labelString: "ctr-jnlp"
+                launcher: "inbound"
+                remoteFS: "/home/jenkins/agent"
+                retentionStrategy: "always"
+          nodeMonitors:
+            - tmpSpace:
+                freeSpaceThreshold: "500MB"
+                ignored: true
+
       # https://github.com/Zsomx/devops-course-szte/blob/c04caad7793f4899f8ea7614ed191de831ef03d3/jenkins/docker/config/docker.yml#L46
       # https://github.com/jenkinsci/docker-plugin/issues/1032
       # docker.yaml: |-
@@ -130,7 +218,7 @@ controller:
       #             dockerHost:
       #               uri: "unix:///var/run/docker.sock"
       #           templates:
-      #             - labelString: "docker-agent"
+      #             - labelString: "self-docker-agent"
       #               connector:
       #                 jnlp:
       #                   jenkinsUrl: "http://jenkins:8080/"
@@ -151,6 +239,8 @@ controller:
       #                   - "type=tmpfs,destination=/run"
       #                   - "type=bind,source=/run/user/1001/podman/podman.sock,destination=/var/run/docker.sock"
       #                   - "type=volume,src=jenkins-workspace,dst=/home/jenkins"
+      #                 securityOpts:
+      #                   - "label=disable"
       #                 user: "root"
       #               pullStrategy: PULL_NEVER
       #               remoteFs: "/home/jenkins"
@@ -158,86 +248,87 @@ controller:
       #               retentionStrategy:
       #                 idleMinutes: 1
 
-      # job-dsl.yaml: |-
-      #   jobs:
-      #     - script: |
-      #         pipelineJob('test'){
-      #           definition{
-      #             cpsScm{
-      #               scm{
-      #                 git{
-      #                   remote {
-      #                     url('https://github.com/fsdrw08/packto-samples.git')
-      #                   }
-      #                   branches("refs/heads/main")
-      #                   extensions {
-      #                     cloneOptions {
-      #                       depth(1)
-      #                       shallow(true)
-      #                     }
-      #                   }
-      #                 }
-      #                 scriptPath('java/maven/Jenkinsfile')
-      #               }
-      #             }
-      #           }
-      #         }
+      job-dsl.yaml: |-
+        jobs:
+          - script: |
+              pipelineJob('test'){
+                definition{
+                  cpsScm{
+                    scm{
+                      git{
+                        remote {
+                          url('https://github.com/fsdrw08/packto-samples.git')
+                        }
+                        branches("refs/heads/main")
+                        extensions {
+                          cloneOptions {
+                            depth(1)
+                            shallow(true)
+                          }
+                        }
+                      }
+                      scriptPath('java/maven/Jenkinsfile')
+                    }
+                  }
+                }
+              }
 
-      #     - script: |
-      #         pipelineJob('test2') {
-      #           definition {
-      #             cps {
-      #               sandbox()
-      #               script("""\
-      #         pipeline {
-      #           agent {
-      #             label "dev-docker-agent"
-      #           }
-      #           stages {
-      #             stage("checkout") {
-      #               // https://www.jenkins.io/doc/pipeline/steps/
-      #               steps {
-      #                 // https://plugins.jenkins.io/git/
-      #                 // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
-      #                 // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
-      #                 // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
-      #                 checkout scmGit(
-      #                   userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
-      #                   branches: [[name:'*/main']],
-      #                   extensions: [cloneOption(depth: 1, shallow: true)]
-      #                 )
-      #                 sh 'pwd'
-      #               }
-      #             }
-      #             stage("build") {
-      #               steps {
-      #                 // https://buildpacks.io/docs/tools/pack/cli/pack_build/
-      #                 script {
-      #                   sh '''
-      #                     docker run \
-      #                       --rm \
-      #                       --tmpfs /tmp:rw \
-      #                       --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock \
-      #                       --volume jenkins-workspace:/workspace:rw \
-      #                       --workdir /workspace \
-      #                       --env HOME="/workspace" \
-      #                       docker.io/buildpacksio/pack:latest build \
-      #                         --trust-builder \
-      #                         --docker-host unix:///run/user/1001/podman/podman.sock \
-      #                         paketo-demo-app \
-      #                         --path ./workspace/test2/java/maven/ \
-      #                         --builder docker.io/paketobuildpacks/builder:base \
-      #                         --buildpack docker.io/paketobuildpacks/java-azure:10
-      #                   '''
-      #                 }
-      #               }
-      #             }
-      #           }
-      #         }
-      #               """)
-      #             }
-      #           }
-      #         }
+          - script: |
+              pipelineJob('test2') {
+                definition {
+                  cps {
+                    sandbox()
+                    script("""\
+              pipeline {
+                agent {
+                  label "self-docker-agent"
+                }
+                stages {
+                  stage("checkout") {
+                    // https://www.jenkins.io/doc/pipeline/steps/
+                    steps {
+                      // https://plugins.jenkins.io/git/
+                      // https://www.jenkins.io/doc/pipeline/steps/params/scmgit/
+                      // https://github.com/pplmx/LearningDocker/blob/0b40004e2a1f77b2a1566537273057870fe7f5d1/compose/jenkins/Pipeline_Sonar.groovy#L11
+                      // https://github.com/easysoft/zentaopms/blob/8272c6cc90a2074cf80f117700a68fa14df3b395/misc/ci/Jenkinsfile.devops#L72
+                      checkout scmGit(
+                        userRemoteConfigs: [[url: 'https://github.com/fsdrw08/packto-samples.git']],
+                        branches: [[name:'*/main']],
+                        extensions: [cloneOption(depth: 1, shallow: true)]
+                      )
+                      sh 'pwd'
+                    }
+                  }
+                  stage("build") {
+                    steps {
+                      // https://buildpacks.io/docs/tools/pack/cli/pack_build/
+                      script {
+                        sh '''
+                          docker run \
+                            --security-opt label=disable \
+                            --rm \
+                            --tmpfs /tmp:rw \
+                            --volume /run/user/1001/podman/podman.sock:/var/run/docker.sock:Z \
+                            --volume jenkins-workspace:/workspace:rw \
+                            --workdir /workspace \
+                            --env HOME="/workspace" \
+                            docker.io/buildpacksio/pack:latest build \
+                              --trust-builder \
+                              --docker-host unix:///run/user/1001/podman/podman.sock \
+                              paketo-demo-app \
+                              --path ./workspace/test2/java/maven/ \
+                              --builder docker.io/paketobuildpacks/builder:base \
+                              --buildpack docker.io/paketobuildpacks/java-azure:10
+                        '''
+                      }
+                    }
+                  }
+                }
+              }
+                    """)
+                  }
+                }
+              }
 
 persistence:
   ## @param persistence.enabled Enable persistence using Persistent Volume Claims
