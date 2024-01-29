@@ -23,7 +23,7 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  # $template_file = "$PSScriptRoot\tmpl-hv_g2-centos.pkr.hcl"
+  $template_file = "$PSScriptRoot\tmpl-hv_g2-centos.pkr.hcl"
   $var_file = "$PSScriptRoot\vars-centos-$CentOSVersion.pkrvars.hcl"
   $machine = "CentOS $CentOSVersion"
   $packer_log = 0
