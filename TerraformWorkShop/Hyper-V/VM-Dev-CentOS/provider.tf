@@ -2,16 +2,22 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.0.4"
+      version = ">=1.1.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = ">=3.2.1"
+      version = ">=3.2.2"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = ">=2.4.1"
     }
   }
+
+  # https://ruben-rodriguez.github.io/posts/minio-s3-terraform-backend/
   backend "s3" {
     bucket = "tfstate"               # Name of the S3 bucket
-    key    = "Hyper-V/Dev-Fedora-VM" # Name of the tfstate file
+    key    = "Hyper-V/Dev-CentOS-VM" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio.service.consul" # Minio endpoint

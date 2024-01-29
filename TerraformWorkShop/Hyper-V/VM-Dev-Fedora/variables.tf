@@ -3,6 +3,11 @@ variable "hyperv_host" {
   default = "127.0.0.1"
 }
 
+variable "hyperv_port" {
+  type    = string
+  default = 5986
+}
+
 variable "hyperv_user" {
   type = string
 }
