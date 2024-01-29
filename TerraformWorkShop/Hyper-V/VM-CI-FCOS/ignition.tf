@@ -120,21 +120,21 @@ data "ignition_directory" "user_home" {
 
 data "ignition_directory" "user_XDG_CONFIG_HOME" {
   path = "/home/podmgr/.config"
-  mode = 493 # oct 755 -> dec 493
+  mode = 448 # oct 755 -> dec 493; oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }
 
 data "ignition_directory" "user_XDG_CONFIG_HOME_systemd" {
   path = "/home/podmgr/.config/systemd"
-  mode = 493 # oct 755 -> dec 493
+  mode = 448 # oct 755 -> dec 493; oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }
 
 data "ignition_directory" "user_XDG_CONFIG_HOME_systemd_user" {
   path = "/home/podmgr/.config/systemd/user"
-  mode = 493 # oct 755 -> dec 493
+  mode = 448 # oct 755 -> dec 493; oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }
@@ -143,7 +143,7 @@ data "ignition_directory" "user_XDG_CONFIG_HOME_systemd_user" {
 # https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
 data "ignition_directory" "user_XDG_CONFIG_HOME_systemd_user_defaultTargetWants" {
   path = "/home/podmgr/.config/systemd/user/default.target.wants"
-  mode = 493 # oct 755 -> dec 493
+  mode = 448 # oct 755 -> dec 493; oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }
@@ -296,7 +296,7 @@ data "ignition_file" "sysctl_unprivileged_port" {
 # https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
 data "ignition_directory" "user_XDG_CONFIG_HOME_containers" {
   path = "/home/podmgr/.config/containers"
-  mode = 493 # oct 755 -> dec 493
+  mode = 448 # oct 755 -> dec 493; oct 700 -> dec 448
   uid  = 1001
   gid  = 1001
 }

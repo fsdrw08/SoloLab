@@ -18,7 +18,9 @@ sudo find / -name cacerts
 cp /etc/pki/ca-trust/extracted/java/cacerts ~/cacerts-consul
 
 # add self sign cert to the backup cacerts
-sudo keytool -import -alias consul -keystore ~/cacerts-consul -file ~/root_ca.pem -storepass changeit -noprompt
+# https://stackoverflow.com/questions/2138940/import-pem-into-java-key-store
+# https://backstage.forgerock.com/knowledge/kb/article/a94909995
+sudo keytool -import -file ~/root_ca.pem -alias consul -keystore ~/cacerts-consul -storepass changeit -noprompt
 
 # run jenkins swarm
 java -Djavax.net.ssl.trustStore=/home/vagrant/cacerts-consul \
