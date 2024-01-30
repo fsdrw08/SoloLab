@@ -25,3 +25,9 @@ variable "source_disk" {
   type    = string
   default = null
 }
+
+variable "cloudinit" {
+  type = object({
+    meta_data = 
+  })
+}
