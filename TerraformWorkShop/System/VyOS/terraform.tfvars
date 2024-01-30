@@ -115,7 +115,7 @@ stepca = {
     file_source = "./step-ca/entrypoint.sh"
   }
   service = {
-    status  = "stopped"
+    status  = "started"
     enabled = true
     systemd = {
       file_source = "./step-ca/step-ca.service"
@@ -283,4 +283,73 @@ minio_certs = {
   dir            = "/opt/minio_certs"
   CAs_dir_link   = "/opt/minio_certs/CAs"
   CAs_dir_target = "/etc/step-ca/certs"
+}
+
+sws = {
+  install = {
+    tar_file_source   = "https://github.com/static-web-server/static-web-server/releases/download/v2.25.0/static-web-server-v2.25.0-x86_64-unknown-linux-gnu.tar.gz"
+    tar_file_path     = "/home/vyos/static-web-server-v2.25.0-x86_64-unknown-linux-gnu.tar.gz"
+    tar_file_bin_path = "static-web-server-v2.25.0-x86_64-unknown-linux-gnu/static-web-server"
+    bin_file_dir      = "/usr/local/bin"
+  }
+  storage = {
+    dir_target = "/mnt/data/sws"
+  }
+  config = {
+    file_source = "./sws/static-web-server.toml"
+    vars = {
+      SERVER_ROOT                    = "/mnt/data/sws"
+      SERVER_LOG_LEVEL               = "warn"
+      SERVER_DIRECTORY_LISTING       = "true"
+      SERVER_DIRECTORY_LISTING_ORDER = "0"
+      VIRTUAL_HOST                   = "sws.service.consul"
+      VIRTUAL_HOST_ROOT              = "/mnt/data/sws/bin"
+    }
+    file_path_dir = "/etc/static-web-server"
+  }
+  runas = {
+    user  = "vyos"
+    group = "users"
+  }
+  service = {
+    sws = {
+      status  = "started"
+      enabled = true
+      systemd_unit_service = {
+        file_source = "./sws/static-web-server.service"
+        vars = {
+          user               = "vyos"
+          group              = "users"
+          SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server.toml"
+        }
+        file_path = "/etc/systemd/system/static-web-server.service"
+      }
+      systemd_unit_socket = {
+        file_source = "./sws/static-web-server.socket"
+        vars = {
+          ListenStream = "127.0.0.1:80"
+        }
+        file_path = "/etc/systemd/system/static-web-server.socket"
+      }
+    }
+    sws_restart = {
+      status  = "started"
+      enabled = true
+      systemd_unit_service = {
+        file_source = "./sws/static-web-server_restart.service"
+        vars = {
+          SERVER_CONFIG_FILE  = "/etc/static-web-server/static-web-server.toml"
+          TARGET_SERVICE_NAME = "static-web-server.service"
+        }
+        file_path = "/etc/systemd/system/static-web-server_restart.service"
+      }
+      systemd_unit_path = {
+        file_source = "./SWS/static-web-server_restart.path"
+        vars = {
+          SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server.toml"
+        }
+        file_path = "/etc/systemd/system/static-web-server_restart.path"
+      }
+    }
+  }
 }

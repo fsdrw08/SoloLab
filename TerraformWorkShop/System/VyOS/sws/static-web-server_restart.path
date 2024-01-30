@@ -1,0 +1,11 @@
+# ref: https://superuser.com/questions/1171751/restart-systemd-service-automatically-whenever-a-directory-changes-any-file-ins#1276457
+
+[Unit]
+Description="Restart SWS service when static config modified"
+Documentation=https://https://static-web-server.net/
+
+[Path]
+PathModified=${SERVER_CONFIG_FILE}
+
+[Install]
+WantedBy=multi-user.target

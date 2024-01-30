@@ -223,3 +223,56 @@ variable "minio_certs" {
     CAs_dir_target = string
   })
 }
+
+variable "sws" {
+  type = object({
+    install = object({
+      tar_file_source   = string
+      tar_file_path     = string
+      tar_file_bin_path = string
+      bin_file_dir      = string
+    })
+    storage = object({
+      dir_target = string
+    })
+    config = object({
+      file_source   = string
+      vars          = map(string)
+      file_path_dir = string
+    })
+    runas = object({
+      user  = string
+      group = string
+    })
+    service = object({
+      sws_restart = object({
+        status  = string
+        enabled = bool
+        systemd_unit_service = object({
+          file_source = string
+          vars        = map(string)
+          file_path   = string
+        })
+        systemd_unit_path = object({
+          file_source = string
+          vars        = map(string)
+          file_path   = string
+        })
+      })
+      sws = object({
+        status  = string
+        enabled = bool
+        systemd_unit_service = object({
+          file_source = string
+          vars        = map(string)
+          file_path   = string
+        })
+        systemd_unit_socket = object({
+          file_source = string
+          vars        = map(string)
+          file_path   = string
+        })
+      })
+    })
+  })
+}
