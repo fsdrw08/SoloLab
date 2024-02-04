@@ -4,5 +4,6 @@ terraform.tfstate*
 *.key
 *.crt
 *.iso
+*.zip
 venv
 terraform.d

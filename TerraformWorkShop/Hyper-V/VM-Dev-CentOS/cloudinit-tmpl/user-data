@@ -8,6 +8,10 @@ bootcmd:
 
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
 write_files:
+  - path: /etc/pki/ca-trust/source/anchors/sololab.pem
+    owner: root:root
+    content: |
+      ${indent(6, ca_cert)}
   # Set-CgroupConfig
   # https://github.com/containers/podman/blob/main/troubleshooting.md#26-running-containers-with-resource-limits-fails-with-a-permissions-error
   - path: /etc/systemd/system/user@1001.service.d/ansible-podman-rootless-provision.conf
@@ -25,18 +29,17 @@ write_files:
       net.ipv4.ping_group_range=0 2000000
       net.ipv4.ip_unprivileged_port_start=53
   # Set-ConsulService
-  - path: /etc/systemd/system/consul.service
+  - path: /home/podmgr/.config/systemd/user/consul.service
     content: |
       [Unit]
       Description="HashiCorp Consul - A service mesh solution"
       Documentation=https://www.consul.io/
       Requires=network-online.target
       After=network-online.target
+      AssertPathExists=/usr/local/bin/consul
       ConditionFileNotEmpty=/home/podmgr/consul.d/consul.hcl
 
       [Service]
-      User=podmgr
-      Group=podmgr
       Type=notify
       ExecStart=/usr/local/bin/consul agent -config-dir=/home/podmgr/consul.d/
       ExecReload=/bin/kill --signal HUP $MAINPID
@@ -67,29 +70,29 @@ write_files:
         "consul.service.consul"
       ]
       enable_local_script_checks = true
-  # Set-JenkinsSwarmService
-  - path: /home/podmgr/Trust-SelfSignCA.sh
-    defer: true
-    owner: podmgr:podmgr
-    content: |
-      #!/usr/bin/bash
-      openssl s_client -showcerts -connect jenkins.service.consul:443 2>&- | \
-      tac | \
-      sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | \
-      tac > /home/podmgr/root_ca.pem
-      chmod 600 /home/podmgr/root_ca.pem && chown podmgr:podmgr /home/podmgr/root_ca.pem
+  # # Set-JenkinsSwarmService
+  # - path: /home/podmgr/Trust-SelfSignCA.sh
+  #   defer: true
+  #   owner: podmgr:podmgr
+  #   content: |
+  #     #!/usr/bin/bash
+  #     openssl s_client -showcerts -connect jenkins.service.consul:443 2>&- | \
+  #     tac | \
+  #     sed -n '/-----END CERTIFICATE-----/,/-----BEGIN CERTIFICATE-----/p; /-----BEGIN CERTIFICATE-----/q' | \
+  #     tac > /home/podmgr/root_ca.pem
+  #     chmod 600 /home/podmgr/root_ca.pem && chown podmgr:podmgr /home/podmgr/root_ca.pem
 
-      # copy to home dir
-      if [[ -f /home/podmgr/cacerts ]]; then
-        rm -f /home/podmgr/cacerts
-      fi
-      cp /etc/pki/ca-trust/extracted/java/cacerts /home/podmgr/cacerts 
-      chmod 600 /home/podmgr/cacerts && chown podmgr:podmgr /home/podmgr/cacerts
+  #     # copy to home dir
+  #     if [[ -f /home/podmgr/cacerts ]]; then
+  #       rm -f /home/podmgr/cacerts
+  #     fi
+  #     cp /etc/pki/ca-trust/extracted/java/cacerts /home/podmgr/cacerts
+  #     chmod 600 /home/podmgr/cacerts && chown podmgr:podmgr /home/podmgr/cacerts
 
-      # add self sign cert to the backup cacerts
-      # https://stackoverflow.com/questions/2138940/import-pem-into-java-key-store
-      # https://backstage.forgerock.com/knowledge/kb/article/a94909995
-      keytool -import -file /home/podmgr/root_ca.pem -alias consul -keystore /home/podmgr/cacerts -storepass changeit -noprompt
+  #     # add self sign cert to the backup cacerts
+  #     # https://stackoverflow.com/questions/2138940/import-pem-into-java-key-store
+  #     # https://backstage.forgerock.com/knowledge/kb/article/a94909995
+  #     keytool -import -file /home/podmgr/root_ca.pem -alias consul -keystore /home/podmgr/cacerts -storepass changeit -noprompt
   # https://github.com/yunionio/ansible-role-jenkins-slave/blob/68ea66a6bf59e8d9589ed334e26dc399efceb330/tasks/main.yml#L23
   - path: /home/podmgr/.config/systemd/user/jenkins-swarm.service
     defer: true
@@ -98,7 +101,6 @@ write_files:
       [Unit]
       Description=Jenkins swarm client
       After=network.target
-      AssertPathExists=/home/podmgr/cacerts
       AssertPathExists=/home/podmgr/swarm-client.jar
 
       [Service]
@@ -138,10 +140,6 @@ write_files:
           }
         ]
       }
-
-ca_certs:
-  trusted:
-    - ${ca_cert}
 
 # https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
@@ -215,6 +213,7 @@ package_upgrade: true
 package_reboot_if_required: true
 packages:
   - nfs-utils
+  - bash-completion
   - git
   - acl
   - python3-pip
@@ -229,15 +228,16 @@ timezone: Asia/Shanghai
 
 # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
 runcmd:
+  - update-ca-trust
   - chmod -R 700 /home/podmgr && chown -R podmgr:podmgr /home/podmgr
   # - systemctl start mnt-data.mount
   # - cp /mnt/data/bin/consul /usr/local/bin/consul
-  - cd /usr/local/bin/; /usr/bin/curl -O -k https://sws.service.consul/consul"
+  - cd /usr/local/bin/; /usr/bin/curl -O -k https://sws.service.consul/consul
   - chmod 755 /usr/local/bin/consul
   - systemctl enable --now consul.service
   # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user; /usr/bin/systemctl enable --now consul.service --user"
   - /usr/bin/systemctl enable --user --machine=podmgr@.host --now podman.socket
-  - /usr/bin/systemctl enable --now consul.service"
+  - /usr/bin/systemctl enable --now consul.service
   # - bash /home/podmgr/Trust-SelfSignCA.sh
   - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); cd /home/podmgr/;/usr/bin/curl -O -k https://jenkins.service.consul/swarm/swarm-client.jar"
   # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now jenkins-swarm.service --user"

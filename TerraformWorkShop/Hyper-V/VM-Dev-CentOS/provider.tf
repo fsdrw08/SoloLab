@@ -2,7 +2,7 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.1.0"
+      version = "1.1.0"
     }
     null = {
       source  = "hashicorp/null"
@@ -11,6 +11,10 @@ terraform {
     local = {
       source  = "hashicorp/local"
       version = ">=2.4.1"
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">=2.4.2"
     }
   }
 
@@ -38,10 +42,10 @@ terraform {
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.hyperv_user
-  password = var.hyperv_password
-  host     = var.hyperv_host
-  port     = var.hyperv_port
+  host     = var.hyperv.host
+  port     = var.hyperv.port
+  user     = var.hyperv.user
+  password = var.hyperv.password
   https    = true
   insecure = true
   use_ntlm = true

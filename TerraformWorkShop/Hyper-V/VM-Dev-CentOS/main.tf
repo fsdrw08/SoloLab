@@ -1,7 +1,15 @@
 locals {
   vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  vm_name = var.vm_name
-  count   = "1"
+  count   = var.vm_count <= 1 ? "" : var.vm_count
+  boot_disk_path = join("\\", [
+    var.vhd_dir,
+    var.vm_name,
+    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+  vars = {
+    null = null
+  }
 }
 
 data "tls_certificate" "rootCA" {
@@ -9,58 +17,110 @@ data "tls_certificate" "rootCA" {
   verify_chain = false
 }
 
+# create zip for iso
+data "archive_file" "cloudinit" {
+  count       = var.vm_count
+  type        = "zip"
+  output_path = "./${var.vm_name}${local.count}.zip"
+  source {
+    content = templatefile(var.cloudinit.meta_data.file_source, merge(local.vars, var.cloudinit.meta_data.vars,
+      {
+        count = local.count
+      }
+    ))
+    filename = "meta-data"
+  }
+  source {
+    content = templatefile(var.cloudinit.user_data.file_source, merge(local.vars, var.cloudinit.user_data.vars,
+      {
+        ca_cert = data.tls_certificate.rootCA.certificates[0].cert_pem
+      },
+      )
+    )
+    filename = "user-data"
+  }
+  source {
+    content = templatefile(var.cloudinit.network_config.file_source, merge(local.vars, var.cloudinit.network_config.vars,
+      {
+        ip_addrs = slice(
+          var.cloudinit.network_config.vars.ip_addr_list,
+          count.index * var.cloudinit.network_config.vars.ip_count[0],
+          (count.index + 1) * var.cloudinit.network_config.vars.ip_count[0]
+        )
+      },
+      )
+    )
+    filename = "network-config"
+  }
+}
+
+# only availble in v1.2.0, but v1.2.0 has a bug that not abel to create vhd
+# resource "hyperv_iso_image" "cloudinit" {
+#   count                     = var.vm_count
+#   volume_name               = "CIDATA"
+#   source_zip_file_path      = data.archive_file.cloudinit[count.index].output_path
+#   source_zip_file_path_hash = data.archive_file.cloudinit[count.index].output_sha
+#   iso_file_system_type      = "iso9660|joliet"
+#   destination_iso_file_path = join("/", [
+#     var.vhd_dir,
+#     "${var.vm_name}${local.count}\\cloudinit.iso"
+#     ]
+#   )
+# }
+
 module "cloudinit_nocloud_iso" {
-  depends_on = [data.tls_certificate.rootCA]
-  source     = "../modules/cloudinit_nocloud_iso2"
-  count      = local.count
+  source = "../modules/cloudinit_nocloud_iso2"
+  count  = var.vm_count
   cloudinit_config = {
-    isoName = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
-    # https://cloudinit.readthedocs.io/en/latest/reference/datasources/nocloud.html
+    isoName = var.vm_count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
     part = [
       {
+        content = templatefile(var.cloudinit.meta_data.file_source, merge(local.vars, var.cloudinit.meta_data.vars,
+          {
+            count = local.count
+          }
+        ))
         filename = "meta-data"
-        content  = <<-EOT
-        instance-id: iid-dev-CentOS_202401
-        local-hostname: Dev-CentOS
-        EOT
       },
       {
+        content = templatefile(var.cloudinit.user_data.file_source, merge(local.vars, var.cloudinit.user_data.vars,
+          {
+            ca_cert = data.tls_certificate.rootCA.certificates[0].cert_pem
+          },
+          )
+        )
         filename = "user-data"
-        content  = templatefile()
       },
       {
+        content = templatefile(var.cloudinit.network_config.file_source, merge(local.vars, var.cloudinit.network_config.vars,
+          {
+            ip_addrs = slice(
+              var.cloudinit.network_config.vars.ip_addr_list,
+              count.index * var.cloudinit.network_config.vars.ip_count[0],
+              (count.index + 1) * var.cloudinit.network_config.vars.ip_count[0]
+            )
+          },
+          )
+        )
         filename = "network-config"
-        # https://cloudinit.readthedocs.io/en/latest/reference/network-config.html#network-configuration-outputs
-        content = <<-EOT
-        version: 2
-        ethernets:
-          eth0:
-            dhcp4: false
-            addresses:
-              - 192.168.255.1${count.index + 2}/255.255.255.0
-            gateway4: 192.168.255.1
-            nameservers:
-              addresses: 192.168.255.1
-        EOT
       }
     ]
   }
 }
 
-
 resource "null_resource" "remote" {
   depends_on = [module.cloudinit_nocloud_iso]
-  count      = local.count
+  count      = var.vm_count
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
     vhd_dir       = local.vhd_dir
-    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
+    vm_name       = var.vm_count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     isoName  = module.cloudinit_nocloud_iso[count.index].isoName
-    host     = var.hyperv_host
-    user     = var.hyperv_user
-    password = sensitive(var.hyperv_password)
+    host     = var.hyperv.host
+    user     = var.hyperv.user
+    password = sensitive(var.hyperv.password)
   }
 
   connection {
@@ -90,36 +150,51 @@ resource "null_resource" "remote" {
   }
 }
 
-resource "hyperv_vhd" "boot_disk" {
-  path = join("\\", [
-    local.vhd_dir,
-    var.vm_name,
-    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
-    ]
-  )
-  source = var.source_disk
-}
-
 module "hyperv_machine_instance" {
-  source     = "../modules/hyperv_instance"
+  source = "../modules/hyperv_instance2"
+  # depends_on = [hyperv_iso_image.cloudinit]
   depends_on = [null_resource.remote]
-  count      = local.count
+  count      = var.vm_count
+
+  boot_disk = {
+    path = join("\\", [
+      var.vhd_dir,
+      "${var.vm_name}${local.count}",
+      join("", ["${var.vm_name}", ".vhdx"])
+      ]
+    )
+    source = var.source_disk
+  }
+
+  boot_disk_drive = [
+    {
+      controller_type     = "Scsi"
+      controller_number   = "0"
+      controller_location = "0"
+      path = join("\\", [
+        var.vhd_dir,
+        "${var.vm_name}${local.count}",
+        join("", ["${var.vm_name}", ".vhdx"])
+        ]
+      )
+    }
+  ]
 
   vm_instance = {
-    name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
+    name                 = "${var.vm_name}${local.count}",
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
-    memory_maximum_bytes = 8191475712
-    memory_minimum_bytes = 2147483648
-    memory_startup_bytes = 2147483648
+    memory_maximum_bytes = var.memory_maximum_bytes
+    memory_minimum_bytes = var.memory_minimum_bytes
+    memory_startup_bytes = var.memory_startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Off"
+    state                = "Running"
 
     vm_firmware = {
       console_mode                    = "Default"
-      enable_secure_boot              = "On"
+      enable_secure_boot              = var.enable_secure_boot
       secure_boot_template            = "MicrosoftUEFICertificateAuthority"
       pause_after_boot_failure        = "Off"
       preferred_network_boot_protocol = "IPv4"
@@ -154,18 +229,14 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    network_adaptors = [
-      {
-        name        = "Internal Switch"
-        switch_name = "Internal Switch"
-      }
-    ]
+    network_adaptors = var.network_adaptors
 
     dvd_drives = [
       {
         controller_number   = 0
         controller_location = 1
-        path = local.count <= 1 ? join("\\", [
+        # path                = "${hyperv_iso_image.cloudinit[count.index].resolve_destination_iso_file_path}"
+        path = var.vm_count <= 1 ? join("\\", [
           "${local.vhd_dir}",
           "${var.vm_name}",
           "${module.cloudinit_nocloud_iso[count.index].isoName}"
@@ -177,13 +248,5 @@ module "hyperv_machine_instance" {
       }
     ]
 
-    hard_disk_drives = [
-      {
-        controller_type     = "Scsi"
-        controller_number   = "0"
-        controller_location = "0"
-        path                = hyperv_vhd.boot_disk.path
-      },
-    ]
   }
 }

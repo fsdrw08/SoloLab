@@ -1,13 +1,13 @@
-# version: 2
-# ethernets:
-#   eth0:
-#     dhcp4: true
-
 version: 2
 ethernets:
   eth0:
-    addresses:
-      - 192.168.255.12/255.255.255.0
-    gateway4: 192.168.255.1
+    addresses: 
+%{ for addr in ip_addrs ~}
+      - ${addr}
+%{ endfor ~}
+    gateway4: ${gateway4[0]}
     nameservers:
-      addresses: 192.168.255.1
+      addresses: 
+%{ for nameserver in nameservers ~}
+        - ${nameserver}
+%{ endfor ~}
