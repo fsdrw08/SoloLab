@@ -3,9 +3,9 @@
 // iso_checksum=https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/iso/CentOS-Stream-9-latest-x86_64-boot.iso.SHA256SUM
 // iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-latest-x86_64-dvd1.iso"
 // iso_checksum="a8b4ae4aa0edcd911aa35205f27a4592d361f771d8e68cad34664b15612fb396"
-iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-20240122.0-x86_64-boot.iso"
+iso_url="C:/Users/Public/Downloads/ISO/CentOS-Stream-9-20240129.0-x86_64-boot.iso"
 iso_checksum_type="sha256"
-iso_checksum="A8C3C96C541D1297D3DD6295E0A1E9BDB1DBE9F4C08F216D45C547B5DE6390EA"
+iso_checksum="cff811102e6a84a71cffabc020348eede7339529626d6c1d2c0f1670a3d46b7a"
 vm_name="packer-centos-stream-9-g2"
 configuration_version="11.0"
 disk_size="70000"
