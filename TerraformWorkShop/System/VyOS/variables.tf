@@ -36,6 +36,24 @@ variable "root_ca" {
   })
 }
 
+variable "certs" {
+  type = list(object({
+    name = string
+    key = object({
+      algorithm   = string
+      ecdsa_curve = optional(string, null)
+      rsa_bits    = optional(string, null)
+    })
+    cert = object({
+      dns_names             = list(string)
+      subject               = map(string)
+      validity_period_hours = number
+      allowed_uses          = list(string)
+      dir                   = string
+    })
+  }))
+}
+
 variable "consul" {
   type = object({
     install = object({

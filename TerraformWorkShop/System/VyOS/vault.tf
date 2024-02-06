@@ -70,36 +70,3 @@ resource "system_link" "vault_data" {
     ]
   }
 }
-
-resource "tls_cert_request" "vault" {
-  private_key_pem = tls_private_key.root.private_key_pem
-
-  dns_names = [
-    "vault.service.consul",
-  ]
-
-  subject {
-    common_name  = "vault.service.consul"
-    organization = "Sololab"
-  }
-}
-
-resource "tls_locally_signed_cert" "vault" {
-  cert_request_pem   = tls_cert_request.vault.cert_request_pem
-  ca_private_key_pem = tls_private_key.root.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.root.cert_pem
-
-  validity_period_hours = (5 * 365 * 24) # 5 years
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-  ]
-}
-
-resource "system_file" "vault_tls" {
-  path = var.vault.tls.cert_file
-  content = format("%s\n%s", tls_locally_signed_cert.vault.cert_pem,
-  tls_self_signed_cert.root.cert_pem)
-}
