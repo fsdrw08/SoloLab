@@ -20,6 +20,22 @@ variable "tftp" {
   })
 }
 
+variable "root_ca" {
+  type = object({
+    key = object({
+      algorithm   = string
+      ecdsa_curve = optional(string, null)
+      rsa_bits    = optional(string, null)
+    })
+    cert = object({
+      subject               = map(string)
+      validity_period_hours = number
+      allowed_uses          = list(string)
+      dir                   = string
+    })
+  })
+}
+
 variable "consul" {
   type = object({
     install = object({
@@ -61,6 +77,42 @@ variable "consul_post_process" {
     script_path = string
     vars        = optional(map(string))
   }))
+}
+
+variable "vault" {
+  type = object({
+    install = object({
+      zip_file_source = string
+      zip_file_path   = string
+      bin_file_dir    = string
+    })
+    runas = object({
+      user  = string
+      group = string
+    })
+    storage = object({
+      dir_target = string
+      dir_link   = string
+    })
+    config = object({
+      file_source   = string
+      file_path_dir = string
+      vars          = optional(map(string))
+    })
+    init_script = optional(object({
+      file_source = string
+      vars        = optional(map(string))
+    }))
+    service = object({
+      status  = string
+      enabled = bool
+      systemd_unit_service = object({
+        file_source = string
+        file_path   = string
+        vars        = optional(map(string))
+      })
+    })
+  })
 }
 
 variable "stepca" {
@@ -245,7 +297,7 @@ variable "sws" {
       group = string
     })
     service = object({
-      sws_restart = object({
+      sws_restart = optional(object({
         status  = string
         enabled = bool
         systemd_unit_service = object({
@@ -258,7 +310,7 @@ variable "sws" {
           vars        = map(string)
           file_path   = string
         })
-      })
+      }))
       sws = object({
         status  = string
         enabled = bool
@@ -267,11 +319,11 @@ variable "sws" {
           vars        = map(string)
           file_path   = string
         })
-        systemd_unit_socket = object({
+        systemd_unit_socket = optional(object({
           file_source = string
           vars        = map(string)
           file_path   = string
-        })
+        }))
       })
     })
   })

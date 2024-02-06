@@ -16,6 +16,24 @@ tftp = {
   }
 }
 
+root_ca = {
+  key = {
+    algorithm = "RSA"
+    rsa_bits  = "2048"
+  }
+  subject = {
+    common_name         = "Sololab Root CA"
+    country             = "CN"
+    locality            = "Foshan"
+    organization        = "Sololab"
+    organizational_unit = "Infra"
+    postal_code         = ""
+    province            = "GD"
+    serial_number       = ""
+    street_address      = ""
+  }
+}
+
 consul = {
   install = {
     zip_file_source = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
@@ -71,6 +89,47 @@ consul_post_process = {
     }
   }
 }
+
+
+vault = {
+  install = {
+    zip_file_source = "https://releases.hashicorp.com/vault/1.15.5/vault_1.15.5_linux_amd64.zip"
+    zip_file_path   = "/home/vyos/vault.zip"
+    bin_file_dir    = "/usr/bin"
+  }
+  runas = {
+    user  = "vyos"
+    group = "users"
+  }
+  storage = {
+    dir_target = "/mnt/data/vault"
+    dir_link   = "/opt/vault"
+  }
+  config = {
+    file_source = "./vault/vault.hcl"
+    vars = {
+      bind_addr       = "192.168.255.2"
+      dns_addr        = "192.168.255.2"
+      client_addr     = "127.0.0.1"
+      data_dir        = "/opt/vault"
+      token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    }
+    file_path_dir = "/etc/vault.d"
+  }
+  service = {
+    status  = "started"
+    enabled = true
+    systemd_unit_service = {
+      file_source = "./vault/vault.service"
+      vars = {
+        user  = "vyos"
+        group = "users"
+      }
+      file_path = "/etc/systemd/system/consul.service"
+    }
+  }
+}
+
 
 stepca = {
   install = {
@@ -296,8 +355,10 @@ sws = {
     dir_target = "/mnt/data/sws"
   }
   config = {
-    file_source = "./sws/static-web-server.toml"
+    file_source = "./sws/static-web-server_non_socket.toml"
     vars = {
+      SERVER_HOST                    = "127.0.0.1"
+      SERVER_PORT                    = "80"
       SERVER_ROOT                    = "/mnt/data/sws"
       SERVER_LOG_LEVEL               = "warn"
       SERVER_DIRECTORY_LISTING       = "true"
@@ -316,40 +377,40 @@ sws = {
       status  = "started"
       enabled = true
       systemd_unit_service = {
-        file_source = "./sws/static-web-server.service"
+        file_source = "./sws/static-web-server_non_socket.service"
         vars = {
           user               = "vyos"
           group              = "users"
-          SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server.toml"
+          SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server_non_socket.toml"
         }
         file_path = "/etc/systemd/system/static-web-server.service"
       }
-      systemd_unit_socket = {
-        file_source = "./sws/static-web-server.socket"
-        vars = {
-          ListenStream = "127.0.0.1:80"
-        }
-        file_path = "/etc/systemd/system/static-web-server.socket"
-      }
+      # systemd_unit_socket = {
+      #   file_source = "./sws/static-web-server.socket"
+      #   vars = {
+      #     ListenStream = "127.0.0.1:80"
+      #   }
+      #   file_path = "/etc/systemd/system/static-web-server.socket"
+      # }
     }
-    sws_restart = {
-      status  = "started"
-      enabled = true
-      systemd_unit_service = {
-        file_source = "./sws/static-web-server_restart.service"
-        vars = {
-          SERVER_CONFIG_FILE  = "/etc/static-web-server/static-web-server.toml"
-          TARGET_SERVICE_NAME = "static-web-server.service"
-        }
-        file_path = "/etc/systemd/system/static-web-server_restart.service"
-      }
-      systemd_unit_path = {
-        file_source = "./SWS/static-web-server_restart.path"
-        vars = {
-          SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server.toml"
-        }
-        file_path = "/etc/systemd/system/static-web-server_restart.path"
-      }
-    }
+    # sws_restart = {
+    #   status  = "started"
+    #   enabled = true
+    #   systemd_unit_service = {
+    #     file_source = "./sws/static-web-server_restart.service"
+    #     vars = {
+    #       SERVER_CONFIG_FILE  = "/etc/static-web-server/static-web-server.toml"
+    #       TARGET_SERVICE_NAME = "static-web-server.service"
+    #     }
+    #     file_path = "/etc/systemd/system/static-web-server_restart.service"
+    #   }
+    #   systemd_unit_path = {
+    #     file_source = "./SWS/static-web-server_restart.path"
+    #     vars = {
+    #       SERVER_CONFIG_FILE = "/etc/static-web-server/static-web-server.toml"
+    #     }
+    #     file_path = "/etc/systemd/system/static-web-server_restart.path"
+    #   }
+    # }
   }
 }

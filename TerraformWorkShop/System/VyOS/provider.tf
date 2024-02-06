@@ -12,6 +12,10 @@ terraform {
     #   source  = "Foltik/vyos"
     #   version = ">=0.3.3"
     # }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">= 4.0.5"
+    }
   }
 }
 
