@@ -14,8 +14,8 @@
 
 [Unit]
 Description=Static Web Server
-Wants=static-web-server.socket
-After=static-web-server.socket
+# Wants=static-web-server.socket
+# After=static-web-server.socket
 AssertFileIsExecutable=/usr/local/bin/static-web-server
 ConditionFileNotEmpty=${SERVER_CONFIG_FILE}
 
@@ -41,15 +41,15 @@ Type=simple
 
 # File descriptor 0 corresponds to the standard input...
 ExecStart=/usr/local/bin/static-web-server \
-    --config-file ${SERVER_CONFIG_FILE} \
-    --fd 0
+    --config-file ${SERVER_CONFIG_FILE}
+    # --fd 0 
 # ↑ "--fd 0" only for socket activation
 
 # ...so the following line attaches fd 0 of the static web server process to
 # the socket defined by the corresponding `static-web-server.socket` unit file.
 # Each instance of static-web-server currently only supports listening on a
 # single socket.
-StandardInput=fd:static-web-server.socket
+# StandardInput=fd:static-web-server.socket
 # ↑ "StandardInput with .socket" only for socket activation
 
 # Debug and tracing output goes to stderr, and can be viewed with e.g.
@@ -67,18 +67,18 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-CapabilityBoundingSet=
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 RestrictNamespaces=true
 
 #RestrictAddressFamilies=none
 # ☟ workaround to implement ☝in older versions of systemd.
 #   see: https://github.com/systemd/systemd/issues/15753
-RestrictAddressFamilies=AF_UNIX
-RestrictAddressFamilies=~AF_UNIX
+# RestrictAddressFamilies=AF_UNIX
+# RestrictAddressFamilies=~AF_UNIX
 
 PrivateDevices=true
-PrivateUsers=true
-PrivateNetwork=true
+PrivateUsers=false
+PrivateNetwork=false
 ## required systemd v245
 # ProtectClock=true
 ProtectControlGroups=true

@@ -1,0 +1,154 @@
+[general]
+
+#### Address & Root dir
+host = "${SERVER_HOST}"
+port = ${SERVER_PORT}
+root = "${SERVER_ROOT}"
+
+#### Logging
+log-level = "${SERVER_LOG_LEVEL}"
+
+#### Cache Control headers
+cache-control-headers = true
+
+#### Auto Compression
+compression = true
+
+#### Error pages
+# Note: If a relative path is used then it will be resolved under the root directory.
+# page404 = "./404.html"
+# page50x = "./50x.html"
+
+#### HTTP/2 + TLS
+http2 = false
+http2-tls-cert = ""
+http2-tls-key = ""
+https-redirect = false
+https-redirect-host = "localhost"
+https-redirect-from-port = 80
+https-redirect-from-hosts = "localhost"
+
+#### CORS & Security headers
+# security-headers = true
+# cors-allow-origins = ""
+
+#### Directory listing
+# Enable directory listing for all requests ending with the slash character (‘/’) [env: SERVER_DIRECTORY_LISTING=] [default: false] [possible values: true, false]
+directory-listing = ${SERVER_DIRECTORY_LISTING}
+
+#### Directory listing sorting code
+# Specify a default code number to order directory listing entries per `Name`, `Last modified` or `Size` attributes (columns). 
+# Code numbers supported: 0 (Name asc), 1 (Name desc), 2 (Last modified asc), 3 (Last modified desc), 4 (Size asc), 5 (Size desc). 
+# Default 6 (unordered) [env: SERVER_DIRECTORY_LISTING_ORDER=] [default: 6]
+directory-listing-order = ${SERVER_DIRECTORY_LISTING_ORDER}
+
+#### Directory listing content format
+# Specify a content format for directory listing entries. 
+# Formats supported: "html" or "json".
+# Default "html" [env: SERVER_DIRECTORY_LISTING_FORMAT=] [default: html] [possible values: html, json]
+directory-listing-format = "html"
+
+#### Basic Authentication
+# basic-auth = ""
+
+#### File descriptor binding
+# fd = ""
+
+#### Worker threads
+# Number of worker threads multiplier that'll be multiplied by the number of system CPUs using the formula: `worker threads = number of CPUs * n` where `n` is the value that changes here. 
+# When multiplier value is 0 or 1 then one thread per core is used. 
+# Number of worker threads result should be a number between 1 and 32,768 though it is advised to keep this value on the smaller side [env: SERVER_THREADS_MULTIPLIER=] [default: 1]
+threads-multiplier = 1
+
+#### Grace period after a graceful shutdown
+# Defines a grace period in seconds after a `SIGTERM` signal is caught which will delay the server before to shut it down gracefully. 
+# The maximum value is 255 seconds [env: SERVER_GRACE_PERIOD=] [default: 0]
+grace-period = 0
+
+#### Page fallback for 404s
+# page-fallback = ""
+
+#### Log request Remote Address if available
+log-remote-address = false
+
+#### Redirect to trailing slash in the requested directory uri
+redirect-trailing-slash = true
+
+#### Check for existing pre-compressed files
+compression-static = true
+
+#### Health-check endpoint (GET or HEAD `/health`)
+health = false
+
+#### List of index files
+# index-files = "index.html, index.htm"
+#### Maintenance Mode
+
+maintenance-mode = false
+# maintenance-mode-status = 503 
+# maintenance-mode-file = "./maintenance.html"
+
+### Windows Only
+
+#### Run the web server as a Windows Service
+# windows-service = false
+
+
+[advanced]
+
+#### HTTP Headers customization (examples only)
+
+#### a. Oneline version
+# [[advanced.headers]]
+# source = "**/*.{js,css}"
+# headers = { Access-Control-Allow-Origin = "*" }
+
+#### b. Multiline version
+# [[advanced.headers]]
+# source = "/index.html"
+# [advanced.headers.headers]
+# Cache-Control = "public, max-age=36000"
+# Content-Security-Policy = "frame-ancestors 'self'"
+# Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+#### c. Multiline version with explicit key (dotted)
+# [[advanced.headers]]
+# source = "**/*.{jpg,jpeg,png,ico,gif}"
+# headers.Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+
+### URL Redirects (examples only)
+
+# [[advanced.redirects]]
+# source = "**/*.{jpg,jpeg}"
+# destination = "/images/generic1.png"
+# kind = 301
+
+# [[advanced.redirects]]
+# source = "/index.html"
+# destination = "https://static-web-server.net"
+# kind = 302
+
+### URL Rewrites (examples only)
+
+# [[advanced.rewrites]]
+# source = "**/*.{png,ico,gif}"
+# destination = "/assets/favicon.ico"
+## Optional redirection
+# redirect = 301
+
+# [[advanced.rewrites]]
+# source = "**/*.{jpg,jpeg}"
+# destination = "/images/sws.png"
+
+### Virtual Hosting
+
+[[advanced.virtual-hosts]]
+# But if the "Host" header matches this...
+host = "${VIRTUAL_HOST}"
+# ...then files will be served from here instead
+root = "${VIRTUAL_HOST_ROOT}"
+
+# [[advanced.virtual-hosts]]
+# host = "blog.example.com"
+# root = "/var/blog/html"

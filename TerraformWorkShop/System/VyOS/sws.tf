@@ -74,26 +74,72 @@ resource "system_file" "sws_service" {
   )
 }
 
-resource "system_file" "sws_socket" {
-  depends_on = [null_resource.sws_bin]
-  path       = var.sws.service.sws.systemd_unit_socket.file_path
-  content = templatefile(
-    var.sws.service.sws.systemd_unit_socket.file_source,
-    var.sws.service.sws.systemd_unit_socket.vars
-  )
+# resource "system_file" "sws_socket" {
+#   depends_on = [null_resource.sws_bin]
+#   path       = var.sws.service.sws.systemd_unit_socket.file_path
+#   content = templatefile(
+#     var.sws.service.sws.systemd_unit_socket.file_source,
+#     var.sws.service.sws.systemd_unit_socket.vars
+#   )
+# }
+
+# resource "null_resource" "sws_socket" {
+#   depends_on = [
+#     system_file.sws_service,
+#     system_file.sws_socket,
+#   ]
+#   triggers = {
+#     unit_name = system_file.sws_socket.basename
+#     host      = var.vm_conn.host
+#     port      = var.vm_conn.port
+#     user      = var.vm_conn.user
+#     password  = sensitive(var.vm_conn.password)
+#   }
+#   connection {
+#     type     = "ssh"
+#     host     = self.triggers.host
+#     port     = self.triggers.port
+#     user     = self.triggers.user
+#     password = self.triggers.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "sleep 5",
+#       "sudo systemctl enable ${self.triggers.unit_name} --now",
+#     ]
+#   }
+#   provisioner "remote-exec" {
+#     when = destroy
+#     inline = [
+#       "sudo systemctl disable ${self.triggers.unit_name} --now",
+#     ]
+#   }
+# }
+
+resource "system_service_systemd" "sws" {
+  depends_on = [
+    null_resource.sws_bin,
+    system_file.sws_config,
+    system_file.sws_service,
+  ]
+  name    = trimsuffix(system_file.sws_service.basename, ".service")
+  status  = var.sws.service.sws.status
+  enabled = var.sws.service.sws.enabled
 }
 
-resource "null_resource" "sws_socket" {
+
+resource "null_resource" "sws_restart" {
   depends_on = [
-    system_file.sws_service,
-    system_file.sws_socket,
+    system_service_systemd.sws,
   ]
   triggers = {
-    unit_name = system_file.sws_socket.basename
-    host      = var.vm_conn.host
-    port      = var.vm_conn.port
-    user      = var.vm_conn.user
-    password  = sensitive(var.vm_conn.password)
+    unit_name   = system_file.sws_service.basename
+    unit_hash   = system_file.sws_service.md5sum
+    config_hash = system_file.sws_config.md5sum
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -105,26 +151,10 @@ resource "null_resource" "sws_socket" {
   provisioner "remote-exec" {
     inline = [
       "sleep 5",
-      "sudo systemctl enable ${self.triggers.unit_name} --now",
+      "sudo systemctl daemon-reload",
+      "sudo systemctl restart ${self.triggers.unit_name}",
     ]
   }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo systemctl disable ${self.triggers.unit_name} --now",
-    ]
-  }
-}
-
-resource "system_service_systemd" "sws" {
-  depends_on = [
-    null_resource.sws_bin,
-    system_file.sws_config,
-    system_file.sws_service,
-  ]
-  name    = trimsuffix(system_file.sws_service.basename, ".service")
-  status  = var.sws.service.sws.status
-  enabled = var.sws.service.sws.enabled
 }
 
 # resource "system_file" "sws_restart_service" {
@@ -176,7 +206,7 @@ resource "system_service_systemd" "sws" {
 # }
 
 resource "system_file" "sws_consul" {
-  depends_on = [null_resource.sws_socket]
+  depends_on = [system_service_systemd.sws]
   path       = "${system_folder.consul_config.path}/sws.hcl"
   content    = file("./sws/sws_consul.hcl")
   user       = "vyos"
