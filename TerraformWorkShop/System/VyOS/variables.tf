@@ -22,35 +22,15 @@ variable "tftp" {
 
 variable "root_ca" {
   type = object({
-    key = object({
-      algorithm   = string
-      ecdsa_curve = optional(string, null)
-      rsa_bits    = optional(string, null)
-    })
-    cert = object({
-      subject               = map(string)
-      validity_period_hours = number
-      allowed_uses          = list(string)
-      dir                   = string
-    })
+    state_path = string
+    dir        = string
   })
 }
 
 variable "certs" {
   type = list(object({
     name = string
-    key = object({
-      algorithm   = string
-      ecdsa_curve = optional(string, null)
-      rsa_bits    = optional(string, null)
-    })
-    cert = object({
-      dns_names             = list(string)
-      subject               = map(string)
-      validity_period_hours = number
-      allowed_uses          = list(string)
-      dir                   = string
-    })
+    dir  = string
   }))
 }
 
