@@ -56,19 +56,6 @@ resource "system_link" "data" {
   target = var.storage.dir_target
   user   = var.runas.user
   group  = var.runas.group
-  connection {
-    type     = "ssh"
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p ${var.storage.dir_target}",
-      "sudo chown ${var.runas.user}:${var.runas.group} ${var.storage.dir_target}",
-    ]
-  }
 }
 
 # persist systemd unit file
