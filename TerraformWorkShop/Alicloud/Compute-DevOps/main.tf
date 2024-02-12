@@ -119,7 +119,7 @@ resource "alicloud_instance" "ecs" {
       gecos: podmgr
       hashed_passwd: ${var.ecs_podmgr_passwd_hash}
       lock_passwd: true
-      sudo: False
+      sudo: null
       shell: /bin/bash
       ssh_import_id: None
       ssh_authorized_keys:
