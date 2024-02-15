@@ -6,13 +6,19 @@ resource "null_resource" "init" {
     user     = var.vm_conn.user
     password = var.vm_conn.password
   }
+  triggers = {
+    dirs        = "/mnt/data/vault/data /mnt/data/vault/tls /mnt/data/vault/init"
+    chown_user  = "vyos"
+    chown_group = "users"
+    chown_dir   = "/mnt/data/vault"
+  }
   provisioner "remote-exec" {
     inline = [
       templatefile("${path.root}/vault/init.sh", {
-        dirs        = "/mnt/data/vault/data /mnt/data/vault/tls"
-        chown_user  = "vyos"
-        chown_group = "users"
-        chown_dir   = "/mnt/data/vault"
+        dirs        = self.triggers.dirs
+        chown_user  = self.triggers.chown_user
+        chown_group = self.triggers.chown_group
+        chown_dir   = self.triggers.chown_dir
       })
     ]
   }
@@ -25,25 +31,41 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
-resource "system_file" "cert" {
-  depends_on = [null_resource.init]
-  path       = "/mnt/data/vault/tls/tls.crt"
-  # https://discuss.hashicorp.com/t/transforming-a-list-of-objects-to-a-map/25373
-  # content = lookup((merge(data.terraform_remote_state.root_ca.outputs.signed_cert_pem...)), each.key, null) #.cert_pem
-  content = lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null)
-}
+# resource "system_file" "ca" {
+#   depends_on = [null_resource.init]
+#   path       = "/mnt/data/vault/tls/ca.crt"
+#   content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+# }
 
-resource "system_file" "key" {
+# resource "system_file" "cert" {
+#   depends_on = [null_resource.init]
+#   path       = "/mnt/data/vault/tls/tls.crt"
+#   content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
+#     data.terraform_remote_state.root_ca.outputs.root_cert_pem
+#   )
+#   # content = lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null)
+# }
+
+# resource "system_file" "key" {
+#   depends_on = [null_resource.init]
+#   path       = "/mnt/data/vault/tls/tls.key"
+#   content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
+# }
+
+resource "system_file" "init" {
   depends_on = [null_resource.init]
-  path       = "/mnt/data/vault/tls/tls.key"
-  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
+  path       = "/home/vyos/Init-Vault.sh"
+  content = templatefile("${path.root}/vault/Init-Vault.sh", {
+    VAULT_ADDR                       = "https://vault.service.consul"
+    CA_CERTIFICATE                   = "/etc/vault.d/ca.crt"
+    VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
+  })
 }
 
 module "vault" {
   depends_on = [
     null_resource.init,
-    system_file.cert,
-    system_file.key
+    system_file.init
   ]
   source = "../modules/vault"
   vm_conn = {
@@ -70,12 +92,25 @@ module "vault" {
     vars = {
       storage_path             = "/opt/vault/data"
       node_id                  = "raft_node_1"
-      api_addr                 = "https://vault.service.consul:8200"
-      cluster_addr             = "https://vault.service.consul:8201"
+      raft_leader_ca_cert_file = "/etc/vault.d/ca.crt"
       listener_address         = "127.0.0.1:8200"
-      tls_cert_file            = "/opt/vault/tls/tls.crt"
-      tls_key_file             = "/opt/vault/tls/tls.key"
+      listener_cluster_address = "{{ GetInterfaceIP `eth2` }}:8201"
+      # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
+      api_addr                 = "https://vault.service.consul"
+      cluster_addr             = "https://vyos-lts.node.consul:8201"
+      tls_cert_file            = "/etc/vault.d/server.crt"
+      tls_key_file             = "/etc/vault.d/server.key"
       tls_disable_client_certs = "true"
+    }
+    tls = {
+      ca_basename   = "ca.crt"
+      ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      cert_basename = "server.crt"
+      cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
+        data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      )
+      key_basename = "server.key"
+      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
     }
     file_path_dir = "/etc/vault.d"
   }

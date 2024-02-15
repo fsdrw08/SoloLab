@@ -51,6 +51,33 @@ resource "system_file" "config" {
   content    = templatefile(var.config.file_source, var.config.vars)
 }
 
+resource "system_file" "ca" {
+  count      = var.config.tls == null ? 0 : 1
+  depends_on = [system_folder.config]
+  path       = format("${var.config.file_path_dir}/%s", basename("${var.config.tls.ca_basename}"))
+  content    = var.config.tls.ca_content
+}
+
+resource "system_file" "cert" {
+  count      = var.config.tls == null ? 0 : 1
+  depends_on = [system_folder.config]
+  path       = format("${var.config.file_path_dir}/%s", basename("${var.config.tls.cert_basename}"))
+  content    = var.config.tls.cert_content
+  user       = var.runas.user
+  group      = var.runas.group
+  mode       = "600"
+}
+
+resource "system_file" "key" {
+  count      = var.config.tls == null ? 0 : 1
+  depends_on = [system_folder.config]
+  path       = format("${var.config.file_path_dir}/%s", basename("${var.config.tls.key_basename}"))
+  content    = var.config.tls.key_content
+  user       = var.runas.user
+  group      = var.runas.group
+  mode       = "600"
+}
+
 resource "system_link" "data" {
   path   = var.storage.dir_link
   target = var.storage.dir_target

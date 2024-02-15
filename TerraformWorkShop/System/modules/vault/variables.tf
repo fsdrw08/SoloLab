@@ -31,9 +31,17 @@ variable "storage" {
 
 variable "config" {
   type = object({
-    file_source   = string
+    file_source = string
+    vars        = optional(map(string))
+    tls = optional(object({
+      ca_basename   = string
+      ca_content    = string
+      cert_basename = string
+      cert_content  = string
+      key_basename  = string
+      key_content   = string
+    }))
     file_path_dir = string
-    vars          = optional(map(string))
   })
 }
 

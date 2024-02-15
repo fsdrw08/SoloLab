@@ -7,6 +7,10 @@
 ui = true
 
 #mlock = true
+
+// https://developer.hashicorp.com/vault/docs/configuration/storage/raft
+// When using the Integrated Storage backend, it is strongly recommended to set disable_mlock to true, 
+// and to disable memory swapping on the system.
 disable_mlock = true
 
 // storage "file" {
@@ -17,11 +21,16 @@ disable_mlock = true
 storage "raft" {
   path = "${storage_path}"
   node_id = "${node_id}"
+  // no need to add retry_join if there is only one node
+  // retry_join {
+  //   leader_api_addr = "${api_addr}"
+  //   leader_ca_cert_file = "${raft_leader_ca_cert_file}"
+  //   leader_client_cert_file = "${tls_cert_file}"
+  //   leader_client_key_file = "${tls_key_file}"
+  // }
 }
 
-api_addr = "${api_addr}"
-// https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
-cluster_addr = "${cluster_addr}"
+
 
 #storage "consul" {
 #  address = "127.0.0.1:8500"
@@ -38,10 +47,30 @@ cluster_addr = "${cluster_addr}"
 // https://developer.hashicorp.com/vault/docs/configuration/listener/tcp
 listener "tcp" {
   address       = "${listener_address}"
+  cluster_address = "${listener_cluster_address}"
   tls_cert_file = "${tls_cert_file}"
   tls_key_file  = "${tls_key_file}"
   tls_disable_client_certs = "${tls_disable_client_certs}"
 }
+
+// https://developer.hashicorp.com/vault/docs/configuration#api_addr
+// Specifies the address (full URL) to advertise to other Vault servers in the cluster for client redirection. 
+// This value is also used for plugin backends. This can also be provided via the environment variable VAULT_API_ADDR. 
+// In general this should be set as a full URL that points to the value of the listener address. 
+// This can be dynamically defined with a go-sockaddr template that is resolved at runtime.
+api_addr = "${api_addr}"
+// https://developer.hashicorp.com/vault/docs/concepts/ha#per-node-cluster-address
+// Note: When using the Integrated Storage backend, it is required to provide 
+// cluster_addr to indicate the address and port to be used for communication 
+// between the nodes in the Raft cluster.
+// https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
+// Similar to the api_addr, cluster_addr is the value that each node, if active, should advertise to the standbys to use for server-to-server communications, 
+// and lives as a top-level value in the configuration file. 
+// On each node, this should be set to a host name or IP address 
+// that a standby can use to reach one of that node's cluster_address values set in the listener blocks, including port. 
+// (Note that this will always be forced to https since only TLS connections are used between servers.)
+cluster_addr = "${cluster_addr}"
+
 
 log_level = "debug"
 # Enterprise license_path
