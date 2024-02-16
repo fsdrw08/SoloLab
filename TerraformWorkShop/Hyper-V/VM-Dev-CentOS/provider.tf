@@ -12,10 +12,10 @@ terraform {
       source  = "hashicorp/local"
       version = ">=2.4.1"
     }
-    archive = {
-      source  = "hashicorp/archive"
-      version = ">=2.4.2"
-    }
+    # archive = {
+    #   source  = "hashicorp/archive"
+    #   version = ">=2.4.2"
+    # }
   }
 
   # https://ruben-rodriguez.github.io/posts/minio-s3-terraform-backend/

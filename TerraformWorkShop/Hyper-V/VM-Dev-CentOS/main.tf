@@ -18,41 +18,41 @@ data "tls_certificate" "rootCA" {
 }
 
 # create zip for iso
-data "archive_file" "cloudinit" {
-  count       = var.vm_count
-  type        = "zip"
-  output_path = "./${var.vm_name}${local.count}.zip"
-  source {
-    content = templatefile(var.cloudinit.meta_data.file_source, merge(local.vars, var.cloudinit.meta_data.vars,
-      {
-        count = local.count
-      }
-    ))
-    filename = "meta-data"
-  }
-  source {
-    content = templatefile(var.cloudinit.user_data.file_source, merge(local.vars, var.cloudinit.user_data.vars,
-      {
-        ca_cert = data.tls_certificate.rootCA.certificates[0].cert_pem
-      },
-      )
-    )
-    filename = "user-data"
-  }
-  source {
-    content = templatefile(var.cloudinit.network_config.file_source, merge(local.vars, var.cloudinit.network_config.vars,
-      {
-        ip_addrs = slice(
-          var.cloudinit.network_config.vars.ip_addr_list,
-          count.index * var.cloudinit.network_config.vars.ip_count[0],
-          (count.index + 1) * var.cloudinit.network_config.vars.ip_count[0]
-        )
-      },
-      )
-    )
-    filename = "network-config"
-  }
-}
+# data "archive_file" "cloudinit" {
+#   count       = var.vm_count
+#   type        = "zip"
+#   output_path = "./${var.vm_name}${local.count}.zip"
+#   source {
+#     content = templatefile(var.cloudinit.meta_data.file_source, merge(local.vars, var.cloudinit.meta_data.vars,
+#       {
+#         count = local.count
+#       }
+#     ))
+#     filename = "meta-data"
+#   }
+#   source {
+#     content = templatefile(var.cloudinit.user_data.file_source, merge(local.vars, var.cloudinit.user_data.vars,
+#       {
+#         ca_cert = data.tls_certificate.rootCA.certificates[0].cert_pem
+#       },
+#       )
+#     )
+#     filename = "user-data"
+#   }
+#   source {
+#     content = templatefile(var.cloudinit.network_config.file_source, merge(local.vars, var.cloudinit.network_config.vars,
+#       {
+#         ip_addrs = slice(
+#           var.cloudinit.network_config.vars.ip_addr_list,
+#           count.index * var.cloudinit.network_config.vars.ip_count[0],
+#           (count.index + 1) * var.cloudinit.network_config.vars.ip_count[0]
+#         )
+#       },
+#       )
+#     )
+#     filename = "network-config"
+#   }
+# }
 
 # only availble in v1.2.0, but v1.2.0 has a bug that not abel to create vhd
 # resource "hyperv_iso_image" "cloudinit" {

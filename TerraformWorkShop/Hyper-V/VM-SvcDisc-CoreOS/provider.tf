@@ -19,14 +19,14 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate"                 # Name of the S3 bucket
-    key    = "Hyper-V/SvcDisc-FCOS-VM" # Name of the tfstate file
+    key    = "Hyper-V/VM-SvcDisc-FCOS" # Name of the tfstate file
 
     endpoints = {
-      s3 = "http://192.168.255.1:9000" # Minio endpoint
+      s3 = "https://minio.service.consul" # Minio endpoint
     }
 
-    access_key = "minio" # Access and secret keys
-    secret_key = "miniosecret"
+    access_key = "admin" # Access and secret keys
+    secret_key = "P@ssw0rd"
 
     region                      = "main" # Region validation will be skipped
     skip_credentials_validation = true   # Skip AWS related checks and validations
@@ -34,6 +34,7 @@ terraform {
     skip_region_validation      = true
     use_path_style              = true
     skip_requesting_account_id  = true
+    insecure                    = true
   }
 }
 
