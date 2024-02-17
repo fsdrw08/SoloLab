@@ -1,7 +1,7 @@
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
-    path = "../../RootCA/terraform.tfstate"
+    path = "../../TLS/RootCA/terraform.tfstate"
   }
 }
 

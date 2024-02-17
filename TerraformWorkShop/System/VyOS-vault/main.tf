@@ -31,27 +31,6 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
-# resource "system_file" "ca" {
-#   depends_on = [null_resource.init]
-#   path       = "/mnt/data/vault/tls/ca.crt"
-#   content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-# }
-
-# resource "system_file" "cert" {
-#   depends_on = [null_resource.init]
-#   path       = "/mnt/data/vault/tls/tls.crt"
-#   content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
-#     data.terraform_remote_state.root_ca.outputs.root_cert_pem
-#   )
-#   # content = lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null)
-# }
-
-# resource "system_file" "key" {
-#   depends_on = [null_resource.init]
-#   path       = "/mnt/data/vault/tls/tls.key"
-#   content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
-# }
-
 resource "system_file" "init" {
   depends_on = [null_resource.init]
   path       = "/home/vyos/Init-Vault.sh"
@@ -123,7 +102,7 @@ module "vault" {
         user  = "vyos"
         group = "users"
       }
-      file_path = "/etc/systemd/system/vault.service"
+      file_path = "/usr/lib/systemd/system/vault.service"
     }
   }
 }

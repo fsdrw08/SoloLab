@@ -43,22 +43,26 @@ certs = [
     }
   },
   {
+    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
     name = "consul"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
-      dns_names = ["consul.service.consul"]
+      dns_names = [
+        "consul.service.consul",
+        "server.dc1.consul"
+      ]
       subject = {
-        common_name  = "consul.service.consul"
+        common_name  = "server.dc1.consul"
         organization = "Sololab"
       }
       validity_period_hours = 43800
       allowed_uses = [
-        "key_encipherment",
         "digital_signature",
-        "server_auth",
+        "cert_signing",
+        "crl_signing"
       ]
     }
   }
