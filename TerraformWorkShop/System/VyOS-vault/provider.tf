@@ -9,6 +9,12 @@ terraform {
       version = ">=0.4.0"
     }
   }
+  backend "consul" {
+    address      = "consul.service.consul:8500"
+    scheme       = "http"
+    path         = "tfstate/vyos-vault"
+    access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+  }
 }
 
 # https://registry.terraform.io/providers/neuspaces/system/latest/docs#usage-example

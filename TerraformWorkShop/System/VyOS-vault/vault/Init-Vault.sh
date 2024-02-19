@@ -1,10 +1,10 @@
 #!/bin/bash
 # https://github.com/CENSUS/vault-secrets-abe-janus/blob/efcf03fe682911b1bc6d3d328c5d5af37fcf889c/other/docker/vault/config/vault_init.sh
 
-export VAULT_ADDR="${VAULT_ADDR}"
-export VAULT_CACERT="${CA_CERTIFICATE}"
+# export VAULT_ADDR="${VAULT_ADDR}"
+# export VAULT_CACERT="${VAULT_CACERT}"
 
-VAULT_OPERATOR_SECRETS_JSON_PATH="${VAULT_OPERATOR_SECRETS_JSON_PATH}"
+# VAULT_OPERATOR_SECRETS_JSON_PATH="${VAULT_OPERATOR_SECRETS_JSON_PATH}"
 
 # MAIN FUNCTIONS
 

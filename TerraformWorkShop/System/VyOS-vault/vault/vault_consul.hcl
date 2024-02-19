@@ -1,14 +1,14 @@
 services {
   id      = "vault-internal-api"
   name    = "vault"
-  address = "127.0.0.1"
+  address = "192.168.255.2"
   port    = 8200
 
   checks = [
     {
       id       = "vault-api-tcp-check-8200"
       name     = "vault-api-tcp-check-8200"
-      tcp      = "127.0.0.1:8200"
+      tcp      = "192.168.255.2:8200"
       interval = "20s"
       timeout  = "2s"
     }

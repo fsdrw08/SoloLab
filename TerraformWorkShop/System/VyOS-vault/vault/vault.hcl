@@ -18,13 +18,14 @@ disable_mlock = true
 // }
 
 // https://developer.hashicorp.com/vault/docs/configuration/storage/raft
+// https://www.velotio.com/engineering-blog/how-to-setup-hashicorp-vault-ha-cluster-with-integrated-storage-raft
 storage "raft" {
   path = "${storage_path}"
   node_id = "${node_id}"
   // no need to add retry_join if there is only one node
   // retry_join {
   //   leader_api_addr = "${api_addr}"
-  //   leader_ca_cert_file = "${raft_leader_ca_cert_file}"
+  //   leader_ca_cert_file = "${tls_ca_file}"
   //   leader_client_cert_file = "${tls_cert_file}"
   //   leader_client_key_file = "${tls_key_file}"
   // }

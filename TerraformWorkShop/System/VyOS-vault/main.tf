@@ -27,7 +27,7 @@ resource "null_resource" "init" {
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
-    path = "../../RootCA/terraform.tfstate"
+    path = "../../TLS/RootCA/terraform.tfstate"
   }
 }
 
@@ -36,7 +36,7 @@ resource "system_file" "init" {
   path       = "/home/vyos/Init-Vault.sh"
   content = templatefile("${path.root}/vault/Init-Vault.sh", {
     VAULT_ADDR                       = "https://vault.service.consul"
-    CA_CERTIFICATE                   = "/etc/vault.d/ca.crt"
+    VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
     VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
   })
 }
@@ -67,18 +67,18 @@ module "vault" {
     dir_link   = "/opt/vault"
   }
   config = {
-    file_source = "${path.root}/vault/vault.hcl"
-    vars = {
+    templatefile_path = "${path.root}/vault/vault.hcl"
+    templatefile_vars = {
       storage_path             = "/opt/vault/data"
       node_id                  = "raft_node_1"
-      raft_leader_ca_cert_file = "/etc/vault.d/ca.crt"
-      listener_address         = "127.0.0.1:8200"
+      listener_address         = "{{ GetInterfaceIP `eth2` }}:8200"
       listener_cluster_address = "{{ GetInterfaceIP `eth2` }}:8201"
       # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
-      api_addr                 = "https://vault.service.consul"
+      api_addr                 = "https://vault.service.consul:8200"
       cluster_addr             = "https://vyos-lts.node.consul:8201"
-      tls_cert_file            = "/etc/vault.d/server.crt"
-      tls_key_file             = "/etc/vault.d/server.key"
+      tls_ca_file              = "/etc/vault.d/tls/ca.crt"
+      tls_cert_file            = "/etc/vault.d/tls/server.crt"
+      tls_key_file             = "/etc/vault.d/tls/server.key"
       tls_disable_client_certs = "true"
     }
     tls = {
@@ -90,19 +90,27 @@ module "vault" {
       )
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
+      sub_dir      = "tls"
     }
-    file_path_dir = "/etc/vault.d"
+    env_templatefile_path = "${path.root}/vault/vault.env"
+    env_templatefile_vars = {
+      VAULT_ADDR                       = "https://vault.service.consul"
+      VAULT_CACERT                     = "/etc/vault.d/ca.crt"
+      VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
+    }
+    dir = "/etc/vault.d"
   }
   service = {
     status  = "started"
     enabled = true
     systemd_unit_service = {
-      file_source = "${path.root}/vault/vault.service"
-      vars = {
-        user  = "vyos"
-        group = "users"
+      templatefile_path = "${path.root}/vault/vault.service"
+      templatefile_vars = {
+        user             = "vyos"
+        group            = "users"
+        post_script_path = system_file.init.path
       }
-      file_path = "/usr/lib/systemd/system/vault.service"
+      target_path = "/usr/lib/systemd/system/vault.service"
     }
   }
 }

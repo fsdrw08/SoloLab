@@ -31,8 +31,8 @@ variable "storage" {
 
 variable "config" {
   type = object({
-    file_source = string
-    vars        = optional(map(string))
+    templatefile_path = string
+    templatefile_vars = optional(map(string))
     tls = optional(object({
       ca_basename   = string
       ca_content    = string
@@ -40,8 +40,11 @@ variable "config" {
       cert_content  = string
       key_basename  = string
       key_content   = string
+      sub_dir       = string
     }))
-    file_path_dir = string
+    env_templatefile_path = optional(string)
+    env_templatefile_vars = optional(map(string))
+    dir                   = string
   })
 }
 
@@ -50,9 +53,9 @@ variable "service" {
     status  = string
     enabled = bool
     systemd_unit_service = object({
-      file_source = string
-      file_path   = string
-      vars        = optional(map(string))
+      templatefile_path = string
+      templatefile_vars = optional(map(string))
+      target_path       = string
     })
   })
 }
