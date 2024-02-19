@@ -57,8 +57,8 @@ module "consul" {
     dir_link   = "/opt/consul"
   }
   config = {
-    file_source = "${path.root}/consul/consul.hcl"
-    vars = {
+    templatefile_path = "${path.root}/consul/consul.hcl"
+    templatefile_vars = {
       bind_addr                  = "{{ GetInterfaceIP `eth2` }}"
       dns_addr                   = "{{ GetInterfaceIP `eth2` }}"
       client_addr                = "{{ GetInterfaceIP `eth2` }}"
@@ -83,18 +83,18 @@ module "consul" {
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
       sub_dir      = "certs"
     }
-    file_path_dir = "/etc/consul.d"
+    dir = "/etc/consul.d"
   }
   service = {
     status  = "started"
     enabled = true
     systemd_unit_service = {
-      file_source = "${path.root}/consul/consul.service"
-      vars = {
+      templatefile_path = "${path.root}/consul/consul.service"
+      templatefile_vars = {
         user  = "vyos"
         group = "users"
       }
-      file_path = "/etc/systemd/system/consul.service"
+      target_path = "/etc/systemd/system/consul.service"
     }
   }
 }

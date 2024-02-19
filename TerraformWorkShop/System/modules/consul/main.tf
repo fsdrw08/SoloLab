@@ -52,7 +52,7 @@ resource "null_resource" "bin" {
 
 # prepare vault config dir
 resource "system_folder" "config" {
-  path  = var.config.file_path_dir
+  path  = var.config.dir
   user  = var.runas.user
   group = var.runas.group
   mode  = "700"
@@ -61,17 +61,16 @@ resource "system_folder" "config" {
 # persist vault config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  # path       = format("${var.config.file_path_dir}/%s", basename("${var.config.file_source}"))
-  path    = join("/", ["${var.config.file_path_dir}", basename("${var.config.file_source}")])
-  content = templatefile(var.config.file_source, var.config.vars)
-  user    = var.runas.user
-  group   = var.runas.group
-  mode    = "600"
+  path       = join("/", ["${var.config.dir}", basename("${var.config.templatefile_path}")])
+  content    = templatefile(var.config.templatefile_path, var.config.templatefile_vars)
+  user       = var.runas.user
+  group      = var.runas.group
+  mode       = "600"
 }
 
 resource "system_folder" "certs" {
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.file_path_dir}", "${var.config.tls.sub_dir}"])
+  path       = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}"])
   user       = var.runas.user
   group      = var.runas.group
   mode       = "700"
@@ -83,7 +82,7 @@ resource "system_file" "ca" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.file_path_dir}", "${var.config.tls.sub_dir}", "${var.config.tls.ca_basename}"])
+  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.ca_basename}"])
   content = var.config.tls.ca_content
   user    = var.runas.user
   group   = var.runas.group
@@ -96,7 +95,7 @@ resource "system_file" "cert" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.file_path_dir}", "${var.config.tls.sub_dir}", "${var.config.tls.cert_basename}"])
+  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.cert_basename}"])
   content = var.config.tls.cert_content
   user    = var.runas.user
   group   = var.runas.group
@@ -109,7 +108,7 @@ resource "system_file" "key" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.file_path_dir}", "${var.config.tls.sub_dir}", "${var.config.tls.key_basename}"])
+  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.key_basename}"])
   content = var.config.tls.key_content
   user    = var.runas.user
   group   = var.runas.group
@@ -127,8 +126,8 @@ resource "system_link" "data" {
 # https://developer.hashicorp.com/vault/tutorials/operations/production-hardening
 # https://github.com/hashicorp/vault/blob/main/.release/linux/package/usr/lib/systemd/system/vault.service
 resource "system_file" "service" {
-  path    = var.service.systemd_unit_service.file_path
-  content = templatefile(var.service.systemd_unit_service.file_source, var.service.systemd_unit_service.vars)
+  path    = var.service.systemd_unit_service.target_path
+  content = templatefile(var.service.systemd_unit_service.templatefile_path, var.service.systemd_unit_service.templatefile_vars)
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled
