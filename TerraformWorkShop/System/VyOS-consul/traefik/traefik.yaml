@@ -1,0 +1,80 @@
+## ref: https://doc.traefik.io/traefik/providers/overview/
+providers:
+  # https://doc.traefik.io/traefik/providers/file/
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
+  # https://doc.traefik.io/traefik/providers/consul-catalog/#traefik-consul-catalog
+  consulCatalog:
+    endpoint:
+      address: ${consul_client_addr}
+      datacenter: ${consul_datacenter}
+      scheme: ${consul_scheme}
+      %{ if ${consul_scheme} != "http" }
+      tls:
+        ca: ${consul_tls_ca}
+      %{ endif }
+    exposedByDefault: false
+## ref: https://doc.traefik.io/traefik/routing/overview/#transport-configuration
+serversTransport:
+  insecureSkipVerify: true
+  rootCAs:
+    - ${rootCA}
+    # - /etc/traefik/root_ca.crt
+# https://doc.traefik.io/traefik/reference/static-configuration/env/#:~:text=TRAEFIK_GLOBAL_CHECKNEWVERSION
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+## @param traefik.staticConfiguration.entryPoints
+## ref: # https://doc.traefik.io/traefik/routing/overview/
+##
+entryPoints:
+  # https://doc.traefik.io/traefik/operations/ping/
+  traefik:
+    address: ${entrypoint_traefik} # ":8080"
+  web:
+    address: ${entrypoint_web} # ":80"
+    forwardedHeaders:
+      trustedIPs:
+        - "0.0.0.0/0"
+  # https://community.traefik.io/t/lets-encrypt-x509-certificate-signed-by-unknown-authority/11112/1
+  websecure:
+    address: ${entrypoint_websecure} # ":443"
+    # https://doc.traefik.io/traefik/routing/entrypoints/#forwarded-headers
+    # https://community.traefik.io/t/how-to-get-real-ip-from-the-client/8239
+    # https://www.bboy.app/2020/04/16/traefik%E5%90%8E%E7%AB%AF%E5%BA%94%E7%94%A8%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E7%9C%9F%E5%AE%9Eip/
+    forwardedHeaders:
+      trustedIPs:
+        - "0.0.0.0/0"
+# https://doc.traefik.io/traefik/operations/ping/#ping
+ping:
+  # https://doc.traefik.io/traefik/operations/ping/#entrypoint
+  entryPoint: traefik
+## Traefik exposes a number of information through an API handler
+api:
+  dashboard: true
+## ref: https://doc.traefik.io/traefik/https/acme/
+certificatesResolvers:
+  external:
+    acme:
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      certificatesDuration: 2160
+      email: ""
+      storage: ${acme_ext_storage}
+      tlsChallenge: {}
+  internal:
+    acme:
+      caServer: ${acme_int_caserver}
+      certificatesDuration: 2160
+      email: ""
+      storage: ${acme_int_storage}
+      tlsChallenge: {}
+## ref: https://doc.traefik.io/traefik/observability/logs/
+##
+log:
+  ## Alternative logging levels are DEBUG, INFO, WARN, ERROR, FATAL, and PANIC.
+  level: DEBUG
+## ref: https://doc.traefik.io/traefik/observability/access-logs/
+accessLog:
+  filePath: ${access_log_path}
+  bufferingSize: 100
