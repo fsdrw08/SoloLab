@@ -61,7 +61,7 @@ resource "system_folder" "config" {
 # persist vault config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", basename("${var.config.templatefile_path}")])
+  path       = join("/", [var.config.dir, basename(var.config.templatefile_path)])
   content    = templatefile(var.config.templatefile_path, var.config.templatefile_vars)
   user       = var.runas.user
   group      = var.runas.group
@@ -70,7 +70,7 @@ resource "system_file" "config" {
 
 resource "system_folder" "certs" {
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}"])
+  path       = join("/", [var.config.dir, var.config.tls.sub_dir])
   user       = var.runas.user
   group      = var.runas.group
   mode       = "700"
@@ -82,7 +82,7 @@ resource "system_file" "ca" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.ca_basename}"])
+  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.ca_basename])
   content = var.config.tls.ca_content
   user    = var.runas.user
   group   = var.runas.group
@@ -95,7 +95,7 @@ resource "system_file" "cert" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.cert_basename}"])
+  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.cert_basename])
   content = var.config.tls.cert_content
   user    = var.runas.user
   group   = var.runas.group
@@ -108,7 +108,7 @@ resource "system_file" "key" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", ["${var.config.dir}", "${var.config.tls.sub_dir}", "${var.config.tls.key_basename}"])
+  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.key_basename])
   content = var.config.tls.key_content
   user    = var.runas.user
   group   = var.runas.group
