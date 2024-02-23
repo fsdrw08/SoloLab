@@ -3,6 +3,7 @@ resource "system_group" "group" {
   count = var.runas.take_charge == true ? 1 : 0
   name  = var.runas.group
 }
+
 resource "system_user" "user" {
   count      = var.runas.take_charge == true ? 1 : 0
   depends_on = [system_group.group]
@@ -52,7 +53,7 @@ resource "null_resource" "bin" {
 
 # prepare traefik config dir
 resource "system_folder" "config" {
-  path  = var.config.static.file_path_dir
+  path  = var.config.dir
   user  = var.runas.user
   group = var.runas.group
   mode  = "755"
@@ -61,7 +62,7 @@ resource "system_folder" "config" {
 # persist traefik static config file in dir
 resource "system_file" "static" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, basename(var.config.templatefile_path)])
+  path       = join("/", [var.config.dir, basename(var.config.static.templatefile_path)])
   content    = templatefile(var.config.static.templatefile_path, var.config.static.templatefile_vars)
   user       = var.runas.user
   group      = var.runas.group
@@ -72,7 +73,7 @@ resource "system_file" "static" {
 resource "system_folder" "dynamic" {
   depends_on = [system_folder.config]
   count      = var.config.dynamic == null ? 0 : 1
-  path       = var.config.dynamic.sub_dir
+  path       = join("/", [var.config.dir, var.config.dynamic.sub_dir])
   user       = var.runas.user
   group      = var.runas.group
   mode       = "755"
@@ -82,12 +83,12 @@ resource "system_folder" "dynamic" {
 resource "system_file" "dynamic" {
   depends_on = [system_folder.dynamic]
   for_each = {
-    for content in var.config.dynamic.file_contents : content.file_source => content
+    for file in var.config.dynamic.files : file.templatefile_path => file
   }
-  path = join("/", [var.config.dynamic.file_path_dir, basename(each.value.file_source)])
+  path = join("/", [var.config.dir, var.config.dynamic.sub_dir, basename(each.value.templatefile_path)])
   content = templatefile(
-    each.value.file_source,
-    each.value.vars
+    each.value.templatefile_path,
+    each.value.templatefile_vars
   )
   user  = var.runas.user
   group = var.runas.group
@@ -144,15 +145,16 @@ resource "system_file" "key" {
 
 # create and link traefik storage dir
 resource "system_link" "data" {
-  path   = var.storage.dir_link
-  target = var.storage.dir_target
-  user   = var.runas.user
-  group  = var.runas.group
+  depends_on = [system_folder.config]
+  path       = var.storage.dir_link
+  target     = var.storage.dir_target
+  user       = var.runas.user
+  group      = var.runas.group
 }
 
 # persist traefik systemd unit file
 resource "system_file" "service" {
-  path = var.service.systemd_unit_service.file_path
+  path = var.service.systemd_unit_service.target_path
   content = templatefile(
     var.service.systemd_unit_service.templatefile_path,
     var.service.systemd_unit_service.templatefile_vars
@@ -168,33 +170,6 @@ resource "system_service_systemd" "service" {
     system_file.service,
   ]
   name    = trimsuffix(system_file.service.basename, ".service")
-  status  = var.service.traefik.status
-  enabled = var.service.traefik.enabled
-}
-
-
-resource "null_resource" "traefik_restart" {
-  depends_on = [
-    system_service_systemd.service,
-  ]
-  triggers = {
-    config   = 
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = sensitive(var.vm_conn.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sleep 5",
-      "sudo systemctl restart traefik",
-    ]
-  }
+  status  = var.service.status
+  enabled = var.service.enabled
 }

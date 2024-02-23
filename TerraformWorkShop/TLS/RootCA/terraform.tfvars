@@ -52,7 +52,8 @@ certs = [
     cert = {
       dns_names = [
         "consul.service.consul",
-        "server.dc1.consul"
+        "server.dc1.consul",
+        "localhost"
       ]
       subject = {
         common_name  = "server.dc1.consul"
@@ -76,6 +77,29 @@ certs = [
       dns_names = ["traefik.service.consul"]
       subject = {
         common_name  = "traefik.service.consul"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  {
+    name = "lldap"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "lldap.service.consul",
+        "localhost"
+      ]
+      subject = {
+        common_name  = "lldap.service.consul"
         organization = "Sololab"
       }
       validity_period_hours = 43800
