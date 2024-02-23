@@ -1,15 +1,15 @@
 // https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference
 services {
-  id      = "consul-internal"
-  name    = "consul"
-  address = "192.168.255.2"
+  id      = "consul-internal-http"
+  name    = "consul-internal"
+  address = "127.0.0.1"
   port    = 8500
 
   checks = [
     {
       id       = "consul-tcp-check-8500"
       name     = "consul-tcp-check-8500"
-      tcp      = "192.168.255.2:8500"
+      tcp      = "127.0.0.1:8500"
       interval = "20s"
       timeout  = "2s"
     }
@@ -17,13 +17,41 @@ services {
 
    tags = [
     "traefik.enable=true",
-    "traefik.http.routers.consul-redirect.rule=Host(`consul.service.consul`)",
-    "traefik.http.routers.consul-redirect.entrypoints=web",
-    "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.consul.rule=Host(`consul.service.consul`)",
-    "traefik.http.routers.consul.entrypoints=websecure",
-    "traefik.http.routers.consul.tls.certresolver=internal",
-    "traefik.http.services.consul.loadbalancer.server.scheme=http",
-    // "traefik.http.services.consul.loadbalancer.server.port=8500"
+    "traefik.http.routers.consul-http.entrypoints=web",
+    "traefik.http.routers.consul-http.rule=Host(`consul.service.consul`)",
+    "traefik.http.services.consul-http.loadbalancer.server.scheme=http",
   ]
+}
+
+services {
+  id      = "consul-internal-https"
+  name    = "consul-internal"
+  address = "127.0.0.1"
+  port    = 8501
+
+  weights = {
+    passing = 1
+  }
+
+  checks = [
+    {
+      id       = "consul-tcp-check-8501"
+      name     = "consul-tcp-check-8501"
+      tcp      = "127.0.0.1:8501"
+      interval = "20s"
+      timeout  = "2s"
+    }
+  ]
+
+   tags = [
+    "traefik.enable=true",
+    "traefik.tcp.routers.consul-https.entrypoints=websecure",
+    "traefik.tcp.routers.consul-https.rule=HostSNI(`consul.service.consul`)",
+    "traefik.tcp.routers.consul-https.tls.passthrough=true",
+  ]
+}
+
+services {
+  id      = "consul-external"
+  name    = "consul"
 }

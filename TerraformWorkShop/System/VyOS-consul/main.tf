@@ -61,7 +61,7 @@ module "consul" {
     templatefile_vars = {
       bind_addr                  = "{{ GetInterfaceIP `eth2` }}"
       dns_addr                   = "{{ GetInterfaceIP `eth2` }}"
-      client_addr                = "{{ GetInterfaceIP `eth2` }}"
+      client_addr                = "127.0.0.1"
       data_dir                   = "/opt/consul"
       encrypt                    = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
       tls_ca_file                = "/etc/consul.d/certs/ca.crt"

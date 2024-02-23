@@ -47,7 +47,7 @@ module "traefik" {
     static = {
       templatefile_path = "${path.root}/traefik/traefik.yaml"
       templatefile_vars = {
-        consul_client_addr   = "127.0.0.1:8500"
+        consul_client_addr   = "127.0.0.1:8501"
         consul_datacenter    = "dc1"
         consul_scheme        = "https"
         consul_tls_ca        = "/etc/traefik/certs/ca.crt"
@@ -120,17 +120,17 @@ module "traefik" {
 
 # https://developer.hashicorp.com/consul/tutorials/get-started-vms/virtual-machine-gs-service-discovery#modify-service-definition-tags
 resource "system_file" "traefik_consul" {
-  depends_on = [system_service_systemd.traefik]
-  path       = "${system_folder.consul_config.path}/traefik.hcl"
+  depends_on = [module.traefik]
+  path       = "/etc/consul.d/traefik_consul.hcl"
   content    = file("./traefik/traefik_consul.hcl")
   user       = "vyos"
   group      = "users"
 }
 
-resource "system_file" "consul-ui_consul" {
-  depends_on = [system_service_systemd.traefik]
-  path       = "${system_folder.consul_config.path}/consul-ui.hcl"
-  content    = file("./consul/consul_consul.hcl")
-  user       = "vyos"
-  group      = "users"
-}
+# resource "system_file" "consul-ui_consul" {
+#   depends_on = [module.traefik]
+#   path       = "${system_folder.consul_config.path}/consul-ui.hcl"
+#   content    = file("./consul/consul_consul.hcl")
+#   user       = "vyos"
+#   group      = "users"
+# }

@@ -10,7 +10,8 @@ providers:
       address: ${consul_client_addr}
       datacenter: ${consul_datacenter}
       scheme: ${consul_scheme}
-      %{ if ${consul_scheme} != "http" }
+      # https://stackoverflow.com/questions/68007540/terraform-conditionally-execute-some-lines-of-code-in-template-file
+      %{ if consul_scheme != "http" }
       tls:
         ca: ${consul_tls_ca}
       %{ endif }

@@ -130,6 +130,7 @@ auto_encrypt {
 }
 
 # acl
+# https://developer.hashicorp.com/consul/tutorials/security-operations/docker-compose-auto-config
 acl {
   enabled = true
   default_policy = "deny"
