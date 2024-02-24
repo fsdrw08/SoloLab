@@ -30,8 +30,3 @@ http:
       basicAuth:
         users:
           - ${userpass}
-
-tls:
-  certificates:
-    - certFile: ${certFile}
-      keyFile: ${keyFile}
