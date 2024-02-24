@@ -56,20 +56,20 @@ resource "system_file" "root_ca" {
 #   allowed_uses = each.value.cert.allowed_uses
 # }
 
-resource "system_file" "cert" {
-  for_each = {
-    for cert in var.certs : cert.name => cert
-  }
-  path = format("%s/%s", each.value.dir, "${each.value.name}.pem")
-  # content = format("%s\n%s", tls_locally_signed_cert.cert[each.key].cert_pem,
-  # tls_self_signed_cert.root.cert_pem)
-  # content = format("%s\n%s", data.terraform_remote_state.signed_cert_pem[each.key].cert_pem,
-  # data.terraform_remote_state.root_ca.outputs.root_cert_pem)
-  # content = data.terraform_remote_state.root_ca.outputs.signed_cert_pem[each.key]
-  # https://discuss.hashicorp.com/t/transforming-a-list-of-objects-to-a-map/25373
-  # content = lookup((merge(data.terraform_remote_state.root_ca.outputs.signed_cert_pem...)), each.key, null) #.cert_pem
-  content = lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), each.key, null) #.cert_pem
-}
+# resource "system_file" "cert" {
+#   for_each = {
+#     for cert in var.certs : cert.name => cert
+#   }
+#   path = format("%s/%s", each.value.dir, "${each.value.name}.pem")
+#   # content = format("%s\n%s", tls_locally_signed_cert.cert[each.key].cert_pem,
+#   # tls_self_signed_cert.root.cert_pem)
+#   # content = format("%s\n%s", data.terraform_remote_state.signed_cert_pem[each.key].cert_pem,
+#   # data.terraform_remote_state.root_ca.outputs.root_cert_pem)
+#   # content = data.terraform_remote_state.root_ca.outputs.signed_cert_pem[each.key]
+#   # https://discuss.hashicorp.com/t/transforming-a-list-of-objects-to-a-map/25373
+#   # content = lookup((merge(data.terraform_remote_state.root_ca.outputs.signed_cert_pem...)), each.key, null) #.cert_pem
+#   content = lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), each.key, null) #.cert_pem
+# }
 
 
 # https://discuss.hashicorp.com/t/transforming-a-list-of-objects-to-a-map/25373
@@ -78,10 +78,10 @@ resource "system_file" "cert" {
 #   value = merge(data.terraform_remote_state.root_ca.outputs.signed_cert_pem...)
 # }
 
-resource "system_file" "key" {
-  for_each = {
-    for cert in var.certs : cert.name => cert
-  }
-  path    = format("%s/%s", each.value.dir, "${each.value.name}.key")
-  content = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), each.key, null)
-}
+# resource "system_file" "key" {
+#   for_each = {
+#     for cert in var.certs : cert.name => cert
+#   }
+#   path    = format("%s/%s", each.value.dir, "${each.value.name}.key")
+#   content = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), each.key, null)
+# }
