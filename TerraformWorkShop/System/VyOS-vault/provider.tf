@@ -10,9 +10,9 @@ terraform {
     }
   }
   backend "consul" {
-    address      = "consul.service.consul:8500"
+    address      = "consul.service.consul"
     scheme       = "http"
-    path         = "tfstate/vyos-vault"
+    path         = "tfstate/system/vyos-vault"
     access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
   }
 }

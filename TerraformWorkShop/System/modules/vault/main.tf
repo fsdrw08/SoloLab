@@ -50,18 +50,18 @@ resource "system_folder" "config" {
 # persist vault config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", basename("${var.config.templatefile_path}")])
-  content    = templatefile(var.config.templatefile_path, var.config.templatefile_vars)
+  path       = join("/", ["${var.config.dir}", basename("${var.config.main.templatefile_path}")])
+  content    = templatefile(var.config.main.templatefile_path, var.config.main.templatefile_vars)
   user       = var.runas.user
   group      = var.runas.group
   mode       = "600"
 }
 
 resource "system_file" "env" {
-  count      = var.config.env_templatefile_path == null ? 0 : 1
+  count      = var.config.env == null ? 0 : 1
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", basename("${var.config.env_templatefile_path}")])
-  content    = templatefile(var.config.env_templatefile_path, var.config.env_templatefile_vars)
+  path       = join("/", ["${var.config.dir}", basename("${var.config.env.templatefile_path}")])
+  content    = templatefile(var.config.env.templatefile_path, var.config.env.templatefile_vars)
   user       = var.runas.user
   group      = var.runas.group
   mode       = "600"

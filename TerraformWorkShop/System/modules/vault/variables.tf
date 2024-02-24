@@ -31,8 +31,10 @@ variable "storage" {
 
 variable "config" {
   type = object({
-    templatefile_path = string
-    templatefile_vars = optional(map(string))
+    main = object({
+      templatefile_path = string
+      templatefile_vars = optional(map(string))
+    })
     tls = optional(object({
       ca_basename   = string
       ca_content    = string
@@ -42,9 +44,11 @@ variable "config" {
       key_content   = string
       sub_dir       = string
     }))
-    env_templatefile_path = optional(string)
-    env_templatefile_vars = optional(map(string))
-    dir                   = string
+    env = optional(object({
+      templatefile_path = string
+      templatefile_vars = optional(map(string))
+    }))
+    dir = string
   })
 }
 
