@@ -1,3 +1,4 @@
+# https://build.opensuse.org/package/view_file/home:Masgalor:LLDAP/lldap/lldap_config.toml?expand=1
 ## Tune the logging to be more verbose by setting this to be true.
 ## You can set it with the LLDAP_VERBOSE environment variable.
 # verbose=false
@@ -19,7 +20,7 @@ http_host = "${http_host}"
 
 ## The port on which to have the HTTP server, for user login and
 ## administration.
-http_port = "${http_port}"
+http_port = ${http_port}
 
 ## The public URL of the server, for password reset links.
 http_url = "${http_url}"
@@ -80,7 +81,7 @@ ldap_user_pass = "${ldap_user_pass}"
 ##  - "mysql://mysql-user:password@mysql-server/my-database"
 ##
 ## This can be overridden with the LLDAP_DATABASE_URL env variable.
-database_url = "sqlite:///var/lib/lldap/users.db?mode=rwc"
+database_url = "${database_url}"
 
 ## Private key file.
 ## Contains the secret private key used to store the passwords safely.
@@ -136,13 +137,11 @@ key_file = "/var/lib/lldap/private_key"
 ## Whether to enable LDAPS.
 enabled=${ldaps_enabled}
 %{ if ldaps_enabled == "true" }
-tls:
-  ca: ${consul_tls_ca}
-%{ endif }
 ## Port on which to listen.
 port=${ldaps_port}
 ## Certificate file.
 cert_file="${ldaps_cert_file}"
 ## Certificate key file.
 key_file="${ldaps_key_file}"
+%{ endif }
 

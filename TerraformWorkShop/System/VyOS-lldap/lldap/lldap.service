@@ -1,0 +1,20 @@
+# https://build.opensuse.org/package/view_file/home:Masgalor:LLDAP/lldap/lldap.service?expand=1
+[Unit]
+Description=Nitnelave LLDAP
+Documentation=https://github.com/nitnelave/lldap
+After=network.target
+
+[Service]
+Type=simple
+User=${user}
+ExecStart=/usr/bin/lldap run --config-file /etc/lldap/lldap_config.toml
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=full
+WorkingDirectory=${WorkingDirectory}
+ReadWriteDirectories=${ReadWriteDirectories}
+
+[Install]
+WantedBy=multi-user.target
