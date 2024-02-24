@@ -57,20 +57,23 @@ module "consul" {
     dir_link   = "/opt/consul"
   }
   config = {
-    templatefile_path = "${path.root}/consul/consul.hcl"
-    templatefile_vars = {
-      bind_addr                  = "{{ GetInterfaceIP `eth2` }}"
-      dns_addr                   = "{{ GetInterfaceIP `eth2` }}"
-      client_addr                = "127.0.0.1"
-      data_dir                   = "/opt/consul"
-      encrypt                    = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
-      tls_ca_file                = "/etc/consul.d/certs/ca.crt"
-      tls_cert_file              = "/etc/consul.d/certs/server.crt"
-      tls_key_file               = "/etc/consul.d/certs/server.key"
-      tls_verify_incoming        = false
-      tls_verify_outgoing        = true
-      tls_verify_server_hostname = true
-      token_init_mgmt            = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    main = {
+      templatefile_path = "${path.root}/consul/consul.hcl"
+      templatefile_vars = {
+        bind_addr                  = "{{ GetInterfaceIP `eth2` }}"
+        dns_addr                   = "{{ GetInterfaceIP `eth2` }}"
+        client_addr                = "127.0.0.1"
+        enable_local_script_checks = true
+        data_dir                   = "/opt/consul"
+        encrypt                    = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
+        tls_ca_file                = "/etc/consul.d/certs/ca.crt"
+        tls_cert_file              = "/etc/consul.d/certs/server.crt"
+        tls_key_file               = "/etc/consul.d/certs/server.key"
+        tls_verify_incoming        = false
+        tls_verify_outgoing        = true
+        tls_verify_server_hostname = true
+        token_init_mgmt            = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+      }
     }
     tls = {
       ca_basename   = "ca.crt"

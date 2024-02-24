@@ -47,7 +47,7 @@ module "traefik" {
     static = {
       templatefile_path = "${path.root}/traefik/traefik.yaml"
       templatefile_vars = {
-        consul_client_addr   = "127.0.0.1:8501"
+        consul_client_addr   = "localhost:8501"
         consul_datacenter    = "dc1"
         consul_scheme        = "https"
         consul_tls_ca        = "/etc/traefik/certs/ca.crt"
@@ -64,13 +64,18 @@ module "traefik" {
     dynamic = {
       files = [
         {
+          templatefile_path = "./traefik/dyn-default_tls.yaml"
+          templatefile_vars = {
+            certFile = "/etc/traefik/certs/wildcard.crt"
+            keyFile  = "/etc/traefik/certs/wildcard.key"
+          }
+        },
+        {
           templatefile_path = "./traefik/dyn-traefik_dashboard.yaml"
           templatefile_vars = {
             sub_domain  = "traefik"
             base_domain = "service.consul"
             userpass    = "admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"
-            certFile    = "/etc/traefik/certs/traefik.crt"
-            keyFile     = "/etc/traefik/certs/traefik.key"
           }
         },
         {
@@ -85,15 +90,15 @@ module "traefik" {
     tls = {
       ca_basename   = "ca.crt"
       ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      cert_basename = "traefik.crt"
+      cert_basename = "wildcard.crt"
       cert_content = join("\n",
         [
-          lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "traefik", null),
+          lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "wildcard", null),
           data.terraform_remote_state.root_ca.outputs.root_cert_pem
         ]
       )
-      key_basename = "traefik.key"
-      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "traefik", null)
+      key_basename = "wildcard.key"
+      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "wildcard", null)
       sub_dir      = "certs"
     }
     dir = "/etc/traefik"

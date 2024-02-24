@@ -85,6 +85,7 @@ bootstrap_expect=1
 # then the provided key is ignored and a warning will be displayed.
 encrypt = "${encrypt}"
 
+enable_local_script_checks = ${enable_local_script_checks}
 # retry_join
 # Similar to -join but allows retrying a join until it is successful. Once it joins
 # successfully to a member in a list of members it will never attempt to join again.
