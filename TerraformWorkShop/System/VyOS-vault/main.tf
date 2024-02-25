@@ -39,6 +39,9 @@ resource "system_file" "init" {
     VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
     VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
   })
+  user  = "vyos"
+  group = "users"
+  mode  = "700"
 }
 
 module "vault" {
@@ -98,7 +101,7 @@ module "vault" {
       templatefile_path = "${path.root}/vault/vault.env"
       templatefile_vars = {
         VAULT_ADDR                       = "https://vault.service.consul"
-        VAULT_CACERT                     = "/etc/vault.d/ca.crt"
+        VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
         VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
       }
     }
