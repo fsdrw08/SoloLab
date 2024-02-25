@@ -13,7 +13,7 @@ terraform {
     address      = "consul.service.consul"
     scheme       = "http"
     path         = "tfstate/system/vyos-lldap"
-    access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    access_token = "ec15675e-2999-d789-832e-8c4794daa8d7"
   }
 }
 
