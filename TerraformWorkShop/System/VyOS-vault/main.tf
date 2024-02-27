@@ -39,6 +39,9 @@ resource "system_file" "init" {
     VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
     VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
   })
+  user  = "vyos"
+  group = "users"
+  mode  = "700"
 }
 
 module "vault" {
@@ -98,7 +101,7 @@ module "vault" {
       templatefile_path = "${path.root}/vault/vault.env"
       templatefile_vars = {
         VAULT_ADDR                       = "https://vault.service.consul"
-        VAULT_CACERT                     = "/etc/vault.d/ca.crt"
+        VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
         VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
       }
     }
@@ -129,12 +132,44 @@ resource "system_file" "vault_consul" {
   group   = "users"
 }
 
-data "system_file" "vault_token" {
-  depends_on = [module.vault]
-  path       = "/mnt/data/vault/init/vault_operator_secrets.json"
+locals {
+  vault_post_process = {
+    New-VaultStaticToken = {
+      script_path = "./vault/New-VaultStaticToken.sh"
+      vars = {
+        ENV_FILE     = "/etc/vault.d/vault.env"
+        STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+      }
+    }
+  }
 }
 
-output "vault_token" {
-  value     = jsondecode(data.system_file.vault_token.content).root_token
-  sensitive = true
+resource "null_resource" "vault_post_process" {
+  depends_on = [module.vault]
+  for_each   = local.vault_post_process
+  triggers = {
+    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      templatefile("${each.value.script_path}", "${each.value.vars}")
+    ]
+  }
+  # provisioner "remote-exec" {
+  #   when = destroy
+  #   inline = [
+  #     "sudo rm -f ${self.triggers.file_source}/consul",
+  #   ]
+  # }
 }
