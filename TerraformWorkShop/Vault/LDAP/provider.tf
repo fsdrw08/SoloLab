@@ -6,7 +6,7 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 3.15.0"
+      version = ">= 3.25.0"
     }
     # local = {
     #   source  = "hashicorp/local"
@@ -18,14 +18,18 @@ terraform {
     # }
   }
 
-  backend "local" {
+  backend "consul" {
+    address      = "consul.service.consul"
+    scheme       = "http"
+    path         = "tfstate/vault/ldap"
+    access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
   }
 }
 
 
 locals {
-  VAULT_ADDR      = "vault.infra.sololab"
-  token           = "hvs.TIUIxx67E7ZhfPgkMIsqiYXk"
+  VAULT_ADDR      = "vault.service.consul"
+  VAULT_TOKEN     = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
@@ -40,7 +44,7 @@ provider "vault" {
   # address = "https://vault.example.net:8200"
 
   address = "https://${local.VAULT_ADDR}"
-  token   = local.token
+  token   = local.VAULT_TOKEN
   # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
   skip_tls_verify = local.skip_tls_verify
 }
