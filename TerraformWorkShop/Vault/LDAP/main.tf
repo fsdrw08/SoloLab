@@ -29,12 +29,12 @@ module "ldap_mgmt" {
       userdn   = "ou=people,dc=root,dc=sololab"
       userattr = "uid"
       # userfilter = "({{.UserAttr}}={{.Username}})"
-      userfilter = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(memberOf=cn=svc-vault-root,ou=groups,dc=root,dc=sololab))"
-      # groupfilter = ""
-      groupdn   = "ou=groups,dc=root,dc=sololab"
-      groupattr = "uid"
+      # do not use upper case group name
+      userfilter = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(memberOf=cn=oidc_user,ou=groups,dc=root,dc=sololab))"
+      groupdn    = "ou=groups,dc=root,dc=sololab"
+      groupattr  = "cn"
       # groupfilter = "(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}}))"
-      groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=svc-vault-*))"
+      groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=svc-vault-*)(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}})))"
 
     }
   }
