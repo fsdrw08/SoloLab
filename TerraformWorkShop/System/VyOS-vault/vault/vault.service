@@ -3,7 +3,7 @@
 Description="HashiCorp Vault - A tool for managing secrets"
 Documentation=https://developer.hashicorp.com/vault/docs
 Requires=network-online.target
-After=network-online.target
+After=network-online.target consul.service
 ConditionFileNotEmpty=/etc/vault.d/vault.hcl
 StartLimitIntervalSec=60
 StartLimitBurst=3
@@ -21,9 +21,9 @@ SecureBits=keep-caps
 AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
-ExecStartPre=/usr/bin/sleep 5
+ExecStartPre=/usr/bin/sleep 8
 ExecStart=/usr/bin/vault server -config=/etc/vault.d/vault.hcl
-ExecStartPost=-/bin/bash -c "[ -f ${post_script_path} ] && ${post_script_path}"
+ExecStartPost=-/bin/bash -c "[ -f ${post_script_path} ] && /usr/bin/sleep 5 && ${post_script_path}"
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGINT
