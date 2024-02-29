@@ -47,7 +47,7 @@ module "traefik" {
     static = {
       templatefile_path = "${path.root}/traefik/traefik.yaml"
       templatefile_vars = {
-        consul_client_addr   = "localhost:8501"
+        consul_client_addr   = "consul.service.consul:8501"
         consul_datacenter    = "dc1"
         consul_scheme        = "https"
         consul_tls_ca        = "/etc/traefik/certs/ca.crt"
