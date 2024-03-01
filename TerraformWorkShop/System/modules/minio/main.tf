@@ -1,4 +1,4 @@
-# consul
+# minio
 resource "system_group" "group" {
   count = var.runas.take_charge == true ? 1 : 0
   name  = var.runas.group
@@ -10,47 +10,14 @@ resource "system_user" "user" {
   group      = var.runas.group
 }
 
-# download consul zip
-resource "system_file" "zip" {
-  source = var.install.zip_file_source
-  path   = var.install.zip_file_path
+# download minio bin
+resource "system_file" "bin" {
+  path   = "${var.install.server.bin_file_dir}/minio"
+  source = var.install.server.bin_file_source
+  mode   = 755
 }
 
-# unzip and put it to /usr/bin/
-resource "null_resource" "bin" {
-  depends_on = [system_file.zip]
-  triggers = {
-    file_source = var.install.zip_file_source
-    file_dir    = var.install.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo unzip ${system_file.zip.path} -d ${var.install.bin_file_dir} -o",
-      "sudo chmod 755 ${var.install.bin_file_dir}/consul",
-      # https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443
-      # "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.install.bin_file_dir}/vault"
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo rm -f ${self.triggers.file_dir}/consul",
-    ]
-  }
-}
-
-# prepare consul config dir
+# prepare minio config dir
 resource "system_folder" "config" {
   path  = var.config.dir
   user  = var.runas.user
@@ -58,7 +25,7 @@ resource "system_folder" "config" {
   mode  = "700"
 }
 
-# persist consul config file in dir
+# persist vault config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, basename(var.config.main.templatefile_path)])
@@ -123,15 +90,15 @@ resource "system_link" "data" {
 }
 
 # persist systemd unit file
-# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-systemd
-# https://github.com/hashicorp/consul/blob/main/.release/linux/package/usr/lib/systemd/system/consul.service
+# https://developer.hashicorp.com/vault/tutorials/operations/production-hardening
+# https://github.com/hashicorp/vault/blob/main/.release/linux/package/usr/lib/systemd/system/vault.service
 resource "system_file" "service" {
   path    = var.service.systemd_unit_service.target_path
   content = templatefile(var.service.systemd_unit_service.templatefile_path, var.service.systemd_unit_service.templatefile_vars)
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled
-# debug service: journalctl -u consul.service
+# debug service: journalctl -u vault.service
 # debug from boot log: journalctl -b
 resource "system_service_systemd" "service" {
   depends_on = [
