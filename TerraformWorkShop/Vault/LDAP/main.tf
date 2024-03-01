@@ -30,11 +30,11 @@ module "ldap_mgmt" {
       userattr = "uid"
       # userfilter = "({{.UserAttr}}={{.Username}})"
       # do not use upper case group name
-      userfilter = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(memberOf=cn=oidc_user,ou=groups,dc=root,dc=sololab))"
+      userfilter = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(memberOf=cn=sso_allow,ou=groups,dc=root,dc=sololab))"
       groupdn    = "ou=groups,dc=root,dc=sololab"
       groupattr  = "cn"
       # groupfilter = "(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}}))"
-      groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=svc-vault-*)(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}})))"
+      groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=app-*)(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}})))"
 
     }
   }
@@ -115,7 +115,17 @@ module "ldap_mgmt" {
       policies = ["vault-root"]
       alias = [
         {
-          name     = "svc-vault-root"
+          name     = "app-vault-root"
+          ldap_key = "sololab"
+        }
+      ]
+    }
+    minio-default = {
+      type     = "external"
+      policies = ["default"]
+      alias = [
+        {
+          name     = "app-minio-default"
           ldap_key = "sololab"
         }
       ]
