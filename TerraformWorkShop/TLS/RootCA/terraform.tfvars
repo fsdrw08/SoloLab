@@ -49,7 +49,9 @@ certs = [
       rsa_bits  = 4096
     }
     cert = {
-      dns_names = ["vault.service.consul"]
+      dns_names = [
+        "vault.service.consul"
+      ]
       subject = {
         common_name  = "vault.service.consul"
         organization = "Sololab"

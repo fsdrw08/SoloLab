@@ -1,5 +1,5 @@
 services {
-  id      = "vault-internal-api"
+  id      = "vault-api"
   name    = "vault"
   address = "192.168.255.2"
   port    = 8200
@@ -24,7 +24,7 @@ services {
   ]
 }
 
-services {
-  id      = "vault-external"
-  name    = "vault"
-}
+// services {
+//   id      = "vault-external"
+//   name    = "vault"
+// }
