@@ -8,6 +8,23 @@
 
 # MAIN FUNCTIONS
 
+# https://github.com/Indellient/vault-habitat/blob/2a010ee30b2639e65d3df5ad05df47c07c0eec55/vault/hooks/run#L49
+function wait_started {
+    counter=0
+    until STATUS=$(vault status -format=json); [ $? -ne 1 ]
+    do
+        if [ $counter -lt 5 ]; then
+            echo "Waiting for vault to come up"
+            sleep 5
+            ((counter++))
+        else
+            echo "check vault stauts manually"
+            exit 1
+        fi
+    done
+    echo "Vault is started"
+}
+
 function init {
     # Initialize Vault
     printf "Initializing Vault...\n"
@@ -57,6 +74,7 @@ function vault_health {
 if [ -f $VAULT_OPERATOR_SECRETS_JSON_PATH ]; then
     # Vault is already initialized
     printf "Vault is already initialized.\n"
+    wait_started
     unseal
     authenticate
     vault_status
@@ -65,6 +83,7 @@ if [ -f $VAULT_OPERATOR_SECRETS_JSON_PATH ]; then
 else
     # Vault is not initialized
     printf "Vault is not initialized.\nStarting the initialization..\n"
+    wait_started
     init
     unseal
     authenticate

@@ -3,6 +3,37 @@
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs
 export $(grep -v '^#' ${ENV_FILE} | xargs)
 
+# https://github.com/Indellient/vault-habitat/blob/2a010ee30b2639e65d3df5ad05df47c07c0eec55/vault/hooks/run#L49
+function wait_started {
+    counter=0
+    until STATUS=$(vault status -format=json); [ $? -ne 1 ]
+    do
+        if [ $counter -lt 5 ]; then
+            echo "Waiting for vault to come up"
+            sleep 5
+            ((counter++))
+        else
+            echo "check vault stauts manually"
+            exit 1
+        fi
+    done
+    echo "Vault is started"
+}
+
+function wait_ready {
+    retried=1
+    # https://github.com/homedepot/spingo/blob/d5f418cc438ec176a219258f816178028cec5394/scripts/initial-setup.sh#L305
+    status=$(vault status -format json | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
+    until [ "$status" = "true" ]
+    do
+      echo "[$retried] Vault not initialized yet"
+      ((retried++))
+      sleep 5
+      status=$(vault status -format json | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
+    done
+    echo "Vault is initialized and unsealed"
+}
+
 function authenticate {
     # Authenticate Vault
     printf "Authenticating Vault...\n"
@@ -27,7 +58,8 @@ function unauthenticate {
     printf "Unauthenticated Vault.\n"
 }
 
-
+wait_started
+wait_ready
 authenticate
 create_token
 unauthenticate
