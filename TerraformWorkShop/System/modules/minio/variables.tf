@@ -9,9 +9,10 @@ variable "vm_conn" {
 
 variable "install" {
   type = object({
-    zip_file_source = string
-    zip_file_path   = string
-    bin_file_dir    = string
+    server = object({
+      bin_file_dir    = string
+      bin_file_source = string
+    })
   })
 }
 
@@ -23,27 +24,18 @@ variable "runas" {
   })
 }
 
-variable "storage" {
-  type = object({
-    dir_target = string
-    dir_link   = string
-  })
-}
-
 variable "config" {
   type = object({
-    main = object({
+    env = object({
       templatefile_path = string
       templatefile_vars = optional(map(string))
     })
-    tls = optional(object({
-      ca_basename   = string
-      ca_content    = string
-      cert_basename = string
-      cert_content  = string
-      key_basename  = string
-      key_content   = string
-      sub_dir       = string
+    certs = optional(object({
+      ca_basename  = string
+      ca_content   = string
+      cert_content = string
+      key_content  = string
+      sub_dir      = string
     }))
     dir = string
   })

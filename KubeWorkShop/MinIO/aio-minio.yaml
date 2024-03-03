@@ -41,26 +41,26 @@ metadata:
     name: minio
 spec:
   initContainers:
-  #   - name: mc
-  #     image: quay.io/minio/mc:latest
-  #     imagePullPolicy: IfNotPresent
-  #     command:
-  #       - '/bin/sh'
-  #       - '-c'
-  #     args:
-  #       - 'cp /usr/bin/mc /mnt/bin/mc'
-  #     volumeMounts:
-  #       - name: mc
-  #         mountPath: /mnt/bin/
-  
-  # https://varlogdiego.com/kubernetes-wait-until-another-pod-is-ready
+    #   - name: mc
+    #     image: quay.io/minio/mc:latest
+    #     imagePullPolicy: IfNotPresent
+    #     command:
+    #       - '/bin/sh'
+    #       - '-c'
+    #     args:
+    #       - 'cp /usr/bin/mc /mnt/bin/mc'
+    #     volumeMounts:
+    #       - name: mc
+    #         mountPath: /mnt/bin/
+
+    # https://varlogdiego.com/kubernetes-wait-until-another-pod-is-ready
     - name: wait-for-idp
       image: docker.io/curlimages/curl:8.00.1
       imagePullPolicy: IfNotPresent
-      command: 
+      command:
         - "/bin/sh"
         - "-c"
-      args: 
+      args:
         - "while [ $(curl -sw '200' -k -x GET https://keycloak.infra.sololab/realms/sololab/.well-known/openid-configuration -o /dev/null) -ne 200 ]; do sleep 5; echo 'Waiting for the keycloak...'; done"
   containers:
     - name: minio
@@ -88,40 +88,40 @@ spec:
         - name: MINIO_BROWSER_REDIRECT_URL
           value: https://minio.infra.sololab/console/
 
-        # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#openid-identity-management
-        - name:  MINIO_IDENTITY_OPENID_CONFIG_URL
+        # https://min.io/docs/minio/linux/reference/minio-server/settings/iam/openid.html#envvar.MINIO_IDENTITY_OPENID_CONFIG_URL
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL
           value: https://keycloak.infra.sololab/realms/sololab/.well-known/openid-configuration
-          
-        - name:  MINIO_IDENTITY_OPENID_CLIENT_ID
+
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID
           value: minio
-          
-        - name:  MINIO_IDENTITY_OPENID_CLIENT_SECRET
+
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET
           value: z2KqVuwXQ28vseV5ITk8st16r5fZfoQ8
-          
-        - name:  MINIO_IDENTITY_OPENID_CLAIM_NAME
+
+        - name: MINIO_IDENTITY_OPENID_CLAIM_NAME
           value: policy
-          
-        - name:  MINIO_IDENTITY_OPENID_SCOPES
+
+        - name: MINIO_IDENTITY_OPENID_SCOPES
           value: openid,email
-          
+
       # https://blog.csdn.net/fly910905/article/details/104706105
       # https://github.com/minio/minio/blob/master/Dockerfile
       args:
         # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#id1
-        - 'server'
+        - "server"
         # - '--address'
         # - ':9000'
         # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#minio.server.-console-address
-        - '--console-address'
-        - ':9001'
+        - "--console-address"
+        - ":9001"
         # https://min.io/docs/minio/linux/operations/network-encryption.html#enabling-tls
         # https://github.com/minio/minio/issues/12992
-        # present CAs sub folder is a must when 
+        # present CAs sub folder is a must when
         # hosting minio behind a reservers proxy with self sign cert
-        - '--certs-dir'
-        - '/mnt/certs'
+        - "--certs-dir"
+        - "/mnt/certs"
         # https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#minio.server.DIRECTORIES
-        - '/data'
+        - "/data"
 
       # https://github.com/minio/console/issues/2681
       # startupProbe:
