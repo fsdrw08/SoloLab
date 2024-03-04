@@ -58,16 +58,23 @@ module "minio" {
     env = {
       templatefile_path = "${path.root}/minio/minio.env"
       templatefile_vars = {
-        MINIO_OPTS                 = <<EOT
+        MINIO_OPTS                          = <<EOT
       --address minio.service.consul:9000 \
       --console-address minio.service.consul:9001 \
       --certs-dir /etc/minio/certs
       EOT
-        MINIO_VOLUMES              = "/mnt/data/minio"
-        MINIO_SERVER_URL           = "https://minio.service.consul"
-        MINIO_BROWSER_REDIRECT_URL = "https://minio.service.consul/ui"
-        MINIO_ROOT_USER            = "admin"
-        MINIO_ROOT_PASSWORD        = "P@ssw0rd"
+        MINIO_VOLUMES                       = "/mnt/data/minio"
+        MINIO_ROOT_USER                     = "admin"
+        MINIO_ROOT_PASSWORD                 = "P@ssw0rd"
+        MINIO_UPDATE                        = "off"
+        MINIO_SERVER_URL                    = "https://minio.service.consul"
+        MINIO_BROWSER_REDIRECT_URL          = "https://minio.service.consul/ui"
+        MINIO_IDENTITY_OPENID_CONFIG_URL    = ""
+        MINIO_IDENTITY_OPENID_CLIENT_ID     = ""
+        MINIO_IDENTITY_OPENID_CLIENT_SECRET = ""
+        MINIO_IDENTITY_OPENID_CLAIM_NAME    = ""
+        MINIO_IDENTITY_OPENID_CLAIM_PREFIX  = ""
+        MINIO_IDENTITY_OPENID_SCOPES        = ""
       }
     }
     certs = {
