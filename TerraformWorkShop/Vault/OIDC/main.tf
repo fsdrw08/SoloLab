@@ -29,6 +29,7 @@ resource "vault_identity_oidc_key_allowed_client_id" "minio" {
 
 # The assignments parameter limits the Vault entities and groups that are allowed to authenticate through the client application. 
 # By default, no Vault entities are allowed. To allow all Vault entities to authenticate, the built-in allow_all assignment is provided.
+# ref: https://github.com/mekstack/mekstack/blob/d9df2e9b64db587256074114ea0ab5b6b4c6fb0a/infra/vault/vault.tf#L34
 resource "vault_identity_oidc_assignment" "minio" {
   name = "oidc-minio"
   group_ids = [
@@ -52,23 +53,24 @@ resource "vault_identity_oidc_client" "minio" {
 
 }
 
-resource "vault_identity_oidc_scope" "minio_groups" {
+# ref: https://github.com/Cottand/selfhosted/blob/aa04e9419ad8ad8830105537293beb71a363e4eb/terraform/nomad-sso/vault-oidc.tf#L90
+resource "vault_identity_oidc_scope" "groups" {
   name     = "groups"
   template = "{\"groups\" :{{identity.entity.groups.names}} }"
 }
 
-resource "vault_identity_oidc_scope" "minio_username" {
+resource "vault_identity_oidc_scope" "username" {
   name     = "username"
   template = "{\"username\":{{identity.entity.name}}}"
 }
 
-resource "vault_identity_oidc_provider" "minio" {
-  name          = "minio"
+resource "vault_identity_oidc_provider" "provider" {
+  name          = "sololab"
   https_enabled = true
   issuer_host   = "vault.service.consul:8200"
   scopes_supported = [
-    vault_identity_oidc_scope.minio_groups.name,
-    vault_identity_oidc_scope.minio_username.name
+    vault_identity_oidc_scope.groups.name,
+    vault_identity_oidc_scope.username.name
   ]
   allowed_client_ids = [
     vault_identity_oidc_client.minio.client_id
