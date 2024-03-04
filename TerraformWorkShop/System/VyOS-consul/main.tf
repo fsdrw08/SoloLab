@@ -108,7 +108,7 @@ locals {
       script_path = "./consul/Config-ConsulDNS.sh"
       vars = {
         CONSUL_CACERT   = "/etc/consul.d/certs/ca.crt"
-        client_addr     = "127.0.0.1:8500"
+        client_addr     = "consul.service.consul:8500"
         token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
       }
     }
@@ -123,7 +123,7 @@ locals {
       script_path = "./consul/Config-TFToken.sh"
       vars = {
         CONSUL_CACERT   = "/etc/consul.d/certs/ca.crt"
-        client_addr     = "127.0.0.1:8500"
+        client_addr     = "consul.service.consul:8500"
         token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         secret_id       = "ec15675e-2999-d789-832e-8c4794daa8d7"
       }
