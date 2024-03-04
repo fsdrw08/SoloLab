@@ -13,7 +13,7 @@ function wait_started {
             sleep 5
             ((counter++))
         else
-            echo "check vault stauts manually"
+            echo "check vault status manually"
             exit 1
         fi
     done
@@ -26,10 +26,15 @@ function wait_ready {
     status=$(vault status -format json | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
     until [ "$status" = "true" ]
     do
-      echo "[$retried] Vault not initialized yet"
-      ((retried++))
-      sleep 5
-      status=$(vault status -format json | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
+        if [ $retried -lt 3 ]; then
+            echo "[$retried] Vault not initialized nor unseal "
+            ((retried++))
+            sleep 5
+            status=$(vault status -format json | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
+        else
+            echo "check vault stauts manually"
+            exit 1
+        fi
     done
     echo "Vault is initialized and unsealed"
 }
