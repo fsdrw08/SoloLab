@@ -8,8 +8,8 @@ function wait_started {
     counter=0
     until STATUS=$(vault status -format=json); [ $? -ne 1 ]
     do
-        if [ $counter -lt 5 ]; then
-            echo "Waiting for vault to come up"
+        if [ $counter -lt 20 ]; then
+            echo "Waiting for vault to come up, $(($counter*5))s passed"
             sleep 5
             ((counter++))
         else

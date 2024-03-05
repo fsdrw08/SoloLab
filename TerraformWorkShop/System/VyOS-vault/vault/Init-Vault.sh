@@ -11,10 +11,10 @@
 # https://github.com/Indellient/vault-habitat/blob/2a010ee30b2639e65d3df5ad05df47c07c0eec55/vault/hooks/run#L49
 function wait_started {
     counter=0
-    until STATUS=$(vault status -format=json); [ $? -ne 1 ]
+    until STATUS=$(vault status -format=json 2>&1); [ $? -ne 1 ]
     do
-        if [ $counter -lt 5 ]; then
-            echo "Waiting for vault to come up"
+        if [ $counter -lt 20 ]; then
+            echo "Waiting for vault to come up, $(($counter*5))s passed"
             sleep 5
             ((counter++))
         else
