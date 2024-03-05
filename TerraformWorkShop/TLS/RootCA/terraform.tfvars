@@ -132,4 +132,27 @@ certs = [
       ]
     }
   },
+  {
+    name = "minio"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "minio.service.consul",
+        "localhost"
+      ]
+      subject = {
+        common_name  = "minio.service.consul"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
 ]

@@ -42,7 +42,7 @@ resource "vault_identity_oidc_assignment" "minio" {
 resource "vault_identity_oidc_client" "minio" {
   name = "minio"
   redirect_uris = [
-    "https://minio.service.consul/oauth_callback"
+    "https://minio.service.consul/ui/oauth_callback"
   ]
   assignments = [
     vault_identity_oidc_assignment.minio.name
@@ -67,7 +67,7 @@ resource "vault_identity_oidc_scope" "username" {
 resource "vault_identity_oidc_provider" "provider" {
   name          = "sololab"
   https_enabled = true
-  issuer_host   = "vault.service.consul:8200"
+  issuer_host   = "vault.service.consul"
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,
     vault_identity_oidc_scope.username.name

@@ -31,9 +31,20 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
+data "vault_identity_oidc_openid_config" "config" {
+  name = "sololab"
+}
+
+data "vault_identity_oidc_client_creds" "creds" {
+  name = "minio"
+}
+
 module "minio" {
   depends_on = [
     null_resource.init,
+    data.terraform_remote_state.root_ca,
+    data.vault_identity_oidc_client_creds.creds,
+    data.vault_identity_oidc_openid_config.config
   ]
   source = "../modules/minio"
   vm_conn = {
@@ -58,6 +69,7 @@ module "minio" {
     env = {
       templatefile_path = "${path.root}/minio/minio.env"
       templatefile_vars = {
+        # https://github.com/minio/minio/issues/12992#issuecomment-901941802
         MINIO_OPTS                          = <<EOT
       --address minio.service.consul:9000 \
       --console-address minio.service.consul:9001 \
@@ -69,12 +81,12 @@ module "minio" {
         MINIO_UPDATE                        = "off"
         MINIO_SERVER_URL                    = "https://minio.service.consul"
         MINIO_BROWSER_REDIRECT_URL          = "https://minio.service.consul/ui"
-        MINIO_IDENTITY_OPENID_CONFIG_URL    = ""
-        MINIO_IDENTITY_OPENID_CLIENT_ID     = ""
-        MINIO_IDENTITY_OPENID_CLIENT_SECRET = ""
-        MINIO_IDENTITY_OPENID_CLAIM_NAME    = ""
-        MINIO_IDENTITY_OPENID_CLAIM_PREFIX  = ""
-        MINIO_IDENTITY_OPENID_SCOPES        = ""
+        MINIO_IDENTITY_OPENID_CONFIG_URL    = "${data.vault_identity_oidc_openid_config.config.issuer}/.well-known/openid-configuration"
+        MINIO_IDENTITY_OPENID_CLIENT_ID     = data.vault_identity_oidc_client_creds.creds.client_id
+        MINIO_IDENTITY_OPENID_CLIENT_SECRET = data.vault_identity_oidc_client_creds.creds.client_secret
+        MINIO_IDENTITY_OPENID_CLAIM_NAME    = "groups"
+        MINIO_IDENTITY_OPENID_CLAIM_PREFIX  = "minio"
+        MINIO_IDENTITY_OPENID_SCOPES        = "openid,username"
       }
     }
     certs = {
