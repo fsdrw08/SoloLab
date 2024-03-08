@@ -13,6 +13,10 @@ variable "install" {
       bin_file_dir    = string
       bin_file_source = string
     })
+    client = optional(object({
+      bin_file_dir    = string
+      bin_file_source = string
+    }))
   })
 }
 

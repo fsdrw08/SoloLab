@@ -10,10 +10,18 @@ resource "system_user" "user" {
   group      = var.runas.group
 }
 
-# download minio bin
-resource "system_file" "bin" {
+# present minio server bin
+resource "system_file" "server_bin" {
   path   = "${var.install.server.bin_file_dir}/minio"
   source = var.install.server.bin_file_source
+  mode   = 755
+}
+
+# present minio server bin
+resource "system_file" "client_bin" {
+  count  = var.install.client == null ? 0 : 1
+  path   = "${var.install.client.bin_file_dir}/mc"
+  source = var.install.client.bin_file_source
   mode   = 755
 }
 
@@ -107,7 +115,7 @@ resource "system_file" "service" {
 # debug from boot log: journalctl -b
 resource "system_service_systemd" "service" {
   depends_on = [
-    system_file.bin,
+    system_file.server_bin,
     system_file.env,
     system_file.service,
   ]

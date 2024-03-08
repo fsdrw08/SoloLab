@@ -59,6 +59,10 @@ module "minio" {
       bin_file_source = "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2024-02-26T09-33-48Z"
       bin_file_dir    = "/usr/local/bin"
     }
+    client = {
+      bin_file_source = "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2024-03-03T00-13-08Z"
+      bin_file_dir    = "/usr/local/bin"
+    }
   }
   runas = {
     user        = "vyos"
@@ -86,7 +90,7 @@ module "minio" {
         MINIO_IDENTITY_OPENID_CLIENT_SECRET = data.vault_identity_oidc_client_creds.creds.client_secret
         MINIO_IDENTITY_OPENID_CLAIM_NAME    = "groups"
         MINIO_IDENTITY_OPENID_CLAIM_PREFIX  = "minio"
-        MINIO_IDENTITY_OPENID_SCOPES        = "openid,username"
+        MINIO_IDENTITY_OPENID_SCOPES        = "openid,username,groups"
       }
     }
     certs = {
