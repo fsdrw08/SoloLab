@@ -21,6 +21,29 @@ root_ca = {
   }
 }
 
+int_ca = {
+  key = {
+    algorithm = "RSA"
+    rsa_bits  = "2048"
+  }
+  cert = {
+    subject = {
+      common_name         = "Sololab Intermediate CA1"
+      country             = "CN"
+      locality            = "Foshan"
+      organization        = "Sololab"
+      organizational_unit = "Infra"
+      province            = "GD"
+      street_address      = []
+    }
+    validity_period_hours = 175296 # (365 * 24 * 20) + (24 * 4) # 20 years
+    allowed_uses = [
+      "cert_signing",
+      "crl_signing",
+    ]
+  }
+}
+
 certs = [
   {
     name = "wildcard"

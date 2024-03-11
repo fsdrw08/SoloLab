@@ -2,6 +2,10 @@ output "root_cert_pem" {
   value = tls_self_signed_cert.root.cert_pem
 }
 
+output "int_ca_pem" {
+  value = tls_locally_signed_cert.int_ca.cert_pem
+}
+
 # https://discuss.hashicorp.com/t/transforming-a-list-of-objects-to-a-map/25373
 output "signed_cert_pem" {
   sensitive = true
