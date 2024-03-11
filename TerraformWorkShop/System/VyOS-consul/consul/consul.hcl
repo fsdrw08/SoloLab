@@ -112,20 +112,39 @@ auto_reload_config = true
 # tls
 # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#tls-configuration
 # https://developer.hashicorp.com/consul/docs/agent/config/config-files#tls-configuration-reference
-tls {
-   defaults {
-      ca_file = "${tls_ca_file}"
-      cert_file = "${tls_cert_file}"
-      key_file = "${tls_key_file}"
+# https://developer.hashicorp.com/consul/docs/connect/ca#root-certificate-rotation
+# not recommend to set the "default" block, consul need a special CA to sign client agent 
+# for service mesh, but https cert is a different thing, the "default" block will combine
+# all together, if so, when change the cert and key in default block, seems will make the 
+# agent cert changed, it will cause server agent dose not trust the client any more, to fix
+# that, we have to update the consul build in CA cert and key to make it trigger Root Cerficate Rotation
+# https://discuss.hashicorp.com/t/puzzled-with-ca-certs/43351/2
 
-      verify_incoming = ${tls_verify_incoming}
-      verify_outgoing = ${tls_verify_outgoing}
-   }
-   internal_rpc {
-      verify_server_hostname = ${tls_verify_server_hostname}
-   }
+tls {
+  defaults {
+    ca_file = "${tls_ca_file}"
+    cert_file = "${tls_cert_file}"
+    key_file = "${tls_key_file}"
+    verify_incoming = ${tls_verify_incoming}
+    verify_outgoing = ${tls_verify_outgoing}
+  }
+  internal_rpc {
+    verify_server_hostname = ${tls_irpc_verify_server_hostname}
+  }
 }
 
+# Service Mesh Parameters
+# by default, consul use it's build-in CA to generate root cert and key,
+# then sign client
+# https://developer.hashicorp.com/consul/docs/connect/ca#root-certificate-rotation
+# https://developer.hashicorp.com/consul/docs/agent/config/config-files#service-mesh-parameters
+# https://developer.hashicorp.com/consul/docs/connect/ca/consul#configuration
+connect {
+  enabled = ${connect_enabled}
+  ca_provider = "consul"
+}
+
+# https://developer.hashicorp.com/consul/tutorials/security/tls-encryption-secure
 auto_encrypt {
   allow_tls = true
 }

@@ -60,27 +60,30 @@ module "consul" {
     main = {
       templatefile_path = "${path.root}/consul/consul.hcl"
       templatefile_vars = {
-        bind_addr                  = "{{ GetInterfaceIP `eth2` }}"
-        dns_addr                   = "{{ GetInterfaceIP `eth2` }}"
-        client_addr                = "{{ GetInterfaceIP `eth2` }}"
-        enable_local_script_checks = true
-        data_dir                   = "/opt/consul"
-        encrypt                    = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
-        tls_ca_file                = "/etc/consul.d/certs/ca.crt"
-        tls_cert_file              = "/etc/consul.d/certs/server.crt"
-        tls_key_file               = "/etc/consul.d/certs/server.key"
-        tls_verify_incoming        = false
-        tls_verify_outgoing        = true
-        tls_verify_server_hostname = true
-        token_init_mgmt            = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+        bind_addr                       = "{{ GetInterfaceIP `eth2` }}"
+        dns_addr                        = "{{ GetInterfaceIP `eth2` }}"
+        client_addr                     = "{{ GetInterfaceIP `eth2` }}"
+        enable_local_script_checks      = true
+        data_dir                        = "/opt/consul"
+        encrypt                         = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
+        tls_ca_file                     = "/etc/consul.d/certs/ca.crt"
+        tls_cert_file                   = "/etc/consul.d/certs/server.crt"
+        tls_key_file                    = "/etc/consul.d/certs/server.key"
+        tls_verify_incoming             = false
+        tls_verify_outgoing             = true
+        tls_irpc_verify_server_hostname = false
+        connect_enabled                 = true
+        token_init_mgmt                 = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
       }
     }
     tls = {
-      ca_basename   = "ca.crt"
-      ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ca_basename = "ca.crt"
+      # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
       cert_basename = "server.crt"
+      # cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
       cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
-        data.terraform_remote_state.root_ca.outputs.root_cert_pem
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem
       )
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
@@ -104,19 +107,19 @@ module "consul" {
 
 locals {
   consul_post_process = {
+    Update-vyOSDNS = {
+      script_path = "./consul/Update-vyOSDNS.sh"
+      vars = {
+        domain = "consul"
+        ip     = "192.168.255.2"
+      }
+    }
     Config-ConsulDNS = {
       script_path = "./consul/Config-ConsulDNS.sh"
       vars = {
         CONSUL_CACERT   = "/etc/consul.d/certs/ca.crt"
         client_addr     = "consul.service.consul:8500"
         token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-      }
-    }
-    Update-vyOSDNS = {
-      script_path = "./consul/Update-vyOSDNS.sh"
-      vars = {
-        domain = "consul"
-        ip     = "192.168.255.2"
       }
     }
     Config-TFToken = {
