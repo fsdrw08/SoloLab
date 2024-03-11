@@ -21,13 +21,12 @@ SecureBits=keep-caps
 AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
-ExecStartPre=/usr/bin/sleep 8
 ExecStart=/usr/bin/vault server -config=/etc/vault.d/vault.hcl
 ExecStartPost=-/bin/bash -c "[ -f ${post_script_path} ] && /usr/bin/sleep 3 && ${post_script_path}"
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGINT
-# Restart=on-failure
+Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
 LimitNOFILE=65536
