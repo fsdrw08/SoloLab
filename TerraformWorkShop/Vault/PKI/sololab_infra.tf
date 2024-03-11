@@ -4,9 +4,9 @@ resource "vault_pki_secret_backend_cert" "infra" {
   # backend     = vault_mount.sololab_v1_ica2_v1.path
   # name        = vault_pki_secret_backend_role.sololab_v1_ica2_v1.name
 
-  depends_on  = [vault_pki_secret_backend_role.sololab_int1_v1]
-  backend     = vault_mount.sololab_int1_v1.path
-  name        = vault_pki_secret_backend_role.sololab_int1_v1.name
+  depends_on  = [vault_pki_secret_backend_role.pki_root]
+  backend     = vault_mount.pki_root.path
+  name        = vault_pki_secret_backend_role.pki_root.name
   common_name = "infra.sololab"
   alt_names = [
     "*.infra.sololab",
