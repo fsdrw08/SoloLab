@@ -141,23 +141,43 @@ tls {
 # https://developer.hashicorp.com/consul/docs/connect/ca/consul#configuration
 connect {
   enabled = ${connect_enabled}
-  ca_provider = "consul"
 }
 
-# https://developer.hashicorp.com/consul/tutorials/security/tls-encryption-secure
-auto_encrypt {
-  allow_tls = true
+// # https://developer.hashicorp.com/consul/tutorials/security/tls-encryption-secure
+// auto_encrypt {
+//   allow_tls = true
+// }
+
+# https://developer.hashicorp.com/consul/tutorials/security-operations/docker-compose-auto-config
+# https://developer.hashicorp.com/consul/docs/agent/config/config-files#auto_config
+auto_config {
+  authorization = {
+    enabled = true
+    static = {
+      oidc_discovery_url = "${auto_config_oidc_discovery_url}"
+      oidc_discovery_ca_cert = "${auto_config_oidc_discovery_ca_cert}"
+      bound_issuer = "${auto_config_bound_issuer}"
+      bound_audiences = ["consul-cluster-dc1"]
+      claim_mappings = {
+        "/consul/hostname" = "node_name"
+      }
+      claim_assertions = [
+        "value.node_name == \"$${node}\""
+      ]
+    }
+  }
 }
 
 # acl
+// https://developer.hashicorp.com/consul/docs/agent/config/config-files#acl-parameters
 # https://developer.hashicorp.com/consul/tutorials/security-operations/docker-compose-auto-config
 acl {
   enabled = true
   default_policy = "deny"
   enable_token_persistence = true
   tokens {
-    initial_management = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-    agent = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-    config_file_service_registration = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    initial_management = "${acl_token_init_mgmt}"
+    agent = "${acl_token_agent}"
+    config_file_service_registration = "${acl_token_config_file_svc_reg}"
   }
 }

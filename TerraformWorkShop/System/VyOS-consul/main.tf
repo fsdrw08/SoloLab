@@ -60,20 +60,25 @@ module "consul" {
     main = {
       templatefile_path = "${path.root}/consul/consul.hcl"
       templatefile_vars = {
-        bind_addr                       = "{{ GetInterfaceIP `eth2` }}"
-        dns_addr                        = "{{ GetInterfaceIP `eth2` }}"
-        client_addr                     = "{{ GetInterfaceIP `eth2` }}"
-        enable_local_script_checks      = true
-        data_dir                        = "/opt/consul"
-        encrypt                         = "qDOPBEr+/oUVeOFQOnVypxwDaHzLrD+lvjo5vCEBbZ0="
-        tls_ca_file                     = "/etc/consul.d/certs/ca.crt"
-        tls_cert_file                   = "/etc/consul.d/certs/server.crt"
-        tls_key_file                    = "/etc/consul.d/certs/server.key"
-        tls_verify_incoming             = false
-        tls_verify_outgoing             = true
-        tls_irpc_verify_server_hostname = false
-        connect_enabled                 = true
-        token_init_mgmt                 = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+        bind_addr                          = "{{ GetInterfaceIP `eth2` }}"
+        dns_addr                           = "{{ GetInterfaceIP `eth2` }}"
+        client_addr                        = "{{ GetInterfaceIP `eth2` }}"
+        enable_local_script_checks         = true
+        data_dir                           = "/opt/consul"
+        encrypt                            = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+        tls_ca_file                        = "/etc/consul.d/certs/ca.crt"
+        tls_cert_file                      = "/etc/consul.d/certs/server.crt"
+        tls_key_file                       = "/etc/consul.d/certs/server.key"
+        tls_verify_incoming                = true
+        tls_verify_outgoing                = true
+        tls_irpc_verify_server_hostname    = true
+        connect_enabled                    = true
+        auto_config_oidc_discovery_url     = "https://vault.service.consul:8201/v1/identity/oidc"
+        auto_config_oidc_discovery_ca_cert = replace(data.terraform_remote_state.root_ca.outputs.int_ca_pem, "\n", "\\n")
+        auto_config_bound_issuer           = "https://vault.service.consul:8201/v1/identity/oidc"
+        acl_token_init_mgmt                = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+        acl_token_agent                    = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+        acl_token_config_file_svc_reg      = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
       }
     }
     tls = {
@@ -81,8 +86,8 @@ module "consul" {
       # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
       ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
       cert_basename = "server.crt"
-      # cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
       cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
+        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
         data.terraform_remote_state.root_ca.outputs.int_ca_pem
       )
       key_basename = "server.key"

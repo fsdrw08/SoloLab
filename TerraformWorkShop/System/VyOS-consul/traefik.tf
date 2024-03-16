@@ -88,13 +88,15 @@ module "traefik" {
       sub_dir = "dynamic"
     }
     tls = {
-      ca_basename   = "ca.crt"
-      ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ca_basename = "ca.crt"
+      # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
       cert_basename = "wildcard.crt"
       cert_content = join("\n",
         [
           lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "wildcard", null),
-          data.terraform_remote_state.root_ca.outputs.root_cert_pem
+          # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+          data.terraform_remote_state.root_ca.outputs.int_ca_pem
         ]
       )
       key_basename = "wildcard.key"
