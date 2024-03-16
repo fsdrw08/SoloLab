@@ -1,0 +1,11 @@
+consul:53 {
+    reload
+    bind ${listen_address}
+    hosts {
+        192.168.255.2 sws.service.consul
+        fallthrough
+    }
+    forward . 127.0.0.1:8600
+    log
+    errors
+}

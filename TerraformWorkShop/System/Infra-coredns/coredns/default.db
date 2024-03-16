@@ -1,0 +1,5 @@
+.:53 {
+    forward . ${default_forward_ip}
+    log
+    errors
+}
