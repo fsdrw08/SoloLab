@@ -57,7 +57,7 @@ module "vault" {
     password = var.vm_conn.password
   }
   install = {
-    zip_file_source = "https://releases.hashicorp.com/vault/1.15.5/vault_1.15.5_linux_amd64.zip"
+    zip_file_source = "https://sws.infra.consul:4433/releases/vault%5F1.15.6%5Flinux%5Famd64.zip"
     zip_file_path   = "/home/vyos/vault.zip"
     bin_file_dir    = "/usr/bin"
   }
@@ -78,8 +78,8 @@ module "vault" {
         listener_address         = "{{ GetInterfaceIP `eth2` }}:8200"
         listener_cluster_address = "{{ GetInterfaceIP `eth2` }}:8201"
         # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
-        api_addr                 = "https://vault.service.consul:8200"
-        cluster_addr             = "https://vyos-lts.node.consul:8201"
+        api_addr                 = "{{ GetInterfaceIP `eth2` }}:8200"
+        cluster_addr             = "{{ GetInterfaceIP `eth2` }}:8201"
         tls_ca_file              = "/etc/vault.d/tls/ca.crt"
         tls_cert_file            = "/etc/vault.d/tls/server.crt"
         tls_key_file             = "/etc/vault.d/tls/server.key"

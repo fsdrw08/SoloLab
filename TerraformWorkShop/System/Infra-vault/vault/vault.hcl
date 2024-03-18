@@ -54,6 +54,14 @@ listener "tcp" {
   tls_disable_client_certs = "${tls_disable_client_certs}"
 }
 
+listener "tcp" {
+  address = "127.0.0.1:8200"
+  cluster_address = "127.0.0.1:8201"
+  tls_cert_file = "${tls_cert_file}"
+  tls_key_file  = "${tls_key_file}"
+  tls_disable_client_certs = "${tls_disable_client_certs}"
+}
+
 // https://developer.hashicorp.com/vault/docs/configuration#api_addr
 // Specifies the address (full URL) to advertise to other Vault servers in the cluster for client redirection. 
 // This value is also used for plugin backends. This can also be provided via the environment variable VAULT_API_ADDR. 

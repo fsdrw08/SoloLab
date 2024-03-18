@@ -54,6 +54,7 @@ certs = [
     cert = {
       dns_names = [
         "sws.infra.consul",
+        "sws.service.consul",
         "localhost"
       ]
       subject = {
@@ -96,7 +97,9 @@ certs = [
     }
     cert = {
       dns_names = [
-        "vault.service.consul"
+        "vault.infra.consul",
+        "vault.service.consul",
+        "localhost"
       ]
       subject = {
         common_name  = "vault.service.consul"
