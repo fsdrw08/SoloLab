@@ -1,11 +1,14 @@
-consul:53 {
+(common) {
     reload
     bind ${listen_address}
-    hosts {
-        192.168.255.2 sws.service.consul
-        fallthrough
-    }
-    forward . 127.0.0.1:8600
     log
     errors
 }
+
+.:53 {
+    forward ${forward}
+    import common
+}
+
+# https://github.com/yuyuvn/clicia-dev-dns/blob/1a2dcb62147fa024023d0e616b7aeb90d8715c8a/coredns/Corefile#L7
+import ${import}

@@ -66,14 +66,14 @@ resource "system_file" "corefile" {
   content    = var.config.corefile.content
   user       = var.runas.user
   group      = var.runas.group
-  mode       = "600"
+  mode       = "755"
 }
 
 # presist coredns zones config sub dir
-resource "system_folder" "zones" {
+resource "system_folder" "snippets" {
   depends_on = [system_folder.config]
-  count      = var.config.zones == null ? 0 : 1
-  path       = join("/", [var.config.dir, var.config.zones.sub_dir])
+  count      = var.config.snippets == null ? 0 : 1
+  path       = join("/", [var.config.dir, var.config.snippets.sub_dir])
   user       = var.runas.user
   group      = var.runas.group
   mode       = "755"

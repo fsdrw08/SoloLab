@@ -28,8 +28,12 @@ variable "config" {
     corefile = object({
       content = string
     })
-    zones = optional(object({
+    snippets = optional(object({
       sub_dir = string
+      # files = list(object({
+      #   basename = string
+      #   content  = string
+      # }))
     }))
     dir = string
   })

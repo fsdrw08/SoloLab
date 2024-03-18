@@ -19,13 +19,21 @@ module "coredns" {
   config = {
     corefile = {
       content = templatefile("${path.root}/coredns/Corefile", {
-        listen_address     = "192.168.255.2"
-        zone_dir           = "/etc/coredns/zones"
-        default_forward_ip = "192.168.255.1"
+        listen_address = "192.168.255.2"
+        import         = "/etc/coredns/snippets/*.conf"
+        forward        = ". 127.0.0.1:8600"
       })
     }
-    zones = {
-      sub_dir = "zones"
+    snippets = {
+      sub_dir = "snippets"
+      # files = [
+      #   {
+      #     basename = "consul.db"
+      #     content = templatefile("${path.root}/coredns/consul.db", {
+
+      #     })
+      #   }
+      # ]
     }
     dir = "/etc/coredns"
   }
