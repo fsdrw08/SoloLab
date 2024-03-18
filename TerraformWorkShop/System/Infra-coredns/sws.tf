@@ -94,3 +94,14 @@ module "sws" {
     }
   }
 }
+
+resource "system_file" "snippet" {
+  depends_on = [module.coredns]
+  # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
+  path = "/etc/coredns/snippets/sws.conf"
+  # content = file("${path.root}/sws/sws.conf")
+  content = templatefile("${path.root}/sws/sws.conf", {
+    IP   = "192.168.255.2"
+    FQDN = "sws.infra.consul"
+  })
+}

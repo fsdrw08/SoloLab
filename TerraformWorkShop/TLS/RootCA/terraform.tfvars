@@ -53,11 +53,11 @@ certs = [
     }
     cert = {
       dns_names = [
-        "sws.service.consul",
+        "sws.infra.consul",
         "localhost"
       ]
       subject = {
-        common_name  = "sws.service.consul"
+        common_name  = "sws.infra.consul"
         organization = "Sololab"
       }
       validity_period_hours = 43800
