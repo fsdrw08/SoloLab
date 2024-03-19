@@ -79,26 +79,6 @@ certs = [
     }
   },
   {
-    name = "wildcard"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = ["*.service.consul"]
-      subject = {
-        common_name  = "service.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  {
     name = "vault"
     key = {
       algorithm = "RSA"
@@ -122,6 +102,49 @@ certs = [
         "digital_signature",
         "server_auth",
         "client_auth"
+      ]
+    }
+  },
+  {
+    name = "lldap"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "lldap.infra.consul",
+        "lldap.service.consul",
+      ]
+      subject = {
+        common_name  = "lldap.infra.consul"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
+  {
+    name = "wildcard"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = ["*.service.consul"]
+      subject = {
+        common_name  = "service.consul"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
       ]
     }
   },

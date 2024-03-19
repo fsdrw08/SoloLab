@@ -61,7 +61,7 @@ module "lldap" {
       templatefile_vars = {
         ldap_host       = "192.168.255.2"
         ldap_port       = "389"
-        http_host       = "127.0.0.1"
+        http_host       = "192.168.255.2"
         http_port       = "17170"
         http_url        = "https://lldap.service.consul"
         jwt_secret      = "REPLACE_WITH_RANDOM"
@@ -71,18 +71,20 @@ module "lldap" {
         database_url    = "sqlite:///var/lib/lldap/users.db?mode=rwc"
         ldaps_enabled   = "true"
         ldaps_port      = "636"
-        ldaps_cert_file = "/etc/lldap/tls/server.crt"
-        ldaps_key_file  = "/etc/lldap/tls/server.key"
+        ldaps_cert_file = "/etc/lldap/certs/server.crt"
+        ldaps_key_file  = "/etc/lldap/certs/server.key"
       }
     }
     tls = {
       cert_basename = "server.crt"
-      cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem
-      )
+      cert_content = join("", [
+        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
+        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ])
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "lldap", null)
-      sub_dir      = "tls"
+      sub_dir      = "certs"
     }
     dir = "/etc/lldap"
   }
@@ -107,7 +109,7 @@ module "lldap" {
 }
 
 resource "system_file" "snippet" {
-  depends_on = [module.vault]
+  depends_on = [module.lldap]
   # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
   path = "/etc/coredns/snippets/lldap.conf"
   # content = file("${path.root}/sws/sws.conf")
