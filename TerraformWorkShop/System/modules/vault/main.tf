@@ -136,6 +136,10 @@ resource "system_service_systemd" "service" {
   depends_on = [
     null_resource.bin,
     system_file.config,
+    system_file.ca,
+    system_file.cert,
+    system_file.key,
+    system_file.env,
     system_file.service,
   ]
   name    = trimsuffix(system_file.service.basename, ".service")

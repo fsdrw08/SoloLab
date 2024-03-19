@@ -35,7 +35,7 @@ resource "system_file" "init" {
   depends_on = [null_resource.init]
   path       = "/home/vyos/Init-Vault.sh"
   content = templatefile("${path.root}/vault/Init-Vault.sh", {
-    VAULT_ADDR                       = "https://vault.service.consul"
+    VAULT_ADDR                       = "https://localhost:8200"
     VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
     VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
   })
@@ -57,7 +57,7 @@ module "vault" {
     password = var.vm_conn.password
   }
   install = {
-    zip_file_source = "https://sws.infra.consul:4433/releases/vault%5F1.15.6%5Flinux%5Famd64.zip"
+    zip_file_source = "http://sws.infra.consul:4080/releases/vault%5F1.15.6%5Flinux%5Famd64.zip"
     zip_file_path   = "/home/vyos/vault.zip"
     bin_file_dir    = "/usr/bin"
   }
@@ -78,8 +78,8 @@ module "vault" {
         listener_address         = "{{ GetInterfaceIP `eth2` }}:8200"
         listener_cluster_address = "{{ GetInterfaceIP `eth2` }}:8201"
         # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
-        api_addr                 = "{{ GetInterfaceIP `eth2` }}:8200"
-        cluster_addr             = "{{ GetInterfaceIP `eth2` }}:8201"
+        api_addr                 = "vault.infra.consul:8200"
+        cluster_addr             = "vault.infra.consul:8201"
         tls_ca_file              = "/etc/vault.d/tls/ca.crt"
         tls_cert_file            = "/etc/vault.d/tls/server.crt"
         tls_key_file             = "/etc/vault.d/tls/server.key"
@@ -88,11 +88,13 @@ module "vault" {
     }
     tls = {
       ca_basename   = "ca.crt"
-      ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
       cert_basename = "server.crt"
-      cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
-        data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      )
+      cert_content = join("", [
+        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
+        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ])
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
       sub_dir      = "tls"
@@ -100,7 +102,7 @@ module "vault" {
     env = {
       templatefile_path = "${path.root}/vault/vault.env"
       templatefile_vars = {
-        VAULT_ADDR                       = "https://vault.service.consul"
+        VAULT_ADDR                       = "https://localhost:8200"
         VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
         VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
       }
@@ -122,14 +124,25 @@ module "vault" {
   }
 }
 
-resource "system_file" "vault_consul" {
-  depends_on = [
-    module.vault,
-  ]
-  path    = "/etc/consul.d/vault.hcl"
-  content = file("${path.root}/vault/vault_consul.hcl")
-  user    = "vyos"
-  group   = "users"
+# resource "system_file" "vault_consul" {
+#   depends_on = [
+#     module.vault,
+#   ]
+#   path    = "/etc/consul.d/vault.hcl"
+#   content = file("${path.root}/vault/vault_consul.hcl")
+#   user    = "vyos"
+#   group   = "users"
+# }
+
+resource "system_file" "snippet" {
+  depends_on = [module.vault]
+  # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
+  path = "/etc/coredns/snippets/vault_dns.conf"
+  # content = file("${path.root}/sws/sws.conf")
+  content = templatefile("${path.root}/vault/vault_dns.conf", {
+    IP   = "192.168.255.2"
+    FQDN = "vault.infra.consul"
+  })
 }
 
 locals {

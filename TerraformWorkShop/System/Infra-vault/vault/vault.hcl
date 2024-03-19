@@ -55,8 +55,8 @@ listener "tcp" {
 }
 
 listener "tcp" {
-  address = "127.0.0.1:8200"
-  cluster_address = "127.0.0.1:8201"
+  address = "localhost:8200"
+  cluster_address = "localhost:8201"
   tls_cert_file = "${tls_cert_file}"
   tls_key_file  = "${tls_key_file}"
   tls_disable_client_certs = "${tls_disable_client_certs}"
