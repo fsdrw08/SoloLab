@@ -35,7 +35,7 @@ resource "system_file" "init" {
   depends_on = [null_resource.init]
   path       = "/home/vyos/Init-Vault.sh"
   content = templatefile("${path.root}/vault/Init-Vault.sh", {
-    VAULT_ADDR                       = "https://localhost:8200"
+    VAULT_ADDR                       = "https://127.0.0.1:8200"
     VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
     VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
   })
@@ -73,10 +73,12 @@ module "vault" {
     main = {
       templatefile_path = "${path.root}/vault/vault.hcl"
       templatefile_vars = {
-        storage_path             = "/opt/vault/data"
-        node_id                  = "raft_node_1"
-        listener_address         = "{{ GetInterfaceIP `eth2` }}:8200"
-        listener_cluster_address = "{{ GetInterfaceIP `eth2` }}:8201"
+        storage_path                   = "/opt/vault/data"
+        node_id                        = "raft_node_1"
+        listener_address               = "{{ GetInterfaceIP `eth2` }}:8200"
+        listener_cluster_address       = "{{ GetInterfaceIP `eth2` }}:8201"
+        listener_local_address         = "127.0.0.1:8200"
+        listener_local_cluster_address = "127.0.0.1:8201"
         # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
         api_addr                 = "vault.infra.consul:8200"
         cluster_addr             = "vault.infra.consul:8201"
@@ -102,7 +104,7 @@ module "vault" {
     env = {
       templatefile_path = "${path.root}/vault/vault.env"
       templatefile_vars = {
-        VAULT_ADDR                       = "https://localhost:8200"
+        VAULT_ADDR                       = "https://127.0.0.1:8200"
         VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
         VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
       }
