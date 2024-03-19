@@ -43,7 +43,8 @@ module "consul" {
     password = var.vm_conn.password
   }
   install = {
-    zip_file_source = "https://releases.hashicorp.com/consul/1.17.3/consul_1.17.3_linux_amd64.zip"
+    # https://releases.hashicorp.com/consul/
+    zip_file_source = "http://sws.infra.consul:4080/releases/consul%5F1.18.0%5Flinux%5Famd64.zip"
     zip_file_path   = "/home/vyos/consul.zip"
     bin_file_dir    = "/usr/bin"
   }
@@ -73,9 +74,9 @@ module "consul" {
         tls_verify_outgoing                = true
         tls_irpc_verify_server_hostname    = true
         connect_enabled                    = true
-        auto_config_oidc_discovery_url     = "https://vault.service.consul:8201/v1/identity/oidc"
+        auto_config_oidc_discovery_url     = "https://vault.service.consul:8200/v1/identity/oidc"
         auto_config_oidc_discovery_ca_cert = replace(data.terraform_remote_state.root_ca.outputs.int_ca_pem, "\n", "\\n")
-        auto_config_bound_issuer           = "https://vault.service.consul:8201/v1/identity/oidc"
+        auto_config_bound_issuer           = "https://vault.service.consul:8200/v1/identity/oidc"
         acl_token_init_mgmt                = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         acl_token_agent                    = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         acl_token_config_file_svc_reg      = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
@@ -92,7 +93,8 @@ module "consul" {
       )
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
-      sub_dir      = "certs"
+      # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#distribute-the-certificates-to-agents
+      sub_dir = "certs"
     }
     dir = "/etc/consul.d"
   }

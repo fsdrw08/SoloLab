@@ -34,7 +34,8 @@ module "traefik" {
     password = var.vm_conn.password
   }
   install = {
-    tar_file_source = "https://github.com/traefik/traefik/releases/download/v2.11.0/traefik_v2.11.0_linux_amd64.tar.gz"
+    # "https://github.com/traefik/traefik/releases/"
+    tar_file_source = "http://sws.infra.consul:4080/releases/traefik%5Fv2.11.0%5Flinux%5Famd64.tar.gz"
     tar_file_path   = "/home/vyos/traefik.tar.gz"
     bin_file_dir    = "/usr/bin"
   }
