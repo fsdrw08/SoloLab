@@ -105,10 +105,12 @@ certs = [
       rsa_bits  = 4096
     }
     cert = {
+      ip_addresses = [
+        "127.0.0.1"
+      ]
       dns_names = [
         "vault.infra.consul",
         "vault.service.consul",
-        "localhost"
       ]
       subject = {
         common_name  = "vault.infra.consul"

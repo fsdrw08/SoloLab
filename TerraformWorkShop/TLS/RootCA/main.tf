@@ -71,7 +71,8 @@ resource "tls_cert_request" "csr" {
   }
   private_key_pem = tls_private_key.key[each.key].private_key_pem
 
-  dns_names = each.value.cert.dns_names
+  ip_addresses = each.value.cert.ip_addresses
+  dns_names    = each.value.cert.dns_names
 
   subject {
     common_name         = lookup(each.value.cert.subject, "common_name", null)

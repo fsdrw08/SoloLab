@@ -58,9 +58,10 @@ variable "certs" {
     })
     cert = object({
       dns_names             = list(string)
+      ip_addresses          = optional(list(string), null)
       subject               = map(string)
       validity_period_hours = number
-      allowed_uses          = list(string)
+      allowed_uses          = optional(list(string), null)
     })
   }))
 }
