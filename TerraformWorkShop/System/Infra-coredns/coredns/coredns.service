@@ -15,6 +15,7 @@ NoNewPrivileges=true
 ExecStart=/usr/bin/coredns -conf=/etc/coredns/Corefile
 ExecReload=/bin/kill -SIGUSR1 $MAINPID
 Restart=on-failure
+RestartSec=5
 # StandardOutput=append:/var/log/coredns.log
 # StandardError=append:/var/log/coredns.err.log
 
