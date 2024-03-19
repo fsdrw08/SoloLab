@@ -51,6 +51,7 @@ resource "tls_locally_signed_cert" "int_ca" {
   ca_private_key_pem = tls_private_key.root.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.root.cert_pem
 
+  is_ca_certificate     = true
   validity_period_hours = var.int_ca.cert.validity_period_hours
 
   allowed_uses = var.int_ca.cert.allowed_uses

@@ -14,9 +14,14 @@ root_ca = {
       street_address      = []
     }
     validity_period_hours = 175296 # (365 * 24 * 20) + (24 * 4) # 20 years
+    # https://github.com/hashicorp/vault-guides/blob/87f2fe347b581ad46e2e0a4b8a540f227cecb4f5/operations/benchmarking/terraform-aws-vault-benchmark/terraform/ssl.tf#L66
     allowed_uses = [
       "cert_signing",
       "crl_signing",
+      "key_encipherment",
+      "digital_signature",
+      "server_auth",
+      "client_auth",
     ]
   }
 }
@@ -40,6 +45,10 @@ int_ca = {
     allowed_uses = [
       "cert_signing",
       "crl_signing",
+      "key_encipherment",
+      "digital_signature",
+      "server_auth",
+      "client_auth",
     ]
   }
 }
@@ -102,7 +111,7 @@ certs = [
         "localhost"
       ]
       subject = {
-        common_name  = "vault.service.consul"
+        common_name  = "vault.infra.consul"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -110,6 +119,7 @@ certs = [
         "key_encipherment",
         "digital_signature",
         "server_auth",
+        "client_auth"
       ]
     }
   },
