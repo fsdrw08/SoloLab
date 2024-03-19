@@ -43,7 +43,7 @@ module "lldap" {
     password = var.vm_conn.password
   }
   install = {
-    tar_file_source   = "https://github.com/lldap/lldap/releases/download/v0.5.0/amd64-lldap.tar.gz"
+    tar_file_source   = "http://sws.infra.consul:4080/releases/amd64%2Dlldap.tar.gz"
     tar_file_path     = "/home/vyos/amd64-lldap.tar.gz"
     tar_file_bin_path = "amd64-lldap/lldap"
     bin_file_dir      = "/usr/bin"
@@ -78,7 +78,7 @@ module "lldap" {
     tls = {
       cert_basename = "server.crt"
       cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
-        data.terraform_remote_state.root_ca.outputs.root_cert_pem
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem
       )
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "lldap", null)
@@ -106,12 +106,23 @@ module "lldap" {
   }
 }
 
-resource "system_file" "lldap_consul" {
-  depends_on = [
-    module.lldap,
-  ]
-  path    = "/etc/consul.d/lldap_consul.hcl"
-  content = file("${path.root}/lldap/lldap_consul.hcl")
-  user    = "vyos"
-  group   = "users"
+resource "system_file" "snippet" {
+  depends_on = [module.vault]
+  # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
+  path = "/etc/coredns/snippets/lldap.conf"
+  # content = file("${path.root}/sws/sws.conf")
+  content = templatefile("${path.root}/lldap/lldap_dns.conf", {
+    IP   = "192.168.255.2"
+    FQDN = "lldap.infra.consul"
+  })
 }
+
+# resource "system_file" "lldap_consul" {
+#   depends_on = [
+#     module.lldap,
+#   ]
+#   path    = "/etc/consul.d/lldap_consul.hcl"
+#   content = file("${path.root}/lldap/lldap_consul.hcl")
+#   user    = "vyos"
+#   group   = "users"
+# }
