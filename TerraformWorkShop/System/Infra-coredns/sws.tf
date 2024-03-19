@@ -56,13 +56,13 @@ module "sws" {
       basename = "static-web-server.toml"
       content = templatefile("./sws/static-web-server_non_socket.toml", {
         SERVER_HOST                      = "192.168.255.2"
-        SERVER_PORT                      = "4433"
+        SERVER_PORT                      = "4080" # 4433
         SERVER_ROOT                      = "/mnt/data/sws"
         SERVER_LOG_LEVEL                 = "warn"
-        SERVER_HTTP2_TLS                 = true
-        SERVER_HTTP2_TLS_CERT            = "/etc/sws/certs/server.crt"
-        SERVER_HTTP2_TLS_KEY             = "/etc/sws/certs/server.key"
-        SERVER_HTTPS_REDIRECT            = true
+        SERVER_HTTP2_TLS                 = false
+        SERVER_HTTP2_TLS_CERT            = "/etc/sws/tls/server.crt"
+        SERVER_HTTP2_TLS_KEY             = "/etc/sws/tls/server.key"
+        SERVER_HTTPS_REDIRECT            = false
         SERVER_HTTPS_REDIRECT_HOST       = "sws.service.consul"
         SERVER_HTTPS_REDIRECT_FROM_PORT  = "4080"
         SERVER_HTTPS_REDIRECT_FROM_HOSTS = "sws.service.consul"
@@ -77,7 +77,7 @@ module "sws" {
       )
       key_basename = "server.key"
       key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "sws", null)
-      sub_dir      = "certs"
+      sub_dir      = "tls"
     }
     dir = "/etc/sws"
   }
