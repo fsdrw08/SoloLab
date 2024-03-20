@@ -29,10 +29,10 @@ variable "runas" {
 variable "config" {
   type = object({
     main = object({
-      templatefile_path = string
-      templatefile_vars = optional(map(string))
+      basename = string
+      content  = string
     })
-    tls = optional(object({
+    certs = optional(object({
       cert_basename = string
       cert_content  = string
       key_basename  = string
@@ -40,8 +40,8 @@ variable "config" {
       sub_dir       = string
     }))
     env = optional(object({
-      templatefile_path = string
-      templatefile_vars = optional(map(string))
+      basename = string
+      content  = string
     }))
     dir = string
   })
@@ -58,10 +58,9 @@ variable "service" {
   type = object({
     status  = string
     enabled = bool
-    systemd_unit_service = object({
-      templatefile_path = string
-      templatefile_vars = optional(map(string))
-      target_path       = string
+    systemd_service_unit = object({
+      path    = string
+      content = string
     })
   })
 }

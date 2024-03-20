@@ -15,7 +15,7 @@ PrivateDevices=true
 ProtectHome=true
 ProtectSystem=full
 Restart=on-failure
-RestartSec=5
+RestartSec=10
 WorkingDirectory=${WorkingDirectory}
 ReadWriteDirectories=${ReadWriteDirectories}
 

@@ -43,7 +43,7 @@ module "lldap" {
     password = var.vm_conn.password
   }
   install = {
-    tar_file_source   = "http://sws.infra.consul:4080/releases/amd64%2Dlldap.tar.gz"
+    tar_file_source   = "http://sws.infra.sololab:4080/releases/amd64%2Dlldap.tar.gz"
     tar_file_path     = "/home/vyos/amd64-lldap.tar.gz"
     tar_file_bin_path = "amd64-lldap/lldap"
     bin_file_dir      = "/usr/bin"
@@ -57,13 +57,13 @@ module "lldap" {
   }
   config = {
     main = {
-      templatefile_path = "${path.root}/lldap/lldap_config.toml"
-      templatefile_vars = {
+      basename = "lldap_config.toml"
+      content = templatefile("${path.root}/lldap/lldap_config.toml", {
         ldap_host       = "192.168.255.2"
         ldap_port       = "389"
         http_host       = "192.168.255.2"
         http_port       = "17170"
-        http_url        = "https://lldap.service.consul"
+        http_url        = "https://lldap.infra.sololab"
         jwt_secret      = "REPLACE_WITH_RANDOM"
         ldap_base_dn    = "dc=root,dc=sololab"
         ldap_user_dn    = "admin"
@@ -73,9 +73,9 @@ module "lldap" {
         ldaps_port      = "636"
         ldaps_cert_file = "/etc/lldap/certs/server.crt"
         ldaps_key_file  = "/etc/lldap/certs/server.key"
-      }
+      })
     }
-    tls = {
+    certs = {
       cert_basename = "server.crt"
       cert_content = join("", [
         lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
@@ -95,27 +95,54 @@ module "lldap" {
   service = {
     status  = "started"
     enabled = true
-    systemd_unit_service = {
-      templatefile_path = "${path.root}/lldap/lldap.service"
-      templatefile_vars = {
+    systemd_service_unit = {
+      content = templatefile("${path.root}/lldap/lldap.service", {
         user                 = "vyos"
         group                = "users"
         WorkingDirectory     = "/usr/share/lldap"
         ReadWriteDirectories = "/var/lib/lldap"
-      }
-      target_path = "/lib/systemd/system/lldap.service"
+      })
+      path = "/lib/systemd/system/lldap.service"
     }
+  }
+}
+
+module "lldap_restart" {
+  depends_on = [module.lldap]
+  source     = "../modules/systemd_path"
+  vm_conn = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  systemd_path_unit = {
+    content = templatefile("${path.root}/lldap/restart.path", {
+      PathModified = [
+        "/etc/lldap/lldap_config.toml",
+        "/etc/lldap/certs/server.crt",
+        "/etc/lldap/certs/server.key"
+      ]
+    })
+    path = "/etc/systemd/system/lldap_restart.path"
+  }
+  systemd_service_unit = {
+    content = templatefile("${path.root}/lldap/restart.service", {
+      AssertPathExists = "/lib/systemd/system/lldap.service"
+      target_service   = "lldap.service"
+    })
+    path = "/etc/systemd/system/lldap_restart.service"
   }
 }
 
 resource "system_file" "snippet" {
   depends_on = [module.lldap]
   # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
-  path = "/etc/coredns/snippets/lldap.conf"
+  path = "/etc/coredns/snippets/lldap_dns.conf"
   # content = file("${path.root}/sws/sws.conf")
   content = templatefile("${path.root}/lldap/lldap_dns.conf", {
     IP   = "192.168.255.2"
-    FQDN = "lldap.infra.consul"
+    FQDN = "lldap.infra.sololab"
   })
 }
 
