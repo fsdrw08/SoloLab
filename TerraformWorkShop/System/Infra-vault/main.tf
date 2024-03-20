@@ -57,7 +57,7 @@ module "vault" {
     password = var.vm_conn.password
   }
   install = {
-    zip_file_source = "http://sws.infra.consul:4080/releases/vault%5F1.15.6%5Flinux%5Famd64.zip"
+    zip_file_source = "http://sws.infra.sololab:4080/releases/vault%5F1.15.6%5Flinux%5Famd64.zip"
     zip_file_path   = "/home/vyos/vault.zip"
     bin_file_dir    = "/usr/bin"
   }
@@ -71,8 +71,8 @@ module "vault" {
   }
   config = {
     main = {
-      templatefile_path = "${path.root}/vault/vault.hcl"
-      templatefile_vars = {
+      basename = "vault.hcl"
+      content = templatefile("${path.root}/vault/vault.hcl", {
         storage_path                   = "/opt/vault/data"
         node_id                        = "raft_node_1"
         listener_address               = "{{ GetInterfaceIP `eth2` }}:8200"
@@ -80,13 +80,13 @@ module "vault" {
         listener_local_address         = "127.0.0.1:8200"
         listener_local_cluster_address = "127.0.0.1:8201"
         # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
-        api_addr                 = "vault.infra.consul:8200"
-        cluster_addr             = "vault.infra.consul:8201"
+        api_addr                 = "vault.infra.sololab:8200"
+        cluster_addr             = "vault.infra.sololab:8201"
         tls_ca_file              = "/etc/vault.d/tls/ca.crt"
         tls_cert_file            = "/etc/vault.d/tls/server.crt"
         tls_key_file             = "/etc/vault.d/tls/server.key"
         tls_disable_client_certs = "true"
-      }
+      })
     }
     tls = {
       ca_basename   = "ca.crt"
@@ -102,27 +102,54 @@ module "vault" {
       sub_dir      = "tls"
     }
     env = {
-      templatefile_path = "${path.root}/vault/vault.env"
-      templatefile_vars = {
+      basename = "vault.env"
+      content = templatefile("${path.root}/vault/vault.env", {
         VAULT_ADDR                       = "https://127.0.0.1:8200"
         VAULT_CACERT                     = "/etc/vault.d/tls/ca.crt"
         VAULT_OPERATOR_SECRETS_JSON_PATH = "/mnt/data/vault/init/vault_operator_secrets.json"
-      }
+      })
     }
     dir = "/etc/vault.d"
   }
   service = {
     status  = "started"
     enabled = true
-    systemd_unit_service = {
-      templatefile_path = "${path.root}/vault/vault.service"
-      templatefile_vars = {
+    systemd_service_unit = {
+      path = "/usr/lib/systemd/system/vault.service"
+      content = templatefile("${path.root}/vault/vault.service", {
         user             = "vyos"
         group            = "users"
         post_script_path = system_file.init.path
-      }
-      target_path = "/usr/lib/systemd/system/vault.service"
+      })
     }
+  }
+}
+
+module "vault_restart" {
+  depends_on = [module.vault]
+  source     = "../modules/systemd_path"
+  vm_conn = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  systemd_path_unit = {
+    content = templatefile("${path.root}/vault/restart.path", {
+      PathModified = [
+        "/etc/vault.d/vault.hcl",
+        "/etc/vault.d/tls/server.crt",
+        "/etc/vault.d/tls/server.key"
+      ]
+    })
+    path = "/usr/lib/systemd/system/vault_restart.path"
+  }
+  systemd_service_unit = {
+    content = templatefile("${path.root}/vault/restart.service", {
+      AssertPathExists = "/lib/systemd/system/vault.service"
+      target_service   = "vault.service"
+    })
+    path = "/usr/lib/systemd/system/vault_restart.service"
   }
 }
 
@@ -143,7 +170,7 @@ resource "system_file" "snippet" {
   # content = file("${path.root}/sws/sws.conf")
   content = templatefile("${path.root}/vault/vault_dns.conf", {
     IP   = "192.168.255.2"
-    FQDN = "vault.infra.consul"
+    FQDN = "vault.infra.sololab"
   })
 }
 

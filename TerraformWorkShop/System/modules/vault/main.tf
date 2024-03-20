@@ -50,8 +50,8 @@ resource "system_folder" "config" {
 # persist vault config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", basename("${var.config.main.templatefile_path}")])
-  content    = templatefile(var.config.main.templatefile_path, var.config.main.templatefile_vars)
+  path       = join("/", ["${var.config.dir}", "${var.config.main.basename}"])
+  content    = var.config.main.content
   user       = var.runas.user
   group      = var.runas.group
   mode       = "600"
@@ -60,8 +60,8 @@ resource "system_file" "config" {
 resource "system_file" "env" {
   count      = var.config.env == null ? 0 : 1
   depends_on = [system_folder.config]
-  path       = join("/", ["${var.config.dir}", basename("${var.config.env.templatefile_path}")])
-  content    = templatefile(var.config.env.templatefile_path, var.config.env.templatefile_vars)
+  path       = join("/", ["${var.config.dir}", "${var.config.env.basename}"])
+  content    = var.config.env.content
   user       = var.runas.user
   group      = var.runas.group
   mode       = "600"
@@ -125,8 +125,8 @@ resource "system_link" "data" {
 # https://developer.hashicorp.com/vault/tutorials/operations/production-hardening
 # https://github.com/hashicorp/vault/blob/main/.release/linux/package/usr/lib/systemd/system/vault.service
 resource "system_file" "service" {
-  path    = var.service.systemd_unit_service.target_path
-  content = templatefile(var.service.systemd_unit_service.templatefile_path, var.service.systemd_unit_service.templatefile_vars)
+  path    = var.service.systemd_service_unit.path
+  content = var.service.systemd_service_unit.content
 }
 
 # sudo systemctl list-unit-files --type=service --state=disabled
