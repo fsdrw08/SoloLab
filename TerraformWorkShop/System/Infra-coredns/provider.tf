@@ -8,6 +8,10 @@ terraform {
       source  = "neuspaces/system"
       version = ">=0.4.0"
     }
+    vyos = {
+      source  = "Foltik/vyos"
+      version = ">=0.3.3"
+    }
   }
 }
 
@@ -20,4 +24,9 @@ provider "system" {
     password = "vyos"
   }
   sudo = true
+}
+
+provider "vyos" {
+  url = "https://192.168.255.1:8443"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

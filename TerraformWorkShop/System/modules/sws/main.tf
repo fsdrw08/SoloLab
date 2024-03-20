@@ -107,8 +107,8 @@ resource "system_file" "key" {
 
 # persist sws systemd unit file
 resource "system_file" "service" {
-  path    = var.service.systemd_unit_service.target_path
-  content = var.service.systemd_unit_service.content
+  path    = var.service.systemd_service_unit.path
+  content = var.service.systemd_service_unit.content
 }
 
 # debug service: journalctl -u sws.service

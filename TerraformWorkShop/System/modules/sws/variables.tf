@@ -45,9 +45,9 @@ variable "service" {
   type = object({
     status  = string
     enabled = bool
-    systemd_unit_service = object({
-      content     = string
-      target_path = string
+    systemd_service_unit = object({
+      content = string
+      path    = string
     })
   })
 }

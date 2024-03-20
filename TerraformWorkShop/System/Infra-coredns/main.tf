@@ -40,12 +40,41 @@ module "coredns" {
   service = {
     status  = "started"
     enabled = true
-    systemd_unit_service = {
+    systemd_service_unit = {
       content = templatefile("${path.root}/coredns/coredns.service", {
         user  = "vyos"
         group = "users"
       })
-      target_path = "/etc/systemd/system/coredns.service"
+      path = "/etc/systemd/system/coredns.service"
     }
+  }
+}
+
+module "coredns_restart" {
+  depends_on = [module.sws]
+  source     = "../modules/systemd_path"
+  vm_conn = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  systemd_path_unit = {
+    path = "/etc/systemd/system/coredns_restart.path"
+    content = templatefile("${path.root}/coredns/restart.path", {
+      PathModified = [
+        "/etc/coredns/Corefile",
+      ]
+      PathExistsGlob = [
+        "/etc/coredns/snippets/*.conf"
+      ]
+    })
+  }
+  systemd_service_unit = {
+    path = "/etc/systemd/system/coredns_restart.service"
+    content = templatefile("${path.root}/coredns/restart.service", {
+      AssertPathExists = "/etc/systemd/system/coredns.service"
+      target_service   = "coredns.service"
+    })
   }
 }
