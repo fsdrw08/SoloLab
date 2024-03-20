@@ -62,12 +62,12 @@ certs = [
     }
     cert = {
       dns_names = [
-        "sws.infra.consul",
+        "sws.infra.sololab",
         "sws.service.consul",
         "localhost"
       ]
       subject = {
-        common_name  = "sws.infra.consul"
+        common_name  = "sws.infra.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -89,11 +89,11 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.infra.consul",
+        "vault.infra.sololab",
         "vault.service.consul",
       ]
       subject = {
-        common_name  = "vault.infra.consul"
+        common_name  = "vault.infra.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -113,11 +113,11 @@ certs = [
     }
     cert = {
       dns_names = [
-        "lldap.infra.consul",
+        "lldap.infra.sololab",
         "lldap.service.consul",
       ]
       subject = {
-        common_name  = "lldap.infra.consul"
+        common_name  = "lldap.infra.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
