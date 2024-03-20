@@ -1,6 +1,6 @@
 vault_ldap_auth_backend = {
   path         = "ldap"
-  url          = "ldaps://lldap.service.consul"
+  url          = "ldaps://lldap.infra.sololab"
   insecure_tls = false
   #   certificate  = data.terraform_remote_state.root_ca.outputs.root_cert_pem
 

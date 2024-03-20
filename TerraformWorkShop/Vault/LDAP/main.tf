@@ -54,6 +54,10 @@ data "ldap_entries" "groups" {
   filter = var.ldap_vault_entities.groups.filter
 }
 
+# output "groups" {
+#   value = data.ldap_entries.groups
+# }
+
 resource "vault_identity_entity" "user" {
   # for_each = {
   #   for user in var.ldap_vault_entities.users : user => user
