@@ -2,6 +2,7 @@ apply terraform
 
 ref: 
 - [Build Certificate Authority (CA) in Vault with an offline Root](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine-external-ca)
+- [Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
 - [mount.tf](https://github.com/arpanrecme/vault_monorepo/blob/main/codified_vault/pki/mount.tf)
 
 ### apply the whole tf resource 

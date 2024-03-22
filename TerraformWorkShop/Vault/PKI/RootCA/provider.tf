@@ -7,25 +7,13 @@ terraform {
       source  = "hashicorp/vault"
       version = ">= 3.11.0"
     }
-    local = {
-      source  = "hashicorp/local"
-      version = ">= 2.2.3"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = ">= 4.0.4"
-    }
-  }
-
-  backend "local" {
   }
 }
 
 locals {
-  VAULT_ADDR = "vault.infra.sololab"
-  token   = "hvs.MByVvHFB0jreYb4I23thar8k"
-  skip_tls_verify = true
-
+  VAULT_ADDR      = "vault.infra.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = false
 }
 
 provider "vault" {
