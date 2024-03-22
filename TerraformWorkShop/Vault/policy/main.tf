@@ -28,9 +28,20 @@ resource "vault_identity_group_policies" "admin" {
 #   group_name = "app-vault-admin"
 # }
 
-resource "vault_identity_group_member_group_ids" "admin" {
+# resource "vault_identity_group_member_group_ids" "admin" {
+#   group_id = vault_identity_group.admin.id
+#   member_group_ids = [
+#     # data.vault_identity_group.external.group_id
+#   ]
+# }
+
+data "vault_identity_entity" "admin" {
+  entity_name = "admin"
+}
+
+resource "vault_identity_group_member_entity_ids" "admin" {
   group_id = vault_identity_group.admin.id
-  member_group_ids = [
-    # data.vault_identity_group.external.group_id
+  member_entity_ids = [
+    data.vault_identity_entity.admin.entity_id
   ]
 }
