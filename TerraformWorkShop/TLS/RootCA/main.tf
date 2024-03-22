@@ -25,6 +25,27 @@ resource "tls_self_signed_cert" "root" {
   allowed_uses = var.root_ca.cert.allowed_uses
 }
 
+resource "local_file" "root" {
+  content  = tls_self_signed_cert.root.cert_pem
+  filename = "${path.root}/root.crt"
+}
+
+# resource "local_file" "rootca_pem_bundle" {
+#   content = join("", [
+#     tls_private_key.root.private_key_pem,
+#     tls_self_signed_cert.root.cert_pem
+#   ])
+#   filename = "${path.root}/RootCA_bundle.pem"
+# }
+
+# resource "local_file" "intca_pem_bundle" {
+#   content = join("", [
+#     tls_private_key.int_ca.private_key_pem,
+#     tls_locally_signed_cert.int_ca.cert_pem
+#   ])
+#   filename = "${path.root}/IntCA_bundle.pem"
+# }
+
 resource "tls_private_key" "int_ca" {
   algorithm = var.int_ca.key.algorithm
   rsa_bits  = var.int_ca.key.rsa_bits
