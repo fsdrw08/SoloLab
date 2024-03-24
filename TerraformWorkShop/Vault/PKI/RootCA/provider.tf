@@ -5,7 +5,7 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 3.11.0"
+      version = ">= 4.1.0"
     }
   }
 }
@@ -13,7 +13,7 @@ terraform {
 locals {
   VAULT_ADDR      = "vault.infra.sololab:8200"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = false
+  skip_tls_verify = true
 }
 
 provider "vault" {

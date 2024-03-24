@@ -9,7 +9,7 @@ ref:
 To create offline root ca, intermedia ca1 ca2 in vault, apply certs for 
 ```powershell
 terraform plan
-terraform apply
+terraform apply --auto-approve -target="vault_mount.pki" -target="vault_mount.pki_ica1"
 ```
 
 ### have a check with the csr of intermediate ca
