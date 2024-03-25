@@ -8,10 +8,11 @@ resource "vault_policy" "admin" {
 }
 
 resource "vault_identity_group" "admin" {
-  name                      = "admin"
-  type                      = "internal"
-  external_policies         = true
-  external_member_group_ids = true
+  name                       = "admin"
+  type                       = "internal"
+  external_policies          = true
+  external_member_group_ids  = true
+  external_member_entity_ids = true
 }
 
 resource "vault_identity_group_policies" "admin" {
@@ -40,7 +41,8 @@ data "vault_identity_entity" "admin" {
 }
 
 resource "vault_identity_group_member_entity_ids" "admin" {
-  group_id = vault_identity_group.admin.id
+  depends_on = [data.vault_identity_entity.admin]
+  group_id   = vault_identity_group.admin.id
   member_entity_ids = [
     data.vault_identity_entity.admin.entity_id
   ]
