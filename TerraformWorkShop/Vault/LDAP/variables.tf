@@ -42,6 +42,7 @@ variable "vault_ldap_auth_backend" {
 }
 
 variable "ldap_vault_entities" {
+  description = "define which user/groups from ldap should sync to vault user/group entities"
   type = object({
     users = optional(object({
       ou     = string
