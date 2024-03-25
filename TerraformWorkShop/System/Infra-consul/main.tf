@@ -24,12 +24,30 @@ resource "null_resource" "init" {
   }
 }
 
-data "terraform_remote_state" "root_ca" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
-  }
+resource "vault_pki_secret_backend_cert" "consul" {
+  backend     = "pki/ica1_v1"
+  name        = "IntCA1-v1-role"
+  common_name = "consul.service.consul"
+  alt_names = [
+    "consul.infra.sololab",
+  ]
 }
+
+data "vault_pki_secret_backend_issuers" "root" {
+  backend = "pki/root"
+}
+
+data "vault_pki_secret_backend_issuer" "root" {
+  backend    = "pki/root"
+  issuer_ref = data.vault_pki_secret_backend_issuers.root.id
+}
+
+# data "terraform_remote_state" "root_ca" {
+#   backend = "local"
+#   config = {
+#     path = "../../TLS/RootCA/terraform.tfstate"
+#   }
+# }
 
 module "consul" {
   depends_on = [
@@ -59,8 +77,8 @@ module "consul" {
   }
   config = {
     main = {
-      templatefile_path = "${path.root}/consul/consul.hcl"
-      templatefile_vars = {
+      basename = "consul.hcl"
+      content = templatefile("${path.root}/consul/consul.hcl", {
         bind_addr                          = "{{ GetInterfaceIP `eth2` }}"
         dns_addr                           = "{{ GetInterfaceIP `eth2` }}"
         client_addr                        = "{{ GetInterfaceIP `eth2` }}"
@@ -74,18 +92,24 @@ module "consul" {
         tls_verify_outgoing                = true
         tls_irpc_verify_server_hostname    = true
         connect_enabled                    = true
-        auto_config_oidc_discovery_url     = "https://vault.service.consul:8200/v1/identity/oidc"
-        auto_config_oidc_discovery_ca_cert = replace(data.terraform_remote_state.root_ca.outputs.int_ca_pem, "\n", "\\n")
-        auto_config_bound_issuer           = "https://vault.service.consul:8200/v1/identity/oidc"
+        auto_config_oidc_discovery_url     = "https://vault.infra.sololab:8200/v1/identity/oidc"
+        auto_config_oidc_discovery_ca_cert = data.vault_pki_secret_backend_issuer.root.certificate
+        auto_config_bound_issuer           = "https://vault.infra.sololab:8200/v1/identity/oidc"
+        auto_config_bound_audiences        = "consul-cluster-dc1"
+        auto_config_claim_mappings         = "\"/consul/hostname\" = \"node_name\""
+        auto_config_claim_assertions       = "value.node_name == \\\"$${node}\\\"" # "value.node_name == \"$${node}\""
+        acl_enabled                        = true
+        acl_default_policy                 = "deny"
+        acl_enable_token_persistence       = true
         acl_token_init_mgmt                = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         acl_token_agent                    = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         acl_token_config_file_svc_reg      = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-      }
+      })
     }
     tls = {
       ca_basename = "ca.crt"
       # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
+      ca_content    = data.vault_pki_secret_backend_issuer.root.certificate
       cert_basename = "server.crt"
       cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
         # data.terraform_remote_state.root_ca.outputs.root_cert_pem

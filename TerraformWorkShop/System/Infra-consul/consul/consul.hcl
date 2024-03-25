@@ -157,12 +157,12 @@ auto_config {
       oidc_discovery_url = "${auto_config_oidc_discovery_url}"
       oidc_discovery_ca_cert = "${auto_config_oidc_discovery_ca_cert}"
       bound_issuer = "${auto_config_bound_issuer}"
-      bound_audiences = ["consul-cluster-dc1"]
+      bound_audiences = ["${auto_config_bound_audiences}"]
       claim_mappings = {
-        "/consul/hostname" = "node_name"
+        ${auto_config_claim_mappings}
       }
       claim_assertions = [
-        "value.node_name == \"$${node}\""
+        "${auto_config_claim_assertions}"
       ]
     }
   }
@@ -172,9 +172,9 @@ auto_config {
 // https://developer.hashicorp.com/consul/docs/agent/config/config-files#acl-parameters
 # https://developer.hashicorp.com/consul/tutorials/security-operations/docker-compose-auto-config
 acl {
-  enabled = true
-  default_policy = "deny"
-  enable_token_persistence = true
+  enabled = ${acl_enabled}
+  default_policy = "${acl_default_policy}"
+  enable_token_persistence = ${acl_enable_token_persistence}
   tokens {
     initial_management = "${acl_token_init_mgmt}"
     agent = "${acl_token_agent}"
