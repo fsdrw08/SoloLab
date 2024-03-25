@@ -52,6 +52,13 @@ resource "vault_pki_secret_backend_role" "role_ica1" {
   allowed_domains  = ["infra.sololab", "service.consul"]
   allow_subdomains = true
   allow_any_name   = true
+  key_usage = [
+    "DigitalSignature",
+    "KeyAgreement",
+    "KeyEncipherment",
+    "ServerAuth",
+    "ClientAuth"
+  ]
 }
 
 # upload root ca cert bundle manually, or uncomment below block
