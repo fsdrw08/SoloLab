@@ -28,7 +28,7 @@ resource "vault_identity_oidc_provider" "provider" {
   ]
   name          = "sololab"
   https_enabled = true
-  issuer_host   = "vault.service.consul"
+  # issuer_host   = "vault.service.consul"
   scopes_supported = [
     vault_identity_oidc_scope.groups.name,
     vault_identity_oidc_scope.username.name

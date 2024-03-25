@@ -1,7 +1,7 @@
 data "vault_identity_group" "minio" {
   for_each = toset([
     "app-minio-default",
-    "app-minio-all-ro"
+    # "app-minio-all-ro"
   ])
   group_name = each.key
 }
