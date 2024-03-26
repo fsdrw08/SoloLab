@@ -57,7 +57,7 @@ module "traefik" {
         entrypoint_web       = "192.168.255.2:80"
         entrypoint_websecure = "192.168.255.2:443"
         acme_ext_storage     = "/etc/traefik/acme/external.json"
-        acme_int_caserver    = "https://step-ca.service.consul:8443/acme/acme/directory"
+        acme_int_caserver    = "https://vault.infra.sololab:8200/v1/pki/ica2_v1/acme/directory/directory"
         acme_int_storage     = "/etc/traefik/acme/internal.json"
         access_log_path      = "/mnt/data/traefik/access.log"
       }
