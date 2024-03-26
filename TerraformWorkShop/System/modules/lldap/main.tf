@@ -50,6 +50,7 @@ resource "null_resource" "bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
+      "sudo systemctl daemon-reload",
       "sudo rm -f ${self.triggers.bin_file_dir}/lldap",
       "sudo rm -rf ${self.triggers.app_pkg_dir}",
     ]

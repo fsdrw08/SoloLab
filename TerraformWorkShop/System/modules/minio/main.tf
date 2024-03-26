@@ -15,6 +15,25 @@ resource "system_file" "server_bin" {
   path   = "${var.install.server.bin_file_dir}/minio"
   source = var.install.server.bin_file_source
   mode   = 755
+  triggers = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "sudo systemctl daemon-reload",
+    ]
+  }
 }
 
 # present minio server bin

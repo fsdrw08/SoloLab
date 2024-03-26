@@ -34,6 +34,7 @@ resource "null_resource" "bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
+      "sudo systemctl daemon-reload",
       "sudo rm -f ${self.triggers.file_dir}/vault",
     ]
   }
@@ -145,4 +146,5 @@ resource "system_service_systemd" "service" {
   name    = trimsuffix(system_file.service.basename, ".service")
   status  = var.service.status
   enabled = var.service.enabled
+
 }

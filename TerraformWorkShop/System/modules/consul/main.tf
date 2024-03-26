@@ -45,6 +45,7 @@ resource "null_resource" "bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
+      "sudo systemctl daemon-reload",
       "sudo rm -f ${self.triggers.file_dir}/consul",
     ]
   }
