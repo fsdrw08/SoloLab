@@ -30,7 +30,6 @@ addresses{
 client_addr = "${client_addr}"
 
 ports{
-  dns = 53
   https = 8501
 }
 

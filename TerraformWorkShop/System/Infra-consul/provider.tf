@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/vault"
       version = ">= 4.1.0"
     }
+    vyos = {
+      source  = "Foltik/vyos"
+      version = ">=0.3.3"
+    }
   }
 }
 
@@ -39,4 +43,9 @@ provider "vault" {
   token   = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
   skip_tls_verify = true
+}
+
+provider "vyos" {
+  url = "https://192.168.255.1:8443"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

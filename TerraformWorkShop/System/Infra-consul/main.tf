@@ -30,6 +30,7 @@ resource "vault_pki_secret_backend_cert" "consul" {
   common_name = "consul.service.consul"
   alt_names = [
     "consul.infra.sololab",
+    "server.dc1.consul"
   ]
 }
 
@@ -39,8 +40,13 @@ data "vault_pki_secret_backend_issuers" "root" {
 
 data "vault_pki_secret_backend_issuer" "root" {
   backend    = "pki/root"
-  issuer_ref = data.vault_pki_secret_backend_issuers.root.id
+  issuer_ref = keys(jsondecode(data.vault_pki_secret_backend_issuers.root.key_info_json))[0]
 }
+
+# output "test" {
+#   value = data.vault_pki_secret_backend_issuer.root.certificate
+#   # value = keys(jsondecode(data.vault_pki_secret_backend_issuers.root.key_info_json))[0]
+# }
 
 # data "terraform_remote_state" "root_ca" {
 #   backend = "local"
@@ -62,7 +68,7 @@ module "consul" {
   }
   install = {
     # https://releases.hashicorp.com/consul/
-    zip_file_source = "http://sws.infra.consul:4080/releases/consul%5F1.18.0%5Flinux%5Famd64.zip"
+    zip_file_source = "http://sws.infra.sololab:4080/releases/consul%5F1.18.0%5Flinux%5Famd64.zip"
     zip_file_path   = "/home/vyos/consul.zip"
     bin_file_dir    = "/usr/bin"
   }
@@ -88,12 +94,12 @@ module "consul" {
         tls_ca_file                        = "/etc/consul.d/certs/ca.crt"
         tls_cert_file                      = "/etc/consul.d/certs/server.crt"
         tls_key_file                       = "/etc/consul.d/certs/server.key"
-        tls_verify_incoming                = true
+        tls_verify_incoming                = false
         tls_verify_outgoing                = true
         tls_irpc_verify_server_hostname    = true
         connect_enabled                    = true
         auto_config_oidc_discovery_url     = "https://vault.infra.sololab:8200/v1/identity/oidc"
-        auto_config_oidc_discovery_ca_cert = data.vault_pki_secret_backend_issuer.root.certificate
+        auto_config_oidc_discovery_ca_cert = replace(data.vault_pki_secret_backend_issuer.root.certificate, "\n", "\\n")
         auto_config_bound_issuer           = "https://vault.infra.sololab:8200/v1/identity/oidc"
         auto_config_bound_audiences        = "consul-cluster-dc1"
         auto_config_claim_mappings         = "\"/consul/hostname\" = \"node_name\""
@@ -111,12 +117,17 @@ module "consul" {
       # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
       ca_content    = data.vault_pki_secret_backend_issuer.root.certificate
       cert_basename = "server.crt"
-      cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem
-      )
+      cert_content = join("\n", [
+        vault_pki_secret_backend_cert.consul.certificate,
+        vault_pki_secret_backend_cert.consul.ca_chain
+      ])
+      # cert_content = format("%s\n%s", lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
+      #   # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      #   data.terraform_remote_state.root_ca.outputs.int_ca_pem
+      # )
       key_basename = "server.key"
-      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
+      key_content  = vault_pki_secret_backend_cert.consul.private_key
+      # key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
       # https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#distribute-the-certificates-to-agents
       sub_dir = "certs"
     }
@@ -136,20 +147,26 @@ module "consul" {
   }
 }
 
+resource "system_file" "coredns_snippet" {
+  depends_on = [module.consul]
+  # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
+  path = "/etc/coredns/snippets/consul_dns.conf"
+  # content = file("${path.root}/sws/sws.conf")
+  content = templatefile("${path.root}/consul/consul_dns.conf", {
+    FQDN    = "consul.infra.sololab"
+    IP      = "192.168.255.2"
+    DOMAIN  = "consul"
+    FORWARD = ". 192.168.255.2:8600"
+  })
+}
+
 locals {
   consul_post_process = {
-    Update-vyOSDNS = {
-      script_path = "./consul/Update-vyOSDNS.sh"
-      vars = {
-        domain = "consul"
-        ip     = "192.168.255.2"
-      }
-    }
     Config-ConsulDNS = {
       script_path = "./consul/Config-ConsulDNS.sh"
       vars = {
         CONSUL_CACERT   = "/etc/consul.d/certs/ca.crt"
-        client_addr     = "consul.service.consul:8500"
+        client_addr     = "consul.infra.sololab:8500"
         token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
       }
     }
@@ -157,7 +174,7 @@ locals {
       script_path = "./consul/Config-TFToken.sh"
       vars = {
         CONSUL_CACERT   = "/etc/consul.d/certs/ca.crt"
-        client_addr     = "consul.service.consul:8500"
+        client_addr     = "consul.infra.sololab:8500"
         token_init_mgmt = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
         secret_id       = "ec15675e-2999-d789-832e-8c4794daa8d7"
       }
@@ -166,8 +183,11 @@ locals {
 }
 
 resource "null_resource" "consul_post_process" {
-  depends_on = [module.consul]
-  for_each   = local.consul_post_process
+  depends_on = [
+    module.consul,
+    system_file.coredns_snippet
+  ]
+  for_each = local.consul_post_process
   triggers = {
     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
     host           = var.vm_conn.host
@@ -194,7 +214,6 @@ resource "null_resource" "consul_post_process" {
   #   ]
   # }
 }
-
 
 resource "system_file" "consul_consul" {
   depends_on = [
