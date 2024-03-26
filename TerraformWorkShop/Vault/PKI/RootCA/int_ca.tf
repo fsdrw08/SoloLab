@@ -45,7 +45,7 @@ resource "vault_pki_secret_backend_config_urls" "config_urls_ica1" {
 resource "vault_pki_secret_backend_role" "role_ica1" {
   backend          = vault_mount.pki_ica1.path
   name             = "IntCA1-v1-role"
-  ttl              = 86400
+  ttl              = 3153600
   allow_ip_sans    = true
   key_type         = "rsa"
   key_bits         = 4096
