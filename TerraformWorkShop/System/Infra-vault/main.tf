@@ -80,8 +80,9 @@ module "vault" {
         listener_local_address         = "127.0.0.1:8200"
         listener_local_cluster_address = "127.0.0.1:8201"
         # https://discuss.hashicorp.com/t/unable-to-init-vault-raft/49119
-        api_addr                 = "vault.infra.sololab:8200"
-        cluster_addr             = "vault.infra.sololab:8201"
+        # Since using TLS, need to add https in the cluster_addr and api_addr values.
+        api_addr                 = "https://vault.infra.sololab:8200"
+        cluster_addr             = "https://vault.infra.sololab:8201"
         tls_ca_file              = "/etc/vault.d/tls/ca.crt"
         tls_cert_file            = "/etc/vault.d/tls/server.crt"
         tls_key_file             = "/etc/vault.d/tls/server.key"
@@ -90,7 +91,7 @@ module "vault" {
     }
     tls = {
       ca_basename   = "ca.crt"
-      ca_content    = data.terraform_remote_state.root_ca.outputs.int_ca_pem
+      ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
       cert_basename = "server.crt"
       cert_content = join("", [
         lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),

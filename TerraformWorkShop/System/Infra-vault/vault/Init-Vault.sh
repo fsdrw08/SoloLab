@@ -71,7 +71,8 @@ function vault_health {
     vault status -format=json
 }
 
-if [ -f $VAULT_OPERATOR_SECRETS_JSON_PATH ]; then
+if [[ -f "$VAULT_OPERATOR_SECRETS_JSON_PATH" && $(stat -c%s "$VAULT_OPERATOR_SECRETS_JSON_PATH") -gt 1 ]]; then
+# if [ -f $VAULT_OPERATOR_SECRETS_JSON_PATH ]; then
     # Vault is already initialized
     printf "Vault is already initialized.\n"
     wait_started
