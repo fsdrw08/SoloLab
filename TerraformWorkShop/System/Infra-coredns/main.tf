@@ -21,7 +21,7 @@ module "coredns" {
       content = templatefile("${path.root}/coredns/Corefile", {
         listen_address = "192.168.255.2"
         import         = "/etc/coredns/snippets/*.conf"
-        forward        = ". 127.0.0.1:8600"
+        forward        = ". 223.5.5.5"
       })
     }
     snippets = {
