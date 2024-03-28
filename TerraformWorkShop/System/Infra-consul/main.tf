@@ -34,13 +34,8 @@ resource "vault_pki_secret_backend_cert" "consul" {
   ]
 }
 
-data "vault_pki_secret_backend_issuers" "root" {
-  backend = "pki/root"
-}
-
-data "vault_pki_secret_backend_issuer" "root" {
-  backend    = "pki/root"
-  issuer_ref = keys(jsondecode(data.vault_pki_secret_backend_issuers.root.key_info_json))[0]
+data "vault_generic_secret" "rootca" {
+  path = "pki/root/cert/ca"
 }
 
 # output "test" {
@@ -99,7 +94,7 @@ module "consul" {
         tls_irpc_verify_server_hostname    = true
         connect_enabled                    = true
         auto_config_oidc_discovery_url     = "https://vault.infra.sololab:8200/v1/identity/oidc"
-        auto_config_oidc_discovery_ca_cert = replace(data.vault_pki_secret_backend_issuer.root.certificate, "\n", "\\n")
+        auto_config_oidc_discovery_ca_cert = replace(data.vault_generic_secret.rootca.data.certificate, "\n", "\\n")
         auto_config_bound_issuer           = "https://vault.infra.sololab:8200/v1/identity/oidc"
         auto_config_bound_audiences        = "consul-cluster-dc1"
         auto_config_claim_mappings         = "\"/consul/hostname\" = \"node_name\""
@@ -115,7 +110,7 @@ module "consul" {
     tls = {
       ca_basename = "ca.crt"
       # ca_content    = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      ca_content    = data.vault_pki_secret_backend_issuer.root.certificate
+      ca_content    = data.vault_generic_secret.rootca.data.certificate
       cert_basename = "server.crt"
       cert_content = join("\n", [
         vault_pki_secret_backend_cert.consul.certificate,
