@@ -5,7 +5,7 @@ resource "vault_mount" "pki" {
   path                      = "pki/ica2_v1"
   type                      = "pki"
   description               = "PKI engine hosting intermediate CA2 v1 for sololab"
-  default_lease_ttl_seconds = (60 * 60)                # 1 hour in seconds
+  default_lease_ttl_seconds = (60 * 60 * 24 * 91)      # 91 days in seconds
   max_lease_ttl_seconds     = (3 * 365 * 24 * 60 * 60) # 3 years in seconds
 }
 
@@ -70,12 +70,12 @@ resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate_set_si
 }
 
 #  for the Intermediate CA, we need to generate a role to consume the PKI secret engine as a client.
-# Using the vault_pki_secret_backend_role resource creates a role for the root CA; 
+# Using the vault_pki_secret_backend_role resource creates a role for this CA; 
 # creating this role allows for specifying an issuer when necessary for the purposes of this scenario. 
 # This also provides a simple way to transition from one issuer to another by referring to it by name.
 resource "vault_pki_secret_backend_role" "role" {
   backend          = vault_mount.pki.path
-  name             = "IntCA2-v1-role"
+  name             = "IntCA2-v1-role-default"
   ttl              = 86400
   allow_ip_sans    = true
   key_type         = "rsa"

@@ -5,7 +5,7 @@ resource "vault_mount" "pki" {
   path                      = "pki/root"
   type                      = "pki"
   description               = "PKI engine hosting root CA v1 for sololab"
-  default_lease_ttl_seconds = (60 * 60)                # 1 hour in seconds
+  default_lease_ttl_seconds = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
   max_lease_ttl_seconds     = (3 * 365 * 24 * 60 * 60) # 3 years in seconds
 }
 
@@ -44,8 +44,8 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
 
 resource "vault_pki_secret_backend_role" "role" {
   backend          = vault_mount.pki.path
-  name             = "RootCA-v1-role"
-  ttl              = 86400
+  name             = "RootCA-v1-role-default"
+  ttl              = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
   allow_ip_sans    = true
   key_type         = "rsa"
   key_bits         = 4096
@@ -73,7 +73,7 @@ data "vault_pki_secret_backend_issuers" "issuers" {
 }
 
 resource "vault_pki_secret_backend_issuer" "issuer" {
-  count                          = data.vault_pki_secret_backend_issuers.issuers.key_info == null ? 0 : 1
+  # count                          = data.vault_pki_secret_backend_issuers.issuers.key_info == null ? 0 : 1
   backend                        = vault_mount.pki.path
   issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
   revocation_signature_algorithm = "SHA256WithRSA"

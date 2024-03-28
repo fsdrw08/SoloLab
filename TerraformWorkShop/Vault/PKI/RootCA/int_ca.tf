@@ -5,7 +5,7 @@ resource "vault_mount" "pki_ica1" {
   path                      = "pki/ica1_v1"
   type                      = "pki"
   description               = "PKI engine hosting intermediate CA1 v1 for sololab"
-  default_lease_ttl_seconds = (60 * 60)                # 1 hour in seconds
+  default_lease_ttl_seconds = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
   max_lease_ttl_seconds     = (3 * 365 * 24 * 60 * 60) # 3 years in seconds
 }
 
@@ -44,8 +44,8 @@ resource "vault_pki_secret_backend_config_urls" "config_urls_ica1" {
 
 resource "vault_pki_secret_backend_role" "role_ica1" {
   backend          = vault_mount.pki_ica1.path
-  name             = "IntCA1-v1-role"
-  ttl              = 3153600
+  name             = "IntCA1-v1-role-default"
+  ttl              = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
   allow_ip_sans    = true
   key_type         = "rsa"
   key_bits         = 4096
@@ -80,7 +80,7 @@ data "vault_pki_secret_backend_issuers" "issuers_ica1" {
 }
 
 resource "vault_pki_secret_backend_issuer" "issuer_ica1" {
-  count                          = data.vault_pki_secret_backend_issuers.issuers_ica1.key_info == null ? 0 : 1
+  # count                          = data.vault_pki_secret_backend_issuers.issuers_ica1.key_info == null ? 0 : 1
   backend                        = vault_mount.pki_ica1.path
   issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers_ica1.key_info), 0)
   revocation_signature_algorithm = "SHA256WithRSA"
