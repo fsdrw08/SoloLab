@@ -24,7 +24,8 @@ http:
         - websecure
       middlewares:
         - userpass
-      tls: true
+      tls:
+        certresolver: internal
   middlewares:
     userpass:
       basicAuth:

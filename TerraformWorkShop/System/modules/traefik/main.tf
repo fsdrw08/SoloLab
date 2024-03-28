@@ -62,8 +62,8 @@ resource "system_folder" "config" {
 # persist traefik static config file in dir
 resource "system_file" "static" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, basename(var.config.static.templatefile_path)])
-  content    = templatefile(var.config.static.templatefile_path, var.config.static.templatefile_vars)
+  path       = join("/", [var.config.dir, var.config.static.basename])
+  content    = var.config.static.content
   user       = var.runas.user
   group      = var.runas.group
   mode       = "600"
@@ -83,16 +83,13 @@ resource "system_folder" "dynamic" {
 resource "system_file" "dynamic" {
   depends_on = [system_folder.dynamic]
   for_each = {
-    for file in var.config.dynamic.files : file.templatefile_path => file
+    for file in var.config.dynamic.files : file.basename => file
   }
-  path = join("/", [var.config.dir, var.config.dynamic.sub_dir, basename(each.value.templatefile_path)])
-  content = templatefile(
-    each.value.templatefile_path,
-    each.value.templatefile_vars
-  )
-  user  = var.runas.user
-  group = var.runas.group
-  mode  = "755"
+  path    = join("/", [var.config.dir, var.config.dynamic.sub_dir, each.value.basename])
+  content = each.value.content
+  user    = var.runas.user
+  group   = var.runas.group
+  mode    = "755"
 }
 
 # presist traefik cert dir
@@ -154,11 +151,8 @@ resource "system_link" "data" {
 
 # persist traefik systemd unit file
 resource "system_file" "service" {
-  path = var.service.systemd_unit_service.target_path
-  content = templatefile(
-    var.service.systemd_unit_service.templatefile_path,
-    var.service.systemd_unit_service.templatefile_vars
-  )
+  path    = var.service.systemd_service_unit.path
+  content = var.service.systemd_service_unit.content
 }
 
 # debug service: journalctl -u traefik.service

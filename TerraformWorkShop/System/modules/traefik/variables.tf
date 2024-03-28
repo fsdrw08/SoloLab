@@ -33,13 +33,13 @@ variable "storage" {
 variable "config" {
   type = object({
     static = object({
-      templatefile_path = string
-      templatefile_vars = optional(map(string))
+      basename = string
+      content  = string
     })
     dynamic = optional(object({
       files = list(object({
-        templatefile_path = string
-        templatefile_vars = optional(map(string))
+        basename = string
+        content  = string
       }))
       sub_dir = string
     }))
@@ -60,10 +60,9 @@ variable "service" {
   type = object({
     status  = string
     enabled = bool
-    systemd_unit_service = object({
-      templatefile_path = string
-      templatefile_vars = optional(map(string))
-      target_path       = string
+    systemd_service_unit = object({
+      path    = string
+      content = string
     })
   })
 }

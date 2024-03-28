@@ -5,17 +5,17 @@ providers:
     directory: "/etc/traefik/dynamic"
     watch: true
   # https://doc.traefik.io/traefik/providers/consul-catalog/#traefik-consul-catalog
-  # consulCatalog:
-  #   endpoint:
-  #     address: ${consul_client_addr}
-  #     datacenter: ${consul_datacenter}
-  #     scheme: ${consul_scheme}
-  #     # https://stackoverflow.com/questions/68007540/terraform-conditionally-execute-some-lines-of-code-in-template-file
-  #     %{ if consul_scheme != "http" }
-  #     tls:
-  #       ca: ${consul_tls_ca}
-  #     %{ endif }
-  #   exposedByDefault: false
+  consulCatalog:
+    endpoint:
+      address: ${consul_client_addr}
+      datacenter: ${consul_datacenter}
+      scheme: ${consul_scheme}
+      # https://stackoverflow.com/questions/68007540/terraform-conditionally-execute-some-lines-of-code-in-template-file
+      %{ if consul_scheme != "http" }
+      tls:
+        ca: ${consul_tls_ca}
+      %{ endif }
+    exposedByDefault: false
 ## ref: https://doc.traefik.io/traefik/routing/overview/#transport-configuration
 serversTransport:
   insecureSkipVerify: true
