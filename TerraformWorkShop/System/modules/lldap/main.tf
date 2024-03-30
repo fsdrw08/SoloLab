@@ -44,7 +44,7 @@ resource "null_resource" "bin" {
       "sudo tar --extract --file=${system_file.tar.path} --directory=${var.install.bin_file_dir} --strip-components=${self.triggers.strip_components_bin} --verbose --overwrite ${var.install.tar_file_bin_path}",
       "sudo chmod 755 ${var.install.bin_file_dir}/lldap",
       "sudo mkdir -p ${var.install.app_pkg_dir}",
-      "sudo tar --extract --file=${system_file.tar.path} --directory=${var.install.app_pkg_dir} --strip-components=${self.triggers.strip_components_bin + 1} --verbose --overwrite --wildcards ${var.install.tar_file_app_path}*",
+      "sudo tar --extract --file=${system_file.tar.path} --directory=${var.install.app_pkg_dir} --strip-components=${self.triggers.strip_components_app + 1} --verbose --overwrite --wildcards ${var.install.tar_file_app_path}*",
     ]
   }
   provisioner "remote-exec" {
