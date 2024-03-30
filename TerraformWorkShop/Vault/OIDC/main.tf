@@ -34,6 +34,6 @@ resource "vault_identity_oidc_provider" "provider" {
     vault_identity_oidc_scope.username.name
   ]
   allowed_client_ids = [
-    vault_identity_oidc_client.minio.client_id
+    "*"
   ]
 }
