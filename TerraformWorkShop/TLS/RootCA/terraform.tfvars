@@ -54,6 +54,56 @@ int_ca = {
 }
 
 certs = [
+  # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
+  {
+    name = "cockroach_node_1"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      ip_addresses = [
+        "192.168.255.2"
+      ]
+      dns_names = [
+        "localhost",
+        "cockroach.infra.sololab"
+      ]
+      subject = {
+        common_name  = "node"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "digital_signature",
+        "key_encipherment",
+        "server_auth",
+        "client_auth",
+      ]
+    }
+  },
+  {
+    name = "cockroach_client_root"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "root",
+      ]
+      subject = {
+        common_name  = "root"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "digital_signature",
+        "key_encipherment",
+        "client_auth",
+      ]
+    }
+  },
   {
     name = "sws"
     key = {
@@ -128,92 +178,92 @@ certs = [
       ]
     }
   },
-  {
-    name = "wildcard"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = ["*.service.consul"]
-      subject = {
-        common_name  = "service.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  {
-    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
-    name = "consul"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "consul.service.consul",
-        "server.dc1.consul",
-        "localhost"
-      ]
-      subject = {
-        common_name  = "server.dc1.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "cert_signing",
-        "crl_signing"
-      ]
-    }
-  },
-  {
-    name = "traefik"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = ["traefik.service.consul"]
-      subject = {
-        common_name  = "traefik.service.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  {
-    name = "minio"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "minio.service.consul",
-        "localhost"
-      ]
-      subject = {
-        common_name  = "minio.service.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
+  # {
+  #   name = "wildcard"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = ["*.service.consul"]
+  #     subject = {
+  #       common_name  = "service.consul"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #     ]
+  #   }
+  # },
+  # {
+  #   # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
+  #   name = "consul"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "consul.service.consul",
+  #       "server.dc1.consul",
+  #       "localhost"
+  #     ]
+  #     subject = {
+  #       common_name  = "server.dc1.consul"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "digital_signature",
+  #       "cert_signing",
+  #       "crl_signing"
+  #     ]
+  #   }
+  # },
+  # {
+  #   name = "traefik"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = ["traefik.service.consul"]
+  #     subject = {
+  #       common_name  = "traefik.service.consul"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #     ]
+  #   }
+  # },
+  # {
+  #   name = "minio"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "minio.service.consul",
+  #       "localhost"
+  #     ]
+  #     subject = {
+  #       common_name  = "minio.service.consul"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #     ]
+  #   }
+  # },
 ]

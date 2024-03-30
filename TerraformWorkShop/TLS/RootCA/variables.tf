@@ -57,9 +57,9 @@ variable "certs" {
       rsa_bits    = optional(string, null)
     })
     cert = object({
-      dns_names             = list(string)
+      dns_names             = optional(list(string))
       ip_addresses          = optional(list(string), null)
-      subject               = map(string)
+      subject               = optional(map(string))
       validity_period_hours = number
       allowed_uses          = optional(list(string), null)
     })
