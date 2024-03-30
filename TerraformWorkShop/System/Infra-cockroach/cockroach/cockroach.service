@@ -1,0 +1,22 @@
+[Unit]
+Description=Cockroach Database cluster node
+Requires=network.target
+After=network-online.target
+
+[Service]
+Type=notify
+User=${user}
+Group=${group}
+# https://www.cockroachlabs.com/docs/v23.2/cockroach-start-single-node#networking
+ExecStart=/usr/local/bin/cockroach start-single-node \
+    --listen-addr=${listen_addr} \
+    --http-addr=${http_addr} \
+    --certs-dir=${certs_dir} \
+    --accept-sql-without-tls \
+    --store=path=${store_path},attrs=ssd 
+TimeoutStopSec=300
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
