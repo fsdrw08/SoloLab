@@ -15,6 +15,10 @@ resource "system_file" "server_bin" {
   path   = "${var.install.server.bin_file_dir}/minio"
   source = var.install.server.bin_file_source
   mode   = 755
+}
+
+resource "null_resource" "bin" {
+  depends_on = [system_file.server_bin]
   triggers = {
     host     = var.vm_conn.host
     port     = var.vm_conn.port

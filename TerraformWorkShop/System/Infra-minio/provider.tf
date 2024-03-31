@@ -10,14 +10,11 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 3.25.0"
+      version = ">= 4.1.0"
     }
   }
-  backend "consul" {
-    address      = "consul.service.consul"
-    scheme       = "http"
-    path         = "tfstate/system/vyos-minio"
-    access_token = "ec15675e-2999-d789-832e-8c4794daa8d7"
+  backend "pg" {
+    conn_str = "postgres://terraform:terraform@192.168.255.2:26257/tfstate"
   }
 }
 
@@ -41,7 +38,7 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address = "https://vault.service.consul"
+  address = "https://vault.infra.sololab:8200"
   token   = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
   skip_tls_verify = true

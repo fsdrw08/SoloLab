@@ -56,11 +56,12 @@ module "minio" {
   install = {
     server = {
       # https://dl.min.io/server/minio/release/linux-amd64/archive/
-      bin_file_source = "https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2024-02-26T09-33-48Z"
+      bin_file_source = "http://sws.infra.sololab:4080/releases/minio.RELEASE.2024%2D03%2D26T22%2D10%2D45Z"
       bin_file_dir    = "/usr/local/bin"
     }
     client = {
-      bin_file_source = "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2024-03-03T00-13-08Z"
+      # https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2024-03-25T16-41-14Z
+      bin_file_source = "http://sws.infra.sololab:4080/releases/mc.RELEASE.2024%2D03%2D25T16%2D41%2D14Z"
       bin_file_dir    = "/usr/local/bin"
     }
   }
