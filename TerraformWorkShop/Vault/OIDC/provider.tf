@@ -17,13 +17,9 @@ terraform {
     #   version = ">= 4.0.4"
     # }
   }
-
-  # backend "consul" {
-  #   address      = "consul.service.consul"
-  #   scheme       = "http"
-  #   path         = "tfstate/vault/oidc"
-  #   access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-  # }
+  backend "pg" {
+    conn_str = "postgres://terraform:terraform@192.168.255.2:26257/tfstate"
+  }
 }
 
 
