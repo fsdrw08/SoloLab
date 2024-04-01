@@ -32,8 +32,7 @@ data "terraform_remote_state" "root_ca" {
 }
 
 module "sws" {
-  depends_on = [module.coredns]
-  source     = "../modules/sws"
+  source = "../modules/sws"
   vm_conn = {
     host     = var.vm_conn.host
     port     = var.vm_conn.port
@@ -55,7 +54,7 @@ module "sws" {
     main = {
       basename = "static-web-server.toml"
       content = templatefile("./sws/static-web-server_non_socket.toml", {
-        SERVER_HOST                      = "192.168.255.2"
+        SERVER_HOST                      = "192.168.255.1"
         SERVER_PORT                      = "4080" # 4433
         SERVER_ROOT                      = "/mnt/data/sws"
         SERVER_LOG_LEVEL                 = "warn"
@@ -123,13 +122,13 @@ module "sws_restart" {
   }
 }
 
-resource "system_file" "snippet" {
-  depends_on = [module.coredns]
-  # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
-  path = "/etc/coredns/snippets/sws_dns.conf"
-  # content = file("${path.root}/sws/sws.conf")
-  content = templatefile("${path.root}/sws/sws_dns.conf", {
-    IP   = "192.168.255.2"
-    FQDN = "sws.infra.sololab"
-  })
-}
+# resource "system_file" "snippet" {
+#   depends_on = [module.coredns]
+#   # https://coredns.io/plugins/auto/#:~:text=is%20the%20second.-,The%20default%20is%3A,example.com,-.
+#   path = "/etc/coredns/snippets/sws_dns.conf"
+#   # content = file("${path.root}/sws/sws.conf")
+#   content = templatefile("${path.root}/sws/sws_dns.conf", {
+#     IP   = "192.168.255.2"
+#     FQDN = "sws.infra.sololab"
+#   })
+# }
