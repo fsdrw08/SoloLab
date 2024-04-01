@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('13x', '14x', '13x-cloudinit')]
+  [ValidateSet('13x', '14x', '13x-cloudinit', '14x-cloudinit')]
   [string]
   $VyOSVersion
 )

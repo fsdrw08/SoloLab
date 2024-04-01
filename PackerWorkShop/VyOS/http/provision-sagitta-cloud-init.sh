@@ -3,17 +3,17 @@
 # Put debian.list
 touch /etc/apt/sources.list.d/debian.list
 cat <<EOF >>/etc/apt/sources.list.d/debian.list
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
-deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
-deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
-deb http://dev.packages.vyos.net/repositories/equuleus equuleus main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+deb http://dev.packages.vyos.net/repositories/current current main
 EOF
 
 # apt-get update
 apt-get update
 
 # Install cloud-init
-apt-get install -t equuleus -y --force-yes cloud-init cloud-utils ifupdown jq nfs-ganesha nfs-ganesha-vfs
+apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq nfs-ganesha nfs-ganesha-vfs
 
 # stop and disable nfs-ganesha
 systemctl disable nfs-ganesha
@@ -44,9 +44,8 @@ cat <<EOF >>/etc/network/interfaces
 source-directory /etc/network/interfaces.d
 EOF
 
-# https://bugs.launchpad.net/ubuntu/+source/linux-hwe-5.4/+bug/1903391
-mkdir /usr/libexec/hypervkvpd
 # https://serverfault.com/questions/1145467/missing-binaries-hv-get-dhcp-info-and-hv-get-dns-info
+mkdir /usr/libexec/hypervkvpd
 # https://git.centos.org/rpms/hyperv-daemons/blob/c8/f/SPECS/hyperv-daemons.spec#_227
 /usr/bin/install -p -m 0755 /mnt/hv_get_dhcp_info.sh /usr/libexec/hypervkvpd/hv_get_dhcp_info
 /usr/bin/install -p -m 0755 /mnt/hv_get_dns_info.sh /usr/libexec/hypervkvpd/hv_get_dns_info
