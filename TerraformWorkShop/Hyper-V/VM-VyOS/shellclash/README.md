@@ -5,6 +5,7 @@ ref:
 1. copy files to vyos
 ```powershell
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\*"
+$debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.0\*"
 # or 
 $debPath = "$env:USERPROFILE\OneDrive - Company Ltd\Software\Network\shellclash-linux\*"
 scp $debPath vyos:/tmp/
@@ -12,10 +13,19 @@ scp $debPath vyos:/tmp/
 2. install shellclash in vyos
 ```shell
 sudo su
-mkdir -p /tmp/SC_tmp && tar -zxf '/tmp/ShellClash.tar.gz' -C /tmp/SC_tmp/ && bash /tmp/SC_tmp/init.sh && source /etc/profile >/dev/null
+mkdir -p /tmp/SC_tmp && tar -zxf '/tmp/ShellCrash.tar.gz' -C /tmp/SC_tmp/ && bash /tmp/SC_tmp/init.sh && source /etc/profile >/dev/null
 #  2 在/usr/share目录下安装(适合Linux系统)
 ```
 3. source shellclash
+for shellcrash
+```shell
+echo "alias crash=\"bash /usr/share/ShellCrash/menu.sh\"" >> ~/.bashrc
+echo "alias clash=\"bash /usr/share/ShellCrash/menu.sh\"" >> ~/.bashrc
+echo "export CRASHDIR=\"/usr/share/ShellCrash\"" >> ~/.bashrc
+source ~/.bashrc
+# launch clash 
+clash
+```
 ```shell
 echo "alias clash=\"bash /usr/share/clash/clash.sh\"" >> ~/.bashrc
 echo "export clashdir=\"/usr/share/clash\"" >> ~/.bashrc
@@ -23,7 +33,7 @@ source ~/.bashrc
 # launch clash 
 clash
 ```
-4. config clash
+1. config clash
 - 1 路由设备配置局域网透明代理 -> 是否开启公网访问Dashboard面板及socks服务？ 0 
     -> 是否导入配置文件？0 -> 立即启动clash服务？0 -> 发现可用的内核文件： /tmp/clash-linux-amd64-pre 
     是否加载？ 1

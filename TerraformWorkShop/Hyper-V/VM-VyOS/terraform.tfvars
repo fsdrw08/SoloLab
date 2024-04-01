@@ -12,8 +12,9 @@ vm_conn = {
   password = "vyos"
 }
 
-vm_name       = "VyOS-LTS-134"
-source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-vyos134.vhdx"
+vm_name     = "VyOS-140-EPA2"
+source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-vyos140.vhdx"
+# source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
 network_adaptors = [
   {
@@ -28,16 +29,16 @@ network_adaptors = [
     dynamic_mac_address = false
     static_mac_address  = "0000FEE1600D"
   },
-  {
-    name                = "LAN1-P2"
-    switch_name         = "Internal Switch"
-    dynamic_mac_address = false
-    static_mac_address  = "0000FEE1900D"
-  },
+  # {
+  #   name                = "LAN1-P2"
+  #   switch_name         = "Internal Switch"
+  #   dynamic_mac_address = false
+  #   static_mac_address  = "0000FEE1900D"
+  # },
 
 ]
 enable_secure_boot   = "Off"
-memory_startup_bytes = 3070230528
-memory_maximum_bytes = 3070230528
+memory_startup_bytes = 2046820352
+memory_maximum_bytes = 2046820352
 memory_minimum_bytes = 1023410176
 
