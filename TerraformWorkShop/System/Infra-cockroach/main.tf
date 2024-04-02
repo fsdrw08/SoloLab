@@ -44,7 +44,7 @@ module "cockroach" {
   }
   install = {
     # https://www.cockroachlabs.com/docs/releases/
-    tar_file_source = "http://sws.infra.sololab:4080/releases/cockroach%2Dv23.2.3.linux%2Damd64.tgz"
+    tar_file_source = "http://sws.core.sololab/releases/cockroach%2Dv23.2.3.linux%2Damd64.tgz"
     tar_file_path   = "/home/vyos/cockroach-v23.2.3.linux-amd64.tgz"
     # tar -ztvf /home/vyos/cockroach-v23.2.3.linux-amd64.tgz
     tar_file_bin_path = "cockroach-v23.2.3.linux-amd64/cockroach"
@@ -86,8 +86,8 @@ module "cockroach" {
       content = templatefile("${path.root}/cockroach/cockroach.service", {
         user        = "vyos"
         group       = "users"
-        listen_addr = "192.168.255.2:26257"
-        http_addr   = "192.168.255.2:8443"
+        listen_addr = "192.168.255.1:5432"
+        http_addr   = "192.168.255.1:5443"
         certs_dir   = "/etc/cockroach/certs"
         store_path  = "/mnt/data/cockroach"
       })
@@ -96,33 +96,34 @@ module "cockroach" {
   }
 }
 
-# module "cockroach_restart" {
-#   depends_on = [module.cockroach]
-#   source     = "../modules/systemd_path"
-#   vm_conn = {
-#     host     = var.vm_conn.host
-#     port     = var.vm_conn.port
-#     user     = var.vm_conn.user
-#     password = var.vm_conn.password
-#   }
-#   systemd_path_unit = {
-#     content = templatefile("${path.root}/cockroach/restart.path", {
-#       PathModified = [
-#         "/etc/cockroach/cockroach_config.toml",
-#         "/etc/cockroach/certs/server.crt",
-#         "/etc/cockroach/certs/server.key"
-#       ]
-#     })
-#     path = "/etc/systemd/system/cockroach_restart.path"
-#   }
-#   systemd_service_unit = {
-#     content = templatefile("${path.root}/cockroach/restart.service", {
-#       AssertPathExists = "/lib/systemd/system/cockroach.service"
-#       target_service   = "cockroach.service"
-#     })
-#     path = "/etc/systemd/system/cockroach_restart.service"
-#   }
-# }
+module "cockroach_restart" {
+  depends_on = [module.cockroach]
+  source     = "../modules/systemd_path"
+  vm_conn = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  systemd_path_unit = {
+    content = templatefile("${path.root}/cockroach/restart.path", {
+      PathModified = [
+        "/etc/systemd/system/cockroach.service",
+      ]
+      PathExistsGlob = [
+        "/etc/cockroach/certs/*"
+      ]
+    })
+    path = "/etc/systemd/system/cockroach_restart.path"
+  }
+  systemd_service_unit = {
+    content = templatefile("${path.root}/cockroach/restart.service", {
+      AssertPathExists = "/etc/systemd/system/cockroach.service"
+      target_service   = "cockroach.service"
+    })
+    path = "/etc/systemd/system/cockroach_restart.service"
+  }
+}
 
 locals {
   cockroach_post_process = {
@@ -130,7 +131,7 @@ locals {
       script_path = "${path.root}/cockroach/Set-TerraformBackend.sh"
       vars = {
         certs_dir   = "/etc/cockroach/certs"
-        listen_addr = "192.168.255.2:26257"
+        listen_addr = "192.168.255.1:5432"
       }
     }
   }

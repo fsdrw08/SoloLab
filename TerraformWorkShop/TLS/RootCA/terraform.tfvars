@@ -63,11 +63,11 @@ certs = [
     }
     cert = {
       ip_addresses = [
-        "192.168.255.2"
+        "192.168.255.1"
       ]
       dns_names = [
         "localhost",
-        "cockroach.infra.sololab"
+        "cockroach.core.sololab"
       ]
       subject = {
         common_name  = "node"
