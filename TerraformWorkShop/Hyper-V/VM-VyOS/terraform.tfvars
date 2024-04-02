@@ -5,17 +5,12 @@ hyperv = {
   password = "P@ssw0rd"
 }
 
-vm_conn = {
-  host     = "192.168.255.1"
-  port     = 22
-  user     = "vyos"
-  password = "vyos"
-}
-
 vm_name     = "VyOS-140-EPA2"
+vhd_dir     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
 source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-vyos140.vhdx"
 # source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
+
 network_adaptors = [
   {
     name                = "WAN"
@@ -37,8 +32,26 @@ network_adaptors = [
   # },
 
 ]
+
 enable_secure_boot   = "Off"
 memory_startup_bytes = 2046820352
 memory_maximum_bytes = 2046820352
 memory_minimum_bytes = 1023410176
 
+cloudinit_nocloud = [
+  {
+    content_source = "./cloudinit-tmpl/meta-data"
+    content_vars = {
+      instance_id    = "iid-VyOS_20240402"
+      local_hostname = "VyOS_140_EPA2"
+    }
+    filename = "meta-data"
+  },
+  {
+    content_source = "./cloudinit-tmpl/user-data-sagitta"
+    content_vars = {
+      null = null
+    }
+    filename = "user-data"
+  }
+]

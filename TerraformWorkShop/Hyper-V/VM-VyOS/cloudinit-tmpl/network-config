@@ -1,0 +1,13 @@
+version: 2
+ethernets:
+  eth0:
+    addresses: 
+%{ for addr in ip_addrs ~}
+      - ${addr}
+%{ endfor ~}
+    gateway4: ${gateway4[0]}
+    nameservers:
+      addresses: 
+%{ for nameserver in nameservers ~}
+        - ${nameserver}
+%{ endfor ~}

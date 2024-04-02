@@ -2,11 +2,11 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">= 1.0.4"
+      version = ">=1.2.1"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = ">= 3.2.1"
+    archive = {
+      source  = "hashicorp/archive"
+      version = "2.4.2"
     }
   }
 }

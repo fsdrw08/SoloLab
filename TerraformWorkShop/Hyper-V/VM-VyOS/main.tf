@@ -1,10 +1,25 @@
 locals {
-  count   = "1"
-  vm_name = var.vm_name
+  vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
   boot_disk_path = join("\\", [
     var.vhd_dir,
     var.vm_name,
     element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
+    ]
+  )
+}
+
+module "cloudinit_nocloud_iso" {
+  source   = "../modules/cloudinit_nocloud_iso3"
+  iso_name = "cloud-init"
+  files = [
+    for data in var.cloudinit_nocloud : {
+      content  = templatefile(data.content_source, data.content_vars)
+      filename = data.filename
+    }
+  ]
+  destination_iso_file_path = join("\\", [
+    var.vhd_dir,
+    "${var.vm_name}\\cloudinit.iso"
     ]
   )
 }
@@ -16,338 +31,11 @@ data "terraform_remote_state" "data_disk" {
   }
 }
 
-
-# https://stackoverflow.com/questions/68577948/terraform-local-file-dependency-with-null-resource-resulting-in-no-such-file-o
-# https://stackoverflow.com/questions/51138667/can-terraform-watch-a-directory-for-changes
-module "cloudinit_nocloud_iso" {
-  source = "../modules/cloudinit_nocloud_iso2"
-  count  = local.count
-  cloudinit_config = {
-    isoName = local.count <= 1 ? "cloud-init.iso" : "cloud-init${count.index + 1}.iso"
-    part = [
-      {
-        filename = "meta-data"
-        content  = <<-EOT
-        instance-id: iid-vyos_20240331
-        local-hostname: VyOS-140-LTS
-        EOT
-      },
-      {
-        filename = "user-data"
-        content  = <<-EOT
-        #cloud-config
-        # https://github.com/ahpnils/lab-as-code/blob/be47a0d8aabf66b38f718de35546411eb60c879b/cloud-init/isp1router1/user-data#L4
-        # https://docs.vyos.io/en/stable/automation/cloud-init.html
-        # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
-        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
-        disk_setup:
-          /dev/sdb:
-            table_type: gpt
-            layout: True
-            overwrite: False
-        fs_setup:
-          - label: data
-            filesystem: 'ext4'
-            device: '/dev/sdb1'
-            partition: auto
-            overwrite: false
-        # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
-        # https://zhuanlan.zhihu.com/p/250658106
-        mounts:
-          - [ /dev/disk/by-label/data, /mnt/data, auto, "nofail,exec", ]
-        mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
-
-        # !!! one command per line
-        # !!! if command ends in a value, it must be inside single quotes
-        # !!! a single-quote symbol is not allowed inside command or value
-        # to debug, refer
-        # https://forum.vyos.io/t/errors-when-trying-to-upgrade-a-working-configuration-from-1-2-5-to-1-3-rolling-lastest-build/5395/6
-        vyos_config_commands:
-          # Interface
-          - set interfaces ethernet eth0 address 'dhcp'
-          - set interfaces ethernet eth0 description 'WAN'
-          - set interfaces ethernet eth1 address '192.168.255.1/24'
-          - set interfaces ethernet eth1 description 'LAN'
-          - set interfaces ethernet eth2 address '192.168.255.2/24'
-          - set interfaces ethernet eth2 description 'SVC'
-          # Service
-          # DHCP server for local network
-          - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start '192.168.255.100'
-          - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop '192.168.255.200'
-          - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 name-server '192.168.255.1'
-          - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 default-router '192.168.255.1'
-          - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name 'sololab'
-          - set service dhcp-server shared-network-name LAN authoritative
-          - set service dhcp-server shared-network-name LAN ping-check
-          - set service dhcp-server hostfile-update
-          - set service dhcp-server host-decl-name
-          # DNS
-          - set service dns forwarding cache-size '0'
-          - set service dns forwarding listen-address '192.168.255.1'
-          - set service dns forwarding allow-from '192.168.255.0/24'
-          - set service dns forwarding name-server '223.5.5.5'
-          - set service dns forwarding name-server '223.6.6.6'
-          # ssh
-          - set service ssh port '22'
-          # api
-          - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
-          - set service https virtual-host vyos listen-address '192.168.255.1'
-          - set service https virtual-host vyos listen-port '8443'
-          - set service https api-restrict virtual-host 'vyos'
-          - set service https certificates system-generated-certificate
-          # System
-          # hostname
-          - set system host-name 'vyos-lts'
-          # auth config
-          - set system login user vyos authentication plaintext-password 'vyos'
-          - set system login user vyos authentication public-keys vagrant key 'AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=='
-          - set system login user vyos authentication public-keys vagrant type 'ssh-rsa'
-          # name server
-          - set system name-server '192.168.255.1'
-          # ntp
-          - set system ntp server 'cn.ntp.org.cn'
-          # timezone
-          - set system time-zone 'Asia/Shanghai'
-          # fix /dev/ttyS0: not a tty https://forum.vyos.io/t/dev-ttys0-not-a-tty/9642
-          - delete system console device 'ttyS0'
-          
-        write_files:
-          - path: /home/vyos/Set-ExternalDisk.sh
-            owner: root:vyattacfg
-            permissions: '0775'
-            content: |
-              #!/usr/bin/bash
-              # Check if disk exists
-              # https://linuxize.com/post/regular-expressions-in-grep/
-              if ! lsblk | grep '^sdb.*disk'; then
-                echo "Disk /dev/sdb not found"
-                exit 1
-              fi
-
-              # Check if GPT partition table exists
-              partition_table=$(parted /dev/sdb print | grep 'Partition Table:')
-              if [[ $partition_table != *gpt* ]]; then
-                echo "Creating GPT partition table on /dev/sdb"
-                sgdisk -g /dev/sdb
-              fi
-
-              # Check if data partition exists
-              if lsblk | grep 'sdb1.*part'; then
-                echo "Partition /dev/sdb1 already exists"
-              else
-                echo "Creating data partition on /dev/sdb"
-                sgdisk -n 1 /dev/sdb
-              fi
-
-              # Check if file system exists
-              if ! lsblk -f | grep 'sdb1.*ext4'; then
-                echo "Creating ext4 file system on /dev/sdb1"
-                mkfs.ext4 /dev/sdb1
-              fi
-
-              # Check if label exists
-              if ! sudo blkid -s LABEL -o value /dev/sdb; then
-                echo "Labeling /dev/sdb1 as data"
-                e2label /dev/sdb1 data
-              fi
-
-              # Mount the partition on boot
-              if ! grep "/dev/sdb1 /mnt/data ext4 defaults 0 2" /etc/fstab; then
-                echo "Mounting /dev/sdb1 to /mnt/data on boot"
-                echo "/dev/sdb1 /mnt/data ext4 defaults 0 2" >> /etc/fstab
-              fi
-
-              # Create mount point if it doesn't exist
-              if [ ! -d "/mnt/data" ]; then
-                echo "Creating /mnt/data directory"
-                mkdir -p /mnt/data
-              fi
-
-              # Mount the partition manually
-              # https://man7.org/linux/man-pages/man8/mount.8.html
-              if ! mountpoint -q /mnt/data; then
-                echo "Mounting /dev/sdb1 to /mnt/data"
-                mount /mnt/data
-              fi
-
-              # Create NFS dir if it doesn't exist
-              if [ ! -d "/mnt/data/nfs" ]; then
-              echo "Perpare /mnt/data/nfs"
-              mkdir -p /mnt/data/nfs
-              chmod 777 /mnt/data/nfs
-              fi
-
-              echo "Disk configuration complete"
-
-          - path: /tmp/finalConfig.sh
-            owner: root:vyattacfg
-            permissions: '0775'
-            content: |
-              #!/bin/vbash
-              # Ensure that we have the correct group or we'll corrupt the configuration
-              if [ "$(id -g -n)" != 'vyattacfg' ] ; then
-                  exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
-              fi
-              
-              source /opt/vyatta/etc/functions/script-template
-              configure
-              
-              # https://minbx.com/tipslab/27/
-              # https://forum.tinyserve.com/d/6-build-a-gateway-dns-server-with-v2ray-on-vyos-to-across-gfw
-              set nat destination rule 10 description 'CLASH FORWARD'
-              set nat destination rule 10 inbound-interface name 'eth1'
-              set nat destination rule 10 protocol 'tcp_udp'
-              set nat destination rule 10 destination port 80,443
-              set nat destination rule 10 source address 192.168.255.0/24
-              set nat destination rule 10 translation address 192.168.255.1
-              set nat destination rule 10 translation port 7892
-              
-              commit
-              save
-
-          # https://github.com/vyos/vyos-1x/blob/equuleus/src/conf_mode/https.py
-          # https://github.com/vyos/vyos-1x/blob/equuleus/data/templates/https/nginx.default.tmpl
-          # add server ip address in first server block, in order to run other reverse proxy in other ip address
-          # - path: /usr/share/vyos/templates/https/nginx.default.tmpl
-          #   owner: root:root
-          #   permissions: '0644'
-          #   content: |
-          #     ### Autogenerated by https.py ###
-          #     # Default server configuration
-          #     #
-          #     server {
-          #             listen 192.168.255.1:80 default_server;
-          #             listen [::]:80 default_server;
-          #             server_name _;
-          #             return 301 https://$host$request_uri;
-          #     }
-
-          #     {% for server in server_block_list %}
-          #     server {
-              
-          #             # SSL configuration
-          #             #
-          #     {% if server.address == '*' %}
-          #             listen {{ server.port }} ssl;
-          #             listen [::]:{{ server.port }} ssl;
-          #     {% else %}
-          #             listen {{ server.address | bracketize_ipv6 }}:{{ server.port }} ssl;
-          #     {% endif %}
-
-          #     {% for name in server.name %}
-          #             server_name {{ name }};
-          #     {% endfor %}
-
-          #     {% if server.certbot %}
-          #             ssl_certificate {{ server.certbot_dir }}/live/{{ server.certbot_domain_dir }}/fullchain.pem;
-          #             ssl_certificate_key {{ server.certbot_dir }}/live/{{ server.certbot_domain_dir }}/privkey.pem;
-          #             include {{ server.certbot_dir }}/options-ssl-nginx.conf;
-          #             ssl_dhparam {{ server.certbot_dir }}/ssl-dhparams.pem;
-          #     {% elif server.vyos_cert %}
-          #             include {{ server.vyos_cert.conf }};
-          #     {% else %}
-          #             #
-          #             # Self signed certs generated by the ssl-cert package
-          #             # Don't use them in a production server!
-          #             #
-          #             include snippets/snakeoil.conf;
-          #     {% endif %}
-          #             ssl_protocols TLSv1.2 TLSv1.3;
-
-          #             # proxy settings for HTTP API, if enabled; 503, if not
-          #             location ~ /(retrieve|configure|config-file|image|generate|show|reset|docs|openapi.json|redoc|graphql) {
-          #     {% if server.api %}
-          #     {% if server.api.socket %}
-          #                     proxy_pass http://unix:/run/api.sock;
-          #     {% else %}
-          #                     proxy_pass http://localhost:{{ server.api.port }};
-          #     {% endif %}
-          #                     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          #                     proxy_set_header X-Forwarded-Proto $scheme;
-          #                     proxy_read_timeout 600;
-          #                     proxy_buffering off;
-          #     {% else %}
-          #                     return 503;
-          #     {% endif %}
-          #             }
-
-          #             error_page 497 =301 https://$host:{{ server.port }}$request_uri;
-          #             error_page 501 502 503 =200 @50*_json;
-
-          #     {% if api_set %}
-          #             location @50*_json {
-          #                     default_type application/json;
-          #                     return 200 '{"error": "service https api unavailable at this proxy address: set service https api-restrict virtual-host"}';
-          #             }
-          #     {% else %}
-          #             location @50*_json {
-          #                     default_type application/json;
-          #                     return 200 '{"error": "Start service in configuration mode: set service https api"}';
-          #             }
-          #     {% endif %}
-
-          #     }
-
-          #     {% endfor %}
-        EOT
-      }
-    ]
-  }
-}
-
-resource "null_resource" "remote" {
-  depends_on = [module.cloudinit_nocloud_iso]
-  count      = local.count
-  triggers = {
-    # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(module.cloudinit_nocloud_iso[count.index].cloudinit_config))
-    vhd_dir       = var.vhd_dir
-    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
-    # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
-    isoName  = module.cloudinit_nocloud_iso[count.index].isoName
-    host     = var.hyperv.host
-    port     = var.hyperv.port
-    user     = var.hyperv.user
-    password = sensitive(var.hyperv.password)
-  }
-
-  connection {
-    type     = "winrm"
-    host     = self.triggers.host
-    user     = self.triggers.user
-    password = self.triggers.password
-    use_ntlm = true
-    https    = true
-    insecure = true
-    timeout  = "20s"
-  }
-  # copy to remote
-  provisioner "file" {
-    source = module.cloudinit_nocloud_iso[count.index].isoName
-    # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
-    destination = join("/", [
-      "${self.triggers.vhd_dir}",
-      "${self.triggers.vm_name}\\${self.triggers.isoName}"
-      ]
-    )
-  }
-
-  # for destroy
-  provisioner "remote-exec" {
-    # https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax#destroy-time-provisioners
-    when = destroy
-    inline = [<<-EOT
-      Powershell -Command "$cloudinit_iso=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.isoName}'); if (Test-Path $cloudinit_iso) { Remove-Item $cloudinit_iso }"
-    EOT
-    ]
-  }
-}
-
-
 module "hyperv_machine_instance" {
-  source     = "../modules/hyperv_instance2"
-  depends_on = [null_resource.remote]
-  count      = local.count
+  source = "../modules/hyperv_instance2"
+  depends_on = [
+    module.cloudinit_nocloud_iso,
+  ]
 
   boot_disk = {
     path   = local.boot_disk_path
@@ -373,7 +61,7 @@ module "hyperv_machine_instance" {
   ]
 
   vm_instance = {
-    name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
+    name                 = var.vm_name
     checkpoint_type      = "Standard"
     static_memory        = true
     generation           = 2
@@ -427,22 +115,19 @@ module "hyperv_machine_instance" {
       {
         controller_number   = 0
         controller_location = 1
-        path                = local.count <= 1 ? join("\\", ["${var.vhd_dir}", "${var.vm_name}", "${module.cloudinit_nocloud_iso[count.index].isoName}"]) : join("\\", ["${var.vhd_dir}", "${var.vm_name}${count.index + 1}", "${module.cloudinit_nocloud_iso[count.index].isoName}"])
+        path                = "${module.cloudinit_nocloud_iso.resolve_destination_iso_file_path}"
+        # path = local.count <= 1 ? join("\\", [
+        #   "${var.vhd_dir}",
+        #   "${var.vm_name}",
+        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
+        #   ]) : join("\\", [
+        #   "${var.vhd_dir}",
+        #   "${var.vm_name}${count.index + 1}",
+        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
+        # ])
       }
     ]
 
   }
 }
 
-# resource "null_resource" "ext_disk" {
-#   depends_on = [module.hyperv_machine_instance]
-#   connection {
-#     type     = "ssh"
-#     host     = var.vm_conn.host
-#     user     = var.vm_conn.user
-#     password = var.vm_conn.password
-#   }
-#   provisioner "remote-exec" {
-#     inline = ["sudo bash /home/vyos/Set-ExternalDisk.sh"]
-#   }
-# }

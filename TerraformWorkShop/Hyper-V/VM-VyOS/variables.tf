@@ -13,15 +13,6 @@ variable "hyperv" {
   }
 }
 
-variable "vm_conn" {
-  type = object({
-    host     = string
-    port     = number
-    user     = string
-    password = string
-  })
-}
-
 variable "vm_name" {
   type    = string
   default = null
@@ -54,6 +45,14 @@ variable "network_adaptors" {
 variable "enable_secure_boot" {
   type    = string
   default = "Off"
+}
+
+variable "cloudinit_nocloud" {
+  type = list(object({
+    content_source = string
+    content_vars   = map(string)
+    filename       = string
+  }))
 }
 
 variable "memory_startup_bytes" {
