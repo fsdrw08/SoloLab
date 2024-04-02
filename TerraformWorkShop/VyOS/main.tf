@@ -1,104 +1,24 @@
-# resource "null_resource" "external_disk" {
-#   connection {
-#     type     = "ssh"
-#     host     = var.vyos_conn.address
-#     user     = var.vyos_conn.ssh_user
-#     password = var.vyos_conn.ssh_password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo bash /tmp/Set-ExternalDisk.sh",
-#     ]
-#   }
-# }
+resource "vyos_config_block_tree" "container-vector-agent" {
+  path = "container name vector-agent"
 
-resource "vyos_config" "containerNetwork" {
-  path = "container network containers"
-  value = jsonencode({
-    "prefix" = "172.16.0.0/24"
-  })
+  configs = {
+    "image" = "${var.config.containers.vector.image}"
+
+    "network services address" = "${cidrhost(var.networks.services, 4)}"
+
+    "environment VECTOR_CONFIG value"       = "/etc/vector/vector.yaml"
+    "environment VECTOR_WATCH_CONFIG value" = "true"
+
+    "volume config destination" = "/etc/vector/vector.yaml"
+    "volume config source"      = "/config/vector-agent/vector.yaml"
+    "volume data destination"   = "/var/lib/vector"
+    "volume data source"        = "/config/vector-agent/data"
+    "volume logs destination"   = "/var/log"
+    "volume logs source"        = "/var/log"
+  }
+
+  depends_on = [
+    vyos_config_block_tree.container_network-services,
+    remote_file.container-vector-agent-config
+  ]
 }
-
-# resource "null_resource" "container_Consul_image" {
-#   connection {
-#     type     = "ssh"
-#     host     = var.vyos_conn.address
-#     user     = var.vyos_conn.ssh_user
-#     password = var.vyos_conn.ssh_password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo podman pull docker.io/bitnami/consul:latest",
-#     ]
-#   }
-# }
-
-# resource "null_resource" "container_Consul_volume" {
-#   connection {
-#     type     = "ssh"
-#     host     = var.vyos_conn.address
-#     user     = var.vyos_conn.ssh_user
-#     password = var.vyos_conn.ssh_password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "sudo mkdir -p /mnt/data/consul/data",
-#       "sudo chmod 777 /mnt/data/consul/data",
-#     ]
-#   }
-# }
-
-resource "vyos_config" "container_Consul" {
-  path = "container name consul"
-  value = jsonencode({
-    "image" = "docker.io/bitnami/consul:latest"
-    "network" = {
-      "containers" = {
-        "address" = "172.16.0.20"
-      }
-    }
-    "environment" = {
-      "TZ"               = { "value" = "Asia/Shanghai" }
-      "CONSUL_BIND_ADDR" = { "value" = "127.0.0.1" }
-    }
-    "port" = {
-      "consul_rpc" = {
-        "source"      = "8300"
-        "destination" = "8300"
-      }
-      "consul_serf" = {
-        "source"      = "8301"
-        "destination" = "8301"
-      }
-      "consul_http" = {
-        "source"      = "8500"
-        "destination" = "8500"
-      }
-      "consul_dns" = {
-        "source"      = "8600"
-        "destination" = "8600"
-      }
-    }
-    "volume" = {
-      "consul_data" = {
-        "source"      = "/mnt/data/consul/data"
-        "destination" = "/bitnami"
-      }
-    }
-  })
-}
-
-# resource "vyos_config" "container_Consul_nat" {
-#   path = "nat destination rule 20"
-#   value = jsonencode({
-#     "description"       = "consul forward"
-#     "inbound-interface" = "eth1"
-#     "protocol"          = "tcp_udp"
-#     "source" = {
-#       "address" = "192.168.255.0/24"
-#     }
-#     "translation" = {
-#       "address" = "172.16.0.10"
-#     }
-#   })
-# }

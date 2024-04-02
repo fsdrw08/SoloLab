@@ -5,30 +5,20 @@ terraform {
       version = ">=3.2.1"
     }
     vyos = {
-      source  = "TGNThump/vyos"
-      version = ">=2.1.0"
+      source  = "Foltik/vyos"
+      version = "0.3.3"
     }
-    remote = {
-      source  = "tenstad/remote"
-      version = ">=0.1.2"
-    }
+    # vyos = {
+    #   source  = "TGNThump/vyos"
+    #   version = "2.1.0"
+    # }
   }
 }
 
 provider "vyos" {
-  endpoint    = "https://${var.vyos_conn.address}:${var.vyos_conn.api_port}"
-  api_key     = var.vyos_conn.api_key
-  skip_saving = false
-}
+  url = "https://192.168.255.1:8443"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
+  # endpoint = "https://192.168.255.1:8443"
+  # api_key  = "MY-HTTPS-API-PLAINTEXT-KEY"
 
-provider "remote" {
-  max_sessions = 2
-
-  conn {
-    host     = var.vyos_conn.address
-    port     = 22
-    user     = var.vyos_conn.ssh_user
-    password = var.vyos_conn.ssh_password
-    sudo     = true
-  }
 }
