@@ -44,7 +44,7 @@ module "cockroach" {
   }
   install = {
     # https://www.cockroachlabs.com/docs/releases/
-    tar_file_source = "http://sws.core.sololab/releases/cockroach%2Dv23.2.3.linux%2Damd64.tgz"
+    tar_file_source = "http://files.mgmt.sololab/releases/cockroach-v23.2.3.linux-amd64.tgz"
     tar_file_path   = "/home/vyos/cockroach-v23.2.3.linux-amd64.tgz"
     # tar -ztvf /home/vyos/cockroach-v23.2.3.linux-amd64.tgz
     tar_file_bin_path = "cockroach-v23.2.3.linux-amd64/cockroach"
