@@ -5,9 +5,8 @@ hyperv = {
   password = "P@ssw0rd"
 }
 
-vm_name  = "Dev-CentOS"
-vm_count = 1
-# vhd_dir     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+vm_name     = "Dev-CentOS"
+vm_count    = 1
 vhd_dir     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
 source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-centos-stream-9-g2.vhdx"
 network_adaptors = [
