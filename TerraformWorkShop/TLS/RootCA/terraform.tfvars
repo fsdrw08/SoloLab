@@ -54,6 +54,28 @@ int_ca = {
 }
 
 certs = [
+  {
+    name = "vyos"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "vyos-api.mgmt.sololab"
+      ]
+      subject = {
+        common_name  = "vyos api"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
   {
     name = "cockroach_node_1"
@@ -67,7 +89,7 @@ certs = [
       ]
       dns_names = [
         "localhost",
-        "cockroach.core.sololab"
+        "cockroach.mgmt.sololab"
       ]
       subject = {
         common_name  = "node"
@@ -101,6 +123,51 @@ certs = [
         "digital_signature",
         "key_encipherment",
         "client_auth",
+      ]
+    }
+  },
+  {
+    name = "cockpit"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "cockpit.mgmt.sololab",
+      ]
+      subject = {
+        common_name  = "cockpit.mgmt.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
+  {
+    name = "lldap"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "lldap.mgmt.sololab",
+        "lldap.service.consul",
+      ]
+      subject = {
+        common_name  = "lldap.mgmt.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
       ]
     }
   },
@@ -152,29 +219,6 @@ certs = [
         "digital_signature",
         "server_auth",
         "client_auth"
-      ]
-    }
-  },
-  {
-    name = "lldap"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "lldap.infra.sololab",
-        "lldap.service.consul",
-      ]
-      subject = {
-        common_name  = "lldap.infra.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth"
       ]
     }
   },

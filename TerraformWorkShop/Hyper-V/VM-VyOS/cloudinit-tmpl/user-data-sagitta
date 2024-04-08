@@ -30,16 +30,16 @@ vyos_config_commands:
   - set interfaces ethernet eth0 address 'dhcp'
   - set interfaces ethernet eth0 description 'WAN'
   - set interfaces ethernet eth1 address '192.168.255.1/24'
-  - set interfaces ethernet eth1 description 'LAN'
+  - set interfaces ethernet eth1 description 'MGMT'
   # Service
   # DHCP server for local network
-  - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 start '192.168.255.100'
-  - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 range 0 stop '192.168.255.200'
-  - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 name-server '192.168.255.1'
-  - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 default-router '192.168.255.1'
-  - set service dhcp-server shared-network-name LAN subnet 192.168.255.0/24 domain-name 'sololab'
-  - set service dhcp-server shared-network-name LAN authoritative
-  - set service dhcp-server shared-network-name LAN ping-check
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 range 0 start '192.168.255.100'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 range 0 stop '192.168.255.200'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 name-server '192.168.255.1'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 default-router '192.168.255.1'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 domain-name 'sololab'
+  - set service dhcp-server shared-network-name MGMT authoritative
+  - set service dhcp-server shared-network-name MGMT ping-check
   - set service dhcp-server hostfile-update
   - set service dhcp-server host-decl-name
   # DNS
@@ -50,10 +50,35 @@ vyos_config_commands:
   - set service dns forwarding name-server '223.6.6.6'
   # ssh
   - set service ssh port '22'
-  # api for vyos 1.4
+  # import ca and cert for vyos api
+  - set pki ca sololab certificate '${ca_cert}'
+  - set pki certificate vyos certificate '${vyos_cert}'
+  - set pki certificate vyos private key '${vyos_key}'
+  # config vyos api
+  - set service https certificates ca-certificate 'sololab'
+  - set service https certificates certificate 'vyos'
   - set service https listen-address '192.168.255.1'
   - set service https port '8443'
   - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
+  # dns record for vyos api
+  - set system static-host-mapping host-name vyos-api.mgmt.sololab inet '192.168.255.1'
+  # load-balancing reverse-proxy for vyos api
+  - set load-balancing reverse-proxy service http listen-address '192.168.255.1'
+  - set load-balancing reverse-proxy service http port '80'
+  - set load-balancing reverse-proxy service http mode 'http'
+  - set load-balancing reverse-proxy service https listen-address '192.168.255.1'
+  - set load-balancing reverse-proxy service https port '443'
+  - set load-balancing reverse-proxy service https mode 'http'
+  - set load-balancing reverse-proxy service tcp443 listen-address '192.168.255.1'
+  - set load-balancing reverse-proxy service tcp443 port '443'
+  - set load-balancing reverse-proxy service tcp443 mode 'tcp'
+  - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
+  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.mgmt.sololab'
+  - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
+  - set load-balancing reverse-proxy backend vyos-api balance 'round-robin'
+  - set load-balancing reverse-proxy backend vyos-api mode 'tcp'
+  - set load-balancing reverse-proxy backend vyos-api server vyos address '192.168.255.1'
+  - set load-balancing reverse-proxy backend vyos-api server vyos port '8443'
   # System
   # hostname
   - set system host-name 'vyos-lts'
@@ -93,20 +118,6 @@ write_files:
       set nat destination rule 10 source address '192.168.255.0/24'
       set nat destination rule 10 translation address '192.168.255.1'
       set nat destination rule 10 translation port '7892'
-      # config reverse proxy
-      set 
-      set load-balancing reverse-proxy service https listen-address '192.168.255.1'
-      set load-balancing reverse-proxy service https port '443'
-      set load-balancing reverse-proxy service https mode 'tcp'
-      set load-balancing reverse-proxy service http listen-address '192.168.255.1'
-      set load-balancing reverse-proxy service http port '80'
-      set load-balancing reverse-proxy service http mode 'http'
-      set load-balancing reverse-proxy service http rule 10 domain-name 'crash.vyos.sololab'
-      set load-balancing reverse-proxy service http rule 10 set backend 'crash'
-      set load-balancing reverse-proxy backend crash balance 'round-robin'
-      set load-balancing reverse-proxy backend crash mode 'http'
-      set load-balancing reverse-proxy backend server vyos address '192.168.255.1'
-      set load-balancing reverse-proxy backend server vyos port '9999'
 
 
       commit

@@ -8,13 +8,88 @@ locals {
   )
 }
 
+data "terraform_remote_state" "root_ca" {
+  backend = "local"
+  config = {
+    path = "../../TLS/RootCA/terraform.tfstate"
+  }
+}
+
+# output "int_ca_pem" {
+#   value = join("",
+#     slice(
+#       split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
+#       1,
+#       length(
+#         split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem)
+#       ) - 2
+#     )
+#   )
+# }
+
+
+# output "vyos_cert" {
+#   value = join("",
+#     slice(
+#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
+#       1,
+#       length(
+#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
+#       ) - 2
+#     )
+#   )
+# }
+
+# output "vyos_key" {
+#   value = join("",
+#     slice(
+#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
+#       1,
+#       length(
+#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
+#       ) - 2
+#     )
+#   )
+#   # value = lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)
+# }
+
 module "cloudinit_nocloud_iso" {
   source   = "../modules/cloudinit_nocloud_iso3"
   iso_name = "cloud-init"
   files = [
-    for data in var.cloudinit_nocloud : {
-      content  = templatefile(data.content_source, data.content_vars)
-      filename = data.filename
+    for content in var.cloudinit_nocloud : {
+      content = templatefile(content.content_source, merge(content.content_vars,
+        {
+          ca_cert = join("",
+            slice(
+              split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
+              1,
+              length(
+                split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem)
+              ) - 2
+            )
+          )
+          vyos_cert = join("",
+            slice(
+              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
+              1,
+              length(
+                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
+              ) - 2
+            )
+          )
+          vyos_key = join("",
+            slice(
+              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
+              1,
+              length(
+                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
+              ) - 2
+            )
+          )
+        }
+      ))
+      filename = content.filename
     }
   ]
   destination_iso_file_path = join("\\", [

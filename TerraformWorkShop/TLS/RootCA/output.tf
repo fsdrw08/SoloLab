@@ -29,3 +29,12 @@ output "signed_key" {
   })
   # value = tolist(tls_private_key.key.*)
 }
+
+output "signed_key_pkcs8" {
+  sensitive = true
+  value = tomap({
+    for key, value in tls_private_key.key :
+    key => value.private_key_pem_pkcs8
+  })
+  # value = tolist(tls_private_key.key.*)
+}
