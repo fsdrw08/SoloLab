@@ -76,6 +76,28 @@ certs = [
       ]
     }
   },
+  {
+    name = "registry"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "registry.mgmt.sololab"
+      ]
+      subject = {
+        common_name  = "distribution registry"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
   {
     name = "cockroach_node_1"

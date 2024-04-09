@@ -36,6 +36,10 @@ variable "config" {
       basename = string
       content  = string
     })
+    htpasswd = optional(object({
+      basename = string
+      content  = string
+    }))
     certs = optional(object({
       ca_basename   = string
       ca_content    = string

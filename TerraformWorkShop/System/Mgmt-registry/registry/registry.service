@@ -1,0 +1,16 @@
+[Unit]
+Description=Distribution registry
+Requires=network.target
+After=network-online.target
+
+[Service]
+User=${user}
+Group=${group}
+# https://www.cockroachlabs.com/docs/v23.2/cockroach-start-single-node#networking
+ExecStart=/usr/bin/registry serve ${config_path}
+TimeoutStopSec=300
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

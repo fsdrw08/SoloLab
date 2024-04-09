@@ -1,6 +1,6 @@
 vm_conn = {
-  host     = "192.168.255.10"
+  host     = "192.168.255.1"
   port     = 22
-  user     = "core"
-  password = "P@ssw0rd"
+  user     = "vyos"
+  password = "vyos"
 }

@@ -46,6 +46,7 @@ resource "null_resource" "bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
+      "sudo systemctl daemon-reload",
       "sudo rm -f ${self.triggers.file_dir}/registry",
     ]
   }
@@ -60,7 +61,7 @@ resource "system_folder" "config" {
 }
 
 # persist registry main config file in dir
-resource "system_file" "main" {
+resource "system_file" "config" {
   depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, var.config.main.basename])
   content    = var.config.main.content
@@ -146,7 +147,12 @@ resource "system_file" "service" {
 resource "system_service_systemd" "service" {
   depends_on = [
     null_resource.bin,
-    system_file.static,
+    system_file.config,
+    system_file.htpasswd,
+    system_file.cert,
+    system_file.key,
+    system_file.ca,
+    system_link.data,
     system_file.service,
   ]
   name    = trimsuffix(system_file.service.basename, ".service")

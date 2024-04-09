@@ -17,6 +17,8 @@ storage:
 #     path: ${REGISTRY_AUTH_HTPASSWD_PATH}
 http:
   addr: ${REGISTRY_HTTP_ADDR}
+  net: ${REGISTRY_HTTP_NET}
+  host: ${REGISTRY_HTTP_HOST}
   debug:
     addr: ${REGISTRY_HTTP_DEBUG_ADDR}
     prometheus:
@@ -25,8 +27,6 @@ http:
   tls:
     certificate: ${REGISTRY_HTTP_TLS_CERTIFICATE}
     key: ${REGISTRY_HTTP_TLS_KEY}
-    clientcas:
-      - ${REGISTRY_HTTP_TLS_CLIENTCAS_0}
   headers:
     X-Content-Type-Options: [nosniff]
     Access-Control-Allow-Origin: ${REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin}
