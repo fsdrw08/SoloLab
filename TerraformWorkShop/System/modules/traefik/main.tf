@@ -39,7 +39,7 @@ resource "null_resource" "bin" {
     inline = [
       # https://doc.traefik.io/traefik/getting-started/install-traefik/#use-the-binary-distribution
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.tar.path} --directory=${var.install.bin_file_dir} --overwrite",
+      "sudo tar --verbose --extract --file=${system_file.tar.path} --directory=${var.install.bin_file_dir} --overwrite traefik",
       "sudo chmod 755 ${var.install.bin_file_dir}/traefik",
     ]
   }
