@@ -1,7 +1,7 @@
 #iso_url=https://github.com/zengkid/build-vyos-lts/releases/download/vyos-sagitta-eap2/vyos-eap2-amd64.iso
 iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.4.0-epa2-amd64.iso"
 iso_checksum_type     = "sha256"
-iso_checksum          = "AF06D7A2C75659F353A7E2A0C54D26B215382B920CB12EB0FE3B5C4DA2AF0417"
+iso_checksum          = "de61bf7f5604d49c6768bc38ebe660d11ccb26dc7f82a51ecd7984f2c14ecafb"
 vm_name               = "packer-vyos140"
 configuration_version = "11.0"
 disk_size             = "128000"
