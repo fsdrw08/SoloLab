@@ -1,0 +1,37 @@
+version: 0.1
+log:
+  level: debug
+  fields:
+    service: registry
+    environment: development
+storage:
+  delete:
+    enabled: ${REGISTRY_STORAGE_DELETE_ENABLED}
+  cache:
+    blobdescriptor: ${REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR}
+  filesystem:
+    rootdirectory: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}
+# auth:
+#   htpasswd:
+#     realm: ${REGISTRY_AUTH_HTPASSWD_REALM}
+#     path: ${REGISTRY_AUTH_HTPASSWD_PATH}
+http:
+  addr: ${REGISTRY_HTTP_ADDR}
+  debug:
+    addr: ${REGISTRY_HTTP_DEBUG_ADDR}
+    prometheus:
+      enabled: true
+      path: /metrics
+  tls:
+    certificate: ${REGISTRY_HTTP_TLS_CERTIFICATE}
+    key: ${REGISTRY_HTTP_TLS_KEY}
+    clientcas:
+      - ${REGISTRY_HTTP_TLS_CLIENTCAS_0}
+  headers:
+    X-Content-Type-Options: [nosniff]
+    Access-Control-Allow-Origin: ${REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin}
+    Access-Control-Allow-Credentials: ${REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials}
+    Access-Control-Allow-Headers: ${REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers}
+    Access-Control-Allow-Methods: ${REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods}
+    Access-Control-Max-Age: [1728000]
+    Access-Control-Expose-Headers: ${REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers}
