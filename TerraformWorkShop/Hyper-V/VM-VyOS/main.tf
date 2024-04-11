@@ -87,6 +87,7 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
+          haproxy_cfg = file("${path.module}/cloudinit-tmpl/haproxy.cfg.j2")
         }
       ))
       filename = content.filename

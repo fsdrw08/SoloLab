@@ -66,9 +66,9 @@ vyos_config_commands:
   - set load-balancing reverse-proxy service http listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service http port '80'
   - set load-balancing reverse-proxy service http mode 'http'
-  - set load-balancing reverse-proxy service https listen-address '192.168.255.1'
-  - set load-balancing reverse-proxy service https port '443'
-  - set load-balancing reverse-proxy service https mode 'http'
+  # - set load-balancing reverse-proxy service https listen-address '192.168.255.1'
+  # - set load-balancing reverse-proxy service https port '443'
+  # - set load-balancing reverse-proxy service https mode 'http'
   - set load-balancing reverse-proxy service tcp443 listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service tcp443 port '443'
   - set load-balancing reverse-proxy service tcp443 mode 'tcp'
@@ -122,3 +122,10 @@ write_files:
 
       commit
       save
+  ## override vyos haproxy config template, for tcp sni
+  ## https://github.com/vyos/vyos-1x/blob/sagitta/data/templates/load-balancing/haproxy.cfg.j2
+  - path: /usr/share/vyos/templates/load-balancing/haproxy.cfg.j2
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, haproxy_cfg)}
