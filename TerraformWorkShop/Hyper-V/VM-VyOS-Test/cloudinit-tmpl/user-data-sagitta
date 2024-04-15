@@ -1,0 +1,124 @@
+#cloud-config
+# https://github.com/ahpnils/lab-as-code/blob/be47a0d8aabf66b38f718de35546411eb60c879b/cloud-init/isp1router1/user-data#L4
+# https://docs.vyos.io/en/stable/automation/cloud-init.html
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+# disk_setup:
+#   /dev/sdb:
+#     table_type: gpt
+#     layout: True
+#     overwrite: False
+# fs_setup:
+#   - label: data
+#     filesystem: "ext4"
+#     device: "/dev/sdb1"
+#     partition: auto
+#     overwrite: false
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+# https://zhuanlan.zhihu.com/p/250658106
+# mounts:
+#   - [/dev/disk/by-label/data, /mnt/data, auto, "nofail,exec"]
+# mount_default_fields: [None, None, "auto", "nofail", "0", "2"]
+
+# !!! one command per line
+# !!! if command ends in a value, it must be inside single quotes
+# !!! a single-quote symbol is not allowed inside command or value
+# to debug, refer
+# https://forum.vyos.io/t/errors-when-trying-to-upgrade-a-working-configuration-from-1-2-5-to-1-3-rolling-lastest-build/5395/6
+vyos_config_commands:
+  # Interface
+  - set interfaces ethernet eth0 address '${eth0_address}'
+  - set interfaces ethernet eth0 description '${eth0_desc}'
+  # - set interfaces ethernet eth1 address '192.168.255.1/24'
+  # - set interfaces ethernet eth1 description 'MGMT'
+  # Service
+  # DHCP server for local network
+  # - set service dhcp-server shared-network-name MGMT subnet ${dhcp_subnet_range} range 0 start '${dhcp_subnet_start}'
+  # - set service dhcp-server shared-network-name MGMT subnet ${dhcp_subnet_range} range 0 stop '${dhcp_subnet_stop}'
+  # - set service dhcp-server shared-network-name MGMT subnet ${dhcp_subnet_range} name-server '${dhcp_name_server}'
+  # - set service dhcp-server shared-network-name MGMT subnet ${dhcp_subnet_range} default-router '${dhcp_default_router}'
+  # - set service dhcp-server shared-network-name MGMT subnet ${dhcp_subnet_range} domain-name '${dhcp_domain_name}'
+  # - set service dhcp-server shared-network-name MGMT authoritative
+  # - set service dhcp-server shared-network-name MGMT ping-check
+  # - set service dhcp-server hostfile-update
+  # - set service dhcp-server host-decl-name
+  # DNS
+  # - set service dns forwarding cache-size '0'
+  # - set service dns forwarding listen-address '192.168.255.1'
+  # - set service dns forwarding allow-from '192.168.255.0/24'
+  # - set service dns forwarding name-server '223.5.5.5'
+  # - set service dns forwarding name-server '223.6.6.6'
+  # ssh
+  - set service ssh port '22'
+  # import ca and cert for vyos api
+  # - set pki ca sololab certificate '${ca_cert}'
+  # - set pki certificate vyos certificate '${vyos_cert}'
+  # - set pki certificate vyos private key '${vyos_key}'
+  # config vyos api
+  # - set service https certificates ca-certificate 'sololab'
+  # - set service https certificates certificate 'vyos'
+  # - set service https listen-address '192.168.255.1'
+  # - set service https port '8443'
+  # - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
+  # dns record for vyos api
+  # - set system static-host-mapping host-name vyos-api.mgmt.sololab inet '192.168.255.1'
+  # load-balancing reverse-proxy for vyos api
+  # - set load-balancing reverse-proxy service http listen-address '192.168.255.1'
+  # - set load-balancing reverse-proxy service http port '80'
+  # - set load-balancing reverse-proxy service http mode 'http'
+  # - set load-balancing reverse-proxy service https listen-address '192.168.255.1'
+  # - set load-balancing reverse-proxy service https port '443'
+  # - set load-balancing reverse-proxy service https mode 'http'
+  # - set load-balancing reverse-proxy service tcp443 listen-address '192.168.255.1'
+  # - set load-balancing reverse-proxy service tcp443 port '443'
+  # - set load-balancing reverse-proxy service tcp443 mode 'tcp'
+  # - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
+  # - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.mgmt.sololab'
+  # - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
+  # - set load-balancing reverse-proxy backend vyos-api balance 'round-robin'
+  # - set load-balancing reverse-proxy backend vyos-api mode 'tcp'
+  # - set load-balancing reverse-proxy backend vyos-api server vyos address '192.168.255.1'
+  # - set load-balancing reverse-proxy backend vyos-api server vyos port '8443'
+  # System
+  # hostname
+  - set system host-name '${hostname}'
+  # auth config
+  - set system login user ${user_name} authentication plaintext-password '${user_password}'
+  - set system login user ${user_name} authentication public-keys vagrant key '${user_public_key}'
+  - set system login user ${user_name} authentication public-keys vagrant type '${user_public_type}'
+  # name server
+  # - set system name-server '192.168.255.1'
+  # ntp
+  # - set system ntp server 'cn.ntp.org.cn'
+  # timezone
+  - set system time-zone 'Asia/Shanghai'
+  # fix /dev/ttyS0: not a tty https://forum.vyos.io/t/dev-ttys0-not-a-tty/9642
+  - delete system console device 'ttyS0'
+
+write_files:
+  - path: /tmp/finalConfig.sh
+    owner: root:vyattacfg
+    permissions: "0775"
+    content: |
+      #!/bin/vbash
+      # Ensure that we have the correct group or we'll corrupt the configuration
+      if [ "$(id -g -n)" != 'vyattacfg' ] ; then
+          exec sg vyattacfg -c "/bin/vbash $(readlink -f $0) $@"
+      fi
+
+      source /opt/vyatta/etc/functions/script-template
+      configure
+
+      # https://minbx.com/tipslab/27/
+      # https://forum.tinyserve.com/d/6-build-a-gateway-dns-server-with-v2ray-on-vyos-to-across-gfw
+      set nat destination rule 10 description 'CLASH FORWARD'
+      set nat destination rule 10 inbound-interface name 'eth1'
+      set nat destination rule 10 protocol 'tcp_udp'
+      set nat destination rule 10 destination port '80,443'
+      set nat destination rule 10 source address '${dhcp_subnet_range}'
+      set nat destination rule 10 translation address '192.168.255.1'
+      set nat destination rule 10 translation port '7892'
+
+
+      commit
+      save

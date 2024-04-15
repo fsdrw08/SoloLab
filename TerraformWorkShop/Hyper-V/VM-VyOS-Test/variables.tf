@@ -1,17 +1,16 @@
-variable "user" {
-  type    = string
-  default = null
-}
-
-variable "password" {
-  type      = string
-  default   = null
-  sensitive = true
-}
-
-variable "host" {
-  type    = string
-  default = null
+variable "hyperv" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
+  default = {
+    host     = "127.0.0.1"
+    port     = 5986
+    user     = "root"
+    password = "P@ssw0rd"
+  }
 }
 
 variable "vm_name" {
@@ -36,14 +35,24 @@ variable "data_disk_ref" {
 
 variable "network_adaptors" {
   type = list(object({
-    name        = string
-    switch_name = string
+    name                = string
+    switch_name         = string
+    dynamic_mac_address = optional(bool)
+    static_mac_address  = optional(string)
   }))
 }
 
 variable "enable_secure_boot" {
   type    = string
   default = "Off"
+}
+
+variable "cloudinit_nocloud" {
+  type = list(object({
+    content_source = string
+    content_vars   = map(string)
+    filename       = string
+  }))
 }
 
 variable "memory_startup_bytes" {
@@ -60,5 +69,3 @@ variable "memory_minimum_bytes" {
   type    = number
   default = 1023410176
 }
-
-

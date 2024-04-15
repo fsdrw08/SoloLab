@@ -2,21 +2,21 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">= 1.0.4"
+      version = ">=1.2.1"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = ">= 3.2.1"
+    archive = {
+      source  = "hashicorp/archive"
+      version = "2.4.2"
     }
   }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.user
-  password = var.password
-  host     = var.host
-  port     = 5986
+  host     = var.hyperv.host
+  port     = var.hyperv.port
+  user     = var.hyperv.user
+  password = var.hyperv.password
   https    = true
   insecure = true
   use_ntlm = true
