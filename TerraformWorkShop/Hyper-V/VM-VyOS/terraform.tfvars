@@ -7,7 +7,7 @@ hyperv = {
 
 vm_name     = "VyOS-140-EPA2"
 vhd_dir     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-vyos140.vhdx"
+source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos140\\Virtual Hard Disks\\packer-vyos140.vhdx"
 # source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\output-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
 
