@@ -131,7 +131,7 @@ source "hyperv-iso" "vm" {
   cd_label              = "${var.cd_label}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
-  skip_export           = "true"
+  skip_export           = true
   shutdown_command      = "sudo -S shutdown -P now"
   shutdown_timeout      = "60m"
   // ssh_password          = "vagrant"
@@ -151,9 +151,9 @@ build {
   //   script          = "./http/provision.sh"
   // }
 
-  post-processor "vagrant" {
-    keep_input_artifact  = true
-    output               = "${var.output_vagrant}"
-    vagrantfile_template = "${var.vagrantfile_template}"
-  }
+  // post-processor "vagrant" {
+  //   keep_input_artifact  = true
+  //   output               = "${var.output_vagrant}"
+  //   vagrantfile_template = "${var.vagrantfile_template}"
+  // }
 }

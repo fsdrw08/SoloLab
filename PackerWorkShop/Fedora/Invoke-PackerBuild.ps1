@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('37', '38')]
+  [ValidateSet('37', '38', '39')]
   [int16]
   $FedoraVersion
 )
@@ -55,7 +55,7 @@ if ($Ready -ne $false) {
       
       $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force -var-file="$var_file" "$template_file"
+      packer build --force -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer build failed, exiting."
