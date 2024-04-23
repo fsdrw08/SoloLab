@@ -1,0 +1,8 @@
+version: 2
+ethernets:
+  ${interface}:
+    dhcp4: false
+    addresses: [${addresses4}]
+    gateway4: ${gateway4}
+    nameservers:
+      addresses: [${ns_addresses}]
