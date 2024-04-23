@@ -72,6 +72,7 @@ vyos_config_commands:
   - set load-balancing reverse-proxy service tcp443 listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service tcp443 port '443'
   - set load-balancing reverse-proxy service tcp443 mode 'tcp'
+  # - set load-balancing reverse-proxy service tcp443 tcp-request inspect-delay '5000'
   - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
   - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.mgmt.sololab'
   - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
