@@ -79,6 +79,11 @@ module "cockroach" {
     }
     dir = "/etc/cockroach"
   }
+}
+
+module "cockroach_service" {
+  depends_on = [module.cockroach]
+  source     = "../modules/service"
   service = {
     status  = "started"
     enabled = true
@@ -94,6 +99,7 @@ module "cockroach" {
       path = "/etc/systemd/system/cockroach.service"
     }
   }
+
 }
 
 module "cockroach_restart" {

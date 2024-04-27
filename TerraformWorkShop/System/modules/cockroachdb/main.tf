@@ -13,6 +13,7 @@ resource "system_user" "user" {
 
 # download CockroachDB tgz (tar.gz)
 resource "system_file" "tar" {
+  count  = var.install == null ? 0 : 1
   source = var.install.tar_file_source
   path   = var.install.tar_file_path
 }
@@ -20,6 +21,7 @@ resource "system_file" "tar" {
 # extract and put it to /usr/local/bin
 # https://www.cockroachlabs.com/docs/stable/install-cockroachdb-linux#install-binary
 resource "null_resource" "bin" {
+  count      = var.install == null ? 0 : 1
   depends_on = [system_file.tar]
   triggers = {
     bin_file_dir         = var.install.bin_file_dir
@@ -42,10 +44,10 @@ resource "null_resource" "bin" {
     inline = [
       # https://www.cockroachlabs.com/docs/releases/
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.tar.path} --directory=${var.install.bin_file_dir} --strip-components=${self.triggers.strip_components_bin} --overwrite ${var.install.tar_file_bin_path}",
+      "sudo tar --verbose --extract --file=${system_file.tar[0].path} --directory=${var.install.bin_file_dir} --strip-components=${self.triggers.strip_components_bin} --overwrite ${var.install.tar_file_bin_path}",
       "sudo chmod 755 ${var.install.bin_file_dir}/cockroach",
       "sudo mkdir -p ${var.install.ext_lib_dir}", # mkdir -p /usr/local/lib/cockroach
-      "sudo tar --verbose --extract --file=${system_file.tar.path} --directory=${var.install.ext_lib_dir} --strip-components=${self.triggers.strip_components_lib + 1} --overwrite --wildcards ${var.install.tar_file_lib_path}*",
+      "sudo tar --verbose --extract --file=${system_file.tar[0].path} --directory=${var.install.ext_lib_dir} --strip-components=${self.triggers.strip_components_lib + 1} --overwrite --wildcards ${var.install.tar_file_lib_path}*",
     ]
   }
   provisioner "remote-exec" {
@@ -67,8 +69,8 @@ resource "system_folder" "config" {
 }
 
 resource "system_folder" "certs" {
-  depends_on = [system_folder.config]
   count      = var.config.certs == null ? 0 : 1
+  depends_on = [system_folder.config]
   path       = join("/", ["${var.config.dir}", "${var.config.certs.sub_dir}"])
   user       = var.runas.user
   group      = var.runas.group
@@ -155,23 +157,3 @@ resource "system_file" "client_key" {
   mode    = "600"
 }
 
-# persist CockroachDB systemd unit file
-resource "system_file" "service" {
-  path    = var.service.systemd_service_unit.path
-  content = var.service.systemd_service_unit.content
-}
-
-# debug service: journalctl -u CockroachDB.service
-# sudo netstat -apn | grep 80
-resource "system_service_systemd" "service" {
-  depends_on = [
-    null_resource.bin,
-    system_file.ca_cert,
-    system_file.node_cert,
-    system_file.node_key,
-    system_file.service,
-  ]
-  name    = trimsuffix(system_file.service.basename, ".service")
-  status  = var.service.status
-  enabled = var.service.enabled
-}
