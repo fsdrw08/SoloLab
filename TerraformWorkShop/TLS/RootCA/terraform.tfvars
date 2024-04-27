@@ -107,7 +107,8 @@ certs = [
     }
     cert = {
       ip_addresses = [
-        "192.168.255.1"
+        "192.168.255.1",
+        "127.0.0.1"
       ]
       dns_names = [
         "localhost",
