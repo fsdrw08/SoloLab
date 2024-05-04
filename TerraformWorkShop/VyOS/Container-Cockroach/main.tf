@@ -57,15 +57,13 @@ module "cockroach_conf" {
       ca_cert_content = data.terraform_remote_state.root_ca.outputs.root_cert_pem
       node_cert_content = join("", [
         lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "cockroach_node_1", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem
       ])
       node_key_content     = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "cockroach_node_1", null)
       client_cert_basename = "client.root.crt"
       client_cert_content = join("", [
         lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "cockroach_client_root", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem
       ])
       client_key_basename = "client.root.key"
       client_key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "cockroach_client_root", null)
@@ -75,7 +73,7 @@ module "cockroach_conf" {
   }
 }
 
-resource "vyos_config_block_tree" "container_cockroach_network" {
+resource "vyos_config_block_tree" "container_network" {
   path = "container network cockroach"
 
   configs = {
@@ -83,11 +81,11 @@ resource "vyos_config_block_tree" "container_cockroach_network" {
   }
 }
 
-resource "vyos_config_block_tree" "container_cockroach_workload" {
+resource "vyos_config_block_tree" "container_workload" {
   depends_on = [
     null_resource.load_image,
     module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
+    vyos_config_block_tree.container_network,
   ]
 
   path = "container name cockroach"
@@ -115,88 +113,94 @@ resource "vyos_config_block_tree" "container_cockroach_workload" {
   }
 }
 
-# resource "vyos_config_block_tree" "nat_cockroach_workload" {
-#   depends_on = [
-#     vyos_config_block_tree.container_cockroach_workload,
-#   ]
+locals {
+  reverse_proxy_cfg = {
+    web_frontend = {
+      path = "load-balancing reverse-proxy service tcp443 rule 20"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "cockroach.mgmt.sololab"
+        "set backend" = "cockroach_5443"
+      }
+    }
+    web_backend = {
+      path = "load-balancing reverse-proxy backend cockroach_5443"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.0.10"
+        "server vyos port"    = "5443"
+      }
+    }
+    sql_frontend = {
+      path = "load-balancing reverse-proxy service tcp5432"
+      configs = {
+        "listen-address" = "192.168.255.1"
+        "port"           = "5432"
+        "mode"           = "tcp"
+        "backend"        = "cockroach_5432"
+      }
+    }
+    sql_backend = {
+      path = "load-balancing reverse-proxy backend cockroach_5432"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.0.10"
+        "server vyos port"    = "5432"
+      }
+    }
+  }
+  cockroach_post_process = {
+    Set-TerraformBackend = {
+      script_path = "${path.root}/Set-TerraformBackend.sh"
+      vars = {
+        container_name = "cockroach"
+        certs_dir      = "/certs/"
+        listen_addr    = "127.0.0.1:5432"
+      }
+    }
+  }
+}
 
-#   path = "nat destination rule 20"
-
-#   configs = {
-#     "description"            = "cockroachws_forward"
-#     "inbound-interface name" = "eth1"
-#     "protocol"               = "tcp_udp"
-#     "destination port"       = "9090"
-#     "source address"         = "192.168.255.0/24"
-#     "translation address"    = "172.16.0.10"
-#   }
-# }
+# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
+resource "vyos_config_block_tree" "reverse_proxy_cfg" {
+  depends_on = [
+    vyos_config_block_tree.container_workload
+  ]
+  for_each = local.reverse_proxy_cfg
+  path     = each.value.path
+  configs  = each.value.configs
+}
 
 resource "vyos_static_host_mapping" "cockroach" {
   depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
+    vyos_config_block_tree.reverse_proxy_cfg,
   ]
   host = "cockroach.mgmt.sololab"
   ip   = "192.168.255.1"
 }
 
-# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
-resource "vyos_config_block_tree" "lb_svc_tcp443_rule_cockroach" {
+resource "null_resource" "post_process" {
   depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
+    vyos_config_block_tree.container_workload,
   ]
-  path = "load-balancing reverse-proxy service tcp443 rule 20"
-  configs = {
-    "ssl"         = "req-ssl-sni"
-    "domain-name" = "cockroach.mgmt.sololab"
-    "set backend" = "cockroach_5443"
+  for_each = local.cockroach_post_process
+  triggers = {
+    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
   }
-}
-
-resource "vyos_config_block_tree" "lb_be_cockroach_5443" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy backend cockroach_5443"
-  configs = {
-    "mode"                = "tcp"
-    "server vyos address" = "172.16.0.10"
-    "server vyos port"    = "5443"
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
   }
-}
-
-# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
-resource "vyos_config_block_tree" "lb_svc_tcp5432" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy service tcp5432"
-  configs = {
-    "listen-address" = "192.168.255.1"
-    "port"           = "5432"
-    "mode"           = "tcp"
-    "backend"        = "cockroach_5432"
-  }
-}
-
-resource "vyos_config_block_tree" "lb_be_cockroach_5432" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy backend cockroach_5432"
-  configs = {
-    "mode"                = "tcp"
-    "server vyos address" = "172.16.0.10"
-    "server vyos port"    = "5432"
+  provisioner "remote-exec" {
+    inline = [
+      templatefile("${each.value.script_path}", "${each.value.vars}")
+    ]
   }
 }
