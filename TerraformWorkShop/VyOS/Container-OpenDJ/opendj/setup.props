@@ -1,0 +1,13 @@
+hostname                      = "${hostname}"
+ldapPort                      = ${ldapPort}
+ldapsPort                     = ${ldapsPort}
+adminConnectorPort            = ${adminConnectorPort}
+enableStartTLS                = ${enableStartTLS}
+generateSelfSignedCertificate = ${generateSelfSignedCertificate}
+useJavaKeyStore               = "${useJavaKeyStore}"
+keyStorePassword              = "${keyStorePassword}"
+rootUserDN                    = "${rootUserDN}"
+rootUserPasswordFile          = "${rootUserPasswordFile}"
+backendType                   = "${backendType}"
+addBaseEntry                  = ${addBaseEntry}
+baseDN                        = "${baseDN}"

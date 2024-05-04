@@ -1,0 +1,5 @@
+dn: cn=Directory Administrators,ou=Groups,${baseDN}
+objectClass: groupofuniquenames
+objectClass: top
+ou: Groups
+cn: Directory Administrators

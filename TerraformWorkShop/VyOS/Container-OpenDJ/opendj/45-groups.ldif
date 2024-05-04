@@ -1,0 +1,4 @@
+dn: ou=Groups,${baseDN}
+objectClass: organizationalunit
+objectClass: top
+ou: Groups

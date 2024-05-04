@@ -195,6 +195,29 @@ certs = [
     }
   },
   {
+    name = "opendj"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "opendj.mgmt.sololab",
+        "opendj.service.consul",
+      ]
+      subject = {
+        common_name  = "opendj.mgmt.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
+  {
     name = "sws"
     key = {
       algorithm = "RSA"
