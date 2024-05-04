@@ -33,7 +33,7 @@ module "nginx_restart" {
     password = var.vm_conn.password
   }
   systemd_path_unit = {
-    content = templatefile("${path.root}/nginx/restart.path", {
+    content = templatefile("${path.module}/nginx/restart.path", {
       PathModified = []
       PathChanged = [
         "/etc/nginx/conf.d"
@@ -42,7 +42,7 @@ module "nginx_restart" {
     path = "/lib/systemd/system/nginx_restart.path"
   }
   systemd_service_unit = {
-    content = templatefile("${path.root}/nginx/restart.service", {
+    content = templatefile("${path.module}/nginx/restart.service", {
       AssertPathExists = "/lib/systemd/system/nginx.service"
       target_service   = "nginx.service"
     })
