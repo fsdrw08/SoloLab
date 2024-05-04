@@ -53,14 +53,3 @@ variable "storage" {
     dir_link   = string
   })
 }
-
-variable "service" {
-  type = object({
-    status  = string
-    enabled = bool
-    systemd_service_unit = object({
-      path    = string
-      content = string
-    })
-  })
-}

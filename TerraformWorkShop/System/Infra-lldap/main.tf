@@ -92,6 +92,11 @@ module "lldap" {
     dir_target = "/mnt/data/lldap"
     dir_link   = "/var/lib/lldap"
   }
+}
+
+module "lldap_service" {
+  depends_on = [module.lldap]
+  source     = "../modules/systemd_service"
   service = {
     status  = "started"
     enabled = true
@@ -106,7 +111,6 @@ module "lldap" {
     }
   }
 }
-
 module "lldap_restart" {
   depends_on = [module.lldap]
   source     = "../modules/systemd_path"
