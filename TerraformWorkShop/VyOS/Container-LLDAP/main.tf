@@ -4,8 +4,8 @@ resource "null_resource" "load_image" {
     port               = var.vm_conn.port
     user               = var.vm_conn.user
     password           = var.vm_conn.password
-    image_name         = "docker.io/lldap/lldap:2024-04-24"
-    image_archive_path = "/mnt/data/offline/images/docker.io_lldap_lldap_2024-04-24.tar"
+    image_name         = "docker.io/lldap/lldap:2024-04-24-debian-rootless"
+    image_archive_path = "/mnt/data/offline/images/docker.io_lldap_lldap_2024-04-24-debian-rootless.tar"
   }
   connection {
     type     = "ssh"
@@ -37,7 +37,7 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
-module "cockroach_conf" {
+module "lldap_conf" {
   source = "../../System/modules/lldap"
   vm_conn = {
     host     = var.vm_conn.host
@@ -45,158 +45,179 @@ module "cockroach_conf" {
     user     = var.vm_conn.user
     password = var.vm_conn.password
   }
-  install = null
   runas = {
     user        = "vyos"
     group       = "users"
     take_charge = false
   }
+  install = null
   config = {
-    certs = {
-      # https://www.cockroachlabs.com/docs/stable/authentication
-      ca_cert_content = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      node_cert_content = join("", [
-        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "cockroach_node_1", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      ])
-      node_key_content     = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "cockroach_node_1", null)
-      client_cert_basename = "client.root.crt"
-      client_cert_content = join("", [
-        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "cockroach_client_root", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      ])
-      client_key_basename = "client.root.key"
-      client_key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "cockroach_client_root", null)
-      sub_dir             = "certs"
+    main = {
+      basename = "lldap_config.toml"
+      content = templatefile("${path.root}/lldap/lldap_config.toml", {
+        # ldap_host       = "192.168.255.1"
+        # http_host       = "192.168.255.1"
+        # ldap_port       = "389"
+        # http_port       = "17170"
+        # http_url        = "https://lldap.infra.sololab"
+        jwt_secret      = "REPLACE_WITH_RANDOM"
+        ldap_base_dn    = "dc=root,dc=sololab"
+        ldap_user_dn    = "admin"
+        ldap_user_pass  = "P@ssw0rd"
+        database_url    = "sqlite:///data/db/users.db?mode=rwc"
+        key_file        = "/data/db/private_key"
+        ldaps_enabled   = "false"
+        ldaps_port      = "6360"
+        ldaps_cert_file = "/data/config/certs/server.crt"
+        ldaps_key_file  = "/data/config/certs/server.key"
+      })
     }
-    dir = "/etc/cockroach"
+    certs = {
+      cert_basename = "server.crt"
+      cert_content = join("", [
+        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
+        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      ])
+      key_basename = "server.key"
+      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "lldap", null)
+      sub_dir      = "certs"
+    }
+    dir = "/etc/lldap"
   }
+  storage = null
 }
 
-resource "vyos_config_block_tree" "container_cockroach_network" {
-  path = "container network cockroach"
+resource "vyos_config_block_tree" "container_network" {
+  path = "container network lldap"
 
   configs = {
     "prefix" = "172.16.1.0/24"
   }
 }
 
-resource "vyos_config_block_tree" "container_cockroach_workload" {
+resource "vyos_config_block_tree" "container_workload" {
   depends_on = [
     null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
+    module.lldap_conf,
+    vyos_config_block_tree.container_network,
   ]
 
-  path = "container name cockroach"
+  path = "container name lldap"
 
   configs = {
-    "image" = "docker.io/lldap/lldap:2024-04-24"
+    "image" = "docker.io/lldap/lldap:2024-04-24-debian-rootless"
 
-    "network cockroach address" = "172.16.1.10"
-    # "port cockroach_http listen-address" = "192.168.255.1"
-    # "port cockroach_http source"         = "5443"
-    # "port cockroach_http destination"    = "5443"
-    # "port cockroach_db listen-address"   = "192.168.255.1"
-    # "port cockroach_db source"           = "5432"
-    # "port cockroach_db destination"      = "5432"
+    "network lldap address" = "172.16.1.10"
+    # "port lldap_http listen-address" = "192.168.255.1"
+    # "port lldap_http source"         = "17170"
+    # "port lldap_http destination"    = "17170"
+    # "port lldap_ldap listen-address" = "192.168.255.1"
+    # "port lldap_ldap source"         = "389"
+    # "port lldap_ldap destination"    = "389"
 
-    "environment TZ value" = "Asia/Shanghai"
+    "uid" = "0"
+    "gid" = "0"
 
-    "volume cockroach_cert source"      = "/etc/cockroach/certs"
-    "volume cockroach_cert destination" = "/certs"
-    "volume cockroach_cert mode"        = "ro"
-    "volume cockroach_data source"      = "/mnt/data/cockroach"
-    "volume cockroach_data destination" = "/cockroach/cockroach-data"
+    "environment TZ value"              = "Asia/Shanghai"
+    "environment LLDAP_HTTP_PORT value" = "17170"
+    "environment LLDAP_HTTP_URL value"  = "https://lldap.mgmt.sololab"
+    "environment LLDAP_LDAP_PORT value" = "3890"
 
-    "arguments" = "start-single-node --sql-addr=:5432 --http-addr=:5443 --certs-dir=/certs --accept-sql-without-tls"
+    "volume lldap_config source"      = "/etc/lldap"
+    "volume lldap_config destination" = "/data/config"
+    "volume lldap_data source"        = "/mnt/data/lldap"
+    "volume lldap_data destination"   = "/data/db"
+
+    "entrypoint" = "/app/lldap"
+    "command"    = "run --config-file /data/config/lldap_config.toml"
   }
 }
 
-# resource "vyos_config_block_tree" "nat_cockroach_workload" {
-#   depends_on = [
-#     vyos_config_block_tree.container_cockroach_workload,
-#   ]
+resource "system_file" "nginx_config" {
+  path = "/etc/nginx/conf.d/lldap.conf"
+  content = templatefile("${path.module}/lldap/lldap_nginx.conf", {
+    listen              = "127.0.0.1:17170 ssl"
+    server_name         = "lldap.mgmt.sololab"
+    ssl_certificate     = "/etc/lldap/certs/server.crt"
+    ssl_certificate_key = "/etc/lldap/certs/server.key"
+    proxy_pass          = "http://172.16.1.10:17170/"
+  })
+  user  = "vyos"
+  group = "users"
+  mode  = "644"
+}
 
-#   path = "nat destination rule 20"
+locals {
+  reverse_proxy = {
+    web_frontend = {
+      path = "load-balancing reverse-proxy service tcp443 rule 30"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "lldap.mgmt.sololab"
+        "set backend" = "lldap_web"
+      }
+    }
+    web_backend = {
+      path = "load-balancing reverse-proxy backend lldap_web"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "17170"
+      }
+    }
+    ldap_frontend = {
+      path = "load-balancing reverse-proxy service tcp389"
+      configs = {
+        "listen-address" = "192.168.255.1"
+        "port"           = "389"
+        "mode"           = "tcp"
+        "backend"        = "lldap_ldap"
+      }
+    }
+    ldap_backend = {
+      path = "load-balancing reverse-proxy backend lldap_ldap"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.1.10"
+        "server vyos port"    = "3890"
+      }
+    }
+    ldaps_frontend = {
+      path = "load-balancing reverse-proxy service tcp636"
+      configs = {
+        "listen-address" = "192.168.255.1"
+        "port"           = "636"
+        "mode"           = "tcp"
+        "backend"        = "lldap_ldaps"
+      }
+    }
+    ldaps_backend = {
+      path = "load-balancing reverse-proxy backend lldap_ldaps"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.1.10"
+        "server vyos port"    = "6360"
+      }
+    }
+  }
+}
 
-#   configs = {
-#     "description"            = "cockroachws_forward"
-#     "inbound-interface name" = "eth1"
-#     "protocol"               = "tcp_udp"
-#     "destination port"       = "9090"
-#     "source address"         = "192.168.255.0/24"
-#     "translation address"    = "172.16.0.10"
-#   }
-# }
+resource "vyos_config_block_tree" "reverse_proxy" {
+  depends_on = [
+    vyos_config_block_tree.container_workload
+  ]
+  for_each = local.reverse_proxy
+  path     = each.value.path
+  configs  = each.value.configs
+}
 
-resource "vyos_static_host_mapping" "cockroach" {
+resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
     null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
+    module.lldap_conf,
+    vyos_config_block_tree.reverse_proxy,
   ]
-  host = "cockroach.mgmt.sololab"
+  host = "lldap.mgmt.sololab"
   ip   = "192.168.255.1"
-}
-
-# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
-resource "vyos_config_block_tree" "lb_svc_tcp443_rule_cockroach" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy service tcp443 rule 20"
-  configs = {
-    "ssl"         = "req-ssl-sni"
-    "domain-name" = "cockroach.mgmt.sololab"
-    "set backend" = "cockroach_5443"
-  }
-}
-
-resource "vyos_config_block_tree" "lb_be_cockroach_5443" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy backend cockroach_5443"
-  configs = {
-    "mode"                = "tcp"
-    "server vyos address" = "172.16.0.10"
-    "server vyos port"    = "5443"
-  }
-}
-
-# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
-resource "vyos_config_block_tree" "lb_svc_tcp5432" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy service tcp5432"
-  configs = {
-    "listen-address" = "192.168.255.1"
-    "port"           = "5432"
-    "mode"           = "tcp"
-    "backend"        = "cockroach_5432"
-  }
-}
-
-resource "vyos_config_block_tree" "lb_be_cockroach_5432" {
-  depends_on = [
-    null_resource.load_image,
-    module.cockroach_conf,
-    vyos_config_block_tree.container_cockroach_network,
-  ]
-  path = "load-balancing reverse-proxy backend cockroach_5432"
-  configs = {
-    "mode"                = "tcp"
-    "server vyos address" = "172.16.0.10"
-    "server vyos port"    = "5432"
-  }
 }

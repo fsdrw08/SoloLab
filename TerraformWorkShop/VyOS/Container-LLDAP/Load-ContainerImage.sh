@@ -9,6 +9,7 @@ if [[ ! " $${AVAILABLE_IMAGES[*]} " =~ " ${image_name} " ]]; then
         sudo podman load --input ${image_archive_path}
     else
         echo "pull and save the target image to ${image_archive_path} first"
+        echo "sudo podman save -o ${image_archive_path} ${image_name} first"
         exit 1
     fi
 fi
