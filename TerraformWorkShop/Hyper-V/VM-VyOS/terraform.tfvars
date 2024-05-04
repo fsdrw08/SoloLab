@@ -34,8 +34,8 @@ network_adaptors = [
 ]
 
 enable_secure_boot   = "Off"
-memory_startup_bytes = 2046820352
-memory_maximum_bytes = 2046820352
+memory_startup_bytes = 4093640704
+memory_maximum_bytes = 4093640704
 memory_minimum_bytes = 1023410176
 
 cloudinit_nocloud = [
