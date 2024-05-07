@@ -4,7 +4,6 @@
 dn: ${baseDN}
 changetype: modify
 add: aci
-aci: (target ="ldap:///${baseDN}")(targetattr != "userPassword")(version 3.0;acl "Disallow Anonymous read-search access"; allow (read, search, compare)(userdn = "ldap:///all");)
 aci: (target="ldap:///${baseDN}") (targetattr = "*")(version 3.0; acl "allow all Admin group"; allow(all,export,import,proxy) groupdn = "ldap:///cn=Directory Administrators,ou=Groups,${baseDN}";)
-aci: (target="ldap:///${baseDN}") (targetattr ="*")(version 3.0; acl "Allow apps proxied auth"; allow(all, proxy)(userdn = "ldap:///cn=*,ou=Apps,${baseDN}");)
 aci: (targetcontrol="1.2.840.113556.1.4.805") (version 3.0; acl "Tree delete for Admins"; allow(all) groupdn = "ldap:///cn=Directory Administrators,ou=Groups,${baseDN}";)
+aci: (target="ldap:///${baseDN}") (targetattr ="*")(version 3.0; acl "Allow apps proxied auth"; allow(all, proxy)(userdn = "ldap:///cn=*,ou=Services,${baseDN}");)

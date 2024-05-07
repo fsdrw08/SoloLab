@@ -19,7 +19,6 @@ data "jks_keystore" "keystore" {
   }
 }
 
-# # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile
 resource "local_file" "keystore" {
   content_base64 = data.jks_keystore.keystore.jks_base64
   filename       = "${path.module}/keystore"
@@ -37,12 +36,13 @@ resource "null_resource" "init" {
     port               = var.vm_conn.port
     user               = var.vm_conn.user
     password           = var.vm_conn.password
-    image_name         = "docker.io/openidentityplatform/opendj:4.6.2-alpine"
-    image_archive_path = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.2-alpine.tar"
+    image_name         = "docker.io/openidentityplatform/opendj:4.6.2"
+    image_archive_path = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.2.tar"
     dirs               = "/mnt/data/opendj"
-    chown_uid          = 1001
-    chown_gid          = 100
-    chown_dir          = "/mnt/data/opendj"
+    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile-alpine
+    chown_uid = 1001
+    chown_gid = 101
+    chown_dir = "/mnt/data/opendj"
   }
   connection {
     type     = "ssh"
@@ -120,24 +120,28 @@ module "opendj_conf" {
     }
     schema = {
       ldif = [
+        # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/src/site/resources/Example.ldif#L51-L66
         {
-          # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/src/site/resources/Example.ldif#L51-L66
           basename = "44-domain_base.ldif"
           content = templatefile("${path.module}/opendj/44-domain_base.ldif", {
             baseDN = "dc=root,dc=sololab"
           })
         },
         {
-          # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/src/site/resources/Example.ldif#L51-L66
           basename = "45-groups.ldif"
           content = templatefile("${path.module}/opendj/45-groups.ldif", {
             baseDN = "dc=root,dc=sololab"
           })
         },
         {
-          # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/src/site/resources/Example.ldif#L51-L66
-          basename = "46-admin_group.ldif"
-          content = templatefile("${path.module}/opendj/46-admin_group.ldif", {
+          basename = "46-people.ldif"
+          content = templatefile("${path.module}/opendj/46-people.ldif", {
+            baseDN = "dc=root,dc=sololab"
+          })
+        },
+        {
+          basename = "47-services.ldif"
+          content = templatefile("${path.module}/opendj/47-services.ldif", {
             baseDN = "dc=root,dc=sololab"
           })
         },
@@ -172,10 +176,11 @@ resource "vyos_config_block_tree" "container_workload" {
   path = "container name opendj"
 
   configs = {
-    "image" = "docker.io/openidentityplatform/opendj:4.6.2-alpine"
+    "image" = "docker.io/openidentityplatform/opendj:4.6.2"
 
     "network opendj address" = "172.16.2.10"
-    "memory"                 = "1024"
+
+    "memory" = "1024"
 
     "environment TZ value"            = "Asia/Shanghai"
     "environment BASE_DN value"       = "dc=root,dc=sololab"
@@ -188,6 +193,7 @@ resource "vyos_config_block_tree" "container_workload" {
     "volume opendj_cert destination" = "/opt/opendj/certs"
     "volume opendj_data source"      = "/mnt/data/opendj"
     "volume opendj_data destination" = "/opt/opendj/data"
+    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile
     # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/opendj-packages/opendj-docker/bootstrap/setup.sh#L39-L49
     "volume opendj_schema source"      = "/etc/opendj/schema"
     "volume opendj_schema destination" = "/opt/opendj/bootstrap/schema"
@@ -231,6 +237,17 @@ locals {
       }
     }
   }
+  post_process = {
+    Disable-AnonymousAccess = {
+      script_path = "${path.root}/opendj/Disable-AnonymousAccess.sh"
+      vars = {
+        container_name = "opendj"
+        hostname       = "localhost"
+        bindDN         = "cn=Directory Manager"
+        bindPassword   = "P@ssw0rd"
+      }
+    }
+  }
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
@@ -250,6 +267,33 @@ resource "vyos_static_host_mapping" "host_mapping" {
   host = "opendj.mgmt.sololab"
   ip   = "192.168.255.1"
 }
+
+resource "null_resource" "post_process" {
+  depends_on = [
+    vyos_config_block_tree.container_workload,
+  ]
+  for_each = local.post_process
+  triggers = {
+    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+    host           = var.vm_conn.host
+    port           = var.vm_conn.port
+    user           = var.vm_conn.user
+    password       = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      templatefile("${each.value.script_path}", "${each.value.vars}")
+    ]
+  }
+}
+
 
 # add post process to disable anonymous access
 # https://backstage.forgerock.com/docs/ds/6.5/reference/index.html#admin-tools-ref
