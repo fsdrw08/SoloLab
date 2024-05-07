@@ -8,8 +8,10 @@ resource "ldap_entry" "user_admin" {
     sn                = ["admin"]
     ds-privilege-name = ["password-reset"]
   })
-  ignore_attributes = ["ds-privilege-name"]
+  ignore_attributes = base64encode("${sha1("passwordsalt")}salt")
+  ignore_attributes = base64encode("${sha1("passwordsalt")}salt")
 }
+"${sha1("passwordsalt")}salt"
 
 resource "ldap_entry" "group_admins" {
   dn = "cn=Directory Administrators,ou=Groups,${var.base_dn}"
