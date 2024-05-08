@@ -15,14 +15,14 @@ resource "system_user" "user" {
 
 # present zot server bin
 resource "system_file" "server_bin" {
-  count  = var.install == null ? 0 : 1
+  count  = var.install.server == null ? 0 : 1
   path   = "${var.install.server.bin_file_dir}/zot"
   source = var.install.server.bin_file_source
   mode   = 755
 }
 
 resource "null_resource" "bin" {
-  count      = var.install == null ? 0 : 1
+  count      = var.install.server == null ? 0 : 1
   depends_on = [system_file.server_bin]
   triggers = {
     host     = var.vm_conn.host
@@ -66,8 +66,6 @@ resource "system_file" "main" {
   depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, var.config.main.basename])
   content    = var.config.main.content
-  user       = var.runas.user
-  group      = var.runas.group
   uid        = var.runas.uid
   gid        = var.runas.gid
   mode       = "644"
@@ -76,8 +74,6 @@ resource "system_file" "main" {
 resource "system_folder" "certs" {
   depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, var.config.certs.sub_dir])
-  user       = var.runas.user
-  group      = var.runas.group
   uid        = var.runas.uid
   gid        = var.runas.gid
   mode       = "755"
@@ -91,8 +87,6 @@ resource "system_file" "cert" {
   ]
   path    = join("/", [system_folder.certs.path, var.config.certs.cert_basename])
   content = var.config.certs.cert_content
-  user    = var.runas.user
-  group   = var.runas.group
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
@@ -106,8 +100,6 @@ resource "system_file" "key" {
   ]
   path    = join("/", [system_folder.certs.path, var.config.certs.key_basename])
   content = var.config.certs.key_content
-  user    = var.runas.user
-  group   = var.runas.group
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"

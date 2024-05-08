@@ -6,6 +6,11 @@ resource "null_resource" "load_image" {
     password           = var.vm_conn.password
     image_name         = "ghcr.io/project-zot/zot-linux-amd64:v2.0.4"
     image_archive_path = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.0.4.tar"
+    dirs               = "/mnt/data/zot"
+    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile-alpine
+    chown_uid = 1002
+    chown_gid = 100
+    chown_dir = "/mnt/data/zot"
   }
   connection {
     type     = "ssh"
@@ -16,16 +21,21 @@ resource "null_resource" "load_image" {
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/Load-ContainerImage.sh", {
+      templatefile("${path.root}/init.sh", {
         image_name         = self.triggers.image_name
         image_archive_path = self.triggers.image_archive_path
+        dirs               = self.triggers.dirs
+        chown_uid          = self.triggers.chown_uid
+        chown_gid          = self.triggers.chown_gid
+        chown_dir          = self.triggers.chown_dir
       })
     ]
   }
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo podman image rm ${self.triggers.image_name}"
+      "sudo podman image rm ${self.triggers.image_name}",
+      "sudo rm -rf ${self.triggers.dirs}",
     ]
   }
 }
@@ -46,96 +56,157 @@ module "zot_conf" {
     password = var.vm_conn.password
   }
   runas = {
-    user        = "vyos"
-    group       = "users"
+    user        = 1002
+    group       = 100
     uid         = 1002
     gid         = 100
     take_charge = false
   }
-  install = null
+  install = {
+    server = null
+    client = null
+  }
   config = {
     main = {
+      # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#configuration-file
       basename = "config.json"
       content = jsonencode({
-        tls = {
-          cert = "/etc/zot/certs/cert.pem"
+        extensions = {
+          # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#enhanced-searching-and-querying-images
+          search = {
+            enable = true
+            cve = {
+              updateInterval = "2h"
+            }
+          }
+          # Mgmt is enabled when the Search extension is enabled
+          mgmt = {
+            enable = true
+          }
+          ui = {
+            enable = true
+          }
+          scrub = {
+            enable   = true
+            interval = "24h"
+          }
+        }
+        http = {
+          address = "0.0.0.0"
+          port    = "5000"
+          realm   = "zot"
+          tls = {
+            cert = "/etc/zot/certs/server.crt"
+            key  = "/etc/zot/certs/server.key"
+          }
+          auth = {
+            # https://zotregistry.dev/v2.0.4/articles/authn-authz/#ldap
+            # https://github.com/project-zot/zot/blob/be5ad667974b43905a118a40435f7117c0dde511/examples/config-ldap.json#L17
+            ldap = {
+              credentialsFile    = "/etc/zot/config-ldap-credentials.json"
+              address            = "opendj.mgmt.sololab"
+              port               = 636
+              startTLS           = true
+              baseDN             = "ou=People,dc=root,dc=sololab"
+              userAttribute      = "uid"
+              userGroupAttribute = "isMemberOf"
+              skipVerify         = true
+              subtreeSearch      = true
+            },
+            failDelay = 5
+          }
+          # https://zotregistry.dev/v2.0.4/articles/authn-authz/#example-access-control-configuration
+          accessControl = {
+            repositories = {
+              "**" = {
+                policies = [
+                  {
+                    groups  = ["cn=App-Zot-CU,ou=Groups,dc=root,dc=sololab"]
+                    actions = ["read", "update"]
+                  }
+                ]
+                defaultPolicy = ["read"]
+              }
+            }
+            adminPolicy = {
+              groups  = ["cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"]
+              actions = ["read", "create", "update", "delete"]
+            }
+          }
+        }
+        # https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
+        storage = {
+          rootDirectory = "/var/lib/registry"
+          # https://zotregistry.dev/v2.0.4/articles/storage/#commit
+          # make data to be written to disk immediately
+          commit = true
+          # https://zotregistry.dev/v2.0.4/articles/storage/#garbage-collection
+          # Garbage collection (gc) is enabled by default to reclaim this space
+          gc = true
+        }
+        log = {
+          level = "debug"
         }
       })
     }
     certs = {
       cert_basename = "server.crt"
       cert_content = join("", [
-        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "lldap", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-        # data.terraform_remote_state.root_ca.outputs.root_cert_pem
+        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "zot", null),
+        data.terraform_remote_state.root_ca.outputs.int_ca_pem
       ])
       key_basename = "server.key"
-      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "lldap", null)
+      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "zot", null)
       sub_dir      = "certs"
     }
-    dir = "/etc/lldap"
+    dir = "/etc/zot"
   }
-  storage = null
+}
+
+resource "system_file" "ldap_credential" {
+  depends_on = [module.zot_conf]
+  path       = "/etc/zot/config-ldap-credentials.json"
+  content = jsonencode({
+    bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
+    bindPassword = "P@ssw0rd"
+  })
+  uid = 1002
+  gid = 100
 }
 
 resource "vyos_config_block_tree" "container_network" {
-  path = "container network lldap"
+  path = "container network zot"
 
   configs = {
-    "prefix" = "172.16.1.0/24"
+    "prefix" = "172.16.3.0/24"
   }
 }
 
 resource "vyos_config_block_tree" "container_workload" {
   depends_on = [
     null_resource.load_image,
-    module.lldap_conf,
+    module.zot_conf,
     vyos_config_block_tree.container_network,
   ]
 
-  path = "container name lldap"
+  path = "container name zot"
 
   configs = {
-    "image" = "docker.io/lldap/lldap:2024-04-24-debian-rootless"
+    "image" = "ghcr.io/project-zot/zot-linux-amd64:v2.0.4"
 
-    "network lldap address" = "172.16.1.10"
-    # "port lldap_http listen-address" = "192.168.255.1"
-    # "port lldap_http source"         = "17170"
-    # "port lldap_http destination"    = "17170"
-    # "port lldap_ldap listen-address" = "192.168.255.1"
-    # "port lldap_ldap source"         = "389"
-    # "port lldap_ldap destination"    = "389"
+    "network zot address" = "172.16.3.10"
 
-    "uid" = "0"
-    "gid" = "0"
+    "uid" = "1002"
+    "gid" = "100"
 
-    "environment TZ value"              = "Asia/Shanghai"
-    "environment LLDAP_HTTP_PORT value" = "17170"
-    "environment LLDAP_HTTP_URL value"  = "https://lldap.mgmt.sololab"
-    "environment LLDAP_LDAP_PORT value" = "3890"
+    "environment TZ value" = "Asia/Shanghai"
 
-    "volume lldap_config source"      = "/etc/lldap"
-    "volume lldap_config destination" = "/data/config"
-    "volume lldap_data source"        = "/mnt/data/lldap"
-    "volume lldap_data destination"   = "/data/db"
-
-    "entrypoint" = "/app/lldap"
-    "command"    = "run --config-file /data/config/lldap_config.toml"
+    "volume zot_config source"      = "/etc/zot"
+    "volume zot_config destination" = "/etc/zot"
+    "volume zot_config mode"        = "ro"
+    "volume zot_data source"        = "/mnt/data/zot"
+    "volume zot_data destination"   = "/var/lib/registry"
   }
-}
-
-resource "system_file" "nginx_config" {
-  path = "/etc/nginx/conf.d/lldap.conf"
-  content = templatefile("${path.module}/lldap/lldap_nginx.conf", {
-    listen              = "127.0.0.1:17170 ssl"
-    server_name         = "lldap.mgmt.sololab"
-    ssl_certificate     = "/etc/lldap/certs/server.crt"
-    ssl_certificate_key = "/etc/lldap/certs/server.key"
-    proxy_pass          = "http://172.16.1.10:17170/"
-  })
-  user  = "vyos"
-  group = "users"
-  mode  = "644"
 }
 
 locals {
@@ -144,50 +215,16 @@ locals {
       path = "load-balancing reverse-proxy service tcp443 rule 30"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "lldap.mgmt.sololab"
-        "set backend" = "lldap_web"
+        "domain-name" = "zot.mgmt.sololab"
+        "set backend" = "zot_web"
       }
     }
     web_backend = {
-      path = "load-balancing reverse-proxy backend lldap_web"
+      path = "load-balancing reverse-proxy backend zot_web"
       configs = {
         "mode"                = "tcp"
-        "server vyos address" = "127.0.0.1"
-        "server vyos port"    = "17170"
-      }
-    }
-    ldap_frontend = {
-      path = "load-balancing reverse-proxy service tcp389"
-      configs = {
-        "listen-address" = "192.168.255.1"
-        "port"           = "389"
-        "mode"           = "tcp"
-        "backend"        = "lldap_ldap"
-      }
-    }
-    ldap_backend = {
-      path = "load-balancing reverse-proxy backend lldap_ldap"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "172.16.1.10"
-        "server vyos port"    = "3890"
-      }
-    }
-    ldaps_frontend = {
-      path = "load-balancing reverse-proxy service tcp636"
-      configs = {
-        "listen-address" = "192.168.255.1"
-        "port"           = "636"
-        "mode"           = "tcp"
-        "backend"        = "lldap_ldaps"
-      }
-    }
-    ldaps_backend = {
-      path = "load-balancing reverse-proxy backend lldap_ldaps"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "172.16.1.10"
-        "server vyos port"    = "6360"
+        "server vyos address" = "172.16.3.10"
+        "server vyos port"    = "5000"
       }
     }
   }
@@ -205,9 +242,8 @@ resource "vyos_config_block_tree" "reverse_proxy" {
 resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
     null_resource.load_image,
-    module.lldap_conf,
     vyos_config_block_tree.reverse_proxy,
   ]
-  host = "lldap.mgmt.sololab"
+  host = "zot.mgmt.sololab"
   ip   = "192.168.255.1"
 }
