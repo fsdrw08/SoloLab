@@ -166,6 +166,7 @@ resource "vyos_config_block_tree" "container_network" {
   }
 }
 
+# https://hub.docker.com/r/openidentityplatform/opendj
 resource "vyos_config_block_tree" "container_workload" {
   depends_on = [
     null_resource.init,

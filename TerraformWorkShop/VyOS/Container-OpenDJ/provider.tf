@@ -8,10 +8,6 @@ terraform {
       source  = "neuspaces/system"
       version = ">=0.4.0"
     }
-    external = {
-      source  = "hashicorp/external"
-      version = ">=2.3.3"
-    }
     jks = {
       source  = "fhke/jks"
       version = ">=1.0.1"
