@@ -37,11 +37,13 @@ variable "config" {
       content  = string
     })
     certs = optional(object({
-      cert_basename = string
-      cert_content  = string
-      key_basename  = string
-      key_content   = string
-      sub_dir       = string
+      cacert_basename = string
+      cacert_content  = string
+      cert_basename   = string
+      cert_content    = string
+      key_basename    = string
+      key_content     = string
+      sub_dir         = string
     }))
     dir = string
   })

@@ -2,7 +2,7 @@
 resource "system_group" "group" {
   count = var.runas.take_charge == true ? 1 : 0
   name  = var.runas.group
-  gid   = var.runas.gid == null ? null : var.runas.gid
+  gid   = var.runas.gid
 }
 
 resource "system_user" "user" {
@@ -77,6 +77,19 @@ resource "system_folder" "certs" {
   uid        = var.runas.uid
   gid        = var.runas.gid
   mode       = "755"
+}
+
+resource "system_file" "cacert" {
+  count = var.config.certs == null ? 0 : 1
+  depends_on = [
+    system_folder.config,
+    system_folder.certs
+  ]
+  path    = join("/", [system_folder.certs.path, var.config.certs.cacert_basename])
+  content = var.config.certs.cacert_content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
+  mode    = "600"
 }
 
 resource "system_file" "cert" {
