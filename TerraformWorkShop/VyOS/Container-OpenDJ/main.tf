@@ -32,17 +32,11 @@ resource "local_file" "keystore" {
 resource "null_resource" "init" {
   depends_on = [local_file.keystore]
   triggers = {
-    host               = var.vm_conn.host
-    port               = var.vm_conn.port
-    user               = var.vm_conn.user
-    password           = var.vm_conn.password
-    image_name         = "docker.io/openidentityplatform/opendj:4.6.2"
-    image_archive_path = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.2.tar"
-    dirs               = "/mnt/data/opendj"
-    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile-alpine
-    chown_uid = 1001
-    chown_gid = 101
-    chown_dir = "/mnt/data/opendj"
+    host      = var.vm_conn.host
+    port      = var.vm_conn.port
+    user      = var.vm_conn.user
+    password  = var.vm_conn.password
+    data_dirs = var.data_dirs
   }
   connection {
     type     = "ssh"
@@ -53,51 +47,31 @@ resource "null_resource" "init" {
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/init.sh", {
-        image_name         = self.triggers.image_name
-        image_archive_path = self.triggers.image_archive_path
-        dirs               = self.triggers.dirs
-        chown_uid          = self.triggers.chown_uid
-        chown_gid          = self.triggers.chown_gid
-        chown_dir          = self.triggers.chown_dir
-      })
+      <<-EOT
+        #!/bin/bash
+        sudo mkdir -p ${var.data_dirs}
+        sudo chown ${var.runas.uid}:${var.runas.gid} ${var.data_dirs}
+      EOT
     ]
   }
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo podman image rm ${self.triggers.image_name}",
-      "sudo rm -rf ${self.triggers.dirs}",
+      "sudo rm -rf ${self.triggers.data_dirs}",
     ]
   }
   provisioner "file" {
     source      = local_file.keystore.filename
     destination = "/mnt/data/offline/others/opendj.jks"
   }
-  lifecycle {
-    prevent_destroy = false
-  }
 }
 
-
-
-module "opendj_conf" {
+module "config_map" {
   depends_on = [local_file.keystore]
   source     = "../../System/modules/opendj"
-  vm_conn = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
-  }
-  runas = {
-    user        = 1001
-    group       = 101
-    uid         = 1001
-    gid         = 101
-    take_charge = false
-  }
-  install = null
+  vm_conn    = var.vm_conn
+  runas      = var.runas
+  install    = null
   config = {
     properties = {
       basename = "setup.props"
@@ -158,86 +132,35 @@ module "opendj_conf" {
   storage = null
 }
 
-resource "vyos_config_block_tree" "container_network" {
-  path = "container network opendj"
 
-  configs = {
-    "prefix" = "172.16.2.0/24"
-  }
-}
-
-# https://hub.docker.com/r/openidentityplatform/opendj
-resource "vyos_config_block_tree" "container_workload" {
+module "vyos_container" {
   depends_on = [
     null_resource.init,
-    module.opendj_conf,
-    vyos_config_block_tree.container_network,
+    module.config_map
   ]
+  source   = "../modules/container"
+  vm_conn  = var.vm_conn
+  network  = var.container.network
+  workload = var.container.workload
+}
 
-  path = "container name opendj"
+resource "vyos_config_block_tree" "reverse_proxy" {
+  depends_on = [module.vyos_container]
+  for_each   = var.reverse_proxy
+  path       = each.value.path
+  configs    = each.value.configs
+}
 
-  configs = {
-    "image" = "docker.io/openidentityplatform/opendj:4.6.2"
-
-    "network opendj address" = "172.16.2.10"
-
-    "memory" = "1024"
-
-    "environment TZ value"            = "Asia/Shanghai"
-    "environment BASE_DN value"       = "dc=root,dc=sololab"
-    "environment ROOT_PASSWORD value" = "P@ssw0rd"
-    # pkcs12 doesn't work, use jks instead
-    # "environment OPENDJ_SSL_OPTIONS value" = "--usePkcs12keyStore /cert/opendj.pfx --keyStorePassword changeit"
-    "environment OPENDJ_SSL_OPTIONS value" = "--useJavaKeystore /opt/opendj/certs/keystore --keyStorePassword changeit"
-
-    "volume opendj_cert source"      = "/etc/opendj/certs"
-    "volume opendj_cert destination" = "/opt/opendj/certs"
-    "volume opendj_data source"      = "/mnt/data/opendj"
-    "volume opendj_data destination" = "/opt/opendj/data"
-    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile
-    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/opendj-packages/opendj-docker/bootstrap/setup.sh#L39-L49
-    "volume opendj_schema source"      = "/etc/opendj/schema"
-    "volume opendj_schema destination" = "/opt/opendj/bootstrap/schema"
-  }
+resource "vyos_static_host_mapping" "host_mapping" {
+  depends_on = [
+    module.vyos_container,
+    vyos_config_block_tree.reverse_proxy,
+  ]
+  host = var.dns_record.host
+  ip   = var.dns_record.ip
 }
 
 locals {
-  reverse_proxy = {
-    ldap_frontend = {
-      path = "load-balancing reverse-proxy service tcp389"
-      configs = {
-        "listen-address" = "192.168.255.1"
-        "port"           = "389"
-        "mode"           = "tcp"
-        "backend"        = "opendj_ldap"
-      }
-    }
-    ldap_backend = {
-      path = "load-balancing reverse-proxy backend opendj_ldap"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "172.16.2.10"
-        "server vyos port"    = "1389"
-      }
-    }
-    ldaps_frontend = {
-      path = "load-balancing reverse-proxy service tcp636"
-      configs = {
-        "listen-address" = "192.168.255.1"
-        "port"           = "636"
-        "mode"           = "tcp"
-        "backend"        = "opendj_ldaps"
-      }
-    }
-    ldaps_backend = {
-      path = "load-balancing reverse-proxy backend opendj_ldaps"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "172.16.2.10"
-        "server vyos port"    = "1636"
-      }
-    }
-  }
   post_process = {
     Disable-AnonymousAccess = {
       script_path = "${path.root}/opendj/Disable-AnonymousAccess.sh"
@@ -251,35 +174,16 @@ locals {
   }
 }
 
-resource "vyos_config_block_tree" "reverse_proxy" {
-  depends_on = [
-    vyos_config_block_tree.container_workload
-  ]
-  for_each = local.reverse_proxy
-  path     = each.value.path
-  configs  = each.value.configs
-}
-
-resource "vyos_static_host_mapping" "host_mapping" {
-  depends_on = [
-    null_resource.init,
-    vyos_config_block_tree.reverse_proxy,
-  ]
-  host = "opendj.mgmt.sololab"
-  ip   = "192.168.255.1"
-}
-
 resource "null_resource" "post_process" {
   depends_on = [
-    vyos_config_block_tree.container_workload,
+    module.vyos_container,
   ]
   for_each = local.post_process
   triggers = {
-    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"

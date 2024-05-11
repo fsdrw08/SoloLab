@@ -1,16 +1,10 @@
-resource "null_resource" "load_image" {
+resource "null_resource" "init" {
   triggers = {
-    host               = var.vm_conn.host
-    port               = var.vm_conn.port
-    user               = var.vm_conn.user
-    password           = var.vm_conn.password
-    image_name         = "ghcr.io/project-zot/zot-linux-amd64:v2.0.4"
-    image_archive_path = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.0.4.tar"
-    dirs               = "/mnt/data/zot"
-    # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile-alpine
-    chown_uid = 1002
-    chown_gid = 100
-    chown_dir = "/mnt/data/zot"
+    host      = var.vm_conn.host
+    port      = var.vm_conn.port
+    user      = var.vm_conn.user
+    password  = var.vm_conn.password
+    data_dirs = var.data_dirs
   }
   connection {
     type     = "ssh"
@@ -21,23 +15,19 @@ resource "null_resource" "load_image" {
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/init.sh", {
-        image_name         = self.triggers.image_name
-        image_archive_path = self.triggers.image_archive_path
-        dirs               = self.triggers.dirs
-        chown_uid          = self.triggers.chown_uid
-        chown_gid          = self.triggers.chown_gid
-        chown_dir          = self.triggers.chown_dir
-      })
+      <<-EOT
+        #!/bin/bash
+        sudo mkdir -p ${var.data_dirs}
+        sudo chown ${var.runas.uid}:${var.runas.gid} ${var.data_dirs}
+      EOT
     ]
   }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo podman image rm ${self.triggers.image_name}",
-      "sudo rm -rf ${self.triggers.dirs}",
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   when = destroy
+  #   inline = [
+  #     "sudo rm -rf ${self.triggers.data_dirs}",
+  #   ]
+  # }
 }
 
 data "terraform_remote_state" "root_ca" {
@@ -47,24 +37,16 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
-module "zot_conf" {
-  source = "../../System/modules/zot"
-  vm_conn = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
-  }
-  runas = {
-    user        = 1002
-    group       = 100
-    uid         = 1002
-    gid         = 100
-    take_charge = false
-  }
+module "config_map" {
+  source  = "../../System/modules/zot"
+  vm_conn = var.vm_conn
+  runas   = var.runas
   install = {
     server = null
-    client = null
+    client = {
+      bin_file_dir    = "/usr/bin"
+      bin_file_source = "http://files.mgmt.sololab/releases/zli-linux-amd64-2.0.4"
+    }
   }
   config = {
     main = {
@@ -77,6 +59,11 @@ module "zot_conf" {
             enable = true
             cve = {
               updateInterval = "2h"
+              # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
+              trivy = {
+                javadbrepository = "ghcr.io/aquasecurity/trivy-java-db" # zot.mgmt.sololab/aquasecurity/trivy-java-db
+                dbrepository     = "ghcr.io/aquasecurity/trivy-db"      # zot.mgmt.sololab/aquasecurity/trivy-db
+              }
             }
           }
           # Mgmt is enabled when the Search extension is enabled
@@ -96,8 +83,9 @@ module "zot_conf" {
           port    = "5000"
           realm   = "zot"
           tls = {
-            cert = "/etc/zot/certs/server.crt"
-            key  = "/etc/zot/certs/server.key"
+            cert   = "/etc/zot/certs/server.crt"
+            key    = "/etc/zot/certs/server.key"
+            cacert = "/etc/zot/certs/ca.crt"
           }
           auth = {
             # https://zotregistry.dev/v2.0.4/articles/authn-authz/#ldap
@@ -150,7 +138,9 @@ module "zot_conf" {
       })
     }
     certs = {
-      cert_basename = "server.crt"
+      cacert_basename = "ca.crt"
+      cacert_content  = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+      cert_basename   = "server.crt"
       cert_content = join("", [
         lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "zot", null),
         data.terraform_remote_state.root_ca.outputs.int_ca_pem
@@ -164,86 +154,36 @@ module "zot_conf" {
 }
 
 resource "system_file" "ldap_credential" {
-  depends_on = [module.zot_conf]
+  depends_on = [module.config_map]
   path       = "/etc/zot/config-ldap-credentials.json"
   content = jsonencode({
     bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
     bindPassword = "P@ssw0rd"
   })
-  uid = 1002
-  gid = 100
+  uid = var.runas.uid
+  gid = var.runas.gid
 }
 
-resource "vyos_config_block_tree" "container_network" {
-  path = "container network zot"
-
-  configs = {
-    "prefix" = "172.16.3.0/24"
-  }
-}
-
-resource "vyos_config_block_tree" "container_workload" {
-  depends_on = [
-    null_resource.load_image,
-    module.zot_conf,
-    vyos_config_block_tree.container_network,
-  ]
-
-  path = "container name zot"
-
-  configs = {
-    "image" = "ghcr.io/project-zot/zot-linux-amd64:v2.0.4"
-
-    "network zot address" = "172.16.3.10"
-
-    "uid" = "1002"
-    "gid" = "100"
-
-    "environment TZ value" = "Asia/Shanghai"
-
-    "volume zot_config source"      = "/etc/zot"
-    "volume zot_config destination" = "/etc/zot"
-    "volume zot_config mode"        = "ro"
-    "volume zot_data source"        = "/mnt/data/zot"
-    "volume zot_data destination"   = "/var/lib/registry"
-  }
-}
-
-locals {
-  reverse_proxy = {
-    web_frontend = {
-      path = "load-balancing reverse-proxy service tcp443 rule 30"
-      configs = {
-        "ssl"         = "req-ssl-sni"
-        "domain-name" = "zot.mgmt.sololab"
-        "set backend" = "zot_web"
-      }
-    }
-    web_backend = {
-      path = "load-balancing reverse-proxy backend zot_web"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "172.16.3.10"
-        "server vyos port"    = "5000"
-      }
-    }
-  }
+module "vyos_container" {
+  depends_on = [module.config_map]
+  source     = "../modules/container"
+  vm_conn    = var.vm_conn
+  network    = var.container.network
+  workload   = var.container.workload
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
-  depends_on = [
-    vyos_config_block_tree.container_workload
-  ]
-  for_each = local.reverse_proxy
-  path     = each.value.path
-  configs  = each.value.configs
+  depends_on = [module.vyos_container]
+  for_each   = var.reverse_proxy
+  path       = each.value.path
+  configs    = each.value.configs
 }
 
 resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
-    null_resource.load_image,
+    module.vyos_container,
     vyos_config_block_tree.reverse_proxy,
   ]
-  host = "zot.mgmt.sololab"
-  ip   = "192.168.255.1"
+  host = var.dns_record.host
+  ip   = var.dns_record.ip
 }
