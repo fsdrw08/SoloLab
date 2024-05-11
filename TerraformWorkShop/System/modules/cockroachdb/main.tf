@@ -2,12 +2,14 @@
 resource "system_group" "group" {
   count = var.runas.take_charge == true ? 1 : 0
   name  = var.runas.group
+  gid   = var.runas.gid
 }
 
 resource "system_user" "user" {
   count      = var.runas.take_charge == true ? 1 : 0
   depends_on = [system_group.group]
   name       = var.runas.user
+  uid        = var.runas.uid
   group      = var.runas.group
 }
 
@@ -62,18 +64,18 @@ resource "null_resource" "bin" {
 
 # prepare CockroachDB config dir
 resource "system_folder" "config" {
-  path  = var.config.dir
-  user  = var.runas.user
-  group = var.runas.group
-  mode  = "755"
+  path = var.config.dir
+  uid  = var.runas.uid
+  gid  = var.runas.gid
+  mode = "755"
 }
 
 resource "system_folder" "certs" {
   count      = var.config.certs == null ? 0 : 1
   depends_on = [system_folder.config]
   path       = join("/", ["${var.config.dir}", "${var.config.certs.sub_dir}"])
-  user       = var.runas.user
-  group      = var.runas.group
+  uid        = var.runas.uid
+  gid        = var.runas.gid
   mode       = "755"
 }
 
@@ -85,8 +87,8 @@ resource "system_file" "ca_cert" {
   ]
   path    = join("/", ["${var.config.dir}", "${var.config.certs.sub_dir}", "ca.crt"])
   content = var.config.certs.ca_cert_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "644"
 }
 
@@ -103,8 +105,8 @@ resource "system_file" "node_cert" {
     ]
   )
   content = var.config.certs.node_cert_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -121,8 +123,8 @@ resource "system_file" "node_key" {
     ]
   )
   content = var.config.certs.node_key_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -134,8 +136,8 @@ resource "system_file" "client_cert" {
   ]
   path    = join("/", ["${var.config.dir}", "${var.config.certs.sub_dir}", "${var.config.certs.client_cert_basename}"])
   content = var.config.certs.client_cert_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -152,8 +154,8 @@ resource "system_file" "client_key" {
     ]
   )
   content = var.config.certs.client_key_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 

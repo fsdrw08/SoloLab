@@ -17,11 +17,11 @@ variable "install" {
 
 variable "runas" {
   type = object({
-    user        = string
-    uid         = number
-    group       = string
-    gid         = number
     take_charge = bool
+    user        = optional(string, null)
+    group       = optional(string, null)
+    uid         = number
+    gid         = number
   })
 }
 

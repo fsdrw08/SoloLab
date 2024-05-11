@@ -21,8 +21,10 @@ variable "install" {
 variable "runas" {
   type = object({
     take_charge = optional(bool, false)
-    user        = string
-    group       = string
+    user        = optional(string, null)
+    group       = optional(string, null)
+    uid         = number
+    gid         = number
   })
 }
 
