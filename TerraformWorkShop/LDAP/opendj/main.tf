@@ -2,13 +2,12 @@
 resource "ldap_entry" "user_admin" {
   dn = "uid=admin,ou=People,${var.base_dn}"
   data_json = jsonencode({
-    objectClass       = ["person", "inetOrgPerson", "organizationalPerson", "top"]
-    userpassword      = ["{SSHA}9tYIWTF0A7+ipgncHEJJhRL9Vb/pydxL4A=="] # P@ssw0rd
+    objectClass       = ["top", "inetOrgPerson", "organizationalPerson", "person"]
+    userPassword      = ["{SSHA}9tYIWTF0A7+ipgncHEJJhRL9Vb/pydxL4A=="] # P@ssw0rd
     cn                = ["admin"]
     sn                = ["admin"]
     ds-privilege-name = ["password-reset"]
   })
-  ignore_attributes = ["ds-privilege-name"]
 }
 
 resource "ldap_entry" "group_admins" {
@@ -16,7 +15,7 @@ resource "ldap_entry" "group_admins" {
   data_json = jsonencode({
     objectClass = ["top", "groupofuniquenames"]
     ou          = ["Groups"]
-    uniquemember = [
+    uniqueMember = [
       "uid=admin,ou=People,${var.base_dn}",
     ]
   })
@@ -25,8 +24,8 @@ resource "ldap_entry" "group_admins" {
 resource "ldap_entry" "svc_readonly" {
   dn = "uid=readonly,ou=Services,${var.base_dn}"
   data_json = jsonencode({
-    objectClass  = ["person", "inetOrgPerson", "organizationalPerson", "top"]
-    userpassword = ["{SSHA}k/8CkwU7/1C/QM+Qw2uNkOqzOQxdv2qLwQ=="]
+    objectClass  = ["top", "inetOrgPerson", "organizationalPerson", "person"]
+    userPassword = ["{SSHA}k/8CkwU7/1C/QM+Qw2uNkOqzOQxdv2qLwQ=="]
     cn           = ["readonly"]
     sn           = ["readonly"]
   })
@@ -35,8 +34,8 @@ resource "ldap_entry" "svc_readonly" {
 resource "ldap_entry" "user_1" {
   dn = "uid=user1,ou=People,${var.base_dn}"
   data_json = jsonencode({
-    objectClass  = ["person", "inetOrgPerson", "organizationalPerson", "top"]
-    userpassword = ["{SSHA}9tYIWTF0A7+ipgncHEJJhRL9Vb/pydxL4A=="] # P@ssw0rd
+    objectClass  = ["top", "inetOrgPerson", "organizationalPerson", "person"]
+    userPassword = ["{SSHA}9tYIWTF0A7+ipgncHEJJhRL9Vb/pydxL4A=="] # P@ssw0rd
     cn           = ["user1"]
     sn           = ["user1"]
   })
@@ -47,7 +46,7 @@ resource "ldap_entry" "group_zot_admin" {
   data_json = jsonencode({
     objectClass = ["top", "groupofuniquenames"]
     ou          = ["Groups"]
-    uniquemember = [
+    uniqueMember = [
       "uid=admin,ou=People,${var.base_dn}",
     ]
   })
@@ -58,7 +57,7 @@ resource "ldap_entry" "group_zot_cu" {
   data_json = jsonencode({
     objectClass = ["top", "groupofuniquenames"]
     ou          = ["Groups"]
-    uniquemember = [
+    uniqueMember = [
       "uid=user1,ou=People,${var.base_dn}",
     ]
   })
