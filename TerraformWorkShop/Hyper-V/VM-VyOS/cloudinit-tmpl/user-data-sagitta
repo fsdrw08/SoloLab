@@ -130,3 +130,8 @@ write_files:
     permissions: "0644"
     content: |
       ${indent(6, haproxy_cfg)}
+  - path: /usr/local/share/ca-certificates/sololab.crt
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, root_ca)}

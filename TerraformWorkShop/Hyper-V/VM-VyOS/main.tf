@@ -69,6 +69,7 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
+          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
           vyos_cert = join("",
             slice(
               split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
