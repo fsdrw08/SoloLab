@@ -41,4 +41,74 @@ podman run --rm quay.io/skopeo/stable copy `
     --dest-tls-verify=false `
     --dest-creds=admin:P@ssw0rd
 
+podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os=linux `
+    --dest-compress-format gzip `
+    --dest-tls-verify=false `
+    --dest-creds=admin:P@ssw0rd
+    docker://docker.io/hashicorp/consul:1.18.1 `
+    oci-archive://zot.mgmt.sololab/hashicorp/consul:1.18.1 `
+
+```
+
+```powershell
+# https://github.com/passcod/winskopeo
+# https://github.com/containers/skopeo/issues/394
+# https://github.com/containers/skopeo/blob/main/docs/skopeo.1.md#image-names
+skopeo copy --insecure-policy `
+    --override-os=linux `
+    --override-arch=amd64 `
+    docker://docker.io/hashicorp/consul:1.18.1 `
+    oci-archive:$env:USERPROFILE/Downloads/images/hashicorp_consul_1.18.1.tar
+
+skopeo copy --insecure-policy `
+    --dest-creds=admin:P@ssw0rd `
+    oci-archive:$env:USERPROFILE/Downloads/images/hashicorp_consul_1.18.1.tar `
+    docker://zot.mgmt.sololab/hashicorp/consul:1.18.1
+
+
+
+
+# https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
+oras login -u admin zot.mgmt.sololab
+Set-Location -Path $env:USERPROFILE/Downloads/images/
+# trivy-db
+# Download the trivy-db
+oras pull ghcr.io/aquasecurity/trivy-db:2
+
+# Download the manifest for trivy-db
+oras manifest fetch `
+    --output trivy-db-manifest.json `
+    ghcr.io/aquasecurity/trivy-db:2
+
+# Push the prior downloaded trivy-db to your registry
+oras push `
+    --disable-path-validation `
+    zot.mgmt.sololab/aquasecurity/trivy-db:2 `
+    db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip
+
+oras manifest push `
+    zot.mgmt.sololab/aquasecurity/trivy-db:2 `
+    trivy-db-manifest.json
+
+oras manifest fetch zot.mgmt.sololab/aquasecurity/trivy-db:2
+
+# trivy-java-db
+oras pull ghcr.io/aquasecurity/trivy-java-db:1
+
+oras manifest fetch `
+    --output trivy-java-db-manifest.json `
+    ghcr.io/aquasecurity/trivy-db:2
+
+oras push `
+    --disable-path-validation `
+    zot.mgmt.sololab/aquasecurity/trivy-java-db:1 `
+    javadb.tar.gz:application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip
+
+oras manifest push `
+    zot.mgmt.sololab/aquasecurity/trivy-java-db:1 `
+    trivy-java-db-manifest.json
+
+oras manifest fetch zot.mgmt.sololab/aquasecurity/trivy-java-db:1
+
+
 ```

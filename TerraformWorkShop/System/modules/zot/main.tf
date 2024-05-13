@@ -21,7 +21,7 @@ resource "system_file" "server_bin" {
   mode   = 755
 }
 
-resource "null_resource" "bin" {
+resource "null_resource" "server_bin" {
   count      = var.install.server == null ? 0 : 1
   depends_on = [system_file.server_bin]
   triggers = {
@@ -51,6 +51,44 @@ resource "system_file" "client_bin" {
   path   = "${var.install.client.bin_file_dir}/zli"
   source = var.install.client.bin_file_source
   mode   = 755
+}
+
+resource "system_file" "oras_tar" {
+  source = var.install.oras.tar_file_source
+  path   = var.install.oras.tar_file_path
+}
+
+resource "null_resource" "oras_bin" {
+  count      = var.install.oras == null ? 0 : 1
+  depends_on = [system_file.oras_tar]
+  triggers = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
+    file_dir = var.install.oras.bin_file_dir
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      # https://oras.land/docs/installation#linux
+      # https://www.man7.org/linux/man-pages/man1/tar.1.html
+      "sudo tar --verbose --extract --file=${system_file.oras_tar.path} --directory=${var.install.oras.bin_file_dir} --overwrite oras",
+      "sudo chmod 755 ${var.install.oras.bin_file_dir}/oras",
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "sudo rm -f ${self.triggers.file_dir}/oras",
+    ]
+  }
 }
 
 # prepare zot config dir

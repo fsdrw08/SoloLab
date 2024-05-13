@@ -27,6 +27,11 @@ variable "install" {
       bin_file_dir    = string
       bin_file_source = string
     }))
+    oras = optional(object({
+      tar_file_source = string
+      tar_file_path   = string
+      bin_file_dir    = string
+    }))
   })
 }
 

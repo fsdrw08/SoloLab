@@ -47,6 +47,11 @@ module "config_map" {
       bin_file_dir    = "/usr/bin"
       bin_file_source = "http://files.mgmt.sololab/releases/zli-linux-amd64-2.0.4"
     }
+    oras = {
+      tar_file_source = "http://files.mgmt.sololab/releases/oras_1.1.0_linux_amd64.tar.gz"
+      tar_file_path   = "/home/vyos/oras_1.1.0_linux_amd64.tar.gz"
+      bin_file_dir    = "/usr/local/bin"
+    }
   }
   config = {
     main = {
@@ -58,11 +63,11 @@ module "config_map" {
           search = {
             enable = true
             cve = {
-              updateInterval = "2h"
+              updateInterval = "168h"
               # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
               trivy = {
-                javadbrepository = "ghcr.io/aquasecurity/trivy-java-db" # zot.mgmt.sololab/aquasecurity/trivy-java-db
-                dbrepository     = "ghcr.io/aquasecurity/trivy-db"      # zot.mgmt.sololab/aquasecurity/trivy-db
+                javadbrepository = "zot.mgmt.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+                dbrepository     = "zot.mgmt.sololab/aquasecurity/trivy-db"      # ghcr.io/aquasecurity/trivy-db
               }
             }
           }
@@ -114,6 +119,8 @@ module "config_map" {
                   }
                 ]
                 defaultPolicy = ["read"]
+                # https://github.com/project-zot/zot/blob/main/examples/README.md#identity-based-authorization
+                anonymousPolicy = ["read"]
               }
             }
             adminPolicy = {
@@ -133,7 +140,7 @@ module "config_map" {
           gc = true
         }
         log = {
-          level = "debug"
+          level = "info"
         }
       })
     }

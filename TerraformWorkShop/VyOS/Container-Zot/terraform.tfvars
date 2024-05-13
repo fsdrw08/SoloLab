@@ -31,6 +31,9 @@ container = {
       "gid" = "100"
 
       "environment TZ value" = "Asia/Shanghai"
+      # https://github.com/project-zot/zot/issues/2298
+      # https://github.com/aquasecurity/trivy/issues/4169
+      "environment SSL_CERT_DIR value" = "/etc/zot/certs"
 
       "volume zot_config source"      = "/etc/zot"
       "volume zot_config destination" = "/etc/zot"
