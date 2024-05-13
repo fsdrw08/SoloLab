@@ -84,4 +84,14 @@ There are typically ways of updating a user's password in ldap:
     --baseDN ou=People,dc=root,dc=sololab \
     uid=admin \
     isMemberOf
+
+/opt/opendj/bin/ldapsearch \
+    --hostname localhost \
+    --port 1636 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword P@ssw0rd \
+    --useSSL \
+    --trustAll \
+    --baseDN ou=Groups,dc=root,dc=sololab \
+    cn="Directory Administrators"
 ```

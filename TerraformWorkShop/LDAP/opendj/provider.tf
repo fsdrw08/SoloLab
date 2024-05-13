@@ -2,7 +2,7 @@ terraform {
   required_providers {
     ldap = {
       source  = "l-with/ldap"
-      version = ">=0.5.6"
+      version = ">=0.8.1"
     }
   }
 }
