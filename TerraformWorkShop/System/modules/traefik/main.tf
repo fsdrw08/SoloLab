@@ -21,12 +21,11 @@ resource "system_file" "tar" {
 resource "null_resource" "bin" {
   depends_on = [system_file.tar]
   triggers = {
-    file_source = var.install.tar_file_source
-    file_dir    = var.install.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
+    file_dir = var.install.bin_file_dir
   }
   connection {
     type     = "ssh"
