@@ -54,16 +54,16 @@ resource "null_resource" "init" {
       EOT
     ]
   }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo rm -rf ${self.triggers.data_dirs}",
-    ]
-  }
   provisioner "file" {
     source      = local_file.keystore.filename
     destination = "/mnt/data/offline/others/opendj.jks"
   }
+  # provisioner "remote-exec" {
+  #   when = destroy
+  #   inline = [
+  #     "sudo rm -rf ${self.triggers.data_dirs}",
+  #   ]
+  # }
 }
 
 module "config_map" {
