@@ -27,6 +27,7 @@ data "ignition_config" "ignition" {
     data.ignition_file.hostname[count.index].rendered,
     data.ignition_file.disable_dhcp.rendered,
     data.ignition_file.eth0[count.index].rendered,
+    # data.ignition_file.hashicorp_repo.rendered,
     data.ignition_file.rpms.rendered,
     data.ignition_file.rootless_linger.rendered,
     data.ignition_file.rootless_podman_socket_tcp_service.rendered,
@@ -37,7 +38,7 @@ data "ignition_config" "ignition" {
     data.ignition_link.timezone.rendered,
     data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
     # if dont want to expose podman tcp socket, just comment below line
-    data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
+    # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
   ]
 }
 
@@ -59,9 +60,9 @@ resource "null_resource" "remote" {
     vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
-    host     = var.hyperv_host
-    user     = var.hyperv_user
-    password = sensitive(var.hyperv_password)
+    host     = var.hyperv.host
+    user     = var.hyperv.user
+    password = sensitive(var.hyperv.password)
   }
 
   connection {
@@ -95,18 +96,36 @@ resource "null_resource" "remote" {
   }
 }
 
+data "terraform_remote_state" "data_disk" {
+  backend = "pg"
+  config = {
+    conn_str    = "postgres://terraform:terraform@192.168.255.1/tfstate"
+    schema_name = "HyperV-SvcDisc-Disk-FCOS"
+  }
+}
+
+resource "terraform_data" "boot_disk" {
+  count = local.count
+  input = join("\\", [
+    var.vhd_dir,
+    local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}",
+    join(".", [
+      "boot",
+      element(
+        split(".", basename(var.source_disk)),
+      length(split(".", basename(var.source_disk))) - 1)
+    ])
+    ]
+  )
+}
+
 module "hyperv_machine_instance" {
   source     = "../modules/hyperv_instance2"
   depends_on = [null_resource.remote]
   count      = local.count
 
   boot_disk = {
-    path = join("\\", [
-      var.vhd_dir,
-      local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}",
-      join("", ["${var.vm_name}", ".vhdx"])
-      ]
-    )
+    path   = terraform_data.boot_disk[count.index].input
     source = var.source_disk
   }
 
@@ -115,12 +134,7 @@ module "hyperv_machine_instance" {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "0"
-      path = join("\\", [
-        var.vhd_dir,
-        local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}",
-        join("", ["${var.vm_name}", ".vhdx"])
-        ]
-      )
+      path                = terraform_data.boot_disk[count.index].input
     }
   ]
 
@@ -129,7 +143,7 @@ module "hyperv_machine_instance" {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "2"
-      path                = local.count <= 1 ? var.data_disk_path : var.data_disk_path[count.index]
+      path                = local.count <= 1 ? data.terraform_remote_state.data_disk.outputs.path : data.terraform_remote_state.data_disk.outputs.path[count.index]
     }
   ]
 
@@ -138,9 +152,9 @@ module "hyperv_machine_instance" {
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
-    memory_maximum_bytes = 8191475712
-    memory_minimum_bytes = 2147483648
-    memory_startup_bytes = 2147483648
+    memory_maximum_bytes = var.memory_maximum_bytes
+    memory_minimum_bytes = var.memory_minimum_bytes
+    memory_startup_bytes = var.memory_startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
     state                = "Off"
@@ -182,20 +196,18 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    network_adaptors = [
-      {
-        name        = "Internal Switch"
-        switch_name = "Internal Switch"
-      }
-    ]
+    network_adaptors = var.network_adaptors
 
   }
 }
 
 # execute kvpctl to put ignition file content to hyper-v kv
 resource "null_resource" "kvpctl" {
-  depends_on = [module.hyperv_machine_instance]
-  count      = local.count
+  depends_on = [
+    module.hyperv_machine_instance,
+    null_resource.remote
+  ]
+  count = local.count
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
@@ -204,9 +216,9 @@ resource "null_resource" "kvpctl" {
     vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
-    host     = var.hyperv_host
-    user     = var.hyperv_user
-    password = sensitive(var.hyperv_password)
+    host     = var.hyperv.host
+    user     = var.hyperv.user
+    password = sensitive(var.hyperv.password)
   }
 
   connection {
@@ -222,7 +234,7 @@ resource "null_resource" "kvpctl" {
 
   provisioner "remote-exec" {
     inline = [<<-EOT
-      Powershell -Command "$ignitionFile=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${var.vm_name} add-ign $ignitionFile"
+      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
     EOT
     ]
   }

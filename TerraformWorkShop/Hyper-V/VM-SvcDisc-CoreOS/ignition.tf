@@ -256,6 +256,7 @@ EOT
   }
 }
 
+# https://github.com/coreos/fedora-coreos-tracker/issues/681#issuecomment-974301872
 data "ignition_systemd_unit" "rpm_ostree" {
   name    = "rpm-ostree-install.service"
   enabled = true
@@ -320,35 +321,35 @@ data "ignition_directory" "user_config_containers_systemd" {
   gid  = 1001
 }
 
-# config rclone config
-data "ignition_directory" "rclone_conf_dir" {
-  path = "/home/podmgr/.config/rclone"
-  mode = 493 # oct 755 -> dec 493
-  uid  = 1001
-  gid  = 1001
-}
+# # config rclone config
+# data "ignition_directory" "rclone_conf_dir" {
+#   path = "/home/podmgr/.config/rclone"
+#   mode = 493 # oct 755 -> dec 493
+#   uid  = 1001
+#   gid  = 1001
+# }
 
-data "ignition_file" "rclone_conf" {
-  path      = "/home/podmgr/.config/rclone/rclone.conf"
-  mode      = 420 # oct 644 -> dec 420
-  overwrite = true
-  uid       = 1001
-  gid       = 1001
-  content {
-    content = <<EOT
-[minio]
-type = s3
-provider = Minio
-env_auth = false
-access_key_id = minio
-secret_access_key = miniosecret
-region = main
-endpoint = http://192.168.255.1:9000
-location_constraint =
-server_side_encryption =
-EOT
-  }
-}
+# data "ignition_file" "rclone_conf" {
+#   path      = "/home/podmgr/.config/rclone/rclone.conf"
+#   mode      = 420 # oct 644 -> dec 420
+#   overwrite = true
+#   uid       = 1001
+#   gid       = 1001
+#   content {
+#     content = <<EOT
+# [minio]
+# type = s3
+# provider = Minio
+# env_auth = false
+# access_key_id = minio
+# secret_access_key = miniosecret
+# region = main
+# endpoint = http://192.168.255.1:9000
+# location_constraint =
+# server_side_encryption =
+# EOT
+#   }
+# }
 
 
 # generate podman container and related systemd config with quadlet

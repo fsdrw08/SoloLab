@@ -1,19 +1,16 @@
-variable "hyperv_host" {
-  type    = string
-  default = "127.0.0.1"
-}
-
-variable "hyperv_port" {
-  type    = string
-  default = 5986
-}
-
-variable "hyperv_user" {
-  type = string
-}
-
-variable "hyperv_password" {
-  type = string
+variable "hyperv" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
+  default = {
+    host     = "127.0.0.1"
+    port     = 5986
+    user     = "root"
+    password = "P@ssw0rd"
+  }
 }
 
 variable "vm_name" {
@@ -31,9 +28,38 @@ variable "source_disk" {
   default = null
 }
 
-variable "data_disk_path" {
+variable "data_disk_ref" {
   type    = string
-  default = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\"
+  default = "null"
+}
+
+variable "network_adaptors" {
+  type = list(object({
+    name                = string
+    switch_name         = string
+    dynamic_mac_address = optional(bool)
+    static_mac_address  = optional(string)
+  }))
+}
+
+variable "enable_secure_boot" {
+  type    = string
+  default = "Off"
+}
+
+variable "memory_startup_bytes" {
+  type    = number
+  default = 1023410176
+}
+
+variable "memory_maximum_bytes" {
+  type    = number
+  default = 2147483648
+}
+
+variable "memory_minimum_bytes" {
+  type    = number
+  default = 1023410176
 }
 
 variable "fcos_timezone" {

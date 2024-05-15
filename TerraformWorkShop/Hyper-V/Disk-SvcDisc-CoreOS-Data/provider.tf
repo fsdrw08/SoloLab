@@ -2,27 +2,31 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.0.4"
+      version = ">=1.2.1"
     }
   }
-  backend "s3" {
-    bucket = "tfstate"                   # Name of the S3 bucket
-    key    = "Hyper-V/SvcDisc-FCOS-Data" # Name of the tfstate file
-
-    endpoints = {
-      s3 = "http://192.168.255.1:9000" # Minio endpoint
-    }
-
-    access_key = "minio" # Access and secret keys
-    secret_key = "miniosecret"
-
-    region                      = "main" # Region validation will be skipped
-    skip_credentials_validation = true   # Skip AWS related checks and validations
-    skip_metadata_api_check     = true
-    skip_region_validation      = true
-    use_path_style              = true
-    skip_requesting_account_id  = true
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    schema_name = "HyperV-SvcDisc-Disk-FCOS"
   }
+  # backend "s3" {
+  #   bucket = "tfstate"                   # Name of the S3 bucket
+  #   key    = "Hyper-V/SvcDisc-FCOS-Data" # Name of the tfstate file
+
+  #   endpoints = {
+  #     s3 = "http://192.168.255.1:9000" # Minio endpoint
+  #   }
+
+  #   access_key = "minio" # Access and secret keys
+  #   secret_key = "miniosecret"
+
+  #   region                      = "main" # Region validation will be skipped
+  #   skip_credentials_validation = true   # Skip AWS related checks and validations
+  #   skip_metadata_api_check     = true
+  #   skip_region_validation      = true
+  #   use_path_style              = true
+  #   skip_requesting_account_id  = true
+  # }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
