@@ -29,25 +29,25 @@ vyos_config_commands:
   # Interface
   - set interfaces ethernet eth0 address 'dhcp'
   - set interfaces ethernet eth0 description 'WAN'
-  - set interfaces ethernet eth1 address '${int_addr}/24'
-  - set interfaces ethernet eth1 description '${int_desc}'
+  - set interfaces ethernet eth1 address '192.168.255.1/24'
+  - set interfaces ethernet eth1 description 'MGMT'
   # Service
   # DHCP server for local network
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 start '${dhcp_start}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 stop '${dhcp_stop}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} name-server '${int_addr}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} default-router '${int_addr}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} domain-name 'sololab'
-  - set service dhcp-server shared-network-name ${int_desc} authoritative
-  - set service dhcp-server shared-network-name ${int_desc} ping-check
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 range 0 start '192.168.255.100'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 range 0 stop '192.168.255.200'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 name-server '192.168.255.1'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 default-router '192.168.255.1'
+  - set service dhcp-server shared-network-name MGMT subnet 192.168.255.0/24 domain-name 'sololab'
+  - set service dhcp-server shared-network-name MGMT authoritative
+  - set service dhcp-server shared-network-name MGMT ping-check
   - set service dhcp-server hostfile-update
   - set service dhcp-server host-decl-name
   # DNS
   - set service dns forwarding cache-size '0'
-  - set service dns forwarding listen-address '${int_addr}'
-  - set service dns forwarding allow-from '${int_cidr}'
-  - set service dns forwarding name-server '${dns_forward_1}'
-  - set service dns forwarding name-server '${dns_forward_2}'
+  - set service dns forwarding listen-address '192.168.255.1'
+  - set service dns forwarding allow-from '192.168.255.0/24'
+  - set service dns forwarding name-server '223.5.5.5'
+  - set service dns forwarding name-server '223.6.6.6'
   # ssh
   - set service ssh port '22'
   # import ca and cert for vyos api
@@ -57,42 +57,42 @@ vyos_config_commands:
   # config vyos api
   - set service https certificates ca-certificate 'sololab'
   - set service https certificates certificate 'vyos'
-  - set service https listen-address '${int_addr}'
+  - set service https listen-address '192.168.255.1'
   - set service https port '8443'
-  - set service https api keys id ${api_key_id} key '${api_key_content}'
+  - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
   # dns record for vyos api
-  - set system static-host-mapping host-name ${api_fqdn} inet '${int_addr}'
+  - set system static-host-mapping host-name vyos-api.mgmt.sololab inet '192.168.255.1'
   # load-balancing reverse-proxy for vyos api
-  - set load-balancing reverse-proxy service http listen-address '${int_addr}'
+  - set load-balancing reverse-proxy service http listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service http port '80'
   - set load-balancing reverse-proxy service http mode 'http'
-  # - set load-balancing reverse-proxy service https listen-address '${int_addr}'
+  # - set load-balancing reverse-proxy service https listen-address '192.168.255.1'
   # - set load-balancing reverse-proxy service https port '443'
   # - set load-balancing reverse-proxy service https mode 'http'
-  - set load-balancing reverse-proxy service tcp443 listen-address '${int_addr}'
+  - set load-balancing reverse-proxy service tcp443 listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service tcp443 port '443'
   - set load-balancing reverse-proxy service tcp443 mode 'tcp'
-  - set load-balancing reverse-proxy service tcp443 tcp-request inspect-delay '5000'
+  # - set load-balancing reverse-proxy service tcp443 tcp-request inspect-delay '5000'
   - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
-  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name '${api_fqdn}'
+  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.mgmt.sololab'
   - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
   - set load-balancing reverse-proxy backend vyos-api balance 'round-robin'
   - set load-balancing reverse-proxy backend vyos-api mode 'tcp'
-  - set load-balancing reverse-proxy backend vyos-api server vyos address '${int_addr}'
+  - set load-balancing reverse-proxy backend vyos-api server vyos address '192.168.255.1'
   - set load-balancing reverse-proxy backend vyos-api server vyos port '8443'
   # System
   # hostname
   - set system host-name 'vyos-lts'
   # auth config
   - set system login user vyos authentication plaintext-password 'vyos'
-  - set system login user vyos authentication public-keys vagrant key '${user_ssh_key}'
+  - set system login user vyos authentication public-keys vagrant key 'AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=='
   - set system login user vyos authentication public-keys vagrant type 'ssh-rsa'
   # name server
-  - set system name-server '${int_addr}'
+  - set system name-server '192.168.255.1'
   # ntp
-  - set system ntp server '${ntp_server}'
+  - set system ntp server 'cn.ntp.org.cn'
   # timezone
-  - set system time-zone '${time_zone}'
+  - set system time-zone 'Asia/Shanghai'
   # fix /dev/ttyS0: not a tty https://forum.vyos.io/t/dev-ttys0-not-a-tty/9642
   - delete system console device 'ttyS0'
 
@@ -116,13 +116,20 @@ write_files:
       set nat destination rule 10 inbound-interface name 'eth1'
       set nat destination rule 10 protocol 'tcp_udp'
       set nat destination rule 10 destination port '80,443'
-      set nat destination rule 10 source address '${int_cidr}'
-      set nat destination rule 10 translation address '${int_addr}'
+      set nat destination rule 10 source address '192.168.255.0/24'
+      set nat destination rule 10 translation address '192.168.255.1'
       set nat destination rule 10 translation port '7892'
 
 
       commit
       save
+  # override vyos haproxy config template, for tcp sni
+  # https://github.com/vyos/vyos-1x/blob/sagitta/data/templates/load-balancing/haproxy.cfg.j2
+  - path: /usr/share/vyos/templates/load-balancing/haproxy.cfg.j2
+    owner: root:root
+    permissions: "0644"
+    content: |
+      ${indent(6, haproxy_cfg)}
   - path: /usr/local/share/ca-certificates/sololab.crt
     owner: root:root
     permissions: "0644"

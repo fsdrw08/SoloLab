@@ -47,14 +47,6 @@ variable "enable_secure_boot" {
   default = "Off"
 }
 
-variable "cloudinit_nocloud" {
-  type = list(object({
-    content_source = string
-    content_vars   = map(string)
-    filename       = string
-  }))
-}
-
 variable "memory_startup_bytes" {
   type    = number
   default = 1023410176
@@ -68,4 +60,12 @@ variable "memory_maximum_bytes" {
 variable "memory_minimum_bytes" {
   type    = number
   default = 1023410176
+}
+
+variable "cloudinit_nocloud" {
+  type = list(object({
+    content_source = string
+    content_vars   = map(string)
+    filename       = string
+  }))
 }

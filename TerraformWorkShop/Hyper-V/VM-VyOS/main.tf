@@ -15,6 +15,7 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
+# for debug
 # output "int_ca_pem" {
 #   value = join("",
 #     slice(
@@ -88,7 +89,7 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
-          haproxy_cfg = file("${path.module}/cloudinit-tmpl/haproxy.cfg.j2")
+          # haproxy_cfg = file("${path.module}/cloudinit-tmpl/haproxy.cfg.j2")
         }
       ))
       filename = content.filename

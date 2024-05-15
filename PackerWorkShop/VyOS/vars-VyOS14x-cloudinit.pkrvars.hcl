@@ -1,7 +1,7 @@
 #iso_url=https://github.com/MattKobayashi/vyos-autobuild/releases/download/1.4.0-epa2/vyos-1.4.0-epa2-amd64.iso
-iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.4.0-epa2-amd64.iso"
+iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.4.0-epa3-amd64.iso"
 iso_checksum_type     = "sha256"
-iso_checksum          = "f6be5b35fe1796eb19bf70aa5035bcff488cc703e2b188baf4bc12ab6d55212a"
+iso_checksum          = "2A639ED06FAB6C0D254A765AD458224230A5470F7BBFC34730ED410E01AA9CAC"
 vm_name               = "packer-vyos140"
 configuration_version = "11.0"
 disk_size             = "128000"
@@ -18,6 +18,7 @@ ssh_password             = "vyos"
 provision_script_options = "-z false"
 // https://wiki.debian.org/CDDVD explanation for /dev/sr1
 boot_command = [
+  // https://github.com/vyos/vyos-build/blob/current/scripts/check-qemu-install
   // "<wait600><enter><wait2><enter><wait2><enter>",
   // vyos login
   "<wait60>vyos<enter>",
@@ -29,17 +30,25 @@ boot_command = [
   // Would you like to continue? (y/N):
   "<wait3>y<enter>",
   // What would you like to name this image? (Default: ...)
-  "<wait3>VyOS-140-epa2<enter>",
-  // Please enter a password for the "vyos" user (Default: vyos)
   "<wait3><enter>",
+  // Please enter a password for the "vyos" user
+  "<wait3>vyos<enter>",
+  // Please confirm password for the "vyos" user
+  "<wait3>vyos<enter>",
   // what console should be used by default? (K: KVM, S: Serial, U: USB-Serial)? (Default: K)
   "<wait3><enter>",
   // Which one should be used for installation? (Default: /dev/sda)
   "<wait3><enter>",
   // Installation will delete all data on the drive. Continue? [y/N]
   "<wait3>y<enter>",
-  // Would you like to use all free space on the drive? [Y/n]
+  // Would you like to use all the free space on the drive? [Y/n]
   "<wait3>y<enter>",
+  // https://github.com/vyos/vyos-1x/blob/c3c81dcc0a79c1ab1bc9a13c62565a69ee5550fa/src/op_mode/image_installer.py#L748
+  // the following config files are available for boot:
+  // 1. /opt/vyatta/etc/config/config.boot
+  // 2. /opt/vyatta/etc/config.boot.default
+  // Which file would you like as boot config? (Default: 1)
+  "<wait3><enter>",
   // The image installed successfully; please reboot now
   "<wait20>reboot<enter>",
   // Are you sure you want to reboot this system? [y/N]
