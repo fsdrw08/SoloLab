@@ -69,7 +69,7 @@ listener "tcp" {
 // This can be dynamically defined with a go-sockaddr template that is resolved at runtime.
 api_addr = "${api_addr}"
 // https://developer.hashicorp.com/vault/docs/concepts/ha#per-node-cluster-address
-// Note: When using the Integrated Storage backend, it is required to provide 
+// Note: When using the Integrated Storage backend(aka raft), it is required to provide 
 // cluster_addr to indicate the address and port to be used for communication 
 // between the nodes in the Raft cluster.
 // https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
