@@ -1,10 +1,14 @@
 # https://cloud.tencent.com/developer/article/1987762
 
-$projectPath = git rev-parse --show-toplevel
+# $projectPath = git rev-parse --show-toplevel
 # $mirrorPath = "$projectPath/TerraformWorkShop/terraform.d/mirror" 
 # "C:/Users/Public/Downloads/terraform.d/mirror" 
-$mirrorPath = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/mirror").Replace("\","/")
+$mirrorPathWin = Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/mirror"
+if (-not (Test-Path -Path $mirrorPathWin)) {
+  New-Item -ItemType Directory -Path $mirrorPathWin
+}
 
+$mirrorPath = $mirrorPathWin.Replace("\","/")
 $provider_installation_block = @"
 provider_installation {
   filesystem_mirror {
@@ -17,8 +21,12 @@ provider_installation {
 }
 "@
 
-$plugin_cache_dir = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache").Replace("\", "/")
+$plugin_cache_dirWin = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache").Replace("\", "/")
+if (-not (Test-Path -Path $plugin_cache_dirWin)) {
+  New-Item -ItemType Directory -Path (Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache")
+}
 
+$plugin_cache_dir = $plugin_cache_dirWin.Replace("\", "/")
 $TF_CLI_CONFIG_FILE = 
 @"
 $provider_installation_block
