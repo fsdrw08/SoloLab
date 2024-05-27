@@ -22,8 +22,8 @@ container = {
   }
   workload = {
     name        = "cockroach"
-    image       = "docker.io/cockroachdb/cockroach:v23.2.4"
-    local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_v23.2.4.tar"
+    image       = "docker.io/cockroachdb/cockroach:v23.2.5"
+    local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_v23.2.5.tar"
     others = {
       "memory" = "1024"
 
