@@ -5,12 +5,6 @@ variable "hyperv" {
     user     = string
     password = string
   })
-  default = {
-    host     = "127.0.0.1"
-    port     = 5986
-    user     = "root"
-    password = "P@ssw0rd"
-  }
 }
 
 variable "vm_name" {
@@ -68,4 +62,5 @@ variable "cloudinit_nocloud" {
     content_vars   = map(string)
     filename       = string
   }))
+  default = null
 }

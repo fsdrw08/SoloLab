@@ -13,7 +13,7 @@ EOF
 apt-get update
 
 # Install cloud-init
-apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq nfs-ganesha nfs-ganesha-vfs
+apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq yq nfs-ganesha nfs-ganesha-vfs 
 
 # stop and disable nfs-ganesha
 systemctl disable nfs-ganesha
@@ -33,8 +33,10 @@ cat <<EOF >>/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 datasource_list: [ NoCloud, ConfigDrive, None ]
 EOF
 
-# Update 10_vyos.cfg
-cp /mnt/10_vyos.cfg /etc/cloud/cloud.cfg.d/10_vyos.cfg
+# Update 10_vyos_current.cfg
+# this config add disk_setup and mounts in cloud_init_modules, in order to mount disk in vm
+# origin file: https://github.com/vyos/vyos-cloud-init/blob/current/config/cloud.cfg.d/10_vyos.cfg
+yq -iy '.cloud_init_modules += ["disk_setup", "mounts"]' /etc/cloud/cloud.cfg.d/10_vyos.cfg
 
 # run dpkg-reconfigure cloud-init
 dpkg-reconfigure -f noninteractive cloud-init

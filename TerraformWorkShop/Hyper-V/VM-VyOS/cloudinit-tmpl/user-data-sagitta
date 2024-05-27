@@ -82,7 +82,7 @@ vyos_config_commands:
   - set load-balancing reverse-proxy backend vyos-api server vyos port '8443'
   # System
   # hostname
-  - set system host-name 'vyos-lts'
+  - set system host-name '${local_hostname}'
   # auth config
   - set system login user vyos authentication plaintext-password 'vyos'
   - set system login user vyos authentication public-keys vagrant key '${user_ssh_key}'
