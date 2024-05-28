@@ -55,9 +55,14 @@ podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os
 # https://github.com/containers/skopeo/issues/394
 # https://github.com/containers/skopeo/blob/main/docs/skopeo.1.md#image-names
 $publicRegistry="quay.io"
-$privateRegistry="zot.mgmt.sololab"
 $image="cockpit/ws:316"
 $archive="cockpit_ws_316.tar"
+$privateRegistry="zot.mgmt.sololab"
+
+$publicRegistry="docker.io"
+$image="hashicorp/vault:1.16.2"
+$archive="hashicorp_vault_1.16.2.tar"
+$privateRegistry="zot.mgmt.sololab"
 skopeo copy --insecure-policy `
     --override-os=linux `
     --override-arch=amd64 `
