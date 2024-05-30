@@ -23,8 +23,8 @@ container = {
   }
   workload = {
     name        = "opendj"
-    image       = "docker.io/openidentityplatform/opendj:4.6.2"
-    local_image = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.2.tar"
+    image       = "docker.io/openidentityplatform/opendj:4.6.3"
+    local_image = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.3.tar"
     others = {
       "memory" = "1024"
 
