@@ -20,20 +20,43 @@ data "helm_template" "podman_kube" {
       data.terraform_remote_state.root_ca.outputs.int_ca_pem,
     ])
   }
-
   set {
     name  = "vault.tls.key"
     value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
   }
+  set {
+    name  = "vault.tls.ca"
+    value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
+  }
 }
 
-resource "system_file" "podman_kube" {
+resource "remote_file" "podman_kube" {
   path    = "${var.podman_kube.yaml_file_dir}/vault-aio.yaml"
   content = data.helm_template.podman_kube.manifest
+  conn {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = sensitive(var.vm_conn.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.conn[0].host
+    port     = self.conn[0].port
+    user     = self.conn[0].user
+    password = self.conn[0].password
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "systemctl --user daemon-reload",
+    ]
+  }
 }
 
 # # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
-resource "system_file" "podman_quadlet" {
+resource "remote_file" "podman_quadlet" {
+  depends_on = [remote_file.podman_kube]
   for_each = {
     for content in var.podman_quadlet.quadlet.file_contents : content.file_source => content
   }
@@ -50,8 +73,8 @@ resource "system_file" "podman_quadlet" {
 
 resource "null_resource" "podman_quadlet" {
   depends_on = [
-    system_file.podman_kube,
-    system_file.podman_quadlet
+    remote_file.podman_kube,
+    remote_file.podman_quadlet
   ]
   triggers = {
     service_name = var.podman_quadlet.service.name
@@ -81,17 +104,36 @@ resource "null_resource" "podman_quadlet" {
   }
 }
 
-# # resource "system_service_systemd" "podman_vault" {
-# #   depends_on = [
-# #     system_file.podman_vault_kube,
-# #     system_file.podman_vault_yaml
-# #   ]
-# #   name   = "vault"
-# #   status = "started"
-# #   scope  = "user"
-# # }
+module "quadlet_restart" {
+  depends_on = [null_resource.podman_quadlet]
+  source     = "../modules/systemd_path_user"
+  vm_conn = {
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
+  }
+  systemd_path_unit = {
+    content = templatefile("${path.root}/podman-vault/restart.path", {
+      PathModified = [
+        "${remote_file.podman_kube.path}",
+      ]
+    })
+    path = "/home/podmgr/.config/systemd/user/vault_restart.path"
+  }
+  systemd_service_unit = {
+    content = templatefile("${path.root}/podman-vault/restart.service", {
+      AssertPathExists = "/run/user/1001/systemd/generator/vault.service"
+      target_service   = "vault.service"
+    })
+    path = "/home/podmgr/.config/systemd/user/vault_restart.service"
+  }
+}
 
-# resource "system_file" "podman_vault_consul" {
-#   path    = "/etc/consul.d/vault_consul.hcl"
-#   content = file("./podman-vault/vault_consul.hcl")
-# }
+resource "vyos_static_host_mapping" "host_mapping" {
+  depends_on = [
+    null_resource.podman_quadlet,
+  ]
+  host = "vault.infra.sololab"
+  ip   = "192.168.255.20"
+}

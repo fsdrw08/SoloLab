@@ -6,6 +6,7 @@ Documentation=https://developer.hashicorp.com/vault/docs
 # Point to the yaml file in the same directory
 Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
 
 [Install]
 WantedBy=default.target

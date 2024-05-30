@@ -13,11 +13,46 @@ vault:
     repository: hashicorp/vault
     tag: 1.16.2
 
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 300
+    timeoutSeconds: 5
+    failureThreshold: 1
+    successThreshold: 1
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          if [ ! -f $VAULT_OPERATOR_SECRETS_PATH ]; then
+            echo "no unseal key file"
+          else
+            VAULT_OPERATOR_SECRETS=$(cat $VAULT_OPERATOR_SECRETS_PATH)
+            VAULT_UNSEAL_KEYS=$(echo $VAULT_OPERATOR_SECRETS)
+            if [ "$VAULT_UNSEAL_KEYS" -le 2 ]; then
+              echo "no unseal key in the file"
+            else
+              for VAULT_UNSEAL_KEY in $VAULT_UNSEAL_KEYS; do
+                vault operator unseal $VAULT_UNSEAL_KEY
+              done
+            fi
+          fi
+
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
   ## ref: https://developer.hashicorp.com/vault/docs/configuration
   ## ref: https://developer.hashicorp.com/vault/tutorials/operations/configure-vault#config
   configFiles:
+    main:
+      api_addr: "https://vault.infra.sololab:8200"
+      cluster_addr: "https://vault.infra.sololab:8201"
+    storage:
+      storage:
+        raft:
+          path: /vault/file
+          node_id: raft_node_1
+        file: null
     listeners:
       listener:
         - tcp:
@@ -27,6 +62,7 @@ vault:
             # https://github.com/hashicorp/vault/blob/2718994242f94df3dc90215b2ecbc5d4198d9e3c/website/content/docs/platform/k8s/helm/examples/standalone-tls.mdx#L191
             tls_cert_file: /vault/userconfig/vault-server-tls/tls.crt
             tls_key_file: /vault/userconfig/vault-server-tls/tls.key
+            tls_client_ca_file: /vault/userconfig/vault-server-tls/ca.crt
             tls_disable_client_certs: true
 
   ## @param vault.podAnnotations Annotations for %%MAIN_CONTAINER_NAME%% pods
@@ -35,3 +71,30 @@ vault:
   ##
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  extraEnvVars:
+    - name: SKIP_CHOWN
+      value: "true"
+    - name: SKIP_SETCAP
+      value: "true"
+    - name: VAULT_ADDR
+      value: https://127.0.0.1:8200
+    - name: VAULT_CACERT
+      value: /vault/userconfig/vault-server-tls/ca.crt
+    - name: VAULT_OPERATOR_SECRETS_PATH
+      value: "/vault/file/vault_operator_secrets"
+
+  autoUnseal:
+    enabled: true
+    env:
+      - name: VAULT_ADDR
+        value: https://127.0.0.1:8200
+      - name: VAULT_OPERATOR_SECRETS_JSON_PATH
+        value: "/vault/unseal/vault_operator_secrets"
+
+volumePermissions:
+  enabled: true
+  image:
+    registry: zot.mgmt.sololab
+    repository: hashicorp/vault
+    tag: 1.16.2

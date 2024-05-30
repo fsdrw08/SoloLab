@@ -8,9 +8,13 @@ terraform {
       source  = "hashicorp/helm"
       version = ">= 2.13.2"
     }
-    system = {
-      source  = "neuspaces/system"
-      version = ">=0.4.0"
+    remote = {
+      source  = "tenstad/remote"
+      version = ">=0.1.3"
+    }
+    vyos = {
+      source  = "Foltik/vyos"
+      version = ">=0.3.3"
     }
   }
   backend "pg" {
@@ -19,11 +23,16 @@ terraform {
   }
 }
 
-provider "system" {
-  ssh {
+provider "remote" {
+  conn {
     host     = var.vm_conn.host
     port     = var.vm_conn.port
     user     = var.vm_conn.user
     password = var.vm_conn.password
   }
+}
+
+provider "vyos" {
+  url = "https://vyos-api.mgmt.sololab"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

@@ -20,8 +20,9 @@ podman_quadlet = {
         file_source = "./podman-vault/vault.kube"
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
-          yaml       = "vault-aio.yaml"
-          PodmanArgs = "--tls-verify=false"
+          yaml          = "vault-aio.yaml"
+          PodmanArgs    = "--tls-verify=false"
+          KubeDownForce = "true"
         }
       },
       # {
