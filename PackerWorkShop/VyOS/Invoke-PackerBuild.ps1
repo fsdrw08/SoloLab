@@ -24,33 +24,23 @@ oscdimg
 
 # Build images
 if ($Ready -ne $false) {
-  # Convert dos format to unix format
-  # "dos2unix"
-  # Get-ChildItem -Path $PSScriptRoot -Recurse -Filter "*.sh" `
-  #   | Select-Object -ExpandProperty VersionInfo `
-  #   | Select-Object -ExpandProperty filename `
-  #   | ForEach-Object {
-  #     #[io.file]::WriteAllText($_, ((Get-Content -Raw  $_) -replace "`r`n","`n"))
-  #     dos2unix $_
-  #   }
 
   # Get Start Time
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file = "$PSScriptRoot\tmpl-hv_g2-VyOS.pkr.hcl"
   $var_file = "$PSScriptRoot\vars-VyOS$VyOSVersion.pkrvars.hcl"
   $machine = "VyOS$VyOSVersion-g2"
   $packer_log = 0
   
-  if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
-    Write-Output "Template and var file found"
+  if (Test-Path -Path "$var_file") {
+    Write-Output "var file found"
     Write-Output "Building: $machine"
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
       $env:PACKER_LOG = $packer_log
-      packer validate -var-file="$var_file" "$template_file"
+      packer validate -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer validation failed, exiting."
@@ -59,7 +49,7 @@ if ($Ready -ne $false) {
     try {
       $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force -var-file="$var_file" "$template_file"
+      packer build --force -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer build failed, exiting."

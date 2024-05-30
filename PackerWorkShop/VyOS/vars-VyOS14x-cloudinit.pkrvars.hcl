@@ -29,7 +29,6 @@ vlan_id                  = ""
 vagrantfile_template     = "./vagrant-VyOS14x.rb"
 ssh_username             = "vyos"
 ssh_password             = "vyos"
-provision_script_options = "-z false"
 // https://wiki.debian.org/CDDVD explanation for /dev/sr1
 boot_command = [
   // https://github.com/vyos/vyos-build/blob/current/scripts/check-qemu-install
