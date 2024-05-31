@@ -13,31 +13,12 @@ vault:
     repository: hashicorp/vault
     tag: 1.16.2
 
-  startupProbe:
-    enabled: true
-    initialDelaySeconds: 10
-    periodSeconds: 300
-    timeoutSeconds: 5
-    failureThreshold: 1
-    successThreshold: 1
+  livenessProbe:
     exec:
       command:
         - /bin/sh
-        - -c
-        - |
-          if [ ! -f $VAULT_OPERATOR_SECRETS_PATH ]; then
-            echo "no unseal key file"
-          else
-            VAULT_OPERATOR_SECRETS=$(cat $VAULT_OPERATOR_SECRETS_PATH)
-            VAULT_UNSEAL_KEYS=$(echo $VAULT_OPERATOR_SECRETS)
-            if [ "$VAULT_UNSEAL_KEYS" -le 2 ]; then
-              echo "no unseal key in the file"
-            else
-              for VAULT_UNSEAL_KEY in $VAULT_UNSEAL_KEYS; do
-                vault operator unseal $VAULT_UNSEAL_KEY
-              done
-            fi
-          fi
+        - -ec
+        - "wget --no-check-certificate -q -O /dev/stdout https://127.0.0.1:8200/v1/sys/health?standbyok=true"
 
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
