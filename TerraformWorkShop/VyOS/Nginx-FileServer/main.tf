@@ -34,10 +34,7 @@ module "nginx_restart" {
   }
   systemd_path_unit = {
     content = templatefile("${path.module}/nginx/restart.path", {
-      PathModified = []
-      PathChanged = [
-        "/etc/nginx/conf.d"
-      ]
+      PathModified = ["/etc/nginx/conf.d/fileserver.conf"]
     })
     path = "/lib/systemd/system/nginx_restart.path"
   }
@@ -65,25 +62,18 @@ resource "system_file" "config" {
   mode  = "644"
 }
 
-resource "vyos_static_host_mapping" "files" {
-  host = "files.mgmt.sololab"
-  ip   = "192.168.255.1"
+resource "vyos_config_block_tree" "reverse_proxy" {
+  depends_on = [system_file.config]
+  for_each   = var.reverse_proxy
+  path       = each.value.path
+  configs    = each.value.configs
 }
 
-# https://serverfault.com/questions/1078467/how-to-force-a-specific-routing-based-on-sni-in-haproxy/1078563#1078563
-resource "vyos_config_block_tree" "lb_svc_http_files" {
-  path = "load-balancing reverse-proxy service http rule 10"
-  configs = {
-    "domain-name" = "files.mgmt.sololab"
-    "set backend" = "files"
-  }
-}
-
-resource "vyos_config_block_tree" "lb_be_files" {
-  path = "load-balancing reverse-proxy backend files"
-  configs = {
-    "mode"                = "http"
-    "server vyos address" = "192.168.255.1"
-    "server vyos port"    = "8080"
-  }
+resource "vyos_static_host_mapping" "host_mapping" {
+  depends_on = [
+    system_file.config,
+    vyos_config_block_tree.reverse_proxy,
+  ]
+  host = var.dns_record.host
+  ip   = var.dns_record.ip
 }

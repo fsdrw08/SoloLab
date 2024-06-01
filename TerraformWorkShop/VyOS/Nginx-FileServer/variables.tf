@@ -6,3 +6,17 @@ variable "vm_conn" {
     password = string
   })
 }
+
+variable "reverse_proxy" {
+  type = map(object({
+    path    = string
+    configs = map(string)
+  }))
+}
+
+variable "dns_record" {
+  type = object({
+    host = string
+    ip   = string
+  })
+}

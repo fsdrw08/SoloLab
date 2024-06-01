@@ -5,9 +5,6 @@ Description="A unit configuration file whose name ends in \".path\" encodes info
 Documentation=https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html
 
 [Path]
-%{ for path in PathChanged ~}
-PathChanged=${path}
-%{ endfor }
 %{ for path in PathModified ~}
 PathModified=${path}
 %{ endfor }
