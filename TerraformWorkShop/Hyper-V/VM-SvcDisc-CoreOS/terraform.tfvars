@@ -7,7 +7,7 @@ hyperv = {
 
 vm_name       = "SvcDisc-FCOS"
 vhd_dir       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fedora-coreos-40.20240416.3.1-hyperv.x86_64.vhdx"
+source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fedora-coreos-hyperv.x86_64.vhdx"
 data_disk_ref = "../Disk-SvcDisc-Data/terraform.tfstate"
 # data_disk_path = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\SvcDisc-FCOS-Data.vhdx"
 network_adaptors = [
