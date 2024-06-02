@@ -11,45 +11,44 @@ resource "system_file" "systemd_service" {
   content = var.systemd_service_unit.content
 }
 
-# resource "system_service_systemd" "traefik_restart_service" {
-#   depends_on = [
-#     null_resource.traefik_bin,
-#     system_file.traefik_config_static,
-#     system_file.traefik_restart_service
-#   ]
-#   # name = split(".", system_file.traefik_restart_service[each.key].basename)[0]
-#   name    = trimsuffix(system_file.traefik_restart_service.basename, ".service")
-#   enabled = var.enabled
-# }
-
-resource "null_resource" "systemd_path_control" {
+resource "system_systemd_unit" "systemd_path" {
   depends_on = [
     system_file.systemd_path,
+    system_file.systemd_service
   ]
-  triggers = {
-    unit_name = system_file.systemd_path.basename
-    host      = var.vm_conn.host
-    port      = var.vm_conn.port
-    user      = var.vm_conn.user
-    password  = sensitive(var.vm_conn.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sleep 5",
-      "sudo systemctl enable ${self.triggers.unit_name} --now",
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo systemctl disable ${self.triggers.unit_name} --now",
-    ]
-  }
+  type    = "path"
+  name    = trimsuffix(system_file.systemd_path.basename, ".path")
+  enabled = var.systemd_path_unit.enabled
 }
+
+# resource "null_resource" "systemd_path_control" {
+#   depends_on = [
+#     system_file.systemd_path,
+#   ]
+#   triggers = {
+#     unit_name = system_file.systemd_path.basename
+#     host      = var.vm_conn.host
+#     port      = var.vm_conn.port
+#     user      = var.vm_conn.user
+#     password  = sensitive(var.vm_conn.password)
+#   }
+#   connection {
+#     type     = "ssh"
+#     host     = self.triggers.host
+#     port     = self.triggers.port
+#     user     = self.triggers.user
+#     password = self.triggers.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "sleep 5",
+#       "sudo systemctl enable ${self.triggers.unit_name} --now",
+#     ]
+#   }
+#   provisioner "remote-exec" {
+#     when = destroy
+#     inline = [
+#       "sudo systemctl disable ${self.triggers.unit_name} --now",
+#     ]
+#   }
+# }

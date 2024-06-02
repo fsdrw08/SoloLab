@@ -36,7 +36,8 @@ module "nginx_restart" {
     content = templatefile("${path.module}/nginx/restart.path", {
       PathModified = ["/etc/nginx/conf.d/fileserver.conf"]
     })
-    path = "/lib/systemd/system/nginx_restart.path"
+    path    = "/lib/systemd/system/nginx_restart.path"
+    enabled = true
   }
   systemd_service_unit = {
     content = templatefile("${path.module}/nginx/restart.service", {

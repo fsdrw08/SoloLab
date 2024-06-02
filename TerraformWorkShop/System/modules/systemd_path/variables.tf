@@ -11,6 +11,7 @@ variable "systemd_path_unit" {
   type = object({
     path    = string
     content = string
+    enabled = bool
   })
 }
 

@@ -6,7 +6,7 @@ terraform {
     }
     system = {
       source  = "neuspaces/system"
-      version = ">=0.4.0"
+      version = ">=0.5.0"
     }
     jks = {
       source  = "fhke/jks"
