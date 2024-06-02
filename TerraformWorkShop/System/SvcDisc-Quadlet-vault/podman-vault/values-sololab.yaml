@@ -11,14 +11,7 @@ vault:
   image:
     registry: zot.mgmt.sololab
     repository: hashicorp/vault
-    tag: 1.16.2
-
-  livenessProbe:
-    exec:
-      command:
-        - /bin/sh
-        - -ec
-        - "wget --no-check-certificate -q -O /dev/stdout https://127.0.0.1:8200/v1/sys/health?standbyok=true"
+    tag: 1.16.3
 
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
@@ -62,20 +55,13 @@ vault:
       value: https://127.0.0.1:8200
     - name: VAULT_CACERT
       value: /vault/userconfig/vault-server-tls/ca.crt
-    - name: VAULT_OPERATOR_SECRETS_PATH
-      value: "/vault/file/vault_operator_secrets"
 
   autoUnseal:
     enabled: true
-    env:
-      - name: VAULT_ADDR
-        value: https://127.0.0.1:8200
-      - name: VAULT_OPERATOR_SECRETS_JSON_PATH
-        value: "/vault/unseal/vault_operator_secrets"
 
 volumePermissions:
   enabled: true
   image:
     registry: zot.mgmt.sololab
     repository: hashicorp/vault
-    tag: 1.16.2
+    tag: 1.16.3

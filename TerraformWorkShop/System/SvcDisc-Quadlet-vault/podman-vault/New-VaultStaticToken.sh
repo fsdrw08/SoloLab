@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs
-VAULT_OPERATOR_SECRETS_JSON_PATH=${VAULT_OPERATOR_SECRETS_JSON_PATH}
+VAULT_OPERATOR_SECRETS_PATH=${VAULT_OPERATOR_SECRETS_PATH}
 VAULT_ADDR=${VAULT_ADDR}
 STATIC_TOKEN=${STATIC_TOKEN}
 
@@ -44,8 +44,8 @@ function wait_ready {
 function authenticate {
     # Authenticate Vault
     printf "Authenticating Vault...\n"
-    VAULT_OPERATOR_SECRETS=$(cat $VAULT_OPERATOR_SECRETS_JSON_PATH)
-    VAULT_TOKEN=$(echo $VAULT_OPERATOR_SECRETS | jq -r .root_token)
+    # VAULT_OPERATOR_SECRETS=$(cat $VAULT_OPERATOR_SECRETS_JSON_PATH)
+    VAULT_TOKEN=$(cat $VAULT_OPERATOR_SECRETS_PATH | grep "Initial Root Token" | awk '{print $NF}')
     export VAULT_TOKEN=$VAULT_TOKEN
 }
 
