@@ -60,18 +60,18 @@ $archive="cockpit_ws_316.tar"
 $privateRegistry="zot.mgmt.sololab"
 
 $publicRegistry="docker.io"
-$image="hashicorp/vault:1.16.2"
-$archive="hashicorp_vault_1.16.2.tar"
+$image="hashicorp/vault:1.16.3"
+$archive="hashicorp_vault_1.16.3.tar"
 $privateRegistry="zot.mgmt.sololab"
 skopeo copy --insecure-policy `
     --override-os=linux `
     --override-arch=amd64 `
     docker://$publicRegistry/$image `
-    oci-archive:$env:USERPROFILE/Downloads/images/$archive
+    oci-archive:$env:PUBLIC/Downloads/containers/$archive
 
 skopeo copy --insecure-policy `
     --dest-creds=admin:P@ssw0rd `
-    oci-archive:$env:USERPROFILE/Downloads/images/$archive `
+    oci-archive:$env:PUBLIC/Downloads/containers/$archive `
     docker://$privateRegistry/$image
 
 
@@ -79,7 +79,7 @@ skopeo copy --insecure-policy `
 
 # https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
 oras login -u admin zot.mgmt.sololab
-Set-Location -Path $env:USERPROFILE/Downloads/images/
+Set-Location -Path $env:PUBLIC/Downloads/containers/
 # trivy-db
 # Download the trivy-db
 oras pull ghcr.io/aquasecurity/trivy-db:2

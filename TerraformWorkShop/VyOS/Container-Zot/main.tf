@@ -44,12 +44,14 @@ module "config_map" {
   install = {
     server = null
     client = {
-      bin_file_dir    = "/usr/bin"
-      bin_file_source = "http://files.mgmt.sololab/releases/zli-linux-amd64-2.0.4"
+      bin_file_dir = "/usr/bin"
+      # https://github.com/project-zot/zot/releases
+      bin_file_source = "http://files.mgmt.sololab/bin/zli-linux-amd64"
     }
     oras = {
-      tar_file_source = "http://files.mgmt.sololab/releases/oras_1.1.0_linux_amd64.tar.gz"
-      tar_file_path   = "/home/vyos/oras_1.1.0_linux_amd64.tar.gz"
+      # https://github.com/oras-project/oras/releases
+      tar_file_source = "http://files.mgmt.sololab/bin/oras_1.2.0_linux_amd64.tar.gz"
+      tar_file_path   = "/home/vyos/oras_1.2.0_linux_amd64.tar.gz"
       bin_file_dir    = "/usr/local/bin"
     }
   }
