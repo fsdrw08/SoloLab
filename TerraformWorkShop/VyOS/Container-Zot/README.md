@@ -18,7 +18,7 @@ $platform="linux/amd64"
 $fromRegistry="docker.io"
 $imageInfo="hashicorp/consul:1.18.1"
 $saveTarget="/mnt/data/offline/images/hashicorp_consul_1.18.1.oci.tar"
-# $outputDir="C:\Users\WindomWu\Downloads\oras"
+
 podman pull $fromRegistry/$imageInfo
 podman save --format oci-archive --output $saveTarget $fromRegistry/$imageInfo
 
@@ -79,7 +79,7 @@ skopeo copy --insecure-policy `
 
 # https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
 oras login -u admin zot.mgmt.sololab
-Set-Location -Path $env:PUBLIC/Downloads/containers/
+Set-Location -Path $env:PUBLIC/Downloads/containers/trivy
 # trivy-db
 # Download the trivy-db
 oras pull ghcr.io/aquasecurity/trivy-db:2
