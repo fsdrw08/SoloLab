@@ -16,6 +16,10 @@ data "ignition_config" "ignition" {
     data.ignition_directory.user_config_systemd.rendered,
     data.ignition_directory.user_config_systemd_user.rendered,
     data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
+    data.ignition_directory.user_config_systemd_user_haltTargetWants.rendered,
+    data.ignition_directory.user_config_systemd_user_poweroffTargetWants.rendered,
+    data.ignition_directory.user_config_systemd_user_shutdownTargetWants.rendered,
+    data.ignition_directory.user_config_systemd_user_rebootTargetWants.rendered,
     data.ignition_directory.user_config_containers.rendered,
     data.ignition_directory.user_config_containers_systemd.rendered,
   ]
@@ -37,6 +41,10 @@ data "ignition_config" "ignition" {
   links = [
     data.ignition_link.timezone.rendered,
     data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
+    data.ignition_link.user_stop_container_before_halt.rendered,
+    data.ignition_link.user_stop_container_before_poweroff.rendered,
+    data.ignition_link.user_stop_container_before_shutdown.rendered,
+    data.ignition_link.user_stop_container_before_reboot.rendered,
     # if dont want to expose podman tcp socket, just comment below line
     # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
   ]
