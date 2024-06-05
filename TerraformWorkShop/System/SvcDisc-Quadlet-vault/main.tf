@@ -78,6 +78,7 @@ resource "null_resource" "podman_quadlet" {
   ]
   triggers = {
     service_name = var.podman_quadlet.service.name
+    quadlet_md5  = md5(join("\n", [for quadlet in remote_file.podman_quadlet : quadlet.content]))
     host         = var.vm_conn.host
     port         = var.vm_conn.port
     user         = var.vm_conn.user

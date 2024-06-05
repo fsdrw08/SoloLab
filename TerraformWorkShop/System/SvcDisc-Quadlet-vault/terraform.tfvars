@@ -22,17 +22,9 @@ podman_quadlet = {
         vars = {
           yaml          = "vault-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "true"
+          KubeDownForce = "false"
         }
       },
-      # {
-      #   file_source = "./podman-vault/vault.image"
-      #   # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-      #   vars = {
-      #     Image     = "zot.mgmt.sololab/hashicorp/vault:1.16.2"
-      #     TLSVerify = "false"
-      #   }
-      # }
     ]
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }
