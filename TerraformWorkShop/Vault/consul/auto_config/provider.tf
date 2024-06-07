@@ -6,31 +6,14 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 4.1.0"
+      version = ">= 4.2.0"
     }
-    # local = {
-    #   source  = "hashicorp/local"
-    #   version = ">= 2.2.3"
-    # }
-    # tls = {
-    #   source  = "hashicorp/tls"
-    #   version = ">= 4.0.4"
-    # }
   }
 
-  # backend "consul" {
-  #   address      = "consul.service.consul"
-  #   scheme       = "http"
-  #   path         = "tfstate/vault/oidc"
-  #   access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-  # }
-}
-
-
-locals {
-  VAULT_ADDR      = "vault.infra.sololab:8200"
-  VAULT_TOKEN     = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    schema_name = "Vault-Consul-auto_config"
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
@@ -43,8 +26,7 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address = "https://${local.VAULT_ADDR}"
-  token   = local.VAULT_TOKEN
-  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
-  skip_tls_verify = local.skip_tls_verify
+  address         = var.vault_conn.address
+  token           = var.vault_conn.token
+  skip_tls_verify = var.vault_conn.skip_tls_verify
 }

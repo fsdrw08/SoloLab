@@ -1,3 +1,22 @@
+variable "vault_conn" {
+  type = object({
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}
+
+variable "ldap_conn" {
+  type = object({
+    host          = string
+    port          = string
+    tls           = bool
+    tls_insecure  = bool
+    bind_user     = string
+    bind_password = string
+  })
+}
+
 variable "vault_ldap_auth_backend" {
   description = "Provides a resource for managing an LDAP auth backend within Vault."
   # https://developer.hashicorp.com/vault/docs/auth/ldap

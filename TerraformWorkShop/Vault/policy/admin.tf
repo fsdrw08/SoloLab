@@ -8,7 +8,7 @@ resource "vault_policy" "admin" {
 }
 
 resource "vault_identity_group" "admin" {
-  name                       = "admin"
+  name                       = "Local-Admin"
   type                       = "internal"
   external_policies          = true
   external_member_group_ids  = true

@@ -5,20 +5,14 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 4.1.0"
+      version = ">= 4.2.0"
     }
-    # ldap = {
-    #   source  = "l-with/ldap"
-    #   version = ">=0.5.3"
-    # }
   }
 
-  # backend "consul" {
-  #   address      = "consul.service.consul"
-  #   scheme       = "http"
-  #   path         = "tfstate/vault/policy"
-  #   access_token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-  # }
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    schema_name = "Vault-Policy"
+  }
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
@@ -33,17 +27,7 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address         = "https://vault.infra.sololab:8200"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
+  address         = var.vault_conn.address
+  token           = var.vault_conn.token
+  skip_tls_verify = var.vault_conn.skip_tls_verify
 }
-
-# provider "ldap" {
-#   host         = "lldap.service.consul"
-#   port         = "636"
-#   tls          = true
-#   tls_insecure = true
-
-#   bind_user     = "cn=admin,ou=people,dc=root,dc=sololab"
-#   bind_password = "P@ssw0rd"
-# }
