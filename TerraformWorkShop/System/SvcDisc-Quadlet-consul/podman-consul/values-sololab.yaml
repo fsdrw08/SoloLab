@@ -1,0 +1,77 @@
+consul:
+  ## hashicorp consul image
+  ## ref: https://hub.docker.com/r/hashicorp/consul/tags/
+  ## @param consul.image.registry consul image registry
+  ## @param consul.image.repository consul image repository
+  ## @param consul.image.tag consul image tag (immutable tags are recommended)
+  ## @param consul.image.digest consul image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param consul.image.pullPolicy consul image pull policy
+  ## @param consul.image.pullSecrets consul image pull secrets
+  ##
+  image:
+    registry: zot.mgmt.sololab
+    repository: hashicorp/consul
+    tag: 1.18.2
+  containerPorts:
+    - name: server
+      containerPort: 8300
+      hostPort: 8300
+      protocol: TCP
+    - name: serf_lan-tcp
+      containerPort: 8301
+      hostPort: 8301
+      protocol: TCP
+    - name: serf_lan-udp
+      containerPort: 8301
+      hostPort: 8301
+      protocol: UDP
+    - name: http
+      containerPort: 8500
+      hostPort: 8500
+      protocol: TCP
+    - name: https
+      containerPort: 8501
+      hostPort: 8501
+      protocol: TCP
+    - name: grpc_tls
+      containerPort: 8503
+      hostPort: 8503
+      protocol: TCP
+    - name: dns-udp
+      containerPort: 8600
+      hostPort: 8600
+      protocol: UDP
+    - name: dns-tcp
+      containerPort: 8600
+      hostPort: 8600
+      protocol: TCP
+  ## @param consul.configFiles
+  configFiles:
+    general:
+      ports:
+        https: 8501
+      auto_config:
+        authorization:
+          enabled: true
+          static:
+
+    tls:
+      tls:
+        defaults:
+          ca_file: /consul/config/certs/ca.crt
+          cert_file: /consul/config/certs/server.crt
+          key_file: /consul/config/certs/server.key
+          verify_incoming: false
+          verify_outgoing: true
+        internal_rpc:
+          verify_server_hostname: true
+  ## @param consul.command Override default container command (useful when using custom images)
+  ## ref: https://github.com/hashicorp/consul/blob/main/.release/docker/docker-entrypoint.sh#L75
+  ##
+  command:
+    - "/bin/sh"
+    - "-c"
+    - |
+      sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=$(getent hosts host.containers.internal | awk '\''{print $1}'\'') \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
+      chmod +x /tmp/docker-entrypoint.sh
+      exec /tmp/docker-entrypoint.sh "$0" "$@"

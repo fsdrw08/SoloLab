@@ -6,7 +6,7 @@ data "terraform_remote_state" "root_ca" {
 }
 
 data "helm_template" "podman_kube" {
-  name  = "vault"
+  name  = var.podman_kube.helm.name
   chart = var.podman_kube.helm.chart
 
   values = [
@@ -14,24 +14,24 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name = "vault.tls.crt"
+    name = "vault.tls.content.\"tls\\.crt\""
     value = join("", [
       lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
       data.terraform_remote_state.root_ca.outputs.int_ca_pem,
     ])
   }
   set {
-    name  = "vault.tls.key"
+    name  = "vault.tls.content.\"tls\\.key\""
     value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
   }
   set {
-    name  = "vault.tls.ca"
+    name  = "vault.tls.content.\"ca\\.crt\""
     value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
   }
 }
 
 resource "remote_file" "podman_kube" {
-  path    = "${var.podman_kube.yaml_file_dir}/vault-aio.yaml"
+  path    = var.podman_kube.yaml_file_path
   content = data.helm_template.podman_kube.manifest
   conn {
     host     = var.vm_conn.host
@@ -105,7 +105,7 @@ resource "null_resource" "podman_quadlet" {
   }
 }
 
-module "quadlet_restart" {
+module "container_restart" {
   depends_on = [null_resource.podman_quadlet]
   source     = "../modules/systemd_path_user"
   vm_conn = {
@@ -115,27 +115,27 @@ module "quadlet_restart" {
     password = var.vm_conn.password
   }
   systemd_path_unit = {
-    content = templatefile("${path.root}/podman-vault/restart.path", {
-      PathModified = [
-        "${remote_file.podman_kube.path}",
-      ]
-    })
-    path = "/home/podmgr/.config/systemd/user/vault_restart.path"
+    content = templatefile(
+      var.container_restart.systemd_path_unit.content.templatefile,
+      var.container_restart.systemd_path_unit.content.vars
+    )
+    path = var.container_restart.systemd_path_unit.path
   }
   systemd_service_unit = {
-    content = templatefile("${path.root}/podman-vault/restart.service", {
-      AssertPathExists = "/run/user/1001/systemd/generator/vault.service"
-      target_service   = "vault.service"
-    })
-    path = "/home/podmgr/.config/systemd/user/vault_restart.service"
+    content = templatefile(
+      var.container_restart.systemd_service_unit.content.templatefile,
+      var.container_restart.systemd_service_unit.content.vars
+    )
+    path = var.container_restart.systemd_service_unit.path
   }
 }
+
 
 resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
     null_resource.podman_quadlet,
   ]
-  host = "vault.infra.sololab"
+  host = "vault.mgmt.sololab"
   ip   = "192.168.255.20"
 }
 
@@ -145,7 +145,7 @@ locals {
       script_path = "./podman-vault/New-VaultStaticToken.sh"
       vars = {
         VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-        VAULT_ADDR                  = "https://vault.infra.sololab:8200"
+        VAULT_ADDR                  = "https://vault.mgmt.sololab:8200"
         STATIC_TOKEN                = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
       }
     }

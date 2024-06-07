@@ -19,7 +19,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
-    schema_name = "System-SvcDisc-Quadlet-Vault"
+    schema_name = "System-SvcDisc-Quadlet-Consul"
   }
 }
 

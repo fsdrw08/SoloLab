@@ -10,10 +10,11 @@ variable "vm_conn" {
 variable "podman_kube" {
   type = object({
     helm = object({
+      name   = string
       chart  = string
       values = string
     })
-    yaml_file_dir = string
+    yaml_file_path = string
   })
 }
 
@@ -30,6 +31,25 @@ variable "podman_quadlet" {
         vars = map(string)
       }))
       file_path_dir = string
+    })
+  })
+}
+
+variable "container_restart" {
+  type = object({
+    systemd_path_unit = object({
+      content = object({
+        templatefile = string
+        vars         = map(string)
+      })
+      path = string
+    })
+    systemd_service_unit = object({
+      content = object({
+        templatefile = string
+        vars         = map(string)
+      })
+      path = string
     })
   })
 }

@@ -6,7 +6,7 @@ data "terraform_remote_state" "root_ca" {
 }
 
 data "helm_template" "podman_kube" {
-  name  = "vault"
+  name  = var.podman_kube.helm.name
   chart = var.podman_kube.helm.chart
 
   values = [
@@ -14,24 +14,28 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name = "vault.tls.crt"
+    name  = "consul.configFiles.encryption.encrypt"
+    value = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+  }
+  set {
+    name = "consul.tls.content.\"server\\.crt\""
     value = join("", [
-      lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
+      lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
       data.terraform_remote_state.root_ca.outputs.int_ca_pem,
     ])
   }
   set {
-    name  = "vault.tls.key"
-    value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
+    name  = "consul.tls.content.\"server\\.key\""
+    value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
   }
   set {
-    name  = "vault.tls.ca"
+    name  = "consul.tls.content.\"ca\\.crt\""
     value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
   }
 }
 
 resource "remote_file" "podman_kube" {
-  path    = "${var.podman_kube.yaml_file_dir}/vault-aio.yaml"
+  path    = var.podman_kube.yaml_file_path
   content = data.helm_template.podman_kube.manifest
   conn {
     host     = var.vm_conn.host
@@ -60,7 +64,6 @@ resource "remote_file" "podman_quadlet" {
   for_each = {
     for content in var.podman_quadlet.quadlet.file_contents : content.file_source => content
   }
-  # path = format("${var.podman_quadlet.quadlet.file_path_dir}/%s", basename("${each.value.file_source}"))
   path = join("/", [
     var.podman_quadlet.quadlet.file_path_dir,
     basename("${each.value.file_source}")
@@ -105,7 +108,7 @@ resource "null_resource" "podman_quadlet" {
   }
 }
 
-module "quadlet_restart" {
+module "container_restart" {
   depends_on = [null_resource.podman_quadlet]
   source     = "../modules/systemd_path_user"
   vm_conn = {
@@ -115,19 +118,18 @@ module "quadlet_restart" {
     password = var.vm_conn.password
   }
   systemd_path_unit = {
-    content = templatefile("${path.root}/podman-vault/restart.path", {
-      PathModified = [
-        "${remote_file.podman_kube.path}",
-      ]
-    })
-    path = "/home/podmgr/.config/systemd/user/vault_restart.path"
+    content = templatefile(
+      var.container_restart.systemd_path_unit.content.templatefile,
+      var.container_restart.systemd_path_unit.content.vars
+    )
+    path = var.container_restart.systemd_path_unit.path
   }
   systemd_service_unit = {
-    content = templatefile("${path.root}/podman-vault/restart.service", {
-      AssertPathExists = "/run/user/1001/systemd/generator/vault.service"
-      target_service   = "vault.service"
-    })
-    path = "/home/podmgr/.config/systemd/user/vault_restart.service"
+    content = templatefile(
+      var.container_restart.systemd_service_unit.content.templatefile,
+      var.container_restart.systemd_service_unit.content.vars
+    )
+    path = var.container_restart.systemd_service_unit.path
   }
 }
 
@@ -135,49 +137,49 @@ resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
     null_resource.podman_quadlet,
   ]
-  host = "vault.infra.sololab"
+  host = "consul.mgmt.sololab"
   ip   = "192.168.255.20"
 }
 
-locals {
-  post_process = {
-    New-VaultStaticToken = {
-      script_path = "./podman-vault/New-VaultStaticToken.sh"
-      vars = {
-        VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-        VAULT_ADDR                  = "https://vault.infra.sololab:8200"
-        STATIC_TOKEN                = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-      }
-    }
-  }
-}
+# locals {
+#   post_process = {
+#     New-VaultStaticToken = {
+#       script_path = "./podman-vault/New-VaultStaticToken.sh"
+#       vars = {
+#         VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
+#         VAULT_ADDR                  = "https://vault.infra.sololab:8200"
+#         STATIC_TOKEN                = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+#       }
+#     }
+#   }
+# }
 
-resource "null_resource" "post_process" {
-  depends_on = [vyos_static_host_mapping.host_mapping]
-  for_each   = local.post_process
-  triggers = {
-    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      templatefile("${each.value.script_path}", "${each.value.vars}")
-    ]
-  }
-  # provisioner "remote-exec" {
-  #   when = destroy
-  #   inline = [
-  #     "sudo rm -f ${self.triggers.file_source}/consul",
-  #   ]
-  # }
-}
+# resource "null_resource" "post_process" {
+#   depends_on = [vyos_static_host_mapping.host_mapping]
+#   for_each   = local.post_process
+#   triggers = {
+#     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+#     host           = var.vm_conn.host
+#     port           = var.vm_conn.port
+#     user           = var.vm_conn.user
+#     password       = sensitive(var.vm_conn.password)
+#   }
+#   connection {
+#     type     = "ssh"
+#     host     = self.triggers.host
+#     port     = self.triggers.port
+#     user     = self.triggers.user
+#     password = self.triggers.password
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       templatefile("${each.value.script_path}", "${each.value.vars}")
+#     ]
+#   }
+#   # provisioner "remote-exec" {
+#   #   when = destroy
+#   #   inline = [
+#   #     "sudo rm -f ${self.triggers.file_source}/consul",
+#   #   ]
+#   # }
+# }
