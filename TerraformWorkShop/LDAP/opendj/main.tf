@@ -21,6 +21,17 @@ resource "ldap_entry" "group_admins" {
   })
 }
 
+resource "ldap_entry" "group_sso_allow" {
+  dn = "cn=sso_allow,ou=Groups,${var.base_dn}"
+  data_json = jsonencode({
+    objectClass = ["top", "groupofuniquenames"]
+    ou          = ["Groups"]
+    uniqueMember = [
+      "uid=admin,ou=People,${var.base_dn}",
+    ]
+  })
+}
+
 resource "ldap_entry" "svc_readonly" {
   dn = "uid=readonly,ou=Services,${var.base_dn}"
   data_json = jsonencode({
