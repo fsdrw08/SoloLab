@@ -63,6 +63,11 @@ $publicRegistry="docker.io"
 $image="hashicorp/vault:1.16.3"
 $archive="hashicorp_vault_1.16.3.tar"
 $privateRegistry="zot.mgmt.sololab"
+
+$publicRegistry="docker.io"
+$image="hashicorp/consul:1.18.2"
+$archive="hashicorp_consul_1.18.2.tar"
+$privateRegistry="zot.mgmt.sololab"
 skopeo copy --insecure-policy `
     --override-os=linux `
     --override-arch=amd64 `
