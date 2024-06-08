@@ -23,7 +23,7 @@ vault_ldap_auth_backend = {
   binddn      = "uid=readonly,ou=Services,dc=root,dc=sololab"
   bindpass    = "P@ssw0rd"
   userdn      = "ou=People,dc=root,dc=sololab"
-  userattr    = "uid"
+  userattr    = "mail"
   userfilter  = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(isMemberOf=cn=sso_allow,ou=Groups,dc=root,dc=sololab))"
   groupdn     = "ou=Groups,dc=root,dc=sololab"
   groupattr   = "cn"

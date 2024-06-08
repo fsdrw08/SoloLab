@@ -37,7 +37,7 @@ resource "vault_identity_group_policies" "admin" {
 # }
 
 data "vault_identity_entity" "admin" {
-  entity_name = "admin"
+  entity_name = "admin@mail.sololab"
 }
 
 resource "vault_identity_group_member_entity_ids" "admin" {

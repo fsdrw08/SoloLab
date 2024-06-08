@@ -63,7 +63,7 @@ resource "vault_identity_entity" "user" {
   #   for user in var.ldap_vault_entities.users : user => user
   # }
   for_each = {
-    for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).uid[0] => entry
+    for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
   }
   name              = each.key
   external_policies = true
@@ -71,7 +71,7 @@ resource "vault_identity_entity" "user" {
 
 resource "vault_identity_entity_alias" "alias" {
   for_each = {
-    for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).uid[0] => entry
+    for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
   }
   name           = each.key
   mount_accessor = vault_ldap_auth_backend.ldap.accessor
