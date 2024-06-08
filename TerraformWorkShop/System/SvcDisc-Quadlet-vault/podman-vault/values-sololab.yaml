@@ -19,8 +19,8 @@ vault:
   ## ref: https://developer.hashicorp.com/vault/tutorials/operations/configure-vault#config
   configFiles:
     main:
-      api_addr: "https://vault.infra.sololab:8200"
-      cluster_addr: "https://vault.infra.sololab:8201"
+      api_addr: "https://vault.mgmt.sololab:8200"
+      cluster_addr: "https://vault.mgmt.sololab:8201"
     storage:
       storage:
         raft:

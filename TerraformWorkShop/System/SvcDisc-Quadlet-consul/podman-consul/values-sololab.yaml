@@ -50,11 +50,31 @@ consul:
     general:
       ports:
         https: 8501
+      # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       auto_config:
         authorization:
           enabled: true
           static:
-
+            oidc_discovery_url: https://vault.mgmt.sololab:8200/v1/identity/oidc
+            oidc_discovery_ca_cert: ## set via helm value
+            bound_issuer: https://vault.mgmt.sololab:8200/v1/identity/oidc
+            bound_audiences:
+              - consul-cluster-dc1
+            claim_mappings:
+              /consul/hostname: node_name
+            claim_assertions:
+              - value.node_name == "${node}"
+    acl:
+      acl:
+        enabled: true
+        default_policy: deny
+        enable_token_persistence: true
+        tokens:
+          initial_management: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
+    encryption:
+      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
     tls:
       tls:
         defaults:

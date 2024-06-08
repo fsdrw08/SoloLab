@@ -14,8 +14,8 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name  = "consul.configFiles.encryption.encrypt"
-    value = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+    name  = "consul.configFiles.general.auto_config.authorization.static.oidc_discovery_ca_cert"
+    value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
   }
   set {
     name = "consul.tls.content.\"server\\.crt\""
@@ -147,7 +147,7 @@ resource "vyos_static_host_mapping" "host_mapping" {
 #       script_path = "./podman-vault/New-VaultStaticToken.sh"
 #       vars = {
 #         VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-#         VAULT_ADDR                  = "https://vault.infra.sololab:8200"
+#         VAULT_ADDR                  = "https://vault.mgmt.sololab:8200"
 #         STATIC_TOKEN                = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
 #       }
 #     }
