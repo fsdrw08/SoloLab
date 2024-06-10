@@ -74,6 +74,16 @@ $image="library/traefik:v3.0.1"
 $archive="library_traefik_v3.0.1.tar"
 $privateRegistry="zot.mgmt.sololab"
 
+$publicRegistry="docker.io"
+$image="traefik/whoami:v1.10.2"
+$archive="traefik_whoami_v1.10.2.tar"
+$privateRegistry="zot.mgmt.sololab"
+
+$publicRegistry="docker.io"
+$image="coredns/coredns:1.11.1"
+$archive="coredns_coredns_1.11.1tar"
+$privateRegistry="zot.mgmt.sololab"
+
 skopeo copy --insecure-policy `
     --override-os=linux `
     --override-arch=amd64 `
