@@ -29,7 +29,7 @@ interface-name=eth0
 
 [ipv4]
 method=manual
-addresses=192.168.255.2${count.index + 0}
+address1=192.168.255.2${count.index + 0}/24
 gateway=192.168.255.1
 dns=192.168.255.1
 EOT
