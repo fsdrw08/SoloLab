@@ -130,6 +130,27 @@ certs = [
       ]
     }
   },
+  # traefik
+  {
+    name = "traefik"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = ["traefik.mgmt.sololab"]
+      subject = {
+        common_name  = "traefik.mgmt.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # opendj
   {
     name = "opendj"
@@ -274,26 +295,6 @@ certs = [
       ]
     }
   },
-  # {
-  #   name = "traefik"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = ["traefik.service.consul"]
-  #     subject = {
-  #       common_name  = "traefik.service.consul"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
-  #     ]
-  #   }
-  # },
   # {
   #   name = "minio"
   #   key = {
