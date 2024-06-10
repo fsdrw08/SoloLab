@@ -14,18 +14,18 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name = "vault.tls.content.\"tls\\.crt\""
+    name = "vault.tls.contents.\"tls\\.crt\""
     value = join("", [
       lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
       data.terraform_remote_state.root_ca.outputs.int_ca_pem,
     ])
   }
   set {
-    name  = "vault.tls.content.\"tls\\.key\""
+    name  = "vault.tls.contents.\"tls\\.key\""
     value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
   }
   set {
-    name  = "vault.tls.content.\"ca\\.crt\""
+    name  = "vault.tls.contents.\"ca\\.crt\""
     value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
   }
 }
@@ -39,6 +39,7 @@ resource "remote_file" "podman_kube" {
     user     = var.vm_conn.user
     password = sensitive(var.vm_conn.password)
   }
+
   connection {
     type     = "ssh"
     host     = self.conn[0].host
