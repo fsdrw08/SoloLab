@@ -1,0 +1,13 @@
+[Unit]
+Description="CoreDNS"
+Documentation=https://coredns.io/manual/toc/
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+Network=${Network}
+
+[Install]
+WantedBy=default.target

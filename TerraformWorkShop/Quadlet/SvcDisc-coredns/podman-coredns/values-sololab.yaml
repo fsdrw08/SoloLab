@@ -1,0 +1,49 @@
+coredns:
+  image:
+    registry: zot.mgmt.sololab
+    repository: coredns/coredns
+    tag: 1.11.1
+  containerPorts:
+    - name: dns_tcp
+      containerPort: 53
+      hostPort: 53
+      hostIP: 192.168.255.20
+      protocol: TCP
+    - name: dns_udp
+      containerPort: 53
+      hostPort: 53
+      hostIP: 192.168.255.20
+      protocol: UDP
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  servers:
+    - zones:
+        - zone: .
+      port: 53
+      plugins:
+        - name: errors
+        # Serves a /health endpoint on :8080, required for livenessProbe
+        - name: health
+          configBlock: |-
+            lameduck 5s
+        - name: forward
+          parameters: . /etc/resolv.conf
+        - name: cache
+          parameters: 30
+        # The loop plugin will send a random probe query to ourselves and will then keep track of how many times we see it.
+        # If we see it more than twice, we assume CoreDNS has seen a forwarding loop and we halt the process.
+        - name: loop
+        - name: log
+        # This plugin allows automatic reload of a changed Corefile.
+        # To enable automatic reloading of zone file changes, use the auto plugin.
+        - name: reload
+        - name: file
+          parameters: /etc/coredns/mgmt.sololab.db mgmt.sololab
+  zoneFiles:
+    - filename: mgmt.sololab.db
+      domain: mgmt.sololab
+      contents: |
+        mgmt.sololab.   IN SOA ns.mgmt.sololab. admin.james.sololab. 2024061341 7200 3600 1209600 3600
+        mgmt.sololab.   IN NS  ns1.mgmt.sololab.
+        *.mgmt.sololab. IN A   192.168.255.20
