@@ -7,12 +7,12 @@ coredns:
     - name: dns_tcp
       containerPort: 53
       hostPort: 53
-      hostIP: 192.168.255.20
+      hostIP: "{{ .Values.coredns.hostIP }}"
       protocol: TCP
     - name: dns_udp
       containerPort: 53
       hostPort: 53
-      hostIP: 192.168.255.20
+      hostIP: "{{ .Values.coredns.hostIP }}"
       protocol: UDP
   extraEnvVars:
     - name: TZ
@@ -46,4 +46,4 @@ coredns:
       contents: |
         mgmt.sololab.   IN SOA ns.mgmt.sololab. admin.james.sololab. 2024061341 7200 3600 1209600 3600
         mgmt.sololab.   IN NS  ns1.mgmt.sololab.
-        *.mgmt.sololab. IN A   192.168.255.20
+        *.mgmt.sololab. IN A  {{ .Values.coredns.hostIP }}

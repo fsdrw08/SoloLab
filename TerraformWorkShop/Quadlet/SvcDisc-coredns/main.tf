@@ -13,6 +13,10 @@ data "helm_template" "podman_kube" {
     "${file(var.podman_kube.helm.values)}"
   ]
 
+  set {
+    name  = "coredns.hostIP"
+    value = "192.168.255.20"
+  }
 }
 
 resource "remote_file" "podman_kube" {
