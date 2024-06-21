@@ -13,7 +13,10 @@ $projectPath = git rev-parse --show-toplevel
 terraform providers mirror (Join-Path -Path $env:PUBLIC -ChildPath "Downloads\terraform.d\mirror")
 ```
 
-1. run terraform init
+3. Ensure have permission to create symlink in windows
+ref: https://github.com/hashicorp/terraform/blob/1714729f8730d2184b9c529768c56f37e3913ec0/internal/providercache/package_install.go#L229
+
+4. run terraform init
 ```powershell
 terraform init --plugin-dir (Join-Path -Path $projectPath -ChildPath ".terraform.d/mirror/registry.terraform.io/")
 ```

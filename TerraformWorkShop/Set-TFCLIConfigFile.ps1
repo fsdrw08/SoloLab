@@ -2,12 +2,13 @@
 
 # $projectPath = git rev-parse --show-toplevel
 # $mirrorPath = "$projectPath/TerraformWorkShop/terraform.d/mirror" 
-# "C:/Users/Public/Downloads/terraform.d/mirror" 
+# set up terraform provider mirror dir "C:/Users/Public/Downloads/terraform.d/mirror" 
 $mirrorPathWin = Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/mirror"
 if (-not (Test-Path -Path $mirrorPathWin)) {
   New-Item -ItemType Directory -Path $mirrorPathWin
 }
 
+# put the mirror dir var into the tf config block
 $mirrorPath = $mirrorPathWin.Replace("\","/")
 $provider_installation_block = @"
 provider_installation {
@@ -26,6 +27,7 @@ if (-not (Test-Path -Path $plugin_cache_dirWin)) {
   New-Item -ItemType Directory -Path (Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache")
 }
 
+# prepare the tf cli config file
 $plugin_cache_dir = $plugin_cache_dirWin.Replace("\", "/")
 $TF_CLI_CONFIG_FILE = 
 @"
@@ -34,6 +36,7 @@ plugin_cache_dir = "$plugin_cache_dir"
 disable_checkpoint = true
 "@
 
+# put the tf cli config file into $env:APPDATA\terraform.rc
 # https://developer.hashicorp.com/terraform/cli/config/config-file#locations
 $TF_CLI_CONFIG_FILE | Out-File $(Join-Path -Path $env:APPDATA -ChildPath "terraform.rc") -Verbose
 
