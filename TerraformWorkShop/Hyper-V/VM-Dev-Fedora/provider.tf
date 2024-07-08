@@ -9,6 +9,10 @@ terraform {
       version = "2.4.2"
     }
   }
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    schema_name = "HyperV-Dev-Fedora-VM"
+  }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs

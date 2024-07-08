@@ -8,7 +8,7 @@ hyperv = {
 
 vm_name       = "Dev-Fedora"
 vhd_dir       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-fedora39\\Virtual Hard Disks\\packer-fedora39-g2.vhdx"
+source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-fedora40\\Virtual Hard Disks\\packer-fedora40-g2.vhdx"
 data_disk_ref = "../Disk-Dev-Fedora-Data/terraform.tfstate"
 
 network_adaptors = [
@@ -29,13 +29,13 @@ cloudinit_nocloud = [
   {
     content_source = "./cloudinit-tmpl/meta-data"
     content_vars = {
-      instance_id    = "iid-dev-Fedora_20240420"
+      instance_id    = "iid-dev-Fedora_20240707"
       local_hostname = "Dev-Fedora"
     }
     filename = "meta-data"
   },
   {
-    content_source = "./cloudinit-tmpl/user-data-39"
+    content_source = "./cloudinit-tmpl/user-data-40"
     content_vars = {
       null = null
     }

@@ -1,4 +1,4 @@
-variable "provider_hyperv" {
+variable "hyperv" {
   type = object({
     user     = string
     password = string

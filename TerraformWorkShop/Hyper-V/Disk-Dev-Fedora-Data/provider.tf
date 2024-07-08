@@ -5,6 +5,10 @@ terraform {
       version = ">=1.2.1"
     }
   }
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    schema_name = "HyperV-Dev-Fedora-Disk"
+  }
   # backend "s3" {
   #   bucket = "tfstate"                 # Name of the S3 bucket
   #   key    = "Hyper-V/Dev-Fedora-Data" # Name of the tfstate file
@@ -27,13 +31,13 @@ terraform {
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.provider_hyperv.user
-  password = var.provider_hyperv.password
-  host     = var.provider_hyperv.host
-  port     = var.provider_hyperv.port
+  user     = var.hyperv.user
+  password = var.hyperv.password
+  host     = var.hyperv.host
+  port     = var.hyperv.port
   https    = true
   insecure = true
-  use_ntlm = true
+  # use_ntlm = true
   # tls_server_name = ""
   # cacert_path     = ""
   # cert_path       = ""

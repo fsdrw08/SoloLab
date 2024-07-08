@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('37', '38', '39')]
+  [ValidateSet('37', '38', '39','40')]
   [int16]
   $FedoraVersion
 )
@@ -23,19 +23,18 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file = "$PSScriptRoot\tmpl-hv_g2-fedora.pkr.hcl"
   $var_file = "$PSScriptRoot\vars-fedora$FedoraVersion.pkrvars.hcl"
   $machine = "Fedora $FedoraVersion"
   $packer_log = 0
   
-  if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
+  if (Test-Path -Path "$var_file") {
     Write-Output "Template and var file found"
     Write-Output "Building: $machine"
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
     try {
       $env:PACKER_LOG = $packer_log
-      packer validate -var-file="$var_file" "$template_file"
+      packer validate -var-file="$var_file" .
     }
     catch {
       Write-Output "Packer validation failed, exiting."
