@@ -56,7 +56,7 @@ data "terraform_remote_state" "root_ca" {
 
 module "cloudinit_nocloud_iso" {
   source   = "../modules/cloudinit_nocloud_iso3"
-  iso_name = "cloud-init"
+  iso_name = "cloud-init-${var.vm_name}"
   files = [
     for content in var.cloudinit_nocloud : {
       content = templatefile(content.content_source, merge(content.content_vars,
