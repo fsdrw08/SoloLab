@@ -76,7 +76,7 @@ data "terraform_remote_state" "data_disk" {
   backend = "pg"
   config = {
     conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
-    schema_name = "HyperV-Dev-Fedora-VM"
+    schema_name = "HyperV-Dev-Fedora-Disk"
   }
 }
 

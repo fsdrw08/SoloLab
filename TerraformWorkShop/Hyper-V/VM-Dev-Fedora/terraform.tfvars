@@ -45,7 +45,7 @@ cloudinit_nocloud = [
     content_source = "./cloudinit-tmpl/network-config"
     content_vars = {
       "interface"    = "eth0"
-      "addresses4"   = "192.168.255.20/24"
+      "addresses4"   = "192.168.255.30/24"
       "gateway4"     = "192.168.255.1"
       "ns_addresses" = "192.168.255.1"
     }
