@@ -87,7 +87,24 @@ consul:
           verify_server_hostname: true
   ## @param consul.command Override default container command (useful when using custom images)
   ## ref: https://github.com/hashicorp/consul/blob/main/.release/docker/docker-entrypoint.sh#L75
+  ## this command is used to set the advertise ip to host ip when consul start
+  ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
+  ## before:
+  ## set -- consul agent \
+  ##   -data-dir="$CONSUL_DATA_DIR" \
+  ##   -config-dir="$CONSUL_CONFIG_DIR" \
+  ##   $CONSUL_BIND \
+  ##   $CONSUL_CLIENT \
+  ##   "$@"
   ##
+  ## after:
+  ## set -- consul agent \
+  ##   -data-dir="$CONSUL_DATA_DIR" \
+  ##   -config-dir="$CONSUL_CONFIG_DIR" \
+  ##   $CONSUL_BIND \
+  ##   -advertise=<host ip> \
+  ##   $CONSUL_CLIENT \
+  ##   "$@"
   command:
     - "/bin/sh"
     - "-c"
