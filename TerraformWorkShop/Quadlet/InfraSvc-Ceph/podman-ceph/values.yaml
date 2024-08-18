@@ -1,0 +1,48 @@
+ceph:
+  config:
+    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ##
+    enabled: true
+    ## @param ceph.config.path set config file location
+    ##
+    path: /tmp/ceph.conf
+  mon:
+    ## @param ceph.mon.enabled enabled ceph mon daemon container
+    ## ref: https://github.com/ceph/ceph-container/tree/main/src/daemon#deploy-a-monitor
+    ##
+    enabled: true
+    ## ceph monitor image
+    ## ref: https://quay.io/repository/ceph/daemon?tab=tags
+    ## @param ceph.mon.image.registry %%MAIN_CONTAINER%% image registry
+    ## @param ceph.mon.image.repository %%MAIN_CONTAINER%% image repository
+    ## @param ceph.mon.image.tag %%MAIN_CONTAINER%% image tag (immutable tags are recommended)
+    ## @param ceph.mon.image.digest %%MAIN_CONTAINER%% image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+    ## @param ceph.mon.image.pullPolicy %%MAIN_CONTAINER%% image pull policy
+    ## @param ceph.mon.image.pullSecrets %%MAIN_CONTAINER%% image pull secrets
+    ##
+    image:
+      registry: zot.mgmt.sololab
+      repository: ceph/daemon
+      tag: latest-main
+      digest: ""
+      ## Specify a imagePullPolicy
+      ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+      ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+      ##
+      pullPolicy: IfNotPresent
+    ## @param ceph.mon.command Override default container command (useful when using custom images)
+    ## ref: https://github.com/ceph/ceph-container/blob/main/src/daemon/Dockerfile#L59
+    ##
+    command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        sed -e "s/^mon_host.*$/mon_host = \"$(getent hosts host.containers.internal | awk '{print $1}')\"/" {{ .Values.ceph.config.path }} > /etc/ceph/ceph.conf
+        exec /opt/ceph-container/bin/entrypoint.sh
+
+  ## @param ceph.podAnnotations Annotations for %%MAIN_CONTAINER_NAME%% pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ##
+  # podAnnotations:
+  # io.podman.annotations.userns: keep-id:uid=167,gid=167

@@ -1,0 +1,13 @@
+[Unit]
+Description="Ceph"
+Documentation=https://github.com/ceph/ceph-container/blob/main/src/daemon/README.md
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+Network=host
+
+[Install]
+WantedBy=default.target

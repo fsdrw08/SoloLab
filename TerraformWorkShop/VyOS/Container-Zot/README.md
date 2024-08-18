@@ -84,6 +84,11 @@ $image="coredns/coredns:1.11.1"
 $archive="coredns_coredns_1.11.1tar"
 $privateRegistry="zot.mgmt.sololab"
 
+$publicRegistry="quay.io"
+$image="ceph/daemon:latest-main"
+$archive="ceph_daemon.latest-main.tar"
+$privateRegistry="zot.mgmt.sololab"
+
 skopeo copy --insecure-policy `
     --override-os=linux `
     --override-arch=amd64 `
