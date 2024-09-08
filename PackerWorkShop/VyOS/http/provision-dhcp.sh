@@ -10,5 +10,10 @@ set interfaces ethernet eth0 address dhcp
 set interfaces ethernet eth0 description WAN
 
 set system name-server 223.5.5.5
+
+commit
+set interfaces ethernet eth0 disable
+commit
+delete interfaces ethernet eth0 disable
 commit
 save

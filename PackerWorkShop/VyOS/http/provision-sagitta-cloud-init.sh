@@ -1,22 +1,24 @@
 #!/bin/bash
 # ref: https://github.com/vyos/vyos-vm-images/blob/07825901d1ebb483ac6edc39e0a4c224fad82638/roles/install-cloud-init/tasks/main.yml
+# https://dev.packages.vyos.net/
 # Put debian.list
 touch /etc/apt/sources.list.d/debian.list
 cat <<EOF >>/etc/apt/sources.list.d/debian.list
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
 deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
-deb http://dev.packages.vyos.net/repositories/current current main
+deb https://rolling-packages.vyos.net/current current main
 EOF
 
 # apt-get update
 apt-get update
 
 # Install cloud-init
-apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq yq nfs-ganesha nfs-ganesha-vfs 
+# apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq yq nfs-ganesha nfs-ganesha-vfs 
+apt-get install -t current -y cloud-init cloud-utils ifupdown jq yq
 
 # stop and disable nfs-ganesha
-systemctl disable nfs-ganesha
+# systemctl disable nfs-ganesha
 
 # apt-get clean
 apt-get clean
