@@ -38,6 +38,9 @@ resource "null_resource" "load_image" {
                 sudo podman load --input ${var.workload.local_image}
             else
                 sudo podman pull ${var.workload.image}
+                if [ -d $(dirname "${var.workload.local_image}") ]; then
+                  sudo mkdir -p $(dirname "${var.workload.local_image}")
+                fi
                 sudo podman save -o ${var.workload.local_image} ${var.workload.image}
                 # echo "pull and save the target image to ${var.workload.local_image} first"
                 # echo "sudo podman save -o ${var.workload.local_image} ${var.workload.image} first"

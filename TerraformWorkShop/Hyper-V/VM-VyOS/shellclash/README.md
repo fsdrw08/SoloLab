@@ -35,7 +35,7 @@ clash
 ```
 1. config clash
 - 1 路由设备配置局域网透明代理 -> 是否开启公网访问Dashboard面板及socks服务？ 0 
-    -> 是否导入配置文件？0 -> 立即启动clash服务？0 -> 发现可用的内核文件： /tmp/clash-linux-amd64-pre 
+    -> 是否导入配置文件？0 -> 立即启动clash服务？0 -> 发现可用的内核文件： /tmp/clash-linux-amd64-meta 
     是否加载？ 1
 - 2 clash功能设置 -> 1 切换Clash运行模式: -> 7 Nft混合：使用nft_tproxy转发
 - 2 clash功能设置 -> 6 设置本机代理服务:    未开启   ————使本机流量经过clash内核
