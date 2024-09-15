@@ -1,4 +1,23 @@
 ceph:
+  ## ceph monitor image
+  ## ref: https://quay.io/repository/ceph/daemon?tab=tags
+  ## @param ceph.image.registry %%MAIN_CONTAINER%% image registry
+  ## @param ceph.image.repository %%MAIN_CONTAINER%% image repository
+  ## @param ceph.image.tag %%MAIN_CONTAINER%% image tag (immutable tags are recommended)
+  ## @param ceph.image.digest %%MAIN_CONTAINER%% image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param ceph.image.pullPolicy %%MAIN_CONTAINER%% image pull policy
+  ## @param ceph.image.pullSecrets %%MAIN_CONTAINER%% image pull secrets
+  ##
+  image:
+    registry: zot.mgmt.sololab
+    repository: ceph/daemon
+    tag: latest-main
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
   config:
     ## @param persistence.enabled Enable persistence using Persistent Volume Claims
     ##
@@ -11,35 +30,28 @@ ceph:
     ## ref: https://github.com/ceph/ceph-container/tree/main/src/daemon#deploy-a-monitor
     ##
     enabled: true
-    ## ceph monitor image
-    ## ref: https://quay.io/repository/ceph/daemon?tab=tags
-    ## @param ceph.mon.image.registry %%MAIN_CONTAINER%% image registry
-    ## @param ceph.mon.image.repository %%MAIN_CONTAINER%% image repository
-    ## @param ceph.mon.image.tag %%MAIN_CONTAINER%% image tag (immutable tags are recommended)
-    ## @param ceph.mon.image.digest %%MAIN_CONTAINER%% image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
-    ## @param ceph.mon.image.pullPolicy %%MAIN_CONTAINER%% image pull policy
-    ## @param ceph.mon.image.pullSecrets %%MAIN_CONTAINER%% image pull secrets
-    ##
-    image:
-      registry: zot.mgmt.sololab
-      repository: ceph/daemon
-      tag: latest-main
-      digest: ""
-      ## Specify a imagePullPolicy
-      ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-      ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
-      ##
-      pullPolicy: IfNotPresent
+
     ## @param ceph.mon.command Override default container command (useful when using custom images)
     ## ref: https://github.com/ceph/ceph-container/blob/main/src/daemon/Dockerfile#L59
     ##
     command:
-      - "/bin/sh"
+      - "/bin/bash"
       - "-c"
       - |
-        sed -e "s/^mon_host.*$/mon_host = \"$(getent hosts host.containers.internal | awk '{print $1}')\"/" {{ .Values.ceph.config.path }} > /etc/ceph/ceph.conf
+        IFS='/' read -r -a ip_mask_array <<< $(ip addr show eth0 | grep 'inet ' | awk '{print $2}')
+        subnet_mask=${ip_mask_array[1]}
+        IFS='.' read -r -a ip_array <<< $(ip addr show eth0 | grep 'inet ' | awk '{print $2}')
+        subnet="${ip_array[0]}.${ip_array[1]}.${ip_array[2]}.0/$subnet_mask"
+        sed -e "s/^mon_host.*$/mon_host = \"$(getent hosts host.containers.internal | awk '{print $1}')\"/" \
+        -e "s|^public_network.*$|public_network = \"$(echo "${ip_array[0]}.${ip_array[1]}.${ip_array[2]}.0/$subnet_mask")\"|" \
+        -e "s|^cluster_network.*$|cluster_network = \"$subnet\"|" {{ .Values.ceph.config.path }} > /etc/ceph/ceph.conf
         exec /opt/ceph-container/bin/entrypoint.sh
 
+  osd:
+    ## @param ceph.osd.enabled enabled ceph osd daemon container
+    ## ref: https://github.com/ceph/ceph-container/tree/main/src/daemon#deploy-an-osd
+    ##
+    enabled: true
   ## @param ceph.podAnnotations Annotations for %%MAIN_CONTAINER_NAME%% pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ## ref: https://github.com/containers/podman/discussions/22378
