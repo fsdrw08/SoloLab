@@ -19,6 +19,8 @@ ref: https://github.com/hashicorp/terraform/blob/1714729f8730d2184b9c529768c56f3
 4. run terraform init
 ```powershell
 terraform init --plugin-dir (Join-Path -Path $projectPath -ChildPath ".terraform.d/mirror/registry.terraform.io/")
+# or 
+sudo terraform init
 ```
 
 or download from https://releases.hashicorp.com/
