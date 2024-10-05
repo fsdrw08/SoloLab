@@ -24,7 +24,7 @@ disk_size             = "128000"
 cd_files                 = [".\\http\\*"]
 switch_name              = "Default Switch"
 output_directory         = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos140-ga/"
-output_vagrant           = "../vbox/packer-vyos14x_wan-hv-g2.box"
+output_vagrant           = "C:/Users/Public/Downloads/vbox/packer-vyos14x-hv-g2.box"
 vlan_id                  = ""
 vagrantfile_template     = "./vagrant-VyOS14x.rb"
 ssh_username             = "vyos"
@@ -72,7 +72,7 @@ boot_command = [
   "<wait3>sudo mount /dev/sr1 /mnt<enter>",
   "<wait3>sudo /mnt/provision-dhcp.sh<enter>",
   // "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
-  "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && echo 'sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff'<enter>",
+  "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && echo 'sudo /mnt/provision-cleanup.sh && sudo /mnt/provision-vagrant.sh && sudo umount /mnt && sudo poweroff'<enter>",
   // "<wait1200>sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
   // "sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
   // "<wait70>sudo /mnt/provision-cleanup.sh<enter>",

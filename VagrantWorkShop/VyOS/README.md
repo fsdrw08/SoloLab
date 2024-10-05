@@ -1,3 +1,8 @@
+### add vbox
+```powershell
+vagrant box add VYOS14x-G2 "C:\Users\Public\Downloads\vbox\packer-vyos14x-hv-g2.box"
+```
+
 Set internal switch net adapter profile to private
 ```powershell
 sudo Set-NetConnectionProfile -InterfaceAlias *Internal* -NetworkCategory Private
