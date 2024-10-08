@@ -6,7 +6,7 @@ packer {
       source  = "github.com/hashicorp/hyperv"
     }
     vagrant = {
-      version = "~> 1"
+      version = ">= 1.1.5"
       source = "github.com/hashicorp/vagrant"
     }
   }

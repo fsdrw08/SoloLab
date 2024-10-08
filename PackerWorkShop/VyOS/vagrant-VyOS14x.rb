@@ -8,7 +8,6 @@ Vagrant.configure("2") do |config|
   config.vm.define "vagrant-vyos14x"
   config.vm.box = "vyos14x"
   config.vm.communicator = "ssh"
-  config.vm.synced_folder ".", "/vagrant", type: "rsync", disabled: "true"
 
   # Admin user name and password
   config.ssh.username = "vagrant"
@@ -16,7 +15,6 @@ Vagrant.configure("2") do |config|
   config.vm.guest = :debian
 
   config.vm.provider "hyperv" do |hv|
-    hv.mac = "0000deadbeef"
     hv.vm_integration_services = {
         guest_service_interface: true,
         heartbeat: true,

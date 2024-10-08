@@ -18,7 +18,7 @@ source "hyperv-iso" "vm" {
   cd_files              = "${var.cd_files}"
   memory                = "${var.memory}"
   output_directory      = "${var.output_directory}"
-  skip_export           = true
+  skip_export           = "${var.skip_export}"
   // https://www.packer.io/plugins/builders/hyperv/iso#disable_shutdown
   shutdown_command      = "sudo shutdown now"
   shutdown_timeout      = "30m"
@@ -46,6 +46,7 @@ build {
       keep_input_artifact  = false
       output               = "${var.output_vagrant}"
       vagrantfile_template = "${var.vagrantfile_template}"
+      provider_override   = "hyperv"
     }
   }
 }

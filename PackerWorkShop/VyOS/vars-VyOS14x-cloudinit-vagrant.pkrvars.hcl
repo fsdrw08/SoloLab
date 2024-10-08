@@ -23,11 +23,10 @@ disk_size             = "128000"
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
 cd_files                 = [".\\http\\*"]
 switch_name              = "Default Switch"
-output_directory         = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos140-ga/"
+output_directory         = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos140-ga-vagrant/"
 output_vagrant           = "C:/Users/Public/Downloads/vbox/packer-vyos14x-hv-g2.box"
 vlan_id                  = ""
 vagrantfile_template     = "./vagrant-VyOS14x.rb"
-skip_export              = true
 ssh_username             = "vyos"
 ssh_password             = "vyos"
 // https://wiki.debian.org/CDDVD explanation for /dev/sr1
@@ -68,12 +67,13 @@ boot_command = [
   // Are you sure you want to reboot this system? [y/N]
   "<wait3>y<enter>",
   //
-  "<wait45>vyos<enter>",
+  "<wait60>vyos<enter>",
   "<wait3>vyos<enter>",
   "<wait3>sudo mount /dev/sr1 /mnt<enter>",
   "<wait3>sudo /mnt/provision-dhcp.sh<enter>",
   // "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
-  "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && echo 'sudo /mnt/provision-cleanup.sh && sudo /mnt/provision-vagrant.sh && sudo umount /mnt && sudo poweroff'<enter>",
+  "<wait9>sudo /mnt/provision-sagitta-cloud-init.sh && echo 'sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff'<enter>",
+  // "<wait9>sudo /mnt/provision-cleanup.sh && sudo /mnt/provision-vagrant.sh && sudo umount /mnt && sudo poweroff<enter>",
   // "<wait1200>sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
   // "sudo /mnt/provision-cleanup.sh && sudo umount /mnt && sudo poweroff<enter>"
   // "<wait70>sudo /mnt/provision-cleanup.sh<enter>",

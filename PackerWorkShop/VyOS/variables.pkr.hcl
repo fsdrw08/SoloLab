@@ -76,6 +76,11 @@ variable "mac_address" {
   default = ""
 }
 
+variable "skip_export" {
+  type = bool
+  default = false
+}
+
 variable "vagrantfile_template" {
   type    = string
   default = ""

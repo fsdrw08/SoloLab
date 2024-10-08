@@ -6,9 +6,17 @@ param (
     '14x', 
     '13x-cloudinit', 
     '14x-cloudinit', 
+    '14x-cloudinit-vagrant', 
     '15x-cloudinit')]
   [string]
-  $VyOSVersion
+  $VyOSVersion,
+
+  [Parameter()]
+  [ValidateSet(
+    'vagrant'
+  )]
+  [string]
+  $except=$null
 )
 
 #Verify the pre-request
@@ -49,7 +57,11 @@ if ($Ready -ne $false) {
     try {
       $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force -var-file="$var_file" .
+      if ($null -ne $except) {
+        packer build --force -var-file="$var_file" --except=$except .
+      } else {
+        packer build --force -var-file="$var_file" .
+      }
     }
     catch {
       Write-Output "Packer build failed, exiting."
