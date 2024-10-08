@@ -11,33 +11,27 @@ runas = {
   take_charge = false
 }
 
-data_dirs = "/mnt/data/cockroach"
+data_dirs = "/mnt/data/v2rayA"
 
 container = {
   network = {
     create      = true
-    name        = "cockroach"
-    cidr_prefix = "172.16.2.0/24"
-    address     = "172.16.2.10"
+    name        = "v2rayA"
+    cidr_prefix = "172.16.1.0/24"
   }
   workload = {
-    name = "cockroach"
-    # image       = "docker.io/cockroachdb/cockroach:v23.2.5"
-    # local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_v23.2.5.tar"
-    image       = "docker.io/cockroachdb/cockroach:latest-v24.2"
-    local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_latest-v24.2.tar"
+    name        = "v2rayA"
+    image       = "docker.io/mzz2017/v2raya:v2.2.5.8"
+    local_image = "/mnt/data/offline/images/docker.io_mzz2017_v2raya_v2.2.5.8.tar"
     others = {
-      "memory" = "1024"
+      # "network v2rayA address" = "172.16.1.10"
+      "allow-host-networks" = ""
+      "memory"              = "1024"
 
       "environment TZ value" = "Asia/Shanghai"
 
-      "volume cockroach_cert source"      = "/etc/cockroach/certs"
-      "volume cockroach_cert destination" = "/certs"
-      "volume cockroach_cert mode"        = "ro"
-      "volume cockroach_data source"      = "/mnt/data/cockroach"
-      "volume cockroach_data destination" = "/cockroach/cockroach-data"
-
-      "arguments" = "start-single-node --sql-addr=:5432 --http-addr=:5443 --certs-dir=/certs --accept-sql-without-tls"
+      "volume v2rayA_data source"      = "/mnt/data/v2rayA"
+      "volume v2rayA_data destination" = "/etc/v2raya"
     }
   }
 }
@@ -55,7 +49,7 @@ reverse_proxy = {
     path = "load-balancing reverse-proxy backend cockroach_5443"
     configs = {
       "mode"                = "tcp"
-      "server vyos address" = "172.16.2.10"
+      "server vyos address" = "172.16.1.10"
       "server vyos port"    = "5443"
     }
   }

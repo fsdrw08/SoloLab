@@ -1,12 +1,3 @@
-resource "vyos_config_block_tree" "container_network" {
-  count = var.network.create == true ? 1 : 0
-  path  = "container network ${var.network.name}"
-
-  configs = {
-    "prefix" = "${var.network.cidr_prefix}"
-  }
-}
-
 resource "null_resource" "load_image" {
   triggers = {
     host     = var.vm_conn.host
@@ -61,6 +52,15 @@ resource "null_resource" "load_image" {
   }
 }
 
+resource "vyos_config_block_tree" "container_network" {
+  count = var.network.create == true ? 1 : 0
+  path  = "container network ${var.network.name}"
+
+  configs = {
+    "prefix" = "${var.network.cidr_prefix}"
+  }
+}
+
 resource "vyos_config_block_tree" "container_workload" {
   depends_on = [
     null_resource.load_image,
@@ -70,7 +70,6 @@ resource "vyos_config_block_tree" "container_workload" {
   path = "container name ${var.workload.name}"
 
   configs = merge({
-    "image"                               = "${var.workload.image}"
-    "network ${var.network.name} address" = "${var.network.address}"
+    "image" = "${var.workload.image}"
   }, var.workload.others)
 }
