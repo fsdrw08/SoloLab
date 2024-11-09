@@ -24,7 +24,7 @@ terraform apply --auto-approve
 6. Prepare ssh config, copy ssh config to local
 ```powershell
 $ssh = Join-Path -Path (git rev-parse --show-toplevel) -ChildPath "LocalWorkShop\.ssh"
-Copy-Item -Path $ssh -Destination $env:USERPROFILE
+Copy-Item -Path $ssh -Destination $env:USERPROFILE -Recurse -Force
 ```
 
 6. ssh into vyos

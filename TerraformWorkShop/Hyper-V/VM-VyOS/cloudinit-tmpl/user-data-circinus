@@ -33,15 +33,17 @@ vyos_config_commands:
   - set interfaces ethernet eth1 description '${int_desc}'
   # Service
   # DHCP server for local network
+  # https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/9-to-10#L18
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} subnet-id '${dhcp_subnet_id}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 start '${dhcp_start}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 stop '${dhcp_stop}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} name-server '${int_addr}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} default-router '${int_addr}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} domain-name 'sololab'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${int_addr}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option default-router '${int_addr}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option domain-name 'sololab'
   - set service dhcp-server shared-network-name ${int_desc} authoritative
-  - set service dhcp-server shared-network-name ${int_desc} ping-check
+  # - set service dhcp-server shared-network-name ${int_desc} ping-check https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L22
   - set service dhcp-server hostfile-update
-  - set service dhcp-server host-decl-name
+  # - set service dhcp-server host-decl-name https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L21
   # DNS
   - set service dns forwarding cache-size '0'
   - set service dns forwarding listen-address '${int_addr}'
@@ -62,24 +64,24 @@ vyos_config_commands:
   - set service https api keys id ${api_key_id} key '${api_key_content}'
   # dns record for vyos api
   - set system static-host-mapping host-name ${api_fqdn} inet '${int_addr}'
-  # load-balancing reverse-proxy for vyos api
-  - set load-balancing reverse-proxy service http listen-address '${int_addr}'
-  - set load-balancing reverse-proxy service http port '80'
-  - set load-balancing reverse-proxy service http mode 'http'
-  # - set load-balancing reverse-proxy service https listen-address '${int_addr}'
-  # - set load-balancing reverse-proxy service https port '443'
-  # - set load-balancing reverse-proxy service https mode 'http'
-  - set load-balancing reverse-proxy service tcp443 listen-address '${int_addr}'
-  - set load-balancing reverse-proxy service tcp443 port '443'
-  - set load-balancing reverse-proxy service tcp443 mode 'tcp'
-  - set load-balancing reverse-proxy service tcp443 tcp-request inspect-delay '5000'
-  - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
-  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name '${api_fqdn}'
-  - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
-  - set load-balancing reverse-proxy backend vyos-api balance 'round-robin'
-  - set load-balancing reverse-proxy backend vyos-api mode 'tcp'
-  - set load-balancing reverse-proxy backend vyos-api server vyos address '${int_addr}'
-  - set load-balancing reverse-proxy backend vyos-api server vyos port '8443'
+  # load-balancing reverse-proxy (name changed to haproxy in 1.5) for vyos api
+  - set load-balancing haproxy service http listen-address '${int_addr}'
+  - set load-balancing haproxy service http port '80'
+  - set load-balancing haproxy service http mode 'http'
+  # - set load-balancing haproxy service https listen-address '${int_addr}'
+  # - set load-balancing haproxy service https port '443'
+  # - set load-balancing haproxy service https mode 'http'
+  - set load-balancing haproxy service tcp443 listen-address '${int_addr}'
+  - set load-balancing haproxy service tcp443 port '443'
+  - set load-balancing haproxy service tcp443 mode 'tcp'
+  - set load-balancing haproxy service tcp443 tcp-request inspect-delay '5000'
+  - set load-balancing haproxy service tcp443 rule 10 ssl 'req-ssl-sni'
+  - set load-balancing haproxy service tcp443 rule 10 domain-name '${api_fqdn}'
+  - set load-balancing haproxy service tcp443 rule 10 set backend 'vyos-api'
+  - set load-balancing haproxy backend vyos-api balance 'round-robin'
+  - set load-balancing haproxy backend vyos-api mode 'tcp'
+  - set load-balancing haproxy backend vyos-api server vyos address '${int_addr}'
+  - set load-balancing haproxy backend vyos-api server vyos port '8443'
   # System
   # hostname
   - set system host-name '${local_hostname}'

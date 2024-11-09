@@ -7,7 +7,7 @@ hyperv = {
 
 vm_name     = "VyOS"
 vhd_dir     = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos150\\Virtual Hard Disks\\packer-vyos150.vhdx"
+source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos15x\\Virtual Hard Disks\\packer-vyos15x.vhdx"
 # source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos14x\\Virtual Hard Disks\\packer-vyos14x.vhdx"
 # source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos13x\\Virtual Hard Disks\\packer-vyos13x.vhdx"
 data_disk_ref = "../Disk-VyOS-Data/terraform.tfstate"
@@ -53,6 +53,7 @@ cloudinit_nocloud = [
       int_desc        = "MGMT"
       int_addr        = "192.168.255.1"
       int_cidr        = "192.168.255.0/24"
+      dhcp_subnet_id  = "1"
       dhcp_start      = "192.168.255.100"
       dhcp_stop       = "192.168.255.200"
       dns_forward_1   = "223.5.5.5"
