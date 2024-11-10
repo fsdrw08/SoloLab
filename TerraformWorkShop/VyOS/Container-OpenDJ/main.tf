@@ -68,7 +68,7 @@ resource "null_resource" "init" {
 
 module "config_map" {
   depends_on = [local_file.keystore]
-  source     = "../../System/modules/opendj"
+  source     = "../../modules/system-opendj"
   vm_conn    = var.vm_conn
   runas      = var.runas
   install    = null

@@ -24,10 +24,11 @@ container = {
     name = "cockroach"
     # image       = "docker.io/cockroachdb/cockroach:v23.2.5"
     # local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_v23.2.5.tar"
-    image       = "docker.io/cockroachdb/cockroach:latest-v24.2"
+    image       = "docker.io/cockroachdb/cockroach:latest-v24.2" # hub.geekery.cn/cockroachdb/cockroach:latest-v24.2
     local_image = "/mnt/data/offline/images/docker.io_cockroachdb_cockroach_latest-v24.2.tar"
     others = {
-      "memory" = "1024"
+      "network cockroach address" = "172.16.2.10"
+      "memory"                    = "1024"
 
       "environment TZ value" = "Asia/Shanghai"
 
@@ -44,7 +45,8 @@ container = {
 
 reverse_proxy = {
   web_frontend = {
-    path = "load-balancing reverse-proxy service tcp443 rule 20"
+    # path = "load-balancing reverse-proxy service tcp443 rule 20" # vyos 1.4
+    path = "load-balancing haproxy service tcp443 rule 20" # vyos 1.5
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "cockroach.mgmt.sololab"
@@ -52,7 +54,7 @@ reverse_proxy = {
     }
   }
   web_backend = {
-    path = "load-balancing reverse-proxy backend cockroach_5443"
+    path = "load-balancing haproxy backend cockroach_5443"
     configs = {
       "mode"                = "tcp"
       "server vyos address" = "172.16.2.10"
@@ -60,7 +62,7 @@ reverse_proxy = {
     }
   }
   sql_frontend = {
-    path = "load-balancing reverse-proxy service tcp5432"
+    path = "load-balancing haproxy service tcp5432"
     configs = {
       "listen-address" = "192.168.255.1"
       "port"           = "5432"
@@ -69,7 +71,7 @@ reverse_proxy = {
     }
   }
   sql_backend = {
-    path = "load-balancing reverse-proxy backend cockroach_5432"
+    path = "load-balancing haproxy backend cockroach_5432"
     configs = {
       "mode"                = "tcp"
       "server vyos address" = "172.16.2.10"

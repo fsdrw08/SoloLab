@@ -36,7 +36,7 @@ module "vyos_container" {
     system_file.cert,
     system_file.key,
   ]
-  source   = "../modules/container"
+  source   = "../../modules/vyos-container"
   vm_conn  = var.vm_conn
   network  = var.container.network
   workload = var.container.workload

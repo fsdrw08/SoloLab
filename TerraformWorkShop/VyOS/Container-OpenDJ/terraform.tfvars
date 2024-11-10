@@ -49,7 +49,8 @@ container = {
 
 reverse_proxy = {
   ldap_frontend = {
-    path = "load-balancing reverse-proxy service tcp389"
+    # path = "load-balancing reverse-proxy service tcp389" # vyos 1.4
+    path = "load-balancing haproxy service tcp389" # vyos 1.5
     configs = {
       "listen-address" = "192.168.255.1"
       "port"           = "389"
@@ -58,7 +59,7 @@ reverse_proxy = {
     }
   }
   ldap_backend = {
-    path = "load-balancing reverse-proxy backend opendj_ldap"
+    path = "load-balancing haproxy backend opendj_ldap" # vyos 1.5
     configs = {
       "mode"                = "tcp"
       "server vyos address" = "172.16.3.10"
@@ -66,7 +67,7 @@ reverse_proxy = {
     }
   }
   ldaps_frontend = {
-    path = "load-balancing reverse-proxy service tcp636"
+    path = "load-balancing haproxy service tcp636" # vyos 1.5
     configs = {
       "listen-address" = "192.168.255.1"
       "port"           = "636"
@@ -75,7 +76,7 @@ reverse_proxy = {
     }
   }
   ldaps_backend = {
-    path = "load-balancing reverse-proxy backend opendj_ldaps"
+    path = "load-balancing haproxy backend opendj_ldaps" # vyos 1.5
     configs = {
       "mode"                = "tcp"
       "server vyos address" = "172.16.3.10"

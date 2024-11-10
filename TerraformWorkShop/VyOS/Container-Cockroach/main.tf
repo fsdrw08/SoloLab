@@ -38,7 +38,7 @@ data "terraform_remote_state" "root_ca" {
 }
 
 module "config_map" {
-  source  = "../../System/modules/cockroachdb"
+  source  = "../../modules/system-cockroachdb"
   vm_conn = var.vm_conn
   install = null
   runas   = var.runas
@@ -69,7 +69,7 @@ module "vyos_container" {
     null_resource.init,
     module.config_map
   ]
-  source   = "../modules/container"
+  source   = "../../modules/vyos-container"
   vm_conn  = var.vm_conn
   network  = var.container.network
   workload = var.container.workload
