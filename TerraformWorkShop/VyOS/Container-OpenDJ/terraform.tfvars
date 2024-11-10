@@ -26,7 +26,8 @@ container = {
     image       = "docker.io/openidentityplatform/opendj:4.6.3"
     local_image = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.3.tar"
     others = {
-      "memory" = "1024"
+      "network opendj address" = "172.16.3.10"
+      "memory"                 = "1024"
 
       "environment TZ value"            = "Asia/Shanghai"
       "environment BASE_DN value"       = "dc=root,dc=sololab"
