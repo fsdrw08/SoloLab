@@ -62,6 +62,7 @@ vyos_config_commands:
   - set service https listen-address '${int_addr}'
   - set service https port '8443'
   - set service https api keys id ${api_key_id} key '${api_key_content}'
+  - set service https api rest
   # dns record for vyos api
   - set system static-host-mapping host-name ${api_fqdn} inet '${int_addr}'
   # load-balancing reverse-proxy (name changed to haproxy in 1.5) for vyos api
