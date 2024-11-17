@@ -1,19 +1,16 @@
-variable "hyperv_host" {
-  type    = string
-  default = "127.0.0.1"
-}
-
-variable "hyperv_port" {
-  type    = string
-  default = 5986
-}
-
-variable "hyperv_user" {
-  type = string
-}
-
-variable "hyperv_password" {
-  type = string
+variable "hyperv" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
+  default = {
+    host     = "127.0.0.1"
+    port     = 5986
+    user     = "root"
+    password = "P@ssw0rd"
+  }
 }
 
 variable "vhd" {
