@@ -18,7 +18,8 @@ variable "runas" {
 }
 
 variable "data_dirs" {
-  type = string
+  type        = string
+  description = "the data dir to store cockroachdb data"
 }
 
 variable "container" {

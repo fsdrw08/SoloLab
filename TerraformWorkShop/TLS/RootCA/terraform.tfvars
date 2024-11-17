@@ -86,6 +86,7 @@ certs = [
       rsa_bits  = 4096
     }
     cert = {
+      # https://www.cockroachlabs.com/docs/stable/authentication#using-a-custom-ca
       ip_addresses = [
         "192.168.255.1",
         "127.0.0.1"
