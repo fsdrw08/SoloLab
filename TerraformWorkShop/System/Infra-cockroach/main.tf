@@ -35,7 +35,7 @@ module "cockroach" {
   depends_on = [
     null_resource.init,
   ]
-  source = "../modules/cockroachdb"
+  source = "../../modules/system-cockroachdb"
   vm_conn = {
     host     = var.vm_conn.host
     port     = var.vm_conn.port
@@ -83,7 +83,7 @@ module "cockroach" {
 
 module "cockroach_service" {
   depends_on = [module.cockroach]
-  source     = "../modules/service"
+  source     = "../../modules/system-systemd_service"
   service = {
     status  = "started"
     enabled = true
@@ -104,7 +104,7 @@ module "cockroach_service" {
 
 module "cockroach_restart" {
   depends_on = [module.cockroach]
-  source     = "../modules/systemd_path"
+  source     = "../../modules/system-systemd_path"
   vm_conn = {
     host     = var.vm_conn.host
     port     = var.vm_conn.port
