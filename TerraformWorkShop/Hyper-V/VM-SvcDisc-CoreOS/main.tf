@@ -33,7 +33,7 @@ data "ignition_config" "ignition" {
     data.ignition_file.eth0[count.index].rendered,
     # data.ignition_file.hashicorp_repo.rendered,
     data.ignition_file.tuna_fedora_repo.rendered,
-    data.ignition_file.tuna_fedora_update_repo.rendered,
+    data.ignition_file.tuna_fedora_updates_repo.rendered,
     data.ignition_file.disable_cisco_repo.rendered,
     data.ignition_file.disable_fedora_updates_archive_repo.rendered,
     data.ignition_file.rpms.rendered,
