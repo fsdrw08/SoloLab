@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "ms-vscode-remote.remote-ssh-edit",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "coolbear.systemd-unit-file"
     ]
 }
