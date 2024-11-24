@@ -117,6 +117,7 @@ skip_if_unavailable=True
   }
 }
 
+# install packages during ignition process
 # https://cockpit-project.org/running.html#coreos
 # https://github.com/coreos/fedora-coreos-tracker/issues/681
 data "ignition_file" "rpms" {

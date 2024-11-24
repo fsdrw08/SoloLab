@@ -131,6 +131,7 @@ data "ignition_link" "rootless_podman_socket_unix_autostart" {
   gid       = 1001
 }
 
+# stop container before machine shutdown
 # https://askubuntu.com/questions/952363/how-do-i-properly-run-this-systemd-service-on-shutdown
 # https://github.com/iree-org/iree/blob/65bbc4b4d56f3e752cc14fd8c8f53796a80bb0bf/build_tools/github_actions/runner/config/systemd/system/gh-runner-deregister.service#L12
 data "ignition_file" "user_stop_container" {
