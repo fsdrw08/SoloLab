@@ -54,6 +54,7 @@ resource "system_file" "client_bin" {
 }
 
 resource "system_file" "oras_tar" {
+  count  = var.install.oras == null ? 0 : 1
   source = var.install.oras.tar_file_source
   path   = var.install.oras.tar_file_path
 }
@@ -79,7 +80,7 @@ resource "null_resource" "oras_bin" {
     inline = [
       # https://oras.land/docs/installation#linux
       # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.oras_tar.path} --directory=${var.install.oras.bin_file_dir} --overwrite oras",
+      "sudo tar --verbose --extract --file=${system_file.oras_tar.0.path} --directory=${var.install.oras.bin_file_dir} --overwrite oras",
       "sudo chmod 755 ${var.install.oras.bin_file_dir}/oras",
     ]
   }
