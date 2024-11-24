@@ -8,6 +8,10 @@ terraform {
       source  = "neuspaces/system"
       version = ">=0.5.0"
     }
+    htpasswd = {
+      source  = "loafoe/htpasswd"
+      version = ">=1.2.1"
+    }
     vyos = {
       source  = "Foltik/vyos"
       version = "0.3.3"

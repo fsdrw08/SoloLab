@@ -37,114 +37,30 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
+# zot config
 module "config_map" {
-  source  = "../../System/modules/zot"
+  source  = "../../modules/system-zot"
   vm_conn = var.vm_conn
   runas   = var.runas
   install = {
     server = null
-    client = {
-      bin_file_dir = "/usr/bin"
-      # https://github.com/project-zot/zot/releases
-      bin_file_source = "http://files.mgmt.sololab/bin/zli-linux-amd64"
-    }
-    oras = {
-      # https://github.com/oras-project/oras/releases
-      tar_file_source = "http://files.mgmt.sololab/bin/oras_1.2.0_linux_amd64.tar.gz"
-      tar_file_path   = "/home/vyos/oras_1.2.0_linux_amd64.tar.gz"
-      bin_file_dir    = "/usr/local/bin"
-    }
+    # client = {
+    #   bin_file_dir = "/usr/bin"
+    #   # https://github.com/project-zot/zot/releases
+    #   bin_file_source = "http://files.mgmt.sololab/bin/zli-linux-amd64"
+    # }
+    # oras = {
+    #   # https://github.com/oras-project/oras/releases
+    #   tar_file_source = "http://files.mgmt.sololab/bin/oras_1.2.0_linux_amd64.tar.gz"
+    #   tar_file_path   = "/home/vyos/oras_1.2.0_linux_amd64.tar.gz"
+    #   bin_file_dir    = "/usr/local/bin"
+    # }
   }
   config = {
     main = {
       # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#configuration-file
       basename = "config.json"
-      content = jsonencode({
-        extensions = {
-          # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#enhanced-searching-and-querying-images
-          search = {
-            enable = true
-            cve = {
-              updateInterval = "168h"
-              # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
-              trivy = {
-                javadbrepository = "zot.mgmt.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
-                dbrepository     = "zot.mgmt.sololab/aquasecurity/trivy-db"      # ghcr.io/aquasecurity/trivy-db
-              }
-            }
-          }
-          # Mgmt is enabled when the Search extension is enabled
-          mgmt = {
-            enable = true
-          }
-          ui = {
-            enable = true
-          }
-          scrub = {
-            enable   = true
-            interval = "24h"
-          }
-        }
-        http = {
-          address = "0.0.0.0"
-          port    = "5000"
-          realm   = "zot"
-          tls = {
-            cert   = "/etc/zot/certs/server.crt"
-            key    = "/etc/zot/certs/server.key"
-            cacert = "/etc/zot/certs/ca.crt"
-          }
-          auth = {
-            # https://zotregistry.dev/v2.0.4/articles/authn-authz/#ldap
-            # https://github.com/project-zot/zot/blob/be5ad667974b43905a118a40435f7117c0dde511/examples/config-ldap.json#L17
-            ldap = {
-              credentialsFile    = "/etc/zot/config-ldap-credentials.json"
-              address            = "opendj.mgmt.sololab"
-              port               = 636
-              startTLS           = true
-              baseDN             = "ou=People,dc=root,dc=sololab"
-              userAttribute      = "uid"
-              userGroupAttribute = "isMemberOf"
-              skipVerify         = true
-              subtreeSearch      = true
-            },
-            failDelay = 5
-          }
-          # https://zotregistry.dev/v2.0.4/articles/authn-authz/#example-access-control-configuration
-          accessControl = {
-            repositories = {
-              "**" = {
-                policies = [
-                  {
-                    groups  = ["cn=App-Zot-CU,ou=Groups,dc=root,dc=sololab"]
-                    actions = ["read", "update"]
-                  }
-                ]
-                defaultPolicy = ["read"]
-                # https://github.com/project-zot/zot/blob/main/examples/README.md#identity-based-authorization
-                anonymousPolicy = ["read"]
-              }
-            }
-            adminPolicy = {
-              groups  = ["cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"]
-              actions = ["read", "create", "update", "delete"]
-            }
-          }
-        }
-        # https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
-        storage = {
-          rootDirectory = "/var/lib/registry"
-          # https://zotregistry.dev/v2.0.4/articles/storage/#commit
-          # make data to be written to disk immediately
-          commit = true
-          # https://zotregistry.dev/v2.0.4/articles/storage/#garbage-collection
-          # Garbage collection (gc) is enabled by default to reclaim this space
-          gc = true
-        }
-        log = {
-          level = "info"
-        }
-      })
+      content  = jsonencode(yamldecode(file("${path.module}/config-htpasswd.yaml")))
     }
     certs = {
       cacert_basename = "ca.crt"
@@ -162,20 +78,36 @@ module "config_map" {
   }
 }
 
-resource "system_file" "ldap_credential" {
+# for ldap auth
+# To allow for separation of configuration and credentials, 
+# the credentials for the LDAP server are specified in a separate file, as shown in the following example.
+# resource "system_file" "ldap_credential" {
+#   depends_on = module.config_map[]
+#   path       = "/etc/zot/config-ldap-credentials.json"
+#   content = jsonencode({
+#     bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
+#     bindPassword = "P@ssw0rd"
+#   })
+#   uid = var.runas.uid
+#   gid = var.runas.gid
+# }
+
+# for htpasswd auth
+resource "htpasswd_password" "htpasswd" {
+  password = "P@ssw0rd"
+}
+
+resource "system_file" "htpasswd" {
   depends_on = [module.config_map]
-  path       = "/etc/zot/config-ldap-credentials.json"
-  content = jsonencode({
-    bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
-    bindPassword = "P@ssw0rd"
-  })
-  uid = var.runas.uid
-  gid = var.runas.gid
+  path       = "/etc/zot/htpasswd"
+  content    = "admin:${htpasswd_password.htpasswd.bcrypt}"
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 module "vyos_container" {
   depends_on = [module.config_map]
-  source     = "../modules/container"
+  source     = "../../modules/vyos-container"
   vm_conn    = var.vm_conn
   network    = var.container.network
   workload   = var.container.workload

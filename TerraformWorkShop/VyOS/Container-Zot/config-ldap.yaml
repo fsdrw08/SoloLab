@@ -1,0 +1,70 @@
+# https://zotregistry.dev/v2.1.0/admin-guide/admin-configuration/#extensions
+extensions:
+  # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#enhanced-searching-and-querying-images
+  search:
+    enable: true
+    cve:
+      updateInterval: "168h"
+      # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
+      trivy:
+        javadbrepository: "zot.mgmt.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+        dbrepository: "zot.mgmt.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
+  # Mgmt is enabled when the Search extension is enabled
+  mgmt:
+    enable: true
+  ui:
+    enable: true
+  scrub:
+    enable: true
+    interval: "24h"
+# Network configuration
+# https://zotregistry.dev/v2.1.0/admin-guide/admin-configuration/#network-configuration
+http:
+  address: "0.0.0.0"
+  port: "5000"
+  realm: "zot"
+  tls:
+    cert: "/etc/zot/certs/server.crt"
+    key: "/etc/zot/certs/server.key"
+    cacert: "/etc/zot/certs/ca.crt"
+  # https://zotregistry.dev/v2.1.0/admin-guide/admin-configuration/#authentication
+  auth:
+    # https://zotregistry.dev/v2.0.4/articles/authn-authz/#ldap
+    # https://github.com/project-zot/zot/blob/be5ad667974b43905a118a40435f7117c0dde511/examples/config-ldap.json#L17
+    ldap:
+      credentialsFile: "/etc/zot/config-ldap-credentials.json"
+      address: "opendj.mgmt.sololab"
+      port: 636
+      startTLS: true
+      baseDN: "ou=People,dc=root,dc=sololab"
+      userAttribute: "uid"
+      userGroupAttribute: "isMemberOf"
+      skipVerify: true
+      subtreeSearch: true
+    failDelay: 5
+  # https://zotregistry.dev/v2.0.4/articles/authn-authz/#example-access-control-configuration
+  accessControl:
+    repositories:
+      "**":
+        policies:
+          - groups: ["cn=App-Zot-CU,ou=Groups,dc=root,dc=sololab"]
+            actions: ["read", "update"]
+        defaultPolicy: ["read"]
+        # https://github.com/project-zot/zot/blob/main/examples/README.md#identity-based-authorization
+        anonymousPolicy: ["read"]
+    adminPolicy:
+      groups: ["cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"]
+      actions: ["read", "create", "update", "delete"]
+
+# https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
+storage:
+  rootDirectory: "/var/lib/registry"
+  # https://zotregistry.dev/v2.0.4/articles/storage/#commit
+  # make data to be written to disk immediately
+  commit: true
+  # https://zotregistry.dev/v2.0.4/articles/storage/#garbage-collection
+  # Garbage collection (gc) is enabled by default to reclaim this space
+  gc: true
+
+log:
+  level: "info"
