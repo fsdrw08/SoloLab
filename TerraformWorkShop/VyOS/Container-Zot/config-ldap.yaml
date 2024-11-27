@@ -7,8 +7,8 @@ extensions:
       updateInterval: "168h"
       # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
       trivy:
-        javadbrepository: "zot.mgmt.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
-        dbrepository: "zot.mgmt.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
+        javadbrepository: "zot.day0.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+        dbrepository: "zot.day0.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
   # Mgmt is enabled when the Search extension is enabled
   mgmt:
     enable: true
@@ -33,7 +33,7 @@ http:
     # https://github.com/project-zot/zot/blob/be5ad667974b43905a118a40435f7117c0dde511/examples/config-ldap.json#L17
     ldap:
       credentialsFile: "/etc/zot/config-ldap-credentials.json"
-      address: "opendj.mgmt.sololab"
+      address: "opendj.day0.sololab"
       port: 636
       startTLS: true
       baseDN: "ou=People,dc=root,dc=sololab"

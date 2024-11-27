@@ -41,7 +41,7 @@ module "registry" {
   }
   install = {
     # https://github.com/distribution/distribution/releases
-    tar_file_source = "http://files.mgmt.sololab/releases/registry_2.8.3_linux_amd64.tar.gz"
+    tar_file_source = "http://files.day0.sololab/releases/registry_2.8.3_linux_amd64.tar.gz"
     tar_file_path   = "/home/vyos/registry_2.8.3_linux_amd64.tar.gz"
     bin_file_dir    = "/usr/bin"
   }
@@ -63,12 +63,12 @@ module "registry" {
         REGISTRY_AUTH_HTPASSWD_REALM  = "basic-realm"
         REGISTRY_HTTP_ADDR            = "192.168.255.1:5000"
         REGISTRY_HTTP_NET             = "tcp"
-        REGISTRY_HTTP_HOST            = "https://registry.mgmt.sololab"
+        REGISTRY_HTTP_HOST            = "https://registry.day0.sololab"
         REGISTRY_HTTP_DEBUG_ADDR      = "192.168.255.1:5001"
         REGISTRY_HTTP_TLS_CERTIFICATE = "/etc/registry/certs/registry.crt"
         REGISTRY_HTTP_TLS_KEY         = "/etc/registry/certs/registry.key"
         # https://github.com/atareao/self-hosted/blob/67271037979fadd16aaf69f3dfad1411f60b3931/registry/config.yml#L33
-        REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin      = "[https://registry-ui.mgmt.sololab]"
+        REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin      = "[https://registry-ui.day0.sololab]"
         REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials = "[true]"
         REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers     = "[Authorization,Accept,Cache-Control]"
         REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods     = "[HEAD,GET,OPTIONS,DELETE]"

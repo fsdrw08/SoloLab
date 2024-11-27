@@ -49,7 +49,7 @@ reverse_proxy = {
     path = "load-balancing haproxy service tcp443 rule 20" # vyos 1.5
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "cockroach.mgmt.sololab"
+      "domain-name" = "cockroach.day0.sololab"
       "set backend" = "cockroach_5443"
     }
   }
@@ -81,6 +81,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "cockroach.mgmt.sololab"
+  host = "cockroach.day0.sololab"
   ip   = "192.168.255.1"
 }

@@ -9,7 +9,7 @@ vault:
   ## @param vault.image.pullSecrets vault image pull secrets
   ##
   image:
-    registry: zot.mgmt.sololab
+    registry: zot.day0.sololab
     repository: hashicorp/vault
     tag: 1.16.3
 
@@ -19,8 +19,8 @@ vault:
   ## ref: https://developer.hashicorp.com/vault/tutorials/operations/configure-vault#config
   configFiles:
     main:
-      api_addr: "https://vault.mgmt.sololab:8200"
-      cluster_addr: "https://vault.mgmt.sololab:8201"
+      api_addr: "https://vault.day0.sololab:8200"
+      cluster_addr: "https://vault.day0.sololab:8201"
     storage:
       storage:
         raft:
@@ -62,6 +62,6 @@ vault:
 volumePermissions:
   enabled: true
   image:
-    registry: zot.mgmt.sololab
+    registry: zot.day0.sololab
     repository: hashicorp/vault
     tag: 1.16.3

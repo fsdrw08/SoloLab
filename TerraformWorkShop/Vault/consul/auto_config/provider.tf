@@ -11,7 +11,7 @@ terraform {
   }
 
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
     schema_name = "Vault-Consul-auto_config"
   }
 }

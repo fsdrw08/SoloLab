@@ -87,6 +87,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "opendj.mgmt.sololab"
+  host = "opendj.day0.sololab"
   ip   = "192.168.255.1"
 }

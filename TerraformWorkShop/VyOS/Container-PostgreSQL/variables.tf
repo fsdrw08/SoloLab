@@ -22,23 +22,7 @@ variable "data_dirs" {
   description = "the data dir to store cockroachdb data"
 }
 
-variable "container_postgresql" {
-  type = object({
-    network = object({
-      create      = bool
-      name        = optional(string)
-      cidr_prefix = optional(string)
-    })
-    workload = object({
-      name        = string
-      image       = string
-      local_image = optional(string, null)
-      others      = map(string)
-    })
-  })
-}
-
-variable "container_adminer" {
+variable "container" {
   type = object({
     network = object({
       create      = bool

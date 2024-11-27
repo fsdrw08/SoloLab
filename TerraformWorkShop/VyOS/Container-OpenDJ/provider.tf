@@ -30,6 +30,6 @@ provider "system" {
 }
 
 provider "vyos" {
-  url = "https://vyos-api.mgmt.sololab"
+  url = "https://vyos-api.day0.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

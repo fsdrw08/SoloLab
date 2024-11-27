@@ -9,7 +9,7 @@ consul:
   ## @param consul.image.pullSecrets consul image pull secrets
   ##
   image:
-    registry: zot.mgmt.sololab
+    registry: zot.day0.sololab
     repository: hashicorp/consul
     tag: 1.18.2
   containerPorts:
@@ -55,9 +55,9 @@ consul:
         authorization:
           enabled: true
           static:
-            oidc_discovery_url: https://vault.mgmt.sololab:8200/v1/identity/oidc
+            oidc_discovery_url: https://vault.day0.sololab:8200/v1/identity/oidc
             oidc_discovery_ca_cert: ## set via helm value
-            bound_issuer: https://vault.mgmt.sololab:8200/v1/identity/oidc
+            bound_issuer: https://vault.day0.sololab:8200/v1/identity/oidc
             bound_audiences:
               - consul-cluster-dc1
             claim_mappings:

@@ -53,7 +53,7 @@ reverse_proxy = {
     path = "load-balancing haproxy service tcp443 rule 40"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "zot.mgmt.sololab"
+      "domain-name" = "zot.day0.sololab"
       "set backend" = "zot_web"
     }
   }
@@ -68,6 +68,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "zot.mgmt.sololab"
+  host = "zot.day0.sololab"
   ip   = "192.168.255.1"
 }

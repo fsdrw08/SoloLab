@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "ldap" {
-  host         = "opendj.mgmt.sololab"
+  host         = "opendj.day0.sololab"
   port         = "636"
   tls          = true
   tls_insecure = true

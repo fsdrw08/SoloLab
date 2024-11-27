@@ -18,7 +18,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
     schema_name = "HyperV-SvcDisc-VM-FCOS"
   }
   # backend "s3" {

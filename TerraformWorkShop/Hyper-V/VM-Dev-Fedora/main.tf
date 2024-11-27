@@ -75,7 +75,7 @@ module "cloudinit_nocloud_iso" {
 data "terraform_remote_state" "data_disk" {
   backend = "pg"
   config = {
-    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
     schema_name = "HyperV-Dev-Fedora-Disk"
   }
 }

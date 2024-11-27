@@ -22,7 +22,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.mgmt.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
     schema_name = "System-SvcDisc-Quadlet-Ceph"
   }
 }
@@ -37,6 +37,6 @@ provider "remote" {
 }
 
 provider "vyos" {
-  url = "https://vyos-api.mgmt.sololab"
+  url = "https://vyos-api.day0.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

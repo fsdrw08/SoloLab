@@ -63,7 +63,7 @@ certs = [
     }
     cert = {
       dns_names = [
-        "vyos-api.mgmt.sololab"
+        "vyos-api.day0.sololab"
       ]
       subject = {
         common_name  = "vyos api"
@@ -93,7 +93,7 @@ certs = [
       ]
       dns_names = [
         "localhost",
-        "cockroach.mgmt.sololab"
+        "cockroach.day0.sololab"
       ]
       subject = {
         common_name  = "node"
@@ -139,9 +139,9 @@ certs = [
       rsa_bits  = 4096
     }
     cert = {
-      dns_names = ["traefik.mgmt.sololab"]
+      dns_names = ["traefik.day0.sololab"]
       subject = {
-        common_name  = "traefik.mgmt.sololab"
+        common_name  = "traefik.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -161,11 +161,11 @@ certs = [
     }
     cert = {
       dns_names = [
-        "opendj.mgmt.sololab",
+        "opendj.day0.sololab",
         "opendj.service.consul",
       ]
       subject = {
-        common_name  = "opendj.mgmt.sololab"
+        common_name  = "opendj.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -185,7 +185,7 @@ certs = [
     }
     cert = {
       dns_names = [
-        "zot.mgmt.sololab"
+        "zot.day0.sololab"
       ]
       subject = {
         common_name  = "Zot Registry"
@@ -208,10 +208,10 @@ certs = [
     }
     cert = {
       dns_names = [
-        "cockpit.mgmt.sololab",
+        "cockpit.day0.sololab",
       ]
       subject = {
-        common_name  = "cockpit.mgmt.sololab"
+        common_name  = "cockpit.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -234,11 +234,11 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.mgmt.sololab",
+        "vault.day0.sololab",
         "vault.service.consul",
       ]
       subject = {
-        common_name  = "vault.mgmt.sololab"
+        common_name  = "vault.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -279,7 +279,7 @@ certs = [
     }
     cert = {
       dns_names = [
-        "consul.mgmt.sololab",
+        "consul.day0.sololab",
         "consul.service.consul",
         "server.dc1.consul",
         "localhost"

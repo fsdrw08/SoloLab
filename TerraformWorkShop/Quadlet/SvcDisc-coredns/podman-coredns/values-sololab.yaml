@@ -1,6 +1,6 @@
 coredns:
   image:
-    registry: zot.mgmt.sololab
+    registry: zot.day0.sololab
     repository: coredns/coredns
     tag: 1.11.1
   containerPorts:
@@ -39,11 +39,11 @@ coredns:
         # To enable automatic reloading of zone file changes, use the auto plugin.
         - name: reload
         - name: file
-          parameters: /etc/coredns/mgmt.sololab.db mgmt.sololab
+          parameters: /etc/coredns/day0.sololab.db day0.sololab
   zoneFiles:
-    - filename: mgmt.sololab.db
-      domain: mgmt.sololab
+    - filename: day0.sololab.db
+      domain: day0.sololab
       contents: |
-        mgmt.sololab.   IN SOA ns.mgmt.sololab. admin.james.sololab. 2024061341 7200 3600 1209600 3600
-        mgmt.sololab.   IN NS  ns1.mgmt.sololab.
-        *.mgmt.sololab. IN A  {{ .Values.coredns.hostIP }}
+        day0.sololab.   IN SOA ns.day0.sololab. admin.james.sololab. 2024061341 7200 3600 1209600 3600
+        day0.sololab.   IN NS  ns1.day0.sololab.
+        *.day0.sololab. IN A  {{ .Values.coredns.hostIP }}

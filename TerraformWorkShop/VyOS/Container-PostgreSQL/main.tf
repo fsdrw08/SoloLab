@@ -4,6 +4,8 @@ resource "null_resource" "init" {
     port      = var.vm_conn.port
     user      = var.vm_conn.user
     password  = var.vm_conn.password
+    uid       = var.runas.uid
+    gid       = var.runas.gid
     data_dirs = var.data_dirs
   }
   connection {
@@ -30,12 +32,12 @@ resource "null_resource" "init" {
   # }
 }
 
-data "terraform_remote_state" "root_ca" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
-  }
-}
+# data "terraform_remote_state" "root_ca" {
+#   backend = "local"
+#   config = {
+#     path = "../../TLS/RootCA/terraform.tfstate"
+#   }
+# }
 
 module "vyos_container_postgresql" {
   depends_on = [
@@ -47,21 +49,10 @@ module "vyos_container_postgresql" {
   workload = var.container_postgresql.workload
 }
 
-module "vyos_container_adminer" {
-  depends_on = [
-    null_resource.init,
-    module.vyos_container_postgresql
-  ]
-  source   = "../../modules/vyos-container"
-  vm_conn  = var.vm_conn
-  network  = var.container_adminer.network
-  workload = var.container_adminer.workload
-}
-
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
     module.vyos_container_postgresql,
-    module.vyos_container_adminer
+    # module.vyos_container_adminer
   ]
   for_each = var.reverse_proxy
   path     = each.value.path
@@ -71,7 +62,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
 resource "vyos_static_host_mapping" "host_mappings" {
   depends_on = [
     module.vyos_container_postgresql,
-    module.vyos_container_adminer,
+    # module.vyos_container_adminer,
     vyos_config_block_tree.reverse_proxy,
   ]
   for_each = {

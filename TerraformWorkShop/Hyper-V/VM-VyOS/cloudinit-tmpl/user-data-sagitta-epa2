@@ -61,7 +61,7 @@ vyos_config_commands:
   - set service https port '8443'
   - set service https api keys id MY-HTTPS-API-ID key 'MY-HTTPS-API-PLAINTEXT-KEY'
   # dns record for vyos api
-  - set system static-host-mapping host-name vyos-api.mgmt.sololab inet '192.168.255.1'
+  - set system static-host-mapping host-name vyos-api.day0.sololab inet '192.168.255.1'
   # load-balancing reverse-proxy for vyos api
   - set load-balancing reverse-proxy service http listen-address '192.168.255.1'
   - set load-balancing reverse-proxy service http port '80'
@@ -74,7 +74,7 @@ vyos_config_commands:
   - set load-balancing reverse-proxy service tcp443 mode 'tcp'
   # - set load-balancing reverse-proxy service tcp443 tcp-request inspect-delay '5000'
   - set load-balancing reverse-proxy service tcp443 rule 10 ssl 'req-ssl-sni'
-  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.mgmt.sololab'
+  - set load-balancing reverse-proxy service tcp443 rule 10 domain-name 'vyos-api.day0.sololab'
   - set load-balancing reverse-proxy service tcp443 rule 10 set backend 'vyos-api'
   - set load-balancing reverse-proxy backend vyos-api balance 'round-robin'
   - set load-balancing reverse-proxy backend vyos-api mode 'tcp'

@@ -121,7 +121,7 @@ resource "vyos_config_block_tree" "container_workload" {
 
     "environment TZ value"              = "Asia/Shanghai"
     "environment LLDAP_HTTP_PORT value" = "17170"
-    "environment LLDAP_HTTP_URL value"  = "https://lldap.mgmt.sololab"
+    "environment LLDAP_HTTP_URL value"  = "https://lldap.day0.sololab"
     "environment LLDAP_LDAP_PORT value" = "3890"
 
     "volume lldap_config source"      = "/etc/lldap"
@@ -138,7 +138,7 @@ resource "system_file" "nginx_config" {
   path = "/etc/nginx/conf.d/lldap.conf"
   content = templatefile("${path.module}/lldap/lldap_nginx.conf", {
     listen              = "127.0.0.1:17170 ssl"
-    server_name         = "lldap.mgmt.sololab"
+    server_name         = "lldap.day0.sololab"
     ssl_certificate     = "/etc/lldap/certs/server.crt"
     ssl_certificate_key = "/etc/lldap/certs/server.key"
     proxy_pass          = "http://172.16.1.10:17170/"
@@ -154,7 +154,7 @@ locals {
       path = "load-balancing reverse-proxy service tcp443 rule 30"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "lldap.mgmt.sololab"
+        "domain-name" = "lldap.day0.sololab"
         "set backend" = "lldap_web"
       }
     }
@@ -218,6 +218,6 @@ resource "vyos_static_host_mapping" "host_mapping" {
     module.lldap_conf,
     vyos_config_block_tree.reverse_proxy,
   ]
-  host = "lldap.mgmt.sololab"
+  host = "lldap.day0.sololab"
   ip   = "192.168.255.1"
 }

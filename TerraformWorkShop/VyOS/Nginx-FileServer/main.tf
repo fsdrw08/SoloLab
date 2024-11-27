@@ -55,7 +55,7 @@ resource "system_file" "config" {
   path = "/etc/nginx/conf.d/fileserver.conf"
   content = templatefile("${path.module}/nginx/fileserver.conf", {
     listen      = "192.168.255.1:8080"
-    server_name = "files.mgmt.sololab"
+    server_name = "files.day0.sololab"
     root        = "/mnt/data/offline"
   })
   user  = "vyos"

@@ -101,7 +101,7 @@ resource "vyos_config_block_tree" "container_cockpit_workload" {
 # }
 
 resource "vyos_static_host_mapping" "files" {
-  host = "cockpit.mgmt.sololab"
+  host = "cockpit.day0.sololab"
   ip   = "192.168.255.1"
 }
 
@@ -110,7 +110,7 @@ resource "vyos_config_block_tree" "lb_svc_http_files" {
   path = "load-balancing reverse-proxy service tcp443 rule 30"
   configs = {
     "ssl"         = "req-ssl-sni"
-    "domain-name" = "cockpit.mgmt.sololab"
+    "domain-name" = "cockpit.day0.sololab"
     "set backend" = "cockpit"
   }
 }

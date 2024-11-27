@@ -9,7 +9,7 @@ reverse_proxy = {
   web_frontend = {
     path = "load-balancing reverse-proxy service http rule 10"
     configs = {
-      "domain-name" = "files.mgmt.sololab"
+      "domain-name" = "files.day0.sololab"
       "set backend" = "files"
     }
   }
@@ -24,6 +24,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "files.mgmt.sololab"
+  host = "files.day0.sololab"
   ip   = "192.168.255.1"
 }

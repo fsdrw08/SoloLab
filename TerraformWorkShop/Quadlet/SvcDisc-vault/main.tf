@@ -136,7 +136,7 @@ resource "vyos_static_host_mapping" "host_mapping" {
   depends_on = [
     null_resource.podman_quadlet,
   ]
-  host = "vault.mgmt.sololab"
+  host = "vault.day0.sololab"
   ip   = "192.168.255.20"
 }
 
@@ -146,7 +146,7 @@ locals {
       script_path = "./podman-vault/New-VaultStaticToken.sh"
       vars = {
         VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-        VAULT_ADDR                  = "https://vault.mgmt.sololab:8200"
+        VAULT_ADDR                  = "https://vault.day0.sololab:8200"
         STATIC_TOKEN                = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
       }
     }

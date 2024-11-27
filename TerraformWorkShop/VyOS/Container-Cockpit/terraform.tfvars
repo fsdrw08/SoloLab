@@ -27,7 +27,7 @@ container = {
 }
 
 dns_record = {
-  host = "cockpit.mgmt.sololab"
+  host = "cockpit.day0.sololab"
   ip   = "192.168.255.1"
 }
 
@@ -37,7 +37,7 @@ reverse_proxy = {
     path = "load-balancing haproxy service tcp443 rule 50" # vyos 1.5
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "cockpit.mgmt.sololab"
+      "domain-name" = "cockpit.day0.sololab"
       "set backend" = "cockpit_web"
     }
   }
