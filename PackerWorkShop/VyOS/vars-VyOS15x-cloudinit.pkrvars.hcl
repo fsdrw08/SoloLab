@@ -1,7 +1,7 @@
-#iso_url=https://github.com/vyos/vyos-nightly-build/releases/download/1.5-rolling-202411070006/vyos-1.5-rolling-202411070006-generic-amd64.iso
-iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.5-rolling-202411070006-generic-amd64.iso"
+#iso_url=https://github.com/vyos/vyos-nightly-build/releases/download/1.5-rolling-202411230007/vyos-1.5-rolling-202411230007-generic-amd64.iso
+iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.5-rolling-202411230007-generic-amd64.iso"
 iso_checksum_type     = "sha256"
-iso_checksum          = "C34E117E38A82495861874921AA605DAD38A31EA059D0108917465EF23E1A7D9"
+iso_checksum          = "C3AF7AF2F54ED9DD4953B084211812DD49F5BDFDD06094AD97861D05E8B69624"
 vm_name               = "packer-vyos150"
 configuration_version = "11.0"
 disk_size             = "128000"

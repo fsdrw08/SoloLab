@@ -42,8 +42,8 @@ cloudinit_nocloud = [
   {
     content_source = "./cloudinit-tmpl/meta-data"
     content_vars = {
-      instance_id    = "iid-VyOS_20241109"
-      local_hostname = "VyOS-140"
+      instance_id    = "iid-VyOS_20241126"
+      local_hostname = "VyOS"
     }
     filename = "meta-data"
   },
@@ -60,7 +60,7 @@ cloudinit_nocloud = [
       dns_forward_2   = "223.6.6.6"
       api_key_id      = "MY-HTTPS-API-ID"
       api_key_content = "MY-HTTPS-API-PLAINTEXT-KEY"
-      api_fqdn        = "vyos-api.mgmt.sololab"
+      api_fqdn        = "vyos-api.day0.sololab"
       local_hostname  = "VyOS"
       user_ssh_key    = "AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=="
       ntp_server      = "cn.ntp.org.cn"
