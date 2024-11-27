@@ -13,7 +13,6 @@ variable "network" {
     create      = bool
     name        = string
     cidr_prefix = optional(string)
-    address     = string
   })
 }
 

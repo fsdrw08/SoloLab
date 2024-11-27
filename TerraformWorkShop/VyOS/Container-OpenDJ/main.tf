@@ -124,8 +124,9 @@ module "config_map" {
     }
     certs = {
       basename = "keystore"
-      source   = "http://files.mgmt.sololab/others/opendj.jks"
-      sub_dir  = "certs"
+      # source   = "http://files.mgmt.sololab/others/opendj.jks"
+      source  = "./keystore"
+      sub_dir = "certs"
     }
     dir = "/etc/opendj"
   }
@@ -138,7 +139,7 @@ module "vyos_container" {
     null_resource.init,
     module.config_map
   ]
-  source   = "../modules/container"
+  source   = "../../modules/vyos-container"
   vm_conn  = var.vm_conn
   network  = var.container.network
   workload = var.container.workload
