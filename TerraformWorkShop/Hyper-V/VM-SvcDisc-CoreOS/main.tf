@@ -2,6 +2,7 @@ locals {
   count = 1
 }
 
+# generate ignition file content
 data "ignition_config" "ignition" {
   count       = local.count
   disks       = [data.ignition_disk.data.rendered]

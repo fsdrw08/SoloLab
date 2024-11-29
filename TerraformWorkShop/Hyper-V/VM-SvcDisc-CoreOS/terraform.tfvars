@@ -5,8 +5,9 @@ hyperv = {
   password = "P@ssw0rd"
 }
 
-vm_name       = "SvcDisc-FCOS"
-vhd_dir       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+vm_name = "SvcDisc-FCOS"
+vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+# https://fedoraproject.org/coreos/download?stream=stable
 source_disk   = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
 data_disk_ref = "../Disk-SvcDisc-FCOS-Data/terraform.tfstate"
 # data_disk_path = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\SvcDisc-FCOS-Data.vhdx"
