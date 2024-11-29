@@ -14,8 +14,8 @@ container = {
   }
   workload = {
     name        = "cockpit"
-    image       = "quay.io/cockpit/ws:327"
-    local_image = "/mnt/data/offline/images/quay.io_cockpit_ws_327.tar"
+    image       = "quay.io/cockpit/ws:329"
+    local_image = "/mnt/data/offline/images/quay.io_cockpit_ws_329.tar"
     others = {
       "network cockpit address" = "172.16.5.10"
       "environment TZ value"    = "Asia/Shanghai"
