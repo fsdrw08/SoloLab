@@ -7,11 +7,17 @@ vm_conn = {
 
 runas = {
   uid         = 26
-  gid         = 100
+  gid         = 26
   take_charge = false
 }
 
 data_dirs = "/mnt/data/postgresql"
+
+cert_config = {
+  host_path          = "/etc/postgresql/certs"
+  tfstate_ref        = "../../TLS/RootCA/terraform.tfstate"
+  tfstate_tls_entity = "postgresql"
+}
 
 container = {
   network = {
@@ -33,6 +39,9 @@ container = {
       "environment POSTGRESQL_PASSWORD value"       = "terraform"
       "environment POSTGRESQL_DATABASE value"       = "tfstate"
       "environment POSTGRESQL_ADMIN_PASSWORD value" = "P@ssw0rd"
+
+      "volume postgresql_cert source"      = "/etc/postgresql/certs"
+      "volume postgresql_cert destination" = "/opt/app-root/src/certs"
 
       "volume postgresql_data source"      = "/mnt/data/postgresql"
       "volume postgresql_data destination" = "/var/lib/pgsql/data"

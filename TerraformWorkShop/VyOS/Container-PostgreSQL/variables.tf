@@ -17,6 +17,14 @@ variable "runas" {
   })
 }
 
+variable "cert_config" {
+  type = object({
+    host_path          = string
+    tfstate_ref        = string
+    tfstate_tls_entity = string
+  })
+}
+
 variable "data_dirs" {
   type        = string
   description = "the data dir to store cockroachdb data"

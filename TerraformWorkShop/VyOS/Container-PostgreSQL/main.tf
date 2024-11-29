@@ -32,26 +32,53 @@ resource "null_resource" "init" {
   # }
 }
 
-# data "terraform_remote_state" "root_ca" {
-#   backend = "local"
-#   config = {
-#     path = "../../TLS/RootCA/terraform.tfstate"
-#   }
-# }
+data "terraform_remote_state" "root_ca" {
+  backend = "local"
+  config = {
+    path = var.cert_config.tfstate_ref
+  }
+}
 
-module "vyos_container_postgresql" {
+resource "system_folder" "ssl_dir" {
+  path = var.cert_config.host_path
+  uid  = var.runas.uid
+  gid  = var.runas.gid
+}
+
+resource "system_file" "ssl_cert" {
+  depends_on = [system_folder.ssl_dir]
+  path       = "${var.cert_config.host_path}/tls.crt"
+  content = join("", [
+    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.cert_config.tfstate_tls_entity, null),
+    data.terraform_remote_state.root_ca.outputs.int_ca_pem
+  ])
+  uid = var.runas.uid
+  gid = var.runas.gid
+}
+
+resource "system_file" "ssl_key" {
+  depends_on = [system_folder.ssl_dir]
+  path       = "${var.cert_config.host_path}/tls.key"
+  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.cert_config.tfstate_tls_entity, null)
+  uid        = var.runas.uid
+  gid        = var.runas.gid
+}
+
+module "vyos_container" {
   depends_on = [
     null_resource.init,
+    system_file.ssl_cert,
+    system_file.ssl_key,
   ]
   source   = "../../modules/vyos-container"
   vm_conn  = var.vm_conn
-  network  = var.container_postgresql.network
-  workload = var.container_postgresql.workload
+  network  = var.container.network
+  workload = var.container.workload
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
-    module.vyos_container_postgresql,
+    module.vyos_container,
     # module.vyos_container_adminer
   ]
   for_each = var.reverse_proxy
@@ -61,8 +88,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
 
 resource "vyos_static_host_mapping" "host_mappings" {
   depends_on = [
-    module.vyos_container_postgresql,
-    # module.vyos_container_adminer,
+    module.vyos_container,
     vyos_config_block_tree.reverse_proxy,
   ]
   for_each = {

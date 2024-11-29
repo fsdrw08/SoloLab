@@ -77,105 +77,83 @@ certs = [
       ]
     }
   },
+  # postgresql
+  {
+    name = "postgresql"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "postgresql.day0.sololab"
+      ]
+      subject = {
+        common_name  = "postgresql for day0"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # cockroach node
-  # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
-  {
-    name = "cockroach_node_1"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      # https://www.cockroachlabs.com/docs/stable/authentication#using-a-custom-ca
-      ip_addresses = [
-        "192.168.255.1",
-        "127.0.0.1"
-      ]
-      dns_names = [
-        "localhost",
-        "cockroach.day0.sololab"
-      ]
-      subject = {
-        common_name  = "node"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "key_encipherment",
-        "server_auth",
-        "client_auth",
-      ]
-    }
-  },
+  # # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
+  # {
+  #   name = "cockroach_node_1"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     # https://www.cockroachlabs.com/docs/stable/authentication#using-a-custom-ca
+  #     ip_addresses = [
+  #       "192.168.255.1",
+  #       "127.0.0.1"
+  #     ]
+  #     dns_names = [
+  #       "localhost",
+  #       "cockroach.day0.sololab"
+  #     ]
+  #     subject = {
+  #       common_name  = "node"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "digital_signature",
+  #       "key_encipherment",
+  #       "server_auth",
+  #       "client_auth",
+  #     ]
+  #   }
+  # },
   # cockroach client
-  {
-    name = "cockroach_client_root"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "root",
-      ]
-      subject = {
-        common_name  = "root"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "key_encipherment",
-        "client_auth",
-      ]
-    }
-  },
-  # traefik
-  {
-    name = "traefik"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = ["traefik.day0.sololab"]
-      subject = {
-        common_name  = "traefik.day0.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  # opendj
-  {
-    name = "opendj"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "opendj.day0.sololab",
-        "opendj.service.consul",
-      ]
-      subject = {
-        common_name  = "opendj.day0.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth"
-      ]
-    }
-  },
+  # {
+  #   name = "cockroach_client_root"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "root",
+  #     ]
+  #     subject = {
+  #       common_name  = "root"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "digital_signature",
+  #       "key_encipherment",
+  #       "client_auth",
+  #     ]
+  #   }
+  # },
   # zot
   {
     name = "zot"
@@ -222,6 +200,50 @@ certs = [
       ]
     }
   },
+  # traefik
+  {
+    name = "traefik"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = ["traefik.core.sololab"]
+      subject = {
+        common_name  = "traefik.core.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # opendj
+  {
+    name = "opendj"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "opendj.core.sololab"
+      ]
+      subject = {
+        common_name  = "opendj.core.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
   # vault
   {
     name = "vault"
@@ -234,7 +256,7 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.day0.sololab",
+        "vault.core.sololab",
         "vault.service.consul",
       ]
       subject = {
@@ -279,7 +301,7 @@ certs = [
     }
     cert = {
       dns_names = [
-        "consul.day0.sololab",
+        "consul.core.sololab",
         "consul.service.consul",
         "server.dc1.consul",
         "localhost"
