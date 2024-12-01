@@ -29,7 +29,7 @@ resource "null_resource" "load_image" {
             if [ -f "$ARCHIVE_IMAGE" ]; then
                 sudo podman load --input $ARCHIVE_IMAGE
             else
-                sudo podman pull $CONTAINER_IMAGE
+                sudo podman pull ${var.workload.pull_flag} $CONTAINER_IMAGE
                 if [ -d $(dirname "$ARCHIVE_IMAGE") ]; then
                   sudo mkdir -p $(dirname "$ARCHIVE_IMAGE")
                 fi
@@ -39,7 +39,7 @@ resource "null_resource" "load_image" {
                 # exit 1
             fi
           else
-            sudo podman pull $CONTAINER_IMAGE
+            sudo podman pull ${var.workload.pull_flag} $CONTAINER_IMAGE
           fi
         fi
       EOT

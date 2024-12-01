@@ -20,7 +20,8 @@ variable "workload" {
   type = object({
     name        = string
     image       = string
-    local_image = optional(string, null)
+    local_image = optional(string, "")
+    pull_flag   = optional(string, "")
     others      = map(string)
   })
 }

@@ -1,7 +1,7 @@
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
+    path = var.certs.cert_content_tfstate_ref
   }
 }
 
@@ -12,23 +12,24 @@ resource "system_folder" "config" {
 # https://cockpit-project.org/guide/latest/cockpit-tls.8
 resource "system_folder" "certs" {
   depends_on = [system_folder.config]
-  path       = "/etc/cockpit/ws-certs.d"
+  # path       = "/etc/cockpit/ws-certs.d"
+  path = var.certs.dir
 }
-
 
 resource "system_file" "cert" {
   depends_on = [system_folder.certs]
-  path       = "/etc/cockpit/ws-certs.d/cockpit.crt"
+  # path       = "/etc/cockpit/ws-certs.d/cockpit.crt"
+  path = "${system_folder.certs.path}/cockpit.crt"
   content = join("", [
-    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "cockpit", null),
+    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
     data.terraform_remote_state.root_ca.outputs.int_ca_pem,
   ])
 }
 
 resource "system_file" "key" {
   depends_on = [system_folder.certs]
-  path       = "/etc/cockpit/ws-certs.d/cockpit.key"
-  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "cockpit", null)
+  path       = "${system_folder.certs.path}/cockpit.key"
+  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
 }
 
 module "vyos_container" {

@@ -14,6 +14,14 @@ variable "vyos_conn" {
   })
 }
 
+variable "certs" {
+  type = object({
+    dir                         = string
+    cert_content_tfstate_ref    = string
+    cert_content_tfstate_entity = string
+  })
+}
+
 variable "container" {
   type = object({
     network = object({
@@ -25,7 +33,8 @@ variable "container" {
     workload = object({
       name        = string
       image       = string
-      local_image = optional(string, null)
+      local_image = optional(string, "")
+      pull_flag   = optional(string, "")
       others      = map(string)
     })
   })
