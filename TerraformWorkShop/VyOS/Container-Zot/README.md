@@ -55,8 +55,8 @@ podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os
 # https://github.com/containers/skopeo/issues/394
 # https://github.com/containers/skopeo/blob/main/docs/skopeo.1.md#image-names
 $publicRegistry="quay.io"
-$image="cockpit/ws:316"
-$archive="cockpit_ws_316.tar"
+$image="cockpit/ws:329"
+$archive="quay.io_cockpit_ws_327.tar"
 $privateRegistry="zot.day0.sololab"
 
 $publicRegistry="docker.io"
@@ -86,8 +86,16 @@ $privateRegistry="zot.day0.sololab"
 
 $publicRegistry="quay.io"
 $image="ceph/daemon:latest-main"
-$archive="ceph_daemon.latest-main.tar"
+$archive="quay.io.ceph_daemon_latest-main.tar"
 $privateRegistry="zot.day0.sololab"
+
+$publicRegistry="quay.io"
+$image="fedora/postgresql-16:20241127"
+$archive="quay.io_fedora_postgresql-16_20241127.tar"
+$privateRegistry="zot.day0.sololab"
+
+$proxy="127.0.0.1:7890"
+$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 skopeo copy --insecure-policy `
     --override-os=linux `
@@ -95,7 +103,10 @@ skopeo copy --insecure-policy `
     docker://$publicRegistry/$image `
     oci-archive:$env:PUBLIC/Downloads/containers/$archive
 
+$proxy=""
+$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 skopeo copy --insecure-policy `
+    --src-tls-verify=false `
     --dest-creds=admin:P@ssw0rd `
     oci-archive:$env:PUBLIC/Downloads/containers/$archive `
     docker://$privateRegistry/$image
@@ -117,11 +128,13 @@ oras manifest fetch `
 
 # Push the prior downloaded trivy-db to your registry
 oras push `
+    --insecure `
     --disable-path-validation `
     zot.day0.sololab/aquasecurity/trivy-db:2 `
     db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip
 
 oras manifest push `
+    --insecure `
     zot.day0.sololab/aquasecurity/trivy-db:2 `
     trivy-db-manifest.json
 
