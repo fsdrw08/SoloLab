@@ -31,9 +31,25 @@ resource "null_resource" "init" {
 }
 
 data "terraform_remote_state" "root_ca" {
+  count   = var.certs == null ? 0 : 1
   backend = "local"
   config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
+    path = var.certs.cert_content_tfstate_ref
+  }
+}
+
+locals {
+  certs = var.certs == null ? null : {
+    cacert_basename = var.certs.cacert_basename
+    cacert_content  = data.terraform_remote_state.root_ca[0].outputs.root_cert_pem
+    cert_basename   = var.certs.cert_basename
+    cert_content = join("", [
+      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
+      data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
+    ])
+    key_basename = var.certs.key_basename
+    key_content  = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
+    dir          = var.certs.dir
   }
 }
 
@@ -57,25 +73,12 @@ module "config_map" {
     # }
   }
   config = {
-    main = {
-      # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#configuration-file
-      basename = "config.json"
-      content  = jsonencode(yamldecode(file("${path.module}/config-htpasswd.yaml")))
-    }
-    certs = {
-      cacert_basename = "ca.crt"
-      cacert_content  = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-      cert_basename   = "server.crt"
-      cert_content = join("", [
-        lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "zot", null),
-        data.terraform_remote_state.root_ca.outputs.int_ca_pem
-      ])
-      key_basename = "server.key"
-      key_content  = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "zot", null)
-      sub_dir      = "certs"
-    }
-    dir = "/etc/zot"
+    # https://zotregistry.dev/v2.0.4/admin-guide/admin-configuration/#configuration-file
+    basename = var.config.basename
+    content  = jsonencode(yamldecode(file("${path.module}/${var.config.content_yaml}")))
+    dir      = var.config.dir
   }
+  certs = local.certs
 }
 
 # for ldap auth

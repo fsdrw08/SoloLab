@@ -103,55 +103,56 @@ resource "system_folder" "config" {
 # persist zot config file in dir
 resource "system_file" "main" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, var.config.main.basename])
-  content    = var.config.main.content
+  path       = join("/", [var.config.dir, var.config.basename])
+  content    = var.config.content
   uid        = var.runas.uid
   gid        = var.runas.gid
   mode       = "644"
 }
 
 resource "system_folder" "certs" {
+  count      = var.certs == null ? 0 : 1
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, var.config.certs.sub_dir])
+  path       = var.certs.dir
   uid        = var.runas.uid
   gid        = var.runas.gid
   mode       = "755"
 }
 
 resource "system_file" "cacert" {
-  count = var.config.certs == null ? 0 : 1
+  count = var.certs == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs.path, var.config.certs.cacert_basename])
-  content = var.config.certs.cacert_content
+  path    = join("/", [system_folder.certs[0].path, var.certs.cacert_basename])
+  content = var.certs.cacert_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
 }
 
 resource "system_file" "cert" {
-  count = var.config.certs == null ? 0 : 1
+  count = var.certs == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs.path, var.config.certs.cert_basename])
-  content = var.config.certs.cert_content
+  path    = join("/", [system_folder.certs[0].path, var.certs.cert_basename])
+  content = var.certs.cert_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
 }
 
 resource "system_file" "key" {
-  count = var.config.certs == null ? 0 : 1
+  count = var.certs == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs.path, var.config.certs.key_basename])
-  content = var.config.certs.key_content
+  path    = join("/", [system_folder.certs[0].path, var.certs.key_basename])
+  content = var.certs.key_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"

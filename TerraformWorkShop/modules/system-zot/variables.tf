@@ -37,19 +37,20 @@ variable "install" {
 
 variable "config" {
   type = object({
-    main = object({
-      basename = string
-      content  = string
-    })
-    certs = optional(object({
-      cacert_basename = string
-      cacert_content  = string
-      cert_basename   = string
-      cert_content    = string
-      key_basename    = string
-      key_content     = string
-      sub_dir         = string
-    }))
-    dir = string
+    basename = string
+    content  = string
+    dir      = string
+  })
+}
+
+variable "certs" {
+  type = object({
+    dir             = optional(string)
+    cacert_basename = optional(string)
+    cacert_content  = optional(string)
+    cert_basename   = optional(string)
+    cert_content    = optional(string)
+    key_basename    = optional(string)
+    key_content     = optional(string)
   })
 }

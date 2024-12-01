@@ -28,6 +28,25 @@ variable "data_dirs" {
   type = string
 }
 
+variable "config" {
+  type = object({
+    basename     = string
+    content_yaml = string
+    dir          = string
+  })
+}
+
+variable "certs" {
+  type = object({
+    dir                         = string
+    cert_content_tfstate_ref    = string
+    cert_content_tfstate_entity = string
+    cacert_basename             = string
+    cert_basename               = string
+    key_basename                = string
+  })
+}
+
 variable "container" {
   type = object({
     network = object({

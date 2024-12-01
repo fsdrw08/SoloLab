@@ -20,6 +20,21 @@ runas = {
 
 data_dirs = "/mnt/data/zot"
 
+config = {
+  basename     = "config.json"
+  content_yaml = "config-htpasswd.yaml"
+  dir          = "/etc/zot"
+}
+
+certs = {
+  dir                         = "/etc/zot/certs"
+  cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
+  cert_content_tfstate_entity = "zot"
+  cacert_basename             = "ca.crt"
+  cert_basename               = "server.crt"
+  key_basename                = "server.key"
+}
+
 container = {
   network = {
     create      = true
@@ -29,7 +44,7 @@ container = {
   }
   workload = {
     name        = "zot"
-    image       = "ghcr.io/project-zot/zot-linux-amd64:v2.1.1" # quay.io/giantswarm/zot-linux-amd64:v2.1.1
+    image       = "quay.io/giantswarm/zot-linux-amd64:v2.1.1" # ghcr.io/project-zot/zot-linux-amd64:v2.1.1
     local_image = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.1.1.tar"
     others = {
       "network zot address" = "172.16.4.10"
