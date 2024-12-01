@@ -24,11 +24,21 @@ variable "runas" {
   })
 }
 
-variable "cert_config" {
+variable "config" {
   type = object({
-    host_path          = string
-    tfstate_ref        = string
-    tfstate_tls_entity = string
+    dir = string
+    files = list(object({
+      basename = string
+      content  = string
+    }))
+  })
+}
+
+variable "certs" {
+  type = object({
+    dir                         = string
+    cert_content_tfstate_ref    = string
+    cert_content_tfstate_entity = string
   })
 }
 

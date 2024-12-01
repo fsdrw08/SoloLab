@@ -35,40 +35,58 @@ resource "null_resource" "init" {
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
-    path = var.cert_config.tfstate_ref
+    path = var.certs.cert_content_tfstate_ref
   }
 }
 
-resource "system_folder" "ssl_dir" {
-  path = var.cert_config.host_path
+resource "system_folder" "config" {
+  path = var.config.dir
   uid  = var.runas.uid
   gid  = var.runas.gid
 }
 
-resource "system_file" "ssl_cert" {
-  depends_on = [system_folder.ssl_dir]
-  path       = "${var.cert_config.host_path}/tls.crt"
-  content = join("", [
-    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.cert_config.tfstate_tls_entity, null),
-    data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  ])
-  uid = var.runas.uid
-  gid = var.runas.gid
+resource "system_file" "config" {
+  depends_on = [system_folder.config]
+  for_each = {
+    for file in var.config.files : file.basename => file
+  }
+  path    = "${system_folder.config.path}/${each.value.basename}"
+  content = each.value.content
 }
 
-resource "system_file" "ssl_key" {
-  depends_on = [system_folder.ssl_dir]
-  path       = "${var.cert_config.host_path}/tls.key"
-  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.cert_config.tfstate_tls_entity, null)
+resource "system_folder" "certs" {
+  depends_on = [system_folder.config]
+  path       = var.certs.dir
   uid        = var.runas.uid
   gid        = var.runas.gid
+}
+
+resource "system_file" "cert" {
+  depends_on = [system_folder.certs]
+  path       = "${system_folder.certs.path}/tls.crt"
+  content = join("", [
+    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
+    data.terraform_remote_state.root_ca.outputs.int_ca_pem
+  ])
+  uid  = var.runas.uid
+  gid  = var.runas.gid
+  mode = 600
+}
+
+resource "system_file" "key" {
+  depends_on = [system_folder.certs]
+  path       = "${system_folder.certs.path}/tls.key"
+  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
+  uid        = var.runas.uid
+  gid        = var.runas.gid
+  mode       = 600
 }
 
 module "vyos_container" {
   depends_on = [
     null_resource.init,
-    system_file.ssl_cert,
-    system_file.ssl_key,
+    system_file.cert,
+    system_file.key,
   ]
   source   = "../../modules/vyos-container"
   vm_conn  = var.vm_conn
