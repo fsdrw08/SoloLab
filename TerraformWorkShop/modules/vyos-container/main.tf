@@ -18,27 +18,28 @@ resource "null_resource" "load_image" {
       <<-EOT
         #!/bin/bash
         # check image archive from local
-        LOCAL_IMAGE="${var.workload.local_image}"
+        CONTAINER_IMAGE="${var.workload.image}"
+        ARCHIVE_IMAGE="${var.workload.local_image}"
         # AVAILABLE_IMAGES=($(sudo podman image list | awk '{ if ( NR > 1  ) { print $1 ":" $2} }'))
         AVAILABLE_IMAGES=($(sudo podman image list --format "{{.Repository}}:{{.Tag}}"))
 
-        if [[ ! " $${AVAILABLE_IMAGES[*]} " =~ " ${var.workload.image} " ]]; then
-          if [ ! -z $LOCAL_IMAGE ]; then
-            echo "Loading image ${var.workload.image}"
-            if [ -f "${var.workload.local_image}" ]; then
-                sudo podman load --input ${var.workload.local_image}
+        if [[ ! " $${AVAILABLE_IMAGES[*]} " =~ " $CONTAINER_IMAGE " ]]; then
+          if [[ -n "$ARCHIVE_IMAGE" ]]; then
+            echo "Loading image $CONTAINER_IMAGE"
+            if [ -f "$ARCHIVE_IMAGE" ]; then
+                sudo podman load --input $ARCHIVE_IMAGE
             else
-                sudo podman pull ${var.workload.image}
-                if [ -d $(dirname "${var.workload.local_image}") ]; then
-                  sudo mkdir -p $(dirname "${var.workload.local_image}")
+                sudo podman pull $CONTAINER_IMAGE
+                if [ -d $(dirname "$ARCHIVE_IMAGE") ]; then
+                  sudo mkdir -p $(dirname "$ARCHIVE_IMAGE")
                 fi
-                sudo podman save -o ${var.workload.local_image} ${var.workload.image}
-                # echo "pull and save the target image to ${var.workload.local_image} first"
-                # echo "sudo podman save -o ${var.workload.local_image} ${var.workload.image} first"
+                sudo podman save -o $ARCHIVE_IMAGE $CONTAINER_IMAGE
+                # echo "pull and save the target image to $ARCHIVE_IMAGE first"
+                # echo "sudo podman save -o $ARCHIVE_IMAGE $CONTAINER_IMAGE first"
                 # exit 1
             fi
           else
-            sudo podman pull ${var.workload.image}
+            sudo podman pull $CONTAINER_IMAGE
           fi
         fi
       EOT

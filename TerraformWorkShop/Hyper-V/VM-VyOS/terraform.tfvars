@@ -42,7 +42,7 @@ cloudinit_nocloud = [
   {
     content_source = "./cloudinit-tmpl/meta-data"
     content_vars = {
-      instance_id    = "iid-VyOS_20241126"
+      instance_id    = "iid-VyOS_202412"
       local_hostname = "VyOS"
     }
     filename = "meta-data"
