@@ -6,3 +6,10 @@ variable "vm_conn" {
     password = string
   })
 }
+
+variable "vyos_conn" {
+  type = object({
+    url = string
+    key = string
+  })
+}

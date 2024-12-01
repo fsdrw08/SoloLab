@@ -7,6 +7,13 @@ variable "vm_conn" {
   })
 }
 
+variable "vyos_conn" {
+  type = object({
+    url = string
+    key = string
+  })
+}
+
 variable "container" {
   type = object({
     network = object({

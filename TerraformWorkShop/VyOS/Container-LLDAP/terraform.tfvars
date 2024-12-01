@@ -4,3 +4,8 @@ vm_conn = {
   user     = "vyos"
   password = "vyos"
 }
+
+vyos_conn = {
+  url = "https://vyos-api.day0.sololab"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
+}

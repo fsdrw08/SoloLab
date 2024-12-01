@@ -5,6 +5,11 @@ vm_conn = {
   password = "vyos"
 }
 
+vyos_conn = {
+  url = "https://vyos-api.day0.sololab"
+  key = "MY-HTTPS-API-PLAINTEXT-KEY"
+}
+
 # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile-alpine
 runas = {
   uid         = 1001
