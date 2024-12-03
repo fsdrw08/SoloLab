@@ -45,7 +45,7 @@ container = {
   workload = {
     name        = "zot"
     image       = "quay.io/giantswarm/zot-linux-amd64:v2.1.1" # ghcr.io/project-zot/zot-linux-amd64:v2.1.1
-    local_image = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.1.1.tar"
+    local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.1.tar"
     others = {
       "network zot address" = "172.16.4.10"
 
