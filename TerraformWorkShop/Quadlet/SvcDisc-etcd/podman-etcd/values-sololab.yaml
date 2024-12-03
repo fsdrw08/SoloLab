@@ -1,0 +1,21 @@
+etcd:
+  image:
+    registry: zot.day0.sololab
+    repository: coreos/etcd
+    tag: v3.5.17
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  configFile:
+    initial-cluster: "svcdisc1=http://192.168.255.20:2380"
+    client-transport-security:
+      ## Path to the client server TLS cert file.
+      cert-file:
+      ## Path to the client server TLS key file.
+      key-file:
+      ## Enable client cert authentication.
+      client-cert-auth: false
+      ## Path to the client server TLS trusted CA cert file.
+      trusted-ca-file:
+      ## Client TLS using generated certificates
+      auto-tls: false
