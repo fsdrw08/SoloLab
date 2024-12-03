@@ -18,7 +18,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate?sslmode=disable"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
     schema_name = "HyperV-SvcDisc-VM-FCOS"
   }
   # backend "s3" {

@@ -20,7 +20,8 @@ gpgkey=https://rpm.releases.hashicorp.com/gpg
 }
 
 # https://mirrors.tuna.tsinghua.edu.cn/help/fedora/
-data "ignition_file" "tuna_fedora_repo" {
+# https://mirrors.ustc.edu.cn/help/fedora.html
+data "ignition_file" "mirror_fedora_repo" {
   path      = "/etc/yum.repos.d/fedora.repo"
   mode      = 420 # oct 644 -> dec 420
   overwrite = true
@@ -29,15 +30,18 @@ data "ignition_file" "tuna_fedora_repo" {
 [fedora]
 name=Fedora $releasever - $basearch
 failovermethod=priority
-baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora/releases/$releasever/Everything/$basearch/os/
-metadata_expire=28d
+baseurl=https://mirrors.ustc.edu.cn/fedora/releases/$releasever/Everything/$basearch/os/
+enabled=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
 skip_if_unavailable=False
     EOT
   }
 }
-data "ignition_file" "tuna_fedora_updates_repo" {
+data "ignition_file" "mirror_fedora_updates_repo" {
   path      = "/etc/yum.repos.d/fedora-updates.repo"
   mode      = 420 # oct 644 -> dec 420
   overwrite = true
@@ -46,8 +50,10 @@ data "ignition_file" "tuna_fedora_updates_repo" {
 [updates]
 name=Fedora $releasever - $basearch - Updates
 failovermethod=priority
-baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora/updates/$releasever/Everything/$basearch/
+baseurl=https://mirrors.ustc.edu.cn/fedora/updates/$releasever/Everything/$basearch/
 enabled=1
+repo_gpgcheck=0
+type=rpm
 gpgcheck=1
 metadata_expire=6h
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
@@ -75,6 +81,7 @@ cost=10000 # default is 1000
     EOT
   }
 }
+
 data "ignition_file" "disable_cisco_repo" {
   path      = "/etc/yum.repos.d/fedora-cisco-openh264.repo"
   mode      = 420 # oct 644 -> dec 420
