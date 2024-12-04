@@ -36,6 +36,7 @@ spec:
           value: powerdns
         - name: TEMPLATE_FILES
           value: pdns_auth
+          # this will render into config under template.d
         - name: PNDS_DNSUPDATE
           value: yes
       ports:
