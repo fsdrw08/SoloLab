@@ -29,6 +29,13 @@ variable "data_dirs" {
   description = "the data dir to store cockroachdb data"
 }
 
+variable "config" {
+  type = object({
+    dir = string
+
+  })
+}
+
 variable "container" {
   type = object({
     network = object({

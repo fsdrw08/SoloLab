@@ -38,9 +38,11 @@ container = {
 
       "environment TZ value"                = "Asia/Shanghai"
       "environment PDNS_AUTH_API_KEY value" = "powerdns"
+      "environment TEMPLATE_FILES value"    = "Asia/Shanghai"
       "environment PNDS_DNSUPDATE value"    = "yes"
 
       # https://github.com/PowerDNS/pdns/blob/master/Dockerfile-auth
+      # https://github.com/PowerDNS/pdns/blob/master/dockerdata/startup.py
       # https://github.com/PowerDNS/pdns/blob/master/dockerdata/pdns.conf
       # https://doc.powerdns.com/authoritative/settings.html#include-dir
       "volume pdns_conf source"      = "/etc/powerdns/pdns.d"
