@@ -31,8 +31,8 @@ variable "data_dirs" {
 
 variable "config" {
   type = object({
-    dir = string
-
+    dir          = string
+    entry_script = string
   })
 }
 

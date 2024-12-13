@@ -18,6 +18,18 @@ runas = {
 
 data_dirs = "/mnt/data/powerdns"
 
+config = {
+  dir          = "/etc/powerdns"
+  entry_script = <<EOT
+#!/bin/sh
+if [ ! -f "/var/lib/powerdns/pdns.sqlite3" ]; then
+    sqlite3 /var/lib/powerdns/pdns.sqlite3 < /usr/local/share/doc/pdns/schema.sqlite3.sql
+fi
+
+/usr/bin/tini -- /usr/local/sbin/pdns_server-startup
+  EOT
+}
+
 container = {
   network = {
     create      = true
