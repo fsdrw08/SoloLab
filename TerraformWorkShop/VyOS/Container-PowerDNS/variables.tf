@@ -33,6 +33,17 @@ variable "config" {
   type = object({
     dir          = string
     entry_script = string
+    files = optional(list(object({
+      basename = string
+      content  = string
+    })))
+  })
+}
+
+variable "certs" {
+  type = object({
+    cert_content_tfstate_ref    = string
+    cert_content_tfstate_entity = string
   })
 }
 
@@ -65,4 +76,11 @@ variable "dns_records" {
     host = string
     ip   = string
   }))
+}
+
+variable "dns_forwarding" {
+  type = object({
+    path    = string
+    configs = map(string)
+  })
 }

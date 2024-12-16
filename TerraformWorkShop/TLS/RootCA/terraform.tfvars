@@ -177,6 +177,29 @@ certs = [
       ]
     }
   },
+  # powerdns api
+  {
+    name = "pdns"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "pdns.day0.sololab"
+      ]
+      subject = {
+        common_name  = "PowerDNS"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # cockpit
   {
     name = "cockpit"
