@@ -10,10 +10,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20241127",
-        "archive": "quay.io_fedora_postgresql-16_20241127.tar",
+        "publicRepo": "fedora/postgresql-16:20241211",
+        "archive": "quay.io_fedora_postgresql-16_20241211.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "fedora/postgresql-16:20241127",
+        "privateRepo": "fedora/postgresql-16:20241211",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
@@ -31,6 +31,14 @@ $syncList = @"
         "privateRegistry": "zot.day0.sololab",
         "privateRepo": "coredns/coredns:1.12.0",
         "description": "https://hub.docker.com/r/coredns/coredns/tags, https://quay.io/repository/giantswarm/coredns?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "powerdns/pdns-auth-49:4.9.2",
+        "archive": "docker.io_powerdns_pdns-auth-49_4.9.2.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "powerdns/pdns-auth-49:4.9.2",
+        "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
     },
 ]
 "@
