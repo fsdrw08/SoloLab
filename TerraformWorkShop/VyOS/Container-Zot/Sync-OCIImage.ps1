@@ -1,12 +1,12 @@
 $syncList = @"
 [
     {
-        "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:329",
-        "archive": "quay.io_cockpit_ws_329.tar",
+        "publicRegistry": "docker.io",
+        "publicRepo": "powerdns/pdns-auth-49:4.9.3",
+        "archive": "docker.io_powerdns_pdns-auth-49_4.9.3.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "cockpit/ws:329",
-        "description": "https://quay.io/repository/cockpit/ws?tab=tags",
+        "privateRepo": "powerdns/pdns-auth-49:4.9.3",
+        "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
     },
     {
         "publicRegistry": "quay.io",
@@ -15,6 +15,14 @@ $syncList = @"
         "privateRegistry": "zot.day0.sololab",
         "privateRepo": "fedora/postgresql-16:20241211",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "cockpit/ws:329",
+        "archive": "quay.io_cockpit_ws_329.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "cockpit/ws:329",
+        "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
@@ -32,14 +40,6 @@ $syncList = @"
         "privateRepo": "coredns/coredns:1.12.0",
         "description": "https://hub.docker.com/r/coredns/coredns/tags, https://quay.io/repository/giantswarm/coredns?tab=tags",
     },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "powerdns/pdns-auth-49:4.9.2",
-        "archive": "docker.io_powerdns_pdns-auth-49_4.9.2.tar",
-        "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "powerdns/pdns-auth-49:4.9.2",
-        "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
-    },
 ]
 "@
 
@@ -48,11 +48,13 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-$proxy="127.0.0.1:7890"
+# $proxy="127.0.0.1:7890"
+$proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {
     if (-not (Test-Path -Path $localDir/$($_.archive))) {
+        Write-Host "Download docker image then convert to OCI archive $localDir/$($_.archive)"
         skopeo copy --insecure-policy `
             --override-os=linux `
             --override-arch=amd64 `
@@ -66,6 +68,7 @@ $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {
     if (Test-Path -Path $localDir/$($_.archive)) {
+    Write-Host "Upload OCI image OCI archive $localDir/$($_.archive) to $($_.privateRegistry)/$($_.privateRepo)"
     skopeo copy --insecure-policy `
         --dest-tls-verify=false `
         --dest-creds="admin:P@ssw0rd" `
