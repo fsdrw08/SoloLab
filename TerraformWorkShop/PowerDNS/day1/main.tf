@@ -23,7 +23,7 @@ resource "powerdns_record" "etcd_SRV" {
   ttl  = 300
   records = [
     "0 10 2380 etcd-0.day1.sololab.",
-    "0 10 2380 etcd-1.day1.sololab.",
-    "0 10 2380 etcd-2.day1.sololab.",
+    # "0 10 2380 etcd-1.day1.sololab.",
+    # "0 10 2380 etcd-2.day1.sololab.",
   ]
 }

@@ -53,7 +53,7 @@ container = {
   # https://hub.docker.com/r/powerdns/pdns-auth-49/tags
   workload = {
     name      = "powerdns"
-    image     = "zot.day0.sololab/powerdns/pdns-auth-49:4.9.2"
+    image     = "zot.day0.sololab/powerdns/pdns-auth-49:4.9.3"
     pull_flag = "--tls-verify=false"
 
     # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
