@@ -7,7 +7,17 @@ etcd:
     - name: TZ
       value: Asia/Shanghai
   configFile:
-    initial-cluster: "svcdisc1=http://192.168.255.20:2380"
+    ## List of this member's peer URLs to advertise to the rest of the cluster.
+    ## for DNS bootstrap, The resolved address in --initial-advertise-peer-urls
+    ## must match one of the resolved addresses in the SRV targets
+    initial-advertise-peer-urls: https://etcd-0.day1.sololab:2380
+    ## List of this member's client URLs to advertise to the public.
+    advertise-client-urls: https://etcd-0.day1.sololab:2379
+    ## List of URLs to listen on for client grpc traffic
+    ## and http as long as --listen-client-http-urls is not specified.
+    listen-client-urls: https://0.0.0.0:2379
+    ## DNS srv domain used to bootstrap the cluster
+    discovery-srv: day1.sololab
     client-transport-security:
       ## Path to the client server TLS cert file.
       cert-file:

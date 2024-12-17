@@ -7,21 +7,21 @@ vm_conn = {
 
 podman_kube = {
   helm = {
-    name   = "traefik"
-    chart  = "../../../HelmWorkShop/helm-charts/charts/traefik"
-    values = "./podman-traefik/values-sololab.yaml"
+    name   = "etcd"
+    chart  = "../../../HelmWorkShop/helm-charts/charts/etcd"
+    values = "./podman-etcd/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
+  yaml_file_path = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
 }
 
 podman_quadlet = {
   quadlet = {
     file_contents = [
       {
-        file_source = "./podman-traefik/traefik-container.kube"
+        file_source = "./podman-etcd/etcd-container.kube"
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
-          yaml          = "traefik-aio.yaml"
+          yaml          = "etcd-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
           KubeDownForce = "true"
         }
@@ -30,7 +30,7 @@ podman_quadlet = {
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }
   service = {
-    name   = "traefik-container"
+    name   = "etcd-container"
     status = "start"
   }
 }
@@ -38,22 +38,22 @@ podman_quadlet = {
 container_restart = {
   systemd_path_unit = {
     content = {
-      templatefile = "./podman-traefik/restart.path"
+      templatefile = "./podman-etcd/restart.path"
       vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
+        PathModified = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
       }
     }
-    path = "/home/podmgr/.config/systemd/user/traefik_restart.path"
+    path = "/home/podmgr/.config/systemd/user/etcd_restart.path"
   }
   systemd_service_unit = {
     content = {
-      templatefile = "./podman-traefik/restart.service"
+      templatefile = "./podman-etcd/restart.service"
       vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/traefik-container.service"
-        target_service   = "traefik-container.service"
+        AssertPathExists = "/run/user/1001/systemd/generator/etcd-container.service"
+        target_service   = "etcd-container.service"
       }
     }
-    path = "/home/podmgr/.config/systemd/user/traefik_restart.service"
+    path = "/home/podmgr/.config/systemd/user/etcd_restart.service"
   }
 
 }
