@@ -1,7 +1,8 @@
 data "terraform_remote_state" "root_ca" {
+  count   = var.certs == null ? 0 : 1
   backend = "local"
   config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
+    path = var.certs.cert_content_tfstate_ref
   }
 }
 
@@ -14,11 +15,7 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name  = "traefik.tls.contents.\"ca\\.crt\""
-    value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  }
-  set {
-    name = "traefik.tls.contents.\"dashboard\\.crt\""
+    name = "etcd.configFile.cert-file"
     value = join("", [
       lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "traefik", null),
       data.terraform_remote_state.root_ca.outputs.int_ca_pem,

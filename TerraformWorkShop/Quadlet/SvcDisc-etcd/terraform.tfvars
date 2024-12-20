@@ -5,6 +5,14 @@ vm_conn = {
   password = "podmgr"
 }
 
+certs = {
+  cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
+  cert_content_tfstate_entity = "etcd"
+  cacert_basename             = "ca.crt"
+  cert_basename               = "server.crt"
+  key_basename                = "server.key"
+}
+
 podman_kube = {
   helm = {
     name   = "etcd"

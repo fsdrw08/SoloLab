@@ -7,25 +7,51 @@ etcd:
     - name: TZ
       value: Asia/Shanghai
   configFile:
-    ## List of this member's peer URLs to advertise to the rest of the cluster.
-    ## for DNS bootstrap, The resolved address in --initial-advertise-peer-urls
-    ## must match one of the resolved addresses in the SRV targets
+    ### Member
+    ## @param etcd.configFile.name Human-readable name for this member.
+    ##
+    name: etcd-0
+    ## @param etcd.configFile.listen-peer-urls List of URLs to listen on for peer traffic.
+    ## This flag tells the etcd to accept incoming requests from its peers on the specified scheme://IP:port combinations.
+    ## Scheme can be http or https. Alternatively, use unix://<file-path> or unixs://<file-path> for unix sockets.
+    ## If 0.0.0.0 is specified as the IP, etcd listens to the given port on all interfaces.
+    ## If an IP address is given as well as a port, etcd will listen on the given port and interface.
+    ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
+    ## The etcd will respond to requests from any of the listed addresses and ports.
+    ##
+    listen-peer-urls: "https://0.0.0.0:2380"
+    ## @param etcd.configFile.listen-client-urls List of URLs to listen on for client grpc traffic and http as long as --listen-client-http-urls is not specified.
+    ## Scheme can be either http or https. Alternatively, use unix://<file-path> or unixs://<file-path> for unix sockets.
+    ## If 0.0.0.0 is specified as the IP, etcd listens to the given port on all interfaces.
+    ## If an IP address is given as well as a port, etcd will listen on the given port and interface.
+    ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
+    ## The etcd will respond to requests from any of the listed addresses and ports.
+    ##
+    listen-client-urls: "https://0.0.0.0:2379"
+    ### Clustering
+    ## @param etcd.configFile.initial-advertise-peer-urls List of this member's peer URLs to advertise to the rest of the cluster.
+    ##
     initial-advertise-peer-urls: https://etcd-0.day1.sololab:2380
-    ## List of this member's client URLs to advertise to the public.
+    ## @param etcd.configFile.initial-cluster-token Initial cluster token for the etcd cluster during bootstrap.
+    ## Specifying this can protect you from unintended cross-cluster interaction when running multiple clusters.
+    initial-cluster-token: "day1-etcd-cluster"
+    ## @param etcd.configFile.advertise-client-urls List of this member's client URLs to advertise to the public.
+    ## The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
+    ##
     advertise-client-urls: https://etcd-0.day1.sololab:2379
-    ## List of URLs to listen on for client grpc traffic
-    ## and http as long as --listen-client-http-urls is not specified.
-    listen-client-urls: https://0.0.0.0:2379
-    ## DNS srv domain used to bootstrap the cluster
-    discovery-srv: day1.sololab
-    client-transport-security:
-      ## Path to the client server TLS cert file.
-      cert-file:
-      ## Path to the client server TLS key file.
-      key-file:
-      ## Enable client cert authentication.
-      client-cert-auth: false
-      ## Path to the client server TLS trusted CA cert file.
-      trusted-ca-file:
-      ## Client TLS using generated certificates
-      auto-tls: false
+    ## @param etcd.configFile.discovery-srv DNS srv domain used to bootstrap the cluster.
+    ##
+    discovery-srv: "day1.sololab"
+    ### Security
+    ## @param etcd.configFile.cert-file Path to the client server TLS cert file.
+    ##
+    cert-file: ""
+    ## @param etcd.configFile.key-file Path to the client server TLS key file.
+    ##
+    key-file: ""
+    ## @param etcd.configFile.peer-cert-file Path to the peer server TLS cert file.
+    ##
+    peer-cert-file: ""
+    ## @param etcd.configFile.peer-key-file Path to the peer server TLS key file.
+    ##
+    peer-key-file: ""
