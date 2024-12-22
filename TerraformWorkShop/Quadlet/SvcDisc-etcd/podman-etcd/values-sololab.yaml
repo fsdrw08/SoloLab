@@ -43,15 +43,25 @@ etcd:
     ##
     discovery-srv: "day1.sololab"
     ### Security
-    ## @param etcd.configFile.cert-file Path to the client server TLS cert file.
-    ##
-    cert-file: ""
-    ## @param etcd.configFile.key-file Path to the client server TLS key file.
-    ##
-    key-file: ""
-    ## @param etcd.configFile.peer-cert-file Path to the peer server TLS cert file.
-    ##
-    peer-cert-file: ""
-    ## @param etcd.configFile.peer-key-file Path to the peer server TLS key file.
-    ##
-    peer-key-file: ""
+    ## @param etcd.configFile.client-transport-security Block to config the client transport security
+    client-transport-security:
+      ## @param etcd.configFile.client-transport-security.cert-file Path to the client server TLS cert file.
+      ## aka --cert-file
+      ##
+      cert-file: /etc/etcd/pki/server.crt
+      ## @param etcd.configFile.client-transport-security.key-file Path to the client server TLS key file.
+      ##
+      key-file: /etc/etcd/pki/server.key
+    ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
+    peer-transport-security:
+      ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.
+      ## Certificate used for SSL/TLS connections between peers.
+      ## This will be used both for listening on the peer address as well as sending requests to other peers.
+      ##
+      cert-file: /etc/etcd/pki/server.crt
+      ## @param etcd.configFile.peer-transport-security.key-file Path to the peer server TLS key file. Must be unencrypted.
+      ##
+      key-file: /etc/etcd/pki/server.key
+  ## @param etcd.tls secret setting of cert and key or whatever tls content will set in the container
+  ## @param etcd.tls.mountPath secret mount path setting of cert and key or whatever tls content will set in the container
+  ##

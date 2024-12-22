@@ -9,12 +9,8 @@ variable "vm_conn" {
 
 variable "certs" {
   type = object({
-    dir                         = string
     cert_content_tfstate_ref    = string
     cert_content_tfstate_entity = string
-    cacert_basename             = string
-    cert_basename               = string
-    key_basename                = string
   })
 }
 

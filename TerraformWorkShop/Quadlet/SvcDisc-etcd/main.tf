@@ -15,15 +15,15 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name = "etcd.configFile.cert-file"
+    name = "etcd.tls.contents.\"server\\.crt\""
     value = join("", [
-      lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "traefik", null),
-      data.terraform_remote_state.root_ca.outputs.int_ca_pem,
+      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
+      data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
     ])
   }
   set {
-    name  = "traefik.tls.contents.\"dashboard\\.key\""
-    value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "traefik", null)
+    name  = "etcd.tls.contents.\"server\\.key\""
+    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
   }
 
 }
@@ -105,7 +105,7 @@ resource "null_resource" "podman_quadlet" {
 
 module "container_restart" {
   depends_on = [null_resource.podman_quadlet]
-  source     = "../../System/modules/systemd_path_user"
+  source     = "../../modules/system-systemd_path_user"
   vm_conn = {
     host     = var.vm_conn.host
     port     = var.vm_conn.port
@@ -128,13 +128,13 @@ module "container_restart" {
   }
 }
 
-resource "vyos_static_host_mapping" "host_mapping" {
-  depends_on = [
-    null_resource.podman_quadlet,
-  ]
-  host = "traefik.day0.sololab"
-  ip   = "192.168.255.20"
-}
+# resource "vyos_static_host_mapping" "host_mapping" {
+#   depends_on = [
+#     null_resource.podman_quadlet,
+#   ]
+#   host = "traefik.day0.sololab"
+#   ip   = "192.168.255.20"
+# }
 
 # locals {
 #   post_process = {

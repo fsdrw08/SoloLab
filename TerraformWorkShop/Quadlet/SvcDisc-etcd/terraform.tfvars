@@ -8,9 +8,9 @@ vm_conn = {
 certs = {
   cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
   cert_content_tfstate_entity = "etcd"
-  cacert_basename             = "ca.crt"
-  cert_basename               = "server.crt"
-  key_basename                = "server.key"
+  # cacert_basename          = "ca.crt"
+  # cert_value_path          = "server.crt"
+  # key_value_path           = "server.key"
 }
 
 podman_kube = {
