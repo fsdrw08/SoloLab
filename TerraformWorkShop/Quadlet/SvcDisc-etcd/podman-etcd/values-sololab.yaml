@@ -19,7 +19,7 @@ etcd:
     ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
     ## The etcd will respond to requests from any of the listed addresses and ports.
     ##
-    listen-peer-urls: "https://0.0.0.0:2380"
+    listen-peer-urls: https://0.0.0.0:2380
     ## @param etcd.configFile.listen-client-urls List of URLs to listen on for client grpc traffic and http as long as --listen-client-http-urls is not specified.
     ## Scheme can be either http or https. Alternatively, use unix://<file-path> or unixs://<file-path> for unix sockets.
     ## If 0.0.0.0 is specified as the IP, etcd listens to the given port on all interfaces.
@@ -27,7 +27,7 @@ etcd:
     ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
     ## The etcd will respond to requests from any of the listed addresses and ports.
     ##
-    listen-client-urls: "https://0.0.0.0:2379"
+    listen-client-urls: https://0.0.0.0:2379,unix://localhost:0
     ### Clustering
     ## @param etcd.configFile.initial-advertise-peer-urls List of this member's peer URLs to advertise to the rest of the cluster.
     ##
