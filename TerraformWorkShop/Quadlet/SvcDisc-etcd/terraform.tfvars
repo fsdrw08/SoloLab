@@ -7,7 +7,7 @@ vm_conn = {
 
 certs = {
   cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
-  cert_content_tfstate_entity = "etcd"
+  cert_content_tfstate_entity = "etcd-server"
   # cacert_basename          = "ca.crt"
   # cert_value_path          = "server.crt"
   # key_value_path           = "server.key"
@@ -31,7 +31,7 @@ podman_quadlet = {
         vars = {
           yaml          = "etcd-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "true"
+          KubeDownForce = "false"
         }
       },
     ]

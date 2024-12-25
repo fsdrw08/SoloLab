@@ -6,6 +6,58 @@ etcd:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
+  ## @param etcd.containerPorts etcd container port to expose to host
+  ## e.g.
+  ## containerPorts:
+  ##   - name: http
+  ##     containerPort: 80
+  ##     hostPort: 80
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##   - name: https
+  ##     containerPort: 443
+  ##     hostPort: 443
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##
+  containerPorts:
+    - name: client
+      containerPort: 2379
+      hostPort: 2379
+      protocol: TCP
+    - name: peer
+      containerPort: 2380
+      hostPort: 2380
+      protocol: TCP
+    - name: health
+      containerPort: 2381
+      hostPort: 2381
+      protocol: TCP
+  ## Configure extra options for etcd containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param etcd.livenessProbe.enabled Enable livenessProbe on etcd containers
+  ## @param etcd.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param etcd.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param etcd.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param etcd.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param etcd.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 180
+    periodSeconds: 300
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    ## https://github.com/openshift/microshift/blob/80d5b311cf012acc0cb33b9178d148198a64c2d3/ansible/roles/install-microshift/files/etcd.service
+    ## note: after enable auth ("etcdctl auth enable"), the `endpoint health` command will require credential,
+    ## use `etcdctl endpoint status` instead if you dont want to provide credential in the probe
+    exec:
+      command:
+        - etcdctl
+        - endpoint
+        - status
+        - --endpoints=unix://localhost:0
   configFile:
     ### Member
     ## @param etcd.configFile.name Human-readable name for this member.
@@ -52,6 +104,16 @@ etcd:
       ## @param etcd.configFile.client-transport-security.key-file Path to the client server TLS key file.
       ##
       key-file: /etc/etcd/pki/server.key
+      ## @param etcd.configFile.client-transport-security.client-cert-auth Enable client cert authentication.
+      ## It's recommended to enable client cert authentication to prevent attacks from unauthenticated clients (e.g. CVE-2023-44487), especially when running etcd as a public service.
+      ## aka --client-cert-auth
+      ##
+      # client-cert-auth: true
+      ## @param etcd.configFile.client-transport-security.trusted-ca-file Path to the client server TLS trusted CA cert file.
+      ## Note setting this parameter will also automatically enable client cert authentication no matter what value is set for `--client-cert-auth`.
+      ## aka --trusted-ca-file
+      ##
+      # trusted-ca-file: /etc/etcd/pki/ca.crt
     ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
     peer-transport-security:
       ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.
@@ -62,6 +124,10 @@ etcd:
       ## @param etcd.configFile.peer-transport-security.key-file Path to the peer server TLS key file. Must be unencrypted.
       ##
       key-file: /etc/etcd/pki/server.key
+    ### Profiling and monitoring
+    ## @param etcd.configFile.listen-metrics-urls List of URLs to listen on for the metrics and health endpoints.
+    ##
+    listen-metrics-urls: http://0.0.0.0:2381
   ## @param etcd.tls secret setting of cert and key or whatever tls content will set in the container
   ## @param etcd.tls.mountPath secret mount path setting of cert and key or whatever tls content will set in the container
   ##
