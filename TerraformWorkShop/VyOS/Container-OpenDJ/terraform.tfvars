@@ -39,10 +39,12 @@ container = {
       "environment ROOT_PASSWORD value" = "P@ssw0rd"
       # pkcs12 doesn't work, use jks instead
       # "environment OPENDJ_SSL_OPTIONS value" = "--usePkcs12keyStore /cert/opendj.pfx --keyStorePassword changeit"
+      # https://github.com/OpenIdentityPlatform/OpenDJ/blob/4.8.2/opendj-server-legacy/src/main/java/org/opends/quicksetup/util/Utils.java#L1499-L1503
       "environment OPENDJ_SSL_OPTIONS value" = "--useJavaKeystore /opt/opendj/certs/keystore --keyStorePassword changeit"
 
       "volume opendj_cert source"      = "/etc/opendj/certs"
       "volume opendj_cert destination" = "/opt/opendj/certs"
+      # https://github.com/OpenIdentityPlatform/OpenDJ/wiki/TIP:-How-to-Persist-OpenDJ-Docker-Container-Data-Between-Restarts
       "volume opendj_data source"      = "/mnt/data/opendj"
       "volume opendj_data destination" = "/opt/opendj/data"
       # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile

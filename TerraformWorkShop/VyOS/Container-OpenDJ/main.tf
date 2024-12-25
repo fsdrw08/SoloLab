@@ -73,6 +73,8 @@ module "config_map" {
   runas      = var.runas
   install    = null
   config = {
+    # the properties block only needed when deploy on local machine
+    # ref: https://github.com/OpenWIS/open-dj-am-install-scripts/blob/4e08bb61782d7d8621e6e88ba65ec4e8d0f2ace9/deploy-scripts/deploy.sh#L28
     properties = {
       basename = "setup.props"
       content = templatefile("${path.module}/opendj/setup.props", {

@@ -1,5 +1,5 @@
 # https://www.digitalocean.com/community/tutorials/how-to-use-ldif-files-to-make-changes-to-an-openldap-system#replacing-the-value-of-an-attribute-in-an-entry
-# https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/src/site/resources/Example.ldif#L51-L66
+# https://github.com/OpenIdentityPlatform/OpenDJ/blob/4.8.2/opendj-doc-generated-ref/src/main/asciidoc/attachments/Example.ldif#L52-L67
 # https://github.com/freeipa/freeipa/blob/cce8dc4da87a934644712158b97242960a8d138e/install/share/default-aci.ldif#L18
 dn: ${baseDN}
 changetype: modify

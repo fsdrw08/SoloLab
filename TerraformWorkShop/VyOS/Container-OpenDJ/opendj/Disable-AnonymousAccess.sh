@@ -16,6 +16,7 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
 set-global-configuration-prop \
 --set reject-unauthenticated-requests:true
 
+# enable use LDAP Client to update end users password manually
 # https://forums.oracle.com/ords/apexds/post/allow-passwords-to-enter-in-pre-encoded-form-9340
 /opt/opendj/bin/dsconfig \
  -p 4444 \
