@@ -10,18 +10,18 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20241211",
-        "archive": "quay.io_fedora_postgresql-16_20241211.tar",
+        "publicRepo": "fedora/postgresql-16:20241225",
+        "archive": "quay.io_fedora_postgresql-16_20241225.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "fedora/postgresql-16:20241211",
+        "privateRepo": "fedora/postgresql-16:20241225",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:329",
-        "archive": "quay.io_cockpit_ws_329.tar",
+        "publicRepo": "cockpit/ws:331",
+        "archive": "quay.io_cockpit_ws_331.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "cockpit/ws:329",
+        "privateRepo": "cockpit/ws:331",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
@@ -40,6 +40,14 @@ $syncList = @"
         "privateRepo": "coredns/coredns:1.12.0",
         "description": "https://hub.docker.com/r/coredns/coredns/tags, https://quay.io/repository/giantswarm/coredns?tab=tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "openidentityplatform/opendj:4.8.2",
+        "archive": "docker.io_openidentityplatform_opendj_4.8.2.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "openidentityplatform/opendj:4.8.2",
+        "description": "https://hub.docker.com/r/openidentityplatform/opendj/tags",
+    },
 ]
 "@
 
@@ -48,8 +56,8 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-# $proxy="127.0.0.1:7890"
-$proxy="192.168.255.1:7890"
+$proxy="127.0.0.1:7890"
+# $proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {

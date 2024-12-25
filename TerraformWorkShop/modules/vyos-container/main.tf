@@ -51,6 +51,9 @@ resource "null_resource" "load_image" {
       "sudo podman image rm ${self.triggers.image}"
     ]
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "vyos_config_block_tree" "container_network" {

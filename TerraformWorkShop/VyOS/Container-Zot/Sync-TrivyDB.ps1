@@ -28,7 +28,7 @@ $env:HTTP_PROXY=$null; $env:HTTPS_PROXY=$null
 oras push `
     --insecure `
     --disable-path-validation `
-    --artifact-type application/vnd.aquasec.trivy.config.v1+json
+    --artifact-type application/vnd.aquasec.trivy.config.v1+json `
     $privateRegistry/$privateRepo `
     db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip `
 

@@ -50,7 +50,7 @@ container = {
   # https://quay.io/repository/fedora/postgresql-16
   workload = {
     name      = "postgresql"
-    image     = "zot.day0.sololab/fedora/postgresql-16:20241127"
+    image     = "zot.day0.sololab/fedora/postgresql-16:20241225"
     pull_flag = "--tls-verify=false"
 
     # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"

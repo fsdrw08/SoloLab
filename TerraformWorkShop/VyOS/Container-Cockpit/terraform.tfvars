@@ -24,10 +24,9 @@ container = {
     address     = "172.16.5.10"
   }
   workload = {
-    name = "cockpit"
-    # image       = "quay.io/cockpit/ws:329"
-    # local_image = "/mnt/data/offline/images/quay.io_cockpit_ws_329.tar"
-    image     = "zot.day0.sololab/cockpit/ws:329"
+    name  = "cockpit"
+    image = "zot.day0.sololab/cockpit/ws:331"
+    # local_image = "/mnt/data/offline/images/quay.io_cockpit_ws_331.tar"
     pull_flag = "--tls-verify=false"
     others = {
       "network cockpit address" = "172.16.5.10"
