@@ -1,0 +1,12 @@
+[Unit]
+Description="etcd key-value store"
+Documentation=https://github.com/etcd-io/etcd
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+
+[Install]
+WantedBy=default.target

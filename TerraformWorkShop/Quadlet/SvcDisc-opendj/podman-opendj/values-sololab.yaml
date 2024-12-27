@@ -1,0 +1,133 @@
+etcd:
+  image:
+    registry: zot.day0.sololab
+    repository: coreos/etcd
+    tag: v3.5.17
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  ## @param etcd.containerPorts etcd container port to expose to host
+  ## e.g.
+  ## containerPorts:
+  ##   - name: http
+  ##     containerPort: 80
+  ##     hostPort: 80
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##   - name: https
+  ##     containerPort: 443
+  ##     hostPort: 443
+  ##     hostIP: 192.168.255.10
+  ##     protocol: TCP
+  ##
+  containerPorts:
+    - name: client
+      containerPort: 2379
+      hostPort: 2379
+      protocol: TCP
+    - name: peer
+      containerPort: 2380
+      hostPort: 2380
+      protocol: TCP
+    - name: health
+      containerPort: 2381
+      hostPort: 2381
+      protocol: TCP
+  ## Configure extra options for etcd containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param etcd.livenessProbe.enabled Enable livenessProbe on etcd containers
+  ## @param etcd.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param etcd.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param etcd.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param etcd.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param etcd.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 180
+    periodSeconds: 300
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    ## https://github.com/openshift/microshift/blob/80d5b311cf012acc0cb33b9178d148198a64c2d3/ansible/roles/install-microshift/files/etcd.service
+    ## note: after enable auth ("etcdctl auth enable"), the `endpoint health` command will require credential,
+    ## use `etcdctl endpoint status` instead if you dont want to provide credential in the probe
+    exec:
+      command:
+        - etcdctl
+        - endpoint
+        - status
+        - --endpoints=unix://localhost:0
+  configFile:
+    ### Member
+    ## @param etcd.configFile.name Human-readable name for this member.
+    ##
+    name: etcd-0
+    ## @param etcd.configFile.listen-peer-urls List of URLs to listen on for peer traffic.
+    ## This flag tells the etcd to accept incoming requests from its peers on the specified scheme://IP:port combinations.
+    ## Scheme can be http or https. Alternatively, use unix://<file-path> or unixs://<file-path> for unix sockets.
+    ## If 0.0.0.0 is specified as the IP, etcd listens to the given port on all interfaces.
+    ## If an IP address is given as well as a port, etcd will listen on the given port and interface.
+    ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
+    ## The etcd will respond to requests from any of the listed addresses and ports.
+    ##
+    listen-peer-urls: https://0.0.0.0:2380
+    ## @param etcd.configFile.listen-client-urls List of URLs to listen on for client grpc traffic and http as long as --listen-client-http-urls is not specified.
+    ## Scheme can be either http or https. Alternatively, use unix://<file-path> or unixs://<file-path> for unix sockets.
+    ## If 0.0.0.0 is specified as the IP, etcd listens to the given port on all interfaces.
+    ## If an IP address is given as well as a port, etcd will listen on the given port and interface.
+    ## Multiple URLs may be used to specify a number of addresses and ports to listen on.
+    ## The etcd will respond to requests from any of the listed addresses and ports.
+    ##
+    listen-client-urls: https://0.0.0.0:2379,unix://localhost:0
+    ### Clustering
+    ## @param etcd.configFile.initial-advertise-peer-urls List of this member's peer URLs to advertise to the rest of the cluster.
+    ##
+    initial-advertise-peer-urls: https://etcd-0.day1.sololab:2380
+    ## @param etcd.configFile.initial-cluster-token Initial cluster token for the etcd cluster during bootstrap.
+    ## Specifying this can protect you from unintended cross-cluster interaction when running multiple clusters.
+    initial-cluster-token: "day1-etcd-cluster"
+    ## @param etcd.configFile.advertise-client-urls List of this member's client URLs to advertise to the public.
+    ## The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
+    ##
+    advertise-client-urls: https://etcd-0.day1.sololab:2379
+    ## @param etcd.configFile.discovery-srv DNS srv domain used to bootstrap the cluster.
+    ##
+    discovery-srv: "day1.sololab"
+    ### Security
+    ## @param etcd.configFile.client-transport-security Block to config the client transport security
+    client-transport-security:
+      ## @param etcd.configFile.client-transport-security.cert-file Path to the client server TLS cert file.
+      ## aka --cert-file
+      ##
+      cert-file: /etc/etcd/pki/server.crt
+      ## @param etcd.configFile.client-transport-security.key-file Path to the client server TLS key file.
+      ##
+      key-file: /etc/etcd/pki/server.key
+      ## @param etcd.configFile.client-transport-security.client-cert-auth Enable client cert authentication.
+      ## It's recommended to enable client cert authentication to prevent attacks from unauthenticated clients (e.g. CVE-2023-44487), especially when running etcd as a public service.
+      ## aka --client-cert-auth
+      ##
+      # client-cert-auth: true
+      ## @param etcd.configFile.client-transport-security.trusted-ca-file Path to the client server TLS trusted CA cert file.
+      ## Note setting this parameter will also automatically enable client cert authentication no matter what value is set for `--client-cert-auth`.
+      ## aka --trusted-ca-file
+      ##
+      # trusted-ca-file: /etc/etcd/pki/ca.crt
+    ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
+    peer-transport-security:
+      ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.
+      ## Certificate used for SSL/TLS connections between peers.
+      ## This will be used both for listening on the peer address as well as sending requests to other peers.
+      ##
+      cert-file: /etc/etcd/pki/server.crt
+      ## @param etcd.configFile.peer-transport-security.key-file Path to the peer server TLS key file. Must be unencrypted.
+      ##
+      key-file: /etc/etcd/pki/server.key
+    ### Profiling and monitoring
+    ## @param etcd.configFile.listen-metrics-urls List of URLs to listen on for the metrics and health endpoints.
+    ##
+    listen-metrics-urls: http://0.0.0.0:2381
+  ## @param etcd.tls secret setting of cert and key or whatever tls content will set in the container
+  ## @param etcd.tls.mountPath secret mount path setting of cert and key or whatever tls content will set in the container
+  ##
