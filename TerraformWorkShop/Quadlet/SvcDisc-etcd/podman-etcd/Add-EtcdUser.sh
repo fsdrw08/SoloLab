@@ -2,7 +2,7 @@
 # podman exec etcd-etcd etcdctl endpoint status --endpoints=${ENDPOINTS}
 
 # https://github.com/SUNET/puppet-sunet/blob/be81ef89c724859eac49fbcf55217ecb72991e0a/templates/knubbis/fleetlock_standalone/etcd-bootstrap/bootstrap.sh.erb#L26
-base_cmd="podman exec etcd-etcd etcdctl --endpoints=${ENDPOINTS} "
+base_cmd="podman exec ${CONTAINER_NAME} etcdctl --endpoints=${ENDPOINTS} "
 
 # wait for etcd container to be alive
 while true; do

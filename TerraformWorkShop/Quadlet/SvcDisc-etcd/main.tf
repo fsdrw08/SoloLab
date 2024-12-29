@@ -141,8 +141,9 @@ locals {
     Add-EtcdUser = {
       script_path = "./podman-etcd/Add-EtcdUser.sh"
       vars = {
-        ENDPOINTS     = "unix://localhost:0"
-        ROOT_PASSWORD = "P@ssw0rd"
+        CONTAINER_NAME = "etcd-etcd"
+        ENDPOINTS      = "unix://localhost:0"
+        ROOT_PASSWORD  = "P@ssw0rd"
       }
     }
   }
