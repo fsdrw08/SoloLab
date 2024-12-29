@@ -1,0 +1,5 @@
+# https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/src/site/resources/Example.ldif#L124
+dn: ou=People\,${baseDN}
+objectClass: organizationalunit
+objectClass: top
+ou: People

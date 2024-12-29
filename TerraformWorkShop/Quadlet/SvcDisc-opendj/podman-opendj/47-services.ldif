@@ -1,0 +1,7 @@
+# https://github.com/alexrzem/ansible-infra/blob/9c9cc16ab3d54cc2fcf876325647ab5a783a4655/roles/ping-directory-install/templates/top.ldif#L61-L65
+# https://github.com/OpenIdentityPlatform/OpenDJ/wiki/Administration-Privilege-and-Access#61-about-access-control-instructions
+dn: ou=Services\,${baseDN}
+objectClass: organizationalunit
+objectClass: top
+ou: Services
+aci: (targetattr = "*")(version 3.0; acl "Service account self modification denied for all attributes"; deny (write) userdn ="ldap:///self";)

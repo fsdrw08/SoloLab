@@ -17,9 +17,15 @@ variable "certs" {
 variable "podman_kube" {
   type = object({
     helm = object({
-      name   = string
-      chart  = string
-      values = string
+      name       = string
+      chart      = string
+      value_file = string
+      value_sets = list(object({
+        name                = string
+        value_string        = optional(string, null)
+        value_template_path = optional(string, null)
+        value_template_vars = optional(map(string), null)
+      }))
     })
     yaml_file_path = string
   })

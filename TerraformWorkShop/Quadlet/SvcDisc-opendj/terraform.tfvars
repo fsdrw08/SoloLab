@@ -7,7 +7,7 @@ vm_conn = {
 
 certs = {
   cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
-  cert_content_tfstate_entity = "etcd-server"
+  cert_content_tfstate_entity = "opendj"
   # cacert_basename          = "ca.crt"
   # cert_value_path          = "server.crt"
   # key_value_path           = "server.key"
@@ -15,21 +15,51 @@ certs = {
 
 podman_kube = {
   helm = {
-    name   = "etcd"
-    chart  = "../../../HelmWorkShop/helm-charts/charts/etcd"
-    values = "./podman-etcd/values-sololab.yaml"
+    name       = "opendj"
+    chart      = "../../../HelmWorkShop/helm-charts/charts/opendj"
+    value_file = "./podman-opendj/values-sololab.yaml"
+    value_sets = [
+      {
+        name                = "opendj.schemas.\"44-domain_base\\.ldif\""
+        value_template_path = "./podman-opendj/44-domain_base.ldif"
+        value_template_vars = {
+          baseDN = "dc=root\\,dc=sololab"
+        }
+      },
+      {
+        name                = "opendj.schemas.\"45-groups\\.ldif\""
+        value_template_path = "./podman-opendj/45-groups.ldif"
+        value_template_vars = {
+          baseDN = "dc=root\\,dc=sololab"
+        }
+      },
+      {
+        name                = "opendj.schemas.\"46-people\\.ldif\""
+        value_template_path = "./podman-opendj/46-people.ldif"
+        value_template_vars = {
+          baseDN = "dc=root\\,dc=sololab"
+        }
+      },
+      {
+        name                = "opendj.schemas.\"47-services\\.ldif\""
+        value_template_path = "./podman-opendj/47-services.ldif"
+        value_template_vars = {
+          baseDN = "dc=root\\,dc=sololab"
+        }
+      },
+    ]
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
+  yaml_file_path = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
 }
 
 podman_quadlet = {
   quadlet = {
     file_contents = [
       {
-        file_source = "./podman-etcd/etcd-container.kube"
+        file_source = "./podman-opendj/opendj-container.kube"
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
-          yaml          = "etcd-aio.yaml"
+          yaml          = "opendj-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
           KubeDownForce = "false"
         }
@@ -38,7 +68,7 @@ podman_quadlet = {
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }
   service = {
-    name   = "etcd-container"
+    name   = "opendj-container"
     status = "start"
   }
 }
@@ -46,22 +76,22 @@ podman_quadlet = {
 container_restart = {
   systemd_path_unit = {
     content = {
-      templatefile = "./podman-etcd/restart.path"
+      templatefile = "./podman-opendj/restart.path"
       vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
+        PathModified = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
       }
     }
-    path = "/home/podmgr/.config/systemd/user/etcd_restart.path"
+    path = "/home/podmgr/.config/systemd/user/opendj_restart.path"
   }
   systemd_service_unit = {
     content = {
-      templatefile = "./podman-etcd/restart.service"
+      templatefile = "./podman-opendj/restart.service"
       vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/etcd-container.service"
-        target_service   = "etcd-container.service"
+        AssertPathExists = "/run/user/1001/systemd/generator/opendj-container.service"
+        target_service   = "opendj-container.service"
       }
     }
-    path = "/home/podmgr/.config/systemd/user/etcd_restart.service"
+    path = "/home/podmgr/.config/systemd/user/opendj_restart.service"
   }
 
 }

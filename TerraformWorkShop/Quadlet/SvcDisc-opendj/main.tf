@@ -15,7 +15,7 @@ data "jks_keystore" "keystore" {
     private_key = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
 
     intermediate_certificates = [
-      data.terraform_remote_state.root_ca.outputs.int_ca_pem,
+      data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
     ]
   }
 }
@@ -25,9 +25,18 @@ data "helm_template" "podman_kube" {
   chart = var.podman_kube.helm.chart
 
   values = [
-    "${file(var.podman_kube.helm.values)}"
+    "${file(var.podman_kube.helm.value_file)}"
   ]
 
+  dynamic "set" {
+    for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
+    content {
+      name = set.value.name
+      value = set.value.value_string != null ? set.value.value_string : templatefile(
+        "${set.value.value_template_path}", "${set.value.value_template_vars}"
+      )
+    }
+  }
   set {
     name  = "opendj.ssl.contents_b64.\"keystore\\.jks\""
     value = data.jks_keystore.keystore.jks_base64
@@ -145,11 +154,13 @@ module "container_restart" {
 
 locals {
   post_process = {
-    Add-EtcdUser = {
-      script_path = "./podman-etcd/Add-EtcdUser.sh"
+    Disable-AnonymousAccess = {
+      script_path = "./podman-opendj/Disable-AnonymousAccess.sh"
       vars = {
-        ENDPOINTS     = "unix://localhost:0"
-        ROOT_PASSWORD = "P@ssw0rd"
+        CONTAINER_NAME = "opendj-opendj"
+        hostname       = "localhost"
+        bindDN         = "cn=Directory Manager"
+        bindPassword   = "P@ssw0rd"
       }
     }
   }

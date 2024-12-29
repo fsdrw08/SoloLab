@@ -12,14 +12,14 @@ terraform {
       source  = "tenstad/remote"
       version = ">=0.1.3"
     }
-    vyos = {
-      source  = "Foltik/vyos"
-      version = ">=0.3.3"
+    jks = {
+      source  = "fhke/jks"
+      version = ">=1.0.1"
     }
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "System-SvcDisc-Quadlet-Consul"
+    schema_name = "System-SvcDisc-Quadlet-OpenDJ"
   }
 }
 
@@ -30,9 +30,4 @@ provider "remote" {
     user     = var.vm_conn.user
     password = var.vm_conn.password
   }
-}
-
-provider "vyos" {
-  url = "https://vyos-api.day0.sololab"
-  key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
