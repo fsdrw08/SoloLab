@@ -95,3 +95,18 @@ container_restart = {
   }
 
 }
+
+pdns = {
+  api_key    = "powerdns"
+  server_url = "https://pdns.day0.sololab"
+}
+
+dns_record = {
+  zone = "day1.sololab."
+  name = "opendj.day1.sololab."
+  type = "A"
+  ttl  = 86400
+  records = [
+    "192.168.255.20"
+  ]
+}

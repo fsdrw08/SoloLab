@@ -7,6 +7,23 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
       echo "  Waiting for OpenDJ to start..." ; sleep 1;
     done;
 
+# take a fine-grained approach to limit anonymous access
+# https://doc.openidentityplatform.org/opendj/admin-guide/chap-privileges-acis#configure-acis
+/opt/opendj/bin/dsconfig \
+--port=4444 \
+--hostname ${hostname} \
+--bindDN '${bindDN}' \
+--bindPassword ${bindPassword} \
+--trustAll \
+--no-prompt \
+set-access-control-handler-prop \
+  --remove=global-aci:'(targetattr!="userPassword||authPassword||changes||
+  changeNumber||changeType||changeTime||targetDN||newRDN||
+  newSuperior||deleteOldRDN||targetEntryUUID||changeInitiatorsName||
+  changeLogCookie||includedAttributes")(version 3.0; acl "Anonymous
+   read access"; allow (read,search,compare) userdn="ldap:///anyone";)'
+
+# enable anonymous access
 /opt/opendj/bin/dsconfig \
 --port 4444 \
 --hostname ${hostname} \
@@ -15,12 +32,12 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
 --trustAll \
 --no-prompt \
 set-global-configuration-prop \
---set reject-unauthenticated-requests:true
+--set reject-unauthenticated-requests:false
 
 # enable use LDAP Client to update end users password manually
 # https://forums.oracle.com/ords/apexds/post/allow-passwords-to-enter-in-pre-encoded-form-9340
 /opt/opendj/bin/dsconfig \
- -p 4444 \
+ --port 4444 \
  --hostname ${hostname} \
  --bindDN '${bindDN}' \
  --bindPassword ${bindPassword} \

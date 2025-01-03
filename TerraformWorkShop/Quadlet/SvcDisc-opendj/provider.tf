@@ -16,6 +16,10 @@ terraform {
       source  = "fhke/jks"
       version = ">=1.0.1"
     }
+    powerdns = {
+      source  = "pyama86/powerdns"
+      version = ">=1.5.1"
+    }
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
@@ -30,4 +34,10 @@ provider "remote" {
     user     = var.vm_conn.user
     password = var.vm_conn.password
   }
+}
+
+provider "powerdns" {
+  api_key        = var.pdns.api_key
+  server_url     = var.pdns.server_url
+  insecure_https = var.pdns.insecure_https
 }

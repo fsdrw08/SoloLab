@@ -66,3 +66,21 @@ variable "container_restart" {
     })
   })
 }
+
+variable "pdns" {
+  type = object({
+    api_key        = string
+    server_url     = string
+    insecure_https = optional(bool, null)
+  })
+}
+
+variable "dns_record" {
+  type = object({
+    zone    = string
+    name    = string
+    type    = string
+    ttl     = number
+    records = list(string)
+  })
+}
