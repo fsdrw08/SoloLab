@@ -1,0 +1,178 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+# config users
+passwd:
+  users:
+    # set core user password and ssh key
+    - name: core
+      groups:
+        - wheel
+        - sudo
+      # to gen password hash
+      # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
+      password_hash: ${core_password_hash}
+      ssh_authorized_keys:
+        - "${core_ssh_authorized_keys}"
+    # set rootless user password and ssh key
+    - name: podmgr
+      uid: 1001
+      # to gen password hash
+      # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
+      password_hash: ${podmgr_password_hash}
+      ssh_authorized_keys:
+        - "${podmgr_ssh_authorized_keys}"
+storage:
+  files:
+    # enable lingering to make user level service able to auto start on boot
+    - path: /var/lib/systemd/linger/podmgr
+    # stop container before machine halt/poweroff/shutdown/reboot
+    # https://askubuntu.com/questions/952363/how-do-i-properly-run-this-systemd-service-on-shutdown
+    # https://github.com/iree-org/iree/blob/65bbc4b4d56f3e752cc14fd8c8f53796a80bb0bf/build_tools/github_actions/runner/config/systemd/system/gh-runner-deregister.service#L12
+    - path: /var/home/podmgr/.config/systemd/user/stop-container.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+      contents:
+        inline: |
+          [Unit]
+          Description=Stop container before shutdown
+          DefaultDependencies=no
+          Before=halt.target poweroff.target shutdown.target reboot.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/bin/sh -c "for svc in $(ls /run/user/1001/systemd/generator/ | grep service); do systemctl --user stop $svc; done"
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=halt.target poweroff.target shutdown.target reboot.target
+  # set rootless user home dir to external disk
+  directories:
+    - path: /var/home/podmgr
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
+    - path: /var/home/podmgr/.config
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # config podman quadlet
+    # https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+    - path: /var/home/podmgr/.config/containers
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    - path: /var/home/podmgr/.config/containers/systemd
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # config user level systemd
+    - path: /var/home/podmgr/.config/systemd
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    - path: /var/home/podmgr/.config/systemd/user
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level default.target.wants dir for service auto start
+    # https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
+    - path: /var/home/podmgr/.config/systemd/user/default.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level sockets.target.wants dir for service auto run during this phase
+    # then link the socket in this dir for socket auto start when user login
+    # https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
+    - path: /var/home/podmgr/.config/systemd/user/sockets.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level halt.target.wants dir for service auto run during this phase
+    - path: /var/home/podmgr/.config/systemd/user/halt.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level poweroff.target.wants dir for service auto run during this phase
+    - path: /var/home/podmgr/.config/systemd/user/poweroff.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level shutdown.target.wants dir for service auto run during this phase
+    - path: /var/home/podmgr/.config/systemd/user/shutdown.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # create user level reboot.target.wants dir for service auto run during this phase
+    - path: /var/home/podmgr/.config/systemd/user/reboot.target.wants
+      mode: 0755
+      user:
+        id: 1001
+      group:
+        id: 1001
+  links:
+    # link the socket in this dir for socket auto start when user login
+    - path: /var/home/podmgr/.config/systemd/user/sockets.target.wants/podman.socket
+      target: /usr/lib/systemd/user/podman.socket
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # link the user level stop container service to halt.target.wants dir for container service auto stop when halt
+    - path: /var/home/podmgr/.config/systemd/user/halt.target.wants/stop-container.service
+      target: /var/home/podmgr/.config/systemd/user/stop-container.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # link the user level stop container service to poweroff.target.wants dir for container service auto stop when halt
+    - path: /var/home/podmgr/.config/systemd/user/poweroff.target.wants/stop-container.service
+      target: /var/home/podmgr/.config/systemd/user/stop-container.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # link the user level stop container service to shutdown.target.wants dir for container service auto stop when halt
+    - path: /var/home/podmgr/.config/systemd/user/shutdown.target.wants/stop-container.service
+      target: /var/home/podmgr/.config/systemd/user/stop-container.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+    # link the user level stop container service to reboot.target.wants dir for container service auto stop when halt
+    - path: /var/home/podmgr/.config/systemd/user/reboot.target.wants/stop-container.service
+      target: /var/home/podmgr/.config/systemd/user/stop-container.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001

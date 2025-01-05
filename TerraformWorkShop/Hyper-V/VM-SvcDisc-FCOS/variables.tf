@@ -1,67 +1,62 @@
-variable "hyperv" {
+variable "prov_hyperv" {
   type = object({
     host     = string
     port     = number
     user     = string
     password = string
   })
-  default = {
-    host     = "127.0.0.1"
-    port     = 5986
-    user     = "root"
-    password = "P@ssw0rd"
-  }
 }
 
-variable "vm_name" {
-  type    = string
-  default = null
+variable "vm" {
+  type = object({
+    name = string
+    vhd = object({
+      dir    = string
+      source = string
+      data_disk_ref = object({
+        backend = string
+        config  = map(string)
+      })
+    })
+    nic = list(object({
+      name                = string
+      switch_name         = string
+      dynamic_mac_address = optional(bool, null)
+      static_mac_address  = optional(string, null)
+    }))
+    enable_secure_boot = optional(string, "On")
+    memory = object({
+      startup_bytes = number
+      maximum_bytes = number
+      minimum_bytes = number
+    })
+  })
 }
 
-variable "vhd_dir" {
-  type    = string
-  default = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+variable "butane" {
+  type = object({
+    files = object({
+      base   = string
+      others = optional(list(string), null)
+    })
+    vars = map(string)
+  })
 }
 
-variable "source_disk" {
-  type    = string
-  default = null
+variable "prov_pdns" {
+  type = object({
+    api_key        = string
+    server_url     = string
+    insecure_https = optional(bool, null)
+  })
 }
 
-variable "data_disk_ref" {
-  type    = string
-  default = "null"
-}
-
-variable "network_adaptors" {
-  type = list(object({
-    name                = string
-    switch_name         = string
-    dynamic_mac_address = optional(bool)
-    static_mac_address  = optional(string)
-  }))
-}
-
-variable "enable_secure_boot" {
-  type    = string
-  default = "Off"
-}
-
-variable "memory_startup_bytes" {
-  type    = number
-  default = 1023410176
-}
-
-variable "memory_maximum_bytes" {
-  type    = number
-  default = 2147483648
-}
-
-variable "memory_minimum_bytes" {
-  type    = number
-  default = 1023410176
-}
-
-variable "fcos_timezone" {
-  type = string
+variable "dns_record" {
+  type = object({
+    zone    = string
+    name    = string
+    type    = string
+    ttl     = number
+    records = list(string)
+  })
 }

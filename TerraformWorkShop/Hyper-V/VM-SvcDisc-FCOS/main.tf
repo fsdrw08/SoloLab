@@ -3,62 +3,74 @@ locals {
 }
 
 # generate ignition file content
-data "ignition_config" "ignition" {
-  count       = local.count
-  disks       = [data.ignition_disk.data.rendered]
-  filesystems = [data.ignition_filesystem.data.rendered]
-  systemd = [
-    data.ignition_systemd_unit.data.rendered,
-    data.ignition_systemd_unit.rpm_ostree.rendered
-  ]
-  directories = [
-    data.ignition_directory.user_home.rendered,
-    data.ignition_directory.user_config.rendered,
-    data.ignition_directory.user_config_systemd.rendered,
-    data.ignition_directory.user_config_systemd_user.rendered,
-    data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
-    data.ignition_directory.user_config_systemd_user_haltTargetWants.rendered,
-    data.ignition_directory.user_config_systemd_user_poweroffTargetWants.rendered,
-    data.ignition_directory.user_config_systemd_user_shutdownTargetWants.rendered,
-    data.ignition_directory.user_config_systemd_user_rebootTargetWants.rendered,
-    data.ignition_directory.user_config_containers.rendered,
-    data.ignition_directory.user_config_containers_systemd.rendered,
-  ]
-  users = [
-    data.ignition_user.core.rendered,
-    data.ignition_user.user.rendered
-  ]
-  files = [
-    data.ignition_file.hostname[count.index].rendered,
-    data.ignition_file.disable_dhcp.rendered,
-    data.ignition_file.eth0[count.index].rendered,
-    # data.ignition_file.hashicorp_repo.rendered,
-    data.ignition_file.mirror_fedora_repo.rendered,
-    data.ignition_file.mirror_fedora_updates_repo.rendered,
-    data.ignition_file.disable_cisco_repo.rendered,
-    data.ignition_file.disable_fedora_updates_archive_repo.rendered,
-    data.ignition_file.rpms.rendered,
-    data.ignition_file.rootless_linger.rendered,
-    data.ignition_file.rootless_podman_socket_tcp_service.rendered,
-    data.ignition_file.enable_password_auth.rendered,
-    data.ignition_file.sysctl_unprivileged_port.rendered,
-  ]
-  links = [
-    data.ignition_link.timezone.rendered,
-    data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
-    data.ignition_link.user_stop_container_before_halt.rendered,
-    data.ignition_link.user_stop_container_before_poweroff.rendered,
-    data.ignition_link.user_stop_container_before_shutdown.rendered,
-    data.ignition_link.user_stop_container_before_reboot.rendered,
-    # if dont want to expose podman tcp socket, just comment below line
-    # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
+# data "ignition_config" "ignition" {
+#   count       = local.count
+#   disks       = [data.ignition_disk.data.rendered]
+#   filesystems = [data.ignition_filesystem.data.rendered]
+#   systemd = [
+#     data.ignition_systemd_unit.data.rendered,
+#     data.ignition_systemd_unit.rpm_ostree.rendered
+#   ]
+#   directories = [
+#     data.ignition_directory.user_home.rendered,
+#     data.ignition_directory.user_config.rendered,
+#     data.ignition_directory.user_config_systemd.rendered,
+#     data.ignition_directory.user_config_systemd_user.rendered,
+#     data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
+#     data.ignition_directory.user_config_systemd_user_haltTargetWants.rendered,
+#     data.ignition_directory.user_config_systemd_user_poweroffTargetWants.rendered,
+#     data.ignition_directory.user_config_systemd_user_shutdownTargetWants.rendered,
+#     data.ignition_directory.user_config_systemd_user_rebootTargetWants.rendered,
+#     data.ignition_directory.user_config_containers.rendered,
+#     data.ignition_directory.user_config_containers_systemd.rendered,
+#   ]
+#   users = [
+#     data.ignition_user.core.rendered,
+#     data.ignition_user.user.rendered
+#   ]
+#   files = [
+#     data.ignition_file.hostname[count.index].rendered,
+#     data.ignition_file.disable_dhcp.rendered,
+#     data.ignition_file.eth0[count.index].rendered,
+#     # data.ignition_file.hashicorp_repo.rendered,
+#     data.ignition_file.mirror_fedora_repo.rendered,
+#     data.ignition_file.mirror_fedora_updates_repo.rendered,
+#     data.ignition_file.disable_cisco_repo.rendered,
+#     data.ignition_file.disable_fedora_updates_archive_repo.rendered,
+#     data.ignition_file.rpms.rendered,
+#     data.ignition_file.rootless_linger.rendered,
+#     data.ignition_file.rootless_podman_socket_tcp_service.rendered,
+#     data.ignition_file.enable_password_auth.rendered,
+#     data.ignition_file.sysctl_unprivileged_port.rendered,
+#   ]
+#   links = [
+#     data.ignition_link.timezone.rendered,
+#     data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
+#     data.ignition_link.user_stop_container_before_halt.rendered,
+#     data.ignition_link.user_stop_container_before_poweroff.rendered,
+#     data.ignition_link.user_stop_container_before_shutdown.rendered,
+#     data.ignition_link.user_stop_container_before_reboot.rendered,
+#     # if dont want to expose podman tcp socket, just comment below line
+#     # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
+#   ]
+# }
+
+data "ct_config" "ignition" {
+  count        = local.count
+  content      = templatefile(var.butane.files.base, var.butane.vars)
+  strict       = true
+  pretty_print = false
+
+  snippets = [
+    for file in var.butane.files.others :
+    templatefile(file, var.butane.vars)
   ]
 }
 
 # present ignition file to local
 resource "local_file" "ignition" {
   count    = local.count
-  content  = data.ignition_config.ignition[count.index].rendered
+  content  = data.ct_config.ignition[count.index].rendered
   filename = "ignition${count.index + 1}.json"
 }
 
@@ -68,14 +80,14 @@ resource "null_resource" "remote" {
   depends_on = [local_file.ignition]
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(data.ignition_config.ignition[count.index].rendered))
-    vhd_dir       = var.vhd_dir
-    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
+    manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
+    vhd_dir       = var.vm.vhd.dir
+    vm_name       = local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
-    host     = var.hyperv.host
-    user     = var.hyperv.user
-    password = sensitive(var.hyperv.password)
+    host     = var.prov_hyperv.host
+    user     = var.prov_hyperv.user
+    password = sensitive(var.prov_hyperv.password)
   }
 
   connection {
@@ -110,23 +122,20 @@ resource "null_resource" "remote" {
 }
 
 data "terraform_remote_state" "data_disk" {
-  backend = "pg"
-  config = {
-    conn_str    = "postgres://terraform:terraform@192.168.255.1/tfstate"
-    schema_name = "HyperV-SvcDisc-Disk-FCOS"
-  }
+  backend = var.vm.vhd.data_disk_ref.backend
+  config  = var.vm.vhd.data_disk_ref.config
 }
 
 resource "terraform_data" "boot_disk" {
   count = local.count
   input = join("\\", [
-    var.vhd_dir,
-    local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}",
+    var.vm.vhd.dir,
+    local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}",
     join(".", [
       "boot",
       element(
-        split(".", basename(var.source_disk)),
-      length(split(".", basename(var.source_disk))) - 1)
+        split(".", basename(var.vm.vhd.source)),
+      length(split(".", basename(var.vm.vhd.source))) - 1)
     ])
     ]
   )
@@ -139,7 +148,7 @@ module "hyperv_machine_instance" {
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
-    source = var.source_disk
+    source = var.vm.vhd.source
   }
 
   boot_disk_drive = [
@@ -161,20 +170,20 @@ module "hyperv_machine_instance" {
   ]
 
   vm_instance = {
-    name                 = local.count <= 1 ? var.vm_name : "${var.vm_name}${count.index + 1}"
+    name                 = local.count <= 1 ? var.vm.name : "${var.vm.name}${count.index + 1}"
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
-    memory_maximum_bytes = var.memory_maximum_bytes
-    memory_minimum_bytes = var.memory_minimum_bytes
-    memory_startup_bytes = var.memory_startup_bytes
+    memory_maximum_bytes = var.vm.memory.maximum_bytes
+    memory_minimum_bytes = var.vm.memory.minimum_bytes
+    memory_startup_bytes = var.vm.memory.startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
     state                = "Off"
 
     vm_firmware = {
       console_mode                    = "Default"
-      enable_secure_boot              = "On"
+      enable_secure_boot              = var.vm.enable_secure_boot
       secure_boot_template            = "MicrosoftUEFICertificateAuthority"
       pause_after_boot_failure        = "Off"
       preferred_network_boot_protocol = "IPv4"
@@ -209,7 +218,7 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    network_adaptors = var.network_adaptors
+    network_adaptors = var.vm.nic
 
   }
 }
@@ -224,14 +233,14 @@ resource "null_resource" "kvpctl" {
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(data.ignition_config.ignition[count.index].rendered))
-    vhd_dir       = var.vhd_dir
-    vm_name       = local.count <= 1 ? "${var.vm_name}" : "${var.vm_name}${count.index + 1}"
+    manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
+    vhd_dir       = var.vm.vhd.dir
+    vm_name       = local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}"
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
-    host     = var.hyperv.host
-    user     = var.hyperv.user
-    password = sensitive(var.hyperv.password)
+    host     = var.prov_hyperv.host
+    user     = var.prov_hyperv.user
+    password = sensitive(var.prov_hyperv.password)
   }
 
   connection {
@@ -247,8 +256,16 @@ resource "null_resource" "kvpctl" {
 
   provisioner "remote-exec" {
     inline = [<<-EOT
-      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
+      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
     EOT
     ]
   }
+}
+
+resource "powerdns_record" "record" {
+  zone    = var.dns_record.zone
+  name    = var.dns_record.name
+  type    = var.dns_record.type
+  ttl     = var.dns_record.ttl
+  records = var.dns_record.records
 }

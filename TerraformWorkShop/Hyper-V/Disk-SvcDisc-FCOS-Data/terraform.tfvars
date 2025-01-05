@@ -8,6 +8,6 @@ hyperv = {
 vhd = {
   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\SvcDisc-FCOS-Data.vhdx"
   block_size = 0
-  type       = "dynamic"
+  type       = "Dynamic"
   size       = 42949672960
 }

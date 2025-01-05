@@ -8,13 +8,21 @@ terraform {
       source  = "hashicorp/null"
       version = ">=3.2.2"
     }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = ">=2.3.5"
+    # ignition = {
+    #   source  = "community-terraform-providers/ignition"
+    #   version = ">=2.3.5"
+    # }
+    ct = {
+      source  = "poseidon/ct"
+      version = ">=0.13.0"
     }
     local = {
       source  = "hashicorp/local"
       version = ">=2.5.1"
+    }
+    powerdns = {
+      source  = "pyama86/powerdns"
+      version = ">=1.5.1"
     }
   }
   backend "pg" {
@@ -44,10 +52,10 @@ terraform {
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.hyperv.user
-  password = var.hyperv.password
-  host     = var.hyperv.host
-  port     = var.hyperv.port
+  user     = var.prov_hyperv.user
+  password = var.prov_hyperv.password
+  host     = var.prov_hyperv.host
+  port     = var.prov_hyperv.port
   https    = true
   insecure = true
   use_ntlm = true
@@ -57,4 +65,10 @@ provider "hyperv" {
   # key_path        = ""
   script_path = "C:/Temp/terraform_%RAND%.cmd"
   timeout     = "30s"
+}
+
+provider "powerdns" {
+  api_key        = var.prov_pdns.api_key
+  server_url     = var.prov_pdns.server_url
+  insecure_https = var.prov_pdns.insecure_https
 }
