@@ -12,7 +12,9 @@ $projectPath = git rev-parse --show-toplevel
 # terraform providers mirror (Join-Path -Path $projectPath -ChildPath "TerraformWorkShop\terraform.d\mirror")
 $proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy;$env:HTTPS_PROXY=$proxy
-terraform providers mirror (Join-Path -Path $env:PUBLIC -ChildPath "Downloads\terraform.d\mirror")
+$publicDir=$env:PUBLIC
+# $publicDir="D:\Users\Public\"
+terraform providers mirror (Join-Path -Path $publicDir -ChildPath "Downloads\terraform.d\mirror")
 $env:HTTP_PROXY=$null;$env:HTTPS_PROXY=$null
 ```
 
