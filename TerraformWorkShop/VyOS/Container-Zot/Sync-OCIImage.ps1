@@ -42,10 +42,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "openidentityplatform/opendj:4.8.2",
-        "archive": "docker.io_openidentityplatform_opendj_4.8.2.tar",
+        "publicRepo": "openidentityplatform/opendj:4.9.0",
+        "archive": "docker.io_openidentityplatform_opendj_4.9.0.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "openidentityplatform/opendj:4.8.2",
+        "privateRepo": "openidentityplatform/opendj:4.9.0",
         "description": "https://hub.docker.com/r/openidentityplatform/opendj/tags",
     },
 ]
