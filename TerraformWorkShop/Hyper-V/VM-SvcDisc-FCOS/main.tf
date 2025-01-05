@@ -2,59 +2,6 @@ locals {
   count = 1
 }
 
-# generate ignition file content
-# data "ignition_config" "ignition" {
-#   count       = local.count
-#   disks       = [data.ignition_disk.data.rendered]
-#   filesystems = [data.ignition_filesystem.data.rendered]
-#   systemd = [
-#     data.ignition_systemd_unit.data.rendered,
-#     data.ignition_systemd_unit.rpm_ostree.rendered
-#   ]
-#   directories = [
-#     data.ignition_directory.user_home.rendered,
-#     data.ignition_directory.user_config.rendered,
-#     data.ignition_directory.user_config_systemd.rendered,
-#     data.ignition_directory.user_config_systemd_user.rendered,
-#     data.ignition_directory.user_config_systemd_user_defaultTargetWants.rendered,
-#     data.ignition_directory.user_config_systemd_user_haltTargetWants.rendered,
-#     data.ignition_directory.user_config_systemd_user_poweroffTargetWants.rendered,
-#     data.ignition_directory.user_config_systemd_user_shutdownTargetWants.rendered,
-#     data.ignition_directory.user_config_systemd_user_rebootTargetWants.rendered,
-#     data.ignition_directory.user_config_containers.rendered,
-#     data.ignition_directory.user_config_containers_systemd.rendered,
-#   ]
-#   users = [
-#     data.ignition_user.core.rendered,
-#     data.ignition_user.user.rendered
-#   ]
-#   files = [
-#     data.ignition_file.hostname[count.index].rendered,
-#     data.ignition_file.disable_dhcp.rendered,
-#     data.ignition_file.eth0[count.index].rendered,
-#     # data.ignition_file.hashicorp_repo.rendered,
-#     data.ignition_file.mirror_fedora_repo.rendered,
-#     data.ignition_file.mirror_fedora_updates_repo.rendered,
-#     data.ignition_file.disable_cisco_repo.rendered,
-#     data.ignition_file.disable_fedora_updates_archive_repo.rendered,
-#     data.ignition_file.rpms.rendered,
-#     data.ignition_file.rootless_linger.rendered,
-#     data.ignition_file.rootless_podman_socket_tcp_service.rendered,
-#     data.ignition_file.enable_password_auth.rendered,
-#     data.ignition_file.sysctl_unprivileged_port.rendered,
-#   ]
-#   links = [
-#     data.ignition_link.timezone.rendered,
-#     data.ignition_link.rootless_podman_socket_unix_autostart.rendered,
-#     data.ignition_link.user_stop_container_before_halt.rendered,
-#     data.ignition_link.user_stop_container_before_poweroff.rendered,
-#     data.ignition_link.user_stop_container_before_shutdown.rendered,
-#     data.ignition_link.user_stop_container_before_reboot.rendered,
-#     # if dont want to expose podman tcp socket, just comment below line
-#     # data.ignition_link.rootless_podman_socket_tcp_autostart.rendered,
-#   ]
-# }
-
 data "ct_config" "ignition" {
   count        = local.count
   content      = templatefile(var.butane.files.base, var.butane.vars)
