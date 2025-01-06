@@ -1,5 +1,12 @@
 locals {
   count = 1
+  vm_names = var.vm.count == 1 ? [var.vm.name] : [
+    for count in range(var.vm.count) : "${var.vm.name}0${count + 1}"
+  ]
+}
+
+output "test" {
+  value = local.vm_names
 }
 
 data "ct_config" "ignition" {

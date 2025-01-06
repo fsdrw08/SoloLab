@@ -9,7 +9,8 @@ variable "prov_hyperv" {
 
 variable "vm" {
   type = object({
-    name = string
+    count = number
+    name  = string
     vhd = object({
       dir    = string
       source = string

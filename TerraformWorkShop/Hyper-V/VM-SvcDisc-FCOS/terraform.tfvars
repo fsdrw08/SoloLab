@@ -6,7 +6,8 @@ prov_hyperv = {
 }
 
 vm = {
-  name = "SvcDisc-FCOS"
+  count = 1
+  name  = "SvcDisc-FCOS"
   vhd = {
     dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
