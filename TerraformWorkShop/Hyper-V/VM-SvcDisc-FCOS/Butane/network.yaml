@@ -23,6 +23,6 @@ storage:
           interface-name=${interface}
 
           [ipv4]
-          address1=${ip_prefix}${count.index + 0}${ip}/${prefix},${gateway}
+          address1=${ip}/${prefix},${gateway}
           dns=${dns};
           method=manual
