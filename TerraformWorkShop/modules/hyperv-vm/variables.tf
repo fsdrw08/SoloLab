@@ -20,22 +20,19 @@ variable "boot_disk" {
 }
 
 variable "boot_disk_drive" {
-  type = list(
-    object({
-      controller_location             = number
-      controller_number               = number
-      controller_type                 = optional(string, null)
-      disk_number                     = optional(number, null)
-      maximum_iops                    = optional(number, null)
-      minimum_iops                    = optional(number, null)
-      override_cache_attributes       = optional(string, null)
-      path                            = optional(string, null)
-      qos_policy_id                   = optional(string, null)
-      resource_pool_name              = optional(string, null)
-      support_persistent_reservations = optional(bool, null)
-    })
-  )
-  default = []
+  type = object({
+    controller_location             = number
+    controller_number               = number
+    controller_type                 = optional(string, null)
+    disk_number                     = optional(number, null)
+    maximum_iops                    = optional(number, null)
+    minimum_iops                    = optional(number, null)
+    override_cache_attributes       = optional(string, null)
+    path                            = optional(string, null)
+    qos_policy_id                   = optional(string, null)
+    resource_pool_name              = optional(string, null)
+    support_persistent_reservations = optional(bool, null)
+  })
 }
 
 variable "additional_disk_drives" {

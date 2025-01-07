@@ -1,5 +1,5 @@
 locals {
-  all_disk_drives = concat(var.boot_disk_drive, var.additional_disk_drives)
+  all_disk_drives = var.additional_disk_drives == null ? [var.boot_disk_drive] : concat([var.boot_disk_drive], var.additional_disk_drives)
 }
 
 resource "hyperv_vhd" "boot_disk" {
