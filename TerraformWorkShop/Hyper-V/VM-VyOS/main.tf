@@ -116,7 +116,8 @@ resource "terraform_data" "boot_disk" {
       "boot",
       element(
         split(".", basename(var.vm.vhd.source)),
-      length(split(".", basename(var.vm.vhd.source))) - 1)
+        length(split(".", basename(var.vm.vhd.source))) - 1
+      )
     ])
     ]
   )
