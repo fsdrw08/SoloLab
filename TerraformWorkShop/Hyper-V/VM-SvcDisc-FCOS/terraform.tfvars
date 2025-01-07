@@ -6,10 +6,11 @@ prov_hyperv = {
 }
 
 vm = {
-  count = 1
-  name  = "SvcDisc-FCOS"
+  count     = 1
+  base_name = "SvcDisc-FCOS"
   vhd = {
-    dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+    dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+    # https://fedoraproject.org/coreos/download?stream=stable
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
     data_disk_ref = {
       backend = "pg"

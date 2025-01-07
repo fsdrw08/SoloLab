@@ -9,15 +9,17 @@ variable "prov_hyperv" {
 
 variable "vm" {
   type = object({
-    count = number
-    name  = string
+    count     = number
+    base_name = string
     vhd = object({
       dir    = string
       source = string
-      data_disk_ref = object({
-        backend = string
-        config  = map(string)
-      })
+      data_disk_ref = optional(
+        object({
+          backend = string
+          config  = map(string)
+        }), null
+      )
     })
     nic = list(object({
       name                = string

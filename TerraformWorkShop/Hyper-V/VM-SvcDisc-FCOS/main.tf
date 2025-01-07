@@ -1,16 +1,11 @@
 locals {
-  count = 1
-  vm_names = var.vm.count == 1 ? [var.vm.name] : [
-    for count in range(var.vm.count) : "${var.vm.name}0${count + 1}"
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
   ]
 }
 
-output "test" {
-  value = local.vm_names
-}
-
 data "ct_config" "ignition" {
-  count        = local.count
+  count        = var.vm.count
   content      = templatefile(var.butane.files.base, var.butane.vars)
   strict       = true
   pretty_print = false
@@ -23,20 +18,20 @@ data "ct_config" "ignition" {
 
 # present ignition file to local
 resource "local_file" "ignition" {
-  count    = local.count
+  count    = var.vm.count
   content  = data.ct_config.ignition[count.index].rendered
   filename = "ignition${count.index + 1}.json"
 }
 
 # copy ignition file to remote
 resource "null_resource" "remote" {
-  count      = local.count
+  count      = var.vm.count
   depends_on = [local_file.ignition]
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
     vhd_dir       = var.vm.vhd.dir
-    vm_name       = local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}"
+    vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
     host     = var.prov_hyperv.host
@@ -75,16 +70,19 @@ resource "null_resource" "remote" {
   }
 }
 
+# fetch data disk info
 data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
   backend = var.vm.vhd.data_disk_ref.backend
   config  = var.vm.vhd.data_disk_ref.config
 }
 
+# prepare boot disk path
 resource "terraform_data" "boot_disk" {
-  count = local.count
+  count = var.vm.count
   input = join("\\", [
     var.vm.vhd.dir,
-    local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}",
+    local.vm_names[count.index],
     join(".", [
       "boot",
       element(
@@ -95,36 +93,36 @@ resource "terraform_data" "boot_disk" {
   )
 }
 
+# vm instance
 module "hyperv_machine_instance" {
-  source     = "../modules/hyperv_instance2"
+  source     = "../../modules/hyperv-vm"
   depends_on = [null_resource.remote]
-  count      = local.count
+  count      = var.vm.count
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
     source = var.vm.vhd.source
   }
 
-  boot_disk_drive = [
-    {
-      controller_type     = "Scsi"
-      controller_number   = "0"
-      controller_location = "0"
-      path                = terraform_data.boot_disk[count.index].input
-    }
-  ]
+  boot_disk_drive = {
+    controller_type     = "Scsi"
+    controller_number   = "0"
+    controller_location = "0"
+    path                = terraform_data.boot_disk[count.index].input
+  }
 
-  additional_disk_drives = [
+
+  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
     {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "2"
-      path                = local.count <= 1 ? data.terraform_remote_state.data_disk.outputs.path : data.terraform_remote_state.data_disk.outputs.path[count.index]
+      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
     }
   ]
 
   vm_instance = {
-    name                 = local.count <= 1 ? var.vm.name : "${var.vm.name}${count.index + 1}"
+    name                 = local.vm_names[count.index]
     checkpoint_type      = "Disabled"
     dynamic_memory       = true
     generation           = 2
@@ -183,13 +181,13 @@ resource "null_resource" "kvpctl" {
     module.hyperv_machine_instance,
     null_resource.remote
   ]
-  count = local.count
+  count = var.vm.count
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
     vhd_dir       = var.vm.vhd.dir
-    vm_name       = local.count <= 1 ? "${var.vm.name}" : "${var.vm.name}${count.index + 1}"
+    vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
     host     = var.prov_hyperv.host
@@ -217,8 +215,8 @@ resource "null_resource" "kvpctl" {
 }
 
 resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
+  zone    = lower(var.dns_record.zone)
+  name    = lower(var.dns_record.name)
   type    = var.dns_record.type
   ttl     = var.dns_record.ttl
   records = var.dns_record.records
