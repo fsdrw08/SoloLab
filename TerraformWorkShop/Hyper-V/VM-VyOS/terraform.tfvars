@@ -42,7 +42,9 @@ vm = {
     # },
   ]
   enable_secure_boot = "Off"
+  power_state        = "Running"
   memory = {
+    static        = true
     startup_bytes = 4093640704
     maximum_bytes = 4093640704
     minimum_bytes = 1023410176

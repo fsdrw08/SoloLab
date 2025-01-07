@@ -16,6 +16,112 @@ data "ct_config" "ignition" {
   ]
 }
 
+# fetch data disk info
+data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
+  backend = var.vm.vhd.data_disk_ref.backend
+  config  = var.vm.vhd.data_disk_ref.config
+}
+
+# prepare boot disk path
+resource "terraform_data" "boot_disk" {
+  count = var.vm.count
+  input = join("\\", [
+    var.vm.vhd.dir,
+    local.vm_names[count.index],
+    join(".", [
+      "boot",
+      element(
+        split(".", basename(var.vm.vhd.source)),
+        length(split(".", basename(var.vm.vhd.source))) - 1
+      )
+    ])
+    ]
+  )
+}
+
+# vm instance
+module "hyperv_machine_instance" {
+  source     = "../../modules/hyperv-vm"
+  depends_on = [null_resource.remote]
+  count      = var.vm.count
+
+  boot_disk = {
+    path   = terraform_data.boot_disk[count.index].input
+    source = var.vm.vhd.source
+  }
+
+  boot_disk_drive = {
+    controller_type     = "Scsi"
+    controller_number   = "0"
+    controller_location = "0"
+    path                = terraform_data.boot_disk[count.index].input
+  }
+
+  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
+    {
+      controller_type     = "Scsi"
+      controller_number   = "0"
+      controller_location = "2"
+      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
+    }
+  ]
+
+  vm_instance = {
+    name                 = local.vm_names[count.index]
+    checkpoint_type      = "Disabled"
+    static_memory        = var.vm.memory.static
+    dynamic_memory       = var.vm.memory.dynamic
+    generation           = 2
+    memory_maximum_bytes = var.vm.memory.maximum_bytes
+    memory_minimum_bytes = var.vm.memory.minimum_bytes
+    memory_startup_bytes = var.vm.memory.startup_bytes
+    notes                = "This VM instance is managed by terraform"
+    processor_count      = 4
+    state                = var.vm.power_state
+
+    vm_firmware = {
+      console_mode                    = "Default"
+      enable_secure_boot              = var.vm.enable_secure_boot
+      secure_boot_template            = "MicrosoftUEFICertificateAuthority"
+      pause_after_boot_failure        = "Off"
+      preferred_network_boot_protocol = "IPv4"
+      boot_order = [
+        {
+          boot_type           = "HardDiskDrive"
+          controller_number   = "0"
+          controller_location = "0"
+        },
+      ]
+    }
+
+    vm_processor = {
+      compatibility_for_migration_enabled               = false
+      compatibility_for_older_operating_systems_enabled = false
+      enable_host_resource_protection                   = false
+      expose_virtualization_extensions                  = false
+      hw_thread_count_per_core                          = 0
+      maximum                                           = 100
+      maximum_count_per_numa_node                       = 4
+      maximum_count_per_numa_socket                     = 1
+      relative_weight                                   = 100
+      reserve                                           = 0
+    }
+
+    integration_services = {
+      "Guest Service Interface" = true
+      "Heartbeat"               = true
+      "Key-Value Pair Exchange" = true
+      "Shutdown"                = true
+      "Time Synchronization"    = true
+      "VSS"                     = true
+    }
+
+    network_adaptors = var.vm.nic
+
+  }
+}
+
 # present ignition file to local
 resource "local_file" "ignition" {
   count    = var.vm.count
@@ -67,112 +173,6 @@ resource "null_resource" "remote" {
       Powershell -Command "$ignition_file=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); if (Test-Path $ignition_file) { Remove-Item $ignition_file }"
     EOT
     ]
-  }
-}
-
-# fetch data disk info
-data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_ref.backend
-  config  = var.vm.vhd.data_disk_ref.config
-}
-
-# prepare boot disk path
-resource "terraform_data" "boot_disk" {
-  count = var.vm.count
-  input = join("\\", [
-    var.vm.vhd.dir,
-    local.vm_names[count.index],
-    join(".", [
-      "boot",
-      element(
-        split(".", basename(var.vm.vhd.source)),
-        length(split(".", basename(var.vm.vhd.source))) - 1
-      )
-    ])
-    ]
-  )
-}
-
-# vm instance
-module "hyperv_machine_instance" {
-  source     = "../../modules/hyperv-vm"
-  depends_on = [null_resource.remote]
-  count      = var.vm.count
-
-  boot_disk = {
-    path   = terraform_data.boot_disk[count.index].input
-    source = var.vm.vhd.source
-  }
-
-  boot_disk_drive = {
-    controller_type     = "Scsi"
-    controller_number   = "0"
-    controller_location = "0"
-    path                = terraform_data.boot_disk[count.index].input
-  }
-
-
-  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
-    {
-      controller_type     = "Scsi"
-      controller_number   = "0"
-      controller_location = "2"
-      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
-    }
-  ]
-
-  vm_instance = {
-    name                 = local.vm_names[count.index]
-    checkpoint_type      = "Disabled"
-    dynamic_memory       = true
-    generation           = 2
-    memory_maximum_bytes = var.vm.memory.maximum_bytes
-    memory_minimum_bytes = var.vm.memory.minimum_bytes
-    memory_startup_bytes = var.vm.memory.startup_bytes
-    notes                = "This VM instance is managed by terraform"
-    processor_count      = 4
-    state                = "Off"
-
-    vm_firmware = {
-      console_mode                    = "Default"
-      enable_secure_boot              = var.vm.enable_secure_boot
-      secure_boot_template            = "MicrosoftUEFICertificateAuthority"
-      pause_after_boot_failure        = "Off"
-      preferred_network_boot_protocol = "IPv4"
-      boot_order = [
-        {
-          boot_type           = "HardDiskDrive"
-          controller_number   = "0"
-          controller_location = "0"
-        },
-      ]
-    }
-
-    vm_processor = {
-      compatibility_for_migration_enabled               = false
-      compatibility_for_older_operating_systems_enabled = false
-      enable_host_resource_protection                   = false
-      expose_virtualization_extensions                  = false
-      hw_thread_count_per_core                          = 0
-      maximum                                           = 100
-      maximum_count_per_numa_node                       = 4
-      maximum_count_per_numa_socket                     = 1
-      relative_weight                                   = 100
-      reserve                                           = 0
-    }
-
-    integration_services = {
-      "Guest Service Interface" = true
-      "Heartbeat"               = true
-      "Key-Value Pair Exchange" = true
-      "Shutdown"                = true
-      "Time Synchronization"    = true
-      "VSS"                     = true
-    }
-
-    network_adaptors = var.vm.nic
-
   }
 }
 

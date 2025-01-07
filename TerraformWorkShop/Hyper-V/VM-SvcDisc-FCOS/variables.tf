@@ -28,7 +28,10 @@ variable "vm" {
       static_mac_address  = optional(string, null)
     }))
     enable_secure_boot = optional(string, "On")
+    power_state        = optional(string, "Off")
     memory = object({
+      static        = optional(bool, null)
+      dynamic       = optional(bool, null)
       startup_bytes = number
       maximum_bytes = number
       minimum_bytes = number

@@ -123,6 +123,7 @@ resource "terraform_data" "boot_disk" {
   )
 }
 
+# vm instance
 module "hyperv_machine_instance" {
   source     = "../../modules/hyperv-vm"
   depends_on = [module.cloudinit_nocloud_iso]
@@ -152,14 +153,15 @@ module "hyperv_machine_instance" {
   vm_instance = {
     name                 = local.vm_names[count.index]
     checkpoint_type      = "Standard"
-    static_memory        = true
+    static_memory        = var.vm.memory.static
+    dynamic_memory       = var.vm.memory.dynamic
     generation           = 2
     memory_maximum_bytes = var.vm.memory.maximum_bytes
     memory_minimum_bytes = var.vm.memory.minimum_bytes
     memory_startup_bytes = var.vm.memory.startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Running"
+    state                = var.vm.power_state
 
     vm_firmware = {
       console_mode                    = "Default"
@@ -198,7 +200,6 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    # network_adaptors = var.network_adaptors
     network_adaptors = var.vm.nic
 
     dvd_drives = [
