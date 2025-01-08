@@ -1,36 +1,39 @@
 {
-    "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe",
+  "ansible.python.interpreterPath": "c:\\Program Files\\Python311\\python.exe",
+  "editor.defaultFormatter": "hashicorp.terraform",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": false,
     "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit"
+      "source.formatAll.terraform": "explicit"
     },
-    "editor.formatOnSave": true,
-    "[terraform]": {
-      "editor.defaultFormatter": "hashicorp.terraform",
-      "editor.formatOnSave": false,
-      "editor.codeActionsOnSave": {
-        "source.formatAll.terraform": "explicit"
-      },
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.formatAll.terraform": "explicit"
     },
-    "[terraform-vars]": {
-      "editor.defaultFormatter": "hashicorp.terraform",
-      "editor.formatOnSave": false,
-      "editor.codeActionsOnSave": {
-        "source.formatAll.terraform": "explicit"
-      },
-    },
-    "[terraform][terraform-vars]": {
-      "editor.codeActionsOnSave": {
-        "source.formatAll.terraform": "explicit"
-      }
-    },
-    "[json]": {
-      "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "[yaml]": {
-      "editor.defaultFormatter": "redhat.vscode-yaml"
-    },
-    "[jsonc]": {
-      "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[terraform][terraform-vars]": {
+    "editor.codeActionsOnSave": {
+      "source.formatAll.terraform": "explicit"
     }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "DotJoshJohnson.xml"
+  }
 }
