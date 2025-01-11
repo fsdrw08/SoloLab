@@ -71,12 +71,12 @@ function Get-KvpValue {
       ForEach-Object Value
   }
 
-$VMId = Get-VM -Name "SvcDisc-FCOS" | Select-Object -ExpandProperty Id
+$VMId = Get-VM -Name "SvcDisc-FCOS" | Select-Object -ExpandProperty id | Select-Object -ExpandProperty guid
 Get-KvpValue -VMId $VMId -Origin "Host" -Name "Name"
 
 Get-CimInstance -Namespace root\virtualization\v2 `
         -ClassName Msvm_ComputerSystem `
-        -Filter "Name='$VMId'" | `
+        -Filter "ElementName='SvcDisc-FCOS'" | `
         Get-CimAssociatedInstance -ResultClassName Msvm_KvpExchangeComponent | `
         Get-CimAssociatedInstance -ResultClassName Msvm_KvpExchangeComponentSettingData | `
     Select-Object -ExpandProperty HostExchangeItems |
