@@ -1,9 +1,7 @@
 data "terraform_remote_state" "root_ca" {
-  count   = var.certs == null ? 0 : 1
-  backend = "local"
-  config = {
-    path = var.certs.cert_content_tfstate_ref
-  }
+  count   = var.certs_ref == null ? 0 : 1
+  backend = var.certs_ref.tfstate.backend
+  config  = var.certs_ref.tfstate.config
 }
 
 data "helm_template" "podman_kube" {
@@ -15,15 +13,15 @@ data "helm_template" "podman_kube" {
   ]
 
   set {
-    name = "etcd.tls.contents.\"server\\.crt\""
+    name = var.certs_ref.config_node.cert
     value = join("", [
-      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
+      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.tfstate_ref.entity, null),
       data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
     ])
   }
   set {
-    name  = "etcd.tls.contents.\"server\\.key\""
-    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
+    name  = var.certs_ref.config_node.key
+    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.tfstate_ref.entity, null)
   }
 
 }

@@ -5,12 +5,18 @@ vm_conn = {
   password = "podmgr"
 }
 
-certs = {
-  cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
-  cert_content_tfstate_entity = "etcd-server"
-  # cacert_basename          = "ca.crt"
-  # cert_value_path          = "server.crt"
-  # key_value_path           = "server.key"
+certs_ref = {
+  tfstate = {
+    backend = "local"
+    config = {
+      path = "../../TLS/RootCA/terraform.tfstate"
+    }
+    entity = "etcd-server"
+  }
+  config_node = {
+    cert = "etcd.tls.contents.\"server\\.crt\""
+    key  = "etcd.tls.contents.\"server\\.key\""
+  }
 }
 
 podman_kube = {

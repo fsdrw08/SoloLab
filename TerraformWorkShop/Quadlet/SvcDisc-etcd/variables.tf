@@ -7,10 +7,20 @@ variable "vm_conn" {
   })
 }
 
-variable "certs" {
+variable "certs_ref" {
   type = object({
-    cert_content_tfstate_ref    = string
-    cert_content_tfstate_entity = string
+    tfstate = optional(
+      object({
+        backend = string
+        config  = map(string)
+        entity  = string
+      }), null
+    )
+    config_node = object({
+      cert = string
+      key  = string
+    })
+
   })
 }
 
