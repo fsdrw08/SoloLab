@@ -18,6 +18,14 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
+        "publicRepo": "sclorg/postgresql-16-c10s:20250108",
+        "archive": "quay.io_sclorg_postgresql-16-c10s_20250108.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "sclorg/postgresql-16-c10s:20250108",
+        "description": "https://quay.io/repository/sclorg/postgresql-16-c10s?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
         "publicRepo": "cockpit/ws:331",
         "archive": "quay.io_cockpit_ws_331.tar",
         "privateRegistry": "zot.day0.sololab",
