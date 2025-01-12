@@ -15,13 +15,13 @@ data "helm_template" "podman_kube" {
   set {
     name = var.certs_ref.config_node.cert
     value = join("", [
-      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.tfstate_ref.entity, null),
+      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs_ref.tfstate.entity, null),
       data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
     ])
   }
   set {
     name  = var.certs_ref.config_node.key
-    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.tfstate_ref.entity, null)
+    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs_ref.tfstate.entity, null)
   }
 
 }
@@ -30,10 +30,10 @@ resource "remote_file" "podman_kube" {
   path    = var.podman_kube.yaml_file_path
   content = data.helm_template.podman_kube.manifest
   conn {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = sensitive(var.vm_conn.password)
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = sensitive(var.prov_remote.password)
   }
 
   connection {
@@ -75,10 +75,10 @@ resource "null_resource" "podman_quadlet" {
   triggers = {
     service_name = var.podman_quadlet.service.name
     quadlet_md5  = md5(join("\n", [for quadlet in remote_file.podman_quadlet : quadlet.content]))
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
+    host         = var.prov_remote.host
+    port         = var.prov_remote.port
+    user         = var.prov_remote.user
+    password     = sensitive(var.prov_remote.password)
   }
   connection {
     type     = "ssh"
@@ -105,10 +105,10 @@ module "container_restart" {
   depends_on = [null_resource.podman_quadlet]
   source     = "../../modules/system-systemd_path_user"
   vm_conn = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
   }
   systemd_path_unit = {
     content = templatefile(
@@ -152,10 +152,10 @@ resource "null_resource" "post_process" {
   for_each   = local.post_process
   triggers = {
     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
+    host           = var.prov_remote.host
+    port           = var.prov_remote.port
+    user           = var.prov_remote.user
+    password       = sensitive(var.prov_remote.password)
   }
   connection {
     type     = "ssh"

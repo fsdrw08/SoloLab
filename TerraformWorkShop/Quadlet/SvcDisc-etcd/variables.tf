@@ -1,4 +1,4 @@
-variable "vm_conn" {
+variable "prov_remote" {
   type = object({
     host     = string
     port     = number
