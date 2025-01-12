@@ -9,6 +9,7 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
 
 # enable use LDAP Client to update end users password manually
 # https://forums.oracle.com/ords/apexds/post/allow-passwords-to-enter-in-pre-encoded-form-9340
+# https://doc.openidentityplatform.org/opendj/admin-guide/chap-account-lockout#configure-account-lockout
 /opt/opendj/bin/dsconfig \
  --port 4444 \
  --hostname ${hostname} \
@@ -18,6 +19,9 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
  --no-prompt \
  set-password-policy-prop \
   --policy-name "Default Password Policy" \
-  --set allow-pre-encoded-passwords:true
+  --set allow-pre-encoded-passwords:true \
+  --set lockout-failure-count:3 \
+  --set lockout-duration:5m \
+  --set lockout-failure-expiration-interval:5m
 EOF
 )"
