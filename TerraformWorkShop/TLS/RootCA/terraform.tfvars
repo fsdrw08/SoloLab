@@ -311,6 +311,29 @@ certs = [
       ]
     }
   },
+  # keycloak
+  {
+    name = "keycloak"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "keycloak.day1.sololab"
+      ]
+      subject = {
+        common_name  = "keycloak.day1.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
   # vault
   {
     name = "vault"
