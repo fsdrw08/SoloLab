@@ -1,5 +1,9 @@
 #!/bin/sh
 
+VAULT_ADDR=${VAULT_ADDR}
+VAULT_OPERATOR_SECRETS_JSON_PATH=${VAULT_OPERATOR_SECRETS_JSON_PATH}
+
+
 function wait_started {
   counter=0
   until STATUS=$(curl -k -X GET "$VAULT_ADDR/v1/sys/health" 2>&1); [ $? -ne 1 ]
@@ -52,7 +56,7 @@ function unseal {
 wait_started
 
 sleep 5s 
-echo "is_inited"
+echo "is_inited ?"
 is_inited
 
 # init

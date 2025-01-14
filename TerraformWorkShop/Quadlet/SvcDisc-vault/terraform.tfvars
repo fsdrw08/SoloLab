@@ -1,15 +1,30 @@
-vm_conn = {
+prov_remote = {
   host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
 }
 
+certs_ref = {
+  tfstate = {
+    backend = "local"
+    config = {
+      path = "../../TLS/RootCA/terraform.tfstate"
+    }
+    entity = "vault"
+  }
+  config_node = {
+    ca   = "vault.tls.contents.\"ca\\.crt\""
+    cert = "vault.tls.contents.\"tls\\.crt\""
+    key  = "vault.tls.contents.\"tls\\.key\""
+  }
+}
+
 podman_kube = {
   helm = {
-    name   = "vault"
-    chart  = "../../../HelmWorkShop/helm-charts/charts/vault"
-    values = "./podman-vault/values-sololab.yaml"
+    name       = "vault"
+    chart      = "../../../HelmWorkShop/helm-charts/charts/vault"
+    value_file = "./podman-vault/values-sololab.yaml"
   }
   yaml_file_path = "/home/podmgr/.config/containers/systemd/vault-aio.yaml"
 }
@@ -55,5 +70,19 @@ container_restart = {
     }
     path = "/home/podmgr/.config/systemd/user/vault_restart.service"
   }
+}
 
+prov_pdns = {
+  api_key    = "powerdns"
+  server_url = "https://pdns.day0.sololab"
+}
+
+dns_record = {
+  zone = "day1.sololab."
+  name = "vault.day1.sololab."
+  type = "A"
+  ttl  = 86400
+  records = [
+    "192.168.255.20"
+  ]
 }

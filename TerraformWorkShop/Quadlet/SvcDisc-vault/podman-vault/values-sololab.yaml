@@ -11,7 +11,7 @@ vault:
   image:
     registry: zot.day0.sololab
     repository: hashicorp/vault
-    tag: 1.16.3
+    tag: 1.18
 
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
@@ -19,8 +19,8 @@ vault:
   ## ref: https://developer.hashicorp.com/vault/tutorials/operations/configure-vault#config
   configFiles:
     main:
-      api_addr: "https://vault.day0.sololab:8200"
-      cluster_addr: "https://vault.day0.sololab:8201"
+      api_addr: "https://vault.day1.sololab:8200"
+      cluster_addr: "https://vault.day1.sololab:8201"
     storage:
       storage:
         raft:
@@ -64,4 +64,4 @@ volumePermissions:
   image:
     registry: zot.day0.sololab
     repository: hashicorp/vault
-    tag: 1.16.3
+    tag: 1.18

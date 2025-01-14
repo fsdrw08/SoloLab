@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs
-VAULT_OPERATOR_SECRETS_PATH=${VAULT_OPERATOR_SECRETS_PATH}
+VAULT_OPERATOR_SECRETS_JSON_PATH=${VAULT_OPERATOR_SECRETS_JSON_PATH}
 VAULT_ADDR=${VAULT_ADDR}
 STATIC_TOKEN=${STATIC_TOKEN}
 
@@ -45,21 +45,24 @@ function authenticate {
     # Authenticate Vault
     printf "Authenticating Vault...\n"
     # VAULT_OPERATOR_SECRETS=$(cat $VAULT_OPERATOR_SECRETS_JSON_PATH)
-    VAULT_TOKEN=$(cat $VAULT_OPERATOR_SECRETS_PATH | grep "Initial Root Token" | awk '{print $NF}')
-    export VAULT_TOKEN=$VAULT_TOKEN
+    # VAULT_TOKEN=$(cat $VAULT_OPERATOR_SECRETS_JSON_PATH | grep "Initial Root Token" | awk '{print $NF}')
+    # INIT_VAULT_TOKEN=$(jq .root_token $VAULT_OPERATOR_SECRETS_JSON_PATH)
+    # https://github.com/hashicorp/vault/issues/6287#issuecomment-684125899
+    INIT_VAULT_TOKEN=$(echo $(jq .root_token $VAULT_OPERATOR_SECRETS_JSON_PATH)| tr -d '"')
+    export INIT_VAULT_TOKEN=$INIT_VAULT_TOKEN
 }
 
 # https://github.com/Kehrlann/concourse-demo/blob/ecf3b68b5da125b6c14f5e04642dc0aa835250e2/demo/infrastructure/setup-vault.sh#L36-L40
 function create_token {
     RESULT=$(curl -s -k --request POST \
-    -H "X-Vault-Token: $VAULT_TOKEN" \
-    --data "{ \"token\": \"$STATIC_TOKEN\" }" \
-    $VAULT_ADDR/v1/auth/token/lookup | jq -r .data.id)
+        -H "X-Vault-Token: $INIT_VAULT_TOKEN" \
+        --data "{ \"token\": \"$STATIC_TOKEN\" }" \
+        $VAULT_ADDR/v1/auth/token/lookup | jq -r .data.id)
 
     if [ $RESULT != $STATIC_TOKEN ]; then
         echo "New static token"
         curl -s -k --request POST \
-            --header "X-Vault-Token: $VAULT_TOKEN" \
+            --header "X-Vault-Token: $INIT_VAULT_TOKEN" \
             --data "{  \"policies\": [\"root\"],  \"id\": \"$STATIC_TOKEN\" }" \
             $VAULT_ADDR/v1/auth/token/create
     else
