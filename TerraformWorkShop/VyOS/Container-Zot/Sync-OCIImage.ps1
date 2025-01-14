@@ -56,6 +56,22 @@ $syncList = @"
         "privateRepo": "openidentityplatform/opendj:4.9.0",
         "description": "https://hub.docker.com/r/openidentityplatform/opendj/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/vault:1.18",
+        "archive": "docker.io_hashicorp_vault_1.18.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "hashicorp/vault:1.18",
+        "description": "https://hub.docker.com/r/hashicorp/vault/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/consul:1.20",
+        "archive": "docker.io_hashicorp_consul_1.20.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "hashicorp/consul:1.20",
+        "description": "https://hub.docker.com/r/hashicorp/consul/tags",
+    },
 ]
 "@
 
@@ -64,8 +80,8 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-$proxy="127.0.0.1:7890"
-# $proxy="192.168.255.1:7890"
+# $proxy="127.0.0.1:7890"
+$proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {
