@@ -39,11 +39,11 @@ $syncList | ConvertFrom-Json | ForEach-Object {
 
 # push
 $privateRegistry = "zot.day0.sololab"
+$env:HTTP_PROXY=$null; $env:HTTPS_PROXY=$null
 # login to zot
 oras login -u admin $privateRegistry
 
 # Push the prior downloaded trivy-db to private registry
-$env:HTTP_PROXY=$null; $env:HTTPS_PROXY=$null
 # https://github.com/aquasecurity/trivy-db/blob/8c398f13db0ed9be333fe1b9ddab158ab7262967/README.md#building-the-db
 
 $trivyArtifactType = "application/vnd.aquasec.trivy.config.v1+json"

@@ -66,6 +66,14 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "apteno/alpine-jq:2025-01-12",
+        "archive": "docker.io_apteno_alpine-jq_2025-01-12.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "apteno/alpine-jq:latest",
+        "description": "https://hub.docker.com/r/apteno/alpine-jq/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "hashicorp/consul:1.20",
         "archive": "docker.io_hashicorp_consul_1.20.tar",
         "privateRegistry": "zot.day0.sololab",
@@ -80,8 +88,8 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-# $proxy="127.0.0.1:7890"
-$proxy="192.168.255.1:7890"
+$proxy="127.0.0.1:7890"
+# $proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {
