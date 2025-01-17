@@ -8,17 +8,15 @@ terraform {
       version = ">= 4.1.0"
     }
   }
-}
-
-locals {
-  VAULT_ADDR      = "vault.infra.sololab:8200"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    schema_name = "Vault-PKI-RootCA"
+  }
 }
 
 provider "vault" {
-  address = "https://${local.VAULT_ADDR}"
-  token   = local.token
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
   # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
-  skip_tls_verify = local.skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }

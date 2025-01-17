@@ -1,25 +1,28 @@
 # https://github.com/livioribeiro/nomad-lxd-terraform/blob/c396cebc1c08a0cca977ee9ceaa6dde8f0ae7c8a/vault_pki.tf#L8
 # https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine-external-ca
 # https://github.com/hashicorp-education/learn-vault-pki-engine/blob/main/terraform/main.tf
+# https://developer.hashicorp.com/vault/docs/secrets/pki/setup#setup
 resource "vault_mount" "pki" {
-  path                      = "pki/root"
+  # the "pki" prefix is the default mount path prefix for mount type of pki
+  path                      = var.vault_pki.mount.path
   type                      = "pki"
-  description               = "PKI engine hosting root CA v1 for sololab"
-  default_lease_ttl_seconds = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
-  max_lease_ttl_seconds     = (3 * 365 * 24 * 60 * 60) # 3 years in seconds
+  description               = var.vault_pki.mount.description
+  default_lease_ttl_seconds = (var.vault_pki.mount.default_lease_ttl_years * 365 * 24 * 60 * 60) # 1 year in seconds
+  max_lease_ttl_seconds     = (var.vault_pki.mount.max_lease_ttl_years * 365 * 24 * 60 * 60)     # 3 years in seconds
 }
 
 resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
   backend  = vault_mount.pki.path
-  path     = "https://${local.VAULT_ADDR}/v1/${vault_mount.pki.path}"
-  aia_path = "https://${local.VAULT_ADDR}/v1/${vault_mount.pki.path}"
+  path     = "https://${var.prov_vault.address}/v1/${vault_mount.pki.path}"
+  aia_path = "https://${var.prov_vault.address}/v1/${vault_mount.pki.path}"
 }
-
 
 # Enable Authority Information Access (AIA) templating
 # Configure the Authority Information Access (AIA)
 # https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine#step-1-generate-root-ca:~:text=The%20vault_pki_secret_backend_config_urls%20configures%20CA%20and%20CRL%20URLs
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_urls
+# https://serverfault.com/questions/1023474/ocsp-setup-for-vault/1159997#1159997
+# https://developer.hashicorp.com/vault/api-docs/secret/pki#ocsp-request
 resource "vault_pki_secret_backend_config_urls" "config_urls" {
   backend           = vault_mount.pki.path
   enable_templating = true
@@ -30,52 +33,56 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
     "{{cluster_aia_path}}/issuer/{{issuer_id}}/crl/der",
   ]
   ocsp_servers = [
-    "{{cluster_path}}/ocsp",
+    "{{cluster_aia_path}}/ocsp",
   ]
 }
 
 # Certificate Revocation List (CRL)
-# resource "vault_pki_secret_backend_crl_config" "pki" {
-#   depends_on = [vault_mount.pki]
-#   backend    = vault_mount.pki.path
-#   expiry     = "8760h"
-#   disable    = false
-# }
+resource "vault_pki_secret_backend_crl_config" "crl_config" {
+  backend      = vault_mount.pki.path
+  expiry       = "72h"
+  disable      = false
+  auto_rebuild = true
+  enable_delta = true
+}
 
 resource "vault_pki_secret_backend_role" "role" {
   backend          = vault_mount.pki.path
-  name             = "RootCA-v1-role-default"
-  ttl              = (1 * 365 * 24 * 60 * 60) # 1 year in seconds
-  allow_ip_sans    = true
-  key_type         = "rsa"
-  key_bits         = 4096
-  allowed_domains  = ["infra.sololab", "service.consul"]
-  allow_subdomains = true
-  allow_any_name   = true
+  name             = var.vault_pki.role.name
+  ttl              = (var.vault_pki.role.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+  allow_ip_sans    = var.vault_pki.role.allow_ip_sans
+  key_type         = var.vault_pki.role.key_type
+  key_bits         = var.vault_pki.role.key_bits
+  allowed_domains  = var.vault_pki.role.allowed_domains
+  allow_subdomains = var.vault_pki.role.allow_subdomains
+  allow_any_name   = var.vault_pki.role.allow_any_name
 }
 
-# upload root ca cert bundle manually, or uncomment below block
+# this resource is used to upload root cacert bundle, after specify root_ca_bundle_path and apply
+# we can set root_ca_bundle_path to empty("") to delete this resource
 # https://github.com/stvdilln/vault-ca-demo/blob/52d03797168fdff075f638e57362ac8c4946cc94/root_ca.tf#L101
-# resource "vault_pki_secret_backend_config_ca" "pki" {
+resource "vault_pki_secret_backend_config_ca" "config_ca" {
+  count = var.vault_pki.imported_issuer.ref_cert_bundle_path == "" ? 0 : 1
 
-#   depends_on = [vault_mount.pki]
-#   backend    = vault_mount.pki.path
+  depends_on = [vault_mount.pki]
+  backend    = vault_mount.pki.path
 
-#   # pem_bundle = format("%s\n%s", data.terraform_remote_state.pki[0].outputs.root_ca_key,
-#   # data.terraform_remote_state.pki[0].outputs.root_ca_crt)
-
-#   pem_bundle = file("${path.module}/../../../TLS/RootCA/RootCA_bundle.pem")
-# }
-
+  pem_bundle = file("${path.module}/${var.vault_pki.imported_issuer.ref_cert_bundle_path}")
+}
 
 data "vault_pki_secret_backend_issuers" "issuers" {
-  backend = vault_mount.pki.path
+  depends_on = [vault_pki_secret_backend_config_ca.config_ca]
+  backend    = vault_mount.pki.path
 }
 
+# https://developer.hashicorp.com/vault/api-docs/secret/pki#notice-about-new-multi-issuer-functionality
+# Vault since 1.11.0 allows a single PKI mount to have multiple Certificate Authority (CA) certificates ("issuers") in a single mount, 
+# for the purpose of facilitating rotation.
 resource "vault_pki_secret_backend_issuer" "issuer" {
+  depends_on = [data.vault_pki_secret_backend_issuers.issuers]
   # count                          = data.vault_pki_secret_backend_issuers.issuers.key_info == null ? 0 : 1
   backend                        = vault_mount.pki.path
   issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
-  revocation_signature_algorithm = "SHA256WithRSA"
-  issuer_name                    = "RootCA-v1"
+  revocation_signature_algorithm = var.vault_pki.imported_issuer.revocation_signature_algorithm
+  issuer_name                    = var.vault_pki.imported_issuer.name
 }

@@ -1,15 +1,28 @@
-apply terraform 
-
+This module is used to create a root CA in hashicorp vault, and import exist ca cert key bundle from exist file,  
+root CA in vault contains vault mount path, pki secret backend configs(url, crl configs, role, issuer), 
 ref: 
+- [vault-ca-demo/root_ca.t](https://github.com/stvdilln/vault-ca-demo/blob/52d03797168fdff075f638e57362ac8c4946cc94/root_ca.tf#L101)
 - [Build Certificate Authority (CA) in Vault with an offline Root](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine-external-ca)
 - [Build your own certificate authority (CA)](https://developer.hashicorp.com/vault/tutorials/secrets-management/pki-engine)
 - [mount.tf](https://github.com/arpanrecme/vault_monorepo/blob/main/codified_vault/pki/mount.tf)
 
+### Pre-request
+Prepare a root cert key bundle first, see [../../../TLS/RootCA/](../../../TLS/RootCA)
+
+
 ### apply the whole tf resource 
-To create offline root ca, intermedia ca1 ca2 in vault, apply certs for 
+To create offline root ca, uncomment 
+```
+ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
+```
+and comment 
+```
+ref_cert_bundle_path           = ""
+```
+in tfvars, then run terraform apply
 ```powershell
 terraform plan
-terraform apply --auto-approve -target="vault_mount.pki" -target="vault_mount.pki_ica1"
+terraform apply --auto-approve
 ```
 
 ### have a check with the csr of intermediate ca
@@ -70,3 +83,22 @@ curl -k --header "X-Vault-Token: $token" $env:VAULT_ADDR/v1/$ca1/ocsp/
 
 curl http://cacerts.digicert.com/DigiCertTLSHybridECCSHA3842020CA1-1.crt
 ```
+
+### different and relations between backend_role and backend_issuer in pki
+via AI
+
+在HashiCorp Vault的PKI后端中，backend role和backend issuer有以下区别和关系：
+#### 区别:
+- 定义和功能:  
+backend issuer：是PKI后端中用于定义证书签发相关配置的实体，它主要负责指定证书签发的参数和规则，如签名算法、证书链等。例如，可以配置一个issuer来指定使用SHA256WithRSA算法进行证书签发。  
+backend role：则是定义了客户端在请求签发证书时所允许使用的参数和限制条件。比如可以设置role允许请求IP SANs、允许的域名、证书的有效期等。
+
+- 配置内容:  
+backend issuer：配置内容主要涉及证书签发的技术细节，如issuer_ref用于指定签发者引用，revocation_signature_algorithm用于指定吊销签名算法等。  
+backend role：配置内容更侧重于对证书请求的约束和限制，如allow_ip_sans用于允许或禁止IP SANs，allowed_domains用于指定允许的域名列表，ttl和max_ttl用于设置证书的有效期等。
+
+#### 关系:
+- 相互依赖:  
+在证书签发过程中，backend issuer和backend role是相互依赖的。只有同时配置了issuer和role，客户端才能根据role中定义的参数和限制条件，通过issuer所指定的签发规则来请求签发证书。例如，要从根CA签发证书，就需要配置根CA的issuer接口和相应的role参数。
+- 共同作用于证书签发:  
+当客户端发起证书签发请求时，Vault会根据请求中指定的role来验证请求的参数是否符合role中定义的限制条件，若符合则会使用role关联的issuer来按照issuer的配置规则进行证书签发。比如，一个role允许请求problemofnetwork.com域及其子域的证书，并且关联了一个特定的issuer，那么客户端在符合role条件的情况下，就可以通过该issuer来获取相应域名的证书。
