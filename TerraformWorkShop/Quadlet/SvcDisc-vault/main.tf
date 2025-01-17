@@ -165,18 +165,18 @@ resource "powerdns_record" "record" {
 
 locals {
   post_process = {
-    Init-Vault = {
-      script_path = "./podman-vault/Init-VaultByCurl.sh"
-      vars = {
-        VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret.json"
-        VAULT_ADDR                       = "https://vault.day1.sololab:8200"
-        STATIC_TOKEN                     = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-      }
-    }
+    # Init-Vault = {
+    #   script_path = "./podman-vault/Init-VaultByCurl.sh"
+    #   vars = {
+    #     VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret.json"
+    #     VAULT_ADDR                       = "https://vault.day1.sololab:8200"
+    #     STATIC_TOKEN                     = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+    #   }
+    # }
     New-VaultStaticToken = {
       script_path = "./podman-vault/New-VaultStaticToken.sh"
       vars = {
-        VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret.json"
+        VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets"
         # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
         VAULT_ADDR   = "https://vault.day1.sololab:8200"
         STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
