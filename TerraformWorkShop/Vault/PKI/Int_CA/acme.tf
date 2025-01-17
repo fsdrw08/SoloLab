@@ -12,6 +12,12 @@ resource "vault_pki_secret_backend_role" "role_acme" {
 
 # enable the acme configuration.
 # https://www.infralovers.com/blog/2023-10-16-hashicorp-vault-acme-terraform-configuration/#:~:text=apply%20the%20secrets,1
+#
+# 202501: consider use vault_pki_secret_backend_config_acme instead 
+# ref: https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#acme-certificate-issuance
+# https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#set-acme-configuration
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
 resource "vault_generic_endpoint" "config_acme" {
   path                 = "${vault_mount.pki.path}/config/acme"
   ignore_absent_fields = true
@@ -28,6 +34,7 @@ resource "vault_generic_endpoint" "config_acme" {
 
 # apply the secrets engine tuning parameter
 # ref: https://developer.hashicorp.com/vault/api-docs/secret/pki#acme-required-headers
+# https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#acme-required-headers
 resource "vault_generic_endpoint" "tune_acme" {
   path                 = "sys/mounts/${vault_mount.pki.path}/tune"
   ignore_absent_fields = true
