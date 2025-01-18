@@ -22,10 +22,12 @@ vault_pki = {
     allow_subdomains = true
     allow_any_name   = true
   }
-  sign = {
-    backend_ref = "pki/root"
-    common_name = "Sololab Intermediate CA Day1"
-    ttl_years   = 3
+  cert = {
+    internal_sign = {
+      backend     = "pki/root"
+      common_name = "Sololab Intermediate CA Day1"
+      ttl_years   = 3
+    }
   }
   issuer = {
     name                           = "IntCA-Day1-v1"

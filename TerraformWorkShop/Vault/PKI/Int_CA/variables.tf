@@ -25,6 +25,16 @@ variable "vault_pki" {
       allow_subdomains = bool
       allow_any_name   = bool
     })
+    cert = object({
+      internal_sign = optional(object({
+        backend     = string
+        common_name = string
+        ttl_years   = number
+      }), null)
+      external_import = optional(object({
+        ref_cert_bundle_path = string
+      }), null)
+    })
     issuer = object({
       name                           = string
       revocation_signature_algorithm = string

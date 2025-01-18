@@ -22,10 +22,14 @@ vault_pki = {
     allow_subdomains = true
     allow_any_name   = true
   }
-  imported_issuer = {
-    name = "RootCA-v1"
-    # ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
-    ref_cert_bundle_path           = ""
+  cert = {
+    external_import = {
+      # ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
+      ref_cert_bundle_path = ""
+    }
+  }
+  issuer = {
+    name                           = "RootCA-v1"
     revocation_signature_algorithm = "SHA256WithRSA"
   }
 }

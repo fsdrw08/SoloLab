@@ -62,12 +62,12 @@ resource "vault_pki_secret_backend_role" "role" {
 # we can set root_ca_bundle_path to empty("") to delete this resource
 # https://github.com/stvdilln/vault-ca-demo/blob/52d03797168fdff075f638e57362ac8c4946cc94/root_ca.tf#L101
 resource "vault_pki_secret_backend_config_ca" "config_ca" {
-  count = var.vault_pki.imported_issuer.ref_cert_bundle_path == "" ? 0 : 1
+  count = var.vault_pki.cert.external_import.ref_cert_bundle_path == "" ? 0 : 1
 
   depends_on = [vault_mount.pki]
   backend    = vault_mount.pki.path
 
-  pem_bundle = file("${path.module}/${var.vault_pki.imported_issuer.ref_cert_bundle_path}")
+  pem_bundle = file("${path.module}/${var.vault_pki.cert.external_import.ref_cert_bundle_path}")
 }
 
 data "vault_pki_secret_backend_issuers" "issuers" {
@@ -79,10 +79,9 @@ data "vault_pki_secret_backend_issuers" "issuers" {
 # Vault since 1.11.0 allows a single PKI mount to have multiple Certificate Authority (CA) certificates ("issuers") in a single mount, 
 # for the purpose of facilitating rotation.
 resource "vault_pki_secret_backend_issuer" "issuer" {
-  depends_on = [data.vault_pki_secret_backend_issuers.issuers]
-  # count                          = data.vault_pki_secret_backend_issuers.issuers.key_info == null ? 0 : 1
+  depends_on                     = [data.vault_pki_secret_backend_issuers.issuers]
   backend                        = vault_mount.pki.path
   issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
-  revocation_signature_algorithm = var.vault_pki.imported_issuer.revocation_signature_algorithm
-  issuer_name                    = var.vault_pki.imported_issuer.name
+  revocation_signature_algorithm = var.vault_pki.issuer.revocation_signature_algorithm
+  issuer_name                    = var.vault_pki.issuer.name
 }

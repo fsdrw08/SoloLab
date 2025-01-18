@@ -65,29 +65,32 @@ resource "vault_pki_secret_backend_role" "role" {
 
 # intermediate CSR
 resource "vault_pki_secret_backend_intermediate_cert_request" "intermediate_cert_request" {
+  count       = var.vault_pki.cert.internal_sign == null ? 0 : 1
   backend     = vault_mount.pki.path
   type        = "internal"
-  common_name = "Sololab Intermediate CA2"
+  common_name = var.vault_pki.cert.internal_sign.common_name
 
 }
 
 data "vault_pki_secret_backend_issuers" "root_ca" {
-  backend = "pki/root"
+  count   = var.vault_pki.cert.internal_sign == null ? 0 : 1
+  backend = var.vault_pki.cert.internal_sign.backend
 }
 
 # sign cert by root ca
 resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermediate" {
-  backend     = "pki/root"
-  csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request.csr
-  common_name = "Sololab Intermediate CA2"
-  issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca.key_info), 0)
-  ttl         = "26280h" # 3y
+  count       = var.vault_pki.cert.internal_sign == null ? 0 : 1
+  backend     = var.vault_pki.cert.internal_sign.backend
+  csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request[0].csr
+  common_name = var.vault_pki.cert.internal_sign.common_name
+  issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca[0].key_info), 0)
+  ttl         = (var.vault_pki.cert.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
 }
 
 # import intermediate cert to Vault
 resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate_set_signed" {
   backend     = vault_mount.pki.path
-  certificate = vault_pki_secret_backend_root_sign_intermediate.root_sign_intermediate.certificate
+  certificate = vault_pki_secret_backend_root_sign_intermediate.root_sign_intermediate[0].certificate
 }
 
 resource "vault_pki_secret_backend_issuer" "issuer" {
@@ -97,19 +100,52 @@ resource "vault_pki_secret_backend_issuer" "issuer" {
   issuer_name                    = var.vault_pki.issuer.name
 }
 
+# acme
+resource "vault_pki_secret_backend_role" "role_acme" {
+  backend          = vault_mount.pki.path
+  name             = "IntCA2-v1-role-acme"
+  ttl              = (60 * 60 * 24 * 91) # 91 days in seconds
+  allow_ip_sans    = true
+  key_type         = "rsa"
+  key_bits         = 4096
+  allowed_domains  = ["infra.sololab", "service.consul"]
+  allow_subdomains = true
+  allow_any_name   = true
+}
 
-#  for the Intermediate CA, we need to generate a role to consume the PKI secret engine as a client.
-# Using the vault_pki_secret_backend_role resource creates a role for this CA; 
-# creating this role allows for specifying an issuer when necessary for the purposes of this scenario. 
-# This also provides a simple way to transition from one issuer to another by referring to it by name.
-# resource "vault_pki_secret_backend_role" "role" {
-#   backend          = vault_mount.pki.path
-#   name             = "IntCA2-v1-role-default"
-#   ttl              = 86400
-#   allow_ip_sans    = true
-#   key_type         = "rsa"
-#   key_bits         = 4096
-#   allowed_domains  = ["infra.sololab", "service.consul"]
-#   allow_subdomains = true
-#   allow_any_name   = true
-# }
+# enable the acme configuration.
+# https://www.infralovers.com/blog/2023-10-16-hashicorp-vault-acme-terraform-configuration/#:~:text=apply%20the%20secrets,1
+#
+# 202501: consider use vault_pki_secret_backend_config_acme instead 
+# ref: https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#acme-certificate-issuance
+# https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#set-acme-configuration
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
+# https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
+resource "vault_pki_secret_backend_config_acme" "config_acme" {
+  backend       = vault_mount.pki.path
+  enabled       = true
+  allowed_roles = [vault_pki_secret_backend_role.role_acme.name]
+}
+
+# apply the secrets engine tuning parameter
+# ref: https://developer.hashicorp.com/vault/api-docs/secret/pki#acme-required-headers
+# https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#acme-required-headers
+resource "vault_generic_endpoint" "tune_acme" {
+  path                 = "sys/mounts/${vault_mount.pki.path}/tune"
+  ignore_absent_fields = true
+  disable_delete       = true
+  write_fields         = ["passthrough_request_headers", "allowed_response_headers", "audit_non_hmac_request_keys", "audit_non_hmac_response_keys"]
+  data_json            = <<EOT
+{
+  "passthrough_request_headers": [
+    "If-Modified-Since"
+  ],
+  "allowed_response_headers": [
+    "Last-Modified", 
+    "Location", 
+    "Replay-Nonce", 
+    "Link"
+  ]
+}
+EOT
+}
