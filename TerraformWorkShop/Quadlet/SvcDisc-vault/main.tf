@@ -186,8 +186,11 @@ locals {
 }
 
 resource "null_resource" "post_process" {
-  depends_on = [powerdns_record.record]
-  for_each   = local.post_process
+  depends_on = [
+    powerdns_record.record,
+    null_resource.podman_quadlet
+  ]
+  for_each = local.post_process
   triggers = {
     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
     host           = var.prov_remote.host
