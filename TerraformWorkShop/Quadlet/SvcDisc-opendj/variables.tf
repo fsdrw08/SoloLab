@@ -7,6 +7,15 @@ variable "vm_conn" {
   })
 }
 
+variable "prov_vault" {
+  type = object({
+    schema          = string
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}
+
 variable "certs" {
   type = object({
     cert_content_tfstate_ref    = string

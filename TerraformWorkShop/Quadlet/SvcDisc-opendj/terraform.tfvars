@@ -5,6 +5,13 @@ vm_conn = {
   password = "podmgr"
 }
 
+prov_vault = {
+  schema          = "https"
+  address         = "vault.day1.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = true
+}
+
 certs = {
   cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
   cert_content_tfstate_entity = "opendj"

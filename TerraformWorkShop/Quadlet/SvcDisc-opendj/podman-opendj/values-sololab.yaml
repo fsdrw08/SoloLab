@@ -21,4 +21,4 @@ opendj:
     ## @param opendj.setupProperties.OPENDJ_SSL_OPTIONS you can replace ssl options at here,
     ## like : "--usePkcs12keyStore /opt/domain.pfx --keyStorePassword domain"
     ##
-    OPENDJ_SSL_OPTIONS: "--useJavaKeystore /opt/opendj/certs/keystore.jks --keyStorePassword changeit"
+    OPENDJ_SSL_OPTIONS: "--usePkcs12keyStore /opt/opendj/certs/keystore.pfx --keyStorePassword changeit"
