@@ -6,14 +6,20 @@ prov_vault = {
 }
 
 vault_pki = {
-  mount = {
+  secret_engine = {
     path                    = "pki/day1"
     description             = "PKI engine hosting intermediate CA day1 v1 for sololab"
-    default_lease_ttl_years = 1
+    default_lease_ttl_years = 3
     max_lease_ttl_years     = 3
   }
   role = {
-    name             = "IntCA-Day1-v1-role-default"
+    name = "IntCA-Day1-v1-role-default"
+    # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
+    # https://pkg.go.dev/crypto/x509#ExtKeyUsage
+    ext_key_usage = [
+      "ServerAuth",
+      "ClientAuth"
+    ]
     ttl_years        = 3
     key_type         = "rsa"
     key_bits         = 4096
@@ -22,11 +28,11 @@ vault_pki = {
     allow_subdomains = true
     allow_any_name   = true
   }
-  cert = {
+  ca = {
     internal_sign = {
       backend     = "pki/root"
       common_name = "Sololab Intermediate CA Day1"
-      ttl_years   = 3
+      ttl_years   = 5
     }
   }
   issuer = {

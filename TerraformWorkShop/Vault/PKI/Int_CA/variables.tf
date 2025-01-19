@@ -9,14 +9,15 @@ variable "prov_vault" {
 
 variable "vault_pki" {
   type = object({
-    mount = object({
+    secret_engine = object({
       path                    = string
       description             = string
-      default_lease_ttl_years = number
-      max_lease_ttl_years     = number
+      default_lease_ttl_years = optional(number, 0)
+      max_lease_ttl_years     = optional(number, 0)
     })
     role = object({
       name             = string
+      ext_key_usage    = list(string)
       ttl_years        = number
       key_type         = string
       key_bits         = number
@@ -25,7 +26,7 @@ variable "vault_pki" {
       allow_subdomains = bool
       allow_any_name   = bool
     })
-    cert = object({
+    ca = object({
       internal_sign = optional(object({
         backend     = string
         common_name = string

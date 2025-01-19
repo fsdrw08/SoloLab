@@ -4,11 +4,11 @@
 # https://developer.hashicorp.com/vault/docs/secrets/pki/setup#setup
 resource "vault_mount" "pki" {
   # the "pki" prefix is the default mount path prefix for mount type of pki
-  path                      = var.vault_pki.mount.path
+  path                      = var.vault_pki.secret_engine.path
   type                      = "pki"
-  description               = var.vault_pki.mount.description
-  default_lease_ttl_seconds = (var.vault_pki.mount.default_lease_ttl_years * 365 * 24 * 60 * 60) # 1 year in seconds
-  max_lease_ttl_seconds     = (var.vault_pki.mount.max_lease_ttl_years * 365 * 24 * 60 * 60)     # 3 years in seconds
+  description               = var.vault_pki.secret_engine.description
+  default_lease_ttl_seconds = (var.vault_pki.secret_engine.default_lease_ttl_years * 365 * 24 * 60 * 60)
+  max_lease_ttl_seconds     = (var.vault_pki.secret_engine.max_lease_ttl_years * 365 * 24 * 60 * 60)
 }
 
 resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
@@ -51,8 +51,11 @@ resource "vault_pki_secret_backend_crl_config" "crl_config" {
 # creating this role allows for specifying an issuer when necessary for the purposes of this scenario. 
 # This also provides a simple way to transition from one issuer to another by referring to it by name.
 resource "vault_pki_secret_backend_role" "role" {
-  backend          = vault_mount.pki.path
-  name             = var.vault_pki.role.name
+  backend = vault_mount.pki.path
+  name    = var.vault_pki.role.name
+  # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
+  # https://pkg.go.dev/crypto/x509#ExtKeyUsage
+  ext_key_usage    = var.vault_pki.role.ext_key_usage
   ttl              = (var.vault_pki.role.ttl_years * 365 * 24 * 60 * 60) # years in seconds
   allow_ip_sans    = var.vault_pki.role.allow_ip_sans
   key_type         = var.vault_pki.role.key_type
@@ -65,26 +68,26 @@ resource "vault_pki_secret_backend_role" "role" {
 
 # intermediate CSR
 resource "vault_pki_secret_backend_intermediate_cert_request" "intermediate_cert_request" {
-  count       = var.vault_pki.cert.internal_sign == null ? 0 : 1
+  count       = var.vault_pki.ca.internal_sign == null ? 0 : 1
   backend     = vault_mount.pki.path
   type        = "internal"
-  common_name = var.vault_pki.cert.internal_sign.common_name
+  common_name = var.vault_pki.ca.internal_sign.common_name
 
 }
 
 data "vault_pki_secret_backend_issuers" "root_ca" {
-  count   = var.vault_pki.cert.internal_sign == null ? 0 : 1
-  backend = var.vault_pki.cert.internal_sign.backend
+  count   = var.vault_pki.ca.internal_sign == null ? 0 : 1
+  backend = var.vault_pki.ca.internal_sign.backend
 }
 
 # sign cert by root ca
 resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermediate" {
-  count       = var.vault_pki.cert.internal_sign == null ? 0 : 1
-  backend     = var.vault_pki.cert.internal_sign.backend
+  count       = var.vault_pki.ca.internal_sign == null ? 0 : 1
+  backend     = var.vault_pki.ca.internal_sign.backend
   csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request[0].csr
-  common_name = var.vault_pki.cert.internal_sign.common_name
+  common_name = var.vault_pki.ca.internal_sign.common_name
   issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca[0].key_info), 0)
-  ttl         = (var.vault_pki.cert.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+  ttl         = (var.vault_pki.ca.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
 }
 
 # import intermediate cert to Vault
@@ -103,12 +106,12 @@ resource "vault_pki_secret_backend_issuer" "issuer" {
 # acme
 resource "vault_pki_secret_backend_role" "role_acme" {
   backend          = vault_mount.pki.path
-  name             = "IntCA2-v1-role-acme"
+  name             = "IntCA-Day1-v1-role-acme"
   ttl              = (60 * 60 * 24 * 91) # 91 days in seconds
   allow_ip_sans    = true
   key_type         = "rsa"
   key_bits         = 4096
-  allowed_domains  = ["infra.sololab", "service.consul"]
+  allowed_domains  = ["day1.sololab", "day1.service.consul"]
   allow_subdomains = true
   allow_any_name   = true
 }
@@ -122,9 +125,10 @@ resource "vault_pki_secret_backend_role" "role_acme" {
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
 resource "vault_pki_secret_backend_config_acme" "config_acme" {
-  backend       = vault_mount.pki.path
-  enabled       = true
-  allowed_roles = [vault_pki_secret_backend_role.role_acme.name]
+  backend         = vault_mount.pki.path
+  enabled         = true
+  allowed_roles   = [vault_pki_secret_backend_role.role_acme.name]
+  allowed_issuers = [vault_pki_secret_backend_issuer.issuer.issuer_id]
 }
 
 # apply the secrets engine tuning parameter
