@@ -4,11 +4,12 @@
 # https://developer.hashicorp.com/vault/docs/secrets/pki/setup#setup
 resource "vault_mount" "pki" {
   # the "pki" prefix is the default mount path prefix for mount type of pki
-  path                      = var.vault_pki.mount.path
+  path                      = var.vault_pki.secret_engine.path
   type                      = "pki"
-  description               = var.vault_pki.mount.description
-  default_lease_ttl_seconds = (var.vault_pki.mount.default_lease_ttl_years * 365 * 24 * 60 * 60) # 1 year in seconds
-  max_lease_ttl_seconds     = (var.vault_pki.mount.max_lease_ttl_years * 365 * 24 * 60 * 60)     # 3 years in seconds
+  description               = var.vault_pki.secret_engine.description
+  default_lease_ttl_seconds = (var.vault_pki.secret_engine.default_lease_ttl_years * 365 * 24 * 60 * 60)
+  max_lease_ttl_seconds     = (var.vault_pki.secret_engine.max_lease_ttl_years * 365 * 24 * 60 * 60)
+
 }
 
 resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
@@ -62,12 +63,12 @@ resource "vault_pki_secret_backend_role" "role" {
 # we can set root_ca_bundle_path to empty("") to delete this resource
 # https://github.com/stvdilln/vault-ca-demo/blob/52d03797168fdff075f638e57362ac8c4946cc94/root_ca.tf#L101
 resource "vault_pki_secret_backend_config_ca" "config_ca" {
-  count = var.vault_pki.cert.external_import.ref_cert_bundle_path == "" ? 0 : 1
+  count = var.vault_pki.ca.external_import.ref_cert_bundle_path == "" ? 0 : 1
 
   depends_on = [vault_mount.pki]
   backend    = vault_mount.pki.path
 
-  pem_bundle = file("${path.module}/${var.vault_pki.cert.external_import.ref_cert_bundle_path}")
+  pem_bundle = file("${path.module}/${var.vault_pki.ca.external_import.ref_cert_bundle_path}")
 }
 
 data "vault_pki_secret_backend_issuers" "issuers" {

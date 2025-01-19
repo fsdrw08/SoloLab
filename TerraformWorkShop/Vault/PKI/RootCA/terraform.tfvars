@@ -6,15 +6,15 @@ prov_vault = {
 }
 
 vault_pki = {
-  mount = {
+  secret_engine = {
     path                    = "pki/root"
     description             = "PKI engine hosting root CA v1 for sololab"
-    default_lease_ttl_years = 1
-    max_lease_ttl_years     = 3
+    default_lease_ttl_years = 5
+    max_lease_ttl_years     = 5
   }
   role = {
     name             = "RootCA-v1-role-default"
-    ttl_years        = 3
+    ttl_years        = 5
     key_type         = "rsa"
     key_bits         = 4096
     allow_ip_sans    = true
@@ -22,7 +22,7 @@ vault_pki = {
     allow_subdomains = true
     allow_any_name   = true
   }
-  cert = {
+  ca = {
     external_import = {
       # ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
       ref_cert_bundle_path = ""
