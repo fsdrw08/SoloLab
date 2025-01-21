@@ -25,7 +25,7 @@ podman_kube = {
     chart  = "../../../HelmWorkShop/helm-charts/charts/etcd"
     values = "./podman-etcd/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
 }
 
 podman_quadlet = {

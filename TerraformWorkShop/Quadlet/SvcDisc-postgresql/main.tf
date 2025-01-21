@@ -36,7 +36,7 @@ data "helm_template" "podman_kube" {
 }
 
 resource "remote_file" "podman_kube" {
-  path    = var.podman_kube.yaml_file_path
+  path    = var.podman_kube.manifest_dest_path
   content = data.helm_template.podman_kube.manifest
   conn {
     host     = var.prov_remote.host

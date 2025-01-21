@@ -17,7 +17,7 @@ podman_kube = {
     #   }
     # ]
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/ceph-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/ceph-aio.yaml"
 }
 
 podman_quadlet = {

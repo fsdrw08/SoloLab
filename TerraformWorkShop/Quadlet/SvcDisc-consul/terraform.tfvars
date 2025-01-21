@@ -11,7 +11,7 @@ podman_kube = {
     chart  = "../../../HelmWorkShop/helm-charts/charts/consul"
     values = "./podman-consul/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
 }
 
 podman_quadlet = {

@@ -11,7 +11,7 @@ podman_kube = {
     chart  = "../../../HelmWorkShop/helm-charts/charts/traefik"
     values = "./podman-traefik/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
 }
 
 podman_quadlet = {

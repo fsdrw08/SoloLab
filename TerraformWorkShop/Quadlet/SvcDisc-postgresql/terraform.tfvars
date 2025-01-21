@@ -25,7 +25,7 @@ podman_kube = {
     chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
     value_file = "./podman-postgresql/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/keycloakdb-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/keycloakdb-aio.yaml"
 }
 
 podman_quadlet = {

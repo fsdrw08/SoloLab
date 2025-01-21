@@ -38,7 +38,7 @@ variable "podman_kube" {
           value_template_vars = optional(map(string), null)
       })), null)
     })
-    yaml_file_path = string
+    manifest_dest_path = string
   })
 }
 

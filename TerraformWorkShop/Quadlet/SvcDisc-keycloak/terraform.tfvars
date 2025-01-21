@@ -25,7 +25,7 @@ podman_kube = {
     chart      = "../../../HelmWorkShop/helm-charts/charts/keycloak"
     value_file = "./podman-keycloak/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/keycloak-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/keycloak-aio.yaml"
 }
 
 podman_quadlet = {

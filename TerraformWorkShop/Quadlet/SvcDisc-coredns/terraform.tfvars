@@ -11,7 +11,7 @@ podman_kube = {
     chart  = "../../../HelmWorkShop/helm-charts/charts/coredns"
     values = "./podman-coredns/values-sololab.yaml"
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/coredns-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/coredns-aio.yaml"
 }
 
 podman_quadlet = {

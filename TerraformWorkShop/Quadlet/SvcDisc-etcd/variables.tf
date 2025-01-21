@@ -31,7 +31,7 @@ variable "podman_kube" {
       chart  = string
       values = string
     })
-    yaml_file_path = string
+    manifest_dest_path = string
   })
 }
 
