@@ -7,24 +7,6 @@ variable "prov_remote" {
   })
 }
 
-variable "certs_ref" {
-  type = object({
-    tfstate = optional(
-      object({
-        backend = string
-        config  = map(string)
-        entity  = string
-      }), null
-    )
-    config_node = object({
-      ca   = optional(string, null)
-      cert = optional(string, null)
-      key  = optional(string, null)
-    })
-
-  })
-}
-
 variable "podman_kube" {
   type = object({
     helm = object({
@@ -32,14 +14,33 @@ variable "podman_kube" {
       chart      = string
       value_file = string
       value_sets = optional(
-        list(object({
-          name                = string
-          value_string        = optional(string, null)
-          value_template_path = optional(string, null)
-          value_template_vars = optional(map(string), null)
-      })), null)
+        list(
+          object({
+            name                = string
+            value_string        = optional(string, null)
+            value_template_path = optional(string, null)
+            value_template_vars = optional(map(string), null)
+          })
+        ), null
+      )
+      tls_value_sets = optional(
+        object({
+          name = object({
+            ca          = string
+            cert        = string
+            private_key = string
+          })
+          value_ref = object({
+            tfstate = object({
+              backend = string
+              config  = map(string)
+              entity  = string
+            })
+          })
+        }), null
+      )
     })
-    yaml_file_path = string
+    manifest_dest_path = string
   })
 }
 

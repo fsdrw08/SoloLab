@@ -1,7 +1,7 @@
 data "terraform_remote_state" "root_ca" {
-  count   = var.certs_ref.tfstate == null ? 0 : 1
-  backend = var.certs_ref.tfstate.backend
-  config  = var.certs_ref.tfstate.config
+  count   = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? 0 : 1
+  backend = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend
+  config  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.config
 }
 
 data "helm_template" "podman_kube" {
@@ -21,40 +21,37 @@ data "helm_template" "podman_kube" {
       )
     }
   }
-  set {
-    name  = var.certs_ref.config_node.ca == null ? null : var.certs_ref.config_node.ca
-    value = var.certs_ref.tfstate == null ? null : data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
+  # tls
+  dynamic "set" {
+    for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
+      # ca
+      tomap({
+        "name"  = var.podman_kube.helm.tls_value_sets.name.ca,
+        "value" = data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
+      }),
+      # cert
+      tomap({
+        "name" = var.podman_kube.helm.tls_value_sets.name.cert,
+        "value" = join("", [
+          lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.podman_kube.helm.tls_value_sets.value_ref.tfstate.entity, null),
+          data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
+        ])
+      }),
+      # key
+      tomap({
+        "name"  = var.podman_kube.helm.tls_value_sets.name.private_key,
+        "value" = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.podman_kube.helm.tls_value_sets.value_ref.tfstate.entity, null)
+      }),
+    ]
+    content {
+      name  = set.value.name
+      value = set.value.value
+    }
   }
-  set {
-    name = var.certs_ref.config_node.cert == null ? null : var.certs_ref.config_node.cert
-    value = var.certs_ref.tfstate == null ? null : join("", [
-      lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs_ref.tfstate.entity, null),
-      data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
-    ])
-  }
-  set {
-    name  = var.certs_ref.config_node.key == null ? null : var.certs_ref.config_node.key
-    value = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs_ref.tfstate.entity, null)
-  }
-  # set {
-  #   name = "vault.tls.contents.\"tls\\.crt\""
-  #   value = join("", [
-  #     lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "vault", null),
-  #     data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-  #   ])
-  # }
-  # set {
-  #   name  = "vault.tls.contents.\"tls\\.key\""
-  #   value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "vault", null)
-  # }
-  # set {
-  #   name  = "vault.tls.contents.\"ca\\.crt\""
-  #   value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  # }
 }
 
 resource "remote_file" "podman_kube" {
-  path    = var.podman_kube.yaml_file_path
+  path    = var.podman_kube.manifest_dest_path
   content = data.helm_template.podman_kube.manifest
   conn {
     host     = var.prov_remote.host

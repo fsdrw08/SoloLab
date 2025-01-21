@@ -5,28 +5,29 @@ prov_remote = {
   password = "podmgr"
 }
 
-certs_ref = {
-  tfstate = {
-    backend = "local"
-    config = {
-      path = "../../TLS/RootCA/terraform.tfstate"
-    }
-    entity = "vault"
-  }
-  config_node = {
-    ca   = "vault.tls.contents.\"ca\\.crt\""
-    cert = "vault.tls.contents.\"tls\\.crt\""
-    key  = "vault.tls.contents.\"tls\\.key\""
-  }
-}
-
 podman_kube = {
   helm = {
     name       = "vault"
     chart      = "../../../HelmWorkShop/helm-charts/charts/vault"
     value_file = "./podman-vault/values-sololab.yaml"
+    tls_value_sets = {
+      name = {
+        ca          = "vault.tls.contents.\"ca\\.crt\""
+        cert        = "vault.tls.contents.\"tls\\.crt\""
+        private_key = "vault.tls.contents.\"tls\\.key\""
+      }
+      value_ref = {
+        tfstate = {
+          backend = "local"
+          config = {
+            path = "../../TLS/RootCA/terraform.tfstate"
+          }
+          entity = "vault"
+        }
+      }
+    }
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/vault-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/vault-aio.yaml"
 }
 
 podman_quadlet = {
