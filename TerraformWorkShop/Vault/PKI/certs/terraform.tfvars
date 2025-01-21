@@ -9,6 +9,11 @@ vault_kvv2 = {
   secret_engine = {
     path = "kvv2/certs"
   }
+  data_key_name = {
+    ca          = "ca"
+    cert        = "cert"
+    private_key = "private_key"
+  }
 }
 
 vault_certs = [

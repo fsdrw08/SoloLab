@@ -16,6 +16,11 @@ variable "vault_kvv2" {
     config = optional(object({
       max_versions = optional(number, null)
     }), null)
+    data_key_name = object({
+      ca          = string
+      cert        = string
+      private_key = string
+    })
   })
 
 }

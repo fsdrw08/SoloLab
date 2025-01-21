@@ -30,9 +30,9 @@ resource "vault_kv_secret_v2" "cert" {
   mount = var.vault_kvv2.secret_engine.path
   name  = each.value.common_name
   data_json = jsonencode({
-    ca            = data.vault_pki_secret_backend_issuer.issuer.certificate
-    cert          = "${vault_pki_secret_backend_cert.cert[each.key].certificate}\n${vault_pki_secret_backend_cert.cert[each.key].ca_chain}"
-    private_key   = vault_pki_secret_backend_cert.cert[each.key].private_key
-    serial_number = vault_pki_secret_backend_cert.cert[each.key].serial_number
+    "${var.vault_kvv2.data_key_name.ca}"          = data.vault_pki_secret_backend_issuer.issuer.certificate
+    "${var.vault_kvv2.data_key_name.cert}"        = "${vault_pki_secret_backend_cert.cert[each.key].certificate}\n${vault_pki_secret_backend_cert.cert[each.key].ca_chain}"
+    "${var.vault_kvv2.data_key_name.private_key}" = vault_pki_secret_backend_cert.cert[each.key].private_key
+    serial_number                                 = vault_pki_secret_backend_cert.cert[each.key].serial_number
   })
 }
