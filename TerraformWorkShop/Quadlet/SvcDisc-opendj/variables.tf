@@ -16,27 +16,40 @@ variable "prov_vault" {
   })
 }
 
-variable "certs" {
-  type = object({
-    cert_content_tfstate_ref    = string
-    cert_content_tfstate_entity = string
-  })
-}
-
 variable "podman_kube" {
   type = object({
     helm = object({
       name       = string
       chart      = string
       value_file = string
-      value_sets = list(object({
-        name                = string
-        value_string        = optional(string, null)
-        value_template_path = optional(string, null)
-        value_template_vars = optional(map(string), null)
-      }))
+      value_sets = optional(
+        list(
+          object({
+            name                = string
+            value_string        = optional(string, null)
+            value_template_path = optional(string, null)
+            value_template_vars = optional(map(string), null)
+          })
+        ), null
+      )
+      tls_value_sets = optional(
+        object({
+          name = string
+          value_ref = object({
+            vault_kvv2 = object({
+              mount = string
+              name  = string
+              data_key = object({
+                ca          = string
+                cert        = string
+                private_key = string
+              })
+            })
+          })
+        }), null
+      )
     })
-    yaml_file_path = string
+    manifest_dest_path = string
   })
 }
 

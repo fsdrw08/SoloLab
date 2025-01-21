@@ -1,8 +1,6 @@
+global:
+  imageRegistry: zot.day0.sololab
 opendj:
-  image:
-    registry: zot.day0.sololab
-    repository: openidentityplatform/opendj
-    tag: 4.8.2
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
@@ -21,4 +19,13 @@ opendj:
     ## @param opendj.setupProperties.OPENDJ_SSL_OPTIONS you can replace ssl options at here,
     ## like : "--usePkcs12keyStore /opt/domain.pfx --keyStorePassword domain"
     ##
-    OPENDJ_SSL_OPTIONS: "--usePkcs12keyStore /opt/opendj/certs/keystore.pfx --keyStorePassword changeit"
+    # OPENDJ_SSL_OPTIONS: "--usePkcs12keyStore /opt/opendj/certs/keystore.pfx --keyStorePassword changeit"
+  ## @param opendj.podAnnotations Annotations for opendj pods
+  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
+  ## the userns annotation only work podman v4.9+
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ## ref: https://github.com/OpenIdentityPlatform/OpenDJ/blob/4.9.1/opendj-packages/opendj-docker/Dockerfile#L31
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=1001,gid=1000

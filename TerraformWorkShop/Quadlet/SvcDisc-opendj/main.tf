@@ -1,37 +1,39 @@
-data "terraform_remote_state" "root_ca" {
-  count   = var.certs == null ? 0 : 1
-  backend = "local"
-  config = {
-    path = var.certs.cert_content_tfstate_ref
-  }
-}
-
-# data "jks_keystore" "keystore" {
-#   password = "changeit"
-
-#   key_pair {
-#     alias       = "sololab"
-#     certificate = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null)
-#     private_key = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
-
-#     intermediate_certificates = [
-#       data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
-#     ]
-#   }
+# data "terraform_remote_state" "root_ca" {
+#   count   = var.certs_ref.tfstate == null ? 0 : 1
+#   backend = var.certs_ref.tfstate.backend.type
+#   config  = var.certs_ref.tfstate.backend.config
 # }
 
 data "vault_kv_secret_v2" "cert" {
-  mount = "kvv2/certs"
-  name  = "opendj.day1.sololab"
+  count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
+  mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
+  name  = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.name
 }
 
-resource "pkcs12_from_pem" "keystore" {
-  password        = "changeit"
-  cert_pem        = data.vault_kv_secret_v2.cert.data["cert"]
-  private_key_pem = data.vault_kv_secret_v2.cert.data["private_key"]
-  ca_pem          = data.vault_kv_secret_v2.cert.data["ca"]
-  # private_key_pass = "key-pass"
+data "jks_keystore" "keystore" {
+  password = "changeit"
+
+  key_pair {
+    alias       = "sololab"
+    certificate = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.cert]
+    private_key = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.private_key]
+    intermediate_certificates = [
+      data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.ca],
+    ]
+  }
 }
+
+# resource "pkcs12_from_pem" "keystore" {
+#   password        = "changeit"
+#   ca_pem          = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.ca]
+#   cert_pem        = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.cert]
+#   private_key_pem = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.private_key]
+#   # ca_pem = [
+#   #   data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
+#   # ]
+#   # cert_pem        = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null)
+#   # private_key_pem = lookup((data.terraform_remote_state.root_ca[0].outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
+# }
 
 data "helm_template" "podman_kube" {
   name  = var.podman_kube.helm.name
@@ -50,17 +52,26 @@ data "helm_template" "podman_kube" {
       )
     }
   }
-  set {
-    # name = "opendj.ssl.contents_b64.\"keystore\\.jks\""
-    # value = data.jks_keystore.keystore.jks_base64
-    name  = "opendj.ssl.contents_b64.\"keystore\\.pfx\""
-    value = pkcs12_from_pem.keystore.result
+  # tls
+  dynamic "set" {
+    for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
+      # pkcs12
+      tomap({
+        "name" = var.podman_kube.helm.tls_value_sets.name,
+        # "value" = pkcs12_from_pem.keystore.result
+        "value" = data.jks_keystore.keystore.jks_base64
+      })
+    ]
+    content {
+      name  = set.value.name
+      value = set.value.value
+    }
   }
 
 }
 
 resource "remote_file" "podman_kube" {
-  path    = var.podman_kube.yaml_file_path
+  path    = var.podman_kube.manifest_dest_path
   content = data.helm_template.podman_kube.manifest
   conn {
     host     = var.vm_conn.host

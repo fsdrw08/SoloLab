@@ -12,14 +12,6 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-certs = {
-  cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
-  cert_content_tfstate_entity = "opendj"
-  # cacert_basename          = "ca.crt"
-  # cert_value_path          = "server.crt"
-  # key_value_path           = "server.key"
-}
-
 podman_kube = {
   helm = {
     name       = "opendj"
@@ -54,9 +46,27 @@ podman_kube = {
           baseDN = "dc=root\\,dc=sololab"
         }
       },
+      {
+        name         = "opendj.ssl.contents_b64.\"keystore\\.pin\""
+        value_string = "Y2hhbmdlaXQ=" # changeit
+      }
     ]
+    tls_value_sets = {
+      name = "opendj.ssl.contents_b64.\"keystore\""
+      value_ref = {
+        vault_kvv2 = {
+          mount = "kvv2/certs"
+          name  = "opendj.day1.sololab"
+          data_key = {
+            ca          = "ca"
+            cert        = "cert"
+            private_key = "private_key"
+          }
+        }
+      }
+    }
   }
-  yaml_file_path = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
+  manifest_dest_path = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
 }
 
 podman_quadlet = {
@@ -68,7 +78,7 @@ podman_quadlet = {
         vars = {
           yaml          = "opendj-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
+          KubeDownForce = "true"
         }
       },
     ]
