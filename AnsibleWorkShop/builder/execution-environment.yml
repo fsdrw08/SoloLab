@@ -8,7 +8,7 @@ dependencies:
     package_pip: ansible-core
   ansible_runner:
     package_pip: ansible-runner
-  galaxy: |
+  galaxy:
     collections:
       - ansible.utils
       - ansible.posix
@@ -17,6 +17,9 @@ dependencies:
       - community.hashi_vault
       - kubernetes.core
       - vyos.vyos
+    roles:
+      - name: ansible-modules-hashivault
+        src: git+https://github.com/TerryHowe/ansible-modules-hashivault.git
   python:
     - netaddr
     - pyyaml # required by kubernetes.core.k8s module
