@@ -5,6 +5,11 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
+data "vault_kv_secret_v2" "root_cert" {
+  mount = "kvv2/certs"
+  name  = "root"
+}
+
 resource "vault_ldap_auth_backend" "ldap" {
   url                  = var.vault_ldap_auth_backend.url
   starttls             = var.vault_ldap_auth_backend.starttls
@@ -12,7 +17,7 @@ resource "vault_ldap_auth_backend" "ldap" {
   tls_min_version      = var.vault_ldap_auth_backend.tls_min_version
   tls_max_version      = var.vault_ldap_auth_backend.tls_max_version
   insecure_tls         = var.vault_ldap_auth_backend.insecure_tls
-  certificate          = data.terraform_remote_state.root_ca.outputs.root_cert_pem
+  certificate          = data.vault_kv_secret_v2.root_cert.data["ca"]
   binddn               = var.vault_ldap_auth_backend.binddn
   bindpass             = var.vault_ldap_auth_backend.bindpass
   userdn               = var.vault_ldap_auth_backend.userdn

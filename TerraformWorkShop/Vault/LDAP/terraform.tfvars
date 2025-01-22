@@ -1,11 +1,11 @@
-vault_conn = {
-  address         = "https://vault.day0.sololab:8200"
+prov_vault = {
+  address         = "https://vault.day1.sololab:8200"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
-ldap_conn = {
-  host          = "opendj.day0.sololab"
+prov_ldap = {
+  host          = "opendj.day1.sololab"
   port          = "636"
   tls           = true
   tls_insecure  = true
@@ -15,7 +15,7 @@ ldap_conn = {
 
 vault_ldap_auth_backend = {
   path         = "ldap"
-  url          = "ldaps://opendj.day0.sololab"
+  url          = "ldaps://opendj.day1.sololab"
   insecure_tls = false
   #   certificate  = data.terraform_remote_state.root_ca.outputs.root_cert_pem
 
@@ -48,6 +48,8 @@ vault_ldap_auth_backend = {
   # groupdn     = "ou=groups,dc=root,dc=sololab"
   # groupattr   = "cn"
   # groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=app-*)(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}})))"
+
+  token_max_ttl = 3600
 }
 
 ldap_vault_entities = {

@@ -1,4 +1,4 @@
-variable "vault_conn" {
+variable "prov_vault" {
   type = object({
     address         = string
     token           = string
@@ -6,7 +6,7 @@ variable "vault_conn" {
   })
 }
 
-variable "ldap_conn" {
+variable "prov_ldap" {
   type = object({
     host          = string
     port          = string

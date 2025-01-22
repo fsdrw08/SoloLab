@@ -9,12 +9,12 @@ terraform {
     }
     ldap = {
       source  = "l-with/ldap"
-      version = ">=0.8.1"
+      version = "<=0.9.1"
     }
   }
 
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
     schema_name = "Vault-LDAP"
   }
 }
@@ -31,16 +31,16 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address         = var.vault_conn.address
-  token           = var.vault_conn.token
-  skip_tls_verify = var.vault_conn.skip_tls_verify
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
 provider "ldap" {
-  host          = var.ldap_conn.host
-  port          = var.ldap_conn.port
-  tls           = var.ldap_conn.tls
-  tls_insecure  = var.ldap_conn.tls_insecure
-  bind_user     = var.ldap_conn.bind_user
-  bind_password = var.ldap_conn.bind_password
+  host          = var.prov_ldap.host
+  port          = var.prov_ldap.port
+  tls           = var.prov_ldap.tls
+  tls_insecure  = var.prov_ldap.tls_insecure
+  bind_user     = var.prov_ldap.bind_user
+  bind_password = var.prov_ldap.bind_password
 }
