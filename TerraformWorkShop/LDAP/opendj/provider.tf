@@ -2,22 +2,22 @@ terraform {
   required_providers {
     ldap = {
       source  = "l-with/ldap"
-      version = "0.8.1"
+      version = "<=0.9.1"
     }
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "Day1-OpenDJ"
+    schema_name = "LDAP-OpenDJ-Day1"
   }
 }
 
 provider "ldap" {
-  host         = "opendj.day1.sololab"
-  port         = "636"
-  tls          = true
-  tls_insecure = true
+  host         = var.prov_ldap.host
+  port         = var.prov_ldap.port
+  tls          = var.prov_ldap.tls
+  tls_insecure = var.prov_ldap.tls_insecure
 
-  bind_user     = "cn=Directory Manager"
-  bind_password = "P@ssw0rd"
+  bind_user     = var.prov_ldap.bind_user
+  bind_password = var.prov_ldap.bind_password
 }
 

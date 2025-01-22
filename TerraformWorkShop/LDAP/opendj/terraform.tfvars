@@ -1,3 +1,13 @@
+prov_ldap = {
+  host         = "opendj.day1.sololab"
+  port         = "636"
+  tls          = true
+  tls_insecure = true
+
+  bind_user     = "cn=Directory Manager"
+  bind_password = "P@ssw0rd"
+}
+
 base_dn = "dc=root,dc=sololab"
 
 ldap_accounts = [
@@ -59,7 +69,7 @@ ldap_groups = [
     }
   },
   {
-    dn = "cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"
+    dn = "cn=App-Vault-Admin,ou=Groups,dc=root,dc=sololab"
     data = {
       objectClass = ["top", "groupOfUniqueNames"]
       ou          = ["Groups"]
@@ -68,24 +78,34 @@ ldap_groups = [
       ]
     }
   },
-  {
-    dn = "cn=App-Zot-CU,ou=Groups,dc=root,dc=sololab"
-    data = {
-      objectClass = ["top", "groupOfUniqueNames"]
-      ou          = ["Groups"]
-      uniqueMember = [
-        "uid=user1,ou=People,dc=root,dc=sololab",
-      ]
-    }
-  },
-  {
-    dn = "cn=App-Consul-Auto_Config,ou=Groups,dc=root,dc=sololab"
-    data = {
-      objectClass = ["top", "groupOfUniqueNames"]
-      ou          = ["Groups"]
-      uniqueMember = [
-        "uid=admin,ou=People,dc=root,dc=sololab",
-      ]
-    }
-  }
+  # {
+  #   dn = "cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"
+  #   data = {
+  #     objectClass = ["top", "groupOfUniqueNames"]
+  #     ou          = ["Groups"]
+  #     uniqueMember = [
+  #       "uid=admin,ou=People,dc=root,dc=sololab",
+  #     ]
+  #   }
+  # },
+  # {
+  #   dn = "cn=App-Zot-CU,ou=Groups,dc=root,dc=sololab"
+  #   data = {
+  #     objectClass = ["top", "groupOfUniqueNames"]
+  #     ou          = ["Groups"]
+  #     uniqueMember = [
+  #       "uid=user1,ou=People,dc=root,dc=sololab",
+  #     ]
+  #   }
+  # },
+  # {
+  #   dn = "cn=App-Consul-Auto_Config,ou=Groups,dc=root,dc=sololab"
+  #   data = {
+  #     objectClass = ["top", "groupOfUniqueNames"]
+  #     ou          = ["Groups"]
+  #     uniqueMember = [
+  #       "uid=admin,ou=People,dc=root,dc=sololab",
+  #     ]
+  #   }
+  # }
 ]
