@@ -12,10 +12,10 @@ terraform {
       source  = "tenstad/remote"
       version = ">=0.1.3"
     }
-    jks = {
-      source  = "fhke/jks"
-      version = ">=1.0.1"
-    }
+    # jks = {
+    #   source  = "fhke/jks"
+    #   version = ">=1.0.1"
+    # }
     pkcs12 = {
       source  = "chilicat/pkcs12"
       version = ">=0.2.5"

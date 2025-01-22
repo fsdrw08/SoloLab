@@ -35,8 +35,8 @@ while [ $(/opt/opendj/bin/status --connectTimeout 0 --bindDN "${bindDN}" --bindP
 
 # https://github.com/aciborowska/jingo/blob/c1a21f041501d5e6653f2e09046a5524af7274ea/datasets/hcc/opendj-sdk/queries/long/3700.txt#L5
 /opt/opendj/bin/dsconfig \
-    --port 4444 \
     --hostname ${hostname} \
+    --port 4444 \
     --bindDN '${bindDN}' \
     --bindPassword ${bindPassword} \
     --trustAll \

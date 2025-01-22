@@ -106,3 +106,11 @@ variable "dns_record" {
     records = list(string)
   })
 }
+
+variable "post_process" {
+  type = map(object({
+    script_path = string
+    vars        = map(string)
+  }))
+  default = null
+}

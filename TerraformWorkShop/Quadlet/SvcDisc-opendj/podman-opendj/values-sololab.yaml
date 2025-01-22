@@ -19,7 +19,9 @@ opendj:
     ## @param opendj.setupProperties.OPENDJ_SSL_OPTIONS you can replace ssl options at here,
     ## like : "--usePkcs12keyStore /opt/domain.pfx --keyStorePassword domain"
     ##
-    # OPENDJ_SSL_OPTIONS: "--usePkcs12keyStore /opt/opendj/certs/keystore.pfx --keyStorePassword changeit"
+    OPENDJ_SSL_OPTIONS: "--usePkcs12keyStore /opt/opendj/certs/keystore.p12 --keyStorePassword changeit"
+  ssl:
+    mountPath: /opt/opendj/certs
   ## @param opendj.podAnnotations Annotations for opendj pods
   ## to keep container user as same permission as host user, set keep-id point to the container user and group id
   ## the userns annotation only work podman v4.9+

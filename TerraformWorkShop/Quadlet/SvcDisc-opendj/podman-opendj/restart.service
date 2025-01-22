@@ -1,7 +1,7 @@
 # https://github.com/lyzeo/rivet/blob/64219c2c43ea6fbcecdc885d9259c713edb9ceee/infra/salt/salt/traefik/files/traefik.service#L11
 
 [Unit]
-Description="One shot action service to restart static-web-server"
+Description="One shot action service to restart ${target_service}"
 Documentation=https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
 After=network-online.target
 AssertPathExists=${AssertPathExists}

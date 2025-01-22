@@ -46,13 +46,9 @@ podman_kube = {
           baseDN = "dc=root\\,dc=sololab"
         }
       },
-      {
-        name         = "opendj.ssl.contents_b64.\"keystore\\.pin\""
-        value_string = "Y2hhbmdlaXQ=" # changeit
-      }
     ]
     tls_value_sets = {
-      name = "opendj.ssl.contents_b64.\"keystore\""
+      name = "opendj.ssl.contents_b64.\"keystore\\.p12\""
       value_ref = {
         vault_kvv2 = {
           mount = "kvv2/certs"
@@ -78,7 +74,7 @@ podman_quadlet = {
         vars = {
           yaml          = "opendj-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "true"
+          KubeDownForce = "false"
         }
       },
     ]
@@ -111,6 +107,18 @@ container_restart = {
     path = "/home/podmgr/.config/systemd/user/opendj_restart.service"
   }
 
+}
+
+post_process = {
+  "Enable-PreEncodedPassword.sh" = {
+    script_path = "./podman-opendj/Enable-PreEncodedPassword.sh"
+    vars = {
+      CONTAINER_NAME = "opendj-opendj"
+      hostname       = "localhost"
+      bindDN         = "cn=Directory Manager"
+      bindPassword   = "P@ssw0rd"
+    }
+  }
 }
 
 pdns = {
