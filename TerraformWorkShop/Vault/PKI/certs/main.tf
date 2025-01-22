@@ -23,6 +23,14 @@ data "vault_pki_secret_backend_issuer" "issuer" {
   issuer_ref = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
 }
 
+resource "vault_kv_secret_v2" "root_cert" {
+  mount = var.vault_kvv2.secret_engine.path
+  name  = "root"
+  data_json = jsonencode({
+    "ca" = data.vault_pki_secret_backend_issuer.issuer.certificate
+  })
+}
+
 resource "vault_kv_secret_v2" "cert" {
   for_each = {
     for cert in var.vault_certs : cert.common_name => cert
