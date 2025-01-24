@@ -1,49 +1,39 @@
-resource "vault_policy" "admin" {
-  name   = "admin"
-  policy = <<-EOT
-  path "*" {
-    capabilities = ["create", "read", "update", "patch", "delete", "list", "sudo"]
+resource "vault_policy" "policy" {
+  for_each = {
+    for binding in var.policy_bindings : binding.policy_name => binding
   }
-  EOT
+  # name   = "admin"
+  # policy = <<-EOT
+  # path "*" {
+  #   capabilities = ["create", "read", "update", "patch", "delete", "list", "sudo"]
+  # }
+  # EOT
+  name   = each.value.policy_name
+  policy = each.value.policy_content
 }
 
-resource "vault_identity_group" "admin" {
-  name                       = "Local-Admin"
-  type                       = "internal"
-  external_policies          = true
-  external_member_group_ids  = true
-  external_member_entity_ids = true
+# put all group in external in to one data set
+data "vault_identity_group" "external" {
+  for_each = {
+    for group in setunion(
+      flatten([
+        for binding in var.policy_bindings : binding.external_groups
+    ])) : group => group
+  }
+  group_name = each.key
 }
 
-resource "vault_identity_group_policies" "admin" {
+resource "vault_identity_group" "internal" {
+  for_each = {
+    for binding in var.policy_bindings : binding.policy_group => binding
+  }
+  name = each.value.policy_group
+  type = "internal"
   policies = [
-    vault_policy.admin.name
+    vault_policy.policy[each.value.policy_name].name
   ]
-
-  exclusive = true
-
-  group_id = vault_identity_group.admin.id
-}
-
-# data "vault_identity_group" "external" {
-#   group_name = "app-vault-admin"
-# }
-
-# resource "vault_identity_group_member_group_ids" "admin" {
-#   group_id = vault_identity_group.admin.id
-#   member_group_ids = [
-#     # data.vault_identity_group.external.group_id
-#   ]
-# }
-
-data "vault_identity_entity" "admin" {
-  entity_name = "admin@mail.sololab"
-}
-
-resource "vault_identity_group_member_entity_ids" "admin" {
-  depends_on = [data.vault_identity_entity.admin]
-  group_id   = vault_identity_group.admin.id
-  member_entity_ids = [
-    data.vault_identity_entity.admin.entity_id
+  member_group_ids = [
+    for group in each.value.external_groups : data.vault_identity_group.external[group].group_id
+    # data.vault_identity_group.external.group_id
   ]
 }
