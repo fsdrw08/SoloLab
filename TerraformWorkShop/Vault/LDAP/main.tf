@@ -78,7 +78,7 @@ resource "vault_identity_entity_alias" "alias" {
   for_each = {
     for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
   }
-  name           = each.key
+  name           = "${each.key} - LDAP"
   mount_accessor = vault_ldap_auth_backend.ldap.accessor
   canonical_id   = vault_identity_entity.user[each.key].id
 }
@@ -96,7 +96,7 @@ resource "vault_identity_group_alias" "alias" {
   for_each = {
     for entry in data.ldap_entries.groups.entries : jsondecode(entry.data_json).cn[0] => entry
   }
-  name           = each.key
+  name           = "${each.key} - LDAP"
   mount_accessor = vault_ldap_auth_backend.ldap.accessor
   canonical_id   = vault_identity_group.group[each.key].id
 }

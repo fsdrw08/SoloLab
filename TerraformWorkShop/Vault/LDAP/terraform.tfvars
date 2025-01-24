@@ -49,7 +49,8 @@ vault_ldap_auth_backend = {
   # groupattr   = "cn"
   # groupfilter = "(&(objectClass=groupOfUniqueNames)(cn=app-*)(|(memberUid={{.Username}})(member={{.UserDN}})(uniqueMember={{.UserDN}})))"
 
-  token_max_ttl = 3600
+  token_ttl     = 28800
+  token_max_ttl = 28800
 }
 
 ldap_vault_entities = {
