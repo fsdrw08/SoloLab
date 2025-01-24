@@ -6,20 +6,6 @@ global:
   imageRegistry: "zot.day0.sololab"
 
 vault:
-  ## hashicorp vault image
-  ## ref: https://hub.docker.com/r/hashicorp/vault/tags/
-  ## @param vault.image.registry vault image registry
-  ## @param vault.image.repository vault image repository
-  ## @param vault.image.tag vault image tag (immutable tags are recommended)
-  ## @param vault.image.digest vault image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
-  ## @param vault.image.pullPolicy vault image pull policy
-  ## @param vault.image.pullSecrets vault image pull secrets
-  ##
-  image:
-    registry: zot.day0.sololab
-    repository: hashicorp/vault
-    tag: 1.18
-
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
   ## ref: https://developer.hashicorp.com/vault/docs/configuration
@@ -28,7 +14,13 @@ vault:
     main:
       api_addr: "https://vault.day1.sololab:8200"
       cluster_addr: "https://vault.day1.sololab:8201"
+    ## @param vault.configFiles.storage storage config for server
     storage:
+      ## @param vault.configFiles.storage
+      ## The storage stanza configures the storage backend, which represents the location for the durable storage of Vault's information
+      ## if the storage file changed, do forget also change it in persistence.mountPath.storage
+      ## https://developer.hashicorp.com/vault/docs/configuration/storage
+      ## https://github.com/kirubasankars/bedrock/blob/b2037fb394d149a9fed560cc60d284b28b4585fb/src/main/agent/vault/config/vault.json#L3
       storage:
         raft:
           path: /vault/file
