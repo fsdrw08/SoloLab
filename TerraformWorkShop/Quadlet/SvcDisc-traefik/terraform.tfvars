@@ -26,6 +26,22 @@ podman_quadlet = {
           KubeDownForce = "true"
         }
       },
+      {
+        file_source = "./podman-traefik/http.socket"
+        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+        vars = {
+          ListenStream = "0.0.0.0:80"
+          name         = "traefik-container"
+        }
+      },
+      {
+        file_source = "./podman-traefik/https.socket"
+        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+        vars = {
+          ListenStream = "0.0.0.0:443"
+          name         = "traefik-container"
+        }
+      },
     ]
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }

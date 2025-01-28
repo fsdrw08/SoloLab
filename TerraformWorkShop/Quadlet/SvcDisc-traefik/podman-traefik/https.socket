@@ -1,0 +1,9 @@
+# https://github.com/eriksjolund/podman-traefik-socket-activation/blob/main/examples/example1/https.socket
+[Socket]
+
+ListenStream=0.0.0.0:80
+FileDescriptorName=websecure
+Service=${name}.service
+
+[Install]
+WantedBy=sockets.target
