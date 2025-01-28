@@ -30,3 +30,10 @@ resource "vault_identity_oidc_key_allowed_client_id" "consul_auto_config" {
   key_name          = vault_identity_oidc_key.consul_auto_config.name
   allowed_client_id = vault_identity_oidc_role.consul_auto_config.client_id
 }
+
+
+module "policy_bindings" {
+  source          = "../../../modules/vault-policy_binding"
+  policy_bindings = var.policy_bindings
+
+}

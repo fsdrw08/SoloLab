@@ -11,7 +11,7 @@ terraform {
   }
 
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
     schema_name = "Vault-Consul-auto_config"
   }
 }
@@ -26,7 +26,7 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address         = var.vault_conn.address
-  token           = var.vault_conn.token
-  skip_tls_verify = var.vault_conn.skip_tls_verify
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
