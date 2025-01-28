@@ -31,8 +31,9 @@ variable "vault_certs" {
       backend   = string
       role_name = string
     })
-    common_name = string
     ttl_years   = number
+    common_name = string
+    alt_names   = optional(list(string), null)
     revoke      = optional(bool, null)
   }))
 }

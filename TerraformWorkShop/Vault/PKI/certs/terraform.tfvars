@@ -22,7 +22,20 @@ vault_certs = [
       backend   = "pki/day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
-    common_name = "opendj.day1.sololab"
     ttl_years   = 3
+    common_name = "opendj.day1.sololab"
+  },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "consul.day1.sololab"
+    alt_names = [
+      "consul.service.consul",
+      "server.dc1.consul",
+      "localhost"
+    ]
   },
 ]
