@@ -1,6 +1,6 @@
 [Unit]
-Description="HashiCorp Vault - A tool for managing secrets"
-Documentation=https://developer.hashicorp.com/vault/docs
+Description="HashiCorp Consul - A service mesh solution""
+Documentation=https://www.consul.io/
 
 [Kube]
 # Point to the yaml file in the same directory

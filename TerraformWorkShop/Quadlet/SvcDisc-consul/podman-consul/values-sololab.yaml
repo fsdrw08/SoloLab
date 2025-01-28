@@ -1,17 +1,6 @@
+global:
+  imageRegistry: zot.day0.sololab
 consul:
-  ## hashicorp consul image
-  ## ref: https://hub.docker.com/r/hashicorp/consul/tags/
-  ## @param consul.image.registry consul image registry
-  ## @param consul.image.repository consul image repository
-  ## @param consul.image.tag consul image tag (immutable tags are recommended)
-  ## @param consul.image.digest consul image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
-  ## @param consul.image.pullPolicy consul image pull policy
-  ## @param consul.image.pullSecrets consul image pull secrets
-  ##
-  image:
-    registry: zot.day0.sololab
-    repository: hashicorp/consul
-    tag: 1.18.2
   containerPorts:
     - name: server
       containerPort: 8300
@@ -55,9 +44,9 @@ consul:
         authorization:
           enabled: true
           static:
-            oidc_discovery_url: https://vault.day0.sololab:8200/v1/identity/oidc
+            oidc_discovery_url: https://vault.day1.sololab:8200/v1/identity/oidc
             oidc_discovery_ca_cert: ## set via helm value
-            bound_issuer: https://vault.day0.sololab:8200/v1/identity/oidc
+            bound_issuer: https://vault.day1.sololab:8200/v1/identity/oidc
             bound_audiences:
               - consul-cluster-dc1
             claim_mappings:
