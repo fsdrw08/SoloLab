@@ -1,4 +1,4 @@
-vm_conn = {
+prov_remote = {
   host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
@@ -121,7 +121,7 @@ post_process = {
   }
 }
 
-pdns = {
+prov_pdns = {
   api_key    = "powerdns"
   server_url = "https://pdns.day0.sololab"
 }

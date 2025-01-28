@@ -63,7 +63,7 @@ resource "remote_file" "podman_kube" {
 module "podman_quadlet" {
   depends_on     = [remote_file.podman_kube]
   source         = "../../modules/system-systemd_quadlet"
-  vm_conn        = var.vm_conn
+  vm_conn        = var.prov_remote
   podman_quadlet = var.podman_quadlet
 }
 
@@ -71,10 +71,10 @@ module "container_restart" {
   depends_on = [module.podman_quadlet]
   source     = "../../modules/system-systemd_path_user"
   vm_conn = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
   }
   systemd_path_unit = {
     content = templatefile(
@@ -108,10 +108,10 @@ resource "null_resource" "post_process" {
   for_each = var.post_process == null ? {} : var.post_process
   triggers = {
     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
+    host           = var.prov_remote.host
+    port           = var.prov_remote.port
+    user           = var.prov_remote.user
+    password       = sensitive(var.prov_remote.password)
   }
   connection {
     type     = "ssh"

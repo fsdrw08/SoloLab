@@ -1,4 +1,4 @@
-variable "vm_conn" {
+variable "prov_remote" {
   type = object({
     host     = string
     port     = number
@@ -89,7 +89,7 @@ variable "container_restart" {
   })
 }
 
-variable "pdns" {
+variable "prov_pdns" {
   type = object({
     api_key        = string
     server_url     = string

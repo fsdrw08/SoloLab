@@ -24,6 +24,10 @@ terraform {
       source  = "pyama86/powerdns"
       version = ">=1.5.1"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 4.1.0"
+    }
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
@@ -33,17 +37,17 @@ terraform {
 
 provider "remote" {
   conn {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
   }
 }
 
 provider "powerdns" {
-  api_key        = var.pdns.api_key
-  server_url     = var.pdns.server_url
-  insecure_https = var.pdns.insecure_https
+  api_key        = var.prov_pdns.api_key
+  server_url     = var.prov_pdns.server_url
+  insecure_https = var.prov_pdns.insecure_https
 }
 
 provider "vault" {
