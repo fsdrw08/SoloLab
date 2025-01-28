@@ -15,20 +15,4 @@ policy_bindings = [
     policy_group    = "Policy-Vault-Admin"
     external_groups = ["App-Vault-Admin"]
   },
-  {
-    policy_name     = "consul-auto_config"
-    policy_content  = <<-EOT
-      path "identity/oidc/token/consul_auto_config" {
-        capabilities = ["read"]
-      }
-      path "identity/entity/id" {
-        capabilities = ["list"]
-      }
-      path "identity/entity/id/{{identity.entity.id}}" {
-        capabilities = ["read", "update"]
-      }
-      EOT
-    policy_group    = "Policy-Consul-auto_config"
-    external_groups = ["App-Consul-Auto_Config"]
-  },
 ]
