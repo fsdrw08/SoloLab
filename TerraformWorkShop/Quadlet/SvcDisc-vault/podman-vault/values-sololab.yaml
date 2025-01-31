@@ -59,7 +59,7 @@ vault:
     enabled: true
     env:
       - name: VAULT_ADDR
-        value: https://127.0.0.1:8200
+        value: https://vault:8200
       - name: VAULT_OPERATOR_SECRETS_JSON_PATH
         value: "/vault/unseal/vault_operator_secrets"
 
