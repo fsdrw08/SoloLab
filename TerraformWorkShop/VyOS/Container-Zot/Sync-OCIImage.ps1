@@ -80,6 +80,14 @@ $syncList = @"
         "privateRepo": "hashicorp/consul:1.20",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "instrumentisto/rsync-ssh:alpine3.21",
+        "archive": "quay.io_instrumentisto_rsync-ssh_alpine3.21.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "instrumentisto/rsync-ssh:alpine3.21",
+        "description": "https://quay.io/repository/instrumentisto/rsync-ssh?tab=tags",
+    },
 ]
 "@
 

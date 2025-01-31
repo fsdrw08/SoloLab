@@ -94,6 +94,9 @@ consul:
   ##   -advertise=<host ip> \
   ##   $CONSUL_CLIENT \
   ##   "$@"
+  ## why not pass the advertise ip into args?
+  ## args only accept plain text command, not accept variable which come with expression
+  ##
   command:
     - "/bin/sh"
     - "-c"
@@ -101,3 +104,34 @@ consul:
       sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=$(getent hosts host.containers.internal | awk '\''{print $1}'\'') \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
       chmod +x /tmp/docker-entrypoint.sh
       exec /tmp/docker-entrypoint.sh "$0" "$@"
+
+  ## @param consul.podAnnotations Annotations for consul pods
+  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
+  ## the userns annotation only work podman v4.9+
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/Dockerfile#L271-L273
+  ## e.g.
+  ## podAnnotations:
+  ##   io.podman.annotations.userns: keep-id:uid=100,gid=1000
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=100,gid=1000
+  # ## @param consul.sidecars Add additional sidecar containers to the consul pod(s)
+  # ## e.g:
+  # ## sidecars:
+  # ##   - name: your-image-name
+  # ##     image: your-image
+  # ##     imagePullPolicy: Always
+  # ##     ports:
+  # ##       - name: portname
+  # ##         containerPort: 1234
+  # ##
+  # sidecars:
+  #   - name: rsync
+  #     image: zot.day0.sololab/instrumentisto/rsync-ssh:alpine3.21
+  #     imagePullPolicy: IfNotPresent
+  #     command:
+  #       - /bin/sh
+  #       - -c
+  #       - "rsync -av --include 'Service*' --exclude '*' --delete /consul-service/ /consul-data/"
