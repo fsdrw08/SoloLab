@@ -75,7 +75,7 @@ consul:
         internal_rpc:
           verify_server_hostname: true
   ## @param consul.command Override default container command (useful when using custom images)
-  ## ref: https://github.com/hashicorp/consul/blob/main/.release/docker/docker-entrypoint.sh#L75
+  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
   ## this command is used to set the advertise ip to host ip when consul start
   ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
   ## before:
@@ -104,7 +104,12 @@ consul:
       sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=$(getent hosts host.containers.internal | awk '\''{print $1}'\'') \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
       chmod +x /tmp/docker-entrypoint.sh
       exec /tmp/docker-entrypoint.sh "$0" "$@"
-
+  ## @param consul.args Override default container args (useful when using custom images)
+  ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
+  ##
+  args:
+    - agent
+    - -config-dir=/consul/services
   ## @param consul.podAnnotations Annotations for consul pods
   ## to keep container user as same permission as host user, set keep-id point to the container user and group id
   ## the userns annotation only work podman v4.9+
@@ -117,21 +122,16 @@ consul:
   ##
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
-  # ## @param consul.sidecars Add additional sidecar containers to the consul pod(s)
-  # ## e.g:
-  # ## sidecars:
-  # ##   - name: your-image-name
-  # ##     image: your-image
-  # ##     imagePullPolicy: Always
-  # ##     ports:
-  # ##       - name: portname
-  # ##         containerPort: 1234
-  # ##
-  # sidecars:
-  #   - name: rsync
-  #     image: zot.day0.sololab/instrumentisto/rsync-ssh:alpine3.21
-  #     imagePullPolicy: IfNotPresent
-  #     command:
-  #       - /bin/sh
-  #       - -c
-  #       - "rsync -av --include 'Service*' --exclude '*' --delete /consul-service/ /consul-data/"
+  ## @param consul.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the consul container(s)
+  ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
+  ##
+  extraVolumeMounts:
+    - name: services
+      mountPath: "/consul/services:Z"
+  ## @param consul.extraVolumes Optionally specify extra list of additional volumes for the consul pod(s)
+  ##
+  extraVolumes:
+    - name: services
+      hostPath:
+        path: /var/home/podmgr/consul-services
+        type: Directory

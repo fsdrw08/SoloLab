@@ -56,7 +56,7 @@ podman_quadlet = {
         vars = {
           yaml          = "consul-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "true"
+          KubeDownForce = "false"
         }
       },
     ]
@@ -89,6 +89,16 @@ container_restart = {
     path = "/home/podmgr/.config/systemd/user/consul_restart.service"
   }
 
+}
+
+post_process = {
+  "Enable-DNSAnonymousAccess.sh" = {
+    script_path = "./podman-consul/Enable-DNSAnonymousAccess.sh"
+    vars = {
+      CONSUL_HTTP_ADDR = "https://consul.day1.sololab:8501"
+      INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    }
+  }
 }
 
 prov_pdns = {
