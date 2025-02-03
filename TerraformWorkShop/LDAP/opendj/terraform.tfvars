@@ -85,6 +85,7 @@ ldap_groups = [
       ou          = ["Groups"]
       uniqueMember = [
         "uid=admin,ou=People,dc=root,dc=sololab",
+        "uid=user1,ou=People,dc=root,dc=sololab",
       ]
     }
   },
