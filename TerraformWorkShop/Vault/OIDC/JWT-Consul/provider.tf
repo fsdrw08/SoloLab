@@ -6,27 +6,14 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 4.1.0"
+      version = ">= 4.2.0"
     }
-    # local = {
-    #   source  = "hashicorp/local"
-    #   version = ">= 2.2.3"
-    # }
-    # tls = {
-    #   source  = "hashicorp/tls"
-    #   version = ">= 4.0.4"
-    # }
   }
+
   backend "pg" {
-    conn_str = "postgres://terraform:terraform@192.168.255.2:26257/tfstate"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    schema_name = "Vault-OIDC-JWT-Consul-auto_config"
   }
-}
-
-
-locals {
-  VAULT_ADDR      = "vault.infra.sololab:8200"
-  VAULT_TOKEN     = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
@@ -39,8 +26,7 @@ provider "vault" {
   # But can be set explicitly
   # address = "https://vault.example.net:8200"
 
-  address = "https://${local.VAULT_ADDR}"
-  token   = local.VAULT_TOKEN
-  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
-  skip_tls_verify = local.skip_tls_verify
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
