@@ -47,6 +47,8 @@ consul:
             oidc_discovery_url: https://vault.day1.sololab:8200/v1/identity/oidc
             oidc_discovery_ca_cert: ## set via helm value
             bound_issuer: https://vault.day1.sololab:8200/v1/identity/oidc
+            # The value for matching the aud field of the JSON web token (JWT).
+            # The audience aud claim in a JWT is meant to refer to the authorization servers that should accept the token.
             bound_audiences:
               - consul-cluster-dc1
             claim_mappings:
