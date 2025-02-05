@@ -30,8 +30,23 @@ resource "vault_identity_oidc_key_allowed_client_id" "consul_auto_config" {
 
 # config policy to make the user who permission granted allow to config meta data in it's own
 module "consul_auto_config_policy_bindings" {
-  source          = "../../../modules/vault-policy_binding"
-  policy_bindings = var.policy_bindings
+  source = "../../../modules/vault-policy_binding"
+  policy_bindings = [{
+    policy_name     = "Consul-Auto_config"
+    policy_content  = <<-EOT
+      path "identity/oidc/token/Consul-Auto_config" {
+        capabilities = ["read"]
+      }
+      path "identity/entity/id" {
+        capabilities = ["list"]
+      }
+      path "identity/entity/id/{{identity.entity.id}}" {
+        capabilities = ["read", "update"]
+      }
+      EOT
+    policy_group    = "Policy-Consul-auto_config"
+    external_groups = ["App-Consul-Auto_Config"]
+  }]
 
 }
 

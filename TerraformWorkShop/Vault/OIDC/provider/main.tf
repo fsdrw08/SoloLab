@@ -1,5 +1,5 @@
 resource "vault_identity_oidc" "server" {
-  issuer = "https://vault.infra.sololab:8200"
+  issuer = var.prov_vault.address
 }
 
 # a jwt token usually include: 
