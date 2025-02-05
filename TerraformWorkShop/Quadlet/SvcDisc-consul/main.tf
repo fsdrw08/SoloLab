@@ -31,7 +31,7 @@ data "helm_template" "podman_kube" {
   values = [
     "${file(var.podman_kube.helm.value_file)}"
   ]
-
+  # normal values
   dynamic "set" {
     for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
     content {
@@ -41,7 +41,7 @@ data "helm_template" "podman_kube" {
       )
     }
   }
-  # tls
+  # tls values
   dynamic "set" {
     for_each = var.podman_kube.helm.tls_value_sets == null ? [] : flatten([var.podman_kube.helm.tls_value_sets.value_sets])
     content {
