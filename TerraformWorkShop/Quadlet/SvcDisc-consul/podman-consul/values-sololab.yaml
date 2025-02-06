@@ -103,7 +103,7 @@ consul:
     - "/bin/sh"
     - "-c"
     - |
-      sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=$(getent hosts host.containers.internal | awk '\''{print $1}'\'') \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
+      sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=$(getent hosts SvcDisc-FCOS.day1.sololab | awk '\''{print $1}'\'') \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
       chmod +x /tmp/docker-entrypoint.sh
       exec /tmp/docker-entrypoint.sh "$0" "$@"
   ## @param consul.args Override default container args (useful when using custom images)

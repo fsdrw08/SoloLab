@@ -1,3 +1,6 @@
+consider use vault consul secret engine to manage consul acl token instead of jwt auth
+[Consul secrets engine](https://developer.hashicorp.com/vault/docs/secrets/consul)
+
 1. prepare vault jwt auth provider in [../../Vault/OIDC/JWT-Consul/](../../Vault/OIDC/JWT-Consul/) first,  
 2. apply the terraform resource in this dir,  
 3. get jwt from vault
