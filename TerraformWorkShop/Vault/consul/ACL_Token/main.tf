@@ -13,7 +13,7 @@ resource "vault_consul_secret_backend" "backend" {
 }
 
 resource "vault_consul_secret_backend_role" "admin" {
-  name    = "global-management"
+  name    = "admin"
   backend = vault_consul_secret_backend.backend.path
   consul_policies = [
     "global-management"
@@ -21,17 +21,38 @@ resource "vault_consul_secret_backend_role" "admin" {
   ttl = 3600
 }
 
+resource "vault_consul_secret_backend_role" "user" {
+  name    = "user"
+  backend = vault_consul_secret_backend.backend.path
+  consul_policies = [
+    "builtin/global-read-only"
+  ]
+  ttl = 3600
+}
+
 module "consul_jwt_auth_policy_bindings" {
   source = "../../../modules/vault-policy_binding"
-  policy_bindings = [{
-    policy_name     = "Consul-ACL_Token"
-    policy_content  = <<-EOT
-      path "consul/creds/global-management" {
+  policy_bindings = [
+    {
+      policy_name     = "Consul-ACL_Token-Admin"
+      policy_content  = <<-EOT
+      path "consul/creds/admin" {
         capabilities = ["read"]
       }
       EOT
-    policy_group    = "Policy-Consul-Admin"
-    external_groups = ["App-Consul-Admin"]
-  }]
+      policy_group    = "Policy-Consul-Admin"
+      external_groups = ["App-Consul-Admin"]
+    },
+    {
+      policy_name     = "Consul-ACL_Token-User"
+      policy_content  = <<-EOT
+      path "consul/creds/user" {
+        capabilities = ["read"]
+      }
+      EOT
+      policy_group    = "Policy-Consul-User"
+      external_groups = ["App-Consul-User"]
+    }
+  ]
 
 }
