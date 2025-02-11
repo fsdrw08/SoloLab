@@ -121,6 +121,12 @@ consul:
   ##
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  extraEnvVars:
+    - name: CONSUL_DISABLE_PERM_MGMT
+      value: "ture"
+    - name: TZ
+      value: Asia/Shanghai
   ## @param consul.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the consul container(s)
   ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
   ##

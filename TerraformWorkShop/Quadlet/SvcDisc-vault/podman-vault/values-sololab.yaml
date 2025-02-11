@@ -46,6 +46,8 @@ vault:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
 
   extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
     - name: SKIP_CHOWN
       value: "true"
     - name: SKIP_SETCAP
