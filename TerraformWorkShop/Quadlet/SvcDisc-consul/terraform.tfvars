@@ -26,7 +26,7 @@ podman_kube = {
       }
       value_sets = [
         {
-          name          = "consul.configFiles.general.auto_config.authorization.static.oidc_discovery_ca_cert"
+          name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
           value_ref_key = "ca"
         },
         {
