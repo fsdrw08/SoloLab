@@ -81,6 +81,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/nomad:1.9",
+        "archive": "docker.io_hashicorp_nomad_1.9.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "hashicorp/nomad:1.9",
+        "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "instrumentisto/rsync-ssh:alpine3.21",
         "archive": "quay.io_instrumentisto_rsync-ssh_alpine3.21.tar",
@@ -96,8 +104,8 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-$proxy="127.0.0.1:7890"
-# $proxy="192.168.255.1:7890"
+# $proxy="127.0.0.1:7890"
+$proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {

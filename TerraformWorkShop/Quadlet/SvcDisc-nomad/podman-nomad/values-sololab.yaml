@@ -1,0 +1,27 @@
+global:
+  imageRegistry: zot.day0.sololab
+nomad:
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 180
+    periodSeconds: 300
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    exec:
+      command:
+        - nomad
+        - server
+        - members
+        - -tls-skip-verify
+        - -address
+        - https://localhost:4646
+  configFiles:
+    main:
+      disable_update_check: true
+      tls:
+        http: true
+        rpc: true
+        ca_file: "/nomad/config/certs/ca.crt"
+        cert_file: "/nomad/config/certs/server.crt"
+        key_file: "/nomad/config/certs/server.key"

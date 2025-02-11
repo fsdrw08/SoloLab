@@ -38,4 +38,15 @@ vault_certs = [
       "localhost"
     ]
   },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "nomad.day1.sololab"
+    alt_names = [
+      "nomad.service.consul",
+    ]
+  },
 ]
