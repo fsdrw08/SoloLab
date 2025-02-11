@@ -1,6 +1,9 @@
 global:
   imageRegistry: zot.day0.sololab
 nomad:
+  image:
+    repository: multani/nomad
+    tag: "1.9.5"
   livenessProbe:
     enabled: true
     initialDelaySeconds: 180
@@ -25,3 +28,11 @@ nomad:
         ca_file: "/nomad/config/certs/ca.crt"
         cert_file: "/nomad/config/certs/server.crt"
         key_file: "/nomad/config/certs/server.key"
+
+  extraEnvVars:
+    - name: NOMAD_DISABLE_PERM_MGMT
+      value: "ture"
+    - name: NOMAD_CONFIG_DIR
+      value: /nomad/config
+    - name: TZ
+      value: Asia/Shanghai

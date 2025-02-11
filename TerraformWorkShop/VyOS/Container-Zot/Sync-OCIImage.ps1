@@ -89,6 +89,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "multani/nomad:1.9.5",
+        "archive": "docker.io_multani_nomad_1.9.5.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "multani/nomad:1.9.5",
+        "description": "https://hub.docker.com/r/multani/nomad/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "instrumentisto/rsync-ssh:alpine3.21",
         "archive": "quay.io_instrumentisto_rsync-ssh_alpine3.21.tar",
