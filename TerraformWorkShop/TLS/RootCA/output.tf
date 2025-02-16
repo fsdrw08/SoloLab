@@ -38,3 +38,15 @@ output "signed_key_pkcs8" {
   })
   # value = tolist(tls_private_key.key.*)
 }
+
+output "signed_certs" {
+  value = [
+    for key in var.certs : {
+      name      = key.name
+      cert_pem  = tls_locally_signed_cert.cert[key.name].cert_pem
+      key_pem   = tls_private_key.key[key.name].private_key_pem
+      key_pkcs8 = tls_private_key.key[key.name].private_key_pem_pkcs8
+    }
+  ]
+  sensitive = true
+}
