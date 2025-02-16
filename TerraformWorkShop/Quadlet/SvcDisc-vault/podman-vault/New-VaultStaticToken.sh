@@ -48,7 +48,7 @@ function authenticate {
     # VAULT_TOKEN=$(cat $VAULT_OPERATOR_SECRETS_JSON_PATH | grep "Initial Root Token" | awk '{print $NF}')
     # INIT_VAULT_TOKEN=$(jq .root_token $VAULT_OPERATOR_SECRETS_JSON_PATH)
     # https://github.com/hashicorp/vault/issues/6287#issuecomment-684125899
-    INIT_VAULT_TOKEN=$(echo $(jq .root_token $VAULT_OPERATOR_SECRETS_JSON_PATH)| tr -d '"')
+    INIT_VAULT_TOKEN=$(echo $(base64 -d $VAULT_OPERATOR_SECRETS_JSON_PATH | jq .root_token )| tr -d '"')
     export INIT_VAULT_TOKEN=$INIT_VAULT_TOKEN
 }
 
