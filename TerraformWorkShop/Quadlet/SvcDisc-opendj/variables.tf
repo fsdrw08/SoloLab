@@ -36,17 +36,31 @@ variable "podman_kube" {
         object({
           name = string
           value_ref = object({
-            vault_kvv2 = object({
-              mount = string
-              name  = string
-              data_key = object({
-                ca          = string
-                cert        = string
-                private_key = string
-              })
-            })
+            vault_kvv2 = optional(
+              object({
+                mount = string
+                name  = string
+                data_key = object({
+                  ca          = string
+                  cert        = string
+                  private_key = string
+                })
+              }),
+              null
+            )
+            tfstate = optional(
+              object({
+                backend = object({
+                  type   = string
+                  config = map(string)
+                })
+                cert_name = string
+              }),
+              null
+            )
           })
-        }), null
+        }),
+        null
       )
     })
     manifest_dest_path = string

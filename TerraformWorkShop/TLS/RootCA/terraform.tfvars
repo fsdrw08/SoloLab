@@ -297,10 +297,10 @@ certs = [
     }
     cert = {
       dns_names = [
-        "opendj.core.sololab"
+        "opendj.day1.sololab"
       ]
       subject = {
-        common_name  = "opendj.core.sololab"
+        common_name  = "opendj.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

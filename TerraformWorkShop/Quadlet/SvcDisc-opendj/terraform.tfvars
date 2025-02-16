@@ -50,14 +50,23 @@ podman_kube = {
     tls_value_sets = {
       name = "opendj.ssl.contents_b64.\"keystore\\.p12\""
       value_ref = {
-        vault_kvv2 = {
-          mount = "kvv2/certs"
-          name  = "opendj.day1.sololab"
-          data_key = {
-            ca          = "ca"
-            cert        = "cert"
-            private_key = "private_key"
+        # vault_kvv2 = {
+        #   mount = "kvv2/certs"
+        #   name  = "opendj.day1.sololab"
+        #   data_key = {
+        #     ca          = "ca"
+        #     cert        = "cert"
+        #     private_key = "private_key"
+        #   }
+        # }
+        tfstate = {
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
           }
+          cert_name = "opendj"
         }
       }
     }
