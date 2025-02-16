@@ -112,8 +112,8 @@ $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
-# $proxy="127.0.0.1:7890"
-$proxy="192.168.255.1:7890"
+$proxy="127.0.0.1:7890"
+# $proxy="192.168.255.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 $syncList | ConvertFrom-Json | ForEach-Object {

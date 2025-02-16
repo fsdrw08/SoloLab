@@ -51,7 +51,7 @@ podman_quadlet = {
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
           yaml          = "nomad-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
+          PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
           KubeDownForce = "false"
         }
       },

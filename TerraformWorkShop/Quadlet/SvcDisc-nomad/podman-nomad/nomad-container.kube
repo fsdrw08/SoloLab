@@ -9,8 +9,6 @@ Wants=vault-container.service
 Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
-# https://github.com/containers/podman/issues/24970#issuecomment-2582792692
-# Network=slirp4netns
 
 [Service]
 ExecStartPre=sleep 10
