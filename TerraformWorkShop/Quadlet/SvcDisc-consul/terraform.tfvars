@@ -17,6 +17,12 @@ podman_kube = {
     name       = "consul"
     chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
     value_file = "./podman-consul/values-sololab.yaml"
+    value_sets = [
+      {
+        name         = "consul.configFiles.main.advertise_addr"
+        value_string = "192.168.255.20"
+      }
+    ]
     tls_value_sets = {
       value_ref = {
         vault_kvv2 = {
