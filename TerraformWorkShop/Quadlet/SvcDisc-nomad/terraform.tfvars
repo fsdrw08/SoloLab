@@ -17,6 +17,20 @@ podman_kube = {
     name       = "nomad"
     chart      = "../../../HelmWorkShop/helm-charts/charts/nomad"
     value_file = "./podman-nomad/values-sololab.yaml"
+    value_sets = [
+      {
+        name         = "nomad.configFiles.main.advertise.http"
+        value_string = "192.168.255.20"
+      },
+      {
+        name         = "nomad.configFiles.main.advertise.rpc"
+        value_string = "192.168.255.20"
+      },
+      {
+        name         = "nomad.configFiles.main.advertise.serf"
+        value_string = "192.168.255.20"
+      },
+    ]
     tls_value_sets = {
       value_ref = {
         vault_kvv2 = {
@@ -52,7 +66,7 @@ podman_quadlet = {
         vars = {
           yaml          = "nomad-aio.yaml"
           PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
-          KubeDownForce = "false"
+          KubeDownForce = "true"
         }
       },
     ]

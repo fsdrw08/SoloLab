@@ -21,7 +21,8 @@ nomad:
         - https://localhost:4646
   configFiles:
     main:
-      disable_update_check: true
+      acl:
+        enabled: true
       tls:
         http: true
         rpc: true
@@ -29,9 +30,13 @@ nomad:
         cert_file: "/nomad/config/certs/server.crt"
         key_file: "/nomad/config/certs/server.key"
 
+  args:
+    - agent
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT
       value: "ture"
+    # env var for image multani/nomad
+    # https://github.com/multani/docker-nomad/blob/9f5cc384481214f0232b38262b0512c2d22a0887/v1.9.x/start.sh#L15
     - name: NOMAD_CONFIG_DIR
       value: /nomad/config
     - name: TZ
