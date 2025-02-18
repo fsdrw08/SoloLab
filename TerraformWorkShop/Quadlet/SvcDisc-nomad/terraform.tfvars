@@ -66,7 +66,8 @@ podman_quadlet = {
         vars = {
           yaml          = "nomad-aio.yaml"
           PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
-          KubeDownForce = "false"
+          KubeDownForce = "true"
+          ExecStartPre  = "sleep 3"
         }
       },
     ]

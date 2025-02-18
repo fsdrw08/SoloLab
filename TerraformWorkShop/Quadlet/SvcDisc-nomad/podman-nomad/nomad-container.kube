@@ -11,7 +11,7 @@ PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
 
 [Service]
-ExecStartPre=sleep 10
+ExecStartPre=${ExecStartPre}
 
 [Install]
 WantedBy=default.target
