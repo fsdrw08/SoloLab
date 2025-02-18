@@ -41,3 +41,10 @@ nomad:
       value: /nomad/config
     - name: TZ
       value: Asia/Shanghai
+  extraVolumes:
+    - name: token
+      persistentVolumeClaim:
+        claimName: nomad-pvc-token
+  extraVolumeMounts:
+    - name: token
+      mountPath: /etc/profile.d

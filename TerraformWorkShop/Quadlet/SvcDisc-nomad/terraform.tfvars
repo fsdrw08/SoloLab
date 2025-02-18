@@ -69,6 +69,12 @@ podman_quadlet = {
           KubeDownForce = "true"
         }
       },
+      {
+        file_source = "./podman-nomad/nomad-container.volume"
+        vars = {
+          VolumeName = "nomad-pvc-token"
+        }
+      },
     ]
     file_path_dir = "/home/podmgr/.config/containers/systemd"
   }
@@ -101,15 +107,15 @@ container_restart = {
 
 }
 
-# post_process = {
-#   "Enable-DNSAnonymousAccess.sh" = {
-#     script_path = "./podman-nomad/Enable-DNSAnonymousAccess.sh"
-#     vars = {
-#       nomad_HTTP_ADDR = "https://nomad.day1.sololab:8501"
-#       INIT_TOKEN      = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-#     }
-#   }
-# }
+post_process = {
+  "New-NomadStaticToken.sh" = {
+    script_path = "./podman-nomad/New-NomadStaticToken.sh"
+    vars = {
+      NOMAD_ADDR           = "https://nomad.day1.sololab:4646"
+      BOOTSTRAP_TOKEN_FILE = "/var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc-token/_data/nomad_token"
+    }
+  }
+}
 
 prov_pdns = {
   api_key    = "powerdns"

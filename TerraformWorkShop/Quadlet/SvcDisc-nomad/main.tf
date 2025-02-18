@@ -49,25 +49,6 @@ data "helm_template" "podman_kube" {
       value = data.vault_kv_secret_v2.cert[0].data[set.value.value_ref_key]
     }
   }
-  # set {
-  #   name  = "consul.configFiles.general.auto_config.authorization.static.oidc_discovery_ca_cert"
-  #   value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  # }
-  # set {
-  #   name = "consul.tls.contents.\"server\\.crt\""
-  #   value = join("", [
-  #     lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), "consul", null),
-  #     data.terraform_remote_state.root_ca.outputs.int_ca_pem,
-  #   ])
-  # }
-  # set {
-  #   name  = "consul.tls.contents.\"server\\.key\""
-  #   value = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), "consul", null)
-  # }
-  # set {
-  #   name  = "consul.tls.contents.\"ca\\.crt\""
-  #   value = data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  # }
 }
 
 # resource "remote_file" "consul_service" {
