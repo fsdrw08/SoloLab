@@ -25,6 +25,7 @@ if [ ! -f "$BOOTSTRAP_TOKEN_FILE" ] || [ ! -s "$BOOTSTRAP_TOKEN_FILE" ]; then
     # 检查响应是否成功
     if [ $? -eq 0 ]; then
         # 将响应内容输出到 $BOOTSTRAP_TOKEN_FILE 文件中
+        ls -al $(dirname $BOOTSTRAP_TOKEN_FILE)
         echo "export NOMAD_TOKEN=\"$response\"" > "$BOOTSTRAP_TOKEN_FILE"
         echo "ACL tokens information has been written to $BOOTSTRAP_TOKEN_FILE"
     else

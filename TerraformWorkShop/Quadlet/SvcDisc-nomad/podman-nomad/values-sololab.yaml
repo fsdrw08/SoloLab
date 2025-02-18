@@ -6,7 +6,7 @@ nomad:
     tag: "1.9.5"
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
+    initialDelaySeconds: 30
     periodSeconds: 300
     timeoutSeconds: 5
     failureThreshold: 3
@@ -41,10 +41,7 @@ nomad:
       value: /nomad/config
     - name: TZ
       value: Asia/Shanghai
-  extraVolumes:
-    - name: token
-      persistentVolumeClaim:
-        claimName: nomad-pvc-token
-  extraVolumeMounts:
-    - name: token
-      mountPath: /etc/profile.d
+    - name: NOMAD_ADDR
+      value: https://nomad.day1.sololab:4646
+    - name: NOMAD_CACERT
+      value: /nomad/config/certs/ca.crt
