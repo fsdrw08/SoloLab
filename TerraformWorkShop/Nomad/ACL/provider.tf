@@ -4,6 +4,10 @@
 # https://registry.terraform.io/providers/hashicorp/local/
 terraform {
   required_providers {
+    nomad = {
+      source  = "hashicorp/nomad"
+      version = ">=2.4.0"
+    }
     vault = {
       source  = "hashicorp/vault"
       version = ">= 4.1.0"
@@ -11,20 +15,19 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "Vault-OIDC-Provider"
+    schema_name = "Nomad-ACL-OIDC"
   }
+}
+
+provider "nomad" {
+  address     = var.prov_nomad.address
+  skip_verify = var.prov_nomad.skip_verify
+  # secret_id   = var.NOMAD_TOKEN
+  # $env:NOMAD_TOKEN="xxxx"
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
 provider "vault" {
-  # It is strongly recommended to configure this provider through the
-  # environment variables described above, so that each user can have
-  # separate credentials set in the environment.
-  #
-  # This will default to using $VAULT_ADDR
-  # But can be set explicitly
-  # address = "https://vault.example.net:8200"
-
   address         = var.prov_vault.address
   token           = var.prov_vault.token
   skip_tls_verify = var.prov_vault.skip_tls_verify

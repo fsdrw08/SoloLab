@@ -110,6 +110,16 @@ ldap_groups = [
       ]
     }
   },
+  {
+    dn = "cn=App-Nomad-Admin,ou=Groups,dc=root,dc=sololab"
+    data = {
+      objectClass = ["top", "groupOfUniqueNames"]
+      ou          = ["Groups"]
+      uniqueMember = [
+        "uid=admin,ou=People,dc=root,dc=sololab",
+      ]
+    }
+  },
   # {
   #   dn = "cn=App-Zot-Admin,ou=Groups,dc=root,dc=sololab"
   #   data = {

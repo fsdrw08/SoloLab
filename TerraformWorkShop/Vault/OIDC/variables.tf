@@ -15,7 +15,19 @@ variable "oidc_provider" {
           name     = string
           template = string
         })
-      ), null
+      ), []
     )
   })
+}
+
+variable "oidc_client" {
+  type = list(
+    object({
+      name             = string
+      allow_groups     = list(string)
+      redirect_uris    = list(string)
+      id_token_ttl     = optional(number, 2400)
+      access_token_ttl = optional(number, 7200)
+    })
+  )
 }

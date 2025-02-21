@@ -107,7 +107,7 @@ post_process = {
     script_path = "./podman-nomad/New-NomadAnonymousPolicy.sh"
     vars = {
       NOMAD_ADDR       = "https://nomad.day1.sololab:4646"
-      NOMAD_TOKEN_FILE = "/var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc-data/_data/server/nomad_token"
+      NOMAD_TOKEN_FILE = "/var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc/_data/server/nomad_token"
     }
   }
 }
