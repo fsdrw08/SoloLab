@@ -13,14 +13,13 @@ variable "hyperv" {
   }
 }
 
-variable "vhd_count" {
-  type = number
-}
+# variable "vhd_count" {
+#   type = number
+# }
 
 variable "vhd" {
   type = object({
-    dir        = string
-    basename   = string
+    path       = string
     type       = string
     size       = number
     block_size = number

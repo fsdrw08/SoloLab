@@ -5,11 +5,8 @@ hyperv = {
   password = "P@ssw0rd"
 }
 
-vhd_count = 1
-
 vhd = {
-  dir        = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk"
-  basename   = "InfraSvc-FCOS-Data.vhdx"
+  path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Infra-FCOS-Data.vhdx"
   block_size = 0
   type       = "Dynamic"
   size       = 42949672960

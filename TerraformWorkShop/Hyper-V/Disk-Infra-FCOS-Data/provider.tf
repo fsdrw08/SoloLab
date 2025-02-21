@@ -6,8 +6,8 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@192.168.255.1/tfstate"
-    schema_name = "HyperV-InfraSvc-Disk-FCOS"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    schema_name = "HyperV-Infra-Disk-FCOS"
   }
 }
 

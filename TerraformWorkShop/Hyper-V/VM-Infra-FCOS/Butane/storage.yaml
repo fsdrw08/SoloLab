@@ -1,0 +1,18 @@
+variant: fcos
+version: 1.5.0
+storage:
+  # data disk
+  disks:
+    - device: /dev/sdb
+      wipe_table: false
+      partitions:
+        - label: data
+          number: 1
+          size_mib: 0
+  filesystems:
+    - device: /dev/disk/by-partlabel/data
+      format: xfs
+      path: /var/home/podmgr
+      wipe_filesystem: false
+      label: data
+      with_mount_unit: true
