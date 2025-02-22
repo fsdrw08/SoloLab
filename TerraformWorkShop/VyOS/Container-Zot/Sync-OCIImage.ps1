@@ -90,10 +90,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "multani/nomad:1.9.5",
-        "archive": "docker.io_multani_nomad_1.9.5.tar",
+        "publicRepo": "multani/nomad:1.9.6",
+        "archive": "docker.io_multani_nomad_1.9.6.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "multani/nomad:1.9.5",
+        "privateRepo": "multani/nomad:1.9.6",
         "description": "https://hub.docker.com/r/multani/nomad/tags",
     },
     {
