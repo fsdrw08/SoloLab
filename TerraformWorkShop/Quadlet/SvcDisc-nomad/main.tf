@@ -1,23 +1,3 @@
-# resource "null_resource" "init" {
-#   connection {
-#     type     = "ssh"
-#     host     = var.prov_remote.host
-#     port     = var.prov_remote.port
-#     user     = var.prov_remote.user
-#     password = var.prov_remote.password
-#   }
-#   triggers = {
-#     dirs = "/home/podmgr/consul-services"
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       templatefile("${path.root}/podman-nomad/init.sh", {
-#         dirs = self.triggers.dirs
-#       })
-#     ]
-#   }
-# }
-
 data "vault_kv_secret_v2" "cert" {
   count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
   mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
@@ -124,4 +104,9 @@ resource "null_resource" "post_process" {
       templatefile("${each.value.script_path}", "${each.value.vars}")
     ]
   }
+}
+
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-nomad.hcl"
+  content = file("./podman-nomad/service.hcl")
 }
