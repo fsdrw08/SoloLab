@@ -32,9 +32,11 @@ variable "podman_kube" {
           })
           value_ref = object({
             tfstate = object({
-              backend = string
-              config  = map(string)
-              entity  = string
+              backend = object({
+                type   = string
+                config = map(string)
+              })
+              cert_name = string
             })
           })
         }), null
