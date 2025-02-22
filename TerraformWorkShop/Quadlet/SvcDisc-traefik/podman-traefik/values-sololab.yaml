@@ -1,3 +1,5 @@
+global:
+  imageRegistry: zot.day0.sololab
 traefik:
   image:
     registry: zot.day0.sololab

@@ -97,6 +97,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/multani/nomad/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "library/traefik:v3.3",
+        "archive": "docker.io_library_traefik_v3.3.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "library/traefik:v3.3",
+        "description": "https://hub.docker.com/r/library/traefik/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "instrumentisto/rsync-ssh:alpine3.21",
         "archive": "quay.io_instrumentisto_rsync-ssh_alpine3.21.tar",

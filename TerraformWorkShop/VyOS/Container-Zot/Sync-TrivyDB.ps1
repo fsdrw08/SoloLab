@@ -19,6 +19,7 @@ $syncList = @"
 "@
 
 $localDir = "$env:PUBLIC/Downloads/containers/trivy"
+# $localDir="D:/Users/Public/Downloads/containers"
 # go to local oci archive dir
 Set-Location -Path $localDir
 
