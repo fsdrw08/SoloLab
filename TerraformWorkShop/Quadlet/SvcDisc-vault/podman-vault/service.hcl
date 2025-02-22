@@ -1,0 +1,45 @@
+services {
+  id      = "vault-web"
+  name    = "vault"
+  port    = 8200
+
+  checks = [
+    {
+      id       = "vault-tcp-check-8200"
+      name     = "vault-tcp-check-8200"
+      tcp      = "192.168.255.20:8200"
+      interval = "20s"
+      timeout  = "2s"
+    }
+  ]
+
+  tags = [
+    "traefik.enable=true",
+    // "traefik.tcp.routers.vault-web.entrypoints=websecure",
+    // "traefik.tcp.routers.vault-web.rule=HostSNI(`vault.day1.sololab`)",
+    // "traefik.tcp.routers.vault-web.tls.passthrough=true",
+    "traefik.http.routers.vault-web-redirect.entrypoints=web",
+    "traefik.http.routers.vault-web-redirect.rule=Host(`vault.day1.sololab`)",
+    "traefik.http.routers.vault-web-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.vault-web.entrypoints=websecure",
+    "traefik.http.routers.vault-web.rule=Host(`vault.day1.sololab`)",
+    "traefik.http.routers.vault-web.tls=true",
+    "traefik.http.services.vault-web.loadbalancer.server.scheme=https",
+  ]
+}
+
+// services {
+//   id      = "vault"
+//   name    = "vault"
+//   port    = 80
+
+//   checks = [
+//     {
+//       id       = "podman-healthcheck-vault"
+//       name     = "podman-healthcheck-vault"
+//       args      = ["/usr/bin/podman", "healthcheck", "run", "vault-vault"]
+//       interval = "20s"
+//       timeout  = "2s"
+//     }
+//   ]
+// }

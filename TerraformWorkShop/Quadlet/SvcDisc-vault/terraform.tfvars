@@ -18,11 +18,13 @@ podman_kube = {
       }
       value_ref = {
         tfstate = {
-          backend = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
           }
-          entity = "vault"
+          cert_name = "vault"
         }
       }
     }
