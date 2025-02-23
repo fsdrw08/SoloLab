@@ -40,20 +40,10 @@ variable "podman_kube" {
               value_ref_key = string
             })
           )
-          # name = object({
-          #   ca          = string
-          #   cert        = string
-          #   private_key = string
-          # })
           value_ref = object({
             vault_kvv2 = object({
               mount = string
               name  = string
-              # data_key = object({
-              #   ca          = string
-              #   cert        = string
-              #   private_key = string
-              # })
             })
           })
         }), null
