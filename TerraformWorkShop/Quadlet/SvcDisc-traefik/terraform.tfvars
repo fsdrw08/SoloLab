@@ -1,15 +1,44 @@
-vm_conn = {
+prov_remote = {
   host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
 }
 
+prov_vault = {
+  schema          = "https"
+  address         = "vault.day1.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = true
+}
+
 podman_kube = {
   helm = {
-    name   = "traefik"
-    chart  = "../../../HelmWorkShop/helm-charts/charts/traefik"
-    values = "./podman-traefik/values-sololab.yaml"
+    name       = "traefik"
+    chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
+    value_file = "./podman-traefik/values-sololab.yaml"
+    tls_value_sets = {
+      value_ref = {
+        vault_kvv2 = {
+          mount = "kvv2/certs"
+          name  = "traefik.day1.sololab"
+        }
+      }
+      value_sets = [
+        {
+          name          = "traefik.tls.contents.\"ca\\.crt\""
+          value_ref_key = "ca"
+        },
+        {
+          name          = "traefik.tls.contents.\"dashboard\\.crt\""
+          value_ref_key = "cert"
+        },
+        {
+          name          = "traefik.tls.contents.\"dashboard\\.key\""
+          value_ref_key = "private_key"
+        },
+      ]
+    }
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
 }
@@ -24,22 +53,6 @@ podman_quadlet = {
           yaml          = "traefik-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
           KubeDownForce = "true"
-        }
-      },
-      {
-        file_source = "./podman-traefik/http.socket"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          ListenStream = "0.0.0.0:80"
-          name         = "traefik-container"
-        }
-      },
-      {
-        file_source = "./podman-traefik/https.socket"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          ListenStream = "0.0.0.0:443"
-          name         = "traefik-container"
         }
       },
     ]
@@ -72,4 +85,19 @@ container_restart = {
     path = "/home/podmgr/.config/systemd/user/traefik_restart.service"
   }
 
+}
+
+prov_pdns = {
+  api_key    = "powerdns"
+  server_url = "https://pdns.day0.sololab"
+}
+
+dns_record = {
+  zone = "day1.sololab."
+  name = "traefik.day1.sololab."
+  type = "A"
+  ttl  = 86400
+  records = [
+    "192.168.255.20"
+  ]
 }
