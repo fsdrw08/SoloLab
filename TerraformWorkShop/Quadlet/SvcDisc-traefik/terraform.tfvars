@@ -52,7 +52,7 @@ podman_quadlet = {
         vars = {
           yaml          = "traefik-aio.yaml"
           PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "true"
+          KubeDownForce = "false"
         }
       },
     ]
@@ -65,25 +65,29 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-traefik/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-traefik/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/traefik_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-traefik/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/traefik-container.service"
-        target_service   = "traefik-container.service"
+      path = "/home/podmgr/.config/systemd/user/traefik_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-traefik/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/traefik-container.service"
+          target_service   = "traefik-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/traefik_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/traefik_restart.service"
-  }
+  ]
+
+  systemd_unit_name = "traefik_restart"
 
 }
 

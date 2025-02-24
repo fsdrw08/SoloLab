@@ -1,3 +1,47 @@
+module "http_socket_activation" {
+  source = "../../modules/system-systemd_unit_user"
+  vm_conn = {
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
+  }
+  systemd_unit_files = [
+    {
+      content = templatefile(
+        "./podman-traefik/http.socket",
+        {
+          name = "traefik-container"
+        }
+      )
+      path = "/home/podmgr/.config/systemd/user/http.socket"
+    }
+  ]
+  systemd_unit_name = "http.socket"
+}
+
+module "https_socket_activation" {
+  source = "../../modules/system-systemd_unit_user"
+  vm_conn = {
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
+  }
+  systemd_unit_files = [
+    {
+      content = templatefile(
+        "./podman-traefik/https.socket",
+        {
+          name = "traefik-container"
+        }
+      )
+      path = "/home/podmgr/.config/systemd/user/https.socket"
+    }
+  ]
+  systemd_unit_name = "http.socket"
+}
+
 data "vault_kv_secret_v2" "cert" {
   count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
   mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
@@ -54,7 +98,11 @@ resource "remote_file" "podman_quadlet" {
 }
 
 module "podman_quadlet" {
-  depends_on     = [remote_file.podman_kube]
+  depends_on = [
+    remote_file.podman_kube,
+    module.http_socket_activation,
+    module.https_socket_activation,
+  ]
   source         = "../../modules/system-systemd_quadlet"
   vm_conn        = var.prov_remote
   podman_quadlet = var.podman_quadlet
@@ -62,27 +110,24 @@ module "podman_quadlet" {
 
 module "container_restart" {
   depends_on = [module.podman_quadlet]
-  source     = "../../modules/system-systemd_path_user"
+  source     = "../../modules/system-systemd_unit_user"
   vm_conn = {
     host     = var.prov_remote.host
     port     = var.prov_remote.port
     user     = var.prov_remote.user
     password = var.prov_remote.password
   }
-  systemd_path_unit = {
-    content = templatefile(
-      var.container_restart.systemd_path_unit.content.templatefile,
-      var.container_restart.systemd_path_unit.content.vars
-    )
-    path = var.container_restart.systemd_path_unit.path
-  }
-  systemd_service_unit = {
-    content = templatefile(
-      var.container_restart.systemd_service_unit.content.templatefile,
-      var.container_restart.systemd_service_unit.content.vars
-    )
-    path = var.container_restart.systemd_service_unit.path
-  }
+  systemd_unit_files = [
+    for file in var.container_restart.systemd_unit_files :
+    {
+      content = templatefile(
+        file.content.templatefile,
+        file.content.vars
+      )
+      path = file.path
+    }
+  ]
+  systemd_unit_name = var.container_restart.systemd_unit_name
 }
 
 resource "powerdns_record" "record" {

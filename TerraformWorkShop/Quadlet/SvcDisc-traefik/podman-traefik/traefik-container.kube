@@ -1,14 +1,19 @@
 [Unit]
 Description="Traefik Proxy"
 Documentation=https://docs.traefik.io
+After=http.socket https.socket
+Requires=http.socket https.socket
 
 # https://github.com/eriksjolund/podman-traefik-socket-activation/blob/main/examples/example1/mytraefik.container
+[Service]
+Sockets=http.socket https.socket
 
 [Kube]
 # Point to the yaml file in the same directory
 Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
+Network=None
 
 [Install]
 WantedBy=default.target
