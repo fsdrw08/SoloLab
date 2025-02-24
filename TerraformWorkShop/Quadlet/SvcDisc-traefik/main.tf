@@ -81,9 +81,39 @@ resource "remote_file" "podman_kube" {
   content = data.helm_template.podman_kube.manifest
 }
 
+resource "null_resource" "podman_kube" {
+  depends_on = [remote_file.podman_kube]
+  triggers = {
+    host               = var.prov_remote.host
+    port               = var.prov_remote.port
+    user               = var.prov_remote.user
+    password           = sensitive(var.prov_remote.password)
+    manifest_dest_path = var.podman_kube.manifest_dest_path
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "podman kube play ${var.podman_kube.manifest_dest_path}",
+    ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "podman kube down --force ${self.triggers.manifest_dest_path}",
+    ]
+  }
+}
+
+
 # # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
 resource "remote_file" "podman_quadlet" {
-  depends_on = [remote_file.podman_kube]
+  depends_on = [null_resource.podman_kube]
   for_each = {
     for content in var.podman_quadlet.quadlet.file_contents : content.file_source => content
   }
@@ -108,33 +138,33 @@ module "podman_quadlet" {
   podman_quadlet = var.podman_quadlet
 }
 
-module "container_restart" {
-  depends_on = [module.podman_quadlet]
-  source     = "../../modules/system-systemd_unit_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_unit_files = [
-    for file in var.container_restart.systemd_unit_files :
-    {
-      content = templatefile(
-        file.content.templatefile,
-        file.content.vars
-      )
-      path = file.path
-    }
-  ]
-  systemd_unit_name = var.container_restart.systemd_unit_name
-}
+# module "container_restart" {
+#   depends_on = [module.podman_quadlet]
+#   source     = "../../modules/system-systemd_unit_user"
+#   vm_conn = {
+#     host     = var.prov_remote.host
+#     port     = var.prov_remote.port
+#     user     = var.prov_remote.user
+#     password = var.prov_remote.password
+#   }
+#   systemd_unit_files = [
+#     for file in var.container_restart.systemd_unit_files :
+#     {
+#       content = templatefile(
+#         file.content.templatefile,
+#         file.content.vars
+#       )
+#       path = file.path
+#     }
+#   ]
+#   systemd_unit_name = var.container_restart.systemd_unit_name
+# }
 
-resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
-}
+# resource "powerdns_record" "record" {
+#   zone    = var.dns_record.zone
+#   name    = var.dns_record.name
+#   type    = var.dns_record.type
+#   ttl     = var.dns_record.ttl
+#   records = var.dns_record.records
+# }
 

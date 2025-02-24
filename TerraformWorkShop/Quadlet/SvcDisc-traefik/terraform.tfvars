@@ -47,12 +47,12 @@ podman_quadlet = {
   quadlet = {
     file_contents = [
       {
-        file_source = "./podman-traefik/traefik-container.kube"
+        file_source = "./podman-traefik/traefik-container.container"
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
-          yaml          = "traefik-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
+          # yaml          = "traefik-aio.yaml"
+          PodmanArgs = "--tls-verify=false"
+          # KubeDownForce = "false"
         }
       },
     ]
