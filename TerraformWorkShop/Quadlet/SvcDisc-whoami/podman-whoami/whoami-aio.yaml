@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: whoami
+  labels:
+    name: whoami
+    traefik.enable: true
+    traefik.http.routers.whoami.entryPoints: web
+    traefik.http.routers.whoami.rule: Host(`whoami.day1.sololab`)
+    # traefik.http.routers.whoami.tls.certresolver: internal
+    traefik.http.services.whoami.loadbalancer.server.port: 8081
+spec:
+  containers:
+    - name: whoami
+      image: zot.day0.sololab/traefik/whoami:v1.10
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      args:
+        - --port=8081

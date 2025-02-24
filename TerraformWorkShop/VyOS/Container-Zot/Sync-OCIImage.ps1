@@ -105,6 +105,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "traefik/whoami:v1.10",
+        "archive": "docker.io_traefik_whoami_v1.10.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "traefik/whoami:v1.10",
+        "description": "https://hub.docker.com/r/traefik/whoami/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "instrumentisto/rsync-ssh:alpine3.21",
         "archive": "quay.io_instrumentisto_rsync-ssh_alpine3.21.tar",

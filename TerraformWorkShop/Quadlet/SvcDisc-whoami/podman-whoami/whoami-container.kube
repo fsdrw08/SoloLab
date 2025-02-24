@@ -1,0 +1,12 @@
+[Unit]
+Description="Traefik whoami"
+Documentation=https://hub.docker.com/r/traefik/whoami
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+
+[Install]
+WantedBy=default.target
