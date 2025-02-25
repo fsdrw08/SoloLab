@@ -18,6 +18,7 @@ resource "null_resource" "systemd_path_control" {
   depends_on = [
     remote_file.systemd_unit_files,
   ]
+  count = var.systemd_unit_name == "" ? 0 : 1
   triggers = {
     unit_name = var.systemd_unit_name
     host      = var.vm_conn.host

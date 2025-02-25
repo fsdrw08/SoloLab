@@ -17,7 +17,7 @@ module "http_socket_activation" {
       path = "/home/podmgr/.config/systemd/user/http.socket"
     }
   ]
-  systemd_unit_name = "http.socket"
+  # systemd_unit_name = "http.socket"
 }
 
 module "https_socket_activation" {
@@ -39,7 +39,7 @@ module "https_socket_activation" {
       path = "/home/podmgr/.config/systemd/user/https.socket"
     }
   ]
-  systemd_unit_name = "http.socket"
+  # systemd_unit_name = "https.socket"
 }
 
 data "vault_kv_secret_v2" "cert" {
@@ -149,7 +149,17 @@ module "podman_quadlet" {
       {
         content = templatefile(
           file.template,
-          file.vars
+          merge(
+            file.vars,
+            {
+              # ca   = data.vault_kv_secret_v2.cert[0].data["ca"]
+              # cert = data.vault_kv_secret_v2.cert[0].data["cert"]
+              # key  = data.vault_kv_secret_v2.cert[0].data["private_key"]
+              ca   = base64encode(data.vault_kv_secret_v2.cert[0].data["ca"])
+              cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
+              key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
+            }
+          )
         )
         path = join("/", [
           file.dir,

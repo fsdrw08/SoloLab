@@ -15,5 +15,6 @@ variable "systemd_unit_files" {
 }
 
 variable "systemd_unit_name" {
-  type = string
+  type    = string
+  default = ""
 }

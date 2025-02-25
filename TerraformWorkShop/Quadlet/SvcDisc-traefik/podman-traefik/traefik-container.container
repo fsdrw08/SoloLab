@@ -6,9 +6,9 @@ Requires=http.socket https.socket
 
 [Service]
 Sockets=http.socket https.socket
-ExecStartPre=printf ${ca} | podman secret create traefik-sec-ca -
-ExecStartPre=printf ${cert} | podman secret create traefik-sec-cert -
-ExecStartPre=printf ${key} | podman secret create traefik-sec-key -
+ExecStartPre=bash -c "printf -- \"${ca}\" | podman secret create traefik-sec-ca -"
+ExecStartPre=bash -c "printf -- \"${cert}\" | podman secret create traefik-sec-cert -"
+ExecStartPre=bash -c "printf -- \"${key}\" | podman secret create traefik-sec-key -"
 
 [Container]
 # Pod=immich.pod
@@ -80,7 +80,9 @@ Environment=TRAEFIK_PROVIDERS_FILE_WATCH=true
 Environment=TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY=false
 Environment=TRAEFIK_SERVERSTRANSPORT_ROOTCAS=/etc/traefik/tls/ca.crt
 
-Secret=source=traefik-sec-tls,target=/etc/traefik/tls
+Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
+Secret=source=traefik-sec-cert,target=/etc/traefik/tls/dashboard.crt
+Secret=source=traefik-sec-key,target=/etc/traefik/tls/dashboard.key
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 Volume=traefik-pvc:/mnt/acmeStorage
