@@ -6,9 +6,9 @@ Requires=http.socket https.socket
 
 [Service]
 Sockets=http.socket https.socket
-ExecStartPre=bash -c "printf -- \"${ca}\" | podman secret create traefik-sec-ca -"
-ExecStartPre=bash -c "printf -- \"${cert}\" | podman secret create traefik-sec-cert -"
-ExecStartPre=bash -c "printf -- \"${key}\" | podman secret create traefik-sec-key -"
+ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm traefik-sec-ca; echo \"${ca}\" | base64 -d | podman secret create traefik-sec-ca -"
+ExecStartPre=bash -c "podman secret exists traefik-sec-cert && podman secret rm traefik-sec-cert; echo \"${cert}\" | base64 -d | podman secret create traefik-sec-cert -"
+ExecStartPre=bash -c "podman secret exists traefik-sec-key && podman secret rm traefik-sec-key; echo \"${key}\" | base64 -d | podman secret create traefik-sec-key -"
 
 [Container]
 # Pod=immich.pod
@@ -38,15 +38,18 @@ Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_STORAGE=/mnt/acmeStorage
 Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_TLSCHALLENGE=true
 
 # EntryPoints - Traefik
-Environment=TRAEFIK_ENTRYPOINTS_traefik_ADDRESS=:8080
+# Environment=TRAEFIK_ENTRYPOINTS_traefik=true
+# Environment=TRAEFIK_ENTRYPOINTS_traefik_ADDRESS=:8080
 
 # EntryPoints - Web
-Environment=TRAEFIK_ENTRYPOINTS_web_ADDRESS=:80
-Environment=TRAEFIK_ENTRYPOINTS_web_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
+Environment=TRAEFIK_ENTRYPOINTS_WEB=true
+Environment=TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
+Environment=TRAEFIK_ENTRYPOINTS_WEB_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
 
 # EntryPoints - WebSecure
-Environment=TRAEFIK_ENTRYPOINTS_webSecure_ADDRESS=:443
-Environment=TRAEFIK_ENTRYPOINTS_webSecure_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
+Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE=true
+Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:443
+Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
 
 # ExposedByDefault
 Environment=TRAEFIK_EXPOSEDBYDEFAULT=false
@@ -56,16 +59,16 @@ Environment=TRAEFIK_GLOBAL_CHECKNEWVERSION=false
 Environment=TRAEFIK_GLOBAL_SENDANONYMOUSUSAGE=false
 
 # Log Configuration
-Environment=TRAEFIK_LOG_LEVEL=DEBUG
+Environment=TRAEFIK_LOG_LEVEL=INFO
 
 # Ping Configuration
 Environment=TRAEFIK_PING=true
 
 # Providers - ConsulCatalog
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_ADDRESS=consul.day1.sololab:8501
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_DATACENTER=dc1
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_SCHEME=https
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TLS_CA=/etc/traefik/tls/ca.crt
+# Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_ADDRESS=consul.day1.sololab:8501
+# Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_DATACENTER=dc1
+# Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_SCHEME=https
+# Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TLS_CA=/etc/traefik/tls/ca.crt
 
 # Providers - Docker
 Environment=TRAEFIK_PROVIDERS_DOCKER_ENDPOINT=unix:///var/run/docker.sock
@@ -73,8 +76,11 @@ Environment=TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
 Environment=TRAEFIK_PROVIDERS_DOCKER_USEBINDPORTIP=false
 
 # Providers - File
-Environment=TRAEFIK_PROVIDERS_FILE_DIRECTORY=/etc/traefik/dynamic
-Environment=TRAEFIK_PROVIDERS_FILE_WATCH=true
+# Environment=TRAEFIK_PROVIDERS_FILE_DIRECTORY=/etc/traefik/dynamic
+# Environment=TRAEFIK_PROVIDERS_FILE_WATCH=true
+
+Environment=TRAEFIK_ACCESSLOG=true
+Environment=TRAEFIK_ACCESSLOG_ADDINTERNALS=true
 
 # ServersTransport
 Environment=TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY=false
@@ -92,22 +98,25 @@ Label="traefik.http.middlewares.userPass.basicauth.users=admin:$apr1$/F5ai.wT$7n
 Label="traefik.http.routers.dashboard-redirect.entrypoints=web"
 Label="traefik.http.middlewares.toHttps.redirectscheme.scheme=https"
 Label="traefik.http.middlewares.toHttps.redirectscheme.permanent=true"
-# Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
-# Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
-# Label="traefik.http.routers.dashboard.entryPoints=webSecure"
-# Label="traefik.http.routers.dashboard.middlewares=userPass"
-# Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
-# Label="traefik.http.routers.dashboard.service=api@internal"
-# Label="traefik.http.routers.dashboard.tls=true"
+Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
+Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
+Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
+Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.entryPoints=websecure"
+Label="traefik.http.routers.dashboard.middlewares=userPass@docker"
+Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.service=api@internal"
+Label="traefik.http.routers.dashboard.tls=true"
 
+SecurityLabelDisable=true
 HealthCmd=["traefik", "healthcheck"]
 HealthStartPeriod=3m
-HealthInterval=10s
+HealthInterval=600s
 HealthTimeout=30s
 HealthRetries=10
 Notify=healthy
 
 PodmanArgs=${PodmanArgs}
-Network=podman-default-kube-network
+Network=${Network}
 [Install]
 WantedBy=default.target

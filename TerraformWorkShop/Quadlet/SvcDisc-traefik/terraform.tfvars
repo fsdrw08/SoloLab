@@ -55,6 +55,16 @@ podman_quadlet = {
         # yaml          = "vault-aio.yaml"
         PodmanArgs = "--tls-verify=false"
         # KubeDownForce = "false"
+        Network = "podman-default-kube-network"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    },
+    {
+      template = "./podman-traefik/mynetwork.network"
+      vars = {
+        # yaml          = "vault-aio.yaml"
+        PodmanArgs = "--tls-verify=false"
+        # KubeDownForce = "false"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }

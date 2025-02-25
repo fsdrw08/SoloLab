@@ -46,35 +46,35 @@ resource "remote_file" "quadlet" {
   # and add provisioner step run "systemctl --user daemon-reload" when destroy in resource "null_resource.quadlet_destroy"
 }
 
-resource "null_resource" "service_mgmt" {
-  depends_on = [remote_file.quadlet]
-  triggers = {
-    service_name = var.podman_quadlet.service.name
-    quadlet_md5  = md5(join("\n", [for quadlet in remote_file.quadlet : quadlet.content]))
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
-    private_key  = sensitive(var.vm_conn.private_key)
-  }
-  connection {
-    type        = "ssh"
-    host        = self.triggers.host
-    port        = self.triggers.port
-    user        = self.triggers.user
-    password    = self.triggers.password
-    private_key = self.triggers.private_key
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "systemctl --user daemon-reload",
-      "systemctl --user ${var.podman_quadlet.service.status} ${self.triggers.service_name}",
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "systemctl --user stop ${self.triggers.service_name}",
-    ]
-  }
-}
+# resource "null_resource" "service_mgmt" {
+#   depends_on = [remote_file.quadlet]
+#   triggers = {
+#     service_name = var.podman_quadlet.service.name
+#     quadlet_md5  = md5(join("\n", [for quadlet in remote_file.quadlet : quadlet.content]))
+#     host         = var.vm_conn.host
+#     port         = var.vm_conn.port
+#     user         = var.vm_conn.user
+#     password     = sensitive(var.vm_conn.password)
+#     private_key  = sensitive(var.vm_conn.private_key)
+#   }
+#   connection {
+#     type        = "ssh"
+#     host        = self.triggers.host
+#     port        = self.triggers.port
+#     user        = self.triggers.user
+#     password    = self.triggers.password
+#     private_key = self.triggers.private_key
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "systemctl --user daemon-reload",
+#       "systemctl --user ${var.podman_quadlet.service.status} ${self.triggers.service_name}",
+#     ]
+#   }
+#   provisioner "remote-exec" {
+#     when = destroy
+#     inline = [
+#       "systemctl --user stop ${self.triggers.service_name}",
+#     ]
+#   }
+# }
