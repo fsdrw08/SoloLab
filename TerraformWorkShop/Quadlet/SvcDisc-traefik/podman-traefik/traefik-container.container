@@ -6,6 +6,9 @@ Requires=http.socket https.socket
 
 [Service]
 Sockets=http.socket https.socket
+ExecStartPre=printf ${ca} | podman secret create traefik-sec-ca -
+ExecStartPre=printf ${cert} | podman secret create traefik-sec-cert -
+ExecStartPre=printf ${key} | podman secret create traefik-sec-key -
 
 [Container]
 # Pod=immich.pod

@@ -75,20 +75,17 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-opendj/opendj-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "opendj-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-opendj/opendj-container.kube"
+      vars = {
+        yaml          = "opendj-aio.yaml"
+        PodmanArgs    = "--tls-verify=false"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    }
+  ]
   service = {
     name   = "opendj-container"
     status = "start"
@@ -96,26 +93,29 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-opendj/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-opendj/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/opendj_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-opendj/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/opendj-container.service"
-        target_service   = "opendj-container.service"
+      path = "/home/podmgr/.config/systemd/user/opendj_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-opendj/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/opendj-container.service"
+          target_service   = "opendj-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/opendj_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/opendj_restart.service"
-  }
+  ]
 
+  systemd_unit_name = "opendj_restart"
 }
 
 post_process = {

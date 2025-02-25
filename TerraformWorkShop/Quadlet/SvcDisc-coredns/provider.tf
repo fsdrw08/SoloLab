@@ -12,27 +12,18 @@ terraform {
       source  = "tenstad/remote"
       version = ">=0.1.3"
     }
-    vyos = {
-      source  = "Foltik/vyos"
-      version = ">=0.3.3"
-    }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
     schema_name = "System-SvcDisc-Quadlet-CoreDNS"
   }
 }
 
 provider "remote" {
   conn {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = var.vm_conn.password
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
   }
-}
-
-provider "vyos" {
-  url = "https://vyos-api.day0.sololab"
-  key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

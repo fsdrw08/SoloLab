@@ -29,20 +29,18 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-postgresql/keycloakdb-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "keycloakdb-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-postgresql/keycloakdb-container.kube"
+      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+      vars = {
+        yaml          = "keycloakdb-aio.yaml"
+        PodmanArgs    = "--tls-verify=false"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    },
+  ]
   service = {
     name   = "keycloakdb-container"
     status = "start"
@@ -50,25 +48,29 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-postgresql/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/keycloakdb-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-postgresql/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/postgresql-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/keycloakdb_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-postgresql/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/keycloakdb-container.service"
-        target_service   = "keycloakdb-container.service"
+      path = "/home/podmgr/.config/systemd/user/postgresql_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-postgresql/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/postgresql-container.service"
+          target_service   = "postgresql-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/postgresql_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/keycloakdb_restart.service"
-  }
+  ]
+
+  systemd_unit_name = "postgresql_restart"
 
 }
 

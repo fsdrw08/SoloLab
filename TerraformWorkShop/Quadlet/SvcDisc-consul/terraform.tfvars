@@ -54,20 +54,17 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-consul/consul-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "consul-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-consul/consul-container.kube"
+      vars = {
+        yaml          = "consul-aio.yaml"
+        PodmanArgs    = "--tls-verify=false"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    }
+  ]
   service = {
     name   = "consul-container"
     status = "start"
@@ -75,26 +72,29 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-consul/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-consul/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/consul_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-consul/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/consul-container.service"
-        target_service   = "consul-container.service"
+      path = "/home/podmgr/.config/systemd/user/consul_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-consul/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/consul-container.service"
+          target_service   = "consul-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/consul_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/consul_restart.service"
-  }
+  ]
 
+  systemd_unit_name = "consul_restart"
 }
 
 post_process = {

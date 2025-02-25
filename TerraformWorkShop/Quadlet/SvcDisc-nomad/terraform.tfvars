@@ -58,21 +58,19 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-nomad/nomad-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "nomad-aio.yaml"
-          PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
-          ExecStartPre  = "sleep 3"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-nomad/nomad-container.kube"
+      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+      vars = {
+        yaml          = "nomad-aio.yaml"
+        PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
+        ExecStartPre  = "sleep 3"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    },
+  ]
   service = {
     name   = "nomad-container"
     status = "start"
@@ -80,26 +78,29 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-nomad/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/nomad-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-nomad/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/nomad-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/nomad_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-nomad/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/nomad-container.service"
-        target_service   = "nomad-container.service"
+      path = "/home/podmgr/.config/systemd/user/nomad_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-nomad/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/nomad-container.service"
+          target_service   = "nomad-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/nomad_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/nomad_restart.service"
-  }
+  ]
 
+  systemd_unit_name = "nomad_restart"
 }
 
 post_process = {

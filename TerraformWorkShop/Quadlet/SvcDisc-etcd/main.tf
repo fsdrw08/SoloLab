@@ -67,63 +67,50 @@ resource "remote_file" "podman_quadlet" {
   )
 }
 
-resource "null_resource" "podman_quadlet" {
+module "podman_quadlet" {
   depends_on = [
     remote_file.podman_kube,
-    remote_file.podman_quadlet
   ]
-  triggers = {
-    service_name = var.podman_quadlet.service.name
-    quadlet_md5  = md5(join("\n", [for quadlet in remote_file.podman_quadlet : quadlet.content]))
-    host         = var.prov_remote.host
-    port         = var.prov_remote.port
-    user         = var.prov_remote.user
-    password     = sensitive(var.prov_remote.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "systemctl --user daemon-reload",
-      "systemctl --user ${var.podman_quadlet.service.status} ${self.triggers.service_name}",
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "systemctl --user stop ${self.triggers.service_name}",
+  source  = "../../modules/system-systemd_quadlet"
+  vm_conn = var.prov_remote
+  podman_quadlet = {
+    service = var.podman_quadlet.service
+    files = [
+      for file in var.podman_quadlet.files :
+      {
+        content = templatefile(
+          file.template,
+          file.vars
+        )
+        path = join("/", [
+          file.dir,
+          basename("${file.template}")
+        ])
+      }
     ]
   }
 }
 
 module "container_restart" {
-  depends_on = [null_resource.podman_quadlet]
-  source     = "../../modules/system-systemd_path_user"
+  depends_on = [module.podman_quadlet]
+  source     = "../../modules/system-systemd_unit_user"
   vm_conn = {
     host     = var.prov_remote.host
     port     = var.prov_remote.port
     user     = var.prov_remote.user
     password = var.prov_remote.password
   }
-  systemd_path_unit = {
-    content = templatefile(
-      var.container_restart.systemd_path_unit.content.templatefile,
-      var.container_restart.systemd_path_unit.content.vars
-    )
-    path = var.container_restart.systemd_path_unit.path
-  }
-  systemd_service_unit = {
-    content = templatefile(
-      var.container_restart.systemd_service_unit.content.templatefile,
-      var.container_restart.systemd_service_unit.content.vars
-    )
-    path = var.container_restart.systemd_service_unit.path
-  }
+  systemd_unit_files = [
+    for file in var.container_restart.systemd_unit_files :
+    {
+      content = templatefile(
+        file.content.templatefile,
+        file.content.vars
+      )
+      path = file.path
+    }
+  ]
+  systemd_unit_name = var.container_restart.systemd_unit_name
 }
 
 # resource "vyos_static_host_mapping" "host_mapping" {

@@ -44,24 +44,38 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-traefik/traefik-container.container"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          # yaml          = "traefik-aio.yaml"
-          PodmanArgs = "--tls-verify=false"
-          # KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  # quadlet = {
+  #   file_contents = [
+  #     {
+  #       file_source = "./podman-traefik/traefik-container.container"
+  #       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+  #       vars = {
+  #         # yaml          = "traefik-aio.yaml"
+  #         PodmanArgs = "--tls-verify=false"
+  #         # KubeDownForce = "false"
+  #       }
+  #     },
+  #   ]
+  #   file_path_dir = "/home/podmgr/.config/containers/systemd"
+  # }
   service = {
     name   = "traefik-container"
     status = "start"
   }
+  files = [
+    {
+      template = "./podman-traefik/traefik-container.container"
+      vars = {
+        # yaml          = "vault-aio.yaml"
+        PodmanArgs = "--tls-verify=false"
+        # KubeDownForce = "false"
+        ca   = 123
+        cert = 123
+        key  = 123
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    }
+  ]
 }
 
 container_restart = {

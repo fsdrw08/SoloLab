@@ -29,20 +29,18 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-etcd/etcd-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "etcd-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-etcd/etcd-container.kube"
+      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+      vars = {
+        yaml          = "etcd-aio.yaml"
+        PodmanArgs    = "--tls-verify=false"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    },
+  ]
   service = {
     name   = "etcd-container"
     status = "start"
@@ -50,24 +48,27 @@ podman_quadlet = {
 }
 
 container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-etcd/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
+  systemd_unit_files = [
+    {
+      content = {
+        templatefile = "./podman-etcd/restart.path"
+        vars = {
+          PathModified = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
+        }
       }
-    }
-    path = "/home/podmgr/.config/systemd/user/etcd_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-etcd/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/etcd-container.service"
-        target_service   = "etcd-container.service"
+      path = "/home/podmgr/.config/systemd/user/etcd_restart.path"
+    },
+    {
+      content = {
+        templatefile = "./podman-etcd/restart.service"
+        vars = {
+          AssertPathExists = "/run/user/1001/systemd/generator/etcd-container.service"
+          target_service   = "etcd-container.service"
+        }
       }
+      path = "/home/podmgr/.config/systemd/user/etcd_restart.service"
     }
-    path = "/home/podmgr/.config/systemd/user/etcd_restart.service"
-  }
+  ]
 
+  systemd_unit_name = "etcd_restart"
 }

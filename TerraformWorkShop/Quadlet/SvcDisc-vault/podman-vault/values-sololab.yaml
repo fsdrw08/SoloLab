@@ -64,6 +64,10 @@ vault:
         value: https://{{ template "common.names.fullname" . }}:8200
       - name: VAULT_OPERATOR_SECRETS_JSON_PATH
         value: "/vault/unseal/vault_operator_secrets_b64"
+      - name: SECRET_SHARES
+        value: 5
+      - name: SECRET_THRESHOLD
+        value: 3
 
 volumePermissions:
   enabled: true

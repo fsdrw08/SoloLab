@@ -14,13 +14,11 @@ variable "podman_quadlet" {
       name   = string
       status = string
     })
-    quadlet = object({
-      file_contents = list(object({
-        file_source = string
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = map(string)
-      }))
-      file_path_dir = string
-    })
+    files = list(
+      object({
+        content = string
+        path    = string
+      })
+    )
   })
 }

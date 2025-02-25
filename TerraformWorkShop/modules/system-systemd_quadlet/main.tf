@@ -33,16 +33,10 @@ resource "null_resource" "quadlet_destroy" {
 resource "remote_file" "quadlet" {
   depends_on = [null_resource.quadlet_destroy]
   for_each = {
-    for content in var.podman_quadlet.quadlet.file_contents : content.file_source => content
+    for file in var.podman_quadlet.files : file.path => file
   }
-  path = join("/", [
-    var.podman_quadlet.quadlet.file_path_dir,
-    basename("${each.value.file_source}")
-  ])
-  content = templatefile(
-    each.value.file_source,
-    each.value.vars
-  )
+  content = each.value.content
+  path    = each.value.path
   # why not put remote-exec provision with when destroy run "systemctl --user daemon-reload" here?
   # ref https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax#destroy-time-provisioners
   # Destroy provisioners are run *before* the resource is destroyed
