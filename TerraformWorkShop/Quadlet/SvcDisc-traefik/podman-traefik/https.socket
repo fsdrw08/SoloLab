@@ -3,7 +3,7 @@
 # https://github.com/traefik/traefik/blob/v3.3.4/docs/content/routing/entrypoints.md#systemd-socket-activation
 ListenStream=0.0.0.0:443
 # FileDescriptorName must match with the traefik entrypoint name
-FileDescriptorName=webSecure
+FileDescriptorName=websecure
 Service=${name}.service
 
 [Install]
