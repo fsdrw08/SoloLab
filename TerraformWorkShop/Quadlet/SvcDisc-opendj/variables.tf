@@ -74,10 +74,13 @@ variable "podman_quadlet" {
       vars     = map(string)
       dir      = string
     }))
-    service = object({
-      name   = string
-      status = string
-    })
+    service = optional(
+      object({
+        name   = string
+        status = string
+      }),
+      null
+    )
   })
 }
 

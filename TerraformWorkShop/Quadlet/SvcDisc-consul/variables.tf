@@ -55,15 +55,18 @@ variable "podman_kube" {
 
 variable "podman_quadlet" {
   type = object({
-    service = object({
-      name   = string
-      status = string
-    })
     files = list(object({
       template = string
       vars     = map(string)
       dir      = string
     }))
+    service = optional(
+      object({
+        name   = string
+        status = string
+      }),
+      null
+    )
   })
 }
 

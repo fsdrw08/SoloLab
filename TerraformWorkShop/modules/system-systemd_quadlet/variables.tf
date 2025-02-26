@@ -10,10 +10,13 @@ variable "vm_conn" {
 
 variable "podman_quadlet" {
   type = object({
-    service = object({
-      name   = string
-      status = string
-    })
+    service = optional(
+      object({
+        name   = string
+        status = string
+      }),
+      null
+    )
     files = list(
       object({
         content = string
