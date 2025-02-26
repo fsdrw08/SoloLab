@@ -1,46 +1,77 @@
-module "http_socket_activation" {
-  source = "../../modules/system-systemd_unit_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_unit_files = [
+resource "remote_file" "http_socket" {
+  content = templatefile(
+    "./podman-traefik/http.socket",
     {
-      content = templatefile(
-        "./podman-traefik/http.socket",
-        {
-          name = "traefik-container"
-        }
-      )
-      path = "/home/podmgr/.config/systemd/user/http.socket"
+      name = "traefik-container"
     }
-  ]
-  # systemd_unit_name = "http.socket"
+  )
+  path = "/home/podmgr/.config/systemd/user/http.socket"
 }
 
-module "https_socket_activation" {
-  source = "../../modules/system-systemd_unit_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_unit_files = [
+resource "remote_file" "https_socket" {
+  content = templatefile(
+    "./podman-traefik/https.socket",
     {
-      content = templatefile(
-        "./podman-traefik/https.socket",
-        {
-          name = "traefik-container"
-        }
-      )
-      path = "/home/podmgr/.config/systemd/user/https.socket"
+      name = "traefik-container"
     }
-  ]
-  # systemd_unit_name = "https.socket"
+  )
+  path = "/home/podmgr/.config/systemd/user/https.socket"
 }
+
+resource "remote_file" "traefik_socket" {
+  content = templatefile(
+    "./podman-traefik/traefik.socket",
+    {
+      name = "traefik-container"
+    }
+  )
+  path = "/home/podmgr/.config/systemd/user/traefik.socket"
+}
+
+
+# module "http_socket_activation" {
+#   source = "../../modules/system-systemd_unit_user"
+#   vm_conn = {
+#     host     = var.prov_remote.host
+#     port     = var.prov_remote.port
+#     user     = var.prov_remote.user
+#     password = var.prov_remote.password
+#   }
+#   systemd_unit_files = [
+#     {
+#       content = templatefile(
+#         "./podman-traefik/http.socket",
+#         {
+#           name = "traefik-container"
+#         }
+#       )
+#       path = "/home/podmgr/.config/systemd/user/http.socket"
+#     }
+#   ]
+#   # systemd_unit_name = "http.socket"
+# }
+
+# module "https_socket_activation" {
+#   source = "../../modules/system-systemd_unit_user"
+#   vm_conn = {
+#     host     = var.prov_remote.host
+#     port     = var.prov_remote.port
+#     user     = var.prov_remote.user
+#     password = var.prov_remote.password
+#   }
+#   systemd_unit_files = [
+#     {
+#       content = templatefile(
+#         "./podman-traefik/https.socket",
+#         {
+#           name = "traefik-container"
+#         }
+#       )
+#       path = "/home/podmgr/.config/systemd/user/https.socket"
+#     }
+#   ]
+#   # systemd_unit_name = "https.socket"
+# }
 
 data "vault_kv_secret_v2" "cert" {
   count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
@@ -137,13 +168,15 @@ data "vault_kv_secret_v2" "cert" {
 module "podman_quadlet" {
   depends_on = [
     # remote_file.podman_quadlet,
-    module.http_socket_activation,
-    module.https_socket_activation,
+    # module.http_socket_activation,
+    # module.https_socket_activation,
+    remote_file.http_socket,
+    remote_file.https_socket
   ]
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
-    service = var.podman_quadlet.service
+    # service = var.podman_quadlet.service
     files = [
       for file in var.podman_quadlet.files :
       {
@@ -155,9 +188,9 @@ module "podman_quadlet" {
               # ca   = data.vault_kv_secret_v2.cert[0].data["ca"]
               # cert = data.vault_kv_secret_v2.cert[0].data["cert"]
               # key  = data.vault_kv_secret_v2.cert[0].data["private_key"]
-              ca   = base64encode(data.vault_kv_secret_v2.cert[0].data["ca"])
-              cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
-              key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
+              ca = base64encode(data.vault_kv_secret_v2.cert[0].data["ca"])
+              # cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
+              # key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
             }
           )
         )

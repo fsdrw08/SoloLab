@@ -1,9 +1,9 @@
 # https://github.com/eriksjolund/podman-traefik-socket-activation/blob/main/examples/example1/https.socket
 [Socket]
 # https://github.com/traefik/traefik/blob/v3.3.4/docs/content/routing/entrypoints.md#systemd-socket-activation
-ListenStream=0.0.0.0:80
+ListenStream=0.0.0.0:8080
 # FileDescriptorName must match with the traefik entrypoint name
-FileDescriptorName=web
+FileDescriptorName=traefik
 Service=${name}.service
 
 [Install]
