@@ -8,6 +8,7 @@ Requires=http.socket https.socket
 Sockets=http.socket https.socket
 ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm traefik-sec-ca; echo \"${ca}\" | base64 -d | podman secret create traefik-sec-ca -"
 
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
 [Container]
 ContainerName=traefik
 
@@ -15,12 +16,10 @@ Image=zot.day0.sololab/library/traefik:v3.3.4
 
 SecurityLabelType=spc_t
 
-Environment=TZ=Asia/Shanghai
-Environment=LEGO_CA_CERTIFICATES=/etc/traefik/tls/ca.crt
-Environment=LEGO_CA_SYSTEM_CERT_POOL=true
+PublishPort=8080:8080
 
+# https://doc.traefik.io/traefik/reference/static-configuration/cli/
 Exec=--accessLog=true \
-  --accessLog.addInternals=true \
   --api=true \
   --api.dashboard=true \
   --certificatesResolvers.external.acme.caServer=https://acme-v02.api.letsencrypt.org/directory \
@@ -37,7 +36,7 @@ Exec=--accessLog=true \
   --entrypoints.webSecure.forwardedHeaders.trustedIPs=0.0.0.0/0 \
   --global.checkNewVersion=false \
   --global.sendAnonymousUsage=false \
-  --log.level=DEBUG \
+  --log.level=INFO \
   --ping=true \
   --providers.consulCatalog=true \
   --providers.consulCatalog.endpoint.address=consul.day1.sololab:8501 \
@@ -50,6 +49,10 @@ Exec=--accessLog=true \
   --providers.docker.exposedByDefault=false \
   --serversTransport.insecureSkipVerify=false \
   --serversTransport.rootCAs=/etc/traefik/tls/ca.crt
+
+Environment=TZ=Asia/Shanghai
+Environment=LEGO_CA_CERTIFICATES=/etc/traefik/tls/ca.crt
+Environment=LEGO_CA_SYSTEM_CERT_POOL=true
 
 Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
 
@@ -82,7 +85,7 @@ HealthStartPeriod=10s
 HealthInterval=600s
 HealthTimeout=30s
 HealthRetries=10
-Notify=healthy
+# Notify=healthy
 
 PodmanArgs=${PodmanArgs}
 Network=${Network}
