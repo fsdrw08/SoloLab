@@ -5,9 +5,10 @@ services {
 
   checks = [
     {
-      id       = "vault-tcp-check-8200"
-      name     = "vault-tcp-check-8200"
-      tcp      = "192.168.255.20:8200"
+      id       = "vault-h2ping-check-8200"
+      name     = "vault-h2ping-check-8200"
+      h2ping   = "192.168.255.20:8200"
+      tls_skip_verify = true
       interval = "20s"
       timeout  = "2s"
     }
