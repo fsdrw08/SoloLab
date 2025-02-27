@@ -8,7 +8,7 @@ variable "prov_vault" {
 
 variable "oidc_provider" {
   type = object({
-    issuer = string
+    issuer_host = string
     scopes = optional(
       list(
         object({

@@ -23,7 +23,7 @@ resource "vault_identity_oidc_provider" "provider" {
   ]
   name          = "sololab"
   https_enabled = true
-  # issuer_host   = "vault.service.consul"
+  issuer_host   = var.oidc_provider.issuer_host
   scopes_supported = [
     for scope in var.oidc_provider.scopes : vault_identity_oidc_scope.scopes[scope.name].name
   ]

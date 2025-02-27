@@ -5,7 +5,7 @@ prov_vault = {
 }
 
 oidc_provider = {
-  issuer = "https://vault.infra.sololab:8200"
+  issuer_host = "vault.day1.sololab:8200"
   scopes = [
     {
       name     = "groups"
@@ -23,8 +23,8 @@ oidc_client = [
     name         = "nomad"
     allow_groups = ["App-Nomad-Admin"]
     redirect_uris = [
-      "https://nomad.day1.sololab:4649/oidc/callback",
-      "https://nomad.day1.sololab:4646/ui/settings/tokens",
+      "https://nomad.day1.sololab/oidc/callback",
+      "https://nomad.day1.sololab/ui/settings/tokens",
     ]
   },
   # {

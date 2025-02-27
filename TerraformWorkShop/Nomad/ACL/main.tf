@@ -16,7 +16,7 @@ resource "nomad_acl_auth_method" "oidc" {
   type           = "OIDC"
   default        = true
   token_locality = "global"
-  max_token_ttl  = "15h"
+  max_token_ttl  = "15h0m0s"
 
   config {
     oidc_discovery_url = data.vault_identity_oidc_openid_config.config.issuer
@@ -26,8 +26,8 @@ resource "nomad_acl_auth_method" "oidc" {
     bound_audiences    = [data.vault_identity_oidc_client_creds.creds.client_id]
     oidc_scopes        = ["groups"]
     allowed_redirect_uris = [
-      "https://nomad.day1.sololab:4649/oidc/callback",
-      "https://nomad.day1.sololab:4646/ui/settings/tokens",
+      "https://nomad.day1.sololab/oidc/callback",
+      "https://nomad.day1.sololab/ui/settings/tokens",
     ]
     list_claim_mappings = {
       "groups" : "roles"

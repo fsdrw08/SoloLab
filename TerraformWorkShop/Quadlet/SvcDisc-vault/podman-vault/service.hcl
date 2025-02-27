@@ -14,17 +14,17 @@ services {
     }
   ]
 
-  tags = [
-    "traefik.enable=true",
-    "traefik.tcp.routers.vault-web.entrypoints=webSecure",
-    "traefik.tcp.routers.vault-web.rule=HostSNI(`vault.day1.sololab`)",
-    "traefik.tcp.routers.vault-web.tls.passthrough=true",
-    # "traefik.http.routers.vault-web-redirect.entrypoints=web",
-    # "traefik.http.routers.vault-web-redirect.rule=Host(`vault.day1.sololab`)",
-    # "traefik.http.routers.vault-web-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.vault-web.entrypoints=websecure",
-    # "traefik.http.routers.vault-web.rule=Host(`vault.day1.sololab`)",
-    # "traefik.http.routers.vault-web.tls=true",
-    # "traefik.http.services.vault-web.loadbalancer.server.scheme=https",
-  ]
+  # tags = [
+  #   "traefik.enable=true",
+  #   "traefik.tcp.routers.vault-web.entrypoints=webSecure",
+  #   "traefik.tcp.routers.vault-web.rule=HostSNI(`vault.day1.sololab`)",
+  #   "traefik.tcp.routers.vault-web.tls.passthrough=true",
+  #   # "traefik.http.routers.vault-web-redirect.entrypoints=web",
+  #   # "traefik.http.routers.vault-web-redirect.rule=Host(`vault.day1.sololab`)",
+  #   # "traefik.http.routers.vault-web-redirect.middlewares=toHttps@file",
+  #   # "traefik.http.routers.vault-web.entrypoints=websecure",
+  #   # "traefik.http.routers.vault-web.rule=Host(`vault.day1.sololab`)",
+  #   # "traefik.http.routers.vault-web.tls=true",
+  #   # "traefik.http.services.vault-web.loadbalancer.server.scheme=https",
+  # ]
 }

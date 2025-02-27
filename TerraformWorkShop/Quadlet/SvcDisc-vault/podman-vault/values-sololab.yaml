@@ -45,6 +45,14 @@ vault:
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
 
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.vault-web.entrypoints: webSecure
+    traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)
+    traefik.tcp.routers.vault-web.tls.passthrough: true
+    traefik.tcp.routers.vault-web.service: vault-web
+    traefik.tcp.services.vault-web.loadbalancer.server.port: 8200
+
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
