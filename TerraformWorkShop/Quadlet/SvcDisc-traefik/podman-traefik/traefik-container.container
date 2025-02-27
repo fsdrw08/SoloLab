@@ -11,7 +11,7 @@ ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm tr
 [Container]
 ContainerName=traefik
 
-Image=zot.day0.sololab/library/traefik:v3.3
+Image=zot.day0.sololab/library/traefik:v3.3.4
 
 SecurityLabelType=spc_t
 
@@ -19,71 +19,39 @@ Environment=TZ=Asia/Shanghai
 Environment=LEGO_CA_CERTIFICATES=/etc/traefik/tls/ca.crt
 Environment=LEGO_CA_SYSTEM_CERT_POOL=true
 
-# API Configuration
-Environment=TRAEFIK_API_DASHBOARD=true
-
-# Certificates Resolvers - External
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_EXTERNAL_ACME_CASERVER=https://acme-v02.api.letsencrypt.org/directory
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_EXTERNAL_ACME_CERTIFICATESDURATION=2160
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_EXTERNAL_ACME_STORAGE=/mnt/acmeStorage/external.json
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_EXTERNAL_ACME_TLSCHALLENGE=true
-
-# Certificates Resolvers - Internal
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_CASERVER=https://vault.day1.sololab:8200/v1/pki/day1/acme/directory
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_CERTIFICATESDURATION=2160
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_STORAGE=/mnt/acmeStorage/internal.json
-Environment=TRAEFIK_CERTIFICATESRESOLVERS_INTERNAL_ACME_TLSCHALLENGE=true
-
-# EntryPoints - Traefik
-# Environment=TRAEFIK_ENTRYPOINTS_traefik=true
-# Environment=TRAEFIK_ENTRYPOINTS_traefik_ADDRESS=:8080
-
-# EntryPoints - Web
-Environment=TRAEFIK_ENTRYPOINTS_WEB=true
-Environment=TRAEFIK_ENTRYPOINTS_WEB_ADDRESS=:80
-Environment=TRAEFIK_ENTRYPOINTS_WEB_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
-
-# EntryPoints - WebSecure
-Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE=true
-Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS=:443
-Environment=TRAEFIK_ENTRYPOINTS_WEBSECURE_FORWARDEDHEADERS_TRUSTEDIPS=0.0.0.0/0
-
-# Global Configuration
-Environment=TRAEFIK_GLOBAL_CHECKNEWVERSION=false
-Environment=TRAEFIK_GLOBAL_SENDANONYMOUSUSAGE=false
-
-# Log Configuration
-Environment=TRAEFIK_LOG_LEVEL=DEBUG
-Environment=TRAEFIK_LOG_NOCOLOR=true
-
-# Ping Configuration
-Environment=TRAEFIK_PING=true
-
-# Providers - ConsulCatalog
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_ADDRESS=consul.day1.sololab:8501
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_DATACENTER=dc1
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_SCHEME=https
-Environment=TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TLS_CA=/etc/traefik/tls/ca.crt
-
-# Providers - Docker
-Environment=TRAEFIK_PROVIDERS_DOCKER_ENDPOINT=unix:///var/run/docker.sock
-Environment=TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
-Environment=TRAEFIK_PROVIDERS_DOCKER_USEBINDPORTIP=false
-
-# Providers - File
-# Environment=TRAEFIK_PROVIDERS_FILE_DIRECTORY=/etc/traefik/dynamic
-# Environment=TRAEFIK_PROVIDERS_FILE_WATCH=true
-
-Environment=TRAEFIK_ACCESSLOG=true
-Environment=TRAEFIK_ACCESSLOG_ADDINTERNALS=true
-
-# ServersTransport
-Environment=TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY=false
-Environment=TRAEFIK_SERVERSTRANSPORT_ROOTCAS=/etc/traefik/tls/ca.crt
+Exec=--accessLog=true \
+  --accessLog.addInternals=true \
+  --api=true \
+  --api.dashboard=true \
+  --certificatesResolvers.external.acme.caServer=https://acme-v02.api.letsencrypt.org/directory \
+  --certificatesResolvers.external.acme.certificatesDuration=2160 \
+  --certificatesResolvers.external.acme.storage=/mnt/acmeStorage/external.json \
+  --certificatesResolvers.external.acme.tlsChallenge=true \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day1.sololab:8200/v1/pki/day1/acme/directory \
+  --certificatesResolvers.internal.acme.certificatesDuration=2160 \
+  --certificatesResolvers.internal.acme.storage=/mnt/acmeStorage/internal.json \
+  --certificatesResolvers.internal.acme.tlsChallenge=true \
+  --entrypoints.web.address=:80 \
+  --entrypoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --entrypoints.webSecure.address=:443 \
+  --entrypoints.webSecure.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --global.checkNewVersion=false \
+  --global.sendAnonymousUsage=false \
+  --log.level=DEBUG \
+  --ping=true \
+  --providers.consulCatalog=true \
+  --providers.consulCatalog.endpoint.address=consul.day1.sololab:8501 \
+  --providers.consulCatalog.endpoint.dataCenter=dc1 \
+  --providers.consulCatalog.endpoint.scheme=https \
+  --providers.consulCatalog.endpoint.tls.ca=/etc/traefik/tls/ca.crt \
+  --providers.consulCatalog.exposedByDefault=false \
+  --providers.docker=true \
+  --providers.docker.endpoint=unix:///var/run/docker.sock \
+  --providers.docker.exposedByDefault=false \
+  --serversTransport.insecureSkipVerify=false \
+  --serversTransport.rootCAs=/etc/traefik/tls/ca.crt
 
 Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
-# Secret=source=traefik-sec-cert,target=/etc/traefik/tls/dashboard.crt
-# Secret=source=traefik-sec-key,target=/etc/traefik/tls/dashboard.key
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
 Volume=traefik-pvc:/mnt/acmeStorage
@@ -97,19 +65,24 @@ Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
 Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
 Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
 Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
-Label="traefik.http.routers.dashboard.entryPoints=websecure"
+Label="traefik.http.routers.dashboard.entryPoints=webSecure"
 Label="traefik.http.routers.dashboard.middlewares=userPass@docker"
 Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.service=api@internal"
 Label="traefik.http.routers.dashboard.tls=true"
 
 SecurityLabelDisable=true
-HealthCmd=["traefik", "healthcheck"]
-HealthStartPeriod=3m
+
+# health check requires traefik enable ping function, this function disable by default
+# traefik ping function requires a entry point name "traefik", port 8080 by default
+# with podman systemd socket activation, we do not need to listen 8080 by socket
+# just leave 8080 empty
+HealthCmd=["traefik", "healthcheck", "--ping"]
+HealthStartPeriod=10s
 HealthInterval=600s
 HealthTimeout=30s
 HealthRetries=10
-# Notify=healthy
+Notify=healthy
 
 PodmanArgs=${PodmanArgs}
 Network=${Network}

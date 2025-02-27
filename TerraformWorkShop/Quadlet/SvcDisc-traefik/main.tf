@@ -18,16 +18,6 @@ resource "remote_file" "https_socket" {
   path = "/home/podmgr/.config/systemd/user/https.socket"
 }
 
-resource "remote_file" "traefik_socket" {
-  content = templatefile(
-    "./podman-traefik/traefik.socket",
-    {
-      name = "traefik-container"
-    }
-  )
-  path = "/home/podmgr/.config/systemd/user/traefik.socket"
-}
-
 
 # module "http_socket_activation" {
 #   source = "../../modules/system-systemd_unit_user"
@@ -176,7 +166,7 @@ module "podman_quadlet" {
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
-    # service = var.podman_quadlet.service
+    service = var.podman_quadlet.service
     files = [
       for file in var.podman_quadlet.files :
       {

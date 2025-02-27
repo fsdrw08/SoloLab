@@ -98,10 +98,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.3",
-        "archive": "docker.io_library_traefik_v3.3.tar",
+        "publicRepo": "library/traefik:v3.3.4",
+        "archive": "docker.io_library_traefik_v3.3.4.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "library/traefik:v3.3",
+        "privateRepo": "library/traefik:v3.3.4",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
