@@ -32,6 +32,15 @@ nomad:
 
   args:
     - agent
+
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.nomad-web.entrypoints: webSecure
+    traefik.tcp.routers.nomad-web.rule: HostSNI(`nomad.day1.sololab`)
+    traefik.tcp.routers.nomad-web.tls.passthrough: true
+    traefik.tcp.routers.nomad-web.service: nomad-web
+    traefik.tcp.services.nomad-web.loadbalancer.server.port: 4646
+
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT
       value: "ture"

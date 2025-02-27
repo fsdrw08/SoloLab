@@ -110,31 +110,6 @@ resource "null_resource" "podman_quadlet" {
   }
 }
 
-module "container_restart" {
-  depends_on = [null_resource.podman_quadlet]
-  source     = "../../modules/system-systemd_path_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_path_unit = {
-    content = templatefile(
-      var.container_restart.systemd_path_unit.content.templatefile,
-      var.container_restart.systemd_path_unit.content.vars
-    )
-    path = var.container_restart.systemd_path_unit.path
-  }
-  systemd_service_unit = {
-    content = templatefile(
-      var.container_restart.systemd_service_unit.content.templatefile,
-      var.container_restart.systemd_service_unit.content.vars
-    )
-    path = var.container_restart.systemd_service_unit.path
-  }
-}
-
 resource "powerdns_record" "record" {
   zone    = var.dns_record.zone
   name    = var.dns_record.name

@@ -74,7 +74,11 @@ module "podman_quadlet" {
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
-    service = var.podman_quadlet.service
+    service = {
+      name           = var.podman_quadlet.service.name
+      status         = var.podman_quadlet.service.status
+      custom_trigger = md5(remote_file.podman_kube.content)
+    }
     files = [
       for file in var.podman_quadlet.files :
       {
@@ -89,28 +93,6 @@ module "podman_quadlet" {
       }
     ]
   }
-}
-
-module "container_restart" {
-  depends_on = [module.podman_quadlet]
-  source     = "../../modules/system-systemd_unit_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_unit_files = [
-    for file in var.container_restart.systemd_unit_files :
-    {
-      content = templatefile(
-        file.content.templatefile,
-        file.content.vars
-      )
-      path = file.path
-    }
-  ]
-  systemd_unit_name = var.container_restart.systemd_unit_name
 }
 
 # resource "vyos_static_host_mapping" "host_mapping" {
@@ -135,7 +117,7 @@ locals {
 }
 
 resource "null_resource" "post_process" {
-  depends_on = [module.container_restart]
+  depends_on = [module.podman_quadlet]
   for_each   = local.post_process
   triggers = {
     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))

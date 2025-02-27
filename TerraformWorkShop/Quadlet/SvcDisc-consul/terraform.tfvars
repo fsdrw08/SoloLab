@@ -71,32 +71,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-consul/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/consul_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-consul/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/consul-container.service"
-          target_service   = "consul-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/consul_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "consul_restart"
-}
-
 post_process = {
   "Enable-DNSAnonymousAccess.sh" = {
     script_path = "./podman-consul/Enable-DNSAnonymousAccess.sh"

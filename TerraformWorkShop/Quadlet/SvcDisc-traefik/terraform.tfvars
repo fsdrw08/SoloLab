@@ -67,33 +67,6 @@ podman_quadlet = {
   ]
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-traefik/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/traefik_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-traefik/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/traefik-container.service"
-          target_service   = "traefik-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/traefik_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "traefik_restart"
-
-}
-
 prov_pdns = {
   api_key    = "powerdns"
   server_url = "https://pdns.day0.sololab"

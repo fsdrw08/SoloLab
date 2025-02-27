@@ -92,32 +92,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-opendj/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/opendj-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/opendj_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-opendj/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/opendj-container.service"
-          target_service   = "opendj-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/opendj_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "opendj_restart"
-}
-
 post_process = {
   "Enable-PreEncodedPassword.sh" = {
     script_path = "./podman-opendj/Enable-PreEncodedPassword.sh"

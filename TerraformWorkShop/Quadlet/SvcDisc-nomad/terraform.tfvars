@@ -77,32 +77,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-nomad/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/nomad-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/nomad_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-nomad/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/nomad-container.service"
-          target_service   = "nomad-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/nomad_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "nomad_restart"
-}
-
 post_process = {
   "New-NomadAnonymousPolicy.sh" = {
     script_path = "./podman-nomad/New-NomadAnonymousPolicy.sh"

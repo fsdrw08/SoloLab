@@ -47,33 +47,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-postgresql/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/postgresql-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/postgresql_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-postgresql/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/postgresql-container.service"
-          target_service   = "postgresql-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/postgresql_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "postgresql_restart"
-
-}
-
 prov_pdns = {
   api_key    = "powerdns"
   server_url = "https://pdns.day0.sololab"

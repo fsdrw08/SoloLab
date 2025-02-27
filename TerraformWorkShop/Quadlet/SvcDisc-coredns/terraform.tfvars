@@ -33,29 +33,3 @@ podman_quadlet = {
     status = "start"
   }
 }
-
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-coredns/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/coredns-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/coredns_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-coredns/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/coredns-container.service"
-          target_service   = "coredns-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/coredns_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "coredns_restart"
-}

@@ -50,32 +50,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-vault/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/vault-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/vault_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-vault/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/vault-container.service"
-          target_service   = "vault-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/vault_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "vault_restart"
-}
-
 prov_pdns = {
   api_key        = "powerdns"
   server_url     = "https://pdns.day0.sololab"

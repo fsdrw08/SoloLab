@@ -77,6 +77,7 @@ consul:
   ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
   ## this command is used to set the advertise ip to host ip when consul start
   ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
+  ## update: too complicate, hard code advertise ip instead
   ## before:
   ## set -- consul agent \
   ##   -data-dir="$CONSUL_DATA_DIR" \
@@ -121,6 +122,14 @@ consul:
   ##
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.consul-web.entrypoints: webSecure
+    traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day1.sololab`)
+    traefik.tcp.routers.consul-web.tls.passthrough: true
+    traefik.tcp.routers.consul-web.service: consul-web
+    traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
 
   extraEnvVars:
     - name: CONSUL_DISABLE_PERM_MGMT

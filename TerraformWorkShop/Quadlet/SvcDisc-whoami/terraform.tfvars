@@ -58,48 +58,23 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  quadlet = {
-    file_contents = [
-      {
-        file_source = "./podman-whoami/whoami-container.kube"
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = {
-          yaml          = "whoami-aio.yaml"
-          PodmanArgs    = "--tls-verify=false"
-          ExecStartPre  = "sleep 3"
-          KubeDownForce = "false"
-        }
-      },
-    ]
-    file_path_dir = "/home/podmgr/.config/containers/systemd"
-  }
+  files = [
+    {
+      template = "./podman-whoami/whoami-container.kube"
+      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+      vars = {
+        yaml          = "whoami-aio.yaml"
+        PodmanArgs    = "--tls-verify=false"
+        ExecStartPre  = "sleep 3"
+        KubeDownForce = "false"
+      }
+      dir = "/home/podmgr/.config/containers/systemd"
+    },
+  ]
   service = {
     name   = "whoami-container"
     status = "start"
   }
-}
-
-container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-whoami/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/whoami-aio.yaml"
-      }
-    }
-    path = "/home/podmgr/.config/systemd/user/whoami_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-whoami/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/whoami-container.service"
-        target_service   = "whoami-container.service"
-      }
-    }
-    path = "/home/podmgr/.config/systemd/user/whoami_restart.service"
-  }
-
 }
 
 prov_pdns = {

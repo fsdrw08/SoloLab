@@ -39,34 +39,30 @@ resource "remote_file" "podman_kube" {
 }
 
 module "podman_quadlet" {
-  depends_on     = [remote_file.podman_kube]
-  source         = "../../modules/system-systemd_quadlet"
-  vm_conn        = var.prov_remote
-  podman_quadlet = var.podman_quadlet
-}
-
-module "container_restart" {
-  depends_on = [module.podman_quadlet]
-  source     = "../../modules/system-systemd_path_user"
-  vm_conn = {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
-  systemd_path_unit = {
-    content = templatefile(
-      var.container_restart.systemd_path_unit.content.templatefile,
-      var.container_restart.systemd_path_unit.content.vars
-    )
-    path = var.container_restart.systemd_path_unit.path
-  }
-  systemd_service_unit = {
-    content = templatefile(
-      var.container_restart.systemd_service_unit.content.templatefile,
-      var.container_restart.systemd_service_unit.content.vars
-    )
-    path = var.container_restart.systemd_service_unit.path
+  depends_on = [
+    remote_file.podman_kube,
+  ]
+  source  = "../../modules/system-systemd_quadlet"
+  vm_conn = var.prov_remote
+  podman_quadlet = {
+    service = {
+      name           = var.podman_quadlet.service.name
+      status         = var.podman_quadlet.service.status
+      custom_trigger = md5(remote_file.podman_kube.content)
+    }
+    files = [
+      for file in var.podman_quadlet.files :
+      {
+        content = templatefile(
+          file.template,
+          file.vars
+        )
+        path = join("/", [
+          file.dir,
+          basename("${file.template}")
+        ])
+      }
+    ]
   }
 }
 

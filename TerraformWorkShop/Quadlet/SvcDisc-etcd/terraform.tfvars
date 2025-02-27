@@ -46,29 +46,3 @@ podman_quadlet = {
     status = "start"
   }
 }
-
-container_restart = {
-  systemd_unit_files = [
-    {
-      content = {
-        templatefile = "./podman-etcd/restart.path"
-        vars = {
-          PathModified = "/home/podmgr/.config/containers/systemd/etcd-aio.yaml"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/etcd_restart.path"
-    },
-    {
-      content = {
-        templatefile = "./podman-etcd/restart.service"
-        vars = {
-          AssertPathExists = "/run/user/1001/systemd/generator/etcd-container.service"
-          target_service   = "etcd-container.service"
-        }
-      }
-      path = "/home/podmgr/.config/systemd/user/etcd_restart.service"
-    }
-  ]
-
-  systemd_unit_name = "etcd_restart"
-}

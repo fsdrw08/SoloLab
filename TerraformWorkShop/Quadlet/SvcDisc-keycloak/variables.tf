@@ -59,25 +59,6 @@ variable "podman_quadlet" {
   })
 }
 
-variable "container_restart" {
-  type = object({
-    systemd_path_unit = object({
-      content = object({
-        templatefile = string
-        vars         = map(string)
-      })
-      path = string
-    })
-    systemd_service_unit = object({
-      content = object({
-        templatefile = string
-        vars         = map(string)
-      })
-      path = string
-    })
-  })
-}
-
 variable "prov_pdns" {
   type = object({
     api_key        = string

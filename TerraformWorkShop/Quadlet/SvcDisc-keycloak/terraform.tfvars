@@ -49,29 +49,6 @@ podman_quadlet = {
   }
 }
 
-container_restart = {
-  systemd_path_unit = {
-    content = {
-      templatefile = "./podman-keycloak/restart.path"
-      vars = {
-        PathModified = "/home/podmgr/.config/containers/systemd/keycloak-aio.yaml"
-      }
-    }
-    path = "/home/podmgr/.config/systemd/user/keycloak_restart.path"
-  }
-  systemd_service_unit = {
-    content = {
-      templatefile = "./podman-keycloak/restart.service"
-      vars = {
-        AssertPathExists = "/run/user/1001/systemd/generator/keycloak-container.service"
-        target_service   = "keycloak-container.service"
-      }
-    }
-    path = "/home/podmgr/.config/systemd/user/keycloak_restart.service"
-  }
-
-}
-
 prov_pdns = {
   api_key    = "powerdns"
   server_url = "https://pdns.day0.sololab"

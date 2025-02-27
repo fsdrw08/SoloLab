@@ -12,8 +12,9 @@ variable "podman_quadlet" {
   type = object({
     service = optional(
       object({
-        name   = string
-        status = string
+        name           = string
+        status         = string
+        custom_trigger = optional(string, "")
       }),
       null
     )

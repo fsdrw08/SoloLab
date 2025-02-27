@@ -31,18 +31,3 @@ variable "podman_quadlet" {
     })
   })
 }
-
-variable "container_restart" {
-  type = object({
-    systemd_unit_files = list(
-      object({
-        content = object({
-          templatefile = string
-          vars         = map(string)
-        })
-        path = string
-      })
-    )
-    systemd_unit_name = string
-  })
-}

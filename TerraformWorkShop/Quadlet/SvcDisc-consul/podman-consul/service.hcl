@@ -13,17 +13,17 @@ services {
     }
   ]
 
-  tags = [
-    "traefik.enable=true",
-    "traefik.tcp.routers.consul-web.entrypoints=webSecure",
-    "traefik.tcp.routers.consul-web.rule=HostSNI(`consul.day1.sololab`)",
-    "traefik.tcp.routers.consul-web.tls.passthrough=true",
-    # "traefik.http.routers.consul-web-redirect.entrypoints=web",
-    # "traefik.http.routers.consul-web-redirect.rule=Host(`consul.day1.sololab`)",
-    # "traefik.http.routers.consul-web-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.consul-web.entrypoints=webSecure",
-    # "traefik.http.routers.consul-web.rule=Host(`consul.day1.sololab`)",
-    # "traefik.http.routers.consul-web.tls=true",
-    # "traefik.http.services.consul-web.loadbalancer.server.scheme=https",
-  ]
+  # tags = [
+  #   "traefik.enable=true",
+  #   "traefik.tcp.routers.consul-web.entrypoints=webSecure",
+  #   "traefik.tcp.routers.consul-web.rule=HostSNI(`consul.day1.sololab`)",
+  #   "traefik.tcp.routers.consul-web.tls.passthrough=true",
+  #   # "traefik.http.routers.consul-web-redirect.entrypoints=web",
+  #   # "traefik.http.routers.consul-web-redirect.rule=Host(`consul.day1.sololab`)",
+  #   # "traefik.http.routers.consul-web-redirect.middlewares=toHttps@file",
+  #   # "traefik.http.routers.consul-web.entrypoints=webSecure",
+  #   # "traefik.http.routers.consul-web.rule=Host(`consul.day1.sololab`)",
+  #   # "traefik.http.routers.consul-web.tls=true",
+  #   # "traefik.http.services.consul-web.loadbalancer.server.scheme=https",
+  # ]
 }

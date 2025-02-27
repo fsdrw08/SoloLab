@@ -46,15 +46,15 @@ resource "remote_file" "quadlet" {
   path    = each.value.path
 }
 
-resource "null_resource" "quadlet_generate" {
+resource "null_resource" "service_stop" {
   depends_on = [remote_file.quadlet]
   triggers = {
-    quadlet_md5 = md5(join("\n", [for quadlet in remote_file.quadlet : quadlet.content]))
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
-    private_key = sensitive(var.vm_conn.private_key)
+    service_name = var.podman_quadlet.service.name
+    host         = var.vm_conn.host
+    port         = var.vm_conn.port
+    user         = var.vm_conn.user
+    password     = sensitive(var.vm_conn.password)
+    private_key  = sensitive(var.vm_conn.private_key)
   }
   connection {
     type        = "ssh"
@@ -65,8 +65,9 @@ resource "null_resource" "quadlet_generate" {
     private_key = self.triggers.private_key
   }
   provisioner "remote-exec" {
+    when = destroy
     inline = [
-      "systemctl --user daemon-reload",
+      "systemctl --user stop ${self.triggers.service_name}",
     ]
   }
 }
@@ -75,29 +76,26 @@ resource "null_resource" "service_mgmt" {
   count = var.podman_quadlet.service == null ? 0 : 1
   depends_on = [
     remote_file.quadlet,
-    null_resource.quadlet_generate
+    null_resource.service_stop
   ]
   triggers = {
     service_name   = var.podman_quadlet.service.name
     service_status = var.podman_quadlet.service.status
     quadlet_md5    = md5(join("\n", [for quadlet in remote_file.quadlet : quadlet.content]))
-    host           = var.vm_conn.host
-    port           = var.vm_conn.port
-    user           = var.vm_conn.user
-    password       = sensitive(var.vm_conn.password)
-    private_key    = sensitive(var.vm_conn.private_key)
+    custom_trigger = var.podman_quadlet.service.custom_trigger
   }
   connection {
     type        = "ssh"
-    host        = self.triggers.host
-    port        = self.triggers.port
-    user        = self.triggers.user
-    password    = self.triggers.password
-    private_key = self.triggers.private_key
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
+    private_key = sensitive(var.vm_conn.private_key)
   }
   provisioner "remote-exec" {
     inline = [
       <<-EOF
+      systemctl --user daemon-reload
       if [ "${var.podman_quadlet.service.status}" = "start" ]; then
           service_status=$(systemctl --user is-active ${self.triggers.service_name})
           if [ "$service_status" = "inactive" ]; then
@@ -117,12 +115,6 @@ resource "null_resource" "service_mgmt" {
       fi
       EOF
       ,
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "systemctl --user stop ${self.triggers.service_name}",
     ]
   }
 }
