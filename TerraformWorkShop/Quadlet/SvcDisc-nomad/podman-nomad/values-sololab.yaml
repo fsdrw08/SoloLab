@@ -4,6 +4,11 @@ nomad:
   image:
     repository: multani/nomad
     tag: "1.9.5"
+  # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
+  hostAliases:
+    - ip: "host-gateway"
+      hostnames:
+        - "vault.day1.sololab"
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30

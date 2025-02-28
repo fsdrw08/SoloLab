@@ -5,7 +5,7 @@ prov_vault = {
 }
 
 oidc_provider = {
-  issuer_host = "vault.day1.sololab:8200"
+  issuer_host = "vault.day1.sololab"
   scopes = [
     {
       name     = "groups"
