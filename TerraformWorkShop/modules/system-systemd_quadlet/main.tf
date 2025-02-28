@@ -98,7 +98,7 @@ resource "null_resource" "service_mgmt" {
       systemctl --user daemon-reload
       if [ "${var.podman_quadlet.service.status}" = "start" ]; then
           service_status=$(systemctl --user is-active ${self.triggers.service_name})
-          if [ "$service_status" = "inactive" ]; then
+          if [ "$service_status" != "active" ]; then
               echo "${self.triggers.service_name} is stop, start it"
               systemctl --user start ${self.triggers.service_name}
           elif [ "$service_status" = "active" ]; then

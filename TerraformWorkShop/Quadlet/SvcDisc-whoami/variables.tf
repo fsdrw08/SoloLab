@@ -55,18 +55,18 @@ variable "podman_kube" {
 
 variable "podman_quadlet" {
   type = object({
-    service = object({
-      name   = string
-      status = string
-    })
-    quadlet = object({
-      file_contents = list(object({
-        file_source = string
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = map(string)
-      }))
-      file_path_dir = string
-    })
+    service = optional(
+      object({
+        name   = string
+        status = string
+      }),
+      null
+    )
+    files = list(object({
+      template = string
+      vars     = map(string)
+      dir      = string
+    }))
   })
 }
 
