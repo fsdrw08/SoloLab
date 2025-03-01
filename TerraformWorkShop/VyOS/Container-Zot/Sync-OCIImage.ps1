@@ -1,6 +1,14 @@
 $syncList = @"
 [
     {
+        "publicRegistry": "quay.io",
+        "publicRepo": "giantswarm/zot:v2.1.2",
+        "archive": "quay.io_giantswarm_zot-v2.1.2.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "giantswarm/zot:v2.1.2",
+        "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "powerdns/pdns-auth-49:4.9.3",
         "archive": "docker.io_powerdns_pdns-auth-49_4.9.3.tar",
