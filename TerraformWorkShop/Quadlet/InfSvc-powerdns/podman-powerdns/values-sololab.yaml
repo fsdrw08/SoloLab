@@ -1,0 +1,46 @@
+global:
+  imageRegistry: zot.day0.sololab
+powerdns:
+  containerPorts:
+    - name: dns-tcp
+      containerPort: 1053
+      hostPort: 53
+      hostIP: 192.168.255.20
+      protocol: TCP
+    - name: dns-udp
+      containerPort: 1053
+      hostPort: 53
+      hostIP: 192.168.255.20
+      protocol: UDP
+    - name: web
+      containerPort: 8081
+      hostPort: 8081
+      protocol: TCP
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  configFiles:
+    ddns:
+      allow-dnsupdate-from: 0.0.0.0/0
+      dnsupdate: yes
+    debug:
+      webserver-loglevel: detailed
+  ## @param powerdns.podLabels Extra labels for %%MAIN_CONTAINER_NAME%% pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.powerdns-web.entrypoints: webSecure
+    traefik.tcp.routers.powerdns-web.rule: HostSNI(`powerdns.day0.sololab`)
+    traefik.tcp.routers.powerdns-web.tls.passthrough: true
+    traefik.tcp.routers.powerdns-web.service: powerdns-web
+    traefik.tcp.services.powerdns-web.loadbalancer.server.port: 8081
+  ## @param opendj.podAnnotations Annotations for opendj pods
+  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
+  ## the userns annotation only work podman v4.9+
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ## ref: https://github.com/PowerDNS/pdns/blob/auth-4.9.4/Dockerfile-auth#L93
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=953,gid=953

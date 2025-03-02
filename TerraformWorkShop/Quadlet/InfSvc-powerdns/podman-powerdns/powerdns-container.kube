@@ -1,0 +1,12 @@
+[Unit]
+Description="The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
+Documentation=https://doc.powerdns.com/authoritative/index.html
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+
+[Install]
+WantedBy=default.target

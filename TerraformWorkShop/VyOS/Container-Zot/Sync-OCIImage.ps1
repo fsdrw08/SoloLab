@@ -10,10 +10,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "powerdns/pdns-auth-49:4.9.3",
-        "archive": "docker.io_powerdns_pdns-auth-49_4.9.3.tar",
+        "publicRepo": "powerdns/pdns-auth-49:4.9.4",
+        "archive": "docker.io_powerdns_pdns-auth-49_4.9.4.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "powerdns/pdns-auth-49:4.9.3",
+        "privateRepo": "powerdns/pdns-auth-49:4.9.4",
         "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
     },
     {
