@@ -36,9 +36,10 @@ create_tsig_key() {
         "type": "TSIGKey"
     }' "$PDNS_HOST/api/v1/servers/localhost/tsigkeys"
 }
+
 # 更新 TSIG key
 update_tsig_key() {
-    curl -X PUT -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
+    curl -s -o /dev/null -X PUT -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
         "name": "'"$TSIG_KEY_ID"'",
         "algorithm": "hmac-sha256",
         "key": "'"$TSIG_KEY_CONTENT"'",
@@ -46,17 +47,29 @@ update_tsig_key() {
     }' "$PDNS_HOST/api/v1/servers/localhost/tsigkeys/$TSIG_KEY_ID"
 }
 
-# 检查 metadata 是否存在
-check_metadata_exist() {
-    curl -s -o /dev/null -w "%%{http_code}" -H "X-API-Key: $API_KEY" "$PDNS_HOST/api/v1/servers/localhost/zones/$ZONE_NAME/metadata"
+### Metadata 操作函数
+check_metadata_exists() {
+    local metadata_name="$1"
+    response=$(curl -sS -H "X-API-Key: $API_KEY" \
+        "$PDNS_HOST/api/v1/servers/localhost/zones/$ZONE_NAME/metadata")
+    
+    if echo "$response" | jq -e ".[] | select(.kind == \"$metadata_name\")" > /dev/null; then
+        echo "exists"
+    else
+        echo "not_exists"
+    fi
 }
 
 # 创建 metadata
 create_metadata() {
-    curl -X PUT -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
-        "kind": "Metadata",
-        "metadata": ["'"$2"'"]
-    }' "$PDNS_HOST/api/v1/servers/localhost/zones/$ZONE_NAME/metadata/$1"
+    local name="$1"
+    local value="$2"
+    curl -X POST -sS -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" \
+        -d '{
+            "kind": "'"$name"'",
+            "metadata": ["'"$value"'"]
+        }' \
+        "$PDNS_HOST/api/v1/servers/localhost/zones/$ZONE_NAME/metadata"
 }
 
 # 主逻辑
@@ -73,16 +86,17 @@ if [ "$(check_tsig_key_exist)" != "200" ]; then
 else
     echo "TSIG key $TSIG_KEY_ID already exists, updating..."
     update_tsig_key
+    echo "update done"
 fi
 
-if [ "$(check_metadata_exist 'ALLOW-DNSUPDATE-FROM')" != "200" ]; then
+if [ "$(check_metadata_exists 'ALLOW-DNSUPDATE-FROM')" = "not_exists" ]; then
     echo "Metadata ALLOW-DNSUPDATE-FROM does not exist, creating..."
     create_metadata "ALLOW-DNSUPDATE-FROM" "0.0.0.0/0"
 else
     echo "Metadata ALLOW-DNSUPDATE-FROM already exists."
 fi
 
-if [ "$(check_metadata_exist 'TSIG-ALLOW-DNSUPDATE')" != "200" ]; then
+if [ "$(check_metadata_exists 'TSIG-ALLOW-DNSUPDATE')" = "not_exists" ]; then
     echo "Metadata TSIG-ALLOW-DNSUPDATE does not exist, creating..."
     create_metadata "TSIG-ALLOW-DNSUPDATE" "$TSIG_KEY_ID"
 else
