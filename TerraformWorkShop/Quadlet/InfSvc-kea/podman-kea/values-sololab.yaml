@@ -1,0 +1,19 @@
+global:
+  imageRegistry: zot.day0.sololab
+kea:
+  containers:
+    dhcp4:
+      extraEnvVars:
+        - name: TZ
+          value: Asia/Shanghai
+      configFiles:
+        kea-dhcp4:
+          Dhcp4:
+            subnet4:
+              - subnet: 192.168.255.0/24
+                pools:
+                  - pool: 192.168.255.100-192.168.255.200
+                id: 1
+                interface: eth0
+    dhcp-ddns:
+      enabled: true

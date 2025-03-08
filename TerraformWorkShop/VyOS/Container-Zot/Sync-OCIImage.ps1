@@ -25,6 +25,14 @@ $syncList = @"
         "description": "https://cloudsmith.io/~isc/repos/docker/packages/detail/docker/kea-dhcp4/#versions",
     },
     {
+        "publicRegistry": "docker.cloudsmith.io",
+        "publicRepo": "isc/docker/kea-dhcp-ddns:2.7.6-20250129",
+        "archive": "docker.cloudsmith.io_isc_docker_kea-dhcp-ddns_2.7.6-20250129.tar",
+        "privateRegistry": "zot.day0.sololab",
+        "privateRepo": "isc/docker/kea-dhcp-ddns:2.7.6-20250129",
+        "description": "https://cloudsmith.io/~isc/repos/docker/packages/detail/docker/kea-dhcp-ddns/#versions",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "fedora/postgresql-16:20241225",
         "archive": "quay.io_fedora_postgresql-16_20241225.tar",
