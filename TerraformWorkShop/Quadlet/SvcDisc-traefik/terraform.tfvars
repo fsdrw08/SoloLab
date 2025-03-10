@@ -52,8 +52,10 @@ podman_quadlet = {
     {
       template = "./podman-traefik/traefik-container.container"
       vars = {
-        PodmanArgs = "--tls-verify=false"
-        Network    = "podman-default-kube-network"
+        Description   = "Traefik Proxy"
+        Documentation = "https://docs.traefik.io"
+        PodmanArgs    = "--tls-verify=false"
+        Network       = "podman-default-kube-network"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },

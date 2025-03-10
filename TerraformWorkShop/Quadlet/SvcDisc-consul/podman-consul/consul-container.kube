@@ -1,6 +1,6 @@
 [Unit]
-Description="HashiCorp Consul - A service mesh solution""
-Documentation=https://www.consul.io/
+Description="${Description}"
+Documentation="${Documentation}"
 After=vault-container.service
 Wants=vault-container.service
 

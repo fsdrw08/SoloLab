@@ -1,6 +1,6 @@
 [Unit]
-Description="PostgreSQL is a powerful, open source object-relational database system"
-Documentation=https://www.postgresql.org/
+Description="${Description}"
+Documentation="${Documentation}"
 
 [Kube]
 # Point to the yaml file in the same directory

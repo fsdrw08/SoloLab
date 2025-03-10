@@ -79,6 +79,8 @@ podman_quadlet = {
     {
       template = "./podman-opendj/opendj-container.kube"
       vars = {
+        Description   = "OpenDJ is an LDAPv3 compliant directory service, which has been developed for the Java platform, providing a high performance, highly available, and secure store for the identities managed by your organization"
+        Documentation = "https://github.com/OpenIdentityPlatform/OpenDJ"
         yaml          = "opendj-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"

@@ -63,6 +63,8 @@ podman_quadlet = {
       template = "./podman-nomad/nomad-container.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
+        Description   = "Nomad is a highly available, distributed, data-center aware cluster and application scheduler designed to support the modern datacenter with support for long-running services, batch jobs, and much more."
+        Documentation = "https://www.nomadproject.io/docs/"
         yaml          = "nomad-aio.yaml"
         PodmanArgs    = "--tls-verify=false --ip=10.89.0.254"
         ExecStartPre  = "sleep 3"

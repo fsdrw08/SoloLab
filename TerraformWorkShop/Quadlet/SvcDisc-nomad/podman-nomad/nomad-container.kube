@@ -1,6 +1,6 @@
 [Unit]
-Description="HashiCorp Nomad"
-Documentation=https://www.nomadproject.io/docs/
+Description="${Description}"
+Documentation="${Documentation}"
 After=vault-container.service
 Wants=vault-container.service
 

@@ -19,6 +19,8 @@ podman_quadlet = {
     {
       template = "./podman-powerdns/powerdns-container.kube"
       vars = {
+        Description   = "The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
+        Documentation = "https://doc.powerdns.com/authoritative/index.html"
         yaml          = "powerdns-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"

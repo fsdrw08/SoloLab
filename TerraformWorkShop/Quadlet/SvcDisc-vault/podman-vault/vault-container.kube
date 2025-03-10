@@ -1,6 +1,6 @@
 [Unit]
-Description="HashiCorp Vault - A tool for managing secrets"
-Documentation=https://developer.hashicorp.com/vault/docs
+Description="${Description}"
+Documentation="${Documentation}"
 
 [Kube]
 # Point to the yaml file in the same directory

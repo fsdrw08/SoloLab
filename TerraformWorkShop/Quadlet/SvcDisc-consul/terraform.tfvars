@@ -58,6 +58,8 @@ podman_quadlet = {
     {
       template = "./podman-consul/consul-container.kube"
       vars = {
+        Description   = "Consul is a multi-networking tool that offers a fully-featured service mesh solution."
+        Documentation = "https://developer.hashicorp.com/consul/docs"
         yaml          = "consul-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"

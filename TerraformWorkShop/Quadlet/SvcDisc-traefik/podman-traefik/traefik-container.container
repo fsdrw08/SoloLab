@@ -1,6 +1,6 @@
 [Unit]
-Description="Traefik Proxy"
-Documentation=https://docs.traefik.io
+Description="${Description}"
+Documentation="${Documentation}"
 After=http.socket https.socket
 Requires=http.socket https.socket
 

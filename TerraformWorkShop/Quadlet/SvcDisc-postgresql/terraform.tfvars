@@ -34,6 +34,8 @@ podman_quadlet = {
       template = "./podman-postgresql/keycloakdb-container.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
+        Description   = "PostgreSQL is a powerful, open source object-relational database system"
+        Documentation = "https://www.postgresql.org/"
         yaml          = "keycloakdb-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"

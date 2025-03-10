@@ -63,6 +63,8 @@ podman_quadlet = {
       template = "./podman-whoami/whoami-container.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
+        Description   = "Tiny Go webserver that prints OS information and HTTP request to output."
+        Documentation = "https://github.com/traefik/whoami, https://hub.docker.com/r/traefik/whoami"
         yaml          = "whoami-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         ExecStartPre  = "sleep 3"

@@ -1,6 +1,6 @@
 [Unit]
-Description="Traefik whoami"
-Documentation=https://hub.docker.com/r/traefik/whoami
+Description="${Description}"
+Documentation="${Documentation}"
 
 [Kube]
 # Point to the yaml file in the same directory

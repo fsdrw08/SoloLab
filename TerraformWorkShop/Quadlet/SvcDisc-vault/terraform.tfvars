@@ -37,6 +37,8 @@ podman_quadlet = {
     {
       template = "./podman-vault/vault-container.kube"
       vars = {
+        Description   = "HashiCorp Vault - A tool for managing secrets"
+        Documentation = "https://developer.hashicorp.com/vault/docs"
         yaml          = "vault-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
