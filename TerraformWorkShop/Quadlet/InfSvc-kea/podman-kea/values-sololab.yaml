@@ -15,5 +15,3 @@ kea:
                   - pool: 192.168.255.100-192.168.255.200
                 id: 1
                 interface: eth0
-    dhcp-ddns:
-      enabled: true
