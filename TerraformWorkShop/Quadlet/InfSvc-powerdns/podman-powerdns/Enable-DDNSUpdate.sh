@@ -73,6 +73,7 @@ create_metadata() {
 }
 
 # 主逻辑
+sleep 10
 if [ "$(check_zone_exist)" != "200" ]; then
     echo "Zone $ZONE_NAME does not exist, creating..."
     create_zone
@@ -104,3 +105,4 @@ else
 fi
 
 echo "Script execution completed."
+echo "To check meta-data in server, run pdnsutil get-meta $ZONE_NAME"
