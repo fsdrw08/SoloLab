@@ -41,7 +41,7 @@ podman_quadlet = {
         Documentation = "https://zotregistry.dev/latest/admin-guide/admin-configuration/"
         yaml          = "zot-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "true"
+        KubeDownForce = "false"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
