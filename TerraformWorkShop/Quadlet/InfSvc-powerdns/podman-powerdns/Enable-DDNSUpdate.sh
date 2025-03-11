@@ -22,6 +22,23 @@ create_zone() {
     }' "$PDNS_HOST/api/v1/servers/localhost/zones"
 }
 
+create_rrset() {
+    curl -X PATCH -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
+        "rrsets": [{
+            "name": "zot.day0.sololab.",
+            "type": "A",
+            "ttl": 3600,
+            "changetype": "REPLACE",
+            "records": [
+                {
+                    "content": "192.168.255.10",
+                    "disabled": false
+                }
+            ]
+        }]
+    }' "$PDNS_HOST/api/v1/servers/localhost/zones/$ZONE_NAME"
+}
+
 # 检查 TSIG key 是否存在
 check_tsig_key_exist() {
     curl -s -o /dev/null -w "%%{http_code}" -H "X-API-Key: $API_KEY" "$PDNS_HOST/api/v1/servers/localhost/tsigkeys/$TSIG_KEY_ID"
@@ -73,13 +90,16 @@ create_metadata() {
 }
 
 # 主逻辑
-sleep 10
+sleep 5
 if [ "$(check_zone_exist)" != "200" ]; then
     echo "Zone $ZONE_NAME does not exist, creating..."
     create_zone
 else
     echo "Zone $ZONE_NAME already exists."
 fi
+
+sleep 5
+create_rrset
 
 if [ "$(check_tsig_key_exist)" != "200" ]; then
     echo "TSIG key $TSIG_KEY_ID does not exist, creating..."
