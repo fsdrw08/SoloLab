@@ -60,9 +60,8 @@ zot:
       gc: true
     log:
       level: "info"
-  htpasswdCredentials:
-    - username: admin
-      password: P@ssw0rd
+  htpasswd: |
+    admin:$2y$10$vAk2SLjHIU2x2dNuzwDxDuq6TwdnLK1XeO8OCzxNqXK3yv3ObYfIy
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.zot-web.entrypoints: webSecure
