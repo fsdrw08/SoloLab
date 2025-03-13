@@ -50,10 +50,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:331",
-        "archive": "quay.io_cockpit_ws_331.tar",
+        "publicRepo": "cockpit/ws:333",
+        "archive": "quay.io_cockpit_ws_333.tar",
         "privateRegistry": "zot.day0.sololab",
-        "privateRepo": "cockpit/ws:331",
+        "privateRepo": "cockpit/ws:333",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {

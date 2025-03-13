@@ -1,0 +1,14 @@
+global:
+  imageRegistry: zot.day0.sololab
+cockpit:
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.cockpit-web.entrypoints: webSecure
+    traefik.tcp.routers.cockpit-web.rule: HostSNI(`cockpit.day0.sololab`)
+    traefik.tcp.routers.cockpit-web.tls.passthrough: true
+    traefik.tcp.routers.cockpit-web.service: cockpit-web
+    traefik.tcp.services.cockpit-web.loadbalancer.server.port: 9090
+
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
