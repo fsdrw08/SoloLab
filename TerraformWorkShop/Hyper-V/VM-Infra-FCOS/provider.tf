@@ -25,10 +25,10 @@ terraform {
       version = ">=1.5.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "HyperV-Infra-VM-FCOS"
-  }
+  # backend "pg" {
+  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+  #   schema_name = "HyperV-Infra-VM-FCOS"
+  # }
   # backend "s3" {
   #   bucket = "tfstate"                 # Name of the S3 bucket
   #   key    = "Hyper-V/VM-SvcDisc-FCOS" # Name of the tfstate file

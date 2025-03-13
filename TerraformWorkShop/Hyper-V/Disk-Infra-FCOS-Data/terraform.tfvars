@@ -1,4 +1,4 @@
-hyperv = {
+prov_hyperv = {
   host     = "127.0.0.1"
   port     = 5986
   user     = "root"

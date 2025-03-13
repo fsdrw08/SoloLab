@@ -5,18 +5,18 @@ terraform {
       version = ">=1.2.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "HyperV-Infra-Disk-FCOS"
-  }
+  # backend "pg" {
+  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+  #   schema_name = "HyperV-Infra-Disk-FCOS"
+  # }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  host     = var.hyperv.host
-  port     = var.hyperv.port
-  user     = var.hyperv.user
-  password = var.hyperv.password
+  host     = var.prov_hyperv.host
+  port     = var.prov_hyperv.port
+  user     = var.prov_hyperv.user
+  password = var.prov_hyperv.password
   https    = true
   insecure = true
   use_ntlm = true

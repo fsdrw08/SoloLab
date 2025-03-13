@@ -1,21 +1,11 @@
-variable "hyperv" {
+variable "prov_hyperv" {
   type = object({
     host     = string
     port     = number
     user     = string
     password = string
   })
-  default = {
-    host     = "127.0.0.1"
-    port     = 5986
-    user     = "root"
-    password = "P@ssw0rd"
-  }
 }
-
-# variable "vhd_count" {
-#   type = number
-# }
 
 variable "vhd" {
   type = object({
