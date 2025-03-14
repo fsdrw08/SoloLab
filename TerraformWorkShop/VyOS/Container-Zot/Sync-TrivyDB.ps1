@@ -39,10 +39,11 @@ $syncList | ConvertFrom-Json | ForEach-Object {
 }
 
 # push
-$privateRegistry = "zot.day0.sololab"
+# $privateRegistry = "zot.day0.sololab"
+$privateRegistry = "192.168.255.10:5000"
 $env:HTTP_PROXY=$null; $env:HTTPS_PROXY=$null
 # login to zot
-oras login -u admin $privateRegistry
+oras login --insecure -u admin $privateRegistry
 
 # Push the prior downloaded trivy-db to private registry
 # https://github.com/aquasecurity/trivy-db/blob/8c398f13db0ed9be333fe1b9ddab158ab7262967/README.md#building-the-db
@@ -64,5 +65,5 @@ $syncList | ConvertFrom-Json | ForEach-Object {
         $_.ManifestFile
 
     "oras manifest fetch"
-    oras manifest fetch $privateRegistry/$($_.privateRepo)
+    oras manifest fetch --insecure $privateRegistry/$($_.privateRepo)
 }

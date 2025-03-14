@@ -2,6 +2,7 @@ zot:
   image:
     registry: quay.io
     repository: giantswarm/zot
+  resourcesPreset: medium
   config:
     # https://zotregistry.dev/v2.1.2/admin-guide/admin-configuration/#extensions
     extensions:
@@ -12,8 +13,8 @@ zot:
           updateInterval: "168h"
           # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
           trivy:
-            javadbrepository: "zot.day0.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
-            dbrepository: "zot.day0.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
+            javadbrepository: "zot.day0.sololab:5000/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+            dbrepository: "zot.day0.sololab:5000/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
       # Mgmt is enabled when the Search extension is enabled
       mgmt:
         enable: true
