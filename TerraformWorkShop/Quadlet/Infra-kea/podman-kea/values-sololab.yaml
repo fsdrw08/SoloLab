@@ -15,3 +15,6 @@ kea:
                   - pool: 192.168.255.100-192.168.255.200
                 id: 1
                 interface: eth0
+                option-data:
+                  - name: domain-name-servers
+                    data: 192.168.255.1,192.168.255.10
