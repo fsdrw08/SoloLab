@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -38,7 +38,7 @@ post_process = {
   "Enable-DDNSUpdate.sh" = {
     script_path = "./podman-powerdns/Enable-DDNSUpdate.sh"
     vars = {
-      PDNS_HOST        = "http://192.168.255.20:8081"
+      PDNS_HOST        = "http://192.168.255.10:8081"
       PDNS_API_KEY     = "powerdns"
       ZONE_NAME        = "day0.sololab."
       ZONE_FQDN        = "day0.sololab."

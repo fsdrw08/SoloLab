@@ -1,16 +1,16 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: 192.168.255.10:5000
 powerdns:
   containerPorts:
     - name: dns-tcp
       containerPort: 1053
       hostPort: 53
-      hostIP: 192.168.255.20
+      hostIP: 192.168.255.10
       protocol: TCP
     - name: dns-udp
       containerPort: 1053
       hostPort: 53
-      hostIP: 192.168.255.20
+      hostIP: 192.168.255.10
       protocol: UDP
     - name: web
       containerPort: 8081
