@@ -8,7 +8,7 @@ prov_remote = {
 podman_kube = {
   helm = {
     name       = "powerdns"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/pdns-auth"
+    chart      = "../../../HelmWorkShop/helm-charts/charts/pdns"
     value_file = "./podman-powerdns/values-sololab.yaml"
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/powerdns-aio.yaml"

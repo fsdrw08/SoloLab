@@ -17,6 +17,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "powerdns/pdns-recursor-49:4.9.9",
+        "archive": "docker.io_powerdns_pdns-recursor-49_4.9.9.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "powerdns/pdns-recursor-49:4.9.9",
+        "description": "https://hub.docker.com/r/powerdns/pdns-recursor-49",
+    },
+    {
         "publicRegistry": "docker.cloudsmith.io",
         "publicRepo": "isc/docker/kea-dhcp4:2.7.6-20250129",
         "archive": "docker.cloudsmith.io_isc_docker_kea-dhcp4_2.7.6-20250129.tar",
