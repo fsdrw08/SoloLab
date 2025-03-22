@@ -33,6 +33,8 @@ Exec=--accessLog=true \
   --providers.docker=true \
   --providers.docker.endpoint=unix:///var/run/docker.sock \
   --providers.docker.exposedByDefault=false \
+  --providers.file=true \
+  --providers.file.directory=/etc/traefik/dynamic \
   --serversTransport.insecureSkipVerify=false \
   --serversTransport.rootCAs=/etc/traefik/tls/ca.crt
 
@@ -43,7 +45,8 @@ Environment=LEGO_CA_SYSTEM_CERT_POOL=true
 Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
-Volume=traefik-pvc:/mnt/acmeStorage
+Volume=traefik-pvc-dynamic:/etc/traefik/dynamic
+Volume=traefik-pvc-tls:/etc/traefik/certs
 
 Label="traefik.enable=true"
 Label="traefik.http.middlewares.userPass.basicauth.users=admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"

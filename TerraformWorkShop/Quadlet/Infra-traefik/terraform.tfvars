@@ -11,11 +11,6 @@ podman_kube = {
     chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
     value_file = "./podman-traefik/values-sololab.yaml"
     tls_value_sets = {
-      name = {
-        ca          = "traefik.tls.contents.\"ca\\.crt\""
-        cert        = "traefik.tls.contents.\"dashboard\\.crt\""
-        private_key = "traefik.tls.contents.\"dashboard\\.key\""
-      }
       value_ref = {
         tfstate = {
           backend = {
@@ -25,6 +20,11 @@ podman_kube = {
             }
           }
           cert_name = "traefik"
+          data_key = {
+            ca          = "zot.tls.contents.\"ca\\.crt\""
+            cert        = "zot.tls.contents.\"server\\.crt\""
+            private_key = "zot.tls.contents.\"server\\.key\""
+          }
         }
       }
     }
@@ -60,15 +60,15 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "https://pdns.day0.sololab"
+  server_url = "http://pdns-auth.day0.sololab:8081"
 }
 
 dns_record = {
-  zone = "day1.sololab."
-  name = "traefik.day1.sololab."
+  zone = "day0.sololab."
+  name = "traefik.day0.sololab."
   type = "A"
   ttl  = 86400
   records = [
-    "192.168.255.20"
+    "192.168.255.10"
   ]
 }
