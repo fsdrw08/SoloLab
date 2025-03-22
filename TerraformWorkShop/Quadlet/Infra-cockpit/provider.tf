@@ -13,9 +13,12 @@ terraform {
       version = ">=0.1.3"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "System-Infra-Quadlet-Cockpit"
+  # backend "pg" {
+  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+  #   schema_name = "System-Infra-Quadlet-Cockpit"
+  # }
+  backend "local" {
+
   }
 }
 
