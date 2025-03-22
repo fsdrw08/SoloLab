@@ -6,12 +6,19 @@ powerdns:
   ##
   podLabels:
     traefik.enable: true
-    traefik.tcp.routers.powerdns-web.entrypoints: webSecure
-    traefik.tcp.routers.powerdns-web.rule: HostSNI(`powerdns.day0.sololab`)
-    traefik.tcp.routers.powerdns-web.tls.passthrough: true
-    traefik.tcp.routers.powerdns-web.service: powerdns-web
-    traefik.tcp.services.powerdns-web.loadbalancer.server.port: 8081
-  ## @param opendj.podAnnotations Annotations for opendj pods
+    # pdns-auth
+    traefik.http.routers.pdns-auth-web.entrypoints: webSecure
+    traefik.http.routers.pdns-auth-web.rule: Host(`pdns-auth.day0.sololab`)
+    traefik.http.routers.pdns-auth-web.tls: true
+    traefik.http.routers.pdns-auth-web.service: pdns-auth-web
+    traefik.http.services.pdns-auth-web.loadbalancer.server.port: 8081
+    # pdns-recursor
+    traefik.http.routers.pdns-recursor-web.entrypoints: webSecure
+    traefik.http.routers.pdns-recursor-web.rule: Host(`pdns-recursor.day0.sololab`)
+    traefik.http.routers.pdns-recursor-web.tls: true
+    traefik.http.routers.pdns-recursor-web.service: pdns-recursor-web
+    traefik.http.services.pdns-recursor-web.loadbalancer.server.port: 8082
+  ## @param powerdns.podAnnotations Annotations for powerdns pods
   ## to keep container user as same permission as host user, set keep-id point to the container user and group id
   ## the userns annotation only work podman v4.9+
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -22,47 +29,39 @@ powerdns:
     io.podman.annotations.userns: keep-id:uid=953,gid=953
   containers:
     auth:
-      containerPorts:
-        - name: dns-tcp
-          containerPort: 1053
-          hostPort: 1053
-          hostIP: 192.168.255.10
-          protocol: TCP
-        - name: dns-udp
-          containerPort: 1053
-          hostPort: 1053
-          hostIP: 192.168.255.10
-          protocol: UDP
-        - name: web
-          containerPort: 8081
-          hostPort: 8081
-          hostIP: 192.168.255.10
-          protocol: TCP
+      containerPorts: []
       extraEnvVars:
         - name: TZ
           value: Asia/Shanghai
+      containerSecurityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "53"
       config:
+        ## @param powerdns.containers.auth.config.local-address Local IP addresses to which we bind.
+        ## Each address specified can include a port number; if no port is included then the local-port port will be used for that address.
+        ## If a port number is specified, it must be separated from the address with a ‘:’; for an IPv6 address the address must be enclosed in square brackets.
+        ## ref: https://doc.powerdns.com/authoritative/settings.html#local-address
+        ##
+        local-address: 192.168.255.10
+        ## @param powerdns.containers.auth.config.local-port Local port to bind to. If an address in local-address does not have an explicit port, this port is used.
+        ## rootless user cannot bind 53 port, so use 1053 instead
+        ## ref: https://doc.powerdns.com/authoritative/settings.html#local-port
+        ##
+        local-port: 1053
+        ## @param powerdns.containers.auth.config.webserver-address IP Address for webserver/API to listen on.
+        ## ref: https://doc.powerdns.com/authoritative/settings.html#webserver-address
+        ##
+        webserver-address: 192.168.255.10
         # ddns:
         allow-dnsupdate-from: 0.0.0.0/0
         dnsupdate: yes
         # debug:
         webserver-loglevel: detailed
     recursor:
-      containerPorts:
-        - name: dns-tcp
-          containerPort: 2053
-          hostPort: 53
-          hostIP: 192.168.255.10
-          protocol: TCP
-        - name: dns-udp
-          containerPort: 2053
-          hostPort: 53
-          hostIP: 192.168.255.10
-          protocol: UDP
-        - name: web
-          containerPort: 8082
-          hostPort: 8082
-          hostIP: 192.168.255.10
-          protocol: TCP
+      containerPorts: []
       config:
+        local-address: 192.168.255.10
+        local-port: 53
         forward-zones: day0.sololab=192.168.255.10:1053
+        webserver-address: 192.168.255.10

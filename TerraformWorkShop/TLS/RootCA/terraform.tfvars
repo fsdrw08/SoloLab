@@ -177,19 +177,42 @@ certs = [
       ]
     }
   },
-  # powerdns api
+  # PowerDNS Authoritative api
   {
-    name = "pdns"
+    name = "pdns-auth"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
     }
     cert = {
       dns_names = [
-        "pdns.day0.sololab"
+        "pdns-auth.day0.sololab"
       ]
       subject = {
-        common_name  = "PowerDNS"
+        common_name  = "PowerDNS Authoritative"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # PowerDNS Recursor api
+  {
+    name = "pdns-recursor"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "pdns-recursor.day0.sololab"
+      ]
+      subject = {
+        common_name  = "PowerDNS Recursor"
         organization = "Sololab"
       }
       validity_period_hours = 43800

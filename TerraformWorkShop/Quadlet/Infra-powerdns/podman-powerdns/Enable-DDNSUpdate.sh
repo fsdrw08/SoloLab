@@ -23,15 +23,18 @@ create_zone() {
 }
 
 create_rrset() {
+    local name="$1"
+    local type="$2"
+    local value="$3"
     curl -X PATCH -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
         "rrsets": [{
-            "name": "zot.day0.sololab.",
-            "type": "A",
+            "name": "'"$name"'",
+            "type": "'"$type"'",
             "ttl": 3600,
             "changetype": "REPLACE",
             "records": [
                 {
-                    "content": "192.168.255.10",
+                    "content": "'"$value"'",
                     "disabled": false
                 }
             ]
@@ -99,7 +102,10 @@ else
 fi
 
 sleep 5
-create_rrset
+create_rrset zot.day0.sololab. A 192.168.255.10
+create_rrset pdns-auth.day0.sololab. A 192.168.255.10
+create_rrset pdns-recursor.day0.sololab. A 192.168.255.10
+create_rrset cockpit.day0.sololab. A 192.168.255.1
 
 if [ "$(check_tsig_key_exist)" != "200" ]; then
     echo "TSIG key $TSIG_KEY_ID does not exist, creating..."

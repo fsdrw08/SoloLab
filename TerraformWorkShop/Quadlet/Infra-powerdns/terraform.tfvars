@@ -24,6 +24,7 @@ podman_quadlet = {
         yaml          = "powerdns-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
+        Network       = "host"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
