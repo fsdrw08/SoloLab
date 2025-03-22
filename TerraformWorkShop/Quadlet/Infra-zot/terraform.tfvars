@@ -11,11 +11,6 @@ podman_kube = {
     chart      = "../../../HelmWorkShop/helm-charts/charts/zot"
     value_file = "./podman-zot/values-sololab.yaml"
     tls_value_sets = {
-      name = {
-        ca          = "zot.tls.contents.\"ca\\.crt\""
-        cert        = "zot.tls.contents.\"server\\.crt\""
-        private_key = "zot.tls.contents.\"server\\.key\""
-      }
       value_ref = {
         tfstate = {
           backend = {
@@ -25,6 +20,11 @@ podman_kube = {
             }
           }
           cert_name = "zot"
+          data_key = {
+            ca          = "zot.tls.contents.\"ca\\.crt\""
+            cert        = "zot.tls.contents.\"server\\.crt\""
+            private_key = "zot.tls.contents.\"server\\.key\""
+          }
         }
       }
     }

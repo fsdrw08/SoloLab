@@ -34,11 +34,6 @@ variable "podman_kube" {
       )
       tls_value_sets = optional(
         object({
-          name = object({
-            ca          = string
-            cert        = string
-            private_key = string
-          })
           value_ref = object({
             vault_kvv2 = optional(
               object({
@@ -59,6 +54,11 @@ variable "podman_kube" {
                   config = map(string)
                 })
                 cert_name = string
+                data_key = object({
+                  ca          = string
+                  cert        = string
+                  private_key = string
+                })
               }),
               null
             )

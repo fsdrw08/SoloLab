@@ -33,12 +33,12 @@ data "helm_template" "podman_kube" {
     for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
       # ca
       tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.name.ca,
+        "name"  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.data_key.ca,
         "value" = data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
       }),
       # cert
       tomap({
-        "name" = var.podman_kube.helm.tls_value_sets.name.cert,
+        "name" = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.data_key.cert,
         "value" = join("", [
           local.cert[0].cert_pem,
           data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
@@ -46,7 +46,7 @@ data "helm_template" "podman_kube" {
       }),
       # key
       tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.name.private_key,
+        "name"  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.data_key.private_key,
         "value" = local.cert[0].key_pem
       }),
     ]
