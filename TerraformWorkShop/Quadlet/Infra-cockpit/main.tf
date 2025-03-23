@@ -1,13 +1,13 @@
 data "terraform_remote_state" "root_ca" {
-  count   = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? 0 : 1
-  backend = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.type
-  config  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.config
+  count   = var.podman_kube.helm.tls_value_sets.tfstate == null ? 0 : 1
+  backend = var.podman_kube.helm.tls_value_sets.tfstate.backend.type
+  config  = var.podman_kube.helm.tls_value_sets.tfstate.backend.config
 }
 
 locals {
-  cert = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? null : [
+  cert = var.podman_kube.helm.tls_value_sets.tfstate == null ? null : [
     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-    if cert.name == var.podman_kube.helm.tls_value_sets.value_ref.tfstate.cert_name
+    if cert.name == var.podman_kube.helm.tls_value_sets.tfstate.cert_name
   ]
 }
 
@@ -33,12 +33,12 @@ data "helm_template" "podman_kube" {
     for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
       # ca
       tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.name.ca,
+        "name"  = var.podman_kube.helm.tls_value_sets.tfstate.data_key.ca,
         "value" = data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
       }),
       # cert
       tomap({
-        "name" = var.podman_kube.helm.tls_value_sets.name.cert,
+        "name" = var.podman_kube.helm.tls_value_sets.tfstate.data_key.cert,
         "value" = join("", [
           local.cert[0].cert_pem,
           data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
@@ -46,7 +46,7 @@ data "helm_template" "podman_kube" {
       }),
       # key
       tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.name.private_key,
+        "name"  = var.podman_kube.helm.tls_value_sets.tfstate.data_key.private_key,
         "value" = local.cert[0].key_pem
       }),
     ]
@@ -89,6 +89,19 @@ module "podman_quadlet" {
     ]
   }
 }
+
+resource "powerdns_record" "record" {
+  zone    = var.dns_record.zone
+  name    = var.dns_record.name
+  type    = var.dns_record.type
+  ttl     = var.dns_record.ttl
+  records = var.dns_record.records
+}
+
+# resource "remote_file" "consul_service" {
+#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
+#   content = file("./podman-cockpit/service.hcl")
+# }
 
 # resource "null_resource" "post_process" {
 #   depends_on = [

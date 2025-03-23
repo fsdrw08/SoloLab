@@ -34,35 +34,33 @@ variable "podman_kube" {
       )
       tls_value_sets = optional(
         object({
-          name = object({
-            ca          = string
-            cert        = string
-            private_key = string
-          })
-          value_ref = object({
-            vault_kvv2 = optional(
-              object({
-                mount = string
-                name  = string
-                data_key = object({
-                  ca          = string
-                  cert        = string
-                  private_key = string
-                })
-              }),
-              null
-            )
-            tfstate = optional(
-              object({
-                backend = object({
-                  type   = string
-                  config = map(string)
-                })
-                cert_name = string
-              }),
-              null
-            )
-          })
+          vault_kvv2 = optional(
+            object({
+              mount = string
+              name  = string
+              data_key = object({
+                ca          = string
+                cert        = string
+                private_key = string
+              })
+            }),
+            null
+          )
+          tfstate = optional(
+            object({
+              backend = object({
+                type   = string
+                config = map(string)
+              })
+              cert_name = string
+              data_key = object({
+                ca          = string
+                cert        = string
+                private_key = string
+              })
+            }),
+            null
+          )
         }),
         null
       )
@@ -88,23 +86,23 @@ variable "podman_quadlet" {
   })
 }
 
-# variable "prov_pdns" {
-#   type = object({
-#     api_key        = string
-#     server_url     = string
-#     insecure_https = optional(bool, null)
-#   })
-# }
+variable "prov_pdns" {
+  type = object({
+    api_key        = string
+    server_url     = string
+    insecure_https = optional(bool, null)
+  })
+}
 
-# variable "dns_record" {
-#   type = object({
-#     zone    = string
-#     name    = string
-#     type    = string
-#     ttl     = number
-#     records = list(string)
-#   })
-# }
+variable "dns_record" {
+  type = object({
+    zone    = string
+    name    = string
+    type    = string
+    ttl     = number
+    records = list(string)
+  })
+}
 
 variable "post_process" {
   type = map(object({
