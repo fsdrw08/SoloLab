@@ -1,6 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 cockpit:
+  containerPorts: []
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.cockpit-web.entrypoints: webSecure
