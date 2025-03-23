@@ -40,6 +40,7 @@ podman_quadlet = {
         yaml          = "zot-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
+        Network       = "host"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }

@@ -2,6 +2,7 @@ zot:
   image:
     registry: quay.io
     repository: giantswarm/zot
+  containerPorts: []
   resourcesPreset: medium
   config:
     # https://zotregistry.dev/v2.1.2/admin-guide/admin-configuration/#extensions
