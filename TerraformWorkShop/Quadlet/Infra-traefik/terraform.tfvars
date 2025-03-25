@@ -44,7 +44,7 @@ podman_quadlet = {
         Description   = "Traefik Proxy"
         Documentation = "https://docs.traefik.io"
         PodmanArgs    = "--tls-verify=false"
-        Network       = "podman"
+        Network       = "host"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },
