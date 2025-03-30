@@ -27,7 +27,7 @@ zot:
     # Network configuration
     # https://zotregistry.dev/v2.1.2/admin-guide/admin-configuration/#network-configuration
     http:
-      address: "0.0.0.0"
+      address: "192.168.255.10"
       port: "5000"
       realm: "zot"
       tls:
