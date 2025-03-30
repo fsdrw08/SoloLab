@@ -10,7 +10,21 @@ podman_kube = {
     name       = "cockpit"
     chart      = "../../../HelmWorkShop/helm-charts/charts/cockpit"
     value_file = "./podman-cockpit/values-sololab.yaml"
-    tls_value_sets = {
+    tls = {
+      value_sets = [
+        {
+          name          = "cockpit.tls.contents.\"ca\\.crt\""
+          value_ref_key = "ca"
+        },
+        {
+          name          = "cockpit.tls.contents.\"server\\.crt\""
+          value_ref_key = "cert_pem"
+        },
+        {
+          name          = "cockpit.tls.contents.\"server\\.key\""
+          value_ref_key = "key_pem"
+        }
+      ]
       tfstate = {
         backend = {
           type = "local"
@@ -19,11 +33,6 @@ podman_kube = {
           }
         }
         cert_name = "cockpit"
-        data_key = {
-          ca          = "cockpit.tls.contents.\"ca\\.crt\""
-          cert        = "cockpit.tls.contents.\"server\\.crt\""
-          private_key = "cockpit.tls.contents.\"server\\.key\""
-        }
       }
     }
   }
@@ -41,6 +50,7 @@ podman_quadlet = {
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }

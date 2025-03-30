@@ -1,13 +1,20 @@
 data "terraform_remote_state" "root_ca" {
-  count   = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? 0 : 1
-  backend = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.type
-  config  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.config
+  count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
+  backend = var.podman_kube.helm.tls.tfstate.backend.type
+  config  = var.podman_kube.helm.tls.tfstate.backend.config
 }
 
 locals {
-  cert = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? null : [
+  # cert = var.podman_kube.helm.tls.tfstate == null ? null : flatten([
+  #   for cert_name in ["pdns-auth", "traefik"] : [
+  #     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
+  #     if cert.name == cert_name
+  #     # if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+  #   ]
+  # ])
+  cert = var.podman_kube.helm.tls.tfstate == null ? null : [
     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-    if cert.name == var.podman_kube.helm.tls_value_sets.value_ref.tfstate.cert_name
+    if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
   ]
 }
 
@@ -78,29 +85,10 @@ data "helm_template" "podman_kube" {
   }
   # tls
   dynamic "set" {
-    for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
-      # ca
-      tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.tfstate.data_key.ca,
-        "value" = data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
-      }),
-      # cert
-      tomap({
-        "name" = var.podman_kube.helm.tls_value_sets.tfstate.data_key.cert,
-        "value" = join("", [
-          local.cert[0].cert_pem,
-          data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
-        ])
-      }),
-      # key
-      tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.tfstate.data_key.private_key,
-        "value" = local.cert[0].key_pem
-      }),
-    ]
+    for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
     content {
       name  = set.value.name
-      value = set.value.value
+      value = local.cert[0][set.value.value_ref_key]
     }
   }
 }
@@ -121,27 +109,29 @@ module "podman_quadlet" {
   vm_conn = var.prov_remote
   podman_quadlet = {
     service = {
-      name   = var.podman_quadlet.service.name
-      status = var.podman_quadlet.service.status
+      name           = var.podman_quadlet.service.name
+      status         = var.podman_quadlet.service.status
+      custom_trigger = md5(remote_file.podman_kube.content)
     }
     files = [
       for file in var.podman_quadlet.files :
       {
         content = templatefile(
           file.template,
-          merge(
-            file.vars,
-            {
-              ca = base64encode(
-                join("", [
-                  local.cert[0].cert_pem,
-                  data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
-                ])
-              )
-              # cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
-              # key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
-            }
-          )
+          file.vars
+          # merge(
+          #   file.vars,
+          #   {
+          #     ca = base64encode(
+          #       join("", [
+          #         local.cert[0].cert_pem,
+          #         data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
+          #       ])
+          #     )
+          #     cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
+          #     key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
+          #   }
+          # )
         )
         path = join("/", [
           file.dir,

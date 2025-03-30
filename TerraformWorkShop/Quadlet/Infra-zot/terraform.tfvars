@@ -10,7 +10,21 @@ podman_kube = {
     name       = "zot"
     chart      = "../../../HelmWorkShop/helm-charts/charts/zot"
     value_file = "./podman-zot/values-sololab.yaml"
-    tls_value_sets = {
+    tls = {
+      value_sets = [
+        {
+          name          = "zot.tls.contents.\"ca\\.crt\""
+          value_ref_key = "ca"
+        },
+        {
+          name          = "zot.tls.contents.\"server\\.crt\""
+          value_ref_key = "cert_pem"
+        },
+        {
+          name          = "zot.tls.contents.\"server\\.key\""
+          value_ref_key = "key_pem"
+        }
+      ]
       tfstate = {
         backend = {
           type = "local"
@@ -19,11 +33,6 @@ podman_kube = {
           }
         }
         cert_name = "zot"
-        data_key = {
-          ca          = "zot.tls.contents.\"ca\\.crt\""
-          cert        = "zot.tls.contents.\"server\\.crt\""
-          private_key = "zot.tls.contents.\"server\\.key\""
-        }
       }
     }
   }
@@ -41,6 +50,7 @@ podman_quadlet = {
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }

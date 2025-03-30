@@ -32,17 +32,18 @@ variable "podman_kube" {
           })
         ), null
       )
-      tls_value_sets = optional(
+      tls = optional(
         object({
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
+          )
           vault_kvv2 = optional(
             object({
               mount = string
               name  = string
-              data_key = object({
-                ca          = string
-                cert        = string
-                private_key = string
-              })
             }),
             null
           )
@@ -53,16 +54,10 @@ variable "podman_kube" {
                 config = map(string)
               })
               cert_name = string
-              data_key = object({
-                ca          = string
-                cert        = string
-                private_key = string
-              })
             }),
             null
           )
-        }),
-        null
+        }), null
       )
     })
     manifest_dest_path = string

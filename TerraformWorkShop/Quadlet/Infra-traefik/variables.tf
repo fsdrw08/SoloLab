@@ -23,37 +23,31 @@ variable "podman_kube" {
           })
         ), null
       )
-      tls_value_sets = optional(
+      tls = optional(
         object({
-          value_ref = object({
-            vault_kvv2 = optional(
-              object({
-                mount = string
-                name  = string
-                data_key = object({
-                  ca          = string
-                  cert        = string
-                  private_key = string
-                })
-              }),
-              null
-            )
-            tfstate = optional(
-              object({
-                backend = object({
-                  type   = string
-                  config = map(string)
-                })
-                cert_name = string
-                data_key = object({
-                  ca          = string
-                  cert        = string
-                  private_key = string
-                })
-              }),
-              null
-            )
-          })
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
+          )
+          vault_kvv2 = optional(
+            object({
+              mount = string
+              name  = string
+            }),
+            null
+          )
+          tfstate = optional(
+            object({
+              backend = object({
+                type   = string
+                config = map(string)
+              })
+              cert_name = string
+            }),
+            null
+          )
         }), null
       )
     })

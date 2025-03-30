@@ -254,9 +254,12 @@ certs = [
       rsa_bits  = 4096
     }
     cert = {
-      dns_names = ["traefik.core.sololab"]
+      dns_names = [
+        "traefik.day0.sololab",
+        "traefik.day1.sololab"
+      ]
       subject = {
-        common_name  = "traefik.core.sololab"
+        common_name  = "*.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

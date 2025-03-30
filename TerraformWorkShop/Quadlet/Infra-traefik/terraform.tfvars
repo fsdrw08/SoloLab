@@ -10,22 +10,29 @@ podman_kube = {
     name       = "traefik"
     chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
     value_file = "./podman-traefik/values-sololab.yaml"
-    tls_value_sets = {
-      value_ref = {
-        tfstate = {
-          backend = {
-            type = "local"
-            config = {
-              path = "../../TLS/RootCA/terraform.tfstate"
-            }
-          }
-          cert_name = "traefik"
-          data_key = {
-            ca          = "zot.tls.contents.\"ca\\.crt\""
-            cert        = "zot.tls.contents.\"server\\.crt\""
-            private_key = "zot.tls.contents.\"server\\.key\""
+    tls = {
+      value_sets = [
+        {
+          name          = "traefik.tls.contents.\"ca\\.crt\""
+          value_ref_key = "ca"
+        },
+        {
+          name          = "traefik.tls.contents.\"dashboard\\.crt\""
+          value_ref_key = "cert_pem"
+        },
+        {
+          name          = "traefik.tls.contents.\"dashboard\\.key\""
+          value_ref_key = "key_pem"
+        }
+      ]
+      tfstate = {
+        backend = {
+          type = "local"
+          config = {
+            path = "../../TLS/RootCA/terraform.tfstate"
           }
         }
+        cert_name = "traefik"
       }
     }
   }
@@ -39,12 +46,15 @@ podman_quadlet = {
   }
   files = [
     {
-      template = "./podman-traefik/traefik-container.container"
+      template = "./podman-traefik/traefik-container.kube"
       vars = {
         Description   = "Traefik Proxy"
         Documentation = "https://docs.traefik.io"
+        yaml          = "traefik-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
+        KubeDownForce = "false"
         Network       = "host"
+        Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },
