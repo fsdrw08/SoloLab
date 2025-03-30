@@ -9,5 +9,8 @@ PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
 Network=${Network}
 
+[Service]
+Restart=${Restart}
+
 [Install]
 WantedBy=default.target

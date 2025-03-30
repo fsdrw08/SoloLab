@@ -13,7 +13,10 @@ Documentation="${Documentation}"
 Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
-# Network=None
+Network=${Network}
+
+[Service]
+Restart=${Restart}
 
 [Install]
 WantedBy=default.target

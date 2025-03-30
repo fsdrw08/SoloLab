@@ -24,6 +24,8 @@ podman_quadlet = {
         yaml          = "kea-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "true"
+        Restart       = "no" #"on-failure"
+        Network       = "host"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
