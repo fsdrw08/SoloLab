@@ -3,18 +3,18 @@ global:
 kea:
   containers:
     dhcp4:
+      containerPorts: []
       extraEnvVars:
         - name: TZ
           value: Asia/Shanghai
-      configFiles:
-        kea-dhcp4:
-          Dhcp4:
-            subnet4:
-              - subnet: 192.168.255.0/24
-                pools:
-                  - pool: 192.168.255.100-192.168.255.200
-                id: 1
-                interface: eth0
-                option-data:
-                  - name: domain-name-servers
-                    data: 192.168.255.1,192.168.255.10
+      config:
+        Dhcp4:
+          subnet4:
+            - subnet: 192.168.255.0/24
+              pools:
+                - pool: 192.168.255.100-192.168.255.200
+              id: 1
+              interface: eth0
+              option-data:
+                - name: domain-name-servers
+                  data: 192.168.255.1,192.168.255.10
