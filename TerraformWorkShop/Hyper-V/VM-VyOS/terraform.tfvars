@@ -66,6 +66,7 @@ cloudinit_nocloud = [
       int_desc        = "MGMT"
       int_addr        = "192.168.255.1"
       int_cidr        = "192.168.255.0/24"
+      name_server     = "192.168.255.10"
       dhcp_subnet_id  = "1"
       dhcp_start      = "192.168.255.100"
       dhcp_stop       = "192.168.255.200"

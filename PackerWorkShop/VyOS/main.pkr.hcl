@@ -43,7 +43,7 @@ build {
   sources = ["source.hyperv-iso.vm"]
   post-processors {
     post-processor "vagrant" {
-      keep_input_artifact  = false
+      keep_input_artifact  = true
       output               = "${var.output_vagrant}"
       vagrantfile_template = "${var.vagrantfile_template}"
       provider_override   = "hyperv"

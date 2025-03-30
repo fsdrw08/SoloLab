@@ -38,6 +38,7 @@ vyos_config_commands:
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 start '${dhcp_start}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 stop '${dhcp_stop}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${int_addr}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${name_server}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option default-router '${int_addr}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option domain-name 'sololab'
   - set service dhcp-server shared-network-name ${int_desc} authoritative

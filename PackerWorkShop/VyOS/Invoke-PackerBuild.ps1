@@ -7,7 +7,8 @@ param (
     '13x-cloudinit', 
     '14x-cloudinit', 
     '14x-cloudinit-vagrant', 
-    '15x-cloudinit')]
+    '15x-cloudinit',
+    '15s-cloudinit')]
   [string]
   $VyOSVersion,
 
