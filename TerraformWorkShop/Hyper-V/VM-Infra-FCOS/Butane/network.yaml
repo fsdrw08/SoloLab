@@ -14,7 +14,7 @@ storage:
           # with no other matching connections.
           no-auto-default=*
     - path: /etc/NetworkManager/system-connections/${interface}.nmconnection
-      mode: 0600
+      mode: 0644
       contents:
         inline: |
           [connection]
@@ -24,5 +24,13 @@ storage:
 
           [ipv4]
           address1=${ip}/${prefix},${gateway}
-          dns=${dns};
+          dns=${general_dns};
           method=manual
+    # https://wiki.archlinux.org/title/Systemd-resolved#Automatically
+    - path: /etc/systemd/resolved.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNS=${domain_dns}
+          Domains=${domain}
