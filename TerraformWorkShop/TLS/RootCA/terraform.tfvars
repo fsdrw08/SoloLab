@@ -77,19 +77,19 @@ certs = [
       ]
     }
   },
-  # postgresql
+  # postgresql for terraform backend
   {
-    name = "postgresql"
+    name = "tfbackend-pg"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
     }
     cert = {
       dns_names = [
-        "postgresql.day0.sololab"
+        "tf-backend-pg.day0.sololab"
       ]
       subject = {
-        common_name  = "postgresql for day0"
+        common_name  = "tfbackend-pg.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
