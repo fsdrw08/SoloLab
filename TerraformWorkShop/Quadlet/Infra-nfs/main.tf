@@ -46,7 +46,7 @@ resource "remote_file" "podman_kube" {
 }
 
 module "podman_quadlet" {
-  source  = "../../modules/system-systemd_quadlet"
+  source  = "../../modules/system-systemd_quadlet-root"
   vm_conn = var.prov_remote
   podman_quadlet = {
     service = {
