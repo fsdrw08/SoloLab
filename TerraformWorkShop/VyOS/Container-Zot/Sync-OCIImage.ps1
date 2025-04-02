@@ -65,6 +65,14 @@ $syncList = @"
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hectorm/nfs-ganesha:v9",
+        "archive": "docker.io_hectorm_nfs-ganesha_v9.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "hectorm/nfs-ganesha:v9",
+        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "coreos/etcd:v3.5.17",
         "archive": "quay.io_coreos_etcd_v3.5.17.tar",

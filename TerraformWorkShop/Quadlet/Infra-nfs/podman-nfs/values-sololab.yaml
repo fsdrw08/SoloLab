@@ -1,0 +1,7 @@
+global:
+  imageRegistry: zot.day0.sololab
+nfs:
+  containerPorts: []
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
