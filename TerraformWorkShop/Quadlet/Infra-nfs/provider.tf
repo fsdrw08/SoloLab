@@ -32,6 +32,7 @@ provider "remote" {
     port     = var.prov_remote.port
     user     = var.prov_remote.user
     password = var.prov_remote.password
+    sudo     = var.prov_remote.sudo
   }
 }
 

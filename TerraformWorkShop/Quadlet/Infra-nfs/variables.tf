@@ -4,6 +4,7 @@ variable "prov_remote" {
     port     = number
     user     = string
     password = string
+    sudo     = optional(bool, false)
   })
 }
 
