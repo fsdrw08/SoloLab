@@ -1,0 +1,18 @@
+global:
+  imageRegistry: zot.day0.sololab
+lldap:
+  config:
+    ldap_host: 192.168.255.10
+    ldap_port: 389
+    http_host: 192.168.255.10
+    http_port: 17170
+    jwt_secret: REPLACE_WITH_RANDOM
+    ldap_base_dn: dc=root,dc=sololab
+    ldap_user_dn: admin
+    ldap_user_pass: P@ssw0rd
+    database_url: sqlite:///data/persistence/users.db?mode=rwc
+    ldaps_options:
+      enabled: true
+      port: 6360
+      cert_file: /data/certs/server.crt
+      key_file: /data/certs/server.key

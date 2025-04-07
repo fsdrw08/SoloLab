@@ -270,6 +270,29 @@ certs = [
       ]
     }
   },
+  # lldap
+  {
+    name = "lldap"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "lldap.day0.sololab",
+      ]
+      subject = {
+        common_name  = "lldap.day0.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
   # etcd
   {
     name = "etcd-server"

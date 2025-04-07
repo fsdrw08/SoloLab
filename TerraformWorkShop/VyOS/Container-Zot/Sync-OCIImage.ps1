@@ -73,6 +73,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "lldap/lldap:2025-04-04-alpine-rootless",
+        "archive": "docker.io_lldap_lldap_2025-04-04-alpine-rootless.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "lldap/lldap:2025-04-04-alpine-rootless",
+        "description": "https://hub.docker.com/r/lldap/lldap/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "coreos/etcd:v3.5.17",
         "archive": "quay.io_coreos_etcd_v3.5.17.tar",
