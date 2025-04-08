@@ -1,11 +1,25 @@
 global:
   imageRegistry: zot.day0.sololab
 lldap:
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.lldap-web-redirect.entrypoints: web
+    traefik.http.routers.lldap-web-redirect.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web-redirect.middlewares: toHttps@file
+    traefik.http.routers.lldap-web.entryPoints: webSecure
+    traefik.http.routers.lldap-web.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web.tls: true
+    traefik.http.routers.lldap-web.service: lldap-web
+    traefik.http.services.lldap-web.loadbalancer.server.port: 17170
+  containerSecurityContext:
+    sysctls:
+      - name: net.ipv4.ip_unprivileged_port_start
+        value: "389"
   config:
     ldap_host: 192.168.255.10
-    ldap_port: 389
+    # ldap_port: 389
     http_host: 192.168.255.10
-    http_port: 17170
+    # http_port: 17170
     jwt_secret: REPLACE_WITH_RANDOM
     ldap_base_dn: dc=root,dc=sololab
     ldap_user_dn: admin
@@ -13,6 +27,6 @@ lldap:
     database_url: sqlite:///data/persistence/users.db?mode=rwc
     ldaps_options:
       enabled: true
-      port: 6360
-      cert_file: /data/certs/server.crt
-      key_file: /data/certs/server.key
+      # port: 636
+      cert_file: /data/certs/cert.pem
+      key_file: /data/certs/key.pem

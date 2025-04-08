@@ -10,6 +10,25 @@ podman_kube = {
     name       = "lldap"
     chart      = "../../../HelmWorkShop/helm-charts/charts/lldap"
     value_file = "./podman-lldap/values-sololab.yaml"
+    value_sets = [
+      {
+        # https://github.com/microsoft/farmvibes-ai/blob/a9e999fcfaf9a90f147257bbdf7221b8a8b7ce52/src/vibe_core/vibe_core/terraform/local/modules/kubernetes/rabbitmq.tf#L57
+        name         = "lldap.extraEnvVars[0].name"
+        value_string = "LLDAP_LDAP_PORT"
+      },
+      {
+        name         = "lldap.extraEnvVars[0].value"
+        value_string = "389"
+      },
+      {
+        name         = "lldap.extraEnvVars[1].name"
+        value_string = "LLDAP_LDAPS_OPTIONS__PORT"
+      },
+      {
+        name         = "lldap.extraEnvVars[1].value"
+        value_string = "636"
+      },
+    ]
     tls = {
       value_sets = [
         {
@@ -44,8 +63,8 @@ podman_quadlet = {
     {
       template = "./podman-lldap/lldap-container.kube"
       vars = {
-        Description   = "lldap Proxy"
-        Documentation = "https://docs.lldap.io"
+        Description   = "Light LDAP implementation"
+        Documentation = "https://github.com/lldap/lldap"
         yaml          = "lldap-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
@@ -54,13 +73,6 @@ podman_quadlet = {
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },
-    {
-      template = "./podman-lldap/lldap-container.volume"
-      vars = {
-        VolumeName = "lldap-pvc"
-      }
-      dir = "/home/podmgr/.config/containers/systemd"
-    }
   ]
 }
 
