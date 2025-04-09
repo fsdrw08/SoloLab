@@ -11,6 +11,7 @@ lldap:
     traefik.http.routers.lldap-web.tls: true
     traefik.http.routers.lldap-web.service: lldap-web
     traefik.http.services.lldap-web.loadbalancer.server.port: 17170
+    # traefik.http.services.lldap-web.loadbalancer.server.url: http://127.0.0.1:17170
   containerSecurityContext:
     sysctls:
       - name: net.ipv4.ip_unprivileged_port_start

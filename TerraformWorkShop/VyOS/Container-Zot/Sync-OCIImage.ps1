@@ -74,10 +74,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "lldap/lldap:2025-04-04-alpine-rootless",
-        "archive": "docker.io_lldap_lldap_2025-04-04-alpine-rootless.tar",
+        "publicRepo": "lldap/lldap:2025-04-09-alpine-rootless",
+        "archive": "docker.io_lldap_lldap_2025-04-09-alpine-rootless.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "lldap/lldap:2025-04-04-alpine-rootless",
+        "privateRepo": "lldap/lldap:2025-04-09-alpine-rootless",
         "description": "https://hub.docker.com/r/lldap/lldap/tags",
     },
     {
