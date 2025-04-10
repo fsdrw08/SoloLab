@@ -246,20 +246,19 @@ certs = [
       ]
     }
   },
-  # traefik
+  # day0 traefik
   {
-    name = "traefik"
+    name = "traefik.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "traefik.day0.sololab",
-        "traefik.day1.sololab"
+        "*.day0.sololab"
       ]
       subject = {
-        common_name  = "*.sololab"
+        common_name  = "*.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

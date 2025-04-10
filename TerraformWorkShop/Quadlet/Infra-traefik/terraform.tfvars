@@ -17,11 +17,11 @@ podman_kube = {
           value_ref_key = "ca"
         },
         {
-          name          = "traefik.tls.contents.\"dashboard\\.crt\""
+          name          = "traefik.tls.contents.\"day0\\.crt\""
           value_ref_key = "cert_pem"
         },
         {
-          name          = "traefik.tls.contents.\"dashboard\\.key\""
+          name          = "traefik.tls.contents.\"day0\\.key\""
           value_ref_key = "key_pem"
         }
       ]
@@ -32,7 +32,7 @@ podman_kube = {
             path = "../../TLS/RootCA/terraform.tfstate"
           }
         }
-        cert_name = "traefik"
+        cert_name = "traefik.day0"
       }
     }
   }

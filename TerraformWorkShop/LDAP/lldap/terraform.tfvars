@@ -1,5 +1,5 @@
 prov_lldap = {
-  http_url                 = "http://lldap.day0.sololab:17170"
+  http_url                 = "https://lldap.day0.sololab"
   ldap_url                 = "ldaps://lldap.day0.sololab"
   insecure_skip_cert_check = true
   username                 = "admin"

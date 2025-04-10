@@ -59,8 +59,8 @@ traefik:
     tlsCerts.yaml:
       tls:
         certificates:
-          - certFile: /etc/traefik/tls/dashboard.crt
-            keyFile: /etc/traefik/tls/dashboard.key
+          - certFile: /etc/traefik/tls/day0.crt
+            keyFile: /etc/traefik/tls/day0.key
   podLabels:
     traefik.enable: true
     traefik.http.middlewares.userPass.basicauth.users: admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
