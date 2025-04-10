@@ -43,7 +43,7 @@ locals {
 #   value = local.memberships
 # }
 
-resource "lldap_member" "membership" {
+resource "lldap_member" "memberships" {
   depends_on = [
     lldap_user.users,
     lldap_group.groups

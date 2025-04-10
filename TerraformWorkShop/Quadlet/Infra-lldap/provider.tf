@@ -23,7 +23,7 @@ terraform {
   }
   # backend "pg" {
   #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "System-SvcDisc-Quadlet-Traefik"
+  #   schema_name = "System-Infa-Quadlet-LLDAP"
   # }
   backend "local" {
 
