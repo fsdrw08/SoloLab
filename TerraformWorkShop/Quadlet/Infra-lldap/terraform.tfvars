@@ -28,6 +28,14 @@ podman_kube = {
         name         = "lldap.extraEnvVars[1].value"
         value_string = "636"
       },
+      # {
+      #   name         = "lldap.extraEnvVars[2].name"
+      #   value_string = "URL"
+      # },
+      # {
+      #   name         = "lldap.extraEnvVars[2].value"
+      #   value_string = "http://lldap.day0.sololab:17170"
+      # },
     ]
     tls = {
       value_sets = [
