@@ -12,11 +12,14 @@ users = [
     user_id = "user1"
     email   = "user1@mail.sololab"
     # uncomment below filed when apply this resource in first time
-    # password     = "P@ssw0rd" 
+    password     = "P@ssw0rd"
     display_name = "user1"
   }
 ]
 
+# to generate iac_id:
+# powershell: new-guid
+# linux: uuidgen
 groups = [
   {
     iac_id       = "02999e39"

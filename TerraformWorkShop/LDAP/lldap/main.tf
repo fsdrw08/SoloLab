@@ -15,20 +15,25 @@ resource "lldap_group" "groups" {
   display_name = each.value.display_name
 }
 
-data "lldap_groups" "groups" {
-  depends_on = [lldap_group.groups]
-}
+# data "lldap_groups" "groups" {
+#   depends_on = [lldap_group.groups]
+# }
 
 locals {
-  groups = {
-    for group in data.lldap_groups.groups.groups : group.display_name => group.id
-  }
+  # groups = {
+  #   for group in data.lldap_groups.groups.groups : group.display_name => group.id
+  # }
 
   memberships = flatten([
     for group in var.groups : [
-      for membership in setproduct([group.display_name], group.members) : join(":", membership)
+      for membership in setproduct([group.iac_id], group.members) : join(":", membership)
     ]
   ])
+  # memberships = flatten([
+  #   for group in var.groups : [
+  #     for membership in setproduct([group.display_name], group.members) : join(":", membership)
+  #   ]
+  # ])
 }
 
 # output "user_guid" {
@@ -47,6 +52,7 @@ resource "lldap_member" "membership" {
     for key, membership in local.memberships : membership => key
   }
 
-  group_id = lookup(local.groups, element(split(":", each.key), 0))
+  # group_id = lookup(local.groups, element(split(":", each.key), 0))
+  group_id = lldap_group.groups[element(split(":", each.key), 0)].id
   user_id  = element(split(":", each.key), 1)
 }
