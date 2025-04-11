@@ -32,13 +32,17 @@ terraform {
       source  = "pyama86/powerdns"
       version = ">=1.5.1"
     }
+    lldap = {
+      source  = "tasansga/lldap"
+      version = ">=0.2.4"
+    }
     vault = {
       source  = "hashicorp/vault"
       version = ">= 4.1.0"
     }
-    lldap = {
-      source  = "tasansga/lldap"
-      version = ">=0.2.4"
+    ldap = {
+      source  = "l-with/ldap"
+      version = "<=0.9.1"
     }
   }
 }
