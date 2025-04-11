@@ -25,7 +25,7 @@ data "vault_pki_secret_backend_issuer" "issuer" {
 }
 
 resource "vault_kv_secret_v2" "root_cert" {
-  mount = var.vault_kvv2.secret_engine.path
+  mount = vault_mount.kvv2.path
   name  = "root"
   data_json = jsonencode({
     "ca" = data.vault_pki_secret_backend_issuer.issuer.certificate
