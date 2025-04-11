@@ -9,6 +9,13 @@ prov_lldap = {
 
 users = [
   {
+    user_id = "readonly"
+    email   = "readonly@mail.sololab"
+    # uncomment below filed when apply this resource in first time
+    password     = "readonly"
+    display_name = "readonly"
+  },
+  {
     user_id = "user1"
     email   = "user1@mail.sololab"
     # uncomment below filed when apply this resource in first time

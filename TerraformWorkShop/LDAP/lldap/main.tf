@@ -56,3 +56,9 @@ resource "lldap_member" "memberships" {
   group_id = lldap_group.groups[element(split(":", each.key), 0)].id
   user_id  = element(split(":", each.key), 1)
 }
+
+resource "lldap_member" "readonly" {
+  depends_on = [lldap_user.users]
+  group_id   = 3 # lldap_strict_readonly
+  user_id    = "readonly"
+}
