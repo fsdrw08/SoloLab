@@ -6,15 +6,18 @@ global:
   imageRegistry: "zot.day0.sololab"
 
 vault:
+  containerPorts: []
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
   ## ref: https://developer.hashicorp.com/vault/docs/configuration
   ## ref: https://developer.hashicorp.com/vault/tutorials/operations/configure-vault#config
+  ##
   configFiles:
     main:
-      api_addr: "https://vault.day1.sololab:8200"
-      cluster_addr: "https://vault.day1.sololab:8201"
+      api_addr: "https://vault.day0.sololab:8200"
+      cluster_addr: "https://vault.day0.sololab:8201"
     ## @param vault.configFiles.storage storage config for server
+    ##
     storage:
       ## @param vault.configFiles.storage
       ## The storage stanza configures the storage backend, which represents the location for the durable storage of Vault's information
@@ -48,7 +51,7 @@ vault:
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.vault-web.entrypoints: webSecure
-    traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)
+    traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day0.sololab`)
     traefik.tcp.routers.vault-web.tls.passthrough: true
     traefik.tcp.routers.vault-web.service: vault-web
     traefik.tcp.services.vault-web.loadbalancer.server.port: 8200
@@ -69,7 +72,7 @@ vault:
     enabled: true
     env:
       - name: VAULT_ADDR
-        value: https://{{ template "common.names.fullname" . }}:8200
+        value: https://127.0.0.1:8200
       - name: VAULT_OPERATOR_SECRETS_JSON_PATH
         value: "/vault/unseal/vault_operator_secrets_b64"
       - name: SECRET_SHARES

@@ -394,10 +394,10 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.day1.sololab",
+        "vault.day0.sololab",
       ]
       subject = {
-        common_name  = "vault.day1.sololab"
+        common_name  = "vault.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

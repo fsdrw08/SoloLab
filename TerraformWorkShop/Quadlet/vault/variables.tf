@@ -23,22 +23,31 @@ variable "podman_kube" {
           })
         ), null
       )
-      tls_value_sets = optional(
+      tls = optional(
         object({
-          name = object({
-            ca          = string
-            cert        = string
-            private_key = string
-          })
-          value_ref = object({
-            tfstate = object({
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
+          )
+          vault_kvv2 = optional(
+            object({
+              mount = string
+              name  = string
+            }),
+            null
+          )
+          tfstate = optional(
+            object({
               backend = object({
                 type   = string
                 config = map(string)
               })
               cert_name = string
-            })
-          })
+            }),
+            null
+          )
         }), null
       )
     })
@@ -48,13 +57,10 @@ variable "podman_kube" {
 
 variable "podman_quadlet" {
   type = object({
-    service = optional(
-      object({
-        name   = string
-        status = string
-      }),
-      null
-    )
+    service = object({
+      name   = string
+      status = string
+    })
     files = list(object({
       template = string
       vars     = map(string)

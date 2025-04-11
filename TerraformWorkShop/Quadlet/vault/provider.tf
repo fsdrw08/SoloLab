@@ -17,9 +17,12 @@ terraform {
       version = ">=1.5.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "System-SvcDisc-Quadlet-Vault"
+  # backend "pg" {
+  #   conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
+  #   schema_name = "Quadlet-Infra-Vault"
+  # }
+  backend "local" {
+
   }
 }
 

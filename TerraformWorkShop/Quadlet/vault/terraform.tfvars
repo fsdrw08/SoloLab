@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -10,22 +10,29 @@ podman_kube = {
     name       = "vault"
     chart      = "../../../HelmWorkShop/helm-charts/charts/vault"
     value_file = "./podman-vault/values-sololab.yaml"
-    tls_value_sets = {
-      name = {
-        ca          = "vault.tls.contents.\"ca\\.crt\""
-        cert        = "vault.tls.contents.\"tls\\.crt\""
-        private_key = "vault.tls.contents.\"tls\\.key\""
-      }
-      value_ref = {
-        tfstate = {
-          backend = {
-            type = "local"
-            config = {
-              path = "../../TLS/RootCA/terraform.tfstate"
-            }
-          }
-          cert_name = "vault"
+    tls = {
+      value_sets = [
+        {
+          name          = "vault.tls.contents.\"ca\\.crt\""
+          value_ref_key = "ca"
+        },
+        {
+          name          = "vault.tls.contents.\"tls\\.crt\""
+          value_ref_key = "cert_pem"
+        },
+        {
+          name          = "vault.tls.contents.\"tls\\.key\""
+          value_ref_key = "key_pem"
         }
+      ]
+      tfstate = {
+        backend = {
+          type = "local"
+          config = {
+            path = "../../TLS/RootCA/terraform.tfstate"
+          }
+        }
+        cert_name = "vault"
       }
     }
   }
@@ -42,6 +49,7 @@ podman_quadlet = {
         yaml          = "vault-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
+        Network       = "host"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
@@ -54,17 +62,17 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key        = "powerdns"
-  server_url     = "https://pdns.day0.sololab"
+  server_url     = "https://pdns-auth.day0.sololab"
   insecure_https = true
 }
 
 dns_record = {
-  zone = "day1.sololab."
-  name = "vault.day1.sololab."
+  zone = "day0.sololab."
+  name = "vault.day0.sololab."
   type = "A"
   ttl  = 86400
   records = [
-    "192.168.255.20"
+    "192.168.255.10"
   ]
 }
 
@@ -74,7 +82,7 @@ post_process = {
     vars = {
       VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets_b64"
       # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-      VAULT_ADDR   = "https://vault.day1.sololab:8200"
+      VAULT_ADDR   = "https://vault.day0.sololab:8200"
       STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
     }
   }
