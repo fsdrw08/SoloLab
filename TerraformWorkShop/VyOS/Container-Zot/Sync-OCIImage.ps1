@@ -106,10 +106,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/vault:1.18",
-        "archive": "docker.io_hashicorp_vault_1.18.tar",
+        "publicRepo": "hashicorp/vault:1.19",
+        "archive": "docker.io_hashicorp_vault_1.19.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/vault:1.18",
+        "privateRepo": "hashicorp/vault:1.19",
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
