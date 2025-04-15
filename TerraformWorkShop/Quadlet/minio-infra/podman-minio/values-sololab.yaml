@@ -18,8 +18,7 @@ minio:
     traefik.http.routers.minio-api.tls: true
     traefik.http.routers.minio-api.service: minio-api
 
-    traefik.http.serversTransports.minio.serverName: minio.day0.sololab
-    traefik.http.services.minio-api.loadBalancer.serversTransport: minio
+    traefik.http.services.minio-api.loadBalancer.serversTransport: minio@file
     traefik.http.services.minio-api.loadbalancer.server.scheme: https
     traefik.http.services.minio-api.loadbalancer.server.port: 9000
 
@@ -33,15 +32,16 @@ minio:
     traefik.http.routers.minio-console.middlewares: minio-console-stripprefix@docker
     traefik.http.routers.minio-console.tls: true
     traefik.http.routers.minio-console.service: minio-console
-    traefik.http.middlewares.minio-console-stripprefix.stripPrefix.prefixes: /ui
+    traefik.http.middlewares.minio-console-stripprefix.stripprefix.prefixes: /ui
 
-    traefik.http.services.minio-console.loadBalancer.serversTransport: minio
+    traefik.http.services.minio-console.loadBalancer.serversTransport: minio@file
     traefik.http.services.minio-console.loadbalancer.server.scheme: https
     traefik.http.services.minio-console.loadbalancer.server.port: 9001
   config:
     MINIO_OPTS: >-
-      --address=minio.day0.sololab:9000
-      --console-address=minio.day0.sololab:9001
+      --address=192.168.255.10:9000
+      --console-address=192.168.255.10:9001
       --certs-dir=/etc/minio/certs
     MINIO_SERVER_URL: https://minio.day0.sololab
-    MINIO_BROWSER_REDIRECT_URL: https://minio.day0.sololab/ui
+    # https://github.com/minio/console/issues/1908#issuecomment-1113587869
+    MINIO_BROWSER_REDIRECT_URL: https://minio.day0.sololab/ui/

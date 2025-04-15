@@ -1,0 +1,6 @@
+http:
+  serversTransports:
+    minio:
+      serverName: minio.day0.sololab
+      rootcas:
+        - "/etc/traefik/tls/ca.crt"
