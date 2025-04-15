@@ -1,0 +1,16 @@
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+Network=${Network}
+
+[Service]
+Restart=${Restart}
+
+[Install]
+WantedBy=default.target

@@ -121,6 +121,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/apteno/alpine-jq/tags",
     },
     {
+        "publicRegistry": "quay.io",
+        "publicRepo": "minio/minio:RELEASE.2025-04-08T15-41-24Z",
+        "archive": "quay.io_minio_minio_RELEASE.2025-04-08T15-41-24Z.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "minio/minio:RELEASE.2025-04-08T15-41-24Z",
+        "description": "https://quay.io/repository/minio/minio?tab=tags",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "hashicorp/consul:1.20",
         "archive": "docker.io_hashicorp_consul_1.20.tar",

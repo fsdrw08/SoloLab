@@ -292,96 +292,6 @@ certs = [
       ]
     }
   },
-  # etcd
-  {
-    name = "etcd-server"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "etcd-0.day1.sololab",
-      ]
-      subject = {
-        common_name  = "etcd.day1.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-        # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
-        "client_auth",
-      ]
-    }
-  },
-  # {
-  #   name = "etcd-guest"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     subject = {
-  #       common_name  = "guest"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "cert_signing",
-  #       "key_encipherment",
-  #       "client_auth",
-  #     ]
-  #   }
-  # },
-  # opendj
-  {
-    name = "opendj"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "opendj.day1.sololab"
-      ]
-      subject = {
-        common_name  = "opendj.day1.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth"
-      ]
-    }
-  },
-  # keycloak
-  {
-    name = "keycloak"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "keycloak.day1.sololab"
-      ]
-      subject = {
-        common_name  = "keycloak.day1.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth"
-      ]
-    }
-  },
   # vault
   {
     name = "vault"
@@ -409,6 +319,118 @@ certs = [
       ]
     }
   },
+  {
+    name = "minio"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "minio.day0.sololab"
+      ]
+      subject = {
+        common_name  = "minio.day0.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # etcd
+  # {
+  #   name = "etcd-server"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "etcd-0.day1.sololab",
+  #     ]
+  #     subject = {
+  #       common_name  = "etcd.day1.sololab"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #       # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
+  #       "client_auth",
+  #     ]
+  #   }
+  # },
+  # {
+  #   name = "etcd-guest"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     subject = {
+  #       common_name  = "guest"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "cert_signing",
+  #       "key_encipherment",
+  #       "client_auth",
+  #     ]
+  #   }
+  # },
+  # opendj
+  # {
+  #   name = "opendj"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "opendj.day1.sololab"
+  #     ]
+  #     subject = {
+  #       common_name  = "opendj.day1.sololab"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth"
+  #     ]
+  #   }
+  # },
+  # keycloak
+  # {
+  #   name = "keycloak"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "keycloak.day1.sololab"
+  #     ]
+  #     subject = {
+  #       common_name  = "keycloak.day1.sololab"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth"
+  #     ]
+  #   }
+  # },
   # {
   #   name = "wildcard"
   #   key = {
@@ -429,52 +451,29 @@ certs = [
   #     ]
   #   }
   # },
-  {
-    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
-    name = "consul"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "consul.core.sololab",
-        "consul.service.consul",
-        "server.dc1.consul",
-        "localhost"
-      ]
-      subject = {
-        common_name  = "server.dc1.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "cert_signing",
-        "crl_signing"
-      ]
-    }
-  },
   # {
-  #   name = "minio"
+  #   # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
+  #   name = "consul"
   #   key = {
   #     algorithm = "RSA"
   #     rsa_bits  = 4096
   #   }
   #   cert = {
   #     dns_names = [
-  #       "minio.service.consul",
+  #       "consul.core.sololab",
+  #       "consul.service.consul",
+  #       "server.dc1.consul",
   #       "localhost"
   #     ]
   #     subject = {
-  #       common_name  = "minio.service.consul"
+  #       common_name  = "server.dc1.consul"
   #       organization = "Sololab"
   #     }
   #     validity_period_hours = 43800
   #     allowed_uses = [
-  #       "key_encipherment",
   #       "digital_signature",
-  #       "server_auth",
+  #       "cert_signing",
+  #       "crl_signing"
   #     ]
   #   }
   # },
