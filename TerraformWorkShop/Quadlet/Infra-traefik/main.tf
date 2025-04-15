@@ -16,11 +16,6 @@ resource "null_resource" "init" {
   }
 }
 
-resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/file-provider.yaml"
-  content = file("./podman-traefik/file-provider.yaml")
-}
-
 data "terraform_remote_state" "root_ca" {
   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
   backend = var.podman_kube.helm.tls.tfstate.backend.type
