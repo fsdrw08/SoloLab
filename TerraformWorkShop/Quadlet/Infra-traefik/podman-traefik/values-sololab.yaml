@@ -53,7 +53,7 @@ traefik:
     #       storage: /mnt/acmeStorage/internal.json
     #       tlsChallenge: {}
     log:
-      level: INFO
+      level: DEBUG
   dynamicConfigurationFiles:
     # https://traefik.io/blog/traefik-2-tls-101-23b4fbee81f1/
     tlsCerts.yaml:
@@ -81,14 +81,19 @@ traefik:
       value: /etc/traefik/tls/ca.crt
     - name: LEGO_CA_SYSTEM_CERT_POOL
       value: "true"
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+    - name: file-provider
+      mountPath: /etc/traefik/dynamic
   extraVolumes:
     - name: docker-socket
       hostPath:
         path: /run/user/1001/podman/podman.sock
         type: Socket
-  extraVolumeMounts:
-    - name: docker-socket
-      mountPath: /var/run/docker.sock
+    - name: dynamic
+      hostPath:
+        path: /var/home/podmgr/traefik-file-provider
 persistence:
   enabled: true
   mountPath: /mnt/acmeStorage

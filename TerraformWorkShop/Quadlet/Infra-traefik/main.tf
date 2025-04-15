@@ -1,3 +1,26 @@
+resource "null_resource" "init" {
+  connection {
+    type     = "ssh"
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
+  }
+  triggers = {
+    dirs = "/home/podmgr/traefik-file-provider"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir ${self.triggers.dirs}"
+    ]
+  }
+}
+
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/file-provider.yaml"
+  content = file("./podman-traefik/file-provider.yaml")
+}
+
 data "terraform_remote_state" "root_ca" {
   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
   backend = var.podman_kube.helm.tls.tfstate.backend.type
