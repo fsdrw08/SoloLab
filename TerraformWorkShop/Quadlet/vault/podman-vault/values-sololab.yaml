@@ -85,4 +85,4 @@ volumePermissions:
   image:
     registry: zot.day0.sololab
     repository: hashicorp/vault
-    tag: 1.18
+    tag: 1.19
