@@ -13,15 +13,15 @@ podman_kube = {
     tls = {
       value_sets = [
         {
-          name          = "zot.tls.contents.\"ca\\.crt\""
+          name          = "zot.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
         {
-          name          = "zot.tls.contents.\"server\\.crt\""
+          name          = "zot.tls.contents.server\\.crt"
           value_ref_key = "cert_pem"
         },
         {
-          name          = "zot.tls.contents.\"server\\.key\""
+          name          = "zot.tls.contents.server\\.key"
           value_ref_key = "key_pem"
         }
       ]

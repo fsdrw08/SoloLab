@@ -40,15 +40,15 @@ podman_kube = {
       }
       value_sets = [
         {
-          name          = "nomad.tls.contents.\"ca\\.crt\""
+          name          = "nomad.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
         {
-          name          = "nomad.tls.contents.\"server\\.crt\""
+          name          = "nomad.tls.contents.server\\.crt"
           value_ref_key = "cert"
         },
         {
-          name          = "nomad.tls.contents.\"server\\.key\""
+          name          = "nomad.tls.contents.server\\.key"
           value_ref_key = "private_key"
         },
       ]

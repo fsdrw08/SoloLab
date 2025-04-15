@@ -40,11 +40,11 @@ podman_kube = {
     tls = {
       value_sets = [
         {
-          name          = "lldap.ssl.contents.\"cert\\.pem\""
+          name          = "lldap.ssl.contents.cert\\.pem"
           value_ref_key = "cert_pem"
         },
         {
-          name          = "lldap.ssl.contents.\"key\\.pem\""
+          name          = "lldap.ssl.contents.key\\.pem"
           value_ref_key = "key_pem"
         }
       ]

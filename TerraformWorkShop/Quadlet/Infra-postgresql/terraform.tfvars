@@ -19,11 +19,11 @@ podman_kube = {
     tls = {
       value_sets = [
         {
-          name          = "postgresql.ssl.contents.\"tls\\.crt\""
+          name          = "postgresql.ssl.contents.tls\\.crt"
           value_ref_key = "cert_pem"
         },
         {
-          name          = "postgresql.ssl.contents.\"tls\\.key\""
+          name          = "postgresql.ssl.contents.tls\\.key"
           value_ref_key = "key_pem"
         }
       ]

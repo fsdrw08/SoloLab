@@ -26,15 +26,15 @@ podman_kube = {
       }
       value_sets = [
         {
-          name          = "traefik.tls.contents.\"ca\\.crt\""
+          name          = "traefik.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
         {
-          name          = "traefik.tls.contents.\"dashboard\\.crt\""
+          name          = "traefik.tls.contents.dashboard\\.crt"
           value_ref_key = "cert"
         },
         {
-          name          = "traefik.tls.contents.\"dashboard\\.key\""
+          name          = "traefik.tls.contents.dashboard\\.key"
           value_ref_key = "private_key"
         },
       ]

@@ -36,15 +36,15 @@ podman_kube = {
           value_ref_key = "ca"
         },
         {
-          name          = "consul.tls.contents.\"ca\\.crt\""
+          name          = "consul.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
         {
-          name          = "consul.tls.contents.\"server\\.crt\""
+          name          = "consul.tls.contents.server\\.crt"
           value_ref_key = "cert"
         },
         {
-          name          = "consul.tls.contents.\"server\\.key\""
+          name          = "consul.tls.contents.server\\.key"
           value_ref_key = "private_key"
         },
       ]
