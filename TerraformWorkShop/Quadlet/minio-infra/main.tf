@@ -1,3 +1,11 @@
+data "vault_identity_oidc_openid_config" "config" {
+  name = "sololab"
+}
+
+data "vault_identity_oidc_client_creds" "creds" {
+  name = "minio"
+}
+
 resource "remote_file" "traefik_file_provider" {
   path    = "/var/home/podmgr/traefik-file-provider/minio-traefik.yaml"
   content = file("./podman-minio/minio-traefik.yaml")
@@ -60,7 +68,33 @@ data "helm_template" "podman_kube" {
         name  = value_set.name
         value = local.cert[0][value_set.value_ref_key]
       }
-    ]
+    ],
+    flatten([
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL"
+        value = "${data.vault_identity_oidc_openid_config.config.issuer}/.well-known/openid-configuration"
+      },
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_CLIENT_ID"
+        value = data.vault_identity_oidc_client_creds.creds.client_id
+      },
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_CLIENT_SECRET"
+        value = data.vault_identity_oidc_client_creds.creds.client_secret
+      },
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_NAME"
+        value = "groups"
+      },
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_PREFIX"
+        value = "minio"
+      },
+      {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_SCOPES"
+        value = "openid\\,username\\,groups"
+      }
+    ])
   ])
 }
 
@@ -94,12 +128,15 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
+resource "powerdns_record" "records" {
+  for_each = {
+    for record in var.dns_records : record.name => record
+  }
+  zone    = each.value.zone
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
 }
 
 # resource "remote_file" "consul_service" {

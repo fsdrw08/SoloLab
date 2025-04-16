@@ -327,10 +327,11 @@ certs = [
     }
     cert = {
       dns_names = [
-        "minio.day0.sololab"
+        "minio-api.day0.sololab",
+        "minio-console.day0.sololab"
       ]
       subject = {
-        common_name  = "minio.day0.sololab"
+        common_name  = "minio-api.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

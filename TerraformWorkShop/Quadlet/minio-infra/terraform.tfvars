@@ -1,3 +1,9 @@
+prov_vault = {
+  address         = "https://vault.day0.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = true
+}
+
 prov_remote = {
   host     = "192.168.255.10"
   port     = 22
@@ -66,12 +72,23 @@ prov_pdns = {
   server_url = "http://pdns-auth.day0.sololab:8081"
 }
 
-dns_record = {
-  zone = "day0.sololab."
-  name = "minio.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
-  ]
-}
+dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "minio-api.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  },
+  {
+    zone = "day0.sololab."
+    name = "minio-console.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  },
+]

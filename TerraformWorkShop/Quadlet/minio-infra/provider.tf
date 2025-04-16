@@ -1,5 +1,9 @@
 terraform {
   required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 4.7.0"
+    }
     null = {
       source  = "hashicorp/null"
       version = "3.2.2"
@@ -24,6 +28,12 @@ terraform {
   backend "local" {
 
   }
+}
+
+provider "vault" {
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
 provider "remote" {

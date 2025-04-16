@@ -1,3 +1,11 @@
+variable "prov_vault" {
+  type = object({
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}
+
 variable "prov_remote" {
   type = object({
     host     = string
@@ -77,12 +85,12 @@ variable "prov_pdns" {
   })
 }
 
-variable "dns_record" {
-  type = object({
+variable "dns_records" {
+  type = list(object({
     zone    = string
     name    = string
     type    = string
     ttl     = number
     records = list(string)
-  })
+  }))
 }
