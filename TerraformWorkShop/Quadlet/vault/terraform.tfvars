@@ -82,7 +82,7 @@ post_process = {
     vars = {
       VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets_b64"
       # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-      VAULT_ADDR   = "https://vault.day0.sololab:8200"
+      VAULT_ADDR   = "https://192.168.255.10:8200"
       STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
     }
   }
