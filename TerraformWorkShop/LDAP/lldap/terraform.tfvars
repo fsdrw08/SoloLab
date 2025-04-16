@@ -44,6 +44,13 @@ groups = [
     ]
   },
   {
+    iac_id       = "4d620c35"
+    display_name = "app-minio-admin"
+    members = [
+      "admin",
+    ]
+  },
+  {
     iac_id       = "e91c1a23"
     display_name = "app-consul-auto_config"
     members = [
