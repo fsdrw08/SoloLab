@@ -15,23 +15,38 @@ oidc_provider = {
       }
       EOT
     },
+    {
+      name     = "minio_scope"
+      template = <<-EOT
+      {
+        "groups": {{identity.entity.groups.names}}
+      }
+      EOT
+    },
   ]
 }
 
 oidc_client = [
   {
-    name         = "nomad"
-    allow_groups = ["App-Nomad-Admin"]
+    name         = "example-app"
+    allow_groups = ["app-minio-admin"]
     redirect_uris = [
-      "https://nomad.day1.sololab/oidc/callback",
-      "https://nomad.day1.sololab/ui/settings/tokens",
+      "http://example-app.day0.sololab/callback",
     ]
   },
   {
     name         = "minio"
-    allow_groups = ["App-MinIO-Admin"]
+    allow_groups = ["app-minio-admin"]
     redirect_uris = [
       "https://minio-console.day0.sololab/oauth_callback",
+    ]
+  },
+  {
+    name         = "nomad"
+    allow_groups = ["app-nomad-admin"]
+    redirect_uris = [
+      "https://nomad.day1.sololab/oidc/callback",
+      "https://nomad.day1.sololab/ui/settings/tokens",
     ]
   },
 ]

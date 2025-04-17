@@ -83,16 +83,20 @@ data "helm_template" "podman_kube" {
         value = data.vault_identity_oidc_client_creds.creds.client_secret
       },
       {
+        name  = "minio.config.MINIO_IDENTITY_OPENID_DISPLAY_NAME"
+        value = "login with vault"
+      },
+      {
         name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_NAME"
         value = "groups"
       },
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_PREFIX"
-        value = "minio"
-      },
+      # {
+      #   name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_PREFIX"
+      #   value = "minio"
+      # },
       {
         name  = "minio.config.MINIO_IDENTITY_OPENID_SCOPES"
-        value = "openid\\,username\\,groups"
+        value = "openid\\,minio_scope"
       }
     ])
   ])
