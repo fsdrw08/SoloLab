@@ -113,6 +113,14 @@ $syncList = @"
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "dexidp/example-app:latest",
+        "archive": "ghcr.io_dexidp_example-app_latest.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "dexidp/example-app:latest",
+        "description": "https://github.com/dexidp/dex/pkgs/container/example-app",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "apteno/alpine-jq:2025-01-12",
         "archive": "docker.io_apteno_alpine-jq_2025-01-12.tar",

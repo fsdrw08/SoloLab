@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-app-sec-ssl
+type: Opaque
+data:
+  ca.crt: ${ca}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+  labels:
+    name: example
+    traefik.enable: "true"
+    traefik.http.routers.example-app.entryPoints: web
+    traefik.http.routers.example-app.rule: Host(`example-app.day0.sololab`)
+    # traefik.http.routers.whoami.tls.certresolver: internal
+    traefik.http.services.example-app.loadbalancer.server.port: "5555"
+spec:
+  containers:
+    - name: app
+      image: zot.day0.sololab/dexidp/example-app:latest
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"
+      command:
+        - example-app
+        - --debug
+        - --listen
+        - http://0.0.0.0:5555
+        - --issuer
+        - ${issuer}
+        - --issuer-root-ca
+        - /certs/ca.crt
+        - --client-id
+        - ${clientId}
+        - --client-secret
+        - ${clientSecret}
+        - --redirect-uri
+        - http://example-app.day0.sololab/callback
+      volumeMounts:
+        - name: ssl
+          mountPath: /certs
+  volumes:
+    - name: ssl
+      secret:
+        secretName: example-app-sec-ssl
+  restartPolicy: Never
