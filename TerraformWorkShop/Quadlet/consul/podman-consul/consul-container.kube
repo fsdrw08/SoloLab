@@ -1,8 +1,8 @@
 [Unit]
 Description="${Description}"
 Documentation="${Documentation}"
-After=vault-container.service
-Wants=vault-container.service
+After=${After}
+Wants=${Wants}
 
 [Kube]
 # Point to the yaml file in the same directory
