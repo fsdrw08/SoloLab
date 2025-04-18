@@ -1,6 +1,8 @@
 [Unit]
 Description="${Description}"
 Documentation="${Documentation}"
+After=${After}
+Wants=${Wants}
 
 [Kube]
 # Point to the yaml file in the same directory

@@ -87,8 +87,9 @@ data "helm_template" "podman_kube" {
         value = "login with vault"
       },
       {
+        # https://min.io/docs/minio/linux/reference/minio-server/settings/iam/openid.html#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
         name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_NAME"
-        value = "groups"
+        value = "policy"
       },
       # {
       #   name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_PREFIX"

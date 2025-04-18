@@ -38,11 +38,15 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 4.7.0"
+      version = ">=4.7.0"
     }
     ldap = {
       source  = "l-with/ldap"
       version = "<=0.9.1"
+    }
+    minio = {
+      source  = "aminueza/minio"
+      version = ">=3.3.0"
     }
   }
 }

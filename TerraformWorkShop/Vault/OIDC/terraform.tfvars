@@ -19,7 +19,7 @@ oidc_provider = {
       name     = "minio_scope"
       template = <<-EOT
       {
-        "groups": {{identity.entity.groups.names}}
+        "policy": {{identity.entity.groups.names}}
       }
       EOT
     },

@@ -56,6 +56,8 @@ podman_quadlet = {
       vars = {
         Description   = "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
         Documentation = "https://min.io/docs/minio/container/index.html"
+        After         = "vault-container.service"
+        Wants         = "vault-container.service"
         yaml          = "minio-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
