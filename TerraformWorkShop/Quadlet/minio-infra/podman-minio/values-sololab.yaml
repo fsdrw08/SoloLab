@@ -1,6 +1,13 @@
 global:
   imageRegistry: zot.day0.sololab
 minio:
+  livenessProbe:
+    exec:
+      command:
+        - mc
+        - --insecure
+        - ready
+        - sololab
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.minio-api.entrypoints: webSecure
@@ -47,8 +54,8 @@ minio:
     # traefik.http.services.minio-console.loadbalancer.server.port: 9001
   config:
     MINIO_OPTS: >-
-      --address=192.168.255.10:9000
-      --console-address=192.168.255.10:9001
+      --address=:9000
+      --console-address=:9001
       --certs-dir=/etc/minio/certs
     MINIO_SERVER_URL: https://minio-api.day0.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
@@ -56,3 +63,6 @@ minio:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
+      # https://min.io/docs/minio/linux/reference/minio-mc/minio-client-settings.html#id2
+    - name: MC_HOST_sololab
+      value: https://{{ .Values.minio.config.MINIO_ROOT_USER }}:{{ .Values.minio.config.MINIO_ROOT_PASSWORD }}@localhost:9000
