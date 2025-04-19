@@ -5,9 +5,10 @@ prov_minio = {
   minio_ssl      = true
 }
 
-policies = [{
-  name   = "app-minio-admin"
-  policy = <<EOF
+policies = [
+  {
+    name   = "app-minio-admin"
+    policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -35,4 +36,24 @@ policies = [{
     ]
 }
   EOF
-}]
+  },
+  {
+    name   = "app-minio-readwrite"
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*"
+            ]
+        }
+    ]
+}
+  EOF
+  },
+]

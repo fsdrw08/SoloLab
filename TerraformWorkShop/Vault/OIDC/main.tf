@@ -17,6 +17,8 @@ resource "vault_identity_oidc_scope" "scopes" {
   template = each.value.template
 }
 
+# ! if delete scope, this provider resource will prevent scope delete
+# no idea how to update this resource before scope destroy
 resource "vault_identity_oidc_provider" "provider" {
   depends_on = [
     vault_identity_oidc_scope.scopes,
@@ -24,8 +26,9 @@ resource "vault_identity_oidc_provider" "provider" {
   name          = "sololab"
   https_enabled = true
   issuer_host   = var.oidc_provider.issuer_host
+  # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes_supported = [
-    for scope in var.oidc_provider.scopes : vault_identity_oidc_scope.scopes[scope.name].name
+    for scope in var.oidc_provider.scopes : scope.name
   ]
   allowed_client_ids = [
     "*"

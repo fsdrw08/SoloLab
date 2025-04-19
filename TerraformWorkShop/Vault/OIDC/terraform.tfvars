@@ -6,6 +6,7 @@ prov_vault = {
 
 oidc_provider = {
   issuer_host = "vault.day0.sololab"
+  # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {
       name     = "groups"
@@ -27,13 +28,13 @@ oidc_provider = {
 }
 
 oidc_client = [
-  {
-    name         = "example-app"
-    allow_groups = ["app-minio-admin"]
-    redirect_uris = [
-      "http://example-app.day0.sololab/callback",
-    ]
-  },
+  # {
+  #   name         = "example-app"
+  #   allow_groups = ["app-minio-admin"]
+  #   redirect_uris = [
+  #     "http://example-app.day0.sololab/callback",
+  #   ]
+  # },
   {
     name         = "minio"
     allow_groups = ["app-minio-admin"]

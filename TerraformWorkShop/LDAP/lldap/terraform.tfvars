@@ -44,10 +44,25 @@ groups = [
     ]
   },
   {
+    iac_id       = "94a5e552"
+    display_name = "app-minio-user"
+    members = [
+      "admin",
+      "user1",
+    ]
+  },
+  {
     iac_id       = "4d620c35"
     display_name = "app-minio-admin"
     members = [
       "admin",
+    ]
+  },
+  {
+    iac_id       = "0c31450b"
+    display_name = "app-minio-readwrite"
+    members = [
+      "user1",
     ]
   },
   {
