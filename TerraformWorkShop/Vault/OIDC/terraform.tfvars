@@ -37,7 +37,7 @@ oidc_client = [
   # },
   {
     name         = "minio"
-    allow_groups = ["app-minio-admin"]
+    allow_groups = ["app-minio-user"]
     redirect_uris = [
       "https://minio-console.day0.sololab/oauth_callback",
     ]
