@@ -77,7 +77,7 @@ resource "null_resource" "post_process" {
   }
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-powerdns.hcl"
-#   content = file("./podman-traefik/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-powerdns.hcl"
+  content = file("./podman-powerdns/service.hcl")
+}

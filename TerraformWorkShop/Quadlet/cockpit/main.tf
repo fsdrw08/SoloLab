@@ -79,10 +79,10 @@ resource "powerdns_record" "record" {
   records = var.dns_record.records
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-#   content = file("./podman-cockpit/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-cockpit.hcl"
+  content = file("./podman-cockpit/service.hcl")
+}
 
 # resource "null_resource" "post_process" {
 #   depends_on = [

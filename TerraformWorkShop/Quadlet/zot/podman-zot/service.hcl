@@ -1,16 +1,17 @@
 services {
-  id      = "traefik-ping"
-  name    = "traefik"
-  port    = 8080
+  id   = "zot-web"
+  name = "zot"
+  port = 5000
 
   checks = [
     {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
-      id       = "traefik-http-check-8080"
-      name     = "traefik-http-check-8080"
-      http      = "http://192.168.255.10:8080/ping"
-      interval = "300s"
-      timeout  = "2s"
+      id              = "zot-https-check"
+      name            = "zot-https-check"
+      http            = "https://zot.day0.sololab/v2/"
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
     }
   ]
 

@@ -71,29 +71,7 @@ module "podman_quadlet" {
   }
 }
 
-# resource "null_resource" "post_process" {
-#   depends_on = [
-#     # powerdns_record.record,
-#     module.podman_quadlet
-#   ]
-#   for_each = var.post_process == null ? {} : var.post_process
-#   triggers = {
-#     script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
-#     host           = var.prov_remote.host
-#     port           = var.prov_remote.port
-#     user           = var.prov_remote.user
-#     password       = sensitive(var.prov_remote.password)
-#   }
-#   connection {
-#     type     = "ssh"
-#     host     = self.triggers.host
-#     port     = self.triggers.port
-#     user     = self.triggers.user
-#     password = self.triggers.password
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       templatefile("${each.value.script_path}", "${each.value.vars}")
-#     ]
-#   }
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-zot.hcl"
+  content = file("./podman-zot/service.hcl")
+}

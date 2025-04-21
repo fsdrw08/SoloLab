@@ -1,29 +1,42 @@
 services {
-  id      = "powerdns-web"
-  name    = "powerdns"
-  port    = 8080
+  id   = "powerdns-auth-web"
+  name = "powerdns-auth"
+  port = 8081
 
   checks = [
     {
-      id       = "powerdns-http-check-8081"
-      name     = "powerdns-http-check-8081"
-      http      = "http://192.168.255.10:8080/api/v1/servers/localhost/statistics?statistic=uptime"
-      interval = "300s"
-      timeout  = "2s"
+      id   = "powerdns-auth-https-check"
+      name = "powerdns-auth-https-check"
+      # https://doc.powerdns.com/authoritative/http-api/statistics.html
+      http = "https://pdns-auth.day0.sololab/api/v1/servers/localhost/statistics?statistic=uptime"
+      header = {
+        X-API-Key = ["powerdns"]
+      }
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
     }
   ]
-
-  # tags = [
-  #   "traefik.enable=true",
-  #   "traefik.tcp.routers.nomad-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.nomad-web.rule=HostSNI(`nomad.day1.sololab`)",
-  #   "traefik.tcp.routers.nomad-web.tls.passthrough=true",
-  #   # "traefik.http.routers.nomad-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.nomad-web-redirect.rule=Host(`nomad.day1.sololab`)",
-  #   # "traefik.http.routers.nomad-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.nomad-web.entrypoints=websecure",
-  #   # "traefik.http.routers.nomad-web.rule=Host(`nomad.day1.sololab`)",
-  #   # "traefik.http.routers.nomad-web.tls=true",
-  #   # "traefik.http.services.nomad-web.loadbalancer.server.scheme=https",
-  # ]
 }
+
+services {
+  id   = "powerdns-recursor-web"
+  name = "powerdns-recursor"
+  port = 8082
+
+  checks = [
+    # https://doc.powerdns.com/recursor/common/api/endpoint-statistics.html
+    {
+      id   = "powerdns-recursor-https-check"
+      name = "powerdns-recursor-https-check"
+      http = "https://pdns-recursor.day0.sololab/api/v1/servers/localhost/statistics"
+      header = {
+        X-API-Key = ["powerdns"]
+      }
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
+    }
+  ]
+}
+# https://doc.powerdns.com/recursor/common/api/endpoint-statistics.html

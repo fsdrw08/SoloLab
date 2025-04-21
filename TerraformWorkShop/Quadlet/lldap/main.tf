@@ -97,7 +97,7 @@ resource "powerdns_record" "record" {
   records = var.dns_record.records
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-#   content = file("./podman-lldap/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-lldap.hcl"
+  content = file("./podman-lldap/service.hcl")
+}
