@@ -2,41 +2,43 @@ global:
   imageRegistry: zot.day0.sololab
 consul:
   containerPorts:
-    - name: server
-      containerPort: 8300
-      hostPort: 8300
-      protocol: TCP
-    - name: serf_lan-tcp
-      containerPort: 8301
-      hostPort: 8301
-      protocol: TCP
-    - name: serf_lan-udp
-      containerPort: 8301
-      hostPort: 8301
-      protocol: UDP
-    - name: http
-      containerPort: 8500
-      hostPort: 8500
-      protocol: TCP
-    - name: https
-      containerPort: 8501
-      hostPort: 8501
-      protocol: TCP
-    - name: grpc_tls
-      containerPort: 8503
-      hostPort: 8503
-      protocol: TCP
-    - name: dns-udp
-      containerPort: 8600
-      hostPort: 8600
-      protocol: UDP
-    - name: dns-tcp
-      containerPort: 8600
-      hostPort: 8600
-      protocol: TCP
+    []
+    # - name: server
+    #   containerPort: 8300
+    #   hostPort: 8300
+    #   protocol: TCP
+    # - name: serf_lan-tcp
+    #   containerPort: 8301
+    #   hostPort: 8301
+    #   protocol: TCP
+    # - name: serf_lan-udp
+    #   containerPort: 8301
+    #   hostPort: 8301
+    #   protocol: UDP
+    # - name: http
+    #   containerPort: 8500
+    #   hostPort: 8500
+    #   protocol: TCP
+    # - name: https
+    #   containerPort: 8501
+    #   hostPort: 8501
+    #   protocol: TCP
+    # - name: grpc_tls
+    #   containerPort: 8503
+    #   hostPort: 8503
+    #   protocol: TCP
+    # - name: dns-udp
+    #   containerPort: 8600
+    #   hostPort: 8600
+    #   protocol: UDP
+    # - name: dns-tcp
+    #   containerPort: 8600
+    #   hostPort: 8600
+    #   protocol: TCP
   ## @param consul.configFiles
   configFiles:
     main:
+      bind_addr: '{{ GetInterfaceIP "eth0" }}'
       ports:
         https: 8501
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
@@ -44,9 +46,9 @@ consul:
         authorization:
           enabled: true
           static:
-            oidc_discovery_url: https://vault.day1.sololab:8200/v1/identity/oidc
+            oidc_discovery_url: https://vault.day0.sololab:8200/v1/identity/oidc
             oidc_discovery_ca_cert: ## set via helm value
-            bound_issuer: https://vault.day1.sololab:8200/v1/identity/oidc
+            bound_issuer: https://vault.day0.sololab:8200/v1/identity/oidc
             # The value for matching the aud field of the JSON web token (JWT).
             # The audience aud claim in a JWT is meant to refer to the authorization servers that should accept the token.
             bound_audiences:
@@ -126,7 +128,7 @@ consul:
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.consul-web.entrypoints: webSecure
-    traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day1.sololab`)
+    traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day0.sololab`)
     traefik.tcp.routers.consul-web.tls.passthrough: true
     traefik.tcp.routers.consul-web.service: consul-web
     traefik.tcp.services.consul-web.loadbalancer.server.port: 8501

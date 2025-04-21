@@ -10,10 +10,10 @@ Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
 # https://github.com/containers/podman/issues/24970#issuecomment-2582792692
-# Network=slirp4netns
+Network=${Network}
 
 [Service]
-ExecStartPre=sleep 10
+ExecStartPre=${ExecStartPre}
 
 [Install]
 WantedBy=default.target

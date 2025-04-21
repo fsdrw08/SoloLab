@@ -18,10 +18,23 @@ resource "null_resource" "init" {
   }
 }
 
+data "terraform_remote_state" "root_ca" {
+  count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
+  backend = var.podman_kube.helm.tls.tfstate.backend.type
+  config  = var.podman_kube.helm.tls.tfstate.backend.config
+}
+
+locals {
+  cert = var.podman_kube.helm.tls.tfstate == null ? null : [
+    for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
+    if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+  ]
+}
+
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
-  mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.name
+  count = var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+  mount = var.podman_kube.helm.tls.vault_kvv2.mount
+  name  = var.podman_kube.helm.tls.vault_kvv2.name
 }
 
 data "helm_template" "podman_kube" {
@@ -31,24 +44,45 @@ data "helm_template" "podman_kube" {
   values = [
     "${file(var.podman_kube.helm.value_file)}"
   ]
+
+  # v2 helm provider
   # normal values
-  dynamic "set" {
-    for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-    content {
-      name = set.value.name
-      value = set.value.value_string != null ? set.value.value_string : templatefile(
-        "${set.value.value_template_path}", "${set.value.value_template_vars}"
-      )
-    }
-  }
-  # tls values
-  dynamic "set" {
-    for_each = var.podman_kube.helm.tls_value_sets == null ? [] : flatten([var.podman_kube.helm.tls_value_sets.value_sets])
-    content {
-      name  = set.value.name
-      value = data.vault_kv_secret_v2.cert[0].data[set.value.value_ref_key]
-    }
-  }
+  # set = local.helm_value_sets
+  # dynamic "set" {
+  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
+  #   content {
+  #     name = set.value.name
+  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
+  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
+  #     )
+  #   }
+  # }
+  # # tls
+  # dynamic "set" {
+  #   for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
+  #   content {
+  #     name  = set.value.name
+  #     value = local.cert[0][set.value.value_ref_key]
+  #   }
+  # }
+
+  # v3 helm provider
+  set = flatten([
+    var.podman_kube.helm.value_sets == null ? [] : [
+      for value_set in flatten([var.podman_kube.helm.value_sets]) : {
+        name = value_set.name
+        value = value_set.value_string != null ? value_set.value_string : templatefile(
+          "${value_set.value_template_path}", "${value_set.value_template_vars}"
+        )
+      }
+    ],
+    var.podman_kube.helm.tls == null ? [] : [
+      for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
+        name  = value_set.name
+        value = local.cert[0][value_set.value_ref_key]
+      }
+    ]
+  ])
 }
 
 resource "remote_file" "consul_service" {

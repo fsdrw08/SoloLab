@@ -138,10 +138,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.20",
-        "archive": "docker.io_hashicorp_consul_1.20.tar",
+        "publicRepo": "hashicorp/consul:1.20.5",
+        "archive": "docker.io_hashicorp_consul_1.20.5.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/consul:1.20",
+        "privateRepo": "hashicorp/consul:1.20.5",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
