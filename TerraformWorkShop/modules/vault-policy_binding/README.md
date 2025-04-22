@@ -1,0 +1,2 @@
+This terraform module is used to bind vault policy with internal vault identity group (aka. policy group), then put external vault identity group under the policy group.
+relationship: one policy : one internal group : multi external groups

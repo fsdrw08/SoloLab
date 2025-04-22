@@ -6,7 +6,7 @@ terraform {
   required_providers {
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">=2.4.0"
+      version = ">= 2.5.0"
     }
     vault = {
       source  = "hashicorp/vault"
@@ -14,7 +14,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "Nomad-ACL-OIDC"
   }
 }

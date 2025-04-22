@@ -9,6 +9,14 @@ oidc_provider = {
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {
+      name     = "username"
+      template = <<-EOT
+      {
+        "username": {{identity.entity.name}}
+      }
+      EOT
+    },
+    {
       name     = "groups"
       template = <<-EOT
       {
@@ -35,19 +43,19 @@ oidc_client = [
   #     "http://example-app.day0.sololab/callback",
   #   ]
   # },
-  {
-    name         = "minio"
-    allow_groups = ["app-minio-user"]
-    redirect_uris = [
-      "https://minio-console.day0.sololab/oauth_callback",
-    ]
-  },
+  # {
+  #   name         = "minio"
+  #   allow_groups = ["app-minio-user"]
+  #   redirect_uris = [
+  #     "https://minio-console.day0.sololab/oauth_callback",
+  #   ]
+  # },
   {
     name         = "nomad"
     allow_groups = ["app-nomad-admin"]
     redirect_uris = [
-      "https://nomad.day1.sololab/oidc/callback",
-      "https://nomad.day1.sololab/ui/settings/tokens",
+      "https://nomad.day0.sololab/oidc/callback",
+      "https://nomad.day0.sololab/ui/settings/tokens",
     ]
   },
 ]
