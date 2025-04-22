@@ -89,6 +89,14 @@ groups = [
     ]
   },
   {
+    iac_id       = "091a24fe"
+    display_name = "app-nomad-user"
+    members = [
+      "admin",
+      "user1"
+    ]
+  },
+  {
     iac_id       = "ca4dde60"
     display_name = "app-nomad-admin"
     members = [

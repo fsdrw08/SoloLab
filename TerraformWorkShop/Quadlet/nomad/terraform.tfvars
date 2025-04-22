@@ -68,8 +68,8 @@ podman_quadlet = {
       vars = {
         Description   = "Nomad is a highly available, distributed, data-center aware cluster and application scheduler designed to support the modern datacenter with support for long-running services, batch jobs, and much more."
         Documentation = "https://www.nomadproject.io/docs/"
-        After         = "vault-container.service"
-        Wants         = "vault-container.service"
+        After         = ""
+        Wants         = ""
         yaml          = "nomad-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"

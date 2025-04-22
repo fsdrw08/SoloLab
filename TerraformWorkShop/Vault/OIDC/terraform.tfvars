@@ -52,7 +52,7 @@ oidc_client = [
   # },
   {
     name         = "nomad"
-    allow_groups = ["app-nomad-admin"]
+    allow_groups = ["app-nomad-user"]
     redirect_uris = [
       "https://nomad.day0.sololab/oidc/callback",
       "https://nomad.day0.sololab/ui/settings/tokens",
