@@ -1,6 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 postgresql:
+  containerPorts: []
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
