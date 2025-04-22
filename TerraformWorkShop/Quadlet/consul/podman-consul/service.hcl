@@ -1,15 +1,16 @@
 services {
-  id      = "consul-web"
-  name    = "consul"
-  port    = 8501
+  id   = "consul-web"
+  name = "consul"
+  port = 8501
 
   checks = [
     {
-      id       = "consul-web-tcp-check-8501"
-      name     = "consul-web-tcp-check-8501"
-      tcp      = "localhost:8501"
-      interval = "20s"
-      timeout  = "2s"
+      id              = "consul-https-check"
+      name            = "consul-https-check"
+      http            = "https://consul.day0.sololab/v1/status/leader"
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
     }
   ]
 
