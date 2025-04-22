@@ -26,8 +26,8 @@ resource "null_resource" "quadlet_destroy" {
   # Destroy provisioners are run *before* the resource is destroyed
   # in order to remove the service which generate by quadlet here, the process should be:
   # remove the quadlet file first, then run "systemctl --user daemon-reload"
-  # that's why we need add depends_on = [null_resource.quadlet_destroy] in this resource
-  # and add provisioner step run "systemctl --user daemon-reload" when destroy in resource "null_resource.quadlet_destroy"
+  # that's why we need add depends_on = [null_resource.quadlet_destroy] in below resource "remote_file.quadlet" 
+  # and add provisioner step run "systemctl --user daemon-reload" in `when = destroy` in this resource "null_resource.quadlet_destroy"
   provisioner "remote-exec" {
     when = destroy
     inline = [

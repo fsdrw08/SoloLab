@@ -85,12 +85,6 @@ data "helm_template" "podman_kube" {
   ])
 }
 
-resource "remote_file" "consul_service" {
-  depends_on = [null_resource.init]
-  path       = "/var/home/podmgr/consul-services/service-consul.hcl"
-  content    = file("./podman-consul/service.hcl")
-}
-
 resource "remote_file" "podman_kube" {
   depends_on = [null_resource.init]
   path       = var.podman_kube.manifest_dest_path
@@ -154,4 +148,10 @@ resource "null_resource" "post_process" {
       templatefile("${each.value.script_path}", "${each.value.vars}")
     ]
   }
+}
+
+resource "remote_file" "consul_service" {
+  depends_on = [null_resource.init]
+  path       = "/var/home/podmgr/consul-services/service-consul.hcl"
+  content    = file("./podman-consul/service.hcl")
 }
