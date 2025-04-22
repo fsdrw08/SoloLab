@@ -3,12 +3,13 @@ global:
 nomad:
   image:
     repository: multani/nomad
-    tag: "1.9.5"
+    tag: "1.10.0"
   # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
-  hostAliases:
-    - ip: "host-gateway"
-      hostnames:
-        - "vault.day1.sololab"
+  # hostAliases:
+  #   - ip: "host-gateway"
+  #     hostnames:
+  #       - "vault.day0.sololab"
+  containerPorts: []
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30
@@ -41,7 +42,7 @@ nomad:
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.nomad-web.entrypoints: webSecure
-    traefik.tcp.routers.nomad-web.rule: HostSNI(`nomad.day1.sololab`)
+    traefik.tcp.routers.nomad-web.rule: HostSNI(`nomad.day0.sololab`)
     traefik.tcp.routers.nomad-web.tls.passthrough: true
     traefik.tcp.routers.nomad-web.service: nomad-web
     traefik.tcp.services.nomad-web.loadbalancer.server.port: 4646
@@ -56,6 +57,6 @@ nomad:
     - name: TZ
       value: Asia/Shanghai
     - name: NOMAD_ADDR
-      value: https://nomad.day1.sololab:4646
+      value: https://nomad.day0.sololab:4646
     - name: NOMAD_CACERT
       value: /nomad/config/certs/ca.crt

@@ -6,24 +6,24 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.13.2"
+      version = "3.0.0-pre2"
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.1.3"
+      version = ">= 0.1.3"
     }
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "System-SvcDisc-Quadlet-Nomad"
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
+    schema_name = "System-Infra-Quadlet-Nomad"
   }
 }
 

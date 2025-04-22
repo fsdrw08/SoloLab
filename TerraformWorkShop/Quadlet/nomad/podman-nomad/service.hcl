@@ -1,15 +1,16 @@
 services {
-  id      = "nomad-web"
-  name    = "nomad"
-  port    = 4646
+  id   = "nomad-web"
+  name = "nomad"
+  port = 4646
 
   checks = [
     {
-      id       = "nomad-tcp-check-4646"
-      name     = "nomad-tcp-check-4646"
-      tcp      = "192.168.255.20:4646"
-      interval = "20s"
-      timeout  = "2s"
+      id              = "nomad-https-check"
+      name            = "nomad-https-check"
+      http            = "https://nomad.day0.sololab/v1/status/leader"
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
     }
   ]
 

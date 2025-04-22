@@ -1,14 +1,16 @@
 [Unit]
 Description="${Description}"
 Documentation="${Documentation}"
-After=vault-container.service
-Wants=vault-container.service
+After=${After}
+Wants=${Wants}
 
 [Kube]
 # Point to the yaml file in the same directory
 Yaml=${yaml}
 PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
+# https://github.com/containers/podman/issues/24970#issuecomment-2582792692
+Network=${Network}
 
 [Service]
 ExecStartPre=${ExecStartPre}

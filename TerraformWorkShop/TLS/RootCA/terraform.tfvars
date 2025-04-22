@@ -345,6 +345,29 @@ certs = [
       ]
     }
   },
+  {
+    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
+    name = "nomad"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "nomad.day0.sololab",
+      ]
+      subject = {
+        common_name  = "nomad.day0.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "digital_signature",
+        "cert_signing",
+        "crl_signing"
+      ]
+    }
+  },
   # {
   #   name = "minio"
   #   key = {

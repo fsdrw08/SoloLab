@@ -4,7 +4,8 @@ NOMAD_ADDR=${NOMAD_ADDR}
 NOMAD_TOKEN_FILE=${NOMAD_TOKEN_FILE}
 
 counter=0
-until STATUS=$(curl -k -X GET "$NOMAD_ADDR/v1/status/leader" 2>&1); [ $? -ne 1 ]
+# until STATUS=$(curl -k -X GET "$NOMAD_ADDR/v1/status/leader" 2>&1); [ $? -ne 1 ]
+until curl -fLsSk -X GET "$NOMAD_ADDR/v1/status/leader" > /dev/null
 do
   if [ $counter -lt 20 ]; then
     echo "Waiting for nomad to come up, $(($counter*5))s passed"
