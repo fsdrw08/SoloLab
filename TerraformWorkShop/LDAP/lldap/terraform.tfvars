@@ -89,6 +89,13 @@ groups = [
     ]
   },
   {
+    iac_id       = "542b0c36"
+    display_name = "app-consul-readonly"
+    members = [
+      "user1"
+    ]
+  },
+  {
     iac_id       = "091a24fe"
     display_name = "app-nomad-user"
     members = [
