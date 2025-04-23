@@ -1,0 +1,153 @@
+global:
+  imageRegistry: zot.day0.sololab
+consul:
+  containerPorts:
+    []
+    # - name: server
+    #   containerPort: 8300
+    #   hostPort: 8300
+    #   protocol: TCP
+    # - name: serf_lan-tcp
+    #   containerPort: 8301
+    #   hostPort: 8301
+    #   protocol: TCP
+    # - name: serf_lan-udp
+    #   containerPort: 8301
+    #   hostPort: 8301
+    #   protocol: UDP
+    # - name: http
+    #   containerPort: 8500
+    #   hostPort: 8500
+    #   protocol: TCP
+    # - name: https
+    #   containerPort: 8501
+    #   hostPort: 8501
+    #   protocol: TCP
+    # - name: grpc_tls
+    #   containerPort: 8503
+    #   hostPort: 8503
+    #   protocol: TCP
+    # - name: dns-udp
+    #   containerPort: 8600
+    #   hostPort: 8600
+    #   protocol: UDP
+    # - name: dns-tcp
+    #   containerPort: 8600
+    #   hostPort: 8600
+    #   protocol: TCP
+  ## @param consul.configFiles
+  configFiles:
+    main:
+      bind_addr: '{{ GetInterfaceIP "eth0" }}'
+      ports:
+        https: 8501
+      # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
+      auto_config:
+        authorization:
+          enabled: true
+          static:
+            oidc_discovery_url: https://vault.day0.sololab:8200/v1/identity/oidc
+            oidc_discovery_ca_cert: ## set via helm value
+            bound_issuer: https://vault.day0.sololab:8200/v1/identity/oidc
+            # The value for matching the aud field of the JSON web token (JWT).
+            # The audience aud claim in a JWT is meant to refer to the authorization servers that should accept the token.
+            bound_audiences:
+              - consul-cluster-dc1
+            claim_mappings:
+              /consul/hostname: node_name
+            claim_assertions:
+              - value.node_name == "${node}"
+      acl:
+        enabled: true
+        default_policy: deny
+        enable_token_persistence: true
+        tokens:
+          initial_management: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
+          config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
+      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
+      tls:
+        defaults:
+          ca_file: /consul/config/certs/ca.crt
+          cert_file: /consul/config/certs/server.crt
+          key_file: /consul/config/certs/server.key
+          verify_incoming: false
+          verify_outgoing: true
+        internal_rpc:
+          verify_server_hostname: true
+  ## @param consul.command Override default container command (useful when using custom images)
+  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
+  ## this command is used to set the advertise ip to host ip when consul start
+  ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
+  ## update: too complicate, hard code advertise ip instead
+  ## before:
+  ## set -- consul agent \
+  ##   -data-dir="$CONSUL_DATA_DIR" \
+  ##   -config-dir="$CONSUL_CONFIG_DIR" \
+  ##   $CONSUL_BIND \
+  ##   $CONSUL_CLIENT \
+  ##   "$@"
+  ##
+  ## after:
+  ## set -- consul agent \
+  ##   -data-dir="$CONSUL_DATA_DIR" \
+  ##   -config-dir="$CONSUL_CONFIG_DIR" \
+  ##   $CONSUL_BIND \
+  ##   -advertise=<host ip> \
+  ##   $CONSUL_CLIENT \
+  ##   "$@"
+  ## why not pass the advertise ip into args?
+  ## args only accept plain text command, not accept variable which come with expression
+  ##
+  # command:
+  #   - "/bin/sh"
+  #   - "-c"
+  #   - |
+  #     sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=192.168.255.20 \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
+  #     chmod +x /tmp/docker-entrypoint.sh
+  #     exec /tmp/docker-entrypoint.sh "$0" "$@"
+  ## @param consul.args Override default container args (useful when using custom images)
+  ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
+  ##
+  args:
+    - agent
+    - -config-dir=/consul/services
+  ## @param consul.podAnnotations Annotations for consul pods
+  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
+  ## the userns annotation only work podman v4.9+
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/Dockerfile#L271-L273
+  ## e.g.
+  ## podAnnotations:
+  ##   io.podman.annotations.userns: keep-id:uid=100,gid=1000
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.consul-web.entrypoints: webSecure
+    traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day0.sololab`)
+    traefik.tcp.routers.consul-web.tls.passthrough: true
+    traefik.tcp.routers.consul-web.service: consul-web
+    traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
+
+  extraEnvVars:
+    - name: CONSUL_DISABLE_PERM_MGMT
+      value: "ture"
+    - name: TZ
+      value: Asia/Shanghai
+  ## @param consul.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the consul container(s)
+  ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
+  ##
+  extraVolumeMounts:
+    - name: services
+      mountPath: "/consul/services:Z"
+  ## @param consul.extraVolumes Optionally specify extra list of additional volumes for the consul pod(s)
+  ##
+  extraVolumes:
+    - name: services
+      hostPath:
+        path: /var/home/podmgr/consul-services
+        type: Directory

@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.10"
+  host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -17,12 +17,12 @@ podman_kube = {
     name       = "consul"
     chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
     value_file = "./podman-consul/values-sololab.yaml"
-    value_sets = [
-      {
-        name         = "consul.configFiles.main.node_name"
-        value_string = "Infra"
-      }
-    ]
+    # value_sets = [
+    #   {
+    #     name         = "consul.configFiles.main.advertise_addr"
+    #     value_string = "192.168.255.20"
+    #   }
+    # ]
     tls = {
       tfstate = {
         backend = {
