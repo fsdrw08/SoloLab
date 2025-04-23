@@ -6,12 +6,12 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 4.2.0"
+      version = ">= 4.7.0"
     }
   }
 
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "Vault-OIDC-JWT-Consul"
   }
 }

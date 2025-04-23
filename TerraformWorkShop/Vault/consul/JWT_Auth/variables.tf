@@ -6,6 +6,24 @@ variable "prov_vault" {
   })
 }
 
+variable "oidc_key" {
+  type = object({
+    name             = string
+    algorithm        = string
+    verification_ttl = number
+    rotation_period  = number
+  })
+}
+
+variable "oidc_roles" {
+  type = list(object({
+    name      = string
+    ttl       = number
+    client_id = string
+    template  = string
+  }))
+}
+
 variable "policy_bindings" {
   type = list(object({
     policy_name     = string
