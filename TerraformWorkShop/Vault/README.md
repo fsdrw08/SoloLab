@@ -3,3 +3,4 @@ Vault IaC deploy procedure for Sololab:
 2. [LDAP](./LDAP/)
 3. [policy](./policy/)
 4. [OIDC](./OIDC/)
+5. [consul](./consul/)

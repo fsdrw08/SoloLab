@@ -1,9 +1,9 @@
-data "terraform_remote_state" "root_ca" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
-  }
-}
+# data "terraform_remote_state" "root_ca" {
+#   backend = "local"
+#   config = {
+#     path = "../../TLS/RootCA/terraform.tfstate"
+#   }
+# }
 
 data "vault_kv_secret_v2" "root_cert" {
   mount = "kvv2/certs"
