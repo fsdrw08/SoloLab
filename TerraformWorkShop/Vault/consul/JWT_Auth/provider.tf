@@ -12,20 +12,12 @@ terraform {
 
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
-    schema_name = "Vault-OIDC-JWT-Consul"
+    schema_name = "Vault-consul-JWT_Auth"
   }
 }
 
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
 provider "vault" {
-  # It is strongly recommended to configure this provider through the
-  # environment variables described above, so that each user can have
-  # separate credentials set in the environment.
-  #
-  # This will default to using $VAULT_ADDR
-  # But can be set explicitly
-  # address = "https://vault.example.net:8200"
-
   address         = var.prov_vault.address
   token           = var.prov_vault.token
   skip_tls_verify = var.prov_vault.skip_tls_verify

@@ -58,7 +58,7 @@ policy_bindings = [
         capabilities = ["read", "update"]
       }
       EOT
-    policy_group    = "Policy-Consul-auto_config"
+    policy_group    = "Policy-Consul-Auto_Config"
     external_groups = ["app-consul-auto_config"]
   },
   # config policy to make the user who permission granted allow to config meta data in it's own
