@@ -37,6 +37,14 @@ groups = [
     ]
   },
   {
+    iac_id       = "9d1dbb70"
+    display_name = "app-vault-user"
+    members = [
+      "admin",
+      "user1",
+    ]
+  },
+  {
     iac_id       = "751b1e41"
     display_name = "app-vault-admin"
     members = [

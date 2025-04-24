@@ -13,6 +13,16 @@ policy_bindings = [
       }
       EOT
     policy_group    = "Policy-Vault-Admin"
-    external_groups = ["App-Vault-Admin"]
+    external_groups = ["app-vault-admin"]
+  },
+  {
+    policy_name     = "user"
+    policy_content  = <<-EOT
+      path "identity/group/*" {
+        capabilities = ["read", "list"]
+      }
+      EOT
+    policy_group    = "Policy-Vault-User"
+    external_groups = ["app-vault-user"]
   },
 ]
