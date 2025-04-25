@@ -7,14 +7,14 @@ prov_vault = {
 oidc_key = {
   name             = "consul"
   algorithm        = "RS256"
-  verification_ttl = 3600
-  rotation_period  = 3600
+  verification_ttl = 28800
+  rotation_period  = 28800
 }
 
 oidc_roles = [
   {
     name = "consul-auto_config"
-    ttl  = 3600
+    ttl  = 28800
     # The value for matching the aud field of the JSON web token (JWT).
     # need to set the same value in Consul config file auto_config.authorization.static.bound_audiences
     # ref: https://developer.hashicorp.com/consul/tutorials/archive/docker-compose-auto-config#bound_audiences
@@ -29,7 +29,7 @@ oidc_roles = [
   },
   # {
   #   name = "consul-jwt_auth"
-  #   ttl  = 3600
+  #   ttl  = 28800
   #   # The value for matching the aud field of the JSON web token (JWT)
   #   # need to set the same value in consul consul_acl_auth_method config_json.BoundAudiences
   #   # ref: https://github.com/gitrgoliveira/vault-consul-auth/blob/356687425d9ee5bbdc03134e372e9b16a5791a07/consul.tf
