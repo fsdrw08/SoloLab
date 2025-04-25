@@ -41,6 +41,7 @@ consul:
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       ports:
         https: 8501
+      # log_level: trace
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       auto_config:
         authorization:
@@ -66,6 +67,8 @@ consul:
           agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
           config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
       encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
+      auto_encrypt:
+        allow_tls: true
       tls:
         defaults:
           ca_file: /consul/config/certs/ca.crt

@@ -23,7 +23,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
-    schema_name = "System-Infra-Quadlet-Consul_client"
+    schema_name = "System-SvcDisc-Quadlet-Consul_client"
   }
 }
 

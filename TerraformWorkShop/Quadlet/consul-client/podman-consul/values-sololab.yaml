@@ -43,34 +43,19 @@ consul:
         https: 8501
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       auto_config:
-        authorization:
-          enabled: true
-          static:
-            oidc_discovery_url: https://vault.day0.sololab:8200/v1/identity/oidc
-            oidc_discovery_ca_cert: ## set via helm value
-            bound_issuer: https://vault.day0.sololab:8200/v1/identity/oidc
-            # The value for matching the aud field of the JSON web token (JWT).
-            # The audience aud claim in a JWT is meant to refer to the authorization servers that should accept the token.
-            bound_audiences:
-              - consul-cluster-dc1
-            claim_mappings:
-              /consul/hostname: node_name
-            claim_assertions:
-              - value.node_name == "${node}"
+        enabled: true
+        server_addresses:
+          - consul.day0.sololab
+      server: false
+      bootstrap_expect: null
+      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
       acl:
         enabled: true
-        default_policy: deny
-        enable_token_persistence: true
         tokens:
-          initial_management: e95b599e-166e-7d80-08ad-aee76e7ddf19
-          agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
-          config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
-      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
+          default: e95b599e-166e-7d80-08ad-aee76e7ddf19
       tls:
         defaults:
           ca_file: /consul/config/certs/ca.crt
-          cert_file: /consul/config/certs/server.crt
-          key_file: /consul/config/certs/server.key
           verify_incoming: false
           verify_outgoing: true
         internal_rpc:

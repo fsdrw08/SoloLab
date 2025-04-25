@@ -340,6 +340,7 @@ certs = [
       validity_period_hours = 43800
       allowed_uses = [
         "digital_signature",
+        "key_encipherment",
         "cert_signing",
         "crl_signing"
       ]
