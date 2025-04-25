@@ -2,6 +2,8 @@
 variant: fcos
 version: 1.5.0
 storage:
+  directories:
+    - path: /etc/systemd/resolved.conf.d
   files:
     # config static ip
     # https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/#_disabling_automatic_configuration_of_ethernet_devices
@@ -27,7 +29,7 @@ storage:
           dns=${general_dns};
           method=manual
     # https://wiki.archlinux.org/title/Systemd-resolved#Automatically
-    - path: /etc/systemd/resolved.conf
+    - path: /etc/systemd/resolved.conf.d/custom.conf
       mode: 0644
       contents:
         inline: |
