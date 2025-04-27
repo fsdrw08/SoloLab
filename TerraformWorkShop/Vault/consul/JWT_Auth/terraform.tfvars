@@ -58,17 +58,13 @@ policy_bindings = [
         capabilities = ["read", "update"]
       }
       
-      # 允许读取和列出 kvv2/jwt 下的所有 secret 的数据
-      path "kvv2/jwt/data/*" {
-        capabilities = ["list", "read"]
+      # 允许对 kvv2/consul 下的所有 secret 的数据进行增删改查
+      path "kvv2/consul/data/*" {
+        capabilities = ["list", "read", "create", "update", "delete"]
       }
-      # 允许列出 kvv2/jwt 下的所有 secret 的元数据，这对于获取 secret 的列表很有用。
-      path "kvv2/jwt/metadata/*" {
+      # 允许列出 kvv2/consul 下的所有 secret 的元数据，这对于获取 secret 的列表很有用。
+      path "kvv2/consul/metadata/*" {
         capabilities = ["list", "read"]
-      }
-      # 允许更新 kvv2/jwt 下的 secret 数据。
-      path "kvv2/jwt/data/" {
-        capabilities = ["update"]
       }
       EOT
     policy_group    = "Policy-Consul-Auto_Config"
