@@ -6,6 +6,7 @@ sleep 2s
 CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}
 INIT_TOKEN=${INIT_TOKEN}
 
+sleep 5
 # 检查是否存在名为anonymous的policy
 POLICY_NAME="anonymous"
 POLICY_ID=$(curl -s -k -H "X-Consul-Token: $INIT_TOKEN" "$CONSUL_HTTP_ADDR/v1/acl/policies" | jq -r '.[] | select(.Name == "'$POLICY_NAME'") | .ID')

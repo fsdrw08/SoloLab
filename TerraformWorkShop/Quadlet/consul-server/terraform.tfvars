@@ -86,7 +86,7 @@ post_process = {
   "Enable-DNSAnonymousAccess.sh" = {
     script_path = "./podman-consul/Enable-DNSAnonymousAccess.sh"
     vars = {
-      CONSUL_HTTP_ADDR = "https://consul.day0.sololab:8501"
+      CONSUL_HTTP_ADDR = "https://192.168.255.10:8501"
       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     }
   }
