@@ -18,6 +18,11 @@ resource "null_resource" "init" {
   }
 }
 
+data "vault_kv_secret_v2" "jwt" {
+  mount = "kvv2/consul"
+  name  = "jwt"
+}
+
 data "terraform_remote_state" "root_ca" {
   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
   backend = var.podman_kube.helm.tls.tfstate.backend.type
@@ -81,7 +86,17 @@ data "helm_template" "podman_kube" {
         name  = value_set.name
         value = local.cert[0][value_set.value_ref_key]
       }
-    ]
+    ],
+    flatten([
+      {
+        name  = "consul.configFiles.custom.node_name"
+        value = "day1"
+      },
+      {
+        name  = "consul.configFiles.custom.auto_config.intro_token"
+        value = data.vault_kv_secret_v2.jwt.data["day1"]
+      }
+    ])
   ])
 }
 

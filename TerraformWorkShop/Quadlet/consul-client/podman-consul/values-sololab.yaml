@@ -38,21 +38,19 @@ consul:
   ## @param consul.configFiles
   configFiles:
     main:
-      bind_addr: '{{ GetInterfaceIP "eth0" }}'
-      ports:
-        https: 8501
-      # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
+      acl:
+        tokens:
+          default: e95b599e-166e-7d80-08ad-aee76e7ddf19
       auto_config:
         enabled: true
         server_addresses:
           - consul.day0.sololab
-      server: false
+      bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
-      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
-      acl:
-        enabled: true
-        tokens:
-          default: e95b599e-166e-7d80-08ad-aee76e7ddf19
+      client_addr: "0.0.0.0"
+      ports:
+        https: 8501
+      server: false
       tls:
         defaults:
           ca_file: /consul/config/certs/ca.crt
