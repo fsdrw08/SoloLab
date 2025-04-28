@@ -14,11 +14,12 @@ podman_quadlet = {
     {
       template = "./podman-traefik/traefik-container.container"
       vars = {
-        Description   = "Traefik Proxy"
-        Documentation = "https://docs.traefik.io"
-        yaml          = "traefik-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        Restart       = "on-failure"
+        Description         = "Traefik Proxy"
+        Documentation       = "https://docs.traefik.io"
+        ExecStartPre_vault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
+        ExecStartPre_consul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
+        PodmanArgs          = "--tls-verify=false"
+        Restart             = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },
@@ -34,7 +35,7 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "http://pdns-auth.day0.sololab:8081"
+  server_url = "https://pdns-auth.day0.sololab"
 }
 
 dns_records = [
