@@ -1,0 +1,10 @@
+http:
+  middlewares:
+    toHttps:
+      redirectScheme:
+        scheme: https
+        permanent: true
+tls:
+  certificates:
+    - certFile: /etc/traefik/tls/day0.crt
+      keyFile: /etc/traefik/tls/day0.key
