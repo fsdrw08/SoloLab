@@ -105,7 +105,6 @@ sleep 5
 create_rrset zot.day0.sololab. A 192.168.255.10
 create_rrset pdns-auth.day0.sololab. A 192.168.255.10
 create_rrset pdns-recursor.day0.sololab. A 192.168.255.10
-create_rrset cockpit.day0.sololab. A 192.168.255.1
 
 if [ "$(check_tsig_key_exist)" != "200" ]; then
     echo "TSIG key $TSIG_KEY_ID does not exist, creating..."
