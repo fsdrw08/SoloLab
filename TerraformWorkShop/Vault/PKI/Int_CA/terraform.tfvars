@@ -5,13 +5,14 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-vault_pki = {
+vault_pki_secret_backend = {
   secret_engine = {
     path                    = "pki/day1"
     description             = "PKI engine hosting intermediate CA day1 v1 for sololab"
     default_lease_ttl_years = 3
     max_lease_ttl_years     = 3
   }
+  public_fqdn = "vault.day0.sololab"
   role = {
     name = "IntCA-Day1-v1-role-default"
     # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage

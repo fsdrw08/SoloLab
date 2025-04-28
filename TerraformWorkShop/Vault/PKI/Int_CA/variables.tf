@@ -7,7 +7,7 @@ variable "prov_vault" {
   })
 }
 
-variable "vault_pki" {
+variable "vault_pki_secret_backend" {
   type = object({
     secret_engine = object({
       path                    = string
@@ -15,6 +15,7 @@ variable "vault_pki" {
       default_lease_ttl_years = optional(number, 0)
       max_lease_ttl_years     = optional(number, 0)
     })
+    public_fqdn = string
     role = object({
       name             = string
       ext_key_usage    = list(string)

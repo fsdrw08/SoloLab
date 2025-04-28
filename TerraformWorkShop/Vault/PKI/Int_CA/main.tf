@@ -4,17 +4,17 @@
 # https://developer.hashicorp.com/vault/docs/secrets/pki/setup#setup
 resource "vault_mount" "pki" {
   # the "pki" prefix is the default mount path prefix for mount type of pki
-  path                      = var.vault_pki.secret_engine.path
+  path                      = var.vault_pki_secret_backend.secret_engine.path
   type                      = "pki"
-  description               = var.vault_pki.secret_engine.description
-  default_lease_ttl_seconds = (var.vault_pki.secret_engine.default_lease_ttl_years * 365 * 24 * 60 * 60)
-  max_lease_ttl_seconds     = (var.vault_pki.secret_engine.max_lease_ttl_years * 365 * 24 * 60 * 60)
+  description               = var.vault_pki_secret_backend.secret_engine.description
+  default_lease_ttl_seconds = (var.vault_pki_secret_backend.secret_engine.default_lease_ttl_years * 365 * 24 * 60 * 60)
+  max_lease_ttl_seconds     = (var.vault_pki_secret_backend.secret_engine.max_lease_ttl_years * 365 * 24 * 60 * 60)
 }
 
 resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
   backend  = vault_mount.pki.path
-  path     = "https://${var.prov_vault.address}/v1/${vault_mount.pki.path}"
-  aia_path = "https://${var.prov_vault.address}/v1/${vault_mount.pki.path}"
+  path     = "https://${var.vault_pki_secret_backend.public_fqdn}/v1/${vault_mount.pki.path}"
+  aia_path = "https://${var.vault_pki_secret_backend.public_fqdn}/v1/${vault_mount.pki.path}"
 }
 
 # Enable Authority Information Access (AIA) templating
@@ -52,42 +52,42 @@ resource "vault_pki_secret_backend_crl_config" "crl_config" {
 # This also provides a simple way to transition from one issuer to another by referring to it by name.
 resource "vault_pki_secret_backend_role" "role" {
   backend = vault_mount.pki.path
-  name    = var.vault_pki.role.name
+  name    = var.vault_pki_secret_backend.role.name
   # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
   # https://pkg.go.dev/crypto/x509#ExtKeyUsage
-  ext_key_usage    = var.vault_pki.role.ext_key_usage
-  ttl              = (var.vault_pki.role.ttl_years * 365 * 24 * 60 * 60) # years in seconds
-  allow_ip_sans    = var.vault_pki.role.allow_ip_sans
-  key_type         = var.vault_pki.role.key_type
-  key_bits         = var.vault_pki.role.key_bits
-  allowed_domains  = var.vault_pki.role.allowed_domains
-  allow_subdomains = var.vault_pki.role.allow_subdomains
-  allow_any_name   = var.vault_pki.role.allow_any_name
+  ext_key_usage    = var.vault_pki_secret_backend.role.ext_key_usage
+  ttl              = (var.vault_pki_secret_backend.role.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+  allow_ip_sans    = var.vault_pki_secret_backend.role.allow_ip_sans
+  key_type         = var.vault_pki_secret_backend.role.key_type
+  key_bits         = var.vault_pki_secret_backend.role.key_bits
+  allowed_domains  = var.vault_pki_secret_backend.role.allowed_domains
+  allow_subdomains = var.vault_pki_secret_backend.role.allow_subdomains
+  allow_any_name   = var.vault_pki_secret_backend.role.allow_any_name
 }
 
 
 # intermediate CSR
 resource "vault_pki_secret_backend_intermediate_cert_request" "intermediate_cert_request" {
-  count       = var.vault_pki.ca.internal_sign == null ? 0 : 1
+  count       = var.vault_pki_secret_backend.ca.internal_sign == null ? 0 : 1
   backend     = vault_mount.pki.path
   type        = "internal"
-  common_name = var.vault_pki.ca.internal_sign.common_name
+  common_name = var.vault_pki_secret_backend.ca.internal_sign.common_name
 
 }
 
 data "vault_pki_secret_backend_issuers" "root_ca" {
-  count   = var.vault_pki.ca.internal_sign == null ? 0 : 1
-  backend = var.vault_pki.ca.internal_sign.backend
+  count   = var.vault_pki_secret_backend.ca.internal_sign == null ? 0 : 1
+  backend = var.vault_pki_secret_backend.ca.internal_sign.backend
 }
 
 # sign cert by root ca
 resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermediate" {
-  count       = var.vault_pki.ca.internal_sign == null ? 0 : 1
-  backend     = var.vault_pki.ca.internal_sign.backend
+  count       = var.vault_pki_secret_backend.ca.internal_sign == null ? 0 : 1
+  backend     = var.vault_pki_secret_backend.ca.internal_sign.backend
   csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request[0].csr
-  common_name = var.vault_pki.ca.internal_sign.common_name
+  common_name = var.vault_pki_secret_backend.ca.internal_sign.common_name
   issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca[0].key_info), 0)
-  ttl         = (var.vault_pki.ca.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+  ttl         = (var.vault_pki_secret_backend.ca.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
 }
 
 # import intermediate cert to Vault
@@ -99,8 +99,8 @@ resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate_set_si
 resource "vault_pki_secret_backend_issuer" "issuer" {
   backend                        = vault_mount.pki.path
   issuer_ref                     = vault_pki_secret_backend_intermediate_set_signed.intermediate_set_signed.imported_issuers[0]
-  revocation_signature_algorithm = var.vault_pki.issuer.revocation_signature_algorithm
-  issuer_name                    = var.vault_pki.issuer.name
+  revocation_signature_algorithm = var.vault_pki_secret_backend.issuer.revocation_signature_algorithm
+  issuer_name                    = var.vault_pki_secret_backend.issuer.name
 }
 
 # acme
