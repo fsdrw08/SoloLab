@@ -17,16 +17,6 @@ podman_kube = {
     name       = "consul"
     chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
     value_file = "./podman-consul/values-sololab.yaml"
-    # value_sets = [
-    #   {
-    #     name         = "consul.configFiles.main.node_name"
-    #     value_string = "day1"
-    #   },
-    #   {
-    #     name         = "consul.configFiles.main.auto_config.intro_token"
-    #     value_string = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJiYzY0NDBlLTk5MzMtYzZlZS1mYmU1LTg2N2ZjOGVkZGMxNiJ9.eyJhdWQiOiJjb25zdWwtY2x1c3Rlci1kYzEiLCJjb25zdWwiOnsiaG9zdG5hbWUiOiJkYXkxIn0sImV4cCI6MTc0NTU4NDUwMywiaWF0IjoxNzQ1NTU1NzAzLCJpc3MiOiJodHRwczovL3ZhdWx0LmRheTAuc29sb2xhYjo4MjAwL3YxL2lkZW50aXR5L29pZGMiLCJuYW1lc3BhY2UiOiJyb290Iiwic3ViIjoiOWY3YjU4ZjItYTUxYS00ZWJhLTRlMWUtOTNmOThjNmM0YzVmIn0.KxCZOJzBuDxZ78rrAeIaNPIQOam22GDnQPNKdHVgtgnYoxmeb6FUWRYl-tOR8XfIA9KdARLFEONJrV0i-SHtoS7kS52kVKZf6E1XPVJkSPaPRDhIpZKvTZQq2IV8bd7dPY6uAIO2u2ZcWPczzBg_T9I4NC7WCgjTQ1N1y4IrJM9KI6P3_61kw2AlMJR67XY1Y_tTBp6Hu7HiSEku-v2Xc0Ppkn9Hn4-6coiA0VfSUrYPPNrdIGOZGWDhgaNEa_EEym1N1zHbDTWUDb3EfYLM0otZ2qxvQIY3p9ID9niKE5mTGJ5EO4FqUAgx-BvtE1AH8sHHUFvA5krJXALX-QTzOQ"
-    #   },
-    # ]
     tls = {
       tfstate = {
         backend = {

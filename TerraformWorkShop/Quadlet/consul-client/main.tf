@@ -89,11 +89,11 @@ data "helm_template" "podman_kube" {
     ],
     flatten([
       {
-        name  = "consul.configFiles.custom.node_name"
+        name  = "consul.configFiles.main.node_name"
         value = "day1"
       },
       {
-        name  = "consul.configFiles.custom.auto_config.intro_token"
+        name  = "consul.configFiles.main.auto_config.intro_token"
         value = data.vault_kv_secret_v2.jwt.data["day1"]
       }
     ])
