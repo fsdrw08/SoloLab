@@ -94,17 +94,17 @@ create_metadata() {
 
 # 主逻辑
 sleep 5
-if [ "$(check_zone_exist)" != "200" ]; then
-    echo "Zone $ZONE_NAME does not exist, creating..."
-    create_zone
-else
-    echo "Zone $ZONE_NAME already exists."
-fi
+# if [ "$(check_zone_exist)" != "200" ]; then
+#     echo "Zone $ZONE_NAME does not exist, creating..."
+#     create_zone
+# else
+#     echo "Zone $ZONE_NAME already exists."
+# fi
 
 sleep 5
-create_rrset zot.day0.sololab. A 192.168.255.10
-create_rrset pdns-auth.day0.sololab. A 192.168.255.10
-create_rrset pdns-recursor.day0.sololab. A 192.168.255.10
+# create_rrset zot.day0.sololab. A 192.168.255.10
+# create_rrset pdns-auth.day0.sololab. A 192.168.255.10
+# create_rrset pdns-recursor.day0.sololab. A 192.168.255.10
 
 if [ "$(check_tsig_key_exist)" != "200" ]; then
     echo "TSIG key $TSIG_KEY_ID does not exist, creating..."

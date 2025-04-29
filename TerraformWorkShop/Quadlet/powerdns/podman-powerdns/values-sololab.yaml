@@ -63,5 +63,5 @@ powerdns:
       config:
         local-address: 192.168.255.10
         local-port: 53
-        forward-zones: day0.sololab=192.168.255.10:1053
+        forward-zones: day0.sololab=192.168.255.10:1053,day1.sololab=192.168.255.10:1053,consul=192.168.255.10:8600
         webserver-address: 192.168.255.10
