@@ -79,14 +79,14 @@ prov_pdns = {
   server_url = "https://pdns-auth.day0.sololab"
 }
 
-# dns_records = [
-#   {
-#     zone = "day0.sololab."
-#     name = "consul-client.day1.sololab."
-#     type = "A"
-#     ttl  = 86400
-#     records = [
-#       "192.168.255.20"
-#     ]
-#   },
-# ]
+dns_records = [
+  {
+    zone = "day1.sololab."
+    name = "consul-client.day1.sololab."
+    type = "CNAME"
+    ttl  = 86400
+    records = [
+      "day1.node.consul."
+    ]
+  },
+]

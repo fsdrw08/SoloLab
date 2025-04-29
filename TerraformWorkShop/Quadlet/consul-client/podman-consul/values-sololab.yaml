@@ -111,7 +111,7 @@ consul:
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.consul-web.entrypoints: webSecure
-    traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day1.sololab`)
+    traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day1.sololab`)
     traefik.tcp.routers.consul-web.tls.passthrough: true
     traefik.tcp.routers.consul-web.service: consul-web
     traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
