@@ -1,3 +1,9 @@
+prov_vault = {
+  address         = "https://vault.day0.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = true
+}
+
 prov_remote = {
   host     = "192.168.255.20"
   port     = 22
@@ -20,16 +26,10 @@ podman_quadlet = {
         ExecStartPre_consul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
         PodmanArgs          = "--tls-verify=false"
         Restart             = "on-failure"
+        Network             = "podman-default-kube-network"
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },
-    {
-      template = "./podman-traefik/traefik-container.volume"
-      vars = {
-        VolumeName = "traefik-pvc"
-      }
-      dir = "/home/podmgr/.config/containers/systemd"
-    }
   ]
 }
 
@@ -42,10 +42,10 @@ dns_records = [
   {
     zone = "day1.sololab."
     name = "traefik.day1.sololab."
-    type = "A"
+    type = "CNAME"
     ttl  = 86400
     records = [
-      "192.168.255.20"
+      "day1.node.consul."
     ]
   },
 ]

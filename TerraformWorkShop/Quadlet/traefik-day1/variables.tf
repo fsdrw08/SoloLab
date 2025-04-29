@@ -1,3 +1,11 @@
+variable "prov_vault" {
+  type = object({
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}
+
 variable "prov_remote" {
   type = object({
     host     = string
