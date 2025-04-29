@@ -43,19 +43,19 @@ oidc_client = [
   #     "http://example-app.day0.sololab/callback",
   #   ]
   # },
-  # {
-  #   name         = "minio"
-  #   allow_groups = ["app-minio-user"]
-  #   redirect_uris = [
-  #     "https://minio-console.day0.sololab/oauth_callback",
-  #   ]
-  # },
   {
     name         = "nomad"
     allow_groups = ["app-nomad-user"]
     redirect_uris = [
       "https://nomad.day0.sololab/oidc/callback",
       "https://nomad.day0.sololab/ui/settings/tokens",
+    ]
+  },
+  {
+    name         = "minio"
+    allow_groups = ["app-minio-user"]
+    redirect_uris = [
+      "https://minio-console.day1.sololab/oauth_callback",
     ]
   },
 ]

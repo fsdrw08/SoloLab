@@ -1,11 +1,11 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab:8200"
+  address         = "https://vault.day0.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
 prov_remote = {
-  host     = "192.168.255.10"
+  host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -56,12 +56,13 @@ podman_quadlet = {
       vars = {
         Description   = "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
         Documentation = "https://min.io/docs/minio/container/index.html"
-        After         = "vault-container.service"
-        Wants         = "vault-container.service"
+        After         = ""
+        Wants         = ""
         yaml          = "minio-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "host"
+        Network       = "podman-default-kube-network"
+        ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
         Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"
@@ -71,26 +72,26 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "http://pdns-auth.day0.sololab:8081"
+  server_url = "http://pdns-auth.day0.sololab"
 }
 
 dns_records = [
   {
-    zone = "day0.sololab."
-    name = "minio-api.day0.sololab."
-    type = "A"
+    zone = "day1.sololab."
+    name = "minio-api.day1.sololab."
+    type = "CNAME"
     ttl  = 86400
     records = [
-      "192.168.255.10"
+      "day1.node.consul"
     ]
   },
   {
-    zone = "day0.sololab."
-    name = "minio-console.day0.sololab."
-    type = "A"
+    zone = "day1.sololab."
+    name = "minio-console.day1.sololab."
+    type = "CNAME"
     ttl  = 86400
     records = [
-      "192.168.255.10"
+      "day1.node.consul"
     ]
   },
 ]

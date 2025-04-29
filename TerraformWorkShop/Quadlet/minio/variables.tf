@@ -93,4 +93,5 @@ variable "dns_records" {
     ttl     = number
     records = list(string)
   }))
+  default = []
 }

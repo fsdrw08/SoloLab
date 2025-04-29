@@ -12,6 +12,7 @@ KubeDownForce=${KubeDownForce}
 Network=${Network}
 
 [Service]
+ExecStartPre=${ExecStartPre}
 Restart=${Restart}
 
 [Install]

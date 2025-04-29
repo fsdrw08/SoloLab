@@ -11,13 +11,13 @@ minio:
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.minio-api.entrypoints: webSecure
-    traefik.tcp.routers.minio-api.rule: HostSNI(`minio-api.day0.sololab`)
+    traefik.tcp.routers.minio-api.rule: HostSNI(`minio-api.day1.sololab`)
     traefik.tcp.routers.minio-api.tls.passthrough: true
     traefik.tcp.routers.minio-api.service: minio-api
     traefik.tcp.services.minio-api.loadbalancer.server.port: 9000
 
     traefik.tcp.routers.minio-console.entrypoints: webSecure
-    traefik.tcp.routers.minio-console.rule: HostSNI(`minio-console.day0.sololab`)
+    traefik.tcp.routers.minio-console.rule: HostSNI(`minio-console.day1.sololab`)
     traefik.tcp.routers.minio-console.tls.passthrough: true
     traefik.tcp.routers.minio-console.service: minio-console
     traefik.tcp.services.minio-console.loadbalancer.server.port: 9001
@@ -57,9 +57,9 @@ minio:
       --address=:9000
       --console-address=:9001
       --certs-dir=/etc/minio/certs
-    MINIO_SERVER_URL: https://minio-api.day0.sololab
+    MINIO_SERVER_URL: https://minio-api.day1.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
-    MINIO_BROWSER_REDIRECT_URL: https://minio-console.day0.sololab
+    MINIO_BROWSER_REDIRECT_URL: https://minio-console.day1.sololab
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
