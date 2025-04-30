@@ -55,6 +55,7 @@ podman_quadlet = {
         KubeDownForce = "false"
         Network       = "host"
         Restart       = "on-failure"
+        ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run traefik-proxy\""
       }
       dir = "/home/podmgr/.config/containers/systemd"
     },

@@ -63,6 +63,7 @@ podman_quadlet = {
         KubeDownForce = "false"
         Network       = "podman-default-kube-network"
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
+        ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run minio-server\""
         Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"

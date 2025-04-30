@@ -25,6 +25,7 @@ podman_quadlet = {
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run powerdns-auth\""
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }

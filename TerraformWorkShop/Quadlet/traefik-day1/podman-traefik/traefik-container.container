@@ -9,6 +9,7 @@ Sockets=http.socket https.socket
 ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm traefik-sec-ca; echo \"${ca}\" | base64 -d | podman secret create traefik-sec-ca -"
 ExecStartPre=${ExecStartPre_vault}
 ExecStartPre=${ExecStartPre_consul}
+ExecStartPost=${ExecStartPost}
 
 # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
 [Container]

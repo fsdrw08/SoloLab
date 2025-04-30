@@ -13,6 +13,7 @@ Network=${Network}
 
 [Service]
 ExecStartPre=${ExecStartPre}
+ExecStartPost=${ExecStartPost}
 Restart=${Restart}
 
 [Install]
