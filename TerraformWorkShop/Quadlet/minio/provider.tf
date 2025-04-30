@@ -21,13 +21,13 @@ terraform {
       version = ">=1.5.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "System-Infa-Quadlet-LLDAP"
-  # }
-  backend "local" {
-
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
+    schema_name = "System-Day1-Quadlet-MinIO"
   }
+  # backend "local" {
+
+  # }
 }
 
 provider "vault" {

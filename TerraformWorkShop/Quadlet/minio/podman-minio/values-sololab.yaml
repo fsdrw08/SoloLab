@@ -1,6 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 minio:
+  containerPorts: []
   livenessProbe:
     exec:
       command:

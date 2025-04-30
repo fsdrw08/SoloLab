@@ -11,18 +11,26 @@ data "vault_identity_oidc_client_creds" "creds" {
 #   content = file("./podman-minio/minio-traefik.yaml")
 # }
 
-data "terraform_remote_state" "root_ca" {
-  count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
-  backend = var.podman_kube.helm.tls.tfstate.backend.type
-  config  = var.podman_kube.helm.tls.tfstate.backend.config
+# load cert from vault
+data "vault_kv_secret_v2" "cert" {
+  count = var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+  mount = var.podman_kube.helm.tls.vault_kvv2.mount
+  name  = var.podman_kube.helm.tls.vault_kvv2.name
 }
 
-locals {
-  cert = var.podman_kube.helm.tls.tfstate == null ? null : [
-    for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-    if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
-  ]
-}
+# load cert from local tls
+# data "terraform_remote_state" "root_ca" {
+#   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
+#   backend = var.podman_kube.helm.tls.tfstate.backend.type
+#   config  = var.podman_kube.helm.tls.tfstate.backend.config
+# }
+
+# locals {
+#   cert = var.podman_kube.helm.tls.tfstate == null ? null : [
+#     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
+#     if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+#   ]
+# }
 
 data "helm_template" "podman_kube" {
   name  = var.podman_kube.helm.name
@@ -65,8 +73,9 @@ data "helm_template" "podman_kube" {
     ],
     var.podman_kube.helm.tls == null ? [] : [
       for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
-        name  = value_set.name
-        value = local.cert[0][value_set.value_ref_key]
+        name = value_set.name
+        # value = local.cert[0][value_set.value_ref_key]
+        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
       }
     ],
     flatten([
@@ -144,7 +153,7 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-#   content = file("./podman-lldap/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-minio.hcl"
+  content = file("./podman-minio/service.hcl")
+}

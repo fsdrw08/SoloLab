@@ -1,6 +1,6 @@
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab:8200"
+  address         = "vault.day0.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -17,14 +17,17 @@ vault_kvv2 = {
 }
 
 vault_certs = [
-  # {
-  #   secret_engine = {
-  #     backend   = "pki/day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
-  #   }
-  #   ttl_years   = 3
-  #   common_name = "opendj.day1.sololab"
-  # },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "minio-api.day1.sololab"
+    alt_names = [
+      "minio-console.day1.sololab",
+    ]
+  },
   # {
   #   secret_engine = {
   #     backend   = "pki/day1"

@@ -20,25 +20,20 @@ podman_kube = {
       value_sets = [
         {
           name          = "minio.tls.contents.public\\.crt"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert"
         },
         {
           name          = "minio.tls.contents.private\\.key"
-          value_ref_key = "key_pem"
+          value_ref_key = "private_key"
         },
         {
           name          = "minio.tls.contents.CAs.sololab\\.crt"
           value_ref_key = "ca"
         }
       ]
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
-          }
-        }
-        cert_name = "minio"
+      vault_kvv2 = {
+        mount = "kvv2/certs"
+        name  = "minio-api.day1.sololab"
       }
     }
   }
@@ -61,8 +56,8 @@ podman_quadlet = {
         yaml          = "minio-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "podman-default-kube-network"
-        ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
+        Network       = "host"
+        ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run minio-server\""
         Restart       = "on-failure"
       }
@@ -73,7 +68,7 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "http://pdns-auth.day0.sololab"
+  server_url = "https://pdns-auth.day0.sololab"
 }
 
 dns_records = [
@@ -83,7 +78,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1.node.consul"
+      "day1.node.consul."
     ]
   },
   {
@@ -92,7 +87,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1.node.consul"
+      "day1.node.consul."
     ]
   },
 ]
