@@ -14,10 +14,12 @@ variable "vm" {
     vhd = object({
       dir    = string
       source = string
-      data_disk_ref = optional(
+      data_disk_tfstate = optional(
         object({
-          backend = string
-          config  = map(string)
+          backend = object({
+            type   = string
+            config = map(string)
+          })
         }), null
       )
     })
@@ -45,7 +47,11 @@ variable "butane" {
       base   = string
       others = optional(list(string), null)
     })
-    vars = map(string)
+    # vars = map(string)
+    vars = object({
+      global = map(string)
+      local  = optional(list(map(string)), null)
+    })
   })
 }
 

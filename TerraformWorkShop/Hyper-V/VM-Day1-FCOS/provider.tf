@@ -26,8 +26,8 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "HyperV-SvcDisc-VM-FCOS"
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
+    schema_name = "HyperV-Day1-VM-FCOS"
   }
   # backend "s3" {
   #   bucket = "tfstate"                 # Name of the S3 bucket

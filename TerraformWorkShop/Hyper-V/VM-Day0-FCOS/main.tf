@@ -1,26 +1,42 @@
+# fetch data disk info
+data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
+  backend = var.vm.vhd.data_disk_tfstate.backend.type
+  config  = var.vm.vhd.data_disk_tfstate.backend.config
+}
+
 locals {
   vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
     for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
   ]
+  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
+    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
+    if regex("^[^.]+", vhd.name) == var.vm.base_name
+    ]) : flatten([
+    for count in range(var.vm.count) : [
+      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
+    ]
+  ])
 }
 
 data "ct_config" "ignition" {
-  count        = var.vm.count
-  content      = templatefile(var.butane.files.base, var.butane.vars)
+  count = var.vm.count
+  content = templatefile(
+    var.butane.files.base,
+    merge(var.butane.vars.global, var.butane.vars.local[count.index])
+  )
   strict       = true
   pretty_print = false
 
   snippets = [
     for file in var.butane.files.others :
-    templatefile(file, var.butane.vars)
+    templatefile(
+      file,
+      merge(var.butane.vars.global, var.butane.vars.local[count.index])
+    )
   ]
-}
-
-# fetch data disk info
-data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_ref.backend
-  config  = var.vm.vhd.data_disk_ref.config
 }
 
 # prepare boot disk path
@@ -58,12 +74,12 @@ module "hyperv_machine_instance" {
     path                = terraform_data.boot_disk[count.index].input
   }
 
-  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
+  additional_disk_drives = var.vm.vhd.data_disk_tfstate == null ? null : [
     {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "2"
-      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
+      path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
     }
   ]
 
