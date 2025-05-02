@@ -34,7 +34,6 @@ storage:
           method=manual
     # https://wiki.archlinux.org/title/Systemd-resolved#Automatically
     - path: /etc/systemd/resolved.conf.d/custom.conf
-      mode: 0600
       contents:
         inline: |
           [Resolve]
