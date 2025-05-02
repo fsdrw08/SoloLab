@@ -71,15 +71,15 @@ module "hyperv_machine_instance" {
     controller_type     = "Scsi"
     controller_number   = "0"
     controller_location = "0"
-    path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
+    path                = terraform_data.boot_disk[count.index].input
   }
 
-  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
+  additional_disk_drives = var.vm.vhd.data_disk_tfstate == null ? null : [
     {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "2"
-      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
+      path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
     }
   ]
 
