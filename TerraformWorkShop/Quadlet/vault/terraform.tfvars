@@ -50,7 +50,7 @@ podman_quadlet = {
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
-        ExecStartPost = "/bin/bash -c \"sleep 10 && podman healthcheck run vault-server\""
+        ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run vault-server\""
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
