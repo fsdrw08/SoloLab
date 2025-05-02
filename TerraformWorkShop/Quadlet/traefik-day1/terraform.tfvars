@@ -25,7 +25,7 @@ podman_quadlet = {
         ExecStartPre_vault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPre_consul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
         PodmanArgs          = "--tls-verify=false"
-        Network             = "podman-default-kube-network"
+        Network             = "podman"
         ExecStartPost       = "/bin/bash -c \"sleep 5 && podman healthcheck run traefik\""
         Restart             = "on-failure"
       }
