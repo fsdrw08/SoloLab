@@ -16,20 +16,11 @@ vault:
     main:
       api_addr: "https://vault.day0.sololab:8200"
       cluster_addr: "https://vault.day0.sololab:8201"
-    ## @param vault.configFiles.storage storage config for server
-    ##
-    storage:
-      ## @param vault.configFiles.storage
-      ## The storage stanza configures the storage backend, which represents the location for the durable storage of Vault's information
-      ## if the storage file changed, do forget also change it in persistence.mountPath.storage
-      ## https://developer.hashicorp.com/vault/docs/configuration/storage
-      ## https://github.com/kirubasankars/bedrock/blob/b2037fb394d149a9fed560cc60d284b28b4585fb/src/main/agent/vault/config/vault.json#L3
       storage:
         raft:
           path: /vault/file
           node_id: raft_node_1
         file: null
-    listeners:
       listener:
         - tcp:
             tls_disable: false
