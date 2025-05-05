@@ -118,5 +118,20 @@ groups = [
       "admin"
     ]
   },
+  {
+    iac_id       = "a4019ca3"
+    display_name = "app-grafana-user"
+    members = [
+      "admin",
+      "user1",
+    ]
+  },
+  {
+    iac_id       = "20a3d418"
+    display_name = "app-grafana-admin"
+    members = [
+      "admin",
+    ]
+  },
 ]
 

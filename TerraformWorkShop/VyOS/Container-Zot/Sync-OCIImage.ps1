@@ -184,6 +184,14 @@ $syncList = @"
         "privateRepo": "instrumentisto/rsync-ssh:alpine3.21",
         "description": "https://quay.io/repository/instrumentisto/rsync-ssh?tab=tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "grafana/grafana:11.6.1",
+        "archive": "docker.io_grafana_grafana_11.6.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "grafana/grafana:11.6.1",
+        "description": "https://hub.docker.com/r/grafana/grafana/tags",
+    },
 ]
 "@
 

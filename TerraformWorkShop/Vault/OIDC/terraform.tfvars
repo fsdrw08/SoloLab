@@ -58,4 +58,11 @@ oidc_client = [
       "https://minio-console.day1.sololab/oauth_callback",
     ]
   },
+  {
+    name         = "grafana"
+    allow_groups = ["app-grafana-user"]
+    redirect_uris = [
+      "https://grafana.day1.sololab/login/generic_oauth",
+    ]
+  },
 ]

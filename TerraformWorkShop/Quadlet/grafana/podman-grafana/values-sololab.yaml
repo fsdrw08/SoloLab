@@ -1,0 +1,34 @@
+global:
+  imageRegistry: zot.day0.sololab
+grafana:
+  containerPorts: []
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 3
+    periodSeconds: 600
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    exec:
+      command:
+        - curl
+        - -kf
+        - https://localhost:3000/api/health
+  configFiles:
+    custom:
+      server:
+        domain: grafana.day1.sololab
+        root_url: https://grafana.day1.sololab
+        cert_key: /etc/grafana/certs/grafana.key
+        cert_file: /etc/grafana/certs/grafana.crt
+        protocol: https
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.grafana.entrypoints: webSecure
+    traefik.tcp.routers.grafana.rule: HostSNI(`grafana.day1.sololab`)
+    traefik.tcp.routers.grafana.tls.passthrough: true
+    traefik.tcp.routers.grafana.service: grafana
+    traefik.tcp.services.grafana.loadbalancer.server.port: 3000
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
