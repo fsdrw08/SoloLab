@@ -19,6 +19,10 @@ podman_kube = {
     tls = {
       value_sets = [
         {
+          name          = "grafana.tls.contents.ca\\.crt"
+          value_ref_key = "ca"
+        },
+        {
           name          = "grafana.tls.contents.grafana\\.crt"
           value_ref_key = "cert"
         },
@@ -54,8 +58,7 @@ podman_quadlet = {
         KubeDownForce = "false"
         Network       = "host"
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
-        # ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run grafana-server\""
-        ExecStartPost = ""
+        ExecStartPost = "/bin/bash -c \"sleep 10 && podman healthcheck run grafana-server\""
         Restart       = "on-failure"
       }
       dir = "/home/podmgr/.config/containers/systemd"

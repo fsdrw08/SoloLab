@@ -78,37 +78,50 @@ data "helm_template" "podman_kube" {
         value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
       }
     ],
-    # flatten([
-    #   {
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_CONFIG_URL"
-    #     value = "${data.vault_identity_oidc_openid_config.config.issuer}/.well-known/openid-configuration"
-    #   },
-    #   {
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_CLIENT_ID"
-    #     value = data.vault_identity_oidc_client_creds.creds.client_id
-    #   },
-    #   {
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_CLIENT_SECRET"
-    #     value = data.vault_identity_oidc_client_creds.creds.client_secret
-    #   },
-    #   {
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_DISPLAY_NAME"
-    #     value = "login with vault"
-    #   },
-    #   {
-    #     # https://min.io/docs/grafana/linux/reference/grafana-server/settings/iam/openid.html#envvar.grafana_IDENTITY_OPENID_CLAIM_NAME
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_CLAIM_NAME"
-    #     value = "policy"
-    #   },
-    #   # {
-    #   #   name  = "grafana.config.grafana_IDENTITY_OPENID_CLAIM_PREFIX"
-    #   #   value = "grafana"
-    #   # },
-    #   {
-    #     name  = "grafana.config.grafana_IDENTITY_OPENID_SCOPES"
-    #     value = "openid\\,grafana_scope"
-    #   }
-    # ])
+    # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
+    flatten([
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.enabled"
+        value = "true"
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.name"
+        value = "vault"
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.auth_url"
+        value = data.vault_identity_oidc_openid_config.config.authorization_endpoint
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.token_url"
+        value = data.vault_identity_oidc_openid_config.config.token_endpoint
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.api_url"
+        value = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.client_id"
+        value = data.vault_identity_oidc_client_creds.creds.client_id
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.client_secret"
+        value = data.vault_identity_oidc_client_creds.creds.client_secret
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.scopes"
+        value = "openid profile email groups user"
+      },
+      {
+        # https://min.io/docs/grafana/linux/reference/grafana-server/settings/iam/openid.html#envvar.grafana_IDENTITY_OPENID_CLAIM_NAME
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.empty_scopes"
+        value = "false"
+      },
+      {
+        name  = "grafana.configFiles.custom.auth\\.generic_oauth.tls_client_ca"
+        value = "/etc/grafana/certs/ca.crt"
+      }
+    ])
   ])
 }
 
