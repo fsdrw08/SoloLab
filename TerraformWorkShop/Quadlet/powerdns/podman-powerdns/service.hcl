@@ -1,6 +1,6 @@
 services {
   id   = "powerdns-auth-web"
-  name = "powerdns-auth"
+  name = "powerdns"
   port = 8081
 
   checks = [
@@ -21,7 +21,7 @@ services {
 
 services {
   id   = "powerdns-recursor-web"
-  name = "powerdns-recursor"
+  name = "powerdns"
   port = 8082
 
   checks = [
