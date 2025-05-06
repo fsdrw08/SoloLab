@@ -11,6 +11,7 @@ Network=${Network}
 
 [Service]
 ExecStartPost=${ExecStartPost}
+Restart=${Restart}
 
 [Install]
 WantedBy=default.target

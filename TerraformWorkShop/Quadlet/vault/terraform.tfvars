@@ -51,6 +51,7 @@ podman_quadlet = {
         KubeDownForce = "false"
         Network       = "host"
         ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run vault-server\""
+        Restart       = ""
       }
       dir = "/home/podmgr/.config/containers/systemd"
     }
