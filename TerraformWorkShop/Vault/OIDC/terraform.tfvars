@@ -36,13 +36,13 @@ oidc_provider = {
 }
 
 oidc_client = [
-  # {
-  #   name         = "example-app"
-  #   allow_groups = ["app-minio-admin"]
-  #   redirect_uris = [
-  #     "http://example-app.day0.sololab/callback",
-  #   ]
-  # },
+  {
+    name         = "example-app"
+    allow_groups = ["app-vault-user"]
+    redirect_uris = [
+      "http://example-app.day0.sololab/callback",
+    ]
+  },
   {
     name         = "nomad"
     allow_groups = ["app-nomad-user"]

@@ -14,45 +14,45 @@ prov_vault = {
 
 podman_kube = {
   helm = {
-    name       = "example-app"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/example-app"
+    # name       = "example-app"
+    # chart      = "../../../HelmWorkShop/helm-charts/charts/example-app"
     value_file = "./podman-example-app/values-sololab.yaml"
-    value_sets = [
-      {
-        name         = "example-app.configFiles.main.advertise.http"
-        value_string = "192.168.255.20"
-      },
-      {
-        name         = "example-app.configFiles.main.advertise.rpc"
-        value_string = "192.168.255.20"
-      },
-      {
-        name         = "example-app.configFiles.main.advertise.serf"
-        value_string = "192.168.255.20"
-      },
-    ]
-    tls_value_sets = {
-      value_ref = {
-        vault_kvv2 = {
-          mount = "kvv2/certs"
-          name  = "example-app.day1.sololab"
-        }
-      }
-      value_sets = [
-        {
-          name          = "example-app.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "example-app.tls.contents.server\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "example-app.tls.contents.server\\.key"
-          value_ref_key = "private_key"
-        },
-      ]
-    }
+    # value_sets = [
+    #   {
+    #     name         = "example-app.configFiles.main.advertise.http"
+    #     value_string = "192.168.255.20"
+    #   },
+    #   {
+    #     name         = "example-app.configFiles.main.advertise.rpc"
+    #     value_string = "192.168.255.20"
+    #   },
+    #   {
+    #     name         = "example-app.configFiles.main.advertise.serf"
+    #     value_string = "192.168.255.20"
+    #   },
+    # ]
+    # tls_value_sets = {
+    #   value_ref = {
+    #     vault_kvv2 = {
+    #       mount = "kvv2/certs"
+    #       name  = "example-app.day1.sololab"
+    #     }
+    #   }
+    #   value_sets = [
+    #     {
+    #       name          = "example-app.tls.contents.ca\\.crt"
+    #       value_ref_key = "ca"
+    #     },
+    #     {
+    #       name          = "example-app.tls.contents.server\\.crt"
+    #       value_ref_key = "cert"
+    #     },
+    #     {
+    #       name          = "example-app.tls.contents.server\\.key"
+    #       value_ref_key = "private_key"
+    #     },
+    #   ]
+    # }
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/example-app-aio.yaml"
 }
