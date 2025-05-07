@@ -22,6 +22,25 @@ grafana:
         cert_key: /etc/grafana/certs/grafana.key
         cert_file: /etc/grafana/certs/grafana.crt
         protocol: https
+      auth.generic_oauth:
+        enabled: true
+        name: vault
+        client_id: # set from terraform data
+        client_secret: # set from terraform data
+        auth_url: # set from terraform data
+        api_url: # set from terraform data
+        token_url: # set from terraform data
+        scopes: openid groups username
+        email_attribute_path: username
+        empty_scopes: false
+        tls_client_ca: /etc/grafana/certs/ca.crt
+        # Configure role mapping, oss version grafana only able to use serval builtin roles
+        # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#configure-role-mapping
+        # https://github.com/ruby-no-kai/rubykaigi-net/blob/29080e7758903dd7429fbdc60eb5f1ddd4b6a2ed/tf/grafana/oidc_client.tf#L17
+        # https://github.com/Lillecarl/nixos/blob/0cd25a6656976b10b9caf49b4dd637d91b5245f5/cloud/grafana-config/oauth.tf#L17
+        #
+        # GrafanaAdmin means Organization administrator
+        role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin' || contains(groups[*], 'app-grafana-admin') && 'Admin' || contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.grafana.entrypoints: webSecure
