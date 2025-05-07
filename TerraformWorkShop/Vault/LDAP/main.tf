@@ -11,6 +11,7 @@ data "vault_kv_secret_v2" "root_cert" {
 }
 
 resource "vault_ldap_auth_backend" "ldap" {
+  path                 = var.vault_ldap_auth_backend.path
   url                  = var.vault_ldap_auth_backend.url
   starttls             = var.vault_ldap_auth_backend.starttls
   case_sensitive_names = var.vault_ldap_auth_backend.case_sensitive_names
@@ -31,7 +32,6 @@ resource "vault_ldap_auth_backend" "ldap" {
   groupattr            = var.vault_ldap_auth_backend.groupattr
   username_as_alias    = var.vault_ldap_auth_backend.username_as_alias
   use_token_groups     = var.vault_ldap_auth_backend.use_token_groups
-  path                 = var.vault_ldap_auth_backend.path
   disable_remount      = var.vault_ldap_auth_backend.disable_remount
   description          = var.vault_ldap_auth_backend.description
   local                = var.vault_ldap_auth_backend.local
@@ -74,6 +74,21 @@ resource "vault_identity_entity" "user" {
   external_policies = true
 }
 
+# resource "vault_identity_entity" "user" {
+#   # for_each = {
+#   #   for user in var.ldap_vault_entities.users : user => user
+#   # }
+#   for_each = {
+#     # for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
+#     for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).uid[0] => entry
+#   }
+#   name              = "entity_${jsondecode(each.value.data_json).uid[0]}"
+#   external_policies = true
+#   metadata = {
+#     email = jsondecode(each.value.data_json).mail[0]
+#   }
+# }
+
 resource "vault_identity_entity_alias" "alias" {
   for_each = {
     for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
@@ -82,6 +97,16 @@ resource "vault_identity_entity_alias" "alias" {
   mount_accessor = vault_ldap_auth_backend.ldap.accessor
   canonical_id   = vault_identity_entity.user[each.key].id
 }
+
+# resource "vault_identity_entity_alias" "alias" {
+#   for_each = {
+#     # for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).mail[0] => entry
+#     for entry in data.ldap_entries.users.entries : jsondecode(entry.data_json).uid[0] => entry
+#   }
+#   name           = jsondecode(each.value.data_json).uid[0]
+#   mount_accessor = vault_ldap_auth_backend.ldap.accessor
+#   canonical_id   = vault_identity_entity.user[jsondecode(each.value.data_json).uid[0]].id
+# }
 
 resource "vault_identity_group" "group" {
   for_each = {

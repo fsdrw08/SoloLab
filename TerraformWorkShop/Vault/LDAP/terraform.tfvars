@@ -44,6 +44,7 @@ vault_ldap_auth_backend = {
   bindpass = "readonly"
   userdn   = "ou=people,dc=root,dc=sololab"
   userattr = "mail"
+  # userattr = "uid"
   # do not use upper case group name
   userfilter  = "(&({{.UserAttr}}={{.Username}})(objectClass=person)(memberOf=cn=sso_allow,ou=groups,dc=root,dc=sololab))"
   groupdn     = "ou=groups,dc=root,dc=sololab"
