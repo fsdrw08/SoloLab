@@ -16,7 +16,7 @@ users = [
     display_name = "readonly"
   },
   {
-    user_id = "user1"
+    user_id = "001"
     email   = "user1@mail.sololab"
     # uncomment below filed when apply this resource in first time
     password     = "P@ssw0rd"
@@ -33,7 +33,7 @@ groups = [
     display_name = "sso_allow"
     members = [
       "admin",
-      "user1"
+      "001"
     ]
   },
   {
@@ -41,7 +41,7 @@ groups = [
     display_name = "app-vault-user"
     members = [
       "admin",
-      "user1",
+      "001",
     ]
   },
   {
@@ -56,7 +56,7 @@ groups = [
     display_name = "app-minio-user"
     members = [
       "admin",
-      "user1",
+      "001",
     ]
   },
   {
@@ -70,7 +70,7 @@ groups = [
     iac_id       = "0c31450b"
     display_name = "app-minio-readwrite"
     members = [
-      "user1",
+      "001",
     ]
   },
   {
@@ -78,7 +78,7 @@ groups = [
     display_name = "app-consul-auto_config"
     members = [
       "admin",
-      "user1"
+      "001"
     ]
   },
   {
@@ -86,7 +86,7 @@ groups = [
     display_name = "app-consul-user"
     members = [
       "admin",
-      "user1"
+      "001"
     ]
   },
   {
@@ -100,7 +100,7 @@ groups = [
     iac_id       = "542b0c36"
     display_name = "app-consul-readonly"
     members = [
-      "user1"
+      "001"
     ]
   },
   {
@@ -108,7 +108,7 @@ groups = [
     display_name = "app-nomad-user"
     members = [
       "admin",
-      "user1"
+      "001"
     ]
   },
   {
@@ -123,14 +123,21 @@ groups = [
     display_name = "app-grafana-user"
     members = [
       "admin",
-      "user1",
+      "001",
+    ]
+  },
+  {
+    iac_id       = "a3d0b5af"
+    display_name = "app-grafana-app-grafana-root"
+    members = [
+      "admin",
     ]
   },
   {
     iac_id       = "20a3d418"
     display_name = "app-grafana-admin"
     members = [
-      "admin",
+
     ]
   },
 ]
