@@ -128,7 +128,7 @@ groups = [
   },
   {
     iac_id       = "a3d0b5af"
-    display_name = "app-grafana-app-grafana-root"
+    display_name = "app-grafana-root"
     members = [
       "admin",
     ]
