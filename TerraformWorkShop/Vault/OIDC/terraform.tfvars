@@ -9,10 +9,11 @@ oidc_provider = {
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {
-      name     = "username"
+      name     = "user"
       template = <<-EOT
       {
-        "username": {{identity.entity.name}}
+        "username": {{identity.entity.name}},
+        "email": {{identity.entity.metadata.email}}
       }
       EOT
     },

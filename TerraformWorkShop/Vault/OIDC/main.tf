@@ -18,7 +18,8 @@ resource "vault_identity_oidc_scope" "scopes" {
 }
 
 # ! if delete scope, this provider resource will prevent scope delete
-# no idea how to update this resource before scope destroy
+# should run terraform apply -target="vault_identity_oidc_provider.provider"
+# to update this resource first
 resource "vault_identity_oidc_provider" "provider" {
   depends_on = [
     vault_identity_oidc_scope.scopes,
