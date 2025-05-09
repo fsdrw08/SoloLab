@@ -21,9 +21,9 @@ resource "vault_identity_oidc_scope" "scopes" {
 # should run terraform apply -target="vault_identity_oidc_provider.provider"
 # to update this resource first
 resource "vault_identity_oidc_provider" "provider" {
-  depends_on = [
-    vault_identity_oidc_scope.scopes,
-  ]
+  # depends_on = [
+  #   vault_identity_oidc_scope.scopes,
+  # ]
   name          = "sololab"
   https_enabled = true
   issuer_host   = var.oidc_provider.issuer_host
