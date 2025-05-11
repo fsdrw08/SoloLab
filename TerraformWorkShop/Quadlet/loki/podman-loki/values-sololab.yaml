@@ -1,0 +1,44 @@
+global:
+  imageRegistry: zot.day0.sololab
+loki:
+  containerPorts: []
+  configFiles:
+    custom:
+      server:
+        domain: loki.day1.sololab
+        root_url: https://loki.day1.sololab
+        cert_key: /etc/loki/certs/loki.key
+        cert_file: /etc/loki/certs/loki.crt
+        protocol: https
+      auth.generic_oauth:
+        enabled: true
+        name: vault
+        client_id: # set from terraform data
+        client_secret: # set from terraform data
+        auth_url: # set from terraform data
+        api_url: # set from terraform data
+        token_url: # set from terraform data
+        scopes: openid groups user
+        email_attribute_path: email
+        empty_scopes: false
+        tls_client_ca: /etc/loki/certs/ca.crt
+        # Configure role mapping, oss version loki only able to use serval builtin roles
+        # https://loki.com/docs/loki/latest/setup-loki/configure-security/configure-authentication/generic-oauth/#configure-role-mapping
+        # https://github.com/ruby-no-kai/rubykaigi-net/blob/29080e7758903dd7429fbdc60eb5f1ddd4b6a2ed/tf/loki/oidc_client.tf#L17
+        # https://github.com/Lillecarl/nixos/blob/0cd25a6656976b10b9caf49b4dd637d91b5245f5/cloud/loki-config/oauth.tf#L17
+        #
+        # lokiAdmin means Organization administrator
+        # ref: https://community.loki.com/t/generic-oauth-cannot-assign-lokiadmin/110312/2
+        # https://loki.com/docs/loki/latest/setup-loki/configure-security/configure-authentication/generic-oauth/#configuration-options:~:text=mapping%20example.-,allow_assign_loki_admin,-No
+        allow_assign_loki_admin: true
+        role_attribute_path: contains(groups[*], 'app-loki-root') && 'lokiAdmin' || contains(groups[*], 'app-loki-admin') && 'Admin' || contains(roles[*], 'app-loki-editor') && 'Editor' || 'Viewer'
+  podLabels:
+    traefik.enable: true
+    traefik.tcp.routers.loki.entrypoints: webSecure
+    traefik.tcp.routers.loki.rule: HostSNI(`loki.day1.sololab`)
+    traefik.tcp.routers.loki.tls.passthrough: true
+    traefik.tcp.routers.loki.service: loki
+    traefik.tcp.services.loki.loadbalancer.server.port: 3000
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
