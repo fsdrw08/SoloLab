@@ -40,24 +40,32 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-vault/vault-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "HashiCorp Vault - A tool for managing secrets"
-        Documentation = "https://developer.hashicorp.com/vault/docs"
+        # unit
+        Description           = "HashiCorp Vault - A tool for managing secrets"
+        Documentation         = "https://developer.hashicorp.com/vault/docs"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "vault-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        ExecStartPre  = ""
         ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run vault-server\""
-        Restart       = ""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     }
   ]
   service = {
-    name   = "vault-container"
+    name   = "vault"
     status = "start"
   }
 }

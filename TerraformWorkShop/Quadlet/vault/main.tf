@@ -59,23 +59,13 @@ module "podman_quadlet" {
         content = templatefile(
           file.template,
           file.vars
-          # merge(
-          #   file.vars,
-          #   {
-          #     ca = base64encode(
-          #       join("", [
-          #         local.cert[0].cert_pem,
-          #         data.terraform_remote_state.root_ca[0].outputs.int_ca_pem,
-          #       ])
-          #     )
-          #     cert = base64encode(data.vault_kv_secret_v2.cert[0].data["cert"])
-          #     key  = base64encode(data.vault_kv_secret_v2.cert[0].data["private_key"])
-          #   }
-          # )
         )
         path = join("/", [
-          file.dir,
-          basename("${file.template}")
+          var.podman_quadlet.dir,
+          join(".", [
+            var.podman_quadlet.service.name,
+            split(".", basename(file.template))[1]
+          ])
         ])
       }
     ]

@@ -63,26 +63,34 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  service = {
-    name   = "lldap-container"
-    status = "start"
-  }
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-lldap/lldap-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "Light LDAP implementation"
-        Documentation = "https://github.com/lldap/lldap"
+        # unit
+        Description           = "Light LDAP implementation"
+        Documentation         = "https://github.com/lldap/lldap"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "lldap-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        ExecStartPre  = ""
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run lldap-server\""
         Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
+  service = {
+    name   = "lldap"
+    status = "start"
+  }
 }
 
 prov_pdns = {

@@ -42,27 +42,35 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  service = {
-    name   = "tfbackend-pg-container"
-    status = "start"
-  }
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-postgresql/tfbackend-pg-container.kube"
+      template = "../templates/quadlet.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
-        Description   = "PostgreSQL is a powerful, open source object-relational database system"
-        Documentation = "https://www.postgresql.org/"
+        # unit
+        Description           = "PostgreSQL is a powerful, open source object-relational database system"
+        Documentation         = "https://www.postgresql.org/"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "tfbackend-pg-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        ExecStartPre  = ""
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run tfbackend-pg-postgresql\""
         Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
+  service = {
+    name   = "tfbackend-pg"
+    status = "start"
+  }
 }
 
 prov_pdns = {

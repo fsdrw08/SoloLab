@@ -61,28 +61,35 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-nomad/nomad-container.kube"
+      template = "../templates/quadlet.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
-        Description   = "Nomad is a highly available, distributed, data-center aware cluster and application scheduler designed to support the modern datacenter with support for long-running services, batch jobs, and much more."
-        Documentation = "https://www.nomadproject.io/docs/"
-        After         = ""
-        Wants         = ""
+        # unit
+        Description           = "Nomad is a highly available, distributed, data-center aware cluster and application scheduler designed to support the modern datacenter with support for long-running services, batch jobs, and much more."
+        Documentation         = "https://www.nomadproject.io/docs/"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "nomad-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
         # wait until vault oidc ready
         # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
+        ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
+        ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run nomad-agent\""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
   service = {
-    name   = "nomad-container"
+    name   = "nomad"
     status = "start"
   }
 }

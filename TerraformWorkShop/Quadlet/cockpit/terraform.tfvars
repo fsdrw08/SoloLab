@@ -40,23 +40,32 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-cockpit/cockpit-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "Cockpit is a web-based graphical interface for servers."
-        Documentation = "https://cockpit-project.org/guide/latest/"
+        # unit
+        Description           = "Cockpit is a web-based graphical interface for servers."
+        Documentation         = "https://cockpit-project.org/guide/latest/"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "cockpit-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        ExecStartPre  = ""
+        ExecStartPost = ""
         Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     }
   ]
   service = {
-    name   = "cockpit-container"
+    name   = "cockpit"
     status = "start"
   }
 }

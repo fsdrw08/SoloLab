@@ -75,21 +75,32 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-opendj/opendj-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "OpenDJ is an LDAPv3 compliant directory service, which has been developed for the Java platform, providing a high performance, highly available, and secure store for the identities managed by your organization"
-        Documentation = "https://github.com/OpenIdentityPlatform/OpenDJ"
+        # unit
+        Description           = "OpenDJ is an LDAPv3 compliant directory service, which has been developed for the Java platform, providing a high performance, highly available, and secure store for the identities managed by your organization"
+        Documentation         = "https://github.com/OpenIdentityPlatform/OpenDJ"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "opendj-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
+        Network       = "host"
+        # service
+        ExecStartPre  = ""
+        ExecStartPost = ""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     }
   ]
   service = {
-    name   = "opendj-container"
+    name   = "opendj"
     status = "start"
   }
 }
@@ -108,7 +119,7 @@ post_process = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "https://pdns.day0.sololab"
+  server_url = "https://pdns-auth.day0.sololab"
 }
 
 dns_record = {

@@ -66,10 +66,10 @@ variable "podman_kube" {
 
 variable "podman_quadlet" {
   type = object({
+    dir = string
     files = list(object({
       template = string
       vars     = map(string)
-      dir      = string
     }))
     service = optional(
       object({

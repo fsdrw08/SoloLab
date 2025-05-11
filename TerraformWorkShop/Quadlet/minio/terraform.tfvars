@@ -41,29 +41,36 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  service = {
-    name   = "minio-container"
-    status = "start"
-  }
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-minio/minio-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
-        Documentation = "https://min.io/docs/minio/container/index.html"
-        After         = ""
-        Wants         = ""
+        # unit
+        Description           = "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
+        Documentation         = "https://min.io/docs/minio/container/index.html"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "minio-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        # wait until vault oidc ready
+        # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run minio-server\""
         Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
+  service = {
+    name   = "minio"
+    status = "start"
+  }
 }
 
 prov_pdns = {

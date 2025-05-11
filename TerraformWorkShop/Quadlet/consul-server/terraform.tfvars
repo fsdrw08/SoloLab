@@ -57,28 +57,34 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-consul/consul-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "Consul is a multi-networking tool that offers a fully-featured service mesh solution."
-        Documentation = "https://developer.hashicorp.com/consul/docs"
-        After         = ""
-        Wants         = ""
+        # unit
+        Description           = "Consul is a multi-networking tool that offers a fully-featured service mesh solution."
+        Documentation         = "https://developer.hashicorp.com/consul/docs"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "consul-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
         # wait until vault oidc ready
         # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run consul-agent\""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     }
   ]
   service = {
-    name   = "consul-container"
+    name   = "consul"
     status = "start"
   }
 }

@@ -15,23 +15,32 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-powerdns/powerdns-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
-        Documentation = "https://doc.powerdns.com/authoritative/index.html"
+        # unit
+        Description           = "The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
+        Documentation         = "https://doc.powerdns.com/authoritative/index.html"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "powerdns-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
+        # service
+        ExecStartPre  = ""
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run powerdns-auth\""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     }
   ]
   service = {
-    name   = "powerdns-container"
+    name   = "powerdns"
     status = "start"
   }
 }

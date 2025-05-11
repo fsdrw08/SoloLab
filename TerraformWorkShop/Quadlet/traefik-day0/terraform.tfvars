@@ -40,33 +40,34 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  service = {
-    name   = "traefik-container"
-    status = "start"
-  }
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-traefik/traefik-container.kube"
+      template = "../templates/quadlet.kube"
       vars = {
-        Description   = "Traefik Proxy"
-        Documentation = "https://docs.traefik.io"
+        # unit
+        Description           = "Traefik Proxy"
+        Documentation         = "https://docs.traefik.io"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "traefik-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
         Network       = "host"
-        Restart       = "on-failure"
+        # service
+        ExecStartPre  = ""
         ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run traefik-proxy\""
+        Restart       = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
-    {
-      template = "./podman-traefik/traefik-container.volume"
-      vars = {
-        VolumeName = "traefik-pvc"
-      }
-      dir = "/home/podmgr/.config/containers/systemd"
-    }
   ]
+  service = {
+    name   = "traefik"
+    status = "start"
+  }
 }
 
 prov_pdns = {

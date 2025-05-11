@@ -126,8 +126,11 @@ module "podman_quadlet" {
           file.vars
         )
         path = join("/", [
-          file.dir,
-          basename("${file.template}")
+          var.podman_quadlet.dir,
+          join(".", [
+            var.podman_quadlet.service.name,
+            split(".", basename(file.template))[1]
+          ])
         ])
       }
     ]

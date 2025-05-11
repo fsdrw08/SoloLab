@@ -58,24 +58,33 @@ podman_kube = {
 }
 
 podman_quadlet = {
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-example-app/example-app-container.kube"
+      template = "../templates/quadlet.kube"
       # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
       vars = {
-        Description   = "Example app from dex idp project to debug jwt"
-        Documentation = "https://brian-candler.medium.com/using-vault-as-an-openid-connect-identity-provider-ee0aaef2bba2"
+        # unit
+        Description           = "Example app from dex idp project to debug jwt"
+        Documentation         = "https://brian-candler.medium.com/using-vault-as-an-openid-connect-identity-provider-ee0aaef2bba2"
+        After                 = ""
+        Wants                 = ""
+        StartLimitIntervalSec = 5
+        StartLimitBurst       = 3
+        # kube
         yaml          = "example-app-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
-        Network       = "host"
         KubeDownForce = "false"
+        Network       = "host"
+        # service
+        ExecStartPre  = ""
+        ExecStartPost = ""
         Restart       = "never"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
   service = {
-    name   = "example-app-container"
+    name   = "example-app"
     status = "start"
   }
 }
