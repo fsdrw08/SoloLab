@@ -17,15 +17,15 @@ variable "prov_remote" {
 
 variable "podman_quadlet" {
   type = object({
+    dir = string
+    files = list(object({
+      template = string
+      vars     = map(string)
+    }))
     service = object({
       name   = string
       status = string
     })
-    files = list(object({
-      template = string
-      vars     = map(string)
-      dir      = string
-    }))
   })
 }
 

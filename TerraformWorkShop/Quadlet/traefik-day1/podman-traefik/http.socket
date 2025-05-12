@@ -3,8 +3,8 @@
 # https://github.com/traefik/traefik/blob/v3.3.4/docs/content/routing/entrypoints.md#systemd-socket-activation
 ListenStream=0.0.0.0:80
 # FileDescriptorName must match with the traefik entrypoint name
-FileDescriptorName=web
-Service=${name}.service
+FileDescriptorName=${FileDescriptorName}
+Service=${Service}
 
 [Install]
 WantedBy=sockets.target

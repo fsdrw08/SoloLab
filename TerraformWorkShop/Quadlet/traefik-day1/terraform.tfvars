@@ -12,26 +12,29 @@ prov_remote = {
 }
 
 podman_quadlet = {
-  service = {
-    name   = "traefik-container"
-    status = "start"
-  }
+  dir = "/home/podmgr/.config/containers/systemd"
   files = [
     {
-      template = "./podman-traefik/traefik-container.container"
+      template = "./podman-traefik/traefik.container"
       vars = {
-        Description         = "Traefik Proxy"
-        Documentation       = "https://docs.traefik.io"
+        # unit
+        Description   = "Traefik Proxy"
+        Documentation = "https://docs.traefik.io"
+        # service
         ExecStartPre_vault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPre_consul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
-        PodmanArgs          = "--tls-verify=false"
-        Network             = "podman"
-        ExecStartPost       = "/bin/bash -c \"sleep 5 && podman healthcheck run traefik\""
-        Restart             = "on-failure"
+        ExecStartPost       = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik\""
+        # container
+        PodmanArgs = "--tls-verify=false"
+        Network    = "podman"
+        Restart    = "on-failure"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
+  service = {
+    name   = "traefik"
+    status = "start"
+  }
 }
 
 prov_pdns = {

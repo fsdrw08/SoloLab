@@ -11,7 +11,7 @@ resource "null_resource" "init" {
   }
   provisioner "remote-exec" {
     inline = [
-      "mkdir ${self.triggers.dirs}"
+      "[ -d ${self.triggers.dirs} ] || mkdir -p ${self.triggers.dirs}"
     ]
   }
 }
@@ -45,7 +45,8 @@ resource "remote_file" "http_socket" {
   content = templatefile(
     "./podman-traefik/http.socket",
     {
-      name = "traefik-container"
+      FileDescriptorName = "web"
+      Service            = "${var.podman_quadlet.service.name}.service"
     }
   )
   path = "/home/podmgr/.config/systemd/user/http.socket"
@@ -55,7 +56,8 @@ resource "remote_file" "https_socket" {
   content = templatefile(
     "./podman-traefik/https.socket",
     {
-      name = "traefik-container"
+      FileDescriptorName = "webSecure"
+      Service            = "${var.podman_quadlet.service.name}.service"
     }
   )
   path = "/home/podmgr/.config/systemd/user/https.socket"
@@ -97,11 +99,6 @@ module "podman_quadlet" {
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
-    service = {
-      name   = var.podman_quadlet.service.name
-      status = var.podman_quadlet.service.status
-      # custom_trigger = md5(remote_file.podman_quadlet.content)
-    }
     files = [
       for file in var.podman_quadlet.files :
       {
@@ -123,11 +120,19 @@ module "podman_quadlet" {
           )
         )
         path = join("/", [
-          file.dir,
-          basename("${file.template}")
+          var.podman_quadlet.dir,
+          join(".", [
+            var.podman_quadlet.service.name,
+            split(".", basename(file.template))[1]
+          ])
         ])
       }
     ]
+    service = {
+      name   = var.podman_quadlet.service.name
+      status = var.podman_quadlet.service.status
+      # custom_trigger = md5(remote_file.podman_quadlet.content)
+    }
   }
 }
 
