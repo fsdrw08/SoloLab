@@ -62,7 +62,7 @@ podman_quadlet = {
         # wait until vault oidc ready
         # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
-        ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run grafana-server\""
+        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run grafana-server\""
         Restart       = "on-failure"
       }
     },

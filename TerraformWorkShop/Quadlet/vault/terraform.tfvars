@@ -59,7 +59,7 @@ podman_quadlet = {
         Network       = "host"
         # service
         ExecStartPre  = ""
-        ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run vault-server\""
+        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run vault-server\""
         Restart       = "on-failure"
       }
     }

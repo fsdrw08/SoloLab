@@ -62,7 +62,7 @@ podman_quadlet = {
         Network       = "host"
         # service
         ExecStartPre  = ""
-        ExecStartPost = "/bin/bash -c \"sleep 5 && podman healthcheck run tfbackend-pg-postgresql\""
+        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run tfbackend-pg-postgresql\""
         Restart       = "on-failure"
       }
     },
