@@ -46,6 +46,7 @@ resource "remote_file" "quadlet" {
   path    = each.value.path
 }
 
+# this resource is only in charge to stop the service when tf resource destroy
 resource "null_resource" "service_stop" {
   depends_on = [remote_file.quadlet]
   triggers = {
@@ -72,6 +73,9 @@ resource "null_resource" "service_stop" {
   }
 }
 
+# this resource is in charge to start/restart service if the trigger status change, 
+# or stop the service if the value of service state set to stop, 
+# but NOT to stop the service when the tf resource destroy, to stop the service when destroy, use null_resource.service_stop
 resource "null_resource" "service_mgmt" {
   count = var.podman_quadlet.service == null ? 0 : 1
   depends_on = [

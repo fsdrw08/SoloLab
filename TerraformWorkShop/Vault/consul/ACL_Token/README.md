@@ -2,7 +2,7 @@ Terraform resources in this directory are used to Administer Consul access contr
 
 ref: [Administer Consul access control tokens with Vault](https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-consul-secrets)
 
-What these tf resources will do:
+These tf resources will:
 1. Create vault consul secret backend
 2. Create vault consul backend roles, specify policy hosting in consul,
 e.g. some builtin policy `global-management`, `builtin/global-read-only`, check [consul/alc/built-in-policies](https://developer.hashicorp.com/consul/docs/security/acl/acl-policies#built-in-policies), bind the `vault-consul_backend-role` with `consul-policy`
