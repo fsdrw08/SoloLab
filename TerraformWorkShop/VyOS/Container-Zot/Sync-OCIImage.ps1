@@ -192,6 +192,14 @@ $syncList = @"
         "privateRepo": "grafana/grafana:11.6.1",
         "description": "https://hub.docker.com/r/grafana/grafana/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "grafana/loki:3.5.0",
+        "archive": "docker.io_grafana_loki_3.5.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "grafana/loki:3.5.0",
+        "description": "https://hub.docker.com/r/grafana/loki/tags",
+    },
 ]
 "@
 

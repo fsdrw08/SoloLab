@@ -42,10 +42,7 @@ vault_certs = [
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "traefik.day1.sololab"
-  #   alt_names = [
-  #     "traefik.service.consul",
-  #   ]
+  #   common_name = "loki.day1.sololab"
   # },
   # {
   #   secret_engine = {

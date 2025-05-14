@@ -1,14 +1,14 @@
 services {
-  id   = "grafana"
-  name = "grafana"
-  port = 9000
+  id   = "loki"
+  name = "loki"
+  port = 3100
 
   checks = [
     {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
-      id              = "grafana-https-check"
-      name            = "grafana-https-check"
-      http            = "https://grafana.day1.sololab/api/health"
+      id              = "loki-https-check"
+      name            = "loki-https-check"
+      http            = "https://loki.day1.sololab/ready"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"

@@ -1,19 +1,6 @@
-data "vault_identity_oidc_openid_config" "config" {
-  name = "sololab"
-}
-
-data "vault_identity_oidc_client_creds" "creds" {
-  name = "loki"
-}
-
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-#   content = file("./podman-loki/loki-traefik.yaml")
-# }
-
 # load cert from vault
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+  count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
   mount = var.podman_kube.helm.tls.vault_kvv2.mount
   name  = var.podman_kube.helm.tls.vault_kvv2.name
 }

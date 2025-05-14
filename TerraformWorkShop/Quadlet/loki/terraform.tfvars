@@ -16,26 +16,26 @@ podman_kube = {
     name       = "loki"
     chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
     value_file = "./podman-loki/values-sololab.yaml"
-    tls = {
-      value_sets = [
-        {
-          name          = "loki.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "loki.tls.contents.loki\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "loki.tls.contents.loki\\.key"
-          value_ref_key = "private_key"
-        },
-      ]
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "loki.day1.sololab"
-      }
-    }
+    # tls = {
+    #   value_sets = [
+    #     {
+    #       name          = "loki.tls.contents.ca\\.crt"
+    #       value_ref_key = "ca"
+    #     },
+    #     {
+    #       name          = "loki.tls.contents.loki\\.crt"
+    #       value_ref_key = "cert"
+    #     },
+    #     {
+    #       name          = "loki.tls.contents.loki\\.key"
+    #       value_ref_key = "private_key"
+    #     },
+    #   ]
+    #   vault_kvv2 = {
+    #     mount = "kvv2/certs"
+    #     name  = "loki.day1.sololab"
+    #   }
+    # }
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/loki-aio.yaml"
 }
@@ -47,8 +47,8 @@ podman_quadlet = {
       template = "../templates/quadlet.kube"
       vars = {
         # unit
-        Description           = "loki instance"
-        Documentation         = "https://docs.loki.org"
+        Description           = "Loki service"
+        Documentation         = "https://grafana.com/docs/loki/v3.5.x/"
         After                 = ""
         Wants                 = ""
         StartLimitIntervalSec = 5
@@ -57,12 +57,11 @@ podman_quadlet = {
         yaml          = "loki-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "host"
+        Network       = "podman"
         # service
-        # wait until vault oidc ready
-        # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-        ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
-        ExecStartPost = "/bin/bash -c \"sleep 15 && podman healthcheck run loki-server\""
+        ExecStartPre = ""
+        ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
+        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run loki-server || sleep $(shuf -i 15-20 -n 1) && podman healthcheck run loki-server \""
         Restart       = "on-failure"
       }
     },
