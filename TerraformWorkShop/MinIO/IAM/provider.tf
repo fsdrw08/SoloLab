@@ -2,7 +2,11 @@ terraform {
   required_providers {
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.3.0"
+      version = ">= 3.5.1"
+    }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 4.7.0"
     }
   }
   backend "pg" {
@@ -16,4 +20,10 @@ provider "minio" {
   minio_user     = var.prov_minio.minio_user
   minio_password = var.prov_minio.minio_password
   minio_ssl      = var.prov_minio.minio_ssl
+}
+
+provider "vault" {
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
