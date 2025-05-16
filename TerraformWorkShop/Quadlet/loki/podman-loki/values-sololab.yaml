@@ -3,6 +3,18 @@ global:
 loki:
   containerPorts: []
   config:
+    schema_config:
+      ## @param loki.config.schema_config.configs list of period_configs
+      ##
+      configs:
+        - from: 2025-01-01
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
     ## loki cannot handle tls well by itself,
     ## reason: failed to run local healthcheck if tls configed
     ## error message: tls: invalid ClientKeyExchange message
@@ -13,6 +25,25 @@ loki:
     #     client_ca_file: /etc/loki/certs/ca.crt
     #     cert_file: /etc/loki/certs/loki.crt
     #     key_file: /etc/loki/certs/loki.key
+
+    ## config storage backend for storing chunks of log data
+    ## ref: https://grafana.com/docs/loki/latest/configure/#storage_config
+    ## ref: https://grafana.com/docs/loki/latest/operations/storage/tsdb/#single-store-tsdb-tsdb
+    ##
+    storage_config:
+      tsdb_shipper:
+        active_index_directory: /var/loki/tsdb-index
+        cache_location: /var/loki/tsdb-cache
+      use_thanos_objstore: true
+      object_store:
+        s3:
+          endpoint: https://minio.day1.sololab
+          bucketnames: loki-data
+          access_key_id: # set from terraform data
+          secret_access_key: # set from terraform data
+          s3forcepathstyle: true
+          http:
+            tls_ca_path: /etc/loki/certs/ca.crt
     ui:
       enabled: true
       node_name: day1
