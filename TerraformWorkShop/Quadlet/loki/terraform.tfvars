@@ -16,26 +16,26 @@ podman_kube = {
     name       = "loki"
     chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
     value_file = "./podman-loki/values-sololab.yaml"
-    # tls = {
-    #   value_sets = [
-    #     {
-    #       name          = "loki.tls.contents.ca\\.crt"
-    #       value_ref_key = "ca"
-    #     },
-    #     {
-    #       name          = "loki.tls.contents.loki\\.crt"
-    #       value_ref_key = "cert"
-    #     },
-    #     {
-    #       name          = "loki.tls.contents.loki\\.key"
-    #       value_ref_key = "private_key"
-    #     },
-    #   ]
-    #   vault_kvv2 = {
-    #     mount = "kvv2/certs"
-    #     name  = "loki.day1.sololab"
-    #   }
-    # }
+    tls = {
+      value_sets = [
+        {
+          name          = "loki.tls.contents.ca\\.crt"
+          value_ref_key = "ca"
+        },
+        # {
+        #   name          = "loki.tls.contents.loki\\.crt"
+        #   value_ref_key = "cert"
+        # },
+        # {
+        #   name          = "loki.tls.contents.loki\\.key"
+        #   value_ref_key = "private_key"
+        # },
+      ]
+      vault_kvv2 = {
+        mount = "kvv2/certs"
+        name  = "root"
+      }
+    }
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/loki-aio.yaml"
 }
