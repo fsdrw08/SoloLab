@@ -6,11 +6,6 @@ data "vault_identity_oidc_client_creds" "creds" {
   name = "grafana"
 }
 
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/grafana-traefik.yaml"
-#   content = file("./podman-grafana/grafana-traefik.yaml")
-# }
-
 # load cert from vault
 data "vault_kv_secret_v2" "cert" {
   count = var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
