@@ -62,21 +62,21 @@ Environment=LEGO_CA_SYSTEM_CERT_POOL=true
 Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
 
 Volume=%t/podman/podman.sock:/var/run/docker.sock
-Volume=traefik-pvc-dynamic:/etc/traefik/dynamic
+Volume=%h/traefik-file-provider:/etc/traefik/dynamic
 Volume=traefik-pvc-tls:/etc/traefik/tls
 
-Label="traefik.enable=true"
-Label="traefik.http.middlewares.userPass.basicauth.users=admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"
-Label="traefik.http.middlewares.toHttps.redirectscheme.scheme=https"
-Label="traefik.http.middlewares.toHttps.redirectscheme.permanent=true"
-Label="traefik.http.routers.dashboard-redirect.entrypoints=web"
-Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
-Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
-Label="traefik.http.routers.dashboard.entryPoints=webSecure"
-Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
-Label="traefik.http.routers.dashboard.middlewares=userPass@docker"
-Label="traefik.http.routers.dashboard.service=api@internal"
-Label="traefik.http.routers.dashboard.tls.certresolver=internal"
+# Label="traefik.enable=true"
+# # Label="traefik.http.middlewares.userPass.basicauth.users=admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"
+# # Label="traefik.http.middlewares.toHttps.redirectscheme.scheme=https"
+# # Label="traefik.http.middlewares.toHttps.redirectscheme.permanent=true"
+# Label="traefik.http.routers.dashboard-redirect.entrypoints=web"
+# Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@file"
+# Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+# Label="traefik.http.routers.dashboard.entryPoints=webSecure"
+# Label="traefik.http.routers.dashboard.middlewares=userPass@file"
+# Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+# Label="traefik.http.routers.dashboard.service=api@internal"
+# Label="traefik.http.routers.dashboard.tls.certresolver=internal"
 
 SecurityLabelDisable=true
 

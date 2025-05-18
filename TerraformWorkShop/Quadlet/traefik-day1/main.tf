@@ -16,6 +16,12 @@ resource "null_resource" "init" {
   }
 }
 
+resource "remote_file" "traefik_file_provider" {
+  depends_on = [null_resource.init]
+  path       = "/var/home/podmgr/traefik-file-provider/traefik-traefik.yaml"
+  content    = file("./podman-traefik/traefik-traefik.yaml")
+}
+
 data "vault_kv_secret_v2" "root_ca" {
   mount = "kvv2/certs"
   name  = "root"
