@@ -3,6 +3,9 @@ global:
 loki:
   containerPorts: []
   config:
+    # common:
+    #   instance_interface_names:
+    #     - lo
     schema_config:
       ## @param loki.config.schema_config.configs list of period_configs
       ##
@@ -19,6 +22,8 @@ loki:
     ## reason: failed to run local healthcheck if tls configed
     ## error message: tls: invalid ClientKeyExchange message
     # server:
+    #   http_listen_address: 127.0.0.1
+    #   grpc_listen_address: 127.0.0.1
     #   http_tls_config:
     #     # https://pkg.go.dev/crypto/tls#ClientAuthType
     #     client_auth_type: VerifyClientCertIfGiven
@@ -55,19 +60,19 @@ loki:
   #   contents:
   #     loki.crt: # set from terraform data
   #     loki.key: # set from terraform data
-  hostAliases:
-    - ip: host-gateway
-      hostnames:
-        - minio-api.day1.sololab
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.loki-redirect.entrypoints: web
-    traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-    traefik.http.routers.loki-redirect.middlewares: toHttps@docker
-    traefik.http.routers.loki.entryPoints: webSecure
-    traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-    traefik.http.routers.loki.tls.certresolver: internal
-    traefik.http.services.loki.loadbalancer.server.port: 3100
+  # hostAliases:
+  #   - ip: host-gateway
+  #     hostnames:
+  #       - minio-api.day1.sololab
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.loki-redirect.entrypoints: web
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.loki.entryPoints: webSecure
+  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.tls.certresolver: internal
+  #   traefik.http.services.loki.loadbalancer.server.port: 3100
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

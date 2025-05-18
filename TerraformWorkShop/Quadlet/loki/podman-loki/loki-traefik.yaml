@@ -1,0 +1,21 @@
+http:
+  routers:
+    loki-redirect:
+      entryPoints:
+        - web
+      middlewares:
+        - toHttps@file
+      rule: Host(`loki.day1.sololab`)
+      service: loki
+    loki:
+      entryPoints:
+        - webSecure
+      rule: Host(`loki.day1.sololab`)
+      service: loki
+      tls:
+        certresolver: internal
+  services:
+    loki:
+      loadBalancer:
+        servers:
+          - url: "http://169.254.1.3:3100/"

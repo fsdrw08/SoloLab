@@ -57,9 +57,10 @@ podman_quadlet = {
         yaml          = "loki-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "podman"
+        Network       = "host"
+        # Network       = "podman"
         # service
-        ExecStartPre = ""
+        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
         ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
         ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run loki-server || sleep $(shuf -i 15-20 -n 1) && podman healthcheck run loki-server \""
         Restart       = "on-failure"
