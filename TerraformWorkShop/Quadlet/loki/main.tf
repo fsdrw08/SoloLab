@@ -128,10 +128,10 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-  content = file("./podman-loki/loki-traefik.yaml")
-}
+# resource "remote_file" "traefik_file_provider" {
+#   path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
+#   content = file("./podman-loki/loki-traefik.yaml")
+# }
 
 resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/service-loki.hcl"

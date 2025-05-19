@@ -60,19 +60,19 @@ loki:
   #   contents:
   #     loki.crt: # set from terraform data
   #     loki.key: # set from terraform data
-  # hostAliases:
-  #   - ip: host-gateway
-  #     hostnames:
-  #       - minio-api.day1.sololab
-  # podLabels:
-  #   traefik.enable: true
-  #   traefik.http.routers.loki-redirect.entrypoints: web
-  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
-  #   traefik.http.routers.loki.entryPoints: webSecure
-  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki.tls.certresolver: internal
-  #   traefik.http.services.loki.loadbalancer.server.port: 3100
+  hostAliases:
+    - ip: host-gateway
+      hostnames:
+        - minio-api.day1.sololab
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.loki-redirect.entrypoints: web
+    traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+    traefik.http.routers.loki-redirect.middlewares: toHttps@file
+    traefik.http.routers.loki.entryPoints: webSecure
+    traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+    traefik.http.routers.loki.tls.certresolver: internal
+    traefik.http.services.loki.loadbalancer.server.port: 3100
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
