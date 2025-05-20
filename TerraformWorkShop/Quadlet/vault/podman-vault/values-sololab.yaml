@@ -32,13 +32,6 @@ vault:
             tls_client_ca_file: /vault/userconfig/vault-server-tls/ca.crt
             tls_disable_client_certs: true
 
-  ## @param vault.podAnnotations Annotations for %%MAIN_CONTAINER_NAME%% pods
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-  ## ref: https://github.com/containers/podman/discussions/22378
-  ##
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=100,gid=1000
-
   podLabels:
     traefik.enable: true
     traefik.tcp.routers.vault-web.entrypoints: webSecure
@@ -76,4 +69,4 @@ volumePermissions:
   image:
     registry: zot.day0.sololab
     repository: hashicorp/vault
-    tag: 1.19
+    tag: 1.19.4
