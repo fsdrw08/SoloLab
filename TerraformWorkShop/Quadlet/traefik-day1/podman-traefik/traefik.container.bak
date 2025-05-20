@@ -1,0 +1,99 @@
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+After=http.socket https.socket
+Requires=http.socket https.socket
+
+[Service]
+Sockets=http.socket https.socket
+ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm traefik-sec-ca; echo \"${ca}\" | base64 -d | podman secret create traefik-sec-ca -"
+ExecStartPre=bash -c "podman secret exists traefik-sec-cert && podman secret rm traefik-sec-cert; echo \"${cert}\" | base64 -d | podman secret create traefik-sec-cert -"
+ExecStartPre=bash -c "podman secret exists traefik-sec-key && podman secret rm traefik-sec-key; echo \"${key}\" | base64 -d | podman secret create traefik-sec-key -"
+ExecStartPre=${ExecStartPre_vault}
+ExecStartPre=${ExecStartPre_consul}
+ExecStartPost=${ExecStartPost}
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+[Container]
+ContainerName=traefik
+
+Image=zot.day0.sololab/library/traefik:v3.4.0
+
+SecurityLabelType=spc_t
+
+PublishPort=8080:8080
+
+# https://doc.traefik.io/traefik/reference/static-configuration/cli/
+Exec=--accessLog=true \
+  --api=true \
+  --api.dashboard=true \
+  --certificatesResolvers.external.acme.caServer=https://acme-v02.api.letsencrypt.org/directory \
+  --certificatesResolvers.external.acme.certificatesDuration=2160 \
+  --certificatesResolvers.external.acme.storage=/etc/traefik/tls/external.json \
+  --certificatesResolvers.external.acme.tlsChallenge=true \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab/v1/pki/day1/acme/directory \
+  --certificatesResolvers.internal.acme.certificatesDuration=2160 \
+  --certificatesResolvers.internal.acme.storage=/etc/traefik/tls/internal.json \
+  --certificatesResolvers.internal.acme.tlsChallenge=true \
+  --entrypoints.web.address=:80 \
+  --entrypoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --entrypoints.webSecure.address=:443 \
+  --entrypoints.webSecure.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --global.checkNewVersion=false \
+  --global.sendAnonymousUsage=false \
+  --log.level=INFO \
+  --ping=true \
+  --providers.consulCatalog=true \
+  --providers.consulCatalog.endpoint.address=consul.day0.sololab \
+  --providers.consulCatalog.endpoint.dataCenter=dc1 \
+  --providers.consulCatalog.endpoint.scheme=https \
+  --providers.consulCatalog.endpoint.tls.ca=/etc/traefik/tls/ca.crt \
+  --providers.consulCatalog.exposedByDefault=false \
+  --providers.docker=true \
+  --providers.docker.endpoint=unix:///var/run/docker.sock \
+  --providers.docker.exposedByDefault=false \
+  --providers.file=true \
+  --providers.file.directory=/etc/traefik/dynamic \
+  --serversTransport.insecureSkipVerify=false \
+  --serversTransport.rootCAs=/etc/traefik/tls/ca.crt
+
+Environment=TZ=Asia/Shanghai
+Environment=LEGO_CA_CERTIFICATES=/etc/traefik/tls/ca.crt
+Environment=LEGO_CA_SYSTEM_CERT_POOL=true
+
+Secret=source=traefik-sec-ca,target=/etc/traefik/tls/ca.crt
+
+Volume=%t/podman/podman.sock:/var/run/docker.sock
+Volume=%h/traefik-file-provider:/etc/traefik/dynamic
+Volume=traefik-pvc-tls:/etc/traefik/tls
+
+Label="traefik.enable=true"
+# Label="traefik.http.middlewares.userPass.basicauth.users=admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1"
+# Label="traefik.http.middlewares.toHttps.redirectscheme.scheme=https"
+# Label="traefik.http.middlewares.toHttps.redirectscheme.permanent=true"
+Label="traefik.http.routers.dashboard-redirect.entrypoints=web"
+Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@file"
+Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.entryPoints=webSecure"
+Label="traefik.http.routers.dashboard.middlewares=userPass@file"
+Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.service=api@internal"
+Label="traefik.http.routers.dashboard.tls.certresolver=internal"
+
+SecurityLabelDisable=true
+
+# health check requires traefik enable ping function, this function disable by default
+# traefik ping function requires a entry point name "traefik", port 8080 by default
+# with podman systemd socket activation, we do not need to listen 8080 by socket
+# just leave 8080 empty
+HealthCmd=["traefik", "healthcheck", "--ping"]
+HealthStartPeriod=10s
+HealthInterval=600s
+HealthTimeout=30s
+HealthRetries=10
+# Notify=healthy
+
+PodmanArgs=${PodmanArgs}
+Network=${Network}
+[Install]
+WantedBy=default.target

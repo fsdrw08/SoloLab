@@ -1,8 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab:5000
 traefik:
-  image:
-    tag: v3.3.4
   containerPorts: []
   containerSecurityContext:
     enabled: true
@@ -18,7 +16,6 @@ traefik:
       #       scheme: https
       #       tls:
       #         ca: /etc/traefik/tls/ca.crt
-      exposedByDefault: false
       serversTransport:
         rootCAs:
           - /etc/traefik/tls/ca.crt
