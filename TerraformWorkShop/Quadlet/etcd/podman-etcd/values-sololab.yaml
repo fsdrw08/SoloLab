@@ -1,8 +1,6 @@
+global:
+  imageRegistry: zot.day0.sololab
 etcd:
-  image:
-    registry: zot.day0.sololab
-    repository: coreos/etcd
-    tag: v3.5.17
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

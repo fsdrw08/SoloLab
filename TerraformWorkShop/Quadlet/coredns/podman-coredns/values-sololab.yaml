@@ -1,8 +1,6 @@
+global:
+  imageRegistry: zot.day0.sololab
 coredns:
-  image:
-    registry: zot.day0.sololab
-    repository: coredns/coredns
-    tag: 1.11.1
   containerPorts:
     - name: dns_tcp
       containerPort: 53
