@@ -74,10 +74,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "lldap/lldap:2025-04-09-alpine-rootless",
-        "archive": "docker.io_lldap_lldap_2025-04-09-alpine-rootless.tar",
+        "publicRepo": "lldap/lldap:2025-05-19-alpine-rootless",
+        "archive": "docker.io_lldap_lldap_2025-05-19-alpine-rootless.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "lldap/lldap:2025-04-09-alpine-rootless",
+        "privateRepo": "lldap/lldap:2025-05-19-alpine-rootless",
         "description": "https://hub.docker.com/r/lldap/lldap/tags",
     },
     {
@@ -106,10 +106,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/vault:1.19",
-        "archive": "docker.io_hashicorp_vault_1.19.tar",
+        "publicRepo": "hashicorp/vault:1.19.4",
+        "archive": "docker.io_hashicorp_vault_1.19.4.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/vault:1.19",
+        "privateRepo": "hashicorp/vault:1.19.4",
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
@@ -130,18 +130,18 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "minio/minio:RELEASE.2025-04-08T15-41-24Z",
-        "archive": "quay.io_minio_minio_RELEASE.2025-04-08T15-41-24Z.tar",
+        "publicRepo": "minio/minio:RELEASE.2025-04-22T22-12-26Z",
+        "archive": "quay.io_minio_minio_RELEASE.2025-04-22T22-12-26Z.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "minio/minio:RELEASE.2025-04-08T15-41-24Z",
+        "privateRepo": "minio/minio:RELEASE.2025-04-22T22-12-26Z",
         "description": "https://quay.io/repository/minio/minio?tab=tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.20.5",
-        "archive": "docker.io_hashicorp_consul_1.20.5.tar",
+        "publicRepo": "hashicorp/consul:1.21.0",
+        "archive": "docker.io_hashicorp_consul_1.21.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/consul:1.20.5",
+        "privateRepo": "hashicorp/consul:1.21.0",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
@@ -186,10 +186,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/grafana:11.6.1",
-        "archive": "docker.io_grafana_grafana_11.6.1.tar",
+        "publicRepo": "grafana/grafana:12.0.0",
+        "archive": "docker.io_grafana_grafana_12.0.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "grafana/grafana:11.6.1",
+        "privateRepo": "grafana/grafana:12.0.0",
         "description": "https://hub.docker.com/r/grafana/grafana/tags",
     },
     {
