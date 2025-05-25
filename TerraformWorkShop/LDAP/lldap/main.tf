@@ -15,9 +15,33 @@ resource "lldap_group" "groups" {
   display_name = each.value.display_name
 }
 
-# data "lldap_groups" "groups" {
-#   depends_on = [lldap_group.groups]
-# }
+data "lldap_groups" "groups" {
+  depends_on = [lldap_group.groups]
+}
+
+resource "lldap_user_memberships" "memberships" {
+  depends_on = [
+    lldap_user.users,
+    lldap_group.groups
+  ]
+  for_each = {
+    for user in var.users : user.user_id => user
+    if user.member_of != null
+  }
+  user_id = each.key
+  # group_ids = toset(flatten([
+  #   for member_of in each.value.member_of : [
+  #     lldap_group.groups[member_of].id
+  #   ]
+  # ]))
+  group_ids = toset(flatten([
+    for member_of in each.value.member_of : [
+      for group in data.lldap_groups.groups.groups : group.id
+      if group.display_name == member_of
+    ]
+  ]))
+}
+
 
 # locals {
 #   # groups = {
@@ -43,16 +67,18 @@ resource "lldap_group" "groups" {
 #   value = local.memberships
 # }
 
-resource "lldap_group_memberships" "memberships" {
-  for_each = {
-    for group in var.groups : group.iac_id => group
-  }
-  group_id = lldap_group.groups[each.key].id
-  user_ids = toset(flatten([
-    for group in var.groups : group.members
-    if group.iac_id == each.key
-  ]))
-}
+
+
+# resource "lldap_group_memberships" "memberships" {
+#   for_each = {
+#     for group in var.groups : group.iac_id => group
+#   }
+#   group_id = lldap_group.groups[each.key].id
+#   user_ids = toset(flatten([
+#     for group in var.groups : group.members
+#     if group.iac_id == each.key
+#   ]))
+# }
 
 # resource "lldap_member" "memberships" {
 #   depends_on = [
@@ -68,8 +94,8 @@ resource "lldap_group_memberships" "memberships" {
 #   user_id  = element(split(":", each.key), 1)
 # }
 
-resource "lldap_member" "readonly" {
-  depends_on = [lldap_user.users]
-  group_id   = 3 # lldap_strict_readonly
-  user_id    = "readonly"
-}
+# resource "lldap_member" "readonly" {
+#   depends_on = [lldap_user.users]
+#   group_id   = 3 # lldap_strict_readonly
+#   user_id    = "readonly"
+# }

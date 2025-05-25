@@ -15,6 +15,7 @@ variable "users" {
     email        = string
     password     = optional(string, null)
     display_name = string
+    member_of    = optional(list(string), null)
   }))
 }
 
@@ -23,6 +24,6 @@ variable "groups" {
   type = list(object({
     iac_id       = string
     display_name = string
-    members      = list(string)
+    # members      = optional(list(string), null)
   }))
 }
