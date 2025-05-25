@@ -25,8 +25,8 @@ users = [
 ]
 
 # to generate iac_id:
-# powershell: new-guid
-# linux: uuidgen
+#   powershell: new-guid
+#   linux: uuidgen
 groups = [
   {
     iac_id       = "02999e39"

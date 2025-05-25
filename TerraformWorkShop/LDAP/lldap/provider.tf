@@ -2,7 +2,7 @@ terraform {
   required_providers {
     lldap = {
       source  = "tasansga/lldap"
-      version = ">=0.2.4"
+      version = ">=0.3.0"
     }
   }
   backend "pg" {
