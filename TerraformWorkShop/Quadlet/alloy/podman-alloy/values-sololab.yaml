@@ -6,6 +6,26 @@ alloy:
     - component: loki.source.journal
       label: journal
       attributes:
+        relabel_rules: loki.relabel.journal.rules
+        forward_to: loki.write.grafana_loki.receiver
+        labels:
+          component: '"loki.source.journal"'
+    - component: loki.relabel
+      label: journal
+      attributes:
+        forward_to: []
+        rule.0:
+          source_labels:
+            - '"__journal__systemd_unit"'
+          target_label: '"systemd_unit"'
+        rule.1:
+          source_labels:
+            - '"__journal__hostname"'
+          target_label: '"systemd_hostname"'
+        rule.2:
+          source_labels:
+            - '"__journal__transport"'
+          target_label: '"systemd_transport"'
 
   podLabels:
     traefik.enable: true
@@ -15,7 +35,7 @@ alloy:
     traefik.http.routers.alloy.entryPoints: webSecure
     traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`)
     traefik.http.routers.alloy.tls.certresolver: internal
-    traefik.http.services.alloy.loadbalancer.server.port: 3100
+    traefik.http.services.alloy.loadbalancer.server.port: 12345
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
