@@ -51,7 +51,7 @@ podman_quadlet = {
         Documentation         = "https://grafana.com/docs/loki/v3.5.x/"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "loki-aio.yaml"

@@ -49,7 +49,7 @@ podman_quadlet = {
         Documentation         = "https://developer.hashicorp.com/consul/docs"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "consul-aio.yaml"
@@ -61,7 +61,7 @@ podman_quadlet = {
         # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
         ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
         ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run consul-agent\""
-        Restart       = "no"
+        Restart       = "on-failure"
       }
     }
   ]

@@ -50,7 +50,7 @@ podman_quadlet = {
         Documentation         = "https://docs.traefik.io"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "traefik-aio.yaml"

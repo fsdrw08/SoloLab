@@ -85,7 +85,7 @@ podman_quadlet = {
         Documentation         = "https://github.com/OpenIdentityPlatform/OpenDJ"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "opendj-aio.yaml"

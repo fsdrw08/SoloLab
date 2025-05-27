@@ -73,7 +73,7 @@ podman_quadlet = {
         Documentation         = "https://github.com/lldap/lldap"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "lldap-aio.yaml"

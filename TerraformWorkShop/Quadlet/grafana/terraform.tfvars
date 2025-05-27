@@ -51,7 +51,7 @@ podman_quadlet = {
         Documentation         = "https://docs.grafana.org"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "grafana-aio.yaml"

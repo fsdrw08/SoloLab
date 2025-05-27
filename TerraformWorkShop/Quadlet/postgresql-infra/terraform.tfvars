@@ -53,7 +53,7 @@ podman_quadlet = {
         Documentation         = "https://www.postgresql.org/"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "tfbackend-pg-aio.yaml"

@@ -69,7 +69,7 @@ podman_quadlet = {
         Documentation         = "https://brian-candler.medium.com/using-vault-as-an-openid-connect-identity-provider-ee0aaef2bba2"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "example-app-aio.yaml"

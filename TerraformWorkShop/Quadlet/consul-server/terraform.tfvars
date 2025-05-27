@@ -67,7 +67,7 @@ podman_quadlet = {
         Documentation         = "https://developer.hashicorp.com/consul/docs"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "consul-aio.yaml"

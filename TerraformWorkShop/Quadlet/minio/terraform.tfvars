@@ -51,7 +51,7 @@ podman_quadlet = {
         Documentation         = "https://min.io/docs/minio/container/index.html"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "minio-aio.yaml"

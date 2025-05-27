@@ -50,7 +50,7 @@ podman_quadlet = {
         Documentation         = "https://cockpit-project.org/guide/latest/"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "cockpit-aio.yaml"

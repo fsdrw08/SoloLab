@@ -25,7 +25,7 @@ podman_quadlet = {
         Documentation         = "https://doc.powerdns.com/authoritative/index.html"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "powerdns-aio.yaml"

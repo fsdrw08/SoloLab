@@ -72,7 +72,7 @@ podman_quadlet = {
         Documentation         = "https://www.nomadproject.io/docs/"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "nomad-aio.yaml"

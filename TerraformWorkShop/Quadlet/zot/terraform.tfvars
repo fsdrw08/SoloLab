@@ -50,7 +50,7 @@ podman_quadlet = {
         Documentation         = "https://zotregistry.dev/latest/admin-guide/admin-configuration/"
         After                 = ""
         Wants                 = ""
-        StartLimitIntervalSec = 5
+        StartLimitIntervalSec = 120
         StartLimitBurst       = 3
         # kube
         yaml          = "zot-aio.yaml"
