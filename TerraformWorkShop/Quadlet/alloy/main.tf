@@ -119,5 +119,5 @@ resource "powerdns_record" "records" {
 
 resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/service-loki.hcl"
-  content = file("./podman-loki/service.hcl")
+  content = file("./podman-alloy/service.hcl")
 }

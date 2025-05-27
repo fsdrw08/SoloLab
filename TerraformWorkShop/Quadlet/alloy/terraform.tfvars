@@ -22,14 +22,14 @@ podman_kube = {
           name          = "alloy.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
-        {
-          name          = "alloy.tls.contents.alloy\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "alloy.tls.contents.alloy\\.key"
-          value_ref_key = "private_key"
-        },
+        # {
+        #   name          = "alloy.tls.contents.alloy\\.crt"
+        #   value_ref_key = "cert"
+        # },
+        # {
+        #   name          = "alloy.tls.contents.alloy\\.key"
+        #   value_ref_key = "private_key"
+        # },
       ]
       vault_kvv2 = {
         mount = "kvv2/certs"
@@ -57,11 +57,11 @@ podman_quadlet = {
         yaml          = "alloy-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "host"
+        Network       = "podman"
         # service
-        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
+        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
         ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run alloy-server || sleep $(shuf -i 15-20 -n 1) && podman healthcheck run alloy-server \""
+        ExecStartPost = ""
         Restart       = "on-failure"
       }
     },

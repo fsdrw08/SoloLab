@@ -3,34 +3,48 @@ global:
 alloy:
   containerPorts: []
   config:
-    - component: loki.source.journal
-      label: journal
-      attributes:
-        relabel_rules: loki.relabel.journal.rules
-        forward_to: loki.write.loki.receiver
-        labels:
-          component: '"loki.source.journal"'
-    - component: loki.relabel
-      label: journal
-      attributes:
-        forward_to: []
-        rule.0:
-          source_labels:
-            - '"__journal__systemd_unit"'
-          target_label: '"systemd_unit"'
-        rule.1:
-          source_labels:
-            - '"__journal__hostname"'
-          target_label: '"systemd_hostname"'
-        rule.2:
-          source_labels:
-            - '"__journal__transport"'
-          target_label: '"systemd_transport"'
-    - component: loki.write
-      label: loki
-      attributes:
-        endpoint:
-          url: '"https://loki.day1.sololab/loki/api/v1/push"'
+    fromYAML:
+      - component: loki.source.journal
+        label: journal
+        attributes:
+          relabel_rules: loki.relabel.journal.rules
+          forward_to:
+            - loki.write.loki.receiver
+          labels:
+            component: '"loki.source.journal"'
+      - component: loki.relabel
+        label: journal
+        attributes:
+          forward_to: []
+          rule.0:
+            source_labels:
+              - '"__journal__systemd_unit"'
+            target_label: '"systemd_unit"'
+          rule.1:
+            source_labels:
+              - '"__journal__hostname"'
+            target_label: '"systemd_hostname"'
+          rule.2:
+            source_labels:
+              - '"__journal__transport"'
+            target_label: '"systemd_transport"'
+      - component: loki.write
+        label: loki
+        attributes:
+          endpoint.0:
+            url: '"https://loki.day1.sololab/loki/api/v1/push"'
+            tls_config.0:
+              ca_file: '"/etc/alloy/certs/ca.crt"'
+  tls:
+    mountPath: /etc/alloy/certs
+  flags:
+    server:
+      http:
+        listen-addr: 0.0.0.0:12345
+  hostAliases:
+    - ip: host-gateway
+      hostnames:
+        - loki.day1.sololab
   podLabels:
     traefik.enable: true
     traefik.http.routers.alloy-redirect.entrypoints: web
@@ -43,3 +57,10 @@ alloy:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
+  extraVolumeMounts:
+    - name: journald
+      mountPath: /run/log/journal
+  extraVolumes:
+    - name: journald
+      hostPath:
+        path: /run/log/journal
