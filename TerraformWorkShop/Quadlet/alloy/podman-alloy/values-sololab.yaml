@@ -7,7 +7,7 @@ alloy:
       label: journal
       attributes:
         relabel_rules: loki.relabel.journal.rules
-        forward_to: loki.write.grafana_loki.receiver
+        forward_to: loki.write.loki.receiver
         labels:
           component: '"loki.source.journal"'
     - component: loki.relabel
@@ -26,7 +26,11 @@ alloy:
           source_labels:
             - '"__journal__transport"'
           target_label: '"systemd_transport"'
-
+    - component: loki.write
+      label: loki
+      attributes:
+        endpoint:
+          url: '"https://loki.day1.sololab/loki/api/v1/push"'
   podLabels:
     traefik.enable: true
     traefik.http.routers.alloy-redirect.entrypoints: web
