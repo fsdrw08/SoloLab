@@ -186,11 +186,11 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/grafana:12.0.0",
-        "archive": "docker.io_grafana_grafana_12.0.0.tar",
+        "publicRepo": "grafana/grafana:12.0.1",
+        "archive": "docker.io_grafana_grafana_12.0.1.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "grafana/grafana:12.0.0",
-        "description": "https://hub.docker.com/r/grafana/grafana/tags",
+        "privateRepo": "grafana/grafana:12.0.1",
+        "description": "https://hub.docker.com/r/grafana/grafana/tags, https://quay.io/repository/giantswarm/grafana?tab=tags",
     },
     {
         "publicRegistry": "docker.io",
@@ -198,7 +198,15 @@ $syncList = @"
         "archive": "docker.io_grafana_loki_3.5.0.tar",
         "privateRegistry": "192.168.255.10:5000",
         "privateRepo": "grafana/loki:3.5.0",
-        "description": "https://hub.docker.com/r/grafana/loki/tags",
+        "description": "https://hub.docker.com/r/grafana/loki/tags, https://quay.io/repository/giantswarm/loki?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "grafana/alloy:v1.8.3",
+        "archive": "docker.io_grafana_alloy_v1.8.3.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "grafana/alloy:v1.8.3",
+        "description": "https://hub.docker.com/r/grafana/alloy/tags, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
 ]
 "@
