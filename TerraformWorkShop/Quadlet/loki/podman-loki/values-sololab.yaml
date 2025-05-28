@@ -2,6 +2,7 @@ global:
   imageRegistry: zot.day0.sololab
 loki:
   containerPorts: []
+  resourcesPreset: "medium"
   config:
     # common:
     #   instance_interface_names:
