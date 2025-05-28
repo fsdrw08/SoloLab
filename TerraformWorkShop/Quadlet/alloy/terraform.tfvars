@@ -48,7 +48,7 @@ podman_quadlet = {
       vars = {
         # unit
         Description           = "alloy service"
-        Documentation         = "https://grafana.com/docs/alloy/v3.5.x/"
+        Documentation         = "https://grafana.com/docs/alloy/v1.8/"
         After                 = ""
         Wants                 = ""
         StartLimitIntervalSec = 120
