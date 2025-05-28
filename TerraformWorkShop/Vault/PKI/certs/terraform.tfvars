@@ -36,14 +36,17 @@ vault_certs = [
     ttl_years   = 3
     common_name = "grafana.day1.sololab"
   },
-  # {
-  #   secret_engine = {
-  #     backend   = "pki/day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
-  #   }
-  #   ttl_years   = 3
-  #   common_name = "loki.day1.sololab"
-  # },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "alloy.day1.sololab"
+    alt_names = [
+      "alloy.day0.sololab",
+    ]
+  },
   # {
   #   secret_engine = {
   #     backend   = "pki/day1"

@@ -7,12 +7,12 @@ variable "prov_vault" {
 }
 
 variable "prov_remote" {
-  type = object({
+  type = list(object({
     host     = string
     port     = number
     user     = string
     password = string
-  })
+  }))
 }
 
 variable "podman_kube" {

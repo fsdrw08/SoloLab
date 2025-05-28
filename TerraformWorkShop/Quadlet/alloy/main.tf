@@ -68,19 +68,60 @@ data "helm_template" "podman_kube" {
   ])
 }
 
-resource "remote_file" "podman_kube" {
-  path    = var.podman_kube.manifest_dest_path
-  content = data.helm_template.podman_kube.manifest
+resource "remote_file" "podman_kube_day0" {
+  provider = remote.Day0
+  path     = var.podman_kube.manifest_dest_path
+  content  = data.helm_template.podman_kube.manifest
 }
 
-module "podman_quadlet" {
-  source  = "../../modules/system-systemd_quadlet"
-  vm_conn = var.prov_remote
+resource "remote_file" "podman_kube_day1" {
+  provider = remote.Day1
+  path     = var.podman_kube.manifest_dest_path
+  content  = data.helm_template.podman_kube.manifest
+}
+
+module "podman_quadlet_day0" {
+  source = "../../modules/system-systemd_quadlet"
+  providers = {
+    remote = remote.Day0
+  }
+  vm_conn = var.prov_remote.0
   podman_quadlet = {
     service = {
       name           = var.podman_quadlet.service.name
       status         = var.podman_quadlet.service.status
-      custom_trigger = md5(remote_file.podman_kube.content)
+      custom_trigger = md5(remote_file.podman_kube_day0.content)
+    }
+    files = [
+      for file in var.podman_quadlet.files :
+      {
+        content = templatefile(
+          file.template,
+          file.vars
+        )
+        path = join("/", [
+          var.podman_quadlet.dir,
+          join(".", [
+            var.podman_quadlet.service.name,
+            split(".", basename(file.template))[1]
+          ])
+        ])
+      }
+    ]
+  }
+}
+
+module "podman_quadlet_day1" {
+  source = "../../modules/system-systemd_quadlet"
+  providers = {
+    remote = remote.Day1
+  }
+  vm_conn = var.prov_remote.1
+  podman_quadlet = {
+    service = {
+      name           = var.podman_quadlet.service.name
+      status         = var.podman_quadlet.service.status
+      custom_trigger = md5(remote_file.podman_kube_day1.content)
     }
     files = [
       for file in var.podman_quadlet.files :
@@ -117,7 +158,14 @@ resource "powerdns_record" "records" {
 #   content = file("./podman-loki/loki-traefik.yaml")
 # }
 
-resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-alloy.hcl"
-  content = file("./podman-alloy/service.hcl")
+resource "remote_file" "consul_service_day0" {
+  provider = remote.Day0
+  path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
+  content  = file("./podman-alloy/service.hcl")
+}
+
+resource "remote_file" "consul_service_day1" {
+  provider = remote.Day1
+  path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
+  content  = file("./podman-alloy/service.hcl")
 }

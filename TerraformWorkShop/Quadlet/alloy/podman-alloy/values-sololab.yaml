@@ -9,6 +9,12 @@ alloy:
       type: spc_t
   config:
     fromYAML:
+      # https://grafana.com/docs/alloy/latest/reference/config-blocks/http/
+      - component: http
+        attributes:
+          tls.0:
+            cert_file: '"/etc/alloy/certs/alloy.crt"'
+            key_file: '"/etc/alloy/certs/alloy.key"'
       # - component: local.file_match
       #   label: local_files
       #   attributes:
@@ -76,19 +82,20 @@ alloy:
     server:
       http:
         listen-addr: 0.0.0.0:12345
-  hostAliases:
-    - ip: host-gateway
-      hostnames:
-        - loki.day1.sololab
   podLabels:
     traefik.enable: true
-    traefik.http.routers.alloy-redirect.entrypoints: web
-    traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`)
-    traefik.http.routers.alloy-redirect.middlewares: toHttps@file
-    traefik.http.routers.alloy.entryPoints: webSecure
-    traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`)
-    traefik.http.routers.alloy.tls.certresolver: internal
-    traefik.http.services.alloy.loadbalancer.server.port: 12345
+    traefik.tcp.routers.alloy.entrypoints: webSecure
+    traefik.tcp.routers.alloy.rule: HostSNI(`alloy.day1.sololab`) || HostSNI(`alloy.day0.sololab`)
+    traefik.tcp.routers.alloy.tls.passthrough: true
+    traefik.tcp.routers.alloy.service: alloy
+    traefik.tcp.services.alloy.loadbalancer.server.port: 12345
+    # traefik.http.routers.alloy-redirect.entrypoints: web
+    # traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`)
+    # traefik.http.routers.alloy-redirect.middlewares: toHttps@file
+    # traefik.http.routers.alloy.entryPoints: webSecure
+    # traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`)
+    # traefik.http.routers.alloy.tls.certresolver: internal
+    # traefik.http.services.alloy.loadbalancer.server.port: 12345
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

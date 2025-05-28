@@ -4,12 +4,20 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-prov_remote = {
-  host     = "192.168.255.20"
-  port     = 22
-  user     = "podmgr"
-  password = "podmgr"
-}
+prov_remote = [
+  {
+    host     = "192.168.255.10"
+    port     = 22
+    user     = "podmgr"
+    password = "podmgr"
+  },
+  {
+    host     = "192.168.255.20"
+    port     = 22
+    user     = "podmgr"
+    password = "podmgr"
+  }
+]
 
 podman_kube = {
   helm = {
@@ -22,18 +30,18 @@ podman_kube = {
           name          = "alloy.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
-        # {
-        #   name          = "alloy.tls.contents.alloy\\.crt"
-        #   value_ref_key = "cert"
-        # },
-        # {
-        #   name          = "alloy.tls.contents.alloy\\.key"
-        #   value_ref_key = "private_key"
-        # },
+        {
+          name          = "alloy.tls.contents.alloy\\.crt"
+          value_ref_key = "cert"
+        },
+        {
+          name          = "alloy.tls.contents.alloy\\.key"
+          value_ref_key = "private_key"
+        },
       ]
       vault_kvv2 = {
         mount = "kvv2/certs"
-        name  = "root"
+        name  = "alloy.day1.sololab"
       }
     }
   }
@@ -57,7 +65,7 @@ podman_quadlet = {
         yaml          = "alloy-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "podman"
+        Network       = "host"
         # service
         ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
         ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
@@ -78,6 +86,15 @@ prov_pdns = {
 }
 
 dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "alloy.day0.sololab."
+    type = "CNAME"
+    ttl  = 86400
+    records = [
+      "infra.node.consul."
+    ]
+  },
   {
     zone = "day1.sololab."
     name = "alloy.day1.sololab."
