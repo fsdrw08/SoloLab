@@ -2,8 +2,35 @@ global:
   imageRegistry: zot.day0.sololab
 alloy:
   containerPorts: []
+  containerSecurityContext:
+    enabled: true
+    privileged: true
+    seLinuxOptions:
+      type: spc_t
   config:
     fromYAML:
+      # - component: local.file_match
+      #   label: local_files
+      #   attributes:
+      #     path_targets:
+      #       - '"__path__"': '"/var/log/*.log"'
+      #     sync_period: '"5s"'
+      # - component: loki.source.file
+      #   label: log_scrape
+      #   attributes:
+      #     targets: local.file_match.local_files.targets
+      #     forward_to:
+      #       - loki.process.filter_logs.receiver
+      #     tail_from_end: true
+      # - component: loki.process
+      #   label: filter_logs
+      #   attributes:
+      #     stage.drop.0:
+      #       source: '""'
+      #       expression: '".*Connection closed by authenticating user root"'
+      #       drop_counter_reason: '"noisy"'
+      #     forward_to:
+      #       - loki.write.loki.receiver
       - component: loki.source.journal
         label: journal
         attributes:
@@ -12,6 +39,10 @@ alloy:
             - loki.write.loki.receiver
           labels:
             component: '"loki.source.journal"'
+          # need to explicitly set the path value for the loki.source.journal component when running within a container
+          # https://community.grafana.com/t/scrape-journald-log-with-alloy-docker-container/119896/2
+          path: '"/var/log/journal"'
+          format_as_json: false
       - component: loki.relabel
         label: journal
         attributes:
@@ -22,9 +53,13 @@ alloy:
             target_label: '"systemd_unit"'
           rule.1:
             source_labels:
+              - '"__journal__systemd_user_unit"'
+            target_label: '"systemd_user_unit"'
+          rule.2:
+            source_labels:
               - '"__journal__hostname"'
             target_label: '"systemd_hostname"'
-          rule.2:
+          rule.3:
             source_labels:
               - '"__journal__transport"'
             target_label: '"systemd_transport"'
@@ -59,8 +94,8 @@ alloy:
       value: Asia/Shanghai
   extraVolumeMounts:
     - name: journald
-      mountPath: /run/log/journal
+      mountPath: /var/log/journal
   extraVolumes:
     - name: journald
       hostPath:
-        path: /run/log/journal
+        path: /var/log/journal
