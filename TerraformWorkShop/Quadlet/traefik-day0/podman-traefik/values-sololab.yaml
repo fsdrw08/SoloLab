@@ -83,6 +83,7 @@ traefik:
   extraVolumeMounts:
     - name: docker-socket
       mountPath: /var/run/docker.sock
+      readOnly: true
     - name: config-dynamic
       mountPath: /etc/traefik/dynamic
   extraVolumes:
