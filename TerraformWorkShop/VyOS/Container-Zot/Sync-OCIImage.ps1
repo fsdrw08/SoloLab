@@ -162,10 +162,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.4.0",
-        "archive": "docker.io_library_traefik_v3.4.0.tar",
+        "publicRepo": "library/traefik:v3.4.1",
+        "archive": "docker.io_library_traefik_v3.4.1.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "library/traefik:v3.4.0",
+        "privateRepo": "library/traefik:v3.4.1",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
