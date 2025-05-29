@@ -15,6 +15,14 @@ variable "prov_remote" {
   })
 }
 
+variable "prov_grafana" {
+  type = object({
+    url                  = string
+    auth                 = string
+    insecure_skip_verify = optional(bool, true)
+  })
+}
+
 variable "podman_kube" {
   type = object({
     helm = object({
