@@ -1,0 +1,19 @@
+global:
+  imageRegistry: zot.day0.sololab
+prometheus:
+  containerPorts: []
+  resourcesPreset: "small"
+  config:
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.prometheus-redirect.entrypoints: web
+    traefik.http.routers.prometheus-redirect.rule: Host(`prometheus.day1.sololab`)
+    traefik.http.routers.prometheus-redirect.middlewares: toHttps@file
+    traefik.http.routers.prometheus.entryPoints: webSecure
+    traefik.http.routers.prometheus.rule: Host(`prometheus.day1.sololab`)
+    traefik.http.routers.prometheus.tls.certresolver: internal
+    traefik.http.services.prometheus.loadbalancer.server.port: 3100
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai

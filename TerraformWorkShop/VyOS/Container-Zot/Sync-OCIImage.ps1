@@ -208,6 +208,14 @@ $syncList = @"
         "privateRepo": "grafana/alloy:v1.8.3",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "prometheus/prometheus:v3.4.1",
+        "archive": "quay.io_prometheus_prometheus_v3.4.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "prometheus/prometheus:v3.4.1",
+        "description": "https://hub.docker.com/r/prom/prometheus/tags, https://quay.io/repository/prometheus/prometheus?tab=tags",
+    },
 ]
 "@
 
