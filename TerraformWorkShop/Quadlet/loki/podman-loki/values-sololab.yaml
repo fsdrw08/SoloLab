@@ -1,7 +1,17 @@
 global:
   imageRegistry: zot.day0.sololab
 loki:
-  containerPorts: []
+  containerPorts:
+    - name: http
+      containerPort: 3100
+      hostPort: 3100
+      hostIP: 127.0.0.1
+      protocol: TCP
+    - name: grpc
+      containerPort: 9095
+      hostPort: 9095
+      hostIP: 127.0.0.1
+      protocol: TCP
   resourcesPreset: "medium"
   config:
     # common:
@@ -56,8 +66,8 @@ loki:
       enabled: true
       node_name: day1
 
-  tls:
-    mountPath: /etc/loki/certs
+  # tls:
+  #   mountPath: /etc/loki/certs
   #   contents:
   #     loki.crt: # set from terraform data
   #     loki.key: # set from terraform data
@@ -65,15 +75,15 @@ loki:
     - ip: host-gateway
       hostnames:
         - minio-api.day1.sololab
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.loki-redirect.entrypoints: web
-    traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-    traefik.http.routers.loki-redirect.middlewares: toHttps@file
-    traefik.http.routers.loki.entryPoints: webSecure
-    traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-    traefik.http.routers.loki.tls.certresolver: internal
-    traefik.http.services.loki.loadbalancer.server.port: 3100
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.loki-redirect.entrypoints: web
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.loki.entryPoints: webSecure
+  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.tls.certresolver: internal
+  #   traefik.http.services.loki.loadbalancer.server.port: 3100
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

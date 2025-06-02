@@ -18,4 +18,4 @@ http:
     loki:
       loadBalancer:
         servers:
-          - url: "http://169.254.1.3:3100/"
+          - url: "http://127.0.0.1:3100/"
