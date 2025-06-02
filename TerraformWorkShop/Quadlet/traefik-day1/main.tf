@@ -47,33 +47,33 @@ data "vault_kv_secret_v2" "root_ca" {
 #   ]
 # }
 
-resource "remote_file" "http_socket" {
-  content = templatefile(
-    "./podman-traefik/http.socket",
-    {
-      FileDescriptorName = "web"
-      Service            = "${var.podman_quadlet.service.name}.service"
-    }
-  )
-  path = "/home/podmgr/.config/systemd/user/http.socket"
-}
+# resource "remote_file" "http_socket" {
+#   content = templatefile(
+#     "./podman-traefik/http.socket",
+#     {
+#       FileDescriptorName = "web"
+#       Service            = "${var.podman_quadlet.service.name}.service"
+#     }
+#   )
+#   path = "/home/podmgr/.config/systemd/user/http.socket"
+# }
 
-resource "remote_file" "https_socket" {
-  content = templatefile(
-    "./podman-traefik/https.socket",
-    {
-      FileDescriptorName = "webSecure"
-      Service            = "${var.podman_quadlet.service.name}.service"
-    }
-  )
-  path = "/home/podmgr/.config/systemd/user/https.socket"
-}
+# resource "remote_file" "https_socket" {
+#   content = templatefile(
+#     "./podman-traefik/https.socket",
+#     {
+#       FileDescriptorName = "webSecure"
+#       Service            = "${var.podman_quadlet.service.name}.service"
+#     }
+#   )
+#   path = "/home/podmgr/.config/systemd/user/https.socket"
+# }
 
 resource "null_resource" "service_stop" {
-  depends_on = [
-    remote_file.http_socket,
-    remote_file.https_socket
-  ]
+  # depends_on = [
+  #   remote_file.http_socket,
+  #   remote_file.https_socket
+  # ]
   triggers = {
     service_name = "http.socket https.socket"
     host         = var.prov_remote.host
@@ -98,8 +98,8 @@ resource "null_resource" "service_stop" {
 
 module "podman_quadlet" {
   depends_on = [
-    remote_file.http_socket,
-    remote_file.https_socket,
+    # remote_file.http_socket,
+    # remote_file.https_socket,
     null_resource.service_stop
   ]
   source  = "../../modules/system-systemd_quadlet"

@@ -1,11 +1,11 @@
 [Unit]
 Description="${Description}"
 Documentation="${Documentation}"
-After=http.socket https.socket
-Requires=http.socket https.socket
+# After=http.socket https.socket
+# Requires=http.socket https.socket
 
 [Service]
-Sockets=http.socket https.socket
+# Sockets=http.socket https.socket
 ExecStartPre=bash -c "podman secret exists traefik-sec-ca && podman secret rm traefik-sec-ca; echo \"${ca}\" | base64 -d | podman secret create traefik-sec-ca -"
 ExecStartPre=${ExecStartPre_vault}
 ExecStartPre=${ExecStartPre_consul}
@@ -19,7 +19,7 @@ Image=zot.day0.sololab/library/traefik:v3.4.1
 
 SecurityLabelType=spc_t
 
-PublishPort=8080:8080
+# PublishPort=8080:8080
 
 # https://doc.traefik.io/traefik/reference/static-configuration/cli/
 Exec=--accessLog=true \
@@ -33,14 +33,16 @@ Exec=--accessLog=true \
   --certificatesResolvers.internal.acme.certificatesDuration=2160 \
   --certificatesResolvers.internal.acme.storage=/etc/traefik/tls/internal.json \
   --certificatesResolvers.internal.acme.tlsChallenge=true \
-  --entrypoints.web.address=:80 \
-  --entrypoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0 \
-  --entrypoints.webSecure.address=:443 \
-  --entrypoints.webSecure.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --entryPoints.web.address=:80 \
+  --entryPoints.web.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --entryPoints.webSecure.address=:443 \
+  --entryPoints.webSecure.forwardedHeaders.trustedIPs=0.0.0.0/0 \
+  --entryPoints.traefik.address=:8080 \
   --global.checkNewVersion=false \
   --global.sendAnonymousUsage=false \
   --log.level=INFO \
   --ping=true \
+  --ping.entryPoint=traefik \
   --providers.consulCatalog=true \
   --providers.consulCatalog.endpoint.address=consul.day0.sololab \
   --providers.consulCatalog.endpoint.dataCenter=dc1 \
@@ -77,6 +79,7 @@ Label="traefik.http.routers.dashboard.middlewares=userPass@file"
 Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.service=api@internal"
 Label="traefik.http.routers.dashboard.tls.certresolver=internal"
+Label="traefik.http.services.dashboard.loadbalancer.server.port=443"
 
 SecurityLabelDisable=true
 

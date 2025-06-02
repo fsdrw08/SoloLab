@@ -26,7 +26,8 @@ podman_quadlet = {
         ExecStartPost       = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik\""
         # container
         PodmanArgs = "--tls-verify=false"
-        Network    = "podman"
+        Network    = "host"
+        # Network    = "podman"
         # Network = "pasta:--map-host-loopback=169.254.1.3"
         Restart = "on-failure"
       }
