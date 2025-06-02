@@ -47,6 +47,14 @@ vault_certs = [
       "alloy.day0.sololab",
     ]
   },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "prometheus.day1.sololab"
+  },
   # {
   #   secret_engine = {
   #     backend   = "pki/day1"

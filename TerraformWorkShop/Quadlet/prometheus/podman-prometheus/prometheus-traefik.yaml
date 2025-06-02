@@ -1,0 +1,21 @@
+http:
+  routers:
+    prometheus-redirect:
+      entryPoints:
+        - web
+      middlewares:
+        - toHttps@file
+      rule: Host(`prometheus.day1.sololab`)
+      service: prometheus
+    prometheus:
+      entryPoints:
+        - webSecure
+      rule: Host(`prometheus.day1.sololab`)
+      service: prometheus
+      tls:
+        certresolver: internal
+  services:
+    prometheus:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9090/"

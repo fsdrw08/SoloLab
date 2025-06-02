@@ -65,16 +65,6 @@ data "helm_template" "podman_kube" {
         value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
       }
     ],
-    flatten([
-      {
-        name  = "loki.config.storage_config.object_store.s3.access_key_id"
-        value = data.vault_kv_secret_v2.minio.data["access_key"]
-      },
-      {
-        name  = "loki.config.storage_config.object_store.s3.secret_access_key"
-        value = data.vault_kv_secret_v2.minio.data["secret_key"]
-      },
-    ])
   ])
 }
 
@@ -122,20 +112,21 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-#   content = file("./podman-loki/loki-traefik.yaml")
-# }
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/prometheus-traefik.yaml"
+  content = file("./podman-prometheus/prometheus-traefik.yaml")
+}
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-loki.hcl"
-  content = file("./podman-loki/service.hcl")
+  path    = "/var/home/podmgr/consul-services/service-prometheus.hcl"
+  content = file("./podman-prometheus/service.hcl")
 }
 
 resource "grafana_data_source" "data_source" {
-  type = "loki"
-  name = "loki"
-  url  = "https://${trimsuffix(var.dns_records.0.name, ".")}"
+  depends_on = [module.podman_quadlet, powerdns_record.records]
+  type       = "prometheus"
+  name       = "prometheus"
+  url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
 
   secure_json_data_encoded = jsonencode({
     tlsCACert = data.vault_kv_secret_v2.cert[0].data["ca"]

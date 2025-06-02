@@ -27,18 +27,18 @@ podman_kube = {
           name          = "prometheus.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
-        # {
-        #   name          = "prometheus.tls.contents.prometheus\\.crt"
-        #   value_ref_key = "cert"
-        # },
-        # {
-        #   name          = "prometheus.tls.contents.prometheus\\.key"
-        #   value_ref_key = "private_key"
-        # },
+        {
+          name          = "prometheus.tls.contents.prometheus\\.crt"
+          value_ref_key = "cert"
+        },
+        {
+          name          = "prometheus.tls.contents.prometheus\\.key"
+          value_ref_key = "private_key"
+        },
       ]
       vault_kvv2 = {
         mount = "kvv2/certs"
-        name  = "root"
+        name  = "prometheus.day1.sololab"
       }
     }
   }
@@ -62,11 +62,11 @@ podman_quadlet = {
         yaml          = "prometheus-aio.yaml"
         PodmanArgs    = "--tls-verify=false"
         KubeDownForce = "false"
-        Network       = "podman"
+        Network       = "host"
         # service
         ExecStartPre = ""
         ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run prometheus-server \""
+        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run prometheus-server\""
         Restart       = "on-failure"
       }
     },

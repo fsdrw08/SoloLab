@@ -8,7 +8,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "prometheus-https-check"
       name            = "prometheus-https-check"
-      http            = "https://prometheus.day1.sololab/"
+      http            = "https://prometheus.day1.sololab/-/healthy"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
