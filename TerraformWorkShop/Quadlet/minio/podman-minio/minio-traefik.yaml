@@ -1,6 +1,10 @@
 http:
   serversTransports:
-    minio:
-      serverName: minio.day0.sololab
+    minio-api:
+      serverName: minio-api.day1.sololab
+      rootcas:
+        - "/etc/traefik/tls/ca.crt"
+    minio-console:
+      serverName: minio-console.day1.sololab
       rootcas:
         - "/etc/traefik/tls/ca.crt"

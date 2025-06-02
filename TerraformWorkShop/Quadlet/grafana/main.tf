@@ -144,6 +144,11 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/grafana-traefik.yaml"
+  content = file("./podman-grafana/grafana-traefik.yaml")
+}
+
 resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/service-grafana.hcl"
   content = file("./podman-grafana/service.hcl")

@@ -1,0 +1,7 @@
+http:
+  serversTransports:
+    consul:
+      serverName: consul-client.day1.sololab
+      insecureSkipVerify: true
+      # rootcas:
+      #   - "/etc/traefik/tls/ca.crt"

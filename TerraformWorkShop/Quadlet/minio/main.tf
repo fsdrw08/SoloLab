@@ -156,6 +156,11 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/minio-traefik.yaml"
+  content = file("./podman-minio/minio-traefik.yaml")
+}
+
 resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/service-minio.hcl"
   content = file("./podman-minio/service.hcl")

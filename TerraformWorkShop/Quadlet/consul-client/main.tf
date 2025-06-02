@@ -171,6 +171,11 @@ resource "null_resource" "post_process" {
   }
 }
 
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/consul-traefik.yaml"
+  content = file("./podman-consul/consul-traefik.yaml")
+}
+
 resource "remote_file" "consul_service" {
   depends_on = [null_resource.init]
   path       = "/var/home/podmgr/consul-services/service-consul.hcl"
