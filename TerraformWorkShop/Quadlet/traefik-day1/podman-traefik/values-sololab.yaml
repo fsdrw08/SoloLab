@@ -1,0 +1,106 @@
+global:
+  imageRegistry: zot.day0.sololab:5000
+traefik:
+  containerPorts: []
+  containerSecurityContext:
+    enabled: true
+    seLinuxOptions:
+      type: spc_t
+  configFiles:
+    static:
+      providers:
+        consulCatalog:
+          endpoint:
+            address: consul.day0.sololab
+            datacenter: dc1
+            scheme: https
+            tls:
+              ca: /etc/traefik/tls/ca.crt
+          exposedByDefault: false
+      serversTransport:
+        rootCAs:
+          - /etc/traefik/tls/ca.crt
+      global:
+        checkNewVersion: false
+        sendAnonymousUsage: false
+      entryPoints:
+        traefik:
+          address: "192.168.255.20:8080"
+        web:
+          address: "192.168.255.20:80"
+          forwardedHeaders:
+            trustedIPs:
+              - "0.0.0.0/0"
+        webSecure:
+          address: "192.168.255.20:443"
+          forwardedHeaders:
+            trustedIPs:
+              - "0.0.0.0/0"
+      certificatesResolvers:
+        external:
+          acme:
+            caServer: https://acme-v02.api.letsencrypt.org/directory
+            certificatesDuration: 2160
+            email: ""
+            storage: /mnt/acmeStorage/external.json
+            tlsChallenge: {}
+        internal:
+          acme:
+            caServer: https://vault.day0.sololab/v1/pki/day1/acme/directory
+            certificatesDuration: 2160
+            email: ""
+            storage: /mnt/acmeStorage/internal.json
+            tlsChallenge: {}
+      log:
+        level: INFO
+      accessLog: {}
+    dynamic:
+      # https://traefik.io/blog/traefik-2-tls-101-23b4fbee81f1/
+      tlsCerts.yaml:
+        tls:
+          certificates:
+            - certFile: /etc/traefik/tls/day1.crt
+              keyFile: /etc/traefik/tls/day1.key
+      httpBasicAuth.yaml:
+        http:
+          middlewares:
+            userPass:
+              basicAuth:
+                users:
+                  - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.dashboard-redirect.entrypoints: web
+    traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard-redirect.middlewares: toHttps@file
+    traefik.http.routers.dashboard.entryPoints: webSecure
+    traefik.http.routers.dashboard.tls: true
+    traefik.http.routers.dashboard.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard.service: api@internal
+    traefik.http.routers.dashboard.middlewares: userPass@file
+    # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
+    traefik.http.services.dashboard.loadbalancer.server.port: 443
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+    - name: LEGO_CA_CERTIFICATES
+      value: /etc/traefik/tls/ca.crt
+    - name: LEGO_CA_SYSTEM_CERT_POOL
+      value: "true"
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+      readOnly: true
+    - name: config-dynamic
+      mountPath: /etc/traefik/dynamic
+  extraVolumes:
+    - name: docker-socket
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
+    - name: config-dynamic
+      hostPath:
+        path: /var/home/podmgr/traefik-file-provider
+persistence:
+  enabled: true
+  mountPath: /mnt/acmeStorage

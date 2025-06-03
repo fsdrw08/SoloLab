@@ -56,7 +56,7 @@ grafana:
 
     traefik.http.routers.grafana.entrypoints: webSecure
     traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
-    traefik.http.routers.grafana.tls.certresolver: internal
+    traefik.http.routers.grafana.tls: true
     traefik.http.routers.grafana.service: grafana
 
     traefik.http.services.grafana.loadBalancer.serversTransport: grafana@file

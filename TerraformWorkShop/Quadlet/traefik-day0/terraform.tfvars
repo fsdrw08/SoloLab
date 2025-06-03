@@ -75,12 +75,14 @@ prov_pdns = {
   server_url = "http://pdns-auth.day0.sololab:8081"
 }
 
-dns_record = {
-  zone = "day0.sololab."
-  name = "traefik.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
-  ]
-}
+dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "traefik.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  }
+]

@@ -44,24 +44,44 @@ data "helm_template" "podman_kube" {
     "${file(var.podman_kube.helm.value_file)}"
   ]
 
+  # v2 helm provider
   # normal values
-  dynamic "set" {
-    for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-    content {
-      name = set.value.name
-      value = set.value.value_string != null ? set.value.value_string : templatefile(
-        "${set.value.value_template_path}", "${set.value.value_template_vars}"
-      )
-    }
-  }
-  # tls
-  dynamic "set" {
-    for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
-    content {
-      name  = set.value.name
-      value = local.cert[0][set.value.value_ref_key]
-    }
-  }
+  # dynamic "set" {
+  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
+  #   content {
+  #     name = set.value.name
+  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
+  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
+  #     )
+  #   }
+  # }
+  # # tls
+  # dynamic "set" {
+  #   for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
+  #   content {
+  #     name  = set.value.name
+  #     value = local.cert[0][set.value.value_ref_key]
+  #   }
+  # }
+
+  # v3 helm provider
+  set = flatten([
+    var.podman_kube.helm.value_sets == null ? [] : [
+      for value_set in flatten([var.podman_kube.helm.value_sets]) : {
+        name = value_set.name
+        value = value_set.value_string != null ? value_set.value_string : templatefile(
+          "${value_set.value_template_path}", "${value_set.value_template_vars}"
+        )
+      }
+    ],
+    var.podman_kube.helm.tls == null ? [] : [
+      for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
+        name = value_set.name
+        # value = local.cert[0][value_set.value_ref_key]
+        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
+      }
+    ],
+  ])
 }
 
 resource "remote_file" "podman_kube" {
@@ -70,12 +90,6 @@ resource "remote_file" "podman_kube" {
 }
 
 module "podman_quadlet" {
-  depends_on = [
-    # remote_file.podman_quadlet,
-    # remote_file.http_socket,
-    # remote_file.https_socket,
-    # null_resource.service_stop
-  ]
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
@@ -103,15 +117,18 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
+resource "powerdns_record" "records" {
+  for_each = {
+    for record in var.dns_records : record.name => record
+  }
+  zone    = each.value.zone
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
 }
 
-resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-  content = file("./podman-traefik/service.hcl")
-}
+# resource "remote_file" "consul_service" {
+#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
+#   content = file("./podman-traefik/service.hcl")
+# }

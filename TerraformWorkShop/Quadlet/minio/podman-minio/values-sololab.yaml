@@ -30,7 +30,7 @@ minio:
 
     traefik.http.routers.minio-api.entrypoints: webSecure
     traefik.http.routers.minio-api.rule: Host(`minio-api.day1.sololab`)
-    traefik.http.routers.minio-api.tls.certresolver: internal
+    traefik.http.routers.minio-api.tls: true
     traefik.http.routers.minio-api.service: minio-api
 
     traefik.http.services.minio-api.loadBalancer.serversTransport: minio-api@file
@@ -44,7 +44,7 @@ minio:
 
     traefik.http.routers.minio-console.entrypoints: webSecure
     traefik.http.routers.minio-console.rule: Host(`minio-console.day1.sololab`)
-    traefik.http.routers.minio-console.tls.certresolver: internal
+    traefik.http.routers.minio-console.tls: true
     traefik.http.routers.minio-console.service: minio-console
 
     traefik.http.services.minio-console.loadBalancer.serversTransport: minio-console@file

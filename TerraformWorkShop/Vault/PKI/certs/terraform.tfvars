@@ -23,6 +23,14 @@ vault_certs = [
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
+    common_name = "*.day1.sololab"
+  },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
     common_name = "minio-api.day1.sololab"
     alt_names = [
       "minio-console.day1.sololab",
@@ -35,6 +43,14 @@ vault_certs = [
     }
     ttl_years   = 3
     common_name = "grafana.day1.sololab"
+  },
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "loki.day1.sololab"
   },
   {
     secret_engine = {
