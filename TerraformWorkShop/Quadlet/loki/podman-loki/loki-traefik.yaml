@@ -12,10 +12,13 @@ http:
         - webSecure
       rule: Host(`loki.day1.sololab`)
       service: loki
-      tls:
-        certresolver: internal
+      tls: true
+  # serversTransports:
+  #   loki:
+  #     insecureSkipVerify: true
   services:
     loki:
       loadBalancer:
+        # serversTransport: loki
         servers:
           - url: "http://127.0.0.1:3100/"

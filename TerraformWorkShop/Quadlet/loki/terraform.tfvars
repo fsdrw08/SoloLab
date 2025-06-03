@@ -27,18 +27,18 @@ podman_kube = {
           name          = "loki.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
-        # {
-        #   name          = "loki.tls.contents.loki\\.crt"
-        #   value_ref_key = "cert"
-        # },
-        # {
-        #   name          = "loki.tls.contents.loki\\.key"
-        #   value_ref_key = "private_key"
-        # },
+        {
+          name          = "loki.tls.contents.loki\\.crt"
+          value_ref_key = "cert"
+        },
+        {
+          name          = "loki.tls.contents.loki\\.key"
+          value_ref_key = "private_key"
+        },
       ]
       vault_kvv2 = {
         mount = "kvv2/certs"
-        name  = "root"
+        name  = "loki.day1.sololab"
       }
     }
   }

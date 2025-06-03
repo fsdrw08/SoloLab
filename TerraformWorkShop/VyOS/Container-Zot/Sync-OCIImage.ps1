@@ -202,6 +202,14 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/grafana-loki:3.5.1",
+        "archive": "docker.io_bitnami_grafana-loki_3.5.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/grafana-loki:3.5.1",
+        "description": "https://hub.docker.com/r/bitnami/grafana-loki/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "grafana/alloy:v1.8.3",
         "archive": "docker.io_grafana_alloy_v1.8.3.tar",
         "privateRegistry": "192.168.255.10:5000",

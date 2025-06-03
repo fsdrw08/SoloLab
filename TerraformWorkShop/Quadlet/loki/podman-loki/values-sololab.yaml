@@ -1,6 +1,8 @@
 global:
   imageRegistry: zot.day0.sololab
 loki:
+  image:
+    repository: bitnami/grafana-loki
   containerPorts:
     - name: http
       containerPort: 3100
@@ -12,6 +14,13 @@ loki:
       hostPort: 9095
       hostIP: 127.0.0.1
       protocol: TCP
+  livenessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          curl -s -k http://localhost:3100/ready
   resourcesPreset: "medium"
   config:
     # common:
@@ -29,16 +38,16 @@ loki:
             prefix: index_
             period: 24h
 
-    ## loki cannot handle tls well by itself,
-    ## reason: failed to run local healthcheck if tls configed
+    ## loki official image cannot handle tls well by itself,
+    ## reason: failed to run local healthcheck with wget if tls configed
     ## error message: tls: invalid ClientKeyExchange message
     # server:
-    #   http_listen_address: 127.0.0.1
-    #   grpc_listen_address: 127.0.0.1
+    #   # http_listen_address: 127.0.0.1
+    #   # grpc_listen_address: 127.0.0.1
     #   http_tls_config:
     #     # https://pkg.go.dev/crypto/tls#ClientAuthType
-    #     client_auth_type: VerifyClientCertIfGiven
-    #     client_ca_file: /etc/loki/certs/ca.crt
+    #     # client_auth_type: VerifyClientCertIfGiven
+    #     # client_ca_file: /etc/loki/certs/ca.crt
     #     cert_file: /etc/loki/certs/loki.crt
     #     key_file: /etc/loki/certs/loki.key
 
@@ -71,6 +80,8 @@ loki:
   #   contents:
   #     loki.crt: # set from terraform data
   #     loki.key: # set from terraform data
+  args:
+    - -config.file=/etc/loki/local-config.yaml
   hostAliases:
     - ip: host-gateway
       hostnames:
@@ -80,10 +91,27 @@ loki:
   #   traefik.http.routers.loki-redirect.entrypoints: web
   #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
   #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.loki-redirect.service: loki
+
+  #   traefik.http.routers.loki.entrypoints: webSecure
+  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.tls: true
+  #   traefik.http.routers.loki.service: loki
+
+  #   traefik.http.services.loki.loadBalancer.serversTransport: loki@file
+  #   traefik.http.services.loki.loadbalancer.server.scheme: https
+  #   traefik.http.services.loki.loadbalancer.server.port: 3100
+
+  #   traefik.http.routers.loki-redirect.entrypoints: web
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
   #   traefik.http.routers.loki.entryPoints: webSecure
   #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
   #   traefik.http.routers.loki.tls.certresolver: internal
   #   traefik.http.services.loki.loadbalancer.server.port: 3100
+  # https://github.com/bitnami/containers/blob/main/bitnami/grafana-loki/3/debian-12/Dockerfile#L54
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=1001,gid=1001
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
