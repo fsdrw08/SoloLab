@@ -153,10 +153,17 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-#   content = file("./podman-loki/loki-traefik.yaml")
-# }
+resource "remote_file" "traefik_file_provider_day0" {
+  provider = remote.Day0
+  path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
+  content  = file("./podman-alloy/alloy-traefik.yaml")
+}
+
+resource "remote_file" "traefik_file_provider_day1" {
+  provider = remote.Day1
+  path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
+  content  = file("./podman-alloy/alloy-traefik.yaml")
+}
 
 resource "remote_file" "consul_service_day0" {
   provider = remote.Day0

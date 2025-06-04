@@ -1,0 +1,4 @@
+http:
+  serversTransports:
+    alloy:
+      insecureSkipVerify: true
