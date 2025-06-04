@@ -1,6 +1,9 @@
 global:
   imageRegistry: zot.day0.sololab
 prometheus:
+  image:
+    repository: bitnami/prometheus
+    tag: 3.4.1
   containerPorts: []
   resourcesPreset: "small"
   # configFiles:

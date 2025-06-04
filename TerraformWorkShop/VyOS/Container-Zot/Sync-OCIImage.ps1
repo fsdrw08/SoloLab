@@ -224,6 +224,14 @@ $syncList = @"
         "privateRepo": "prometheus/prometheus:v3.4.1",
         "description": "https://hub.docker.com/r/prom/prometheus/tags, https://quay.io/repository/prometheus/prometheus?tab=tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/prometheus:3.4.1",
+        "archive": "docker.io_bitnami_prometheus_3.4.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/prometheus:3.4.1",
+        "description": "https://hub.docker.com/r/bitnami/prometheus/tags",
+    },
 ]
 "@
 
