@@ -122,17 +122,20 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
+resource "powerdns_record" "records" {
+  for_each = {
+    for record in var.dns_records : record.name => record
+  }
+  zone    = each.value.zone
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
 }
 
 resource "null_resource" "post_process" {
   depends_on = [
-    powerdns_record.record,
+    powerdns_record.records,
     module.podman_quadlet
   ]
   for_each = var.post_process == null ? {} : var.post_process
@@ -151,6 +154,11 @@ resource "null_resource" "post_process" {
       templatefile("${each.value.script_path}", "${each.value.vars}")
     ]
   }
+}
+
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/consul-traefik.yaml"
+  content = file("./podman-consul/consul-traefik.yaml")
 }
 
 resource "remote_file" "consul_service" {

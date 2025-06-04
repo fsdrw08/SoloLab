@@ -76,12 +76,14 @@ prov_pdns = {
   insecure_https = true
 }
 
-dns_record = {
-  zone = "day0.sololab."
-  name = "cockpit.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
-  ]
-}
+dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "cockpit.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  }
+]

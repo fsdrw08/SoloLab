@@ -4,11 +4,25 @@ cockpit:
   containerPorts: []
   podLabels:
     traefik.enable: true
-    traefik.tcp.routers.cockpit-web.entrypoints: webSecure
-    traefik.tcp.routers.cockpit-web.rule: HostSNI(`cockpit.day0.sololab`)
-    traefik.tcp.routers.cockpit-web.tls.passthrough: true
-    traefik.tcp.routers.cockpit-web.service: cockpit-web
-    traefik.tcp.services.cockpit-web.loadbalancer.server.port: 9090
+    traefik.http.routers.cockpit-redirect.entrypoints: web
+    traefik.http.routers.cockpit-redirect.rule: Host(`cockpit.day0.sololab`)
+    traefik.http.routers.cockpit-redirect.middlewares: toHttps@file
+    traefik.http.routers.cockpit-redirect.service: cockpit
+
+    traefik.http.routers.cockpit.entrypoints: webSecure
+    traefik.http.routers.cockpit.rule: Host(`cockpit.day0.sololab`)
+    traefik.http.routers.cockpit.tls: true
+    traefik.http.routers.cockpit.service: cockpit
+
+    traefik.http.services.cockpit.loadBalancer.serversTransport: cockpit@file
+    traefik.http.services.cockpit.loadbalancer.server.scheme: https
+    traefik.http.services.cockpit.loadbalancer.server.port: 9090
+
+    # traefik.tcp.routers.cockpit-web.entrypoints: webSecure
+    # traefik.tcp.routers.cockpit-web.rule: HostSNI(`cockpit.day0.sololab`)
+    # traefik.tcp.routers.cockpit-web.tls.passthrough: true
+    # traefik.tcp.routers.cockpit-web.service: cockpit-web
+    # traefik.tcp.services.cockpit-web.loadbalancer.server.port: 9090
 
   extraEnvVars:
     - name: TZ

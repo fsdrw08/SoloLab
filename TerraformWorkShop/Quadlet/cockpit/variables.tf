@@ -89,14 +89,14 @@ variable "prov_pdns" {
   })
 }
 
-variable "dns_record" {
-  type = object({
+variable "dns_records" {
+  type = list(object({
     zone    = string
     name    = string
     type    = string
     ttl     = number
     records = list(string)
-  })
+  }))
 }
 
 variable "post_process" {

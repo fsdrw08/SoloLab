@@ -104,12 +104,14 @@ prov_pdns = {
   server_url = "https://pdns-auth.day0.sololab"
 }
 
-dns_record = {
-  zone = "day0.sololab."
-  name = "consul.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
-  ]
-}
+dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "consul.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  }
+]

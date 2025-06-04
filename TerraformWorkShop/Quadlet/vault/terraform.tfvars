@@ -76,7 +76,7 @@ prov_pdns = {
   insecure_https = true
 }
 
-dns_record = {
+dns_records = [{
   zone = "day0.sololab."
   name = "vault.day0.sololab."
   type = "A"
@@ -84,7 +84,7 @@ dns_record = {
   records = [
     "192.168.255.10"
   ]
-}
+}]
 
 post_process = {
   New-VaultStaticToken = {
