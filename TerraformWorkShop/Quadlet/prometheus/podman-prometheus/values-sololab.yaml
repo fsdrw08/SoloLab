@@ -38,13 +38,17 @@ prometheus:
               labels:
                 app: "prometheus"
         # need to add correct relabel config
-        # - job_name: consul_sd
-        #   consul_sd_configs:
-        #     - server: consul.day0.sololab
-        #       datacenter: dc1
-        #       scheme: https
-        #       tls_config:
-        #         ca_file: /etc/prometheus/certs/ca.crt
+        - job_name: consul_sd
+          consul_sd_configs:
+            - server: consul.day0.sololab
+              datacenter: dc1
+              scheme: https
+              tls_config:
+                ca_file: /etc/prometheus/certs/ca.crt
+          relabel_configs:
+            - source_labels: ["__meta_consul_tags"]
+              regex: .*scrapable.*
+              action: keep
     ## @param prometheus.configFiles.web basic authentication and TLS config
     ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
     ## ref: https://prometheus.io/docs/prometheus/3.4/configuration/https/
