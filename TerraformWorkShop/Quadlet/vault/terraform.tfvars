@@ -41,33 +41,37 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "HashiCorp Vault - A tool for managing secrets"
-        Documentation         = "https://developer.hashicorp.com/vault/docs"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "vault-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre  = ""
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run vault-server\""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "HashiCorp Vault - A tool for managing secrets"
+            Documentation         = "https://developer.hashicorp.com/vault/docs"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "vault-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run vault-server\""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "vault"
+        status = "start"
       }
-    }
+    },
   ]
-  service = {
-    name   = "vault"
-    status = "start"
-  }
 }
 
 prov_pdns = {

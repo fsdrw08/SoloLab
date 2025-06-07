@@ -47,34 +47,38 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "Loki service"
-        Documentation         = "https://grafana.com/docs/loki/v3.5.x/"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "loki-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "podman"
-        # service
-        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
-        ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run loki-server || sleep $(shuf -i 15-20 -n 1) && podman healthcheck run loki-server \""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Loki service"
+            Documentation         = "https://grafana.com/docs/loki/v3.5.x/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "loki-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "podman"
+            # service
+            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
+            ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run loki-server || sleep $(shuf -i 15-20 -n 1) && podman healthcheck run loki-server \""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "loki"
+        status = "start"
       }
     },
   ]
-  service = {
-    name   = "loki"
-    status = "start"
-  }
 }
 
 prov_pdns = {

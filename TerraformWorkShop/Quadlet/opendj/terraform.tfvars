@@ -76,33 +76,37 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "OpenDJ is an LDAPv3 compliant directory service, which has been developed for the Java platform, providing a high performance, highly available, and secure store for the identities managed by your organization"
-        Documentation         = "https://github.com/OpenIdentityPlatform/OpenDJ"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "opendj-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre  = ""
-        ExecStartPost = ""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "OpenDJ is an LDAPv3 compliant directory service, which has been developed for the Java platform, providing a high performance, highly available, and secure store for the identities managed by your organization"
+            Documentation         = "https://github.com/OpenIdentityPlatform/OpenDJ"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "opendj-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "opendj"
+        status = "start"
       }
-    }
+    },
   ]
-  service = {
-    name   = "opendj"
-    status = "start"
-  }
 }
 
 post_process = {

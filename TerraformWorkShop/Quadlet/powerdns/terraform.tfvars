@@ -16,33 +16,37 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
-        Documentation         = "https://doc.powerdns.com/authoritative/index.html"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "powerdns-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre  = ""
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run powerdns-auth\""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "The PowerDNS Authoritative Server is a versatile nameserver which supports a large number of backends."
+            Documentation         = "https://doc.powerdns.com/authoritative/index.html"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "powerdns-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run powerdns-auth\""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "powerdns"
+        status = "start"
       }
-    }
+    },
   ]
-  service = {
-    name   = "powerdns"
-    status = "start"
-  }
 }
 
 post_process = {

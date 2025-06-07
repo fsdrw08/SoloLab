@@ -41,31 +41,35 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "OCI-native container image registry, simplified"
-        Documentation         = "https://zotregistry.dev/latest/admin-guide/admin-configuration/"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "zot-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre  = ""
-        ExecStartPost = ""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "OCI-native container image registry, simplified"
+            Documentation         = "https://zotregistry.dev/latest/admin-guide/admin-configuration/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "zot-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "zot"
+        status = "start"
       }
-    }
+    },
   ]
-  service = {
-    name   = "zot"
-    status = "start"
-  }
 }

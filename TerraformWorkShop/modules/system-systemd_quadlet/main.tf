@@ -49,8 +49,11 @@ resource "remote_file" "quadlet" {
 # this resource is only in charge to stop the service when tf resource destroy
 resource "null_resource" "service_stop" {
   depends_on = [remote_file.quadlet]
+  for_each = var.podman_quadlet.services == null ? null : {
+    for service in var.podman_quadlet.services : service.name => service
+  }
   triggers = {
-    service_name = var.podman_quadlet.service.name
+    service_name = each.value.name
     host         = var.vm_conn.host
     port         = var.vm_conn.port
     user         = var.vm_conn.user
@@ -77,16 +80,18 @@ resource "null_resource" "service_stop" {
 # or stop the service if the value of service state set to stop, 
 # but NOT to stop the service when the tf resource destroy, to stop the service when destroy, use null_resource.service_stop
 resource "null_resource" "service_mgmt" {
-  count = var.podman_quadlet.service == null ? 0 : 1
+  for_each = var.podman_quadlet.services == null ? null : {
+    for service in var.podman_quadlet.services : service.name => service
+  }
   depends_on = [
     remote_file.quadlet,
     null_resource.service_stop
   ]
   triggers = {
-    service_name   = var.podman_quadlet.service.name
-    service_status = var.podman_quadlet.service.status
+    service_name   = each.value.name
+    service_status = each.value.status
     quadlet_md5    = md5(join("\n", [for quadlet in remote_file.quadlet : quadlet.content]))
-    custom_trigger = var.podman_quadlet.service.custom_trigger
+    custom_trigger = each.value.custom_trigger
   }
   connection {
     type        = "ssh"
@@ -100,7 +105,7 @@ resource "null_resource" "service_mgmt" {
     inline = [
       <<-EOF
       systemctl --user daemon-reload
-      if [ "${var.podman_quadlet.service.status}" = "start" ]; then
+      if [ "${each.value.status}" = "start" ]; then
           service_status=$(systemctl --user is-active ${self.triggers.service_name})
           if [ "$service_status" != "active" ]; then
               echo "${self.triggers.service_name} is stop, start it"
@@ -111,7 +116,7 @@ resource "null_resource" "service_mgmt" {
           else
               echo "${self.triggers.service_name} status unknown"
           fi
-      elif [ "${var.podman_quadlet.service.status}" = "stop" ]; then
+      elif [ "${each.value.status}" = "stop" ]; then
           echo "stop ${self.triggers.service_name}"
           systemctl --user stop ${self.triggers.service_name}
       else

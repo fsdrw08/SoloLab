@@ -58,25 +58,30 @@ podman_kube = {
 }
 
 podman_quadlet = {
-  files = [
+  dir = "/home/podmgr/.config/containers/systemd"
+  units = [
     {
-      template = "./podman-whoami/whoami-container.kube"
-      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-      vars = {
-        Description   = "Tiny Go webserver that prints OS information and HTTP request to output."
-        Documentation = "https://github.com/traefik/whoami, https://hub.docker.com/r/traefik/whoami"
-        yaml          = "whoami-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        ExecStartPre  = "sleep 3"
-        KubeDownForce = "false"
+      files = [
+        {
+          template = "./podman-whoami/whoami-container.kube"
+          # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+          vars = {
+            Description   = "Tiny Go webserver that prints OS information and HTTP request to output."
+            Documentation = "https://github.com/traefik/whoami, https://hub.docker.com/r/traefik/whoami"
+            yaml          = "whoami-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            ExecStartPre  = "sleep 3"
+            KubeDownForce = "false"
+          }
+          dir = "/home/podmgr/.config/containers/systemd"
+        },
+      ]
+      service = {
+        name   = "whoami-container"
+        status = "start"
       }
-      dir = "/home/podmgr/.config/containers/systemd"
     },
   ]
-  service = {
-    name   = "whoami-container"
-    status = "start"
-  }
 }
 
 prov_pdns = {

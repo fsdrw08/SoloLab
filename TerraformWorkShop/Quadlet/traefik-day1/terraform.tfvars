@@ -42,36 +42,40 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "./podman-traefik/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "Traefik Proxy"
-        Documentation         = "https://docs.traefik.io"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "traefik-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # Network    = "podman"
-        # Network = "pasta:--map-host-loopback=169.254.1.3"
-        # service
-        ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
-        ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
-        ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
-        Restart            = "on-failure"
+      files = [
+        {
+          template = "./podman-traefik/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Traefik Proxy"
+            Documentation         = "https://docs.traefik.io"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "traefik-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # Network    = "podman"
+            # Network = "pasta:--map-host-loopback=169.254.1.3"
+            # service
+            ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
+            ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day0.sololab/v1/catalog/services"
+            ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
+            Restart            = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "traefik"
+        status = "start"
       }
     },
   ]
-  service = {
-    name   = "traefik"
-    status = "start"
-  }
 }
 
 prov_pdns = {

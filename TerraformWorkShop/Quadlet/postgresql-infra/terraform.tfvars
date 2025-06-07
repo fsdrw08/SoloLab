@@ -43,34 +43,38 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-      vars = {
-        # unit
-        Description           = "PostgreSQL is a powerful, open source object-relational database system"
-        Documentation         = "https://www.postgresql.org/"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "tfbackend-pg-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre  = ""
-        ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run tfbackend-pg-postgresql\""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
+          vars = {
+            # unit
+            Description           = "PostgreSQL is a powerful, open source object-relational database system"
+            Documentation         = "https://www.postgresql.org/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "tfbackend-pg-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run tfbackend-pg-postgresql\""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "tfbackend-pg"
+        status = "start"
       }
     },
   ]
-  service = {
-    name   = "tfbackend-pg"
-    status = "start"
-  }
 }
 
 prov_pdns = {
