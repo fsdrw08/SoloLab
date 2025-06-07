@@ -87,25 +87,30 @@ module "podman_quadlet_day0" {
   }
   vm_conn = var.prov_remote.0
   podman_quadlet = {
-    service = {
-      name           = var.podman_quadlet.service.name
-      status         = var.podman_quadlet.service.status
-      custom_trigger = md5(remote_file.podman_kube_day0.content)
-    }
-    files = [
-      for file in var.podman_quadlet.files :
-      {
-        content = templatefile(
-          file.template,
-          file.vars
-        )
-        path = join("/", [
-          var.podman_quadlet.dir,
-          join(".", [
-            var.podman_quadlet.service.name,
-            split(".", basename(file.template))[1]
+    files = flatten([
+      for unit in var.podman_quadlet.units : [
+        for file in unit.files :
+        {
+          content = templatefile(
+            file.template,
+            file.vars
+          )
+          path = join("/", [
+            var.podman_quadlet.dir,
+            join(".", [
+              unit.service.name,
+              split(".", basename(file.template))[1]
+            ])
           ])
-        ])
+        }
+      ]
+    ])
+    services = [
+      for unit in var.podman_quadlet.units : unit.service == null ? null :
+      {
+        name           = unit.service.name
+        status         = unit.service.status
+        custom_trigger = md5(remote_file.podman_kube_day0.content)
       }
     ]
   }
@@ -118,27 +123,32 @@ module "podman_quadlet_day1" {
   }
   vm_conn = var.prov_remote.1
   podman_quadlet = {
-    service = {
-      name           = var.podman_quadlet.service.name
-      status         = var.podman_quadlet.service.status
-      custom_trigger = md5(remote_file.podman_kube_day1.content)
-    }
-    files = [
-      for file in var.podman_quadlet.files :
+    services = [
+      for unit in var.podman_quadlet.units : unit.service == null ? null :
       {
-        content = templatefile(
-          file.template,
-          file.vars
-        )
-        path = join("/", [
-          var.podman_quadlet.dir,
-          join(".", [
-            var.podman_quadlet.service.name,
-            split(".", basename(file.template))[1]
-          ])
-        ])
+        name           = unit.service.name
+        status         = unit.service.status
+        custom_trigger = md5(remote_file.podman_kube_day0.content)
       }
     ]
+    files = flatten([
+      for unit in var.podman_quadlet.units : [
+        for file in unit.files :
+        {
+          content = templatefile(
+            file.template,
+            file.vars
+          )
+          path = join("/", [
+            var.podman_quadlet.dir,
+            join(".", [
+              unit.service.name,
+              split(".", basename(file.template))[1]
+            ])
+          ])
+        }
+      ]
+    ])
   }
 }
 
@@ -168,11 +178,11 @@ resource "remote_file" "traefik_file_provider_day1" {
 resource "remote_file" "consul_service_day0" {
   provider = remote.Day0
   path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
-  content  = file("./podman-alloy/service.hcl")
+  content  = file("./podman-alloy/service-day0.hcl")
 }
 
 resource "remote_file" "consul_service_day1" {
   provider = remote.Day1
   path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
-  content  = file("./podman-alloy/service.hcl")
+  content  = file("./podman-alloy/service-day1.hcl")
 }

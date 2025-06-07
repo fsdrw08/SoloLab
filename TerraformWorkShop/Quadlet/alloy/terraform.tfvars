@@ -50,34 +50,63 @@ podman_kube = {
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
-  files = [
+  units = [
     {
-      template = "../templates/quadlet.kube"
-      vars = {
-        # unit
-        Description           = "alloy service"
-        Documentation         = "https://grafana.com/docs/alloy/v1.8/"
-        After                 = ""
-        Wants                 = ""
-        StartLimitIntervalSec = 120
-        StartLimitBurst       = 3
-        # kube
-        yaml          = "alloy-aio.yaml"
-        PodmanArgs    = "--tls-verify=false"
-        KubeDownForce = "false"
-        Network       = "host"
-        # service
-        ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
-        ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-        ExecStartPost = ""
-        Restart       = "on-failure"
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "alloy service"
+            Documentation         = "https://grafana.com/docs/alloy/v1.8/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "alloy-aio.yaml"
+            KubeDownForce = "false"
+            PodmanArgs    = "--tls-verify=false"
+            Network       = "host"
+            # service
+            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
+            ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "alloy"
+        status = "start"
+      }
+    },
+    {
+      files = [{
+        template = "./podman-alloy/prometheus-podman-exporter.container"
+        vars = {
+          # unit
+          Description           = "Prometheus exporter for podman environments exposing containers, pods, images, volumes and networks information."
+          Documentation         = "https://github.com/containers/prometheus-podman-exporter?tab=readme-ov-file#installation"
+          After                 = ""
+          Wants                 = ""
+          StartLimitIntervalSec = 120
+          StartLimitBurst       = 3
+          # service
+          ExecStartPre  = ""
+          ExecStartPost = ""
+          Restart       = "on-failure"
+          # container
+          PodmanArgs = "--tls-verify=false"
+          Network    = "host"
+        }
+      }]
+      service = {
+        name   = "prometheus-podman-exporter"
+        status = "start"
       }
     },
   ]
-  service = {
-    name   = "alloy"
-    status = "start"
-  }
 }
 
 prov_pdns = {
@@ -98,6 +127,24 @@ dns_records = [
   {
     zone = "day1.sololab."
     name = "alloy.day1.sololab."
+    type = "CNAME"
+    ttl  = 86400
+    records = [
+      "day1.node.consul."
+    ]
+  },
+  {
+    zone = "day0.sololab."
+    name = "prometheus-podman-exporter.day0.sololab."
+    type = "CNAME"
+    ttl  = 86400
+    records = [
+      "infra.node.consul."
+    ]
+  },
+  {
+    zone = "day1.sololab."
+    name = "prometheus-podman-exporter.day1.sololab."
     type = "CNAME"
     ttl  = 86400
     records = [

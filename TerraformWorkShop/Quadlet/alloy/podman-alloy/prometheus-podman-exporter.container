@@ -1,0 +1,43 @@
+# https://www.freedesktop.org/software/systemd/man/257/systemd.unit.html
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+After=${After}
+Wants=${Wants}
+StartLimitIntervalSec=${StartLimitIntervalSec}
+StartLimitBurst=${StartLimitBurst}
+
+# https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
+[Service]
+ExecStartPre=${ExecStartPre}
+ExecStartPost=${ExecStartPost}
+Restart=${Restart}
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+# https://github.com/containers/prometheus-podman-exporter/blob/main/install.md#container-image
+[Container]
+ContainerName=prometheus-podman-exporter
+
+Image=zot.day0.sololab/navidys/prometheus-podman-exporter:v1.17.0
+
+SecurityLabelType=spc_t
+
+Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
+
+Volume=%t/podman/podman.sock:/run/podman/podman.sock
+
+UserNS=keep-id:uid=65534
+
+Label="traefik.enable=true"
+
+Label="traefik.http.routers.prometheus-podman-exporter.entrypoints=web"
+Label="traefik.http.routers.prometheus-podman-exporter.rule=Host(`prometheus-podman-exporter.day0.sololab`) || Host(`prometheus-podman-exporter.day1.sololab`)"
+Label="traefik.http.routers.prometheus-podman-exporter.service=prometheus-podman-exporter"
+Label="traefik.http.services.prometheus-podman-exporter.loadbalancer.server.port=9882"
+
+SecurityLabelDisable=true
+
+PodmanArgs=${PodmanArgs}
+Network=${Network}
+[Install]
+WantedBy=default.target
