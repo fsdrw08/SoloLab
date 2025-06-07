@@ -112,21 +112,12 @@ alloy:
     - name: journald
       hostPath:
         path: /var/log/journal
-  #   - name: docker-socket
-  #     hostPath:
-  #       path: /run/user/1001/podman/podman.sock
-  #       type: Socket
-
-  # sidecars:
-  #   - name: podman-exporter
-  #     image: zot.day0.sololab/navidys/prometheus-podman-exporter:v1.17.0
-  #     securityContext:
-  #       seLinuxOptions:
-  #         type: spc_t
-  #     env:
-  #       - name: CONTAINER_HOST
-  #         value: unix:///run/podman/podman.sock
-  #     volumeMounts:
-  #       - name: docker-socket
-  #         mountPath: /run/podman/podman.sock
-  #         readOnly: true
+    - name: proc
+      hostPath:
+        path: /proc
+    - name: sys
+      hostPath:
+        path: sys
+    - name: root
+      hostPath:
+        path: /rootfs

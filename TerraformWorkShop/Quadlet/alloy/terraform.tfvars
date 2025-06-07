@@ -19,6 +19,11 @@ prov_remote = [
   }
 ]
 
+prov_grafana = {
+  url  = "https://grafana.day1.sololab"
+  auth = "admin:admin"
+}
+
 podman_kube = {
   helm = {
     name       = "alloy"

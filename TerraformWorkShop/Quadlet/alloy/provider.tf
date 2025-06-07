@@ -20,6 +20,10 @@ terraform {
       source  = "pyama86/powerdns"
       version = ">=1.5.1"
     }
+    grafana = {
+      source  = "grafana/grafana"
+      version = ">= 3.25.1"
+    }
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
@@ -60,4 +64,9 @@ provider "powerdns" {
   api_key        = var.prov_pdns.api_key
   server_url     = var.prov_pdns.server_url
   insecure_https = var.prov_pdns.insecure_https
+}
+
+provider "grafana" {
+  url  = var.prov_grafana.url
+  auth = var.prov_grafana.auth
 }

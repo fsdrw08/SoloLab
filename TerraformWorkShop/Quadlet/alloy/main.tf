@@ -186,3 +186,17 @@ resource "remote_file" "consul_service_day1" {
   path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
   content  = file("./podman-alloy/service-day1.hcl")
 }
+
+data "grafana_data_source" "data_source" {
+  name = "prometheus"
+}
+
+resource "grafana_dashboard" "podman" {
+  config_json = templatefile(
+    "./podman-alloy/podman-exporter-dashboard.json",
+    {
+      DS_PROMETHEUS = data.grafana_data_source.data_source.uid
+    }
+
+  )
+}
