@@ -47,7 +47,7 @@ prometheus:
                 ca_file: /etc/prometheus/certs/ca.crt
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*scrapable.*
+              regex: .*exporter.*
               action: keep
     ## @param prometheus.configFiles.web basic authentication and TLS config
     ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
@@ -62,7 +62,8 @@ prometheus:
     web:
       config:
         file: /etc/prometheus/web.yml
-  #     listen-address: 127.0.0.1:9090
+        # listen-address: 127.0.0.1:9090
+      enable-remote-write-receiver: true
   # hostAliases:
   #   - ip: host-gateway
   #     hostnames:

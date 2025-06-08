@@ -31,6 +31,6 @@ services {
     }
   ]
   tags = [
-    "scrapable",
+    "exporter",
   ]
 }
