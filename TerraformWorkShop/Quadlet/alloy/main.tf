@@ -200,3 +200,13 @@ resource "grafana_dashboard" "podman" {
 
   )
 }
+
+resource "grafana_dashboard" "node" {
+  config_json = templatefile(
+    "./podman-alloy/Node-Exporter-Full.json",
+    {
+      DS_PROMETHEUS = data.grafana_data_source.data_source.uid
+    }
+
+  )
+}

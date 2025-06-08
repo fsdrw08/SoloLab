@@ -76,6 +76,46 @@ alloy:
             url: '"https://loki.day1.sololab/loki/api/v1/push"'
             tls_config.0:
               ca_file: '"/etc/alloy/certs/ca.crt"'
+      # - component: prometheus.exporter.process
+      #   label: process
+      #   attributes:
+      #     procfs_path: '"/host/proc"'
+      #     matcher.0:
+      #       name: '"{{.ExeFull}}"'
+      #       cmdline: [".+"]
+      - component: prometheus.exporter.unix
+        label: node
+        attributes:
+          rootfs_path: '"/host/root"'
+          procfs_path: '"/host/proc"'
+          sysfs_path: '"/host/sys"'
+          udev_data_path: '"/host/udev"'
+          netdev.0:
+            device_include: '"^(enp.*|eth.*|br[0-9]+|lo$)"'
+          netclass.0:
+            ignored_devices: '"^lxc.*"'
+          filesystem.0:
+            fs_types_exclude: '"^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|tmpfs)$"'
+      - component: prometheus.scrape
+        label: node
+        attributes:
+          scrape_interval: '"30s"'
+          targets: prometheus.exporter.unix.node.targets
+          forward_to: [prometheus.remote_write.prometheus.receiver]
+      - component: discovery.relabel
+        label: node
+        attributes:
+          targets: prometheus.exporter.unix.node.targets
+          rule.1:
+            target_label: '"job"'
+            replacement: '"integrations/node_exporter"'
+      - component: prometheus.remote_write
+        label: prometheus
+        attributes:
+          endpoint.0:
+            url: '"https://prometheus.day1.sololab/api/v1/write"'
+            tls_config.0:
+              ca_file: '"/etc/alloy/certs/ca.crt"'
   tls:
     mountPath: /etc/alloy/certs
   flags:
@@ -108,16 +148,31 @@ alloy:
   extraVolumeMounts:
     - name: journald
       mountPath: /var/log/journal
+    - name: root
+      mountPath: /host/root
+      readOnly: true
+    - name: proc
+      mountPath: /host/proc
+      readOnly: true
+    - name: sys
+      mountPath: /host/sys
+      readOnly: true
+    - name: udev
+      mountPath: /host/udev
+      readOnly: true
   extraVolumes:
     - name: journald
       hostPath:
         path: /var/log/journal
+    - name: root
+      hostPath:
+        path: /
     - name: proc
       hostPath:
         path: /proc
     - name: sys
       hostPath:
-        path: sys
-    - name: root
+        path: /sys
+    - name: udev
       hostPath:
-        path: /rootfs
+        path: /run/udev/data
