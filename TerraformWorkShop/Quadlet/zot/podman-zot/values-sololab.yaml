@@ -4,6 +4,7 @@ zot:
     repository: giantswarm/zot
   containerPorts: []
   resourcesPreset: medium
+  podRestartPolicy: OnFailure
   config:
     # https://zotregistry.dev/v2.1.2/admin-guide/admin-configuration/#extensions
     extensions:
