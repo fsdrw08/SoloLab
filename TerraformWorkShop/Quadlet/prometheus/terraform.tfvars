@@ -24,15 +24,15 @@ podman_kube = {
     tls = {
       value_sets = [
         {
-          name          = "prometheus.tls.contents.ca\\.crt"
+          name          = "prometheus.containers.server.tls.contents.ca\\.crt"
           value_ref_key = "ca"
         },
         {
-          name          = "prometheus.tls.contents.prometheus\\.crt"
+          name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
           value_ref_key = "cert"
         },
         {
-          name          = "prometheus.tls.contents.prometheus\\.key"
+          name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
           value_ref_key = "private_key"
         },
       ]

@@ -1,69 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 prometheus:
-  image:
-    repository: bitnami/prometheus
-    tag: 3.4.1
-  containerPorts: []
-  livenessProbe:
-    exec:
-      command:
-        - sh
-        - -c
-        - |
-          curl -s -k https://localhost:9090/-/healthy
-  resourcesPreset: "small"
-  # adopt bitnami image user id
-  # https://github.com/bitnami/containers/blob/main/bitnami/prometheus/3/debian-12/Dockerfile
-  containerSecurityContext:
-    enabled: true
-    runAsUser: 1001
-    runAsGroup: 1001
-    runAsNonRoot: true
-    readOnlyRootFilesystem: false
-  configFiles:
-    main:
-      scrape_configs:
-        ## Here it's Prometheus itself.
-        ## The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-        - job_name: prometheus
-          metrics_path: /metrics # defaults to '/metrics'
-          scheme: https # defaults to 'http'.
-          tls_config:
-            ca_file: /etc/prometheus/certs/ca.crt
-            server_name: prometheus.day1.sololab
-          static_configs:
-            - targets: ["localhost:9090"]
-              # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
-              labels:
-                app: "prometheus"
-        # need to add correct relabel config
-        - job_name: consul_sd
-          consul_sd_configs:
-            - server: consul.day0.sololab
-              datacenter: dc1
-              scheme: https
-              tls_config:
-                ca_file: /etc/prometheus/certs/ca.crt
-          relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
-              regex: .*exporter.*
-              action: keep
-    ## @param prometheus.configFiles.web basic authentication and TLS config
-    ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
-    ## ref: https://prometheus.io/docs/prometheus/3.4/configuration/https/
-    ##
-    web:
-      tls_server_config:
-        cert_file: /etc/prometheus/certs/prometheus.crt
-        key_file: /etc/prometheus/certs/prometheus.key
-  # https://prometheus.io/docs/prometheus/3.4/command-line/prometheus/
-  flags:
-    web:
-      config:
-        file: /etc/prometheus/web.yml
-        # listen-address: 127.0.0.1:9090
-      enable-remote-write-receiver: true
   # hostAliases:
   #   - ip: host-gateway
   #     hostnames:
@@ -84,6 +21,72 @@ prometheus:
   # adopt bitnami image user id
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=1001,gid=1001
-  extraEnvVars:
-    - name: TZ
-      value: Asia/Shanghai
+  containers:
+    server:
+      enabled: true
+      image:
+        repository: bitnami/prometheus
+        tag: 3.4.1
+      containerPorts: []
+      livenessProbe:
+        exec:
+          command:
+            - sh
+            - -c
+            - |
+              curl -s -k https://localhost:9090/-/healthy
+      resourcesPreset: "small"
+      # adopt bitnami image user id
+      # https://github.com/bitnami/containers/blob/main/bitnami/prometheus/3/debian-12/Dockerfile
+      containerSecurityContext:
+        enabled: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+        readOnlyRootFilesystem: false
+      configFiles:
+        main:
+          scrape_configs:
+            ## Here it's Prometheus itself.
+            ## The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+            - job_name: prometheus
+              metrics_path: /metrics # defaults to '/metrics'
+              scheme: https # defaults to 'http'.
+              tls_config:
+                ca_file: /etc/prometheus/certs/ca.crt
+                server_name: prometheus.day1.sololab
+              static_configs:
+                - targets: ["localhost:9090"]
+                  # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+                  labels:
+                    app: "prometheus"
+            # need to add correct relabel config
+            - job_name: consul_sd
+              consul_sd_configs:
+                - server: consul.day0.sololab
+                  datacenter: dc1
+                  scheme: https
+                  tls_config:
+                    ca_file: /etc/prometheus/certs/ca.crt
+              relabel_configs:
+                - source_labels: ["__meta_consul_tags"]
+                  regex: .*exporter.*
+                  action: keep
+        ## @param prometheus.configFiles.web basic authentication and TLS config
+        ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
+        ## ref: https://prometheus.io/docs/prometheus/3.4/configuration/https/
+        ##
+        web:
+          tls_server_config:
+            cert_file: /etc/prometheus/certs/prometheus.crt
+            key_file: /etc/prometheus/certs/prometheus.key
+      # https://prometheus.io/docs/prometheus/3.4/command-line/prometheus/
+      flags:
+        web:
+          config:
+            file: /etc/prometheus/web.yml
+            # listen-address: 127.0.0.1:9090
+          enable-remote-write-receiver: true
+      extraEnvVars:
+        - name: TZ
+          value: Asia/Shanghai
