@@ -40,7 +40,7 @@ variable "podman_kube" {
         ), null
       )
       tls = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -64,7 +64,8 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string

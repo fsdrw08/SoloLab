@@ -21,7 +21,7 @@ podman_kube = {
     name       = "prometheus"
     chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
     value_file = "./podman-prometheus/values-sololab.yaml"
-    tls = {
+    tls = [{
       value_sets = [
         {
           name          = "prometheus.containers.server.tls.contents.ca\\.crt"
@@ -40,7 +40,7 @@ podman_kube = {
         mount = "kvv2/certs"
         name  = "prometheus.day1.sololab"
       }
-    }
+    }]
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
 }

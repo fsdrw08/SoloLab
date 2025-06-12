@@ -234,6 +234,22 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
+        "publicRepo": "prometheus/alertmanager:v0.28.1",
+        "archive": "quay.io_prometheus_alertmanager_v0.28.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "prometheus/alertmanager:v0.28.1",
+        "description": "https://hub.docker.com/r/prom/prometheus/tags, https://quay.io/repository/prometheus/prometheus?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/prometheus:3.4.1",
+        "archive": "docker.io_bitnami_prometheus_3.4.1.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/prometheus:3.4.1",
+        "description": "https://hub.docker.com/r/bitnami/prometheus/tags",
+    },
+    {
+        "publicRegistry": "quay.io",
         "publicRepo": "navidys/prometheus-podman-exporter:v1.17.0",
         "archive": "docker.io_navidys_prometheus-podman-exporter_v1.17.0.tar",
         "privateRegistry": "192.168.255.10:5000",

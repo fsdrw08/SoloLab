@@ -1,8 +1,11 @@
 # load cert from vault
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-  mount = var.podman_kube.helm.tls.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls.vault_kvv2.name
+  # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+  for_each = var.podman_kube.helm.tls == null ? null : {
+    for tls in var.podman_kube.helm.tls : tls.vault_kvv2.name => tls
+  }
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 # load cert from local tls
@@ -59,11 +62,13 @@ data "helm_template" "podman_kube" {
       }
     ],
     var.podman_kube.helm.tls == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
-        name = value_set.name
-        # value = local.cert[0][value_set.value_ref_key]
-        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
-      }
+      for tls in var.podman_kube.helm.tls : [
+        for value_set in tls.value_sets : {
+          name = value_set.name
+          # value = local.cert[0][value_set.value_ref_key]
+          value = data.vault_kv_secret_v2.cert[tls.vault_kvv2.name].data[value_set.value_ref_key]
+        }
+      ]
     ],
   ])
 }
@@ -134,7 +139,7 @@ resource "grafana_data_source" "data_source" {
   url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
 
   secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.cert[0].data["ca"]
+    tlsCACert = data.vault_kv_secret_v2.cert["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
   })
 
   json_data_encoded = jsonencode({
