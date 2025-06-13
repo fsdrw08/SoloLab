@@ -19,14 +19,14 @@ data "vault_kv_secret_v2" "certs" {
   name  = each.value.name
 }
 
-data "vault_kv_secret_v2" "cert" {
-  # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-  for_each = var.podman_kube.helm.tls == null ? null : {
-    for tls in var.podman_kube.helm.tls : tls.vault_kvv2.name => tls
-  }
-  mount = each.value.vault_kvv2.mount
-  name  = each.value.vault_kvv2.name
-}
+# data "vault_kv_secret_v2" "cert" {
+#   # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+#   for_each = var.podman_kube.helm.tls == null ? null : {
+#     for tls in var.podman_kube.helm.tls : tls.vault_kvv2.name => tls
+#   }
+#   mount = each.value.vault_kvv2.mount
+#   name  = each.value.vault_kvv2.name
+# }
 
 # load cert from local tls
 # data "terraform_remote_state" "root_ca" {
@@ -226,38 +226,38 @@ module "podman_quadlet" {
 #   }
 # }
 
-# resource "powerdns_record" "records" {
-#   for_each = {
-#     for record in var.dns_records : record.name => record
-#   }
-#   zone    = each.value.zone
-#   name    = each.value.name
-#   type    = each.value.type
-#   ttl     = each.value.ttl
-#   records = each.value.records
-# }
+resource "powerdns_record" "records" {
+  for_each = {
+    for record in var.dns_records : record.name => record
+  }
+  zone    = each.value.zone
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+}
 
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/prometheus-traefik.yaml"
-#   content = file("./podman-prometheus/prometheus-traefik.yaml")
-# }
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/prometheus-traefik.yaml"
+  content = file("./podman-prometheus/prometheus-traefik.yaml")
+}
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-prometheus.hcl"
-#   content = file("./podman-prometheus/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  path    = "/var/home/podmgr/consul-services/service-prometheus.hcl"
+  content = file("./podman-prometheus/service.hcl")
+}
 
-# resource "grafana_data_source" "data_source" {
-#   depends_on = [module.podman_quadlet, powerdns_record.records]
-#   type       = "prometheus"
-#   name       = "prometheus"
-#   url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
+resource "grafana_data_source" "data_source" {
+  depends_on = [module.podman_quadlet, powerdns_record.records]
+  type       = "prometheus"
+  name       = "prometheus"
+  url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
 
-#   secure_json_data_encoded = jsonencode({
-#     tlsCACert = data.vault_kv_secret_v2.cert["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
-#   })
+  secure_json_data_encoded = jsonencode({
+    tlsCACert = data.vault_kv_secret_v2.certs["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
+  })
 
-#   json_data_encoded = jsonencode({
-#     tlsAuthWithCACert = true
-#   })
-# }
+  json_data_encoded = jsonencode({
+    tlsAuthWithCACert = true
+  })
+}

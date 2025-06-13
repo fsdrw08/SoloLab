@@ -16,36 +16,36 @@ prov_grafana = {
   auth = "admin:admin"
 }
 
-podman_kube = {
-  helm = {
-    name       = "prometheus"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
-    value_file = "./podman-prometheus/values-sololab.yaml"
-    tls = [
-      {
-        value_sets = [
-          {
-            name          = "prometheus.containers.server.tls.contents.ca\\.crt"
-            value_ref_key = "ca"
-          },
-          {
-            name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
-            value_ref_key = "cert"
-          },
-          {
-            name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
-            value_ref_key = "private_key"
-          },
-        ]
-        vault_kvv2 = {
-          mount = "kvv2/certs"
-          name  = "prometheus.day1.sololab"
-        }
-      }
-    ]
-  }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
-}
+# podman_kube = {
+#   helm = {
+#     name       = "prometheus"
+#     chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
+#     value_file = "./podman-prometheus/values-sololab.yaml"
+#     tls = [
+#       {
+#         value_sets = [
+#           {
+#             name          = "prometheus.containers.server.tls.contents.ca\\.crt"
+#             value_ref_key = "ca"
+#           },
+#           {
+#             name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
+#             value_ref_key = "cert"
+#           },
+#           {
+#             name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
+#             value_ref_key = "private_key"
+#           },
+#         ]
+#         vault_kvv2 = {
+#           mount = "kvv2/certs"
+#           name  = "prometheus.day1.sololab"
+#         }
+#       }
+#     ]
+#   }
+#   manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
+# }
 
 podman_kubes = [
   {
@@ -76,24 +76,24 @@ podman_kubes = [
         },
         {
           value_sets = [
+            # {
+            #   name          = "prometheus.containers.blackboxExporter.tls.contents.ca\\.crt"
+            #   value_ref_key = "ca"
+            # },
             {
-              name          = "prometheus.containers.server.tls.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-            {
-              name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
+              name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.crt"
               value_ref_key = "cert"
             },
             {
-              name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
+              name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.key"
               value_ref_key = "private_key"
             },
           ]
           vault_kvv2 = {
             mount = "kvv2/certs"
-            name  = "loki.day1.sololab"
+            name  = "prometheus-blackbox-exporter.day1.sololab"
           }
-        },
+        }
       ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
@@ -150,5 +150,14 @@ dns_records = [
     records = [
       "day1.node.consul."
     ]
-  }
+  },
+  {
+    zone = "day1.sololab."
+    name = "prometheus-blackbox-exporter.day1.sololab."
+    type = "CNAME"
+    ttl  = 86400
+    records = [
+      "day1.node.consul."
+    ]
+  },
 ]

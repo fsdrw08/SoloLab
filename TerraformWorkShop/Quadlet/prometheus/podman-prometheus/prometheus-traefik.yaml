@@ -4,6 +4,10 @@ http:
       serverName: prometheus.day1.sololab
       rootcas:
         - "/etc/traefik/tls/ca.crt"
+    prometheus-blackbox-exporter:
+      serverName: prometheus-blackbox-exporter.day1.sololab
+      rootcas:
+        - "/etc/traefik/tls/ca.crt"
   # routers:
   #   prometheus-redirect:
   #     entryPoints:

@@ -241,20 +241,28 @@ $syncList = @"
         "description": "https://hub.docker.com/r/prom/prometheus/tags, https://quay.io/repository/prometheus/prometheus?tab=tags",
     },
     {
-        "publicRegistry": "docker.io",
-        "publicRepo": "bitnami/prometheus:3.4.1",
-        "archive": "docker.io_bitnami_prometheus_3.4.1.tar",
-        "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "bitnami/prometheus:3.4.1",
-        "description": "https://hub.docker.com/r/bitnami/prometheus/tags",
-    },
-    {
         "publicRegistry": "quay.io",
         "publicRepo": "navidys/prometheus-podman-exporter:v1.17.0",
-        "archive": "docker.io_navidys_prometheus-podman-exporter_v1.17.0.tar",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.17.0.tar",
         "privateRegistry": "192.168.255.10:5000",
         "privateRepo": "navidys/prometheus-podman-exporter:v1.17.0",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "prometheus/blackbox-exporter:v0.26.0",
+        "archive": "quay.io_prometheus_blackbox-exporter_v0.26.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "prometheus/blackbox-exporter:v0.26.0",
+        "description": "https://quay.io/repository/prometheus/blackbox-exporter?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/blackbox-exporter:0.26.0",
+        "archive": "docker.io_bitnami_blackbox-exporter_0.26.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/blackbox-exporter:0.26.0",
+        "description": "https://hub.docker.com/r/bitnami/blackbox-exporter/tags",
     },
 ]
 "@
