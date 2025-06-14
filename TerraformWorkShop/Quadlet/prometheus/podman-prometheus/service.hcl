@@ -1,6 +1,7 @@
 services {
   id   = "prometheus"
   name = "prometheus"
+  address = "prometheus.day1.sololab"
   port = 9090
 
   checks = [
@@ -14,25 +15,18 @@ services {
       timeout         = "2s"
     }
   ]
-
-  # tags = [
-  #   "traefik.enable=true",
-  #   "traefik.tcp.routers.minio-console-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.minio-console-web.rule=HostSNI(`minio-console.day1.sololab`)",
-  #   "traefik.tcp.routers.minio-console-web.tls.passthrough=true",
-  #   # "traefik.http.routers.minio-console-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.minio-console-web-redirect.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.minio-console-web.entrypoints=websecure",
-  #   # "traefik.http.routers.minio-console-web.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web.tls=true",
-  #   # "traefik.http.services.minio-console-web.loadbalancer.server.scheme=https",
-  # ]
+  tags = [
+    "blackbox-exporter"
+  ]
+  meta = {
+    scheme = "https"
+  }
 }
 
 services {
   id   = "prometheus-blackbox-exporter"
   name = "prometheus-blackbox-exporter"
+  address = "prometheus-blackbox-exporter.day1.sololab"
   port = 9115
 
   checks = [
@@ -46,4 +40,10 @@ services {
       timeout         = "2s"
     }
   ]
+  tags = [
+    "blackbox-exporter"
+  ]
+  meta = {
+    scheme = "https"
+  }
 }

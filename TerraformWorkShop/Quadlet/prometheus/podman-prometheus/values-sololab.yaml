@@ -77,7 +77,42 @@ prometheus:
                   labels:
                     app: "prometheus"
             # need to add correct relabel config
-            - job_name: consul_sd
+            - job_name: blackbox_exporter
+              scrape_interval: 15s
+              scrape_timeout: 5s
+              metrics_path: /probe
+              tls_config:
+                ca_file: /etc/prometheus/certs/ca.crt
+                server_name: prometheus.day1.sololab
+              params:
+                module: [http_2xx]
+              consul_sd_configs:
+                - server: consul.day0.sololab
+                  datacenter: dc1
+                  scheme: https
+                  tls_config:
+                    ca_file: /etc/prometheus/certs/ca.crt
+              # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
+              relabel_configs:
+                - source_labels: ["__meta_consul_tags"]
+                  regex: .*blackbox-exporter.*
+                  action: keep
+                # https://github.com/spirkaa/infra/blob/fa0fcce1e2e764d911f58c621cb81c9065e1ad41/cluster/observability/kube-prometheus-stack/kps/values.yaml#L163
+                - source_labels:
+                    - __meta_consul_service_metadata_scheme
+                    - __meta_consul_service_address
+                    - __meta_consul_service_port
+                  regex: (.+);(.+);(.+)
+                  replacement: ${1}://${2}:${3}
+                  target_label: __param_target
+                - source_labels: [__param_target]
+                  target_label: instance
+                # blackbox exporter config
+                - target_label: __scheme__
+                  replacement: https
+                - target_label: __address__
+                  replacement: prometheus-blackbox-exporter.day1.sololab
+            - job_name: podman_exporter
               consul_sd_configs:
                 - server: consul.day0.sololab
                   datacenter: dc1
@@ -86,7 +121,7 @@ prometheus:
                     ca_file: /etc/prometheus/certs/ca.crt
               relabel_configs:
                 - source_labels: ["__meta_consul_tags"]
-                  regex: .*exporter.*
+                  regex: .*podman-exporter.*
                   action: keep
         ## @param prometheus.configFiles.web basic authentication and TLS config
         ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
@@ -114,6 +149,17 @@ prometheus:
       livenessProbe:
         enabled: false
       configFiles:
+        main:
+          modules:
+            http_2xx:
+              prober: http
+              timeout: 5s
+              http:
+                valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+                follow_redirects: true
+                preferred_ip_protocol: "ip4"
+                tls_config:
+                  insecure_skip_verify: true
         web:
           tls_server_config:
             cert_file: /etc/blackbox_exporter/certs/blackboxExporter.crt

@@ -261,3 +261,13 @@ resource "grafana_data_source" "data_source" {
     tlsAuthWithCACert = true
   })
 }
+
+resource "grafana_dashboard" "blackbox" {
+  config_json = templatefile(
+    "./podman-prometheus/Blackbox-Exporter-Full.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+
+  )
+}
