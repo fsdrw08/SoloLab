@@ -1,7 +1,7 @@
 services {
   id   = "traefik-ping"
   name = "traefik"
-  port = 8080
+  port = 443
 
   checks = [
     {
@@ -14,17 +14,14 @@ services {
     }
   ]
 
-  # tags = [
-  #   "traefik.enable=true",
-  #   "traefik.tcp.routers.nomad-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.nomad-web.rule=HostSNI(`nomad.day1.sololab`)",
-  #   "traefik.tcp.routers.nomad-web.tls.passthrough=true",
-  #   # "traefik.http.routers.nomad-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.nomad-web-redirect.rule=Host(`nomad.day1.sololab`)",
-  #   # "traefik.http.routers.nomad-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.nomad-web.entrypoints=websecure",
-  #   # "traefik.http.routers.nomad-web.rule=Host(`nomad.day1.sololab`)",
-  #   # "traefik.http.routers.nomad-web.tls=true",
-  #   # "traefik.http.services.nomad-web.loadbalancer.server.scheme=https",
-  # ]
+  tags = [
+    "exporter",
+  ]
+
+  meta = {
+    scheme = "https"
+    address = "traefik.day1.sololab"
+    path = "metrics"
+    metrics_path = "metrics"
+  }
 }
