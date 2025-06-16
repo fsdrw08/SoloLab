@@ -271,3 +271,13 @@ resource "grafana_dashboard" "blackbox" {
 
   )
 }
+
+resource "grafana_dashboard" "traefik" {
+  config_json = templatefile(
+    "./podman-prometheus/traefik-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+
+  )
+}

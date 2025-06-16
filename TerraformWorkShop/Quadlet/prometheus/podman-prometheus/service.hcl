@@ -1,7 +1,6 @@
 services {
   id   = "prometheus"
   name = "prometheus"
-  address = "prometheus.day1.sololab"
   port = 9090
 
   checks = [
@@ -15,18 +14,15 @@ services {
       timeout         = "2s"
     }
   ]
-  tags = [
-    "blackbox-exporter"
-  ]
   meta = {
     scheme = "https"
+    address = "prometheus.day1.sololab"
   }
 }
 
 services {
   id   = "prometheus-blackbox-exporter"
   name = "prometheus-blackbox-exporter"
-  address = "prometheus-blackbox-exporter.day1.sololab"
   port = 9115
 
   checks = [
@@ -40,10 +36,9 @@ services {
       timeout         = "2s"
     }
   ]
-  tags = [
-    "blackbox-exporter"
-  ]
+
   meta = {
     scheme = "https"
+    address = "prometheus-blackbox-exporter.day1.sololab"
   }
 }

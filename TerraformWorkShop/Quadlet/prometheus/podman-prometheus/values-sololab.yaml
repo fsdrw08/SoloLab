@@ -94,16 +94,18 @@ prometheus:
                     ca_file: /etc/prometheus/certs/ca.crt
               # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
               relabel_configs:
-                - source_labels: ["__meta_consul_tags"]
-                  regex: .*blackbox-exporter.*
+                - source_labels: ["__meta_consul_service_metadata_address"]
+                  regex: ".+"
                   action: keep
+                # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
                 # https://github.com/spirkaa/infra/blob/fa0fcce1e2e764d911f58c621cb81c9065e1ad41/cluster/observability/kube-prometheus-stack/kps/values.yaml#L163
                 - source_labels:
                     - __meta_consul_service_metadata_scheme
-                    - __meta_consul_service_address
+                    - __meta_consul_service_metadata_address
                     - __meta_consul_service_port
-                  regex: (.+);(.+);(.+)
-                  replacement: ${1}://${2}:${3}
+                    - __meta_consul_service_metadata_path
+                  regex: (.+);(.+);(.+);(.*)
+                  replacement: ${1}://${2}:${3}/${4}
                   target_label: __param_target
                 - source_labels: [__param_target]
                   target_label: instance
@@ -112,7 +114,9 @@ prometheus:
                   replacement: https
                 - target_label: __address__
                   replacement: prometheus-blackbox-exporter.day1.sololab
-            - job_name: podman_exporter
+            - job_name: general_exporter_consul_sd
+              tls_config:
+                insecure_skip_verify: true
               consul_sd_configs:
                 - server: consul.day0.sololab
                   datacenter: dc1
@@ -121,8 +125,20 @@ prometheus:
                     ca_file: /etc/prometheus/certs/ca.crt
               relabel_configs:
                 - source_labels: ["__meta_consul_tags"]
-                  regex: .*podman-exporter.*
+                  regex: .*exporter.*
                   action: keep
+                - source_labels: ["__meta_consul_service_metadata_scheme"]
+                  target_label: __scheme__
+                - source_labels:
+                    # - __meta_consul_service_metadata_scheme
+                    - __meta_consul_service_metadata_address
+                    - __meta_consul_service_port
+                    # - __meta_consul_service_metadata_metrics_path
+                  regex: (.+);(.+)
+                  replacement: ${1}:${2}
+                  target_label: __address__
+                - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+                  target_label: __metrics_path__
         ## @param prometheus.configFiles.web basic authentication and TLS config
         ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
         ## ref: https://prometheus.io/docs/prometheus/3.4/configuration/https/
