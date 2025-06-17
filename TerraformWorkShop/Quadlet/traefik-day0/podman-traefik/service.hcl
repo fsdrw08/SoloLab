@@ -1,7 +1,7 @@
 services {
   id   = "traefik-ping"
   name = "traefik"
-  port = 8080
+  port = 443
 
   checks = [
     {
@@ -13,4 +13,14 @@ services {
       timeout  = "2s"
     }
   ]
+
+  tags = [
+    "exporter",
+  ]
+  meta = {
+    scheme       = "https"
+    address      = "traefik.day0.sololab"
+    path         = "metrics"
+    metrics_path = "metrics"
+  }
 }

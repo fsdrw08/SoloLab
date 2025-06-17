@@ -17,11 +17,10 @@ services {
   tags = [
     "exporter",
   ]
-
   meta = {
-    scheme = "https"
-    address = "traefik.day1.sololab"
-    path = "metrics"
+    scheme       = "https"
+    address      = "traefik.day1.sololab"
+    path         = "metrics"
     metrics_path = "metrics"
   }
 }

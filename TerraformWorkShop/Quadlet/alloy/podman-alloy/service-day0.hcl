@@ -23,14 +23,21 @@ services {
   checks = [
     {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
-      id              = "prometheus-podman-exporter-http-check"
-      name            = "prometheus-podman-exporter-http-check"
-      http            = "http://prometheus-podman-exporter.day0.sololab/"
-      interval        = "300s"
-      timeout         = "2s"
+      id       = "prometheus-podman-exporter-http-check"
+      name     = "prometheus-podman-exporter-http-check"
+      http     = "http://prometheus-podman-exporter.day0.sololab/"
+      interval = "300s"
+      timeout  = "2s"
     }
   ]
+
   tags = [
     "exporter",
   ]
+  meta = {
+    scheme       = "http"
+    address      = "prometheus-podman-exporter.day0.sololab"
+    path         = "metrics"
+    metrics_path = "metrics"
+  }
 }
