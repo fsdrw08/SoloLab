@@ -6,19 +6,21 @@ prov_vault = {
 
 policy_bindings = [
   {
-    policy_name     = "vault-admin"
-    policy_content  = <<-EOT
+    policy_name    = "vault-admin"
+    policy_content = <<-EOT
       path "*" {
         capabilities = ["create", "read", "update", "patch", "delete", "list", "sudo"]
       }
       EOT
-    policy_group    = "Policy-Vault-Admin"
-    external_groups = ["app-vault-admin"]
+    group_binding = {
+      policy_group    = "Policy-Vault-Admin"
+      external_groups = ["app-vault-admin"]
+    }
   },
   # https://github.com/doohee323/tz-k8s-vagrant/blob/9149105349fdd6bf045fbea598f1b01f17ba899b/tz-local/resource/vault/data/read-role.hcl#L4
   {
-    policy_name     = "vault-user"
-    policy_content  = <<-EOT
+    policy_name    = "vault-user"
+    policy_content = <<-EOT
       path "identity/group/*" {
         capabilities = ["list", "read"]
       }
@@ -38,7 +40,9 @@ policy_bindings = [
         capabilities = ["list", "read"]
       }
       EOT
-    policy_group    = "Policy-Vault-User"
-    external_groups = ["app-vault-user"]
+    group_binding = {
+      policy_group    = "Policy-Vault-User"
+      external_groups = ["app-vault-user"]
+    }
   },
 ]
