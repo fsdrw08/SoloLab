@@ -7,6 +7,7 @@ global:
 
 vault:
   containerPorts: []
+  resourcesPreset: "small"
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
   ## ref: https://developer.hashicorp.com/vault/docs/configuration
@@ -31,6 +32,9 @@ vault:
             tls_key_file: /vault/userconfig/vault-server-tls/tls.key
             tls_client_ca_file: /vault/userconfig/vault-server-tls/ca.crt
             tls_disable_client_certs: true
+      telemetry:
+        disable_hostname: true
+        enable_host_metrics: true
 
   podLabels:
     traefik.enable: true
