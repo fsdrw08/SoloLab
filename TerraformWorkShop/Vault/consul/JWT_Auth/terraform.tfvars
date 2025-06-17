@@ -46,8 +46,8 @@ oidc_roles = [
 policy_bindings = [
   # config policy to make the user who permission granted allow to config meta data in it's own
   {
-    policy_name     = "consul-auto_config"
-    policy_content  = <<-EOT
+    policy_name    = "consul-auto_config"
+    policy_content = <<-EOT
       path "identity/oidc/token/consul-auto_config" {
         capabilities = ["read"]
       }
@@ -67,8 +67,10 @@ policy_bindings = [
         capabilities = ["list", "read"]
       }
       EOT
-    policy_group    = "Policy-Consul-Auto_Config"
-    external_groups = ["app-consul-auto_config"]
+    group_binding = {
+      policy_group    = "Policy-Consul-Auto_Config"
+      external_groups = ["app-consul-auto_config"]
+    }
   },
   # config policy to make the user who permission granted allow to config meta data in it's own
   # {

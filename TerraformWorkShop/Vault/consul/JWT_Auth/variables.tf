@@ -26,9 +26,11 @@ variable "oidc_roles" {
 
 variable "policy_bindings" {
   type = list(object({
-    policy_name     = string
-    policy_content  = string
-    policy_group    = string
-    external_groups = list(string)
+    policy_name    = string
+    policy_content = string
+    group_binding = object({
+      policy_group    = string
+      external_groups = list(string)
+    })
   }))
 }

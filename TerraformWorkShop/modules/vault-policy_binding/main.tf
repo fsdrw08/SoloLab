@@ -36,6 +36,7 @@ resource "vault_identity_group" "internal" {
 resource "vault_token" "token" {
   for_each = {
     for binding in var.policy_bindings : binding.policy_name => binding
+    if binding.token_binding != null
   }
   policies = [vault_policy.policy[each.value.policy_name].name]
 }
