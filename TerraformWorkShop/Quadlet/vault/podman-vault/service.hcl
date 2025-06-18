@@ -15,8 +15,12 @@ services {
     }
   ]
 
+  tags = [
+    "vault-exporter",
+  ]
   meta = {
     scheme = "https"
     address = "vault.day0.sololab"
+    metrics_path = "/v1/sys/metrics"
   }
 }

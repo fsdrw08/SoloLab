@@ -103,7 +103,7 @@ prometheus:
                     - __meta_consul_service_metadata_scheme
                     - __meta_consul_service_metadata_address
                     - __meta_consul_service_port
-                    - __meta_consul_service_metadata_path
+                    - __meta_consul_service_metadata_health_check_path
                   regex: (.+);(.+);(.+);(.*)
                   replacement: ${1}://${2}:${3}/${4}
                   target_label: __param_target
@@ -125,15 +125,42 @@ prometheus:
                     ca_file: /etc/prometheus/certs/ca.crt
               relabel_configs:
                 - source_labels: ["__meta_consul_tags"]
-                  regex: .*exporter.*
+                  regex: .*,exporter,.*
                   action: keep
                 - source_labels: ["__meta_consul_service_metadata_scheme"]
                   target_label: __scheme__
                 - source_labels:
-                    # - __meta_consul_service_metadata_scheme
                     - __meta_consul_service_metadata_address
                     - __meta_consul_service_port
-                    # - __meta_consul_service_metadata_metrics_path
+                  regex: (.+);(.+)
+                  replacement: ${1}:${2}
+                  target_label: __address__
+                - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+                  target_label: __metrics_path__
+            - job_name: vault_exporter
+              params:
+                format: ["prometheus"]
+              tls_config:
+                ca_file: /etc/prometheus/certs/ca.crt
+              authorization:
+                credentials_file: /etc/prometheus/certs/prometheus-token
+              consul_sd_configs:
+                - server: consul.day0.sololab
+                  datacenter: dc1
+                  scheme: https
+                  tls_config:
+                    ca_file: /etc/prometheus/certs/ca.crt
+                  services:
+                    - vault
+              relabel_configs:
+                - source_labels: ["__meta_consul_tags"]
+                  regex: .*vault-exporter.*
+                  action: keep
+                - source_labels: ["__meta_consul_service_metadata_scheme"]
+                  target_label: __scheme__
+                - source_labels:
+                    - __meta_consul_service_metadata_address
+                    - __meta_consul_service_port
                   regex: (.+);(.+)
                   replacement: ${1}:${2}
                   target_label: __address__
