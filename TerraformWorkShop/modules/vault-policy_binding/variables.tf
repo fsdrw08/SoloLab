@@ -12,9 +12,12 @@ variable "policy_bindings" {
     )
     token_binding = optional(
       object({
-        token_name = string
-        token_ttl  = optional(string, null)
-
+        display_name     = optional(string, null)
+        explicit_max_ttl = optional(string, null)
+        no_parent        = optional(bool, null)
+        period           = optional(string, null)
+        renewable        = optional(string, null)
+        ttl              = optional(string, null)
       }),
       null
     )

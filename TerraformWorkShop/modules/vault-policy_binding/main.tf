@@ -38,5 +38,21 @@ resource "vault_token" "token" {
     for binding in var.policy_bindings : binding.policy_name => binding
     if binding.token_binding != null
   }
-  policies = [vault_policy.policy[each.value.policy_name].name]
+  policies         = [vault_policy.policy[each.value.policy_name].name]
+  no_parent        = each.value.token_binding.no_parent
+  renewable        = each.value.token_binding.renewable
+  ttl              = each.value.token_binding.ttl
+  explicit_max_ttl = each.value.token_binding.explicit_max_ttl
+  display_name     = each.value.token_binding.display_name
+  period           = each.value.token_binding.period
+}
+
+output "tokens" {
+  value = [
+    for binding in var.policy_bindings : {
+      name  = binding.policy_name
+      token = vault_token.token[binding.policy_name].client_token
+    }
+    if binding.token_binding != null
+  ]
 }
