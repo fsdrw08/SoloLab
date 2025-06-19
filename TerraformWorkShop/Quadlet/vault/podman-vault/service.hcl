@@ -19,8 +19,9 @@ services {
     "vault-exporter",
   ]
   meta = {
-    scheme = "https"
-    address = "vault.day0.sololab"
-    metrics_path = "/v1/sys/metrics"
+    scheme                    = "https"
+    address                   = "vault.day0.sololab"
+    metrics_path              = "/v1/sys/metrics"
+    metrics_path_param_format = "prometheus"
   }
 }

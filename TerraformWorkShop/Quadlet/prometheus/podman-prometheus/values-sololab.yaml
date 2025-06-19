@@ -137,9 +137,11 @@ prometheus:
                   target_label: __address__
                 - source_labels: ["__meta_consul_service_metadata_metrics_path"]
                   target_label: __metrics_path__
+                # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config
+                - action: labelmap
+                  regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+                  replacement: __param_$1
             - job_name: vault_exporter
-              params:
-                format: ["prometheus"]
               tls_config:
                 ca_file: /etc/prometheus/certs/ca.crt
               authorization:
@@ -166,6 +168,9 @@ prometheus:
                   target_label: __address__
                 - source_labels: ["__meta_consul_service_metadata_metrics_path"]
                   target_label: __metrics_path__
+                - action: labelmap
+                  regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+                  replacement: __param_$1
         ## @param prometheus.configFiles.web basic authentication and TLS config
         ## The config file will presents in the path which specify in prometheus.flags.web.config.file, default: /etc/prometheus/web.yml
         ## ref: https://prometheus.io/docs/prometheus/3.4/configuration/https/
