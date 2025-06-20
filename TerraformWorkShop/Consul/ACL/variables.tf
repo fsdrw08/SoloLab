@@ -28,6 +28,10 @@ variable "policy_bindings" {
       }),
       null
     )
-    attach_token = bool
+    token = optional(object({
+      vault_kvv2_path = string
+      }),
+      null
+    )
   }))
 }
