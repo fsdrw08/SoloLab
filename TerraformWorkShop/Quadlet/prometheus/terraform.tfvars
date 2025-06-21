@@ -77,13 +77,25 @@ podman_kubes = [
         {
           value_sets = [
             {
-              name          = "prometheus.containers.server.tls.contents.prometheus-token"
+              name          = "prometheus.containers.server.tls.contents.vault-token"
               value_ref_key = "token"
             },
           ]
           vault_kvv2 = {
             mount = "kvv2/vault_token"
             name  = "prometheus-metrics"
+          }
+        },
+        {
+          value_sets = [
+            {
+              name          = "prometheus.containers.server.tls.contents.consul-token"
+              value_ref_key = "token"
+            },
+          ]
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "token-prometheus"
           }
         },
         {

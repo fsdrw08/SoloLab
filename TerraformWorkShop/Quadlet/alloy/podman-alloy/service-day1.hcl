@@ -35,9 +35,9 @@ services {
     "exporter",
   ]
   meta = {
-    scheme       = "http"
-    address      = "prometheus-podman-exporter.day1.sololab"
-    path         = "metrics"
-    metrics_path = "metrics"
+    scheme            = "http"
+    address           = "prometheus-podman-exporter.day1.sololab"
+    health_check_path = "metrics"
+    metrics_path      = "metrics"
   }
 }

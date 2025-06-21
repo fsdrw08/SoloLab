@@ -15,13 +15,14 @@ services {
   ]
 
   tags = [
-    "exporter",
+    "consul-exporter",
   ]
   meta = {
-    scheme  = "https"
-    address = "consul.day0.sololab"
+    scheme            = "https"
+    address           = "consul.day0.sololab"
+    health_check_path = "v1/status/leader"
     # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
-    metrics_path              = "/v1/agent/metrics"
+    metrics_path              = "v1/agent/metrics"
     metrics_path_param_format = "prometheus"
   }
 }

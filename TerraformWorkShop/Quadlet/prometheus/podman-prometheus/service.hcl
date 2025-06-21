@@ -14,9 +14,15 @@ services {
       timeout         = "2s"
     }
   ]
+
+  tags = [
+    "exporter",
+  ]
   meta = {
-    scheme = "https"
-    address = "prometheus.day1.sololab"
+    scheme            = "https"
+    address           = "prometheus.day1.sololab"
+    health_check_path = "metrics"
+    metrics_path      = "metrics"
   }
 }
 
@@ -37,8 +43,13 @@ services {
     }
   ]
 
+  tags = [
+    "exporter",
+  ]
   meta = {
-    scheme = "https"
-    address = "prometheus-blackbox-exporter.day1.sololab"
+    scheme            = "https"
+    address           = "prometheus-blackbox-exporter.day1.sololab"
+    health_check_path = "metrics"
+    metrics_path      = "metrics"
   }
 }

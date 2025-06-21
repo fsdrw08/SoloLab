@@ -63,20 +63,6 @@ prometheus:
       configFiles:
         main:
           scrape_configs:
-            ## Here it's Prometheus itself.
-            ## The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-            - job_name: prometheus
-              metrics_path: /metrics # defaults to '/metrics'
-              scheme: https # defaults to 'http'.
-              tls_config:
-                ca_file: /etc/prometheus/certs/ca.crt
-                server_name: prometheus.day1.sololab
-              static_configs:
-                - targets: ["localhost:9090"]
-                  # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
-                  labels:
-                    app: "prometheus"
-            # need to add correct relabel config
             - job_name: blackbox_exporter
               scrape_interval: 15s
               scrape_timeout: 5s
@@ -145,7 +131,7 @@ prometheus:
               tls_config:
                 ca_file: /etc/prometheus/certs/ca.crt
               authorization:
-                credentials_file: /etc/prometheus/certs/prometheus-token
+                credentials_file: /etc/prometheus/certs/vault-token
               consul_sd_configs:
                 - server: consul.day0.sololab
                   datacenter: dc1
@@ -157,6 +143,38 @@ prometheus:
               relabel_configs:
                 - source_labels: ["__meta_consul_tags"]
                   regex: .*vault-exporter.*
+                  action: keep
+                - source_labels: ["__meta_consul_service_metadata_scheme"]
+                  target_label: __scheme__
+                - source_labels:
+                    - __meta_consul_service_metadata_address
+                    - __meta_consul_service_port
+                  regex: (.+);(.+)
+                  replacement: ${1}:${2}
+                  target_label: __address__
+                - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+                  target_label: __metrics_path__
+                - action: labelmap
+                  regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+                  replacement: __param_$1
+            - job_name: consul_exporter
+              tls_config:
+                ca_file: /etc/prometheus/certs/ca.crt
+              http_headers:
+                X-Consul-Token:
+                  files:
+                    - /etc/prometheus/certs/consul-token
+              consul_sd_configs:
+                - server: consul.day0.sololab
+                  datacenter: dc1
+                  scheme: https
+                  tls_config:
+                    ca_file: /etc/prometheus/certs/ca.crt
+                  services:
+                    - consul
+              relabel_configs:
+                - source_labels: ["__meta_consul_tags"]
+                  regex: .*consul-exporter.*
                   action: keep
                 - source_labels: ["__meta_consul_service_metadata_scheme"]
                   target_label: __scheme__

@@ -70,6 +70,8 @@ minio:
     MINIO_SERVER_URL: https://minio-api.day1.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
     MINIO_BROWSER_REDIRECT_URL: https://minio-console.day1.sololab
+    # https://min.io/docs/minio/linux/reference/minio-server/settings/metrics-and-logging.html#id14
+    MINIO_PROMETHEUS_AUTH_TYPE: public
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

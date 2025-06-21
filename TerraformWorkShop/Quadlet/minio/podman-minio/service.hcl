@@ -15,17 +15,13 @@ services {
     }
   ]
 
-  # tags = [
-  #   "traefik.enable=true",
-  #   "traefik.tcp.routers.minio-console-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.minio-console-web.rule=HostSNI(`minio-console.day1.sololab`)",
-  #   "traefik.tcp.routers.minio-console-web.tls.passthrough=true",
-  #   # "traefik.http.routers.minio-console-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.minio-console-web-redirect.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.minio-console-web.entrypoints=websecure",
-  #   # "traefik.http.routers.minio-console-web.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web.tls=true",
-  #   # "traefik.http.services.minio-console-web.loadbalancer.server.scheme=https",
-  # ]
+  tags = [
+    "exporter",
+  ]
+  meta = {
+    scheme            = "https"
+    address           = "minio-api.day1.sololab"
+    health_check_path = "minio/health/live"
+    metrics_path      = "minio/v2/metrics/cluster"
+  }
 }

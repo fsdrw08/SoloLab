@@ -278,6 +278,50 @@ resource "grafana_dashboard" "traefik" {
     {
       DS_PROMETHEUS = grafana_data_source.data_source.uid
     }
+  )
+}
 
+resource "grafana_dashboard" "vault" {
+  config_json = templatefile(
+    "./podman-prometheus/vault-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+  )
+}
+
+resource "grafana_dashboard" "consul" {
+  config_json = templatefile(
+    "./podman-prometheus/consul-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+  )
+}
+
+resource "grafana_dashboard" "minio" {
+  config_json = templatefile(
+    "./podman-prometheus/minio-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+  )
+}
+
+resource "grafana_dashboard" "zot" {
+  config_json = templatefile(
+    "./podman-prometheus/zot-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+  )
+}
+
+resource "grafana_dashboard" "loki" {
+  config_json = templatefile(
+    "./podman-prometheus/loki-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
   )
 }
