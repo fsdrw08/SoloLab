@@ -2,10 +2,10 @@ $syncList = @"
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.2",
-        "archive": "quay.io_giantswarm_zot-v2.1.2.tar",
+        "publicRepo": "giantswarm/zot:v2.1.5",
+        "archive": "quay.io_giantswarm_zot-v2.1.5.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "giantswarm/zot:v2.1.2",
+        "privateRepo": "giantswarm/zot:v2.1.5",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
     },
     {
