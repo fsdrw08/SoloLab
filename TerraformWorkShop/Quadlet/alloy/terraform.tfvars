@@ -126,7 +126,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "infra.node.consul."
+      "Day0-FCOS.node.consul."
     ]
   },
   {
@@ -144,7 +144,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "infra.node.consul."
+      "Day0-FCOS.node.consul."
     ]
   },
   {
