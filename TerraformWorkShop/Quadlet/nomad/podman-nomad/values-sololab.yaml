@@ -3,7 +3,6 @@ global:
 nomad:
   image:
     repository: multani/nomad
-    tag: "1.10.0"
   # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
   # hostAliases:
   #   - ip: "host-gateway"
@@ -35,6 +34,11 @@ nomad:
         ca_file: "/nomad/config/certs/ca.crt"
         cert_file: "/nomad/config/certs/server.crt"
         key_file: "/nomad/config/certs/server.key"
+      consul:
+        address: "https://consul.day0.sololab:8501"
+        ca_file: "/nomad/config/certs/ca.crt"
+        ssl: true
+        token: # set by vault data
 
   args:
     - agent

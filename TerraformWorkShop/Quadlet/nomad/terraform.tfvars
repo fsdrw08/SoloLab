@@ -12,53 +12,69 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-podman_kube = {
-  helm = {
-    name       = "nomad"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/nomad"
-    value_file = "./podman-nomad/values-sololab.yaml"
-    # value_sets = [
-    #   {
-    #     name         = "nomad.configFiles.main.advertise.http"
-    #     value_string = "192.168.255.10"
-    #   },
-    #   {
-    #     name         = "nomad.configFiles.main.advertise.rpc"
-    #     value_string = "192.168.255.10"
-    #   },
-    #   {
-    #     name         = "nomad.configFiles.main.advertise.serf"
-    #     value_string = "192.168.255.10"
-    #   },
-    # ]
-    tls = {
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+podman_kubes = [
+  {
+    helm = {
+      name       = "nomad"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/nomad"
+      value_file = "./podman-nomad/values-sololab.yaml"
+      # value_sets = [
+      #   {
+      #     name         = "nomad.configFiles.main.advertise.http"
+      #     value_string = "192.168.255.10"
+      #   },
+      #   {
+      #     name         = "nomad.configFiles.main.advertise.rpc"
+      #     value_string = "192.168.255.10"
+      #   },
+      #   {
+      #     name         = "nomad.configFiles.main.advertise.serf"
+      #     value_string = "192.168.255.10"
+      #   },
+      # ]
+      tls = [
+        {
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "nomad"
           }
-        }
-        cert_name = "nomad"
-      }
-      value_sets = [
-        {
-          name          = "nomad.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
+          value_sets = [
+            {
+              name          = "nomad.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "nomad.tls.contents.server\\.crt"
+              value_ref_key = "cert_pem"
+            },
+            {
+              name          = "nomad.tls.contents.server\\.key"
+              value_ref_key = "key_pem"
+            },
+          ]
         },
         {
-          name          = "nomad.tls.contents.server\\.crt"
-          value_ref_key = "cert_pem"
-        },
-        {
-          name          = "nomad.tls.contents.server\\.key"
-          value_ref_key = "key_pem"
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "token-nomad_server"
+          }
+          value_sets = [
+            {
+              name          = "nomad.configFiles.main.consul.token"
+              value_ref_key = "token"
+            }
+          ]
         },
       ]
     }
-  }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/nomad-aio.yaml"
-}
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/nomad-aio.yaml"
+  },
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"

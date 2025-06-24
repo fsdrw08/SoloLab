@@ -14,6 +14,51 @@ prov_consul = {
 
 policy_bindings = [
   {
+    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
+    name        = "nomad_server"
+    description = "Policy for nomad server to interact with Consul"
+    rules       = <<-EOT
+      agent_prefix "" {
+        policy = "read"
+      }
+
+      node_prefix "" {
+        policy = "write"
+      }
+
+      service_prefix "" {
+        policy = "write"
+      }
+
+      acl  = "write"
+      mesh = "write"
+    EOT
+    token = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
+  {
+    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
+    name        = "nomad_client"
+    description = "Policy for nomad client to interact with Consul"
+    rules       = <<-EOT
+      agent_prefix "" {
+        policy = "read"
+      }
+
+      node_prefix "" {
+        policy = "write"
+      }
+
+      service_prefix "" {
+        policy = "write"
+      }
+    EOT
+    token = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
+  {
     name        = "prometheus"
     description = "Policy for Prometheus to read node information"
     rules       = <<-EOT

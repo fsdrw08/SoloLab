@@ -17,12 +17,6 @@ podman_kube = {
     name       = "consul"
     chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
     value_file = "./podman-consul/values-sololab.yaml"
-    value_sets = [
-      {
-        name         = "consul.configFiles.main.node_name"
-        value_string = "Infra"
-      }
-    ]
     tls = {
       tfstate = {
         backend = {
