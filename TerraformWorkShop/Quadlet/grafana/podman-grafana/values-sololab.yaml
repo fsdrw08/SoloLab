@@ -15,7 +15,7 @@ grafana:
         - -kf
         - https://localhost:3000/api/health
   configFiles:
-    custom:
+    grafana:
       server:
         domain: grafana.day1.sololab
         root_url: https://grafana.day1.sololab
