@@ -178,6 +178,11 @@ resource "null_resource" "post_process" {
   }
 }
 
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/nomad-traefik.yaml"
+  content = file("./podman-nomad/nomad-traefik.yaml")
+}
+
 resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/service-nomad.hcl"
   content = file("./podman-nomad/service.hcl")
