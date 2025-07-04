@@ -30,7 +30,7 @@ resource "nomad_acl_auth_method" "oidc" {
     oidc_client_id     = data.vault_identity_oidc_client_creds.creds.client_id
     oidc_client_secret = data.vault_identity_oidc_client_creds.creds.client_secret
     bound_audiences    = [data.vault_identity_oidc_client_creds.creds.client_id]
-    oidc_scopes        = ["username", "groups"]
+    oidc_scopes        = ["user", "groups"]
     allowed_redirect_uris = [
       "https://nomad.day0.sololab/oidc/callback",
       "https://nomad.day0.sololab/ui/settings/tokens",
