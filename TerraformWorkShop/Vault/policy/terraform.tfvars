@@ -63,6 +63,9 @@ policy_bindings = [
       path "identity/entity-alias/id" {
         capabilities = ["list"]
       }
+      path "identity/oidc/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
       ## KV Secrets Engine
       # manage kv secrets engine
       path "kvv2/*" {

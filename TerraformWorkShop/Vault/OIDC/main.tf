@@ -17,7 +17,7 @@ resource "vault_identity_oidc_scope" "scopes" {
   template = each.value.template
 }
 
-# ! if delete scope, this provider resource will prevent scope delete
+# !!! if delete scope, this provider resource will prevent scope delete
 # should run terraform apply -target="vault_identity_oidc_provider.provider"
 # to update this resource first
 resource "vault_identity_oidc_provider" "provider" {
