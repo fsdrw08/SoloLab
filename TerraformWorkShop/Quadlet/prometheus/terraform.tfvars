@@ -16,37 +16,6 @@ prov_grafana = {
   auth = "admin:admin"
 }
 
-# podman_kube = {
-#   helm = {
-#     name       = "prometheus"
-#     chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
-#     value_file = "./podman-prometheus/values-sololab.yaml"
-#     tls = [
-#       {
-#         value_sets = [
-#           {
-#             name          = "prometheus.containers.server.tls.contents.ca\\.crt"
-#             value_ref_key = "ca"
-#           },
-#           {
-#             name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
-#             value_ref_key = "cert"
-#           },
-#           {
-#             name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
-#             value_ref_key = "private_key"
-#           },
-#         ]
-#         vault_kvv2 = {
-#           mount = "kvv2/certs"
-#           name  = "prometheus.day1.sololab"
-#         }
-#       }
-#     ]
-#   }
-#   manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
-# }
-
 podman_kubes = [
   {
     helm = {

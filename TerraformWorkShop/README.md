@@ -1,4 +1,7 @@
-ref: [解决Terraform初始化慢~配置本地离线源](https://cloud.tencent.com/developer/article/1987762)
+ref: 
+- [解决Terraform初始化慢~配置本地离线源](https://cloud.tencent.com/developer/article/1987762)
+- [plugin-dir](https://developer.hashicorp.com/terraform/cli/commands/init#plugin-dir-path)
+- [custom terrafrom configurations in file](https://developer.hashicorp.com/terraform/cli/config/config-file#locations)
 
 1. run [Set-TFCLIConfigFile.ps1](Set-TFCLIConfigFile.ps1) to setup terraform.rc
 ```powershell
