@@ -23,6 +23,12 @@ loki:
           curl -s -k http://localhost:3100/ready
   resourcesPreset: "medium"
   config:
+    # https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
+    limits_config:
+      allow_structured_metadata: true
+      volume_enabled: true
+    pattern_ingester:
+      enabled: true
     # common:
     #   instance_interface_names:
     #     - lo

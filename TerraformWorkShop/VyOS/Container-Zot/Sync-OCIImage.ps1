@@ -74,6 +74,14 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "sigoden/dufs:v0.43.0",
+        "archive": "docker.io_sigoden_dufs_v0.43.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "sigoden/dufs:v0.43.0",
+        "description": "https://hub.docker.com/r/sigoden/dufs/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "lldap/lldap:2025-05-19-alpine-rootless",
         "archive": "docker.io_lldap_lldap_2025-05-19-alpine-rootless.tar",
         "privateRegistry": "192.168.255.10:5000",

@@ -2,6 +2,7 @@
 
 NOMAD_ADDR=${NOMAD_ADDR}
 NOMAD_TOKEN_FILE=${NOMAD_TOKEN_FILE}
+WORKLOAD=${WORKLOAD}
 
 counter=0
 # until STATUS=$(curl -k -X GET "$NOMAD_ADDR/v1/status/leader" 2>&1); [ $? -ne 1 ]
@@ -59,4 +60,5 @@ else
        --data "$POLICY_JSON" "$NOMAD_ADDR/v1/acl/policy/anonymous"
 
   echo "Policy 'anonymous' created successfully."
+  podman healthcheck run $WORKLOAD
 fi

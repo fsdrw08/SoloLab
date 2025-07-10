@@ -11,8 +11,8 @@ nomad:
   containerPorts: []
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 30
-    periodSeconds: 300
+    initialDelaySeconds: 3
+    periodSeconds: 600
     timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
@@ -35,7 +35,7 @@ nomad:
         cert_file: "/nomad/config/certs/server.crt"
         key_file: "/nomad/config/certs/server.key"
       consul:
-        address: "https://consul.day0.sololab:8501"
+        address: "consul.day0.sololab:8501"
         ca_file: "/nomad/config/certs/ca.crt"
         ssl: true
         token: # set by vault data
@@ -45,17 +45,25 @@ nomad:
 
   podLabels:
     traefik.enable: true
-    traefik.tcp.routers.nomad-web.entrypoints: webSecure
-    traefik.tcp.routers.nomad-web.rule: HostSNI(`nomad.day0.sololab`)
-    traefik.tcp.routers.nomad-web.tls.passthrough: true
-    traefik.tcp.routers.nomad-web.service: nomad-web
-    traefik.tcp.services.nomad-web.loadbalancer.server.port: 4646
+    traefik.http.routers.nomad-redirect.entrypoints: web
+    traefik.http.routers.nomad-redirect.rule: Host(`nomad.day0.sololab`)
+    traefik.http.routers.nomad-redirect.middlewares: toHttps@file
+    traefik.http.routers.nomad-redirect.service: nomad
+
+    traefik.http.routers.nomad.entrypoints: webSecure
+    traefik.http.routers.nomad.rule: Host(`nomad.day0.sololab`)
+    traefik.http.routers.nomad.tls: true
+    traefik.http.routers.nomad.service: nomad
+
+    traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
+    traefik.http.services.nomad.loadbalancer.server.scheme: https
+    traefik.http.services.nomad.loadbalancer.server.port: 4646
 
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT
       value: "ture"
     # env var for image multani/nomad
-    # https://github.com/multani/docker-nomad/blob/9f5cc384481214f0232b38262b0512c2d22a0887/v1.9.x/start.sh#L15
+    # https://github.com/multani/docker-nomad/blob/1.10.2/v1.10.x/start.sh#L15
     - name: NOMAD_CONFIG_DIR
       value: /nomad/config
     - name: TZ
