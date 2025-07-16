@@ -1,21 +1,21 @@
-#iso_url=https://community-downloads.vyos.dev/stream/1.5-stream-2025-Q1/vyos-1.5-stream-2025-Q1-generic-amd64.iso
-iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.5-stream-2025-Q1-generic-amd64.iso"
+#iso_url=https://community-downloads.vyos.dev/stream/1.5-stream-2025-Q2/vyos-1.5-stream-2025-Q2-generic-amd64.iso
+iso_url               = "C:/Users/Public/Downloads/ISO/vyos-1.5-stream-2025-Q2-generic-amd64.iso"
 iso_checksum_type     = "sha256"
-iso_checksum          = "86546C04E3F1ACFD191AB6126BABE82D0E9218BB08884819EB01436BC19EC330"
+iso_checksum          = "BAA604C965E2EE6557C193A466EE5B83D35DFFD4B69201B63397617CA6E18430"
 vm_name               = "packer-vyos15s"
 configuration_version = "11.0"
 disk_size             = "128000"
 // disk_additional_size=["150000"]
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
-cd_files                 = [".\\http\\*"]
-switch_name              = "Default Switch"
-output_directory         = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos15s/"
-output_vagrant           = "C:/Users/Public/Downloads/vbox/packer-vyos15s-hv-g2.box"
-vlan_id                  = ""
-vagrantfile_template     = "./vagrant-VyOS15s.rb"
-skip_export              = true
-ssh_username             = "vyos"
-ssh_password             = "vyos"
+cd_files             = [".\\http\\*"]
+switch_name          = "Default Switch"
+output_directory     = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos15s/"
+output_vagrant       = "C:/Users/Public/Downloads/vbox/packer-vyos15s-hv-g2.box"
+vlan_id              = ""
+vagrantfile_template = "./vagrant-VyOS15s.rb"
+skip_export          = true
+ssh_username         = "vyos"
+ssh_password         = "vyos"
 // https://wiki.debian.org/CDDVD explanation for /dev/sr1
 boot_command = [
   // "<wait600><enter><wait2><enter><wait2><enter>",

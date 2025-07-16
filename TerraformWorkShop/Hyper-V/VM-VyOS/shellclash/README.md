@@ -6,8 +6,9 @@ ref:
 ```powershell
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.8.0\*"
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.0\*"
+$debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.1\*"
 # or 
-$debPath = "$env:USERPROFILE\OneDrive - Company Ltd\Software\Network\shellclash-linux\1.9.0\*"
+$debPath = "$env:USERPROFILE\OneDrive - Company Ltd\Software\Network\shellclash-linux\1.9.1\*"
 scp $debPath vyos:/tmp/
 ```
 2. install shellclash in vyos
@@ -45,6 +46,9 @@ v1.8.0
 - 7 clash进阶设置 ->  6 配置内置DNS服务 -> 7 禁用DNS劫持：已禁用, 2 修改Fallback_DNS: 192.168.255.1
 - 7 clash进阶设置 ->  6 配置内置DNS服务 ->  4 一键配置加密DNS
 -
+
+v1.9.1
+- 2 内核功能设置 -> 2 切换DNS运行模式 -> 4 DNS进阶设置 -> 7 禁用DNS劫持
 <!-- 
 1. install shellclash:
 from vyos, run 

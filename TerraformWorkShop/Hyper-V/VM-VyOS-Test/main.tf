@@ -1,13 +1,3 @@
-locals {
-  vhd_dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-  boot_disk_path = join("\\", [
-    var.vhd_dir,
-    var.vm_name,
-    element(split("\\", var.source_disk), length(split("\\", var.source_disk)) - 1)
-    ]
-  )
-}
-
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
@@ -15,6 +5,17 @@ data "terraform_remote_state" "root_ca" {
   }
 }
 
+locals {
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
+  ]
+  cert = [
+    for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
+    if cert.name == "vyos"
+  ]
+}
+
+# for debug
 # output "int_ca_pem" {
 #   value = join("",
 #     slice(
@@ -54,8 +55,9 @@ data "terraform_remote_state" "root_ca" {
 # }
 
 module "cloudinit_nocloud_iso" {
-  source   = "../modules/cloudinit_nocloud_iso3"
-  iso_name = "cloud-init"
+  source   = "../../modules/hyperv-cloudinit-nocloud"
+  count    = var.vm.count
+  iso_name = "cloud-init-${local.vm_names[count.index]}"
   files = [
     for content in var.cloudinit_nocloud : {
       content = templatefile(content.content_source, merge(content.content_vars,
@@ -69,88 +71,105 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
+          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
           vyos_cert = join("",
             slice(
-              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
+              split("\n", local.cert.0["cert_pem"]),
               1,
               length(
-                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
+                split("\n", local.cert.0["cert_pem"])
               ) - 2
             )
           )
+
           vyos_key = join("",
             slice(
-              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
+              split("\n", local.cert.0["key_pkcs8"]),
               1,
               length(
-                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
+                split("\n", local.cert.0["key_pkcs8"])
               ) - 2
             )
           )
-          haproxy_cfg = file("${path.module}/cloudinit-tmpl/haproxy.cfg.j2")
         }
       ))
       filename = content.filename
     }
   ]
   destination_iso_file_path = join("\\", [
-    var.vhd_dir,
-    "${var.vm_name}\\cloudinit.iso"
+    var.vm.vhd.dir,
+    "${local.vm_names[count.index]}\\cloudinit.iso"
     ]
   )
 }
 
-# data "terraform_remote_state" "data_disk" {
-#   backend = "local"
-#   config = {
-#     path = "${path.module}/${var.data_disk_ref}"
-#   }
-# }
+# fetch data disk info
+data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
+  backend = var.vm.vhd.data_disk_ref.backend
+  config  = var.vm.vhd.data_disk_ref.config
+}
 
+# prepare boot disk path
+resource "terraform_data" "boot_disk" {
+  count = var.vm.count
+  input = join("\\", [
+    var.vm.vhd.dir,
+    local.vm_names[count.index],
+    join(".", [
+      "boot",
+      element(
+        split(".", basename(var.vm.vhd.source)),
+        length(split(".", basename(var.vm.vhd.source))) - 1
+      )
+    ])
+    ]
+  )
+}
+
+# vm instance
 module "hyperv_machine_instance" {
-  source = "../modules/hyperv_instance2"
-  depends_on = [
-    module.cloudinit_nocloud_iso,
-  ]
+  source     = "../../modules/hyperv-vm"
+  depends_on = [module.cloudinit_nocloud_iso]
+  count      = var.vm.count
 
   boot_disk = {
-    path   = local.boot_disk_path
-    source = var.source_disk
+    path   = terraform_data.boot_disk[count.index].input
+    source = var.vm.vhd.source
   }
 
-  boot_disk_drive = [
+  boot_disk_drive = {
+    controller_type     = "Scsi"
+    controller_number   = "0"
+    controller_location = "0"
+    path                = terraform_data.boot_disk[count.index].input
+  }
+
+  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
     {
       controller_type     = "Scsi"
       controller_number   = "0"
-      controller_location = "0"
-      path                = local.boot_disk_path
+      controller_location = "2"
+      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
     }
   ]
 
-  additional_disk_drives = [
-    # {
-    #   controller_type     = "Scsi"
-    #   controller_number   = "0"
-    #   controller_location = "2"
-    #   path                = data.terraform_remote_state.data_disk.outputs.path
-    # }
-  ]
-
   vm_instance = {
-    name                 = var.vm_name
+    name                 = local.vm_names[count.index]
     checkpoint_type      = "Standard"
-    static_memory        = true
+    static_memory        = var.vm.memory.static
+    dynamic_memory       = var.vm.memory.dynamic
     generation           = 2
-    memory_maximum_bytes = var.memory_maximum_bytes
-    memory_minimum_bytes = var.memory_minimum_bytes
-    memory_startup_bytes = var.memory_startup_bytes
+    memory_maximum_bytes = var.vm.memory.maximum_bytes
+    memory_minimum_bytes = var.vm.memory.minimum_bytes
+    memory_startup_bytes = var.vm.memory.startup_bytes
     notes                = "This VM instance is managed by terraform"
     processor_count      = 4
-    state                = "Running"
+    state                = var.vm.power_state
 
     vm_firmware = {
       console_mode                    = "Default"
-      enable_secure_boot              = var.enable_secure_boot
+      enable_secure_boot              = var.vm.enable_secure_boot
       secure_boot_template            = "MicrosoftUEFICertificateAuthority"
       pause_after_boot_failure        = "Off"
       preferred_network_boot_protocol = "IPv4"
@@ -185,22 +204,13 @@ module "hyperv_machine_instance" {
       "VSS"                     = true
     }
 
-    network_adaptors = var.network_adaptors
+    network_adaptors = var.vm.nic
 
     dvd_drives = [
       {
         controller_number   = 0
         controller_location = 1
-        path                = "${module.cloudinit_nocloud_iso.resolve_destination_iso_file_path}"
-        # path = local.count <= 1 ? join("\\", [
-        #   "${var.vhd_dir}",
-        #   "${var.vm_name}",
-        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
-        #   ]) : join("\\", [
-        #   "${var.vhd_dir}",
-        #   "${var.vm_name}${count.index + 1}",
-        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
-        # ])
+        path                = "${module.cloudinit_nocloud_iso[count.index].resolve_destination_iso_file_path}"
       }
     ]
 

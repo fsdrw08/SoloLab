@@ -1,14 +1,18 @@
-locals {
-  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
-    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
-  ]
-}
-
 data "terraform_remote_state" "root_ca" {
   backend = "local"
   config = {
     path = "../../TLS/RootCA/terraform.tfstate"
   }
+}
+
+locals {
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
+  ]
+  cert = [
+    for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
+    if cert.name == "vyos"
+  ]
 }
 
 # for debug
@@ -70,23 +74,23 @@ module "cloudinit_nocloud_iso" {
           root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
           vyos_cert = join("",
             slice(
-              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
+              split("\n", local.cert.0["cert_pem"]),
               1,
               length(
-                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
+                split("\n", local.cert.0["cert_pem"])
               ) - 2
             )
           )
+
           vyos_key = join("",
             slice(
-              split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
+              split("\n", local.cert.0["key_pkcs8"]),
               1,
               length(
-                split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
+                split("\n", local.cert.0["key_pkcs8"])
               ) - 2
             )
           )
-          # haproxy_cfg = file("${path.module}/cloudinit-tmpl/haproxy.cfg.j2")
         }
       ))
       filename = content.filename
@@ -207,15 +211,6 @@ module "hyperv_machine_instance" {
         controller_number   = 0
         controller_location = 1
         path                = "${module.cloudinit_nocloud_iso[count.index].resolve_destination_iso_file_path}"
-        # path = local.count <= 1 ? join("\\", [
-        #   "${var.vhd_dir}",
-        #   "${locals.vm_names}",
-        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
-        #   ]) : join("\\", [
-        #   "${var.vhd_dir}",
-        #   "${locals.vm_names}${count.index + 1}",
-        #   "${module.cloudinit_nocloud_iso[count.index].isoName}"
-        # ])
       }
     ]
 
