@@ -38,7 +38,7 @@ podman_kube = {
         },
         {
           name          = "consul.tls.contents.server\\.crt"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "consul.tls.contents.server\\.key"

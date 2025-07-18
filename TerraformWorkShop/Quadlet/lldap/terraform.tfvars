@@ -41,7 +41,7 @@ podman_kube = {
       value_sets = [
         {
           name          = "lldap.ssl.contents.cert\\.pem"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "lldap.ssl.contents.key\\.pem"

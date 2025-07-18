@@ -18,7 +18,7 @@ podman_kube = {
         },
         {
           name          = "traefik.tls.contents.\"day0\\.crt\""
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "traefik.tls.contents.\"day0\\.key\""

@@ -18,7 +18,7 @@ podman_kube = {
         },
         {
           name          = "cockpit.tls.contents.server\\.crt"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "cockpit.tls.contents.server\\.key"

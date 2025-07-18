@@ -18,7 +18,7 @@ podman_kube = {
         },
         {
           name          = "vault.tls.contents.tls\\.crt"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "vault.tls.contents.tls\\.key"

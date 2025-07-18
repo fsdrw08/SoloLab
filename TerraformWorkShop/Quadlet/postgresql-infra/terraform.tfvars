@@ -20,7 +20,7 @@ podman_kube = {
       value_sets = [
         {
           name          = "postgresql.ssl.contents.tls\\.crt"
-          value_ref_key = "cert_pem"
+          value_ref_key = "cert_pem_chain"
         },
         {
           name          = "postgresql.ssl.contents.tls\\.key"
