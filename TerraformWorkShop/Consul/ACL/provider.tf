@@ -11,7 +11,7 @@ terraform {
   }
 
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "Consul-ACL"
   }
 }

@@ -56,5 +56,9 @@ terraform {
       source  = "grafana/grafana"
       version = ">= 3.25.1"
     }
+    system = {
+      source  = "neuspaces/system"
+      version = ">= 0.5.0"
+    }
   }
 }
