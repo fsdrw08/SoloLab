@@ -42,18 +42,18 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20241225",
-        "archive": "quay.io_fedora_postgresql-16_20241225.tar",
+        "publicRepo": "fedora/postgresql-16:20250716",
+        "archive": "quay.io_fedora_postgresql-16_20250716.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "fedora/postgresql-16:20241225",
+        "privateRepo": "fedora/postgresql-16:20250716",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "sclorg/postgresql-16-c10s:20250108",
-        "archive": "quay.io_sclorg_postgresql-16-c10s_20250108.tar",
+        "publicRepo": "sclorg/postgresql-16-c10s:20250716",
+        "archive": "quay.io_sclorg_postgresql-16-c10s_20250716.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "sclorg/postgresql-16-c10s:20250108",
+        "privateRepo": "sclorg/postgresql-16-c10s:20250716",
         "description": "https://quay.io/repository/sclorg/postgresql-16-c10s?tab=tags",
     },
     {
@@ -154,18 +154,18 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/nomad:1.10.2",
-        "archive": "docker.io_hashicorp_nomad_1.10.2.tar",
+        "publicRepo": "hashicorp/nomad:1.10.3",
+        "archive": "docker.io_hashicorp_nomad_1.10.3.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/nomad:1.10.2",
+        "privateRepo": "hashicorp/nomad:1.10.3",
         "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "multani/nomad:1.10.2",
-        "archive": "docker.io_multani_nomad_1.10.2.tar",
+        "publicRepo": "multani/nomad:1.10.3",
+        "archive": "docker.io_multani_nomad_1.10.3.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "multani/nomad:1.10.2",
+        "privateRepo": "multani/nomad:1.10.3",
         "description": "https://hub.docker.com/r/multani/nomad/tags",
     },
     {
@@ -277,7 +277,7 @@ $syncList = @"
 
 $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="C:/Users/Public/Downloads/containers"
-# $localDir="D:/Users/Public/Downloads/containers"
+$localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
 $proxy="127.0.0.1:7890"
