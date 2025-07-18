@@ -1,0 +1,28 @@
+# https://github.com/hashicorp/nomad/blob/v1.10.3/e2e/terraform/provision-infra/provision-nomad/etc/nomad.d/nomad-client.service
+[Unit]
+Description=Nomad Client Agent
+After=podman-user-wait-network-online.service
+StartLimitIntervalSec=0
+StartLimitBurst=3
+
+# Nomad and Consul are started very closely together. This helps ensure Consul
+# is already running before Nomad starts and avoids having to SIGHUP the Nomad
+# clients in order to reload the Consul fingerprints.
+# Wants=consul.service
+# After=consul.service
+
+[Service]
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=sudo ${bin_path} agent -config ${config_file}
+EnvironmentFile=-/etc/nomad.d/.environment
+KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=65536
+LimitNPROC=infinity
+TasksMax=infinity
+Restart=on-failure
+RestartSec=2
+OOMScoreAdjust=-999
+
+[Install]
+WantedBy=multi-user.target
