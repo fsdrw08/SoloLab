@@ -1,5 +1,5 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -16,34 +16,38 @@ prov_grafana = {
   auth = "admin:admin"
 }
 
-podman_kube = {
-  helm = {
-    name       = "loki"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
-    value_file = "./podman-loki/values-sololab.yaml"
-    tls = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "loki"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
+      value_file = "./podman-loki/values-sololab.yaml"
+      tls = [
         {
-          name          = "loki.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "loki.tls.contents.loki\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "loki.tls.contents.loki\\.key"
-          value_ref_key = "private_key"
-        },
+          value_sets = [
+            {
+              name          = "loki.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "loki.tls.contents.loki\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "loki.tls.contents.loki\\.key"
+              value_ref_key = "private_key"
+            },
+          ]
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "loki.day1.sololab"
+          }
+        }
       ]
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "loki.day1.sololab"
-      }
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/loki-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/loki-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -93,7 +97,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1.node.consul."
+      "day1-fcos.node.consul."
     ]
   }
 ]
