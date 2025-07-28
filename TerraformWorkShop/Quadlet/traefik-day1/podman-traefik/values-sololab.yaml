@@ -11,7 +11,7 @@ traefik:
       providers:
         consulCatalog:
           endpoint:
-            address: consul.day0.sololab
+            address: consul.day1.sololab:8501
             datacenter: dc1
             scheme: https
             tls:
@@ -46,7 +46,7 @@ traefik:
             tlsChallenge: {}
         internal:
           acme:
-            caServer: https://vault.day0.sololab/v1/pki/day1/acme/directory
+            caServer: https://vault.day1.sololab:8200/v1/pki/day1/acme/directory
             certificatesDuration: 2160
             email: ""
             storage: /mnt/acmeStorage/internal.json

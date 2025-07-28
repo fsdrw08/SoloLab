@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.10"
+  host     = "192.168.255.20"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -81,12 +81,12 @@ prov_pdns = {
 }
 
 dns_records = [{
-  zone = "day0.sololab."
-  name = "vault.day0.sololab."
+  zone = "day1.sololab."
+  name = "vault.day1.sololab."
   type = "A"
   ttl  = 86400
   records = [
-    "192.168.255.10"
+    "192.168.255.20"
   ]
 }]
 
@@ -96,7 +96,7 @@ post_process = {
     vars = {
       VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets_b64"
       # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-      VAULT_ADDR   = "https://192.168.255.10:8200"
+      VAULT_ADDR   = "https://192.168.255.20:8200"
       STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
     }
   }

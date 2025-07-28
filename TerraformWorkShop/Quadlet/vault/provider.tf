@@ -21,9 +21,6 @@ terraform {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "System-Infra-Quadlet-Vault"
   }
-  # backend "local" {
-
-  # }
 }
 
 provider "remote" {

@@ -304,10 +304,10 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.day0.sololab",
+        "vault.day1.sololab",
       ]
       subject = {
-        common_name  = "vault.day0.sololab"
+        common_name  = "vault.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -319,56 +319,56 @@ certs = [
       ]
     }
   },
-  {
-    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
-    name = "consul"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "consul.day0.sololab",
-        "consul.service.consul",
-        "server.dc1.consul",
-        "localhost"
-      ]
-      subject = {
-        common_name  = "server.dc1.consul"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "key_encipherment",
-        "cert_signing",
-        "crl_signing"
-      ]
-    }
-  },
-  {
-    # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
-    name = "nomad"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "nomad.day0.sololab",
-      ]
-      subject = {
-        common_name  = "nomad.day0.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "digital_signature",
-        "cert_signing",
-        "crl_signing"
-      ]
-    }
-  },
+  # {
+  #   # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
+  #   name = "consul"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "consul.day0.sololab",
+  #       "consul.service.consul",
+  #       "server.dc1.consul",
+  #       "localhost"
+  #     ]
+  #     subject = {
+  #       common_name  = "server.dc1.consul"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "digital_signature",
+  #       "key_encipherment",
+  #       "cert_signing",
+  #       "crl_signing"
+  #     ]
+  #   }
+  # },
+  # {
+  #   # https://github.com/hashicorp/microservices-architecture-on-aws/blob/0e73496fc694f402617859b95af97e8b784fb972/tls.tf#L42
+  #   name = "nomad"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "nomad.day0.sololab",
+  #     ]
+  #     subject = {
+  #       common_name  = "nomad.day0.sololab"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "digital_signature",
+  #       "cert_signing",
+  #       "crl_signing"
+  #     ]
+  #   }
+  # },
   # {
   #   name = "minio"
   #   key = {

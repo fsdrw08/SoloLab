@@ -35,7 +35,7 @@ nomad:
         cert_file: "/nomad/config/certs/server.crt"
         key_file: "/nomad/config/certs/server.key"
       consul:
-        address: "consul.day0.sololab:8501"
+        address: "consul.day1.sololab:8501"
         ca_file: "/nomad/config/certs/ca.crt"
         ssl: true
         token: # set by vault data
@@ -46,12 +46,12 @@ nomad:
   podLabels:
     traefik.enable: true
     traefik.http.routers.nomad-redirect.entrypoints: web
-    traefik.http.routers.nomad-redirect.rule: Host(`nomad.day0.sololab`)
+    traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
     traefik.http.routers.nomad-redirect.middlewares: toHttps@file
     traefik.http.routers.nomad-redirect.service: nomad
 
     traefik.http.routers.nomad.entrypoints: webSecure
-    traefik.http.routers.nomad.rule: Host(`nomad.day0.sololab`)
+    traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
     traefik.http.routers.nomad.tls: true
     traefik.http.routers.nomad.service: nomad
 
@@ -69,6 +69,6 @@ nomad:
     - name: TZ
       value: Asia/Shanghai
     - name: NOMAD_ADDR
-      value: https://nomad.day0.sololab:4646
+      value: https://nomad.day1.sololab:4646
     - name: NOMAD_CACERT
       value: /nomad/config/certs/ca.crt

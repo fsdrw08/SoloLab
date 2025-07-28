@@ -78,8 +78,9 @@ data "helm_template" "podman_kube" {
     ],
     var.podman_kube.helm.tls == null ? [] : [
       for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
-        name  = value_set.name
-        value = local.cert[0][value_set.value_ref_key]
+        name = value_set.name
+        # value = local.cert[0][value_set.value_ref_key]
+        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
       }
     ]
   ])

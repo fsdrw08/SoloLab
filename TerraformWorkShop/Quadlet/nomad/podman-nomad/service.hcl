@@ -7,7 +7,7 @@ services {
     {
       id              = "nomad-https-check"
       name            = "nomad-https-check"
-      http            = "https://nomad.day0.sololab/v1/status/leader"
+      http            = "https://nomad.day1.sololab/v1/status/leader"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"

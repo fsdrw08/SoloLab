@@ -7,7 +7,7 @@ services {
     {
       id              = "consul-https-check"
       name            = "consul-https-check"
-      http            = "https://consul.day0.sololab/v1/status/leader"
+      http            = "https://consul.day1.sololab:8501/v1/status/leader"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
@@ -19,7 +19,7 @@ services {
   ]
   meta = {
     scheme            = "https"
-    address           = "consul.day0.sololab"
+    address           = "consul.day1.sololab"
     health_check_path = "v1/status/leader"
     # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
     metrics_path              = "v1/agent/metrics"

@@ -1,11 +1,11 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab:8200"
+  address         = "https://vault.day1.sololab:8200"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
 oidc_provider = {
-  issuer_host = "vault.day0.sololab"
+  issuer_host = "vault.day1.sololab"
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {
@@ -41,15 +41,15 @@ oidc_client = [
     name         = "example-app"
     allow_groups = ["app-vault-user"]
     redirect_uris = [
-      "http://example-app.day0.sololab/callback",
+      "http://example-app.day1.sololab/callback",
     ]
   },
   {
     name         = "nomad"
     allow_groups = ["app-nomad-user"]
     redirect_uris = [
-      "https://nomad.day0.sololab/oidc/callback",
-      "https://nomad.day0.sololab/ui/settings/tokens",
+      "https://nomad.day1.sololab/oidc/callback",
+      "https://nomad.day1.sololab/ui/settings/tokens",
     ]
   },
   {
