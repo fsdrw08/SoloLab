@@ -4,12 +4,21 @@ variable "prov_remote" {
     port     = number
     user     = string
     password = string
-    sudo     = optional(bool, false)
+    sudo     = bool
   })
 }
 
-variable "podman_kube" {
-  type = object({
+# variable "prov_vault" {
+#   type = object({
+#     schema          = string
+#     address         = string
+#     token           = string
+#     skip_tls_verify = bool
+#   })
+# }
+
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -25,7 +34,7 @@ variable "podman_kube" {
         ), null
       )
       tls = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -49,23 +58,29 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
   type = object({
-    service = object({
-      name   = string
-      status = string
-    })
-    files = list(object({
-      template = string
-      vars     = map(string)
-      dir      = string
+    dir = string
+    units = list(object({
+      files = list(object({
+        template = string
+        vars     = map(string)
+      }))
+      service = optional(
+        object({
+          name   = string
+          status = string
+        }),
+        null
+      )
     }))
   })
 }
@@ -87,3 +102,11 @@ variable "dns_record" {
     records = list(string)
   })
 }
+
+# variable "post_process" {
+#   type = map(object({
+#     script_path = string
+#     vars        = map(string)
+#   }))
+#   default = null
+# }
