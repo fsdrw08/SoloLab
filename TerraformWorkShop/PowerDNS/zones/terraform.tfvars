@@ -1,4 +1,4 @@
-pdns = {
+prov_pdns = {
   api_key    = "powerdns"
   server_url = "http://192.168.255.10:8081"
 }
@@ -91,3 +91,25 @@ zones = [
     ]
   }
 ]
+
+prov_remote = {
+  host     = "192.168.255.10"
+  port     = 22
+  user     = "podmgr"
+  password = "podmgr"
+}
+
+
+post_process = {
+  "Enable-DDNSUpdate.sh" = {
+    script_path = "./Enable-DDNSUpdate.sh"
+    vars = {
+      PDNS_HOST        = "http://192.168.255.10:8081"
+      PDNS_API_KEY     = "powerdns"
+      ZONE_NAME        = "day0.sololab."
+      ZONE_FQDN        = "day0.sololab."
+      TSIG_KEY_NAME    = "dhcp-key"
+      TSIG_KEY_CONTENT = "AobsqQd3xT6oYFd51iayOwr/nz883CEndLc7NjCZj8kZ0v6GvWhGPF2etFrGmP7kTaiTBJXBJU5aFHqDycnbFg=="
+    }
+  }
+}

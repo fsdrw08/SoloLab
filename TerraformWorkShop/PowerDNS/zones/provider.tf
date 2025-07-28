@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "powerdns" {
-  api_key        = var.pdns.api_key
-  server_url     = var.pdns.server_url
-  insecure_https = var.pdns.insecure_https
+  api_key        = var.prov_pdns.api_key
+  server_url     = var.prov_pdns.server_url
+  insecure_https = var.prov_pdns.insecure_https
 }

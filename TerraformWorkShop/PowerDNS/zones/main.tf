@@ -33,54 +33,28 @@ resource "powerdns_record" "records" {
   records = each.value.results
 }
 
-# resource "powerdns_zone" "zone" {
-#   name         = "day0.sololab."
-#   kind         = "Native"
-#   soa_edit_api = "DEFAULT"
-#   nameservers = [
-#     "ns1.day0.sololab."
-#   ]
-# }
-
-# resource "powerdns_record" "SOA" {
-#   zone = powerdns_zone.zone.name
-#   name = "day0.sololab."
-#   type = "SOA"
-#   ttl  = 86400
-#   records = [
-#     "ns1.day0.sololab. day0.sololab. 2025030201 3600 600 1814400 7200"
-#   ]
-# }
-
-# # name server
-# resource "powerdns_record" "ns1" {
-#   zone = powerdns_zone.zone.name
-#   name = "ns1.day0.sololab."
-#   type = "A"
-#   ttl  = 86400
-#   records = [
-#     "192.168.255.1"
-#   ]
-# }
-
-# resource "powerdns_record" "etcd_SRV" {
-#   zone = powerdns_zone.zone.name
-#   name = "_etcd-server-ssl._tcp.day0.sololab."
-#   type = "SRV"
-#   ttl  = 300
-#   records = [
-#     "0 10 2380 etcd-0.day0.sololab.",
-#     # "0 10 2380 etcd-1.day0.sololab.",
-#     # "0 10 2380 etcd-2.day0.sololab.",
-#   ]
-# }
-
-# resource "powerdns_record" "etcd_A" {
-#   zone = powerdns_zone.zone.name
-#   name = "etcd-0.day0.sololab."
-#   type = "A"
-#   ttl  = 86400
-#   records = [
-#     "192.168.255.20"
-#   ]
-# }
+resource "null_resource" "post_process" {
+  depends_on = [
+    powerdns_zone.zones,
+  ]
+  for_each = var.post_process == null ? {} : var.post_process
+  triggers = {
+    script_content = sha256(templatefile("${each.value.script_path}", "${each.value.vars}"))
+    host           = var.prov_remote.host
+    port           = var.prov_remote.port
+    user           = var.prov_remote.user
+    password       = sensitive(var.prov_remote.password)
+  }
+  connection {
+    type     = "ssh"
+    host     = self.triggers.host
+    port     = self.triggers.port
+    user     = self.triggers.user
+    password = self.triggers.password
+  }
+  provisioner "remote-exec" {
+    inline = [
+      templatefile("${each.value.script_path}", "${each.value.vars}")
+    ]
+  }
+}

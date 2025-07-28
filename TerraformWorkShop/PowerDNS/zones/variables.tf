@@ -1,4 +1,4 @@
-variable "pdns" {
+variable "prov_pdns" {
   type = object({
     api_key        = string
     server_url     = string
@@ -17,4 +17,21 @@ variable "zones" {
       results = list(string)
     }))
   }))
+}
+
+variable "prov_remote" {
+  type = object({
+    host     = string
+    port     = number
+    user     = string
+    password = string
+  })
+}
+
+variable "post_process" {
+  type = map(object({
+    script_path = string
+    vars        = map(string)
+  }))
+  default = null
 }
