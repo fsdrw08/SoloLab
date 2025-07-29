@@ -5,39 +5,43 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "traefik"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
-    value_file = "./podman-traefik/values-sololab.yaml"
-    tls = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "traefik"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
+      value_file = "./podman-traefik/values-sololab.yaml"
+      tls = [
         {
-          name          = "traefik.tls.contents.\"ca\\.crt\""
-          value_ref_key = "ca"
-        },
-        {
-          name          = "traefik.tls.contents.\"day0\\.crt\""
-          value_ref_key = "cert_pem_chain"
-        },
-        {
-          name          = "traefik.tls.contents.\"day0\\.key\""
-          value_ref_key = "key_pem"
-        }
-      ]
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+          value_sets = [
+            {
+              name          = "traefik.tls.contents.\"ca\\.crt\""
+              value_ref_key = "ca"
+            },
+            {
+              name          = "traefik.tls.contents.\"day0\\.crt\""
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "traefik.tls.contents.\"day0\\.key\""
+              value_ref_key = "key_pem"
+            }
+          ]
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "traefik.day0"
           }
         }
-        cert_name = "traefik.day0"
-      }
+      ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"

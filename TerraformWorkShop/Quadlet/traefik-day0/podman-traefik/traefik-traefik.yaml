@@ -1,9 +1,10 @@
 http:
   middlewares:
-    toHttps:
-      redirectScheme:
-        scheme: https
-        permanent: true
+    # toHttps middleware already configured in traefik helm config map
+    # toHttps:
+    #   redirectScheme:
+    #     scheme: https
+    #     permanent: true
     userPass:
       basicAuth:
         users:

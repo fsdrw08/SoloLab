@@ -2,7 +2,7 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -10,7 +10,7 @@ terraform {
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.1.3"
+      version = ">= 0.1.3"
     }
     powerdns = {
       source  = "pyama86/powerdns"
