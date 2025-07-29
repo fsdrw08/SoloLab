@@ -170,10 +170,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.4.1",
-        "archive": "docker.io_library_traefik_v3.4.1.tar",
+        "publicRepo": "library/traefik:v3.5.0",
+        "archive": "docker.io_library_traefik_v3.5.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "library/traefik:v3.4.1",
+        "privateRepo": "library/traefik:v3.5.0",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -277,7 +277,7 @@ $syncList = @"
 
 $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="C:/Users/Public/Downloads/containers"
-$localDir="D:/Users/Public/Downloads/containers"
+# $localDir="D:/Users/Public/Downloads/containers"
 # Test-Path -Path $localDir
 
 $proxy="127.0.0.1:7890"
