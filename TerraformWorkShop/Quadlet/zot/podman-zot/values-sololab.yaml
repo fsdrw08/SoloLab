@@ -84,6 +84,7 @@ zot:
     traefik.http.services.zot.loadBalancer.serversTransport: zot@file
     traefik.http.services.zot.loadbalancer.server.scheme: https
     traefik.http.services.zot.loadbalancer.server.port: 5000
+    traefik.http.services.zot.loadbalancer.healthCheck.path: /v2/
 
     # traefik.tcp.routers.zot-web.entrypoints: webSecure
     # traefik.tcp.routers.zot-web.rule: HostSNI(`zot.day0.sololab`)
