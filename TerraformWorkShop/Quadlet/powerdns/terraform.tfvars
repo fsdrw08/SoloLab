@@ -5,14 +5,16 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "powerdns"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/pdns"
-    value_file = "./podman-powerdns/values-sololab.yaml"
+podman_kubes = [
+  {
+    helm = {
+      name       = "powerdns"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/pdns"
+      value_file = "./podman-powerdns/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/powerdns-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/powerdns-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -48,18 +50,3 @@ podman_quadlet = {
     },
   ]
 }
-
-# post_process = {
-#   "Enable-DDNSUpdate.sh" = {
-#     script_path = "./podman-powerdns/Enable-DDNSUpdate.sh"
-#     vars = {
-#       PDNS_HOST        = "http://192.168.255.10:8081"
-#       PDNS_API_KEY     = "powerdns"
-#       ZONE_NAME        = "day0.sololab."
-#       ZONE_FQDN        = "day0.sololab."
-#       TSIG_KEY_NAME    = "dhcp-key"
-#       TSIG_KEY_CONTENT = "AobsqQd3xT6oYFd51iayOwr/nz883CEndLc7NjCZj8kZ0v6GvWhGPF2etFrGmP7kTaiTBJXBJU5aFHqDycnbFg=="
-#     }
-#   }
-# }
-

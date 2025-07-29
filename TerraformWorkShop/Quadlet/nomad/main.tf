@@ -115,6 +115,9 @@ resource "remote_file" "podman_kubes" {
 }
 
 module "podman_quadlet" {
+  depends_on = [
+    remote_file.podman_kubes,
+  ]
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
   podman_quadlet = {
