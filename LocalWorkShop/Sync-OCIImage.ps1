@@ -250,10 +250,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "navidys/prometheus-podman-exporter:v1.17.0",
-        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.17.0.tar",
+        "publicRepo": "navidys/prometheus-podman-exporter:v1.17.2",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.17.2.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "navidys/prometheus-podman-exporter:v1.17.0",
+        "privateRepo": "navidys/prometheus-podman-exporter:v1.17.2",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
     },
     {

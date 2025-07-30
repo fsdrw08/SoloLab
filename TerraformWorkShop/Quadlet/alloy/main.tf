@@ -163,11 +163,11 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-resource "remote_file" "traefik_file_provider_day0" {
-  provider = remote.Day0
-  path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
-  content  = file("./podman-alloy/alloy-traefik.yaml")
-}
+# resource "remote_file" "traefik_file_provider_day0" {
+#   provider = remote.Day0
+#   path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
+#   content  = file("./podman-alloy/alloy-traefik.yaml")
+# }
 
 resource "remote_file" "traefik_file_provider_day1" {
   provider = remote.Day1
@@ -175,11 +175,11 @@ resource "remote_file" "traefik_file_provider_day1" {
   content  = file("./podman-alloy/alloy-traefik.yaml")
 }
 
-resource "remote_file" "consul_service_day0" {
-  provider = remote.Day0
-  path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
-  content  = file("./podman-alloy/service-day0.hcl")
-}
+# resource "remote_file" "consul_service_day0" {
+#   provider = remote.Day0
+#   path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
+#   content  = file("./podman-alloy/service-day0.hcl")
+# }
 
 resource "remote_file" "consul_service_day1" {
   provider = remote.Day1

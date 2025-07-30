@@ -1,5 +1,5 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -83,31 +83,6 @@ podman_quadlet = {
       ]
       service = {
         name   = "alloy"
-        status = "start"
-      }
-    },
-    {
-      files = [{
-        template = "./podman-alloy/prometheus-podman-exporter.container"
-        vars = {
-          # unit
-          Description           = "Prometheus exporter for podman environments exposing containers, pods, images, volumes and networks information."
-          Documentation         = "https://github.com/containers/prometheus-podman-exporter?tab=readme-ov-file#installation"
-          After                 = ""
-          Wants                 = ""
-          StartLimitIntervalSec = 120
-          StartLimitBurst       = 3
-          # service
-          ExecStartPre  = ""
-          ExecStartPost = ""
-          Restart       = "on-failure"
-          # container
-          PodmanArgs = "--tls-verify=false"
-          Network    = "host"
-        }
-      }]
-      service = {
-        name   = "prometheus-podman-exporter"
         status = "start"
       }
     },
