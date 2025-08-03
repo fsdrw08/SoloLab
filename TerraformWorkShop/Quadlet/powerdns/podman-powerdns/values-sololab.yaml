@@ -63,6 +63,9 @@ powerdns:
       config:
         local-address: 192.168.255.10
         local-port: 53
-        forward-zones: day0.sololab=192.168.255.10:1053,day1.sololab=192.168.255.10:1053,consul=192.168.255.20:8600
+        # https://github.com/hashicorp/consul/issues/1267
+        # https://doc.powerdns.com/recursor/settings.html#dnssec
+        forward-zones: day0.sololab=192.168.255.10:1053,consul=192.168.255.20:8600
+        forward-zones-recurse: day1.sololab=192.168.255.10:1053
         max-negative-ttl: 10
         webserver-address: 192.168.255.10
