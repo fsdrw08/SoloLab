@@ -262,6 +262,16 @@ resource "grafana_data_source" "data_source" {
   })
 }
 
+resource "grafana_dashboard" "podman" {
+  config_json = templatefile(
+    "./podman-prometheus/podman-exporter-dashboard.json",
+    {
+      DS_PROMETHEUS = grafana_data_source.data_source.uid
+    }
+
+  )
+}
+
 resource "grafana_dashboard" "blackbox" {
   config_json = templatefile(
     "./podman-prometheus/Blackbox-Exporter-Full.json",

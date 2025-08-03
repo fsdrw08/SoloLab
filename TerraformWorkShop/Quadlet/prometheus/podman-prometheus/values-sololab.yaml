@@ -73,7 +73,7 @@ prometheus:
               params:
                 module: [http_2xx]
               consul_sd_configs:
-                - server: consul.day0.sololab
+                - server: consul.day1.sololab
                   datacenter: dc1
                   scheme: https
                   tls_config:
@@ -104,7 +104,7 @@ prometheus:
               tls_config:
                 insecure_skip_verify: true
               consul_sd_configs:
-                - server: consul.day0.sololab
+                - server: consul.day1.sololab
                   datacenter: dc1
                   scheme: https
                   tls_config:
@@ -133,7 +133,7 @@ prometheus:
               authorization:
                 credentials_file: /etc/prometheus/certs/vault-token
               consul_sd_configs:
-                - server: consul.day0.sololab
+                - server: consul.day1.sololab
                   datacenter: dc1
                   scheme: https
                   tls_config:
@@ -165,7 +165,7 @@ prometheus:
                   files:
                     - /etc/prometheus/certs/consul-token
               consul_sd_configs:
-                - server: consul.day0.sololab
+                - server: consul.day1.sololab
                   datacenter: dc1
                   scheme: https
                   tls_config:
