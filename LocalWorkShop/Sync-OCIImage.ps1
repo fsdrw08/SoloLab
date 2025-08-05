@@ -2,10 +2,10 @@ $syncList = @"
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.5",
-        "archive": "quay.io_giantswarm_zot-v2.1.5.tar",
+        "publicRepo": "giantswarm/zot:v2.1.7",
+        "archive": "quay.io_giantswarm_zot-v2.1.7.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "giantswarm/zot:v2.1.5",
+        "privateRepo": "giantswarm/zot:v2.1.7",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
     },
     {
@@ -58,10 +58,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:337",
-        "archive": "quay.io_cockpit_ws_337.tar",
+        "publicRepo": "cockpit/ws:343",
+        "archive": "quay.io_cockpit_ws_343.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "cockpit/ws:337",
+        "privateRepo": "cockpit/ws:343",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
@@ -82,10 +82,10 @@ $syncList = @"
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "lldap/lldap:2025-05-19-alpine-rootless",
-        "archive": "docker.io_lldap_lldap_2025-05-19-alpine-rootless.tar",
+        "publicRepo": "lldap/lldap:2025-07-29-alpine-rootless",
+        "archive": "docker.io_lldap_lldap_2025-07-29-alpine-rootless.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "lldap/lldap:2025-05-19-alpine-rootless",
+        "privateRepo": "lldap/lldap:2025-07-29-alpine-rootless",
         "description": "https://hub.docker.com/r/lldap/lldap/tags",
     },
     {
