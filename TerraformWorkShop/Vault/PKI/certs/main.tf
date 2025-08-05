@@ -13,6 +13,7 @@ resource "vault_pki_secret_backend_cert" "cert" {
   ttl         = (each.value.ttl_years * 365 * 24 * 60 * 60)
   common_name = each.value.common_name
   alt_names   = each.value.alt_names
+  ip_sans     = each.value.ip_sans
 }
 
 data "vault_pki_secret_backend_issuers" "issuers" {

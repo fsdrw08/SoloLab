@@ -34,6 +34,7 @@ variable "vault_certs" {
     ttl_years   = number
     common_name = string
     alt_names   = optional(list(string), null)
+    ip_sans     = optional(list(string), null)
     revoke      = optional(bool, null)
   }))
 }

@@ -47,6 +47,22 @@ vault_certs = [
     ttl_years   = 3
     common_name = "nomad.day1.sololab"
   },
+  # https://developer.hashicorp.com/nomad/tutorials/archive/security-enable-tls#agent-certificates
+  # https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad#create-and-populate-the-templates-directory
+  # https://github.com/livioribeiro/nomad-lxd-terraform/blob/0c792716c9824c4c59de349d27b6aa1d1c16b09d/certs.tf#L197
+  {
+    secret_engine = {
+      backend   = "pki/day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "client.global.nomad"
+    alt_names = [
+      "nomad.service.consul",
+      "localhost",
+    ]
+    ip_sans = ["127.0.0.1"]
+  },
   {
     secret_engine = {
       backend   = "pki/day1"
@@ -101,15 +117,4 @@ vault_certs = [
     ttl_years   = 3
     common_name = "prometheus-blackbox-exporter.day1.sololab"
   },
-  # {
-  #   secret_engine = {
-  #     backend   = "pki/day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
-  #   }
-  #   ttl_years   = 3
-  #   common_name = "nomad.day1.sololab"
-  #   alt_names = [
-  #     "nomad.service.consul",
-  #   ]
-  # },
 ]
