@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab:5000
+  imageRegistry: zot.day0.sololab
 traefik:
   containerPorts: []
   containerSecurityContext:
