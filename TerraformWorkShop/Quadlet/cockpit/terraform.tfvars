@@ -5,39 +5,43 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "cockpit"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/cockpit"
-    value_file = "./podman-cockpit/values-sololab.yaml"
-    tls = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "cockpit"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/cockpit"
+      value_file = "./podman-cockpit/values-sololab.yaml"
+      tls = [
         {
-          name          = "cockpit.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "cockpit.tls.contents.server\\.crt"
-          value_ref_key = "cert_pem_chain"
-        },
-        {
-          name          = "cockpit.tls.contents.server\\.key"
-          value_ref_key = "key_pem"
-        }
-      ]
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+          value_sets = [
+            {
+              name          = "cockpit.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "cockpit.tls.contents.server\\.crt"
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "cockpit.tls.contents.server\\.key"
+              value_ref_key = "key_pem"
+            }
+          ]
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "cockpit"
           }
         }
-        cert_name = "cockpit"
-      }
+      ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/cockpit-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/cockpit-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"

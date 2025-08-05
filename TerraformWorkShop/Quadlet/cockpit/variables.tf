@@ -7,17 +7,8 @@ variable "prov_remote" {
   })
 }
 
-# variable "prov_vault" {
-#   type = object({
-#     schema          = string
-#     address         = string
-#     token           = string
-#     skip_tls_verify = bool
-#   })
-# }
-
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -33,7 +24,7 @@ variable "podman_kube" {
         ), null
       )
       tls = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -57,11 +48,12 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
@@ -99,12 +91,5 @@ variable "dns_records" {
     ttl     = number
     records = list(string)
   }))
-}
-
-variable "post_process" {
-  type = map(object({
-    script_path = string
-    vars        = map(string)
-  }))
-  default = null
+  default = []
 }
