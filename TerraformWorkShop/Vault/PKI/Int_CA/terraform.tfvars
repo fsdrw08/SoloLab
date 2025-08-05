@@ -1,6 +1,6 @@
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab:8200"
+  address         = "vault.day1.sololab:8200"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -12,7 +12,7 @@ vault_pki_secret_backend = {
     default_lease_ttl_years = 3
     max_lease_ttl_years     = 3
   }
-  public_fqdn = "vault.day0.sololab"
+  public_fqdn = "vault.day1.sololab"
   role = {
     name = "IntCA-Day1-v1-role-default"
     # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
