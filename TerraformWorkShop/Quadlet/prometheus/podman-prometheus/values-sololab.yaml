@@ -42,15 +42,17 @@ prometheus:
       enabled: true
       image:
         repository: bitnami/prometheus
-        tag: 3.4.1
+        tag: 3.5.0
       containerPorts: []
       livenessProbe:
-        exec:
-          command:
-            - sh
-            - -c
-            - |
-              curl -s -k https://localhost:9090/-/healthy
+        enabled: false
+        # https://github.com/bitnami/containers/issues/82158
+        # exec:
+        #   command:
+        #     - sh
+        #     - -c
+        #     - |
+        #       curl -s -k https://localhost:9090/-/healthy
       resourcesPreset: "small"
       # adopt bitnami image user id
       # https://github.com/bitnami/containers/blob/main/bitnami/prometheus/3/debian-12/Dockerfile

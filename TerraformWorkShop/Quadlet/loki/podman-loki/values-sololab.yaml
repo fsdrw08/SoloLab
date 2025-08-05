@@ -1,8 +1,8 @@
 global:
   imageRegistry: zot.day0.sololab
 loki:
-  image:
-    repository: bitnami/grafana-loki
+  # image:
+  #   repository: bitnami/grafana-loki
   containerPorts:
     - name: http
       containerPort: 3100
@@ -15,12 +15,13 @@ loki:
       hostIP: 127.0.0.1
       protocol: TCP
   livenessProbe:
-    exec:
-      command:
-        - sh
-        - -c
-        - |
-          curl -s -k http://localhost:3100/ready
+    enabled: false
+    # exec:
+    #   command:
+    #     - sh
+    #     - -c
+    #     - |
+    #       curl -s -k http://localhost:3100/ready
   resourcesPreset: "medium"
   config:
     # https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
@@ -117,7 +118,7 @@ loki:
   #   traefik.http.services.loki.loadbalancer.server.port: 3100
   # https://github.com/bitnami/containers/blob/main/bitnami/grafana-loki/3/debian-12/Dockerfile#L54
   podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=1001,gid=1001
+    io.podman.annotations.userns: keep-id:uid=10001,gid=10001
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
