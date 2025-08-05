@@ -29,9 +29,6 @@ terraform {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "System-Day1-Quadlet-Loki"
   }
-  # backend "local" {
-
-  # }
 }
 
 provider "vault" {

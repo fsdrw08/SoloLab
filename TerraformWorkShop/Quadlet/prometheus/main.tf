@@ -19,15 +19,6 @@ data "vault_kv_secret_v2" "certs" {
   name  = each.value.name
 }
 
-# data "vault_kv_secret_v2" "cert" {
-#   # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-#   for_each = var.podman_kube.helm.tls == null ? null : {
-#     for tls in var.podman_kube.helm.tls : tls.vault_kvv2.name => tls
-#   }
-#   mount = each.value.vault_kvv2.mount
-#   name  = each.value.vault_kvv2.name
-# }
-
 # load cert from local tls
 # data "terraform_remote_state" "root_ca" {
 #   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
@@ -96,57 +87,6 @@ data "helm_template" "podman_kubes" {
   ])
 }
 
-# data "helm_template" "podman_kube" {
-#   name  = var.podman_kube.helm.name
-#   chart = var.podman_kube.helm.chart
-
-#   values = [
-#     "${file(var.podman_kube.helm.value_file)}"
-#   ]
-
-#   # v2 helm provider
-#   # normal values
-#   # set = local.helm_value_sets
-#   # dynamic "set" {
-#   #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-#   #   content {
-#   #     name = set.value.name
-#   #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-#   #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-#   #     )
-#   #   }
-#   # }
-#   # # tls
-#   # dynamic "set" {
-#   #   for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
-#   #   content {
-#   #     name  = set.value.name
-#   #     value = local.cert[0][set.value.value_ref_key]
-#   #   }
-#   # }
-
-#   # v3 helm provider
-#   set = flatten([
-#     var.podman_kube.helm.value_sets == null ? [] : [
-#       for value_set in flatten([var.podman_kube.helm.value_sets]) : {
-#         name = value_set.name
-#         value = value_set.value_string != null ? value_set.value_string : templatefile(
-#           "${value_set.value_template_path}", "${value_set.value_template_vars}"
-#         )
-#       }
-#     ],
-#     var.podman_kube.helm.tls == null ? [] : [
-#       for tls in var.podman_kube.helm.tls : [
-#         for value_set in tls.value_sets : {
-#           name = value_set.name
-#           # value = local.cert[0][value_set.value_ref_key]
-#           value = data.vault_kv_secret_v2.cert[tls.vault_kvv2.name].data[value_set.value_ref_key]
-#         }
-#       ]
-#     ],
-#   ])
-# }
-
 resource "remote_file" "podman_kubes" {
   for_each = {
     for podman_kube in var.podman_kubes : podman_kube.helm.name => podman_kube
@@ -154,11 +94,6 @@ resource "remote_file" "podman_kubes" {
   path    = each.value.manifest_dest_path
   content = data.helm_template.podman_kubes[each.key].manifest
 }
-
-# resource "remote_file" "podman_kube" {
-#   path    = var.podman_kube.manifest_dest_path
-#   content = data.helm_template.podman_kube.manifest
-# }
 
 module "podman_quadlet" {
   source  = "../../modules/system-systemd_quadlet"
@@ -192,39 +127,6 @@ module "podman_quadlet" {
     ]
   }
 }
-
-# module "podman_quadlet" {
-#   source  = "../../modules/system-systemd_quadlet"
-#   vm_conn = var.prov_remote
-#   podman_quadlet = {
-#     files = flatten([
-#       for unit in var.podman_quadlet.units : [
-#         for file in unit.files :
-#         {
-#           content = templatefile(
-#             file.template,
-#             file.vars
-#           )
-#           path = join("/", [
-#             var.podman_quadlet.dir,
-#             join(".", [
-#               unit.service.name,
-#               split(".", basename(file.template))[1]
-#             ])
-#           ])
-#         }
-#       ]
-#     ])
-#     services = [
-#       for unit in var.podman_quadlet.units : unit.service == null ? null :
-#       {
-#         name           = unit.service.name
-#         status         = unit.service.status
-#         custom_trigger = md5(remote_file.podman_kube.content)
-#       }
-#     ]
-#   }
-# }
 
 resource "powerdns_record" "records" {
   for_each = {
@@ -262,74 +164,19 @@ resource "grafana_data_source" "data_source" {
   })
 }
 
-resource "grafana_dashboard" "podman" {
-  config_json = templatefile(
+resource "grafana_dashboard" "dashboards" {
+  for_each = toset([
     "./podman-prometheus/podman-exporter-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-
-  )
-}
-
-resource "grafana_dashboard" "blackbox" {
-  config_json = templatefile(
     "./podman-prometheus/Blackbox-Exporter-Full.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-
-  )
-}
-
-resource "grafana_dashboard" "traefik" {
-  config_json = templatefile(
     "./podman-prometheus/traefik-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}
-
-resource "grafana_dashboard" "vault" {
-  config_json = templatefile(
     "./podman-prometheus/vault-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}
-
-resource "grafana_dashboard" "consul" {
-  config_json = templatefile(
     "./podman-prometheus/consul-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}
-
-resource "grafana_dashboard" "minio" {
-  config_json = templatefile(
     "./podman-prometheus/minio-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}
-
-resource "grafana_dashboard" "zot" {
-  config_json = templatefile(
     "./podman-prometheus/zot-dashboard.json",
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}
-
-resource "grafana_dashboard" "loki" {
-  config_json = templatefile(
     "./podman-prometheus/loki-dashboard.json",
+  ])
+  config_json = templatefile(
+    each.key,
     {
       DS_PROMETHEUS = grafana_data_source.data_source.uid
     }

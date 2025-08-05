@@ -19,7 +19,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
-    schema_name = "System-Infra-Quadlet-dufs"
+    schema_name = "System-Day0-Quadlet-dufs"
   }
 }
 

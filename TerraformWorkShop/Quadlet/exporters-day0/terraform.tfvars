@@ -19,38 +19,6 @@ podman_kubes = [
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
   units = [
-    # {
-    #   files = [
-    #     {
-    #       template = "./podman-exporters/prometheus-podman-exporter.container"
-    #       vars = {
-    #         # unit
-    #         Description           = "Prometheus podman exporter"
-    #         Documentation         = "https://github.com/containers/prometheus-podman-exporter"
-    #         After                 = ""
-    #         Wants                 = ""
-    #         StartLimitIntervalSec = 120
-    #         StartLimitBurst       = 3
-    #         # kube
-    #         # yaml          = "prometheus-podman-exporter-aio.yaml"
-    #         # PodmanArgs    = "--tls-verify=false"
-    #         # KubeDownForce = "false"
-    #         # Network       = "host"
-    #         # service
-    #         ExecStartPre  = ""
-    #         ExecStartPost = ""
-    #         Restart       = "on-failure"
-    #         # container
-    #         PodmanArgs = "--tls-verify=false"
-    #         Network    = "host"
-    #       }
-    #     },
-    #   ]
-    #   service = {
-    #     name   = "prometheus-podman-exporter"
-    #     status = "start"
-    #   }
-    # },
     {
       files = [
         {
