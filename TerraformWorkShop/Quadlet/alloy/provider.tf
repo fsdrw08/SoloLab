@@ -29,9 +29,6 @@ terraform {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
     schema_name = "System-Day1-Quadlet-Alloy"
   }
-  # backend "local" {
-
-  # }
 }
 
 provider "vault" {
@@ -41,22 +38,11 @@ provider "vault" {
 }
 
 provider "remote" {
-  alias = "Day0"
   conn {
-    host     = var.prov_remote.0.host
-    port     = var.prov_remote.0.port
-    user     = var.prov_remote.0.user
-    password = var.prov_remote.0.password
-  }
-}
-
-provider "remote" {
-  alias = "Day1"
-  conn {
-    host     = var.prov_remote.1.host
-    port     = var.prov_remote.1.port
-    user     = var.prov_remote.1.user
-    password = var.prov_remote.1.password
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
   }
 }
 

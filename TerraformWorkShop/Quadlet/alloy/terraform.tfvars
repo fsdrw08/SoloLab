@@ -4,54 +4,58 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-prov_remote = [
-  {
-    host     = "192.168.255.10"
-    port     = 22
-    user     = "podmgr"
-    password = "podmgr"
-  },
-  {
-    host     = "192.168.255.20"
-    port     = 22
-    user     = "podmgr"
-    password = "podmgr"
-  }
-]
+prov_remote = {
+  host     = "192.168.255.20"
+  port     = 22
+  user     = "podmgr"
+  password = "podmgr"
+}
 
 prov_grafana = {
   url  = "https://grafana.day1.sololab"
   auth = "admin:admin"
 }
 
-podman_kube = {
-  helm = {
-    name       = "alloy"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/alloy"
-    value_file = "./podman-alloy/values-sololab.yaml"
-    tls = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "alloy"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/alloy"
+      value_file = "./podman-alloy/values-sololab.yaml"
+      tls = [
         {
-          name          = "alloy.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "alloy.tls.contents.alloy\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "alloy.tls.contents.alloy\\.key"
-          value_ref_key = "private_key"
-        },
+          value_sets = [
+            {
+              name          = "alloy.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "alloy.tls.contents.alloy\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "alloy.tls.contents.alloy\\.key"
+              value_ref_key = "private_key"
+            },
+          ]
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "alloy.day1.sololab"
+          }
+        }
       ]
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "alloy.day1.sololab"
-      }
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/alloy-aio.yaml"
+  },
+  {
+    helm = {
+      name       = "prometheus-podman-exporter"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-podman-exporter"
+      value_file = "./podman-exporter/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-podman-exporter-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/alloy-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -86,6 +90,35 @@ podman_quadlet = {
         status = "start"
       }
     },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Prometheus podman exporter"
+            Documentation         = "https://github.com/containers/prometheus-podman-exporter"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
+            yaml          = "prometheus-podman-exporter-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "prometheus-podman-exporter"
+        status = "start"
+      }
+    },
   ]
 }
 
@@ -96,30 +129,12 @@ prov_pdns = {
 
 dns_records = [
   {
-    zone = "day0.sololab."
-    name = "alloy.day0.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "Day0-FCOS.node.consul."
-    ]
-  },
-  {
     zone = "day1.sololab."
     name = "alloy.day1.sololab."
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1.node.consul."
-    ]
-  },
-  {
-    zone = "day0.sololab."
-    name = "prometheus-podman-exporter.day0.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "Day0-FCOS.node.consul."
+      "Day1-FCOS.node.consul."
     ]
   },
   {
@@ -128,7 +143,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1.node.consul."
+      "Day1-FCOS.node.consul."
     ]
   }
 ]

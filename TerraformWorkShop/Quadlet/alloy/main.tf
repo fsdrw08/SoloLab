@@ -1,8 +1,22 @@
 # load cert from vault
-data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-  mount = var.podman_kube.helm.tls.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls.vault_kvv2.name
+locals {
+  tls_vault_kvv2 = flatten([
+    for podman_kube in var.podman_kubes : [
+      for tls in podman_kube.helm.tls == null ? [] : podman_kube.helm.tls : {
+        mount = tls.vault_kvv2.mount
+        name  = tls.vault_kvv2.name
+      }
+    ]
+  ])
+}
+
+data "vault_kv_secret_v2" "certs" {
+  # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
+  for_each = local.tls_vault_kvv2 == null ? null : {
+    for tls_vault_kvv2 in local.tls_vault_kvv2 : tls_vault_kvv2.name => tls_vault_kvv2
+  }
+  mount = each.value.mount
+  name  = each.value.name
 }
 
 # load cert from local tls
@@ -19,12 +33,15 @@ data "vault_kv_secret_v2" "cert" {
 #   ]
 # }
 
-data "helm_template" "podman_kube" {
-  name  = var.podman_kube.helm.name
-  chart = var.podman_kube.helm.chart
+data "helm_template" "podman_kubes" {
+  for_each = {
+    for podman_kube in var.podman_kubes : podman_kube.helm.name => podman_kube
+  }
+  name  = each.value.helm.name
+  chart = each.value.helm.chart
 
   values = [
-    "${file(var.podman_kube.helm.value_file)}"
+    "${file(each.value.helm.value_file)}"
   ]
 
   # v2 helm provider
@@ -50,42 +67,37 @@ data "helm_template" "podman_kube" {
 
   # v3 helm provider
   set = flatten([
-    var.podman_kube.helm.value_sets == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.value_sets]) : {
+    each.value.helm.value_sets == null ? [] : [
+      for value_set in flatten([each.value.helm.value_sets]) : {
         name = value_set.name
         value = value_set.value_string != null ? value_set.value_string : templatefile(
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
     ],
-    var.podman_kube.helm.tls == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
-        name = value_set.name
-        # value = local.cert[0][value_set.value_ref_key]
-        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
-      }
+    each.value.helm.tls == null ? [] : [
+      for tls in each.value.helm.tls : [
+        for value_set in tls.value_sets : {
+          name = value_set.name
+          # value = local.cert[0][value_set.value_ref_key]
+          value = data.vault_kv_secret_v2.certs[tls.vault_kvv2.name].data[value_set.value_ref_key]
+        }
+      ]
     ],
   ])
 }
 
-resource "remote_file" "podman_kube_day0" {
-  provider = remote.Day0
-  path     = var.podman_kube.manifest_dest_path
-  content  = data.helm_template.podman_kube.manifest
-}
-
-resource "remote_file" "podman_kube_day1" {
-  provider = remote.Day1
-  path     = var.podman_kube.manifest_dest_path
-  content  = data.helm_template.podman_kube.manifest
-}
-
-module "podman_quadlet_day0" {
-  source = "../../modules/system-systemd_quadlet"
-  providers = {
-    remote = remote.Day0
+resource "remote_file" "podman_kubes" {
+  for_each = {
+    for podman_kube in var.podman_kubes : podman_kube.helm.name => podman_kube
   }
-  vm_conn = var.prov_remote.0
+  path    = each.value.manifest_dest_path
+  content = data.helm_template.podman_kubes[each.key].manifest
+}
+
+module "podman_quadlet" {
+  source  = "../../modules/system-systemd_quadlet"
+  vm_conn = var.prov_remote
   podman_quadlet = {
     files = flatten([
       for unit in var.podman_quadlet.units : [
@@ -110,45 +122,9 @@ module "podman_quadlet_day0" {
       {
         name           = unit.service.name
         status         = unit.service.status
-        custom_trigger = md5(remote_file.podman_kube_day0.content)
+        custom_trigger = md5(remote_file.podman_kubes[unit.service.name].content)
       }
     ]
-  }
-}
-
-module "podman_quadlet_day1" {
-  source = "../../modules/system-systemd_quadlet"
-  providers = {
-    remote = remote.Day1
-  }
-  vm_conn = var.prov_remote.1
-  podman_quadlet = {
-    services = [
-      for unit in var.podman_quadlet.units : unit.service == null ? null :
-      {
-        name           = unit.service.name
-        status         = unit.service.status
-        custom_trigger = md5(remote_file.podman_kube_day0.content)
-      }
-    ]
-    files = flatten([
-      for unit in var.podman_quadlet.units : [
-        for file in unit.files :
-        {
-          content = templatefile(
-            file.template,
-            file.vars
-          )
-          path = join("/", [
-            var.podman_quadlet.dir,
-            join(".", [
-              unit.service.name,
-              split(".", basename(file.template))[1]
-            ])
-          ])
-        }
-      ]
-    ])
   }
 }
 
@@ -163,50 +139,33 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "traefik_file_provider_day0" {
-#   provider = remote.Day0
-#   path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
-#   content  = file("./podman-alloy/alloy-traefik.yaml")
-# }
-
-resource "remote_file" "traefik_file_provider_day1" {
-  provider = remote.Day1
-  path     = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
-  content  = file("./podman-alloy/alloy-traefik.yaml")
+resource "remote_file" "traefik_file_provider" {
+  path    = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
+  content = file("./podman-alloy/alloy-traefik.yaml")
 }
 
-# resource "remote_file" "consul_service_day0" {
-#   provider = remote.Day0
-#   path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
-#   content  = file("./podman-alloy/service-day0.hcl")
-# }
-
-resource "remote_file" "consul_service_day1" {
-  provider = remote.Day1
-  path     = "/var/home/podmgr/consul-services/service-alloy.hcl"
-  content  = file("./podman-alloy/service-day1.hcl")
+resource "remote_file" "consul_service" {
+  for_each = toset([
+    "./podman-alloy/service-alloy.hcl",
+    "./podman-exporter/service-podman-exporter.hcl"
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 data "grafana_data_source" "data_source" {
   name = "prometheus"
 }
 
-resource "grafana_dashboard" "podman" {
-  config_json = templatefile(
-    "./podman-alloy/podman-exporter-dashboard.json",
-    {
-      DS_PROMETHEUS = data.grafana_data_source.data_source.uid
-    }
-
-  )
-}
-
-resource "grafana_dashboard" "node" {
-  config_json = templatefile(
+resource "grafana_dashboard" "dashboards" {
+  for_each = toset([
+    # "./podman-alloy/podman-exporter-dashboard.json",
     "./podman-alloy/Node-Exporter-Full.json",
+  ])
+  config_json = templatefile(
+    each.key,
     {
       DS_PROMETHEUS = data.grafana_data_source.data_source.uid
     }
-
   )
 }

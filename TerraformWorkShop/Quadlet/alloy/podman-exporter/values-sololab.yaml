@@ -1,0 +1,37 @@
+global:
+  imageRegistry: zot.day0.sololab
+exporter:
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 65534
+    seLinuxOptions:
+      type: spc_t
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.podman-exporter-redirect.entrypoints: web
+    traefik.http.routers.podman-exporter-redirect.rule: Host(`prometheus-podman-exporter.day1.sololab`)
+    traefik.http.routers.podman-exporter-redirect.middlewares: toHttps@file
+    traefik.http.routers.podman-exporter-redirect.service: podman-exporter
+
+    traefik.http.routers.podman-exporter.entrypoints: webSecure
+    traefik.http.routers.podman-exporter.rule: Host(`prometheus-podman-exporter.day1.sololab`)
+    traefik.http.routers.podman-exporter.tls: true
+    traefik.http.routers.podman-exporter.service: podman-exporter
+
+    traefik.http.services.podman-exporter.loadbalancer.server.port: 9882
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=65534,gid=65534
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+    - name: CONTAINER_HOST
+      value: unix:///run/podman/podman.sock
+  extraVolumeMounts:
+    - name: podman-socket
+      mountPath: /run/podman/podman.sock
+      readOnly: true
+  extraVolumes:
+    - name: podman-socket
+      hostPath:
+        path: /run/user/1001/podman/podman.sock
+        type: Socket
