@@ -4,7 +4,7 @@ storage:
   # data disk
   disks:
     - device: /dev/sdb
-      wipe_table: true
+      wipe_table: false
       partitions:
         - label: 1001
           number: 1
