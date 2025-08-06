@@ -10,10 +10,10 @@ dufs:
     traefik.http.routers.dufs-http.rule: Host(`dufs.day0.sololab`)
     traefik.http.routers.dufs-http.service: dufs
 
-    # traefik.http.routers.dufs.entrypoints: webSecure
-    # traefik.http.routers.dufs.rule: Host(`dufs.day0.sololab`)
-    # traefik.http.routers.dufs.tls: true
-    # traefik.http.routers.dufs.service: dufs
+    traefik.http.routers.dufs.entrypoints: webSecure
+    traefik.http.routers.dufs.rule: Host(`dufs.day0.sololab`)
+    traefik.http.routers.dufs.tls: true
+    traefik.http.routers.dufs.service: dufs
 
     # traefik.http.services.dufs.loadBalancer.serversTransport: dufs@file
     # traefik.http.services.dufs.loadbalancer.server.scheme: https
