@@ -6,3 +6,12 @@ variable "prov_system" {
     password = string
   })
 }
+
+variable "prov_vault" {
+  type = object({
+    schema          = string
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}

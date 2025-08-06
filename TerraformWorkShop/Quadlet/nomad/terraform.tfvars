@@ -131,6 +131,6 @@ dns_record = {
   type = "CNAME"
   ttl  = 86400
   records = [
-    "day1-fcos.node.consul."
+    "Day1-FCOS.node.consul."
   ]
 }

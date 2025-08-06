@@ -52,12 +52,71 @@ resource "null_resource" "bin" {
   }
 }
 
+# prepare nomad config dir
+resource "system_folder" "config" {
+  count = var.config.create_dir == true ? 1 : 0
+  path  = var.config.dir
+  user  = var.runas.user
+  group = var.runas.group
+  mode  = "777"
+}
+
 # persist nomad config file in dir
 resource "system_file" "config" {
-  path    = join("/", [var.config.dir, basename(var.config.main.basename)])
-  content = var.config.main.content
-  user    = var.runas.user
-  group   = var.runas.group
+  depends_on = [system_folder.config]
+  path       = join("/", [var.config.dir, basename(var.config.main.basename)])
+  content    = var.config.main.content
+  user       = var.runas.user
+  group      = var.runas.group
+  mode       = "666"
+}
+
+
+resource "system_folder" "certs" {
+  depends_on = [system_folder.config]
+  count      = var.config.tls == null ? 0 : 1
+  path       = join("/", [var.config.dir, var.config.tls.sub_dir])
+  uid        = var.runas.uid
+  gid        = var.runas.gid
+  mode       = "700"
+}
+
+resource "system_file" "ca" {
+  count = var.config.tls == null ? 0 : 1
+  depends_on = [
+    system_folder.config,
+    system_folder.certs
+  ]
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.ca_basename])
+  content = var.config.tls.ca_content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
+  mode    = "600"
+}
+
+resource "system_file" "cert" {
+  count = var.config.tls == null ? 0 : 1
+  depends_on = [
+    system_folder.config,
+    system_folder.certs
+  ]
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.cert_basename])
+  content = var.config.tls.cert_content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
+  mode    = "600"
+}
+
+resource "system_file" "key" {
+  count = var.config.tls == null ? 0 : 1
+  depends_on = [
+    system_folder.config,
+    system_folder.certs
+  ]
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.key_basename])
+  content = var.config.tls.key_content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -83,6 +142,7 @@ resource "system_file" "service" {
 
 # this resource is only in charge to stop the service when tf resource destroy
 resource "null_resource" "service_stop" {
+  depends_on = [system_file.service]
   triggers = {
     service_name = trimsuffix(system_file.service.basename, ".service")
     host         = var.vm_conn.host
@@ -114,13 +174,17 @@ resource "null_resource" "service_mgmt" {
   depends_on = [
     null_resource.bin,
     system_file.config,
+    system_file.ca,
+    system_file.cert,
+    system_file.key,
     system_file.service,
+    null_resource.service_stop
   ]
   triggers = {
     service_name   = trimsuffix(system_file.service.basename, ".service")
     service_status = var.service.status
-    config_md5     = system_file.config.md5sum
-    bin_md5        = system_file.zip.md5sum
+    config_md5     = md5(system_file.config.content)
+    bin_md5        = md5(system_file.zip.content)
   }
   connection {
     type        = "ssh"

@@ -20,7 +20,9 @@ variable "runas" {
   type = object({
     take_charge = optional(bool, false)
     user        = string
+    uid         = number
     group       = string
+    gid         = string
   })
 }
 
@@ -30,7 +32,21 @@ variable "config" {
       basename = string
       content  = string
     })
-    dir = string
+    tls = optional(object({
+      ca_basename   = string
+      ca_content    = string
+      cert_basename = string
+      cert_content  = string
+      key_basename  = string
+      key_content   = string
+      sub_dir       = string
+    }))
+    env = optional(object({
+      basename = string
+      content  = string
+    }))
+    dir        = string
+    create_dir = bool
   })
 }
 
@@ -39,8 +55,8 @@ variable "service" {
     status  = string
     enabled = bool
     systemd_service_unit = object({
-      content = string
       path    = string
+      content = string
     })
   })
 }

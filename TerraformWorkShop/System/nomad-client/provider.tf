@@ -11,7 +11,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
-    schema_name = "System-Infra-System-Nomad_Client"
+    schema_name = "System-Day1-System-Nomad_Client"
   }
 }
 
@@ -24,4 +24,11 @@ provider "system" {
     password = var.prov_system.password
   }
   sudo = true
+}
+
+provider "vault" {
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
