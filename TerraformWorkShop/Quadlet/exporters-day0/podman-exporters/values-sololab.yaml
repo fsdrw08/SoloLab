@@ -1,11 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 exporter:
-  containerSecurityContext:
-    enabled: true
-    runAsUser: 65534
-    seLinuxOptions:
-      type: spc_t
   podLabels:
     traefik.enable: true
     traefik.http.routers.podman-exporter-redirect.entrypoints: web
@@ -19,8 +14,6 @@ exporter:
     traefik.http.routers.podman-exporter.service: podman-exporter
 
     traefik.http.services.podman-exporter.loadbalancer.server.port: 9882
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=65534,gid=65534
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
