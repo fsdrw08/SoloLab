@@ -1,0 +1,16 @@
+global:
+  imageRegistry: zot.day0.sololab
+redis:
+  containerPorts: []
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  configFiles:
+    redis:
+      include:
+        - /etc/redis/acl.conf
+    acl:
+      user:
+        - default off
+        - admin on ~* +@all >P@ssw0rd
+        - gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
