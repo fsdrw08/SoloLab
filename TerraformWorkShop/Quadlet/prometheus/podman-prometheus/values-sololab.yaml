@@ -65,6 +65,12 @@ prometheus:
       configFiles:
         main:
           scrape_configs:
+            # the blackbox exporter implements the multi-target exporter pattern, this config tell prometheus to:
+            # 1. get target data from consul service definition's metadata, only keep the data which the service has `address` metadata
+            # 2. assemble the metadata to an url, pass the url info to the `instance` label
+            # 3. config blackbox exporter url by internal label __scheme__ and __address__
+            # finally, prometheus will send http request to: `scheme`://`address`/`probe?module=http_2xx&target=${instance}`
+            # ref: https://prometheus.io/docs/guides/multi-target-exporter/#querying-multi-target-exporters-with-prometheus:~:text=To%20fix%20this%2C%20we%20will%20use%20relabeling.
             - job_name: blackbox_exporter
               scrape_interval: 15s
               scrape_timeout: 5s
@@ -102,6 +108,11 @@ prometheus:
                   replacement: https
                 - target_label: __address__
                   replacement: prometheus-blackbox-exporter.day1.sololab
+            # this config tell prometheus to:
+            # 1. get target data from consul service definition's metadata, only keep the data which the service has `exporter` tag
+            # 2. assemble the service's metadata to an url, format:
+            # `scheme`://`address`:`port`/`metrics_path`?`metrics_path_param_<key>=metrics_path_param_<value>`
+            # finally, prometheus send request to the url above
             - job_name: general_exporter_consul_sd
               tls_config:
                 insecure_skip_verify: true
