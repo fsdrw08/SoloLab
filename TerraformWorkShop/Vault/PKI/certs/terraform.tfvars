@@ -115,6 +115,6 @@ vault_certs = [
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "prometheus-blackbox-exporter.day1.sololab"
+    common_name = "redis-insight.day1.sololab"
   },
 ]

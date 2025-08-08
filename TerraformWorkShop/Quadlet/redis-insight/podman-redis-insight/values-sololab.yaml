@@ -1,0 +1,24 @@
+global:
+  imageRegistry: zot.day0.sololab
+redisInsight:
+  containerPorts: []
+  config:
+    RI_SERVER_TLS_CERT: /tls/server.crt
+    RI_SERVER_TLS_KEY: /tls/server.key
+    RI_ENCRYPTION_KEY: somepassword
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.redisInsight-redirect.entrypoints: web
+    traefik.http.routers.redisInsight-redirect.rule: Host(`redis-insight.day1.sololab`)
+    traefik.http.routers.redisInsight-redirect.middlewares: toHttps@file
+    traefik.http.routers.redisInsight-redirect.service: redisInsight
+
+    traefik.http.routers.redisInsight.entrypoints: webSecure
+    traefik.http.routers.redisInsight.rule: Host(`redis-insight.day1.sololab`)
+    traefik.http.routers.redisInsight.tls: true
+    traefik.http.routers.redisInsight.service: redisInsight
+
+    traefik.http.services.redisInsight.loadBalancer.serversTransport: redis-insight@file
+    traefik.http.services.redisInsight.loadbalancer.server.scheme: https
+    traefik.http.services.redisInsight.loadbalancer.server.port: 5540
