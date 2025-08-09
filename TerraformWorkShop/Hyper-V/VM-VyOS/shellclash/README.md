@@ -7,6 +7,7 @@ ref:
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.8.0\*"
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.0\*"
 $debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.1\*"
+$debPath = "$env:USERPROFILE\OneDrive\Software\Network\shellclash-linux\1.9.1-pre\*"
 # or 
 $debPath = "$env:USERPROFILE\OneDrive - Company Ltd\Software\Network\shellclash-linux\1.9.1\*"
 scp $debPath vyos:/tmp/
@@ -25,7 +26,7 @@ echo "alias clash=\"bash /usr/share/ShellCrash/menu.sh\"" >> ~/.bashrc
 echo "export CRASHDIR=\"/usr/share/ShellCrash\"" >> ~/.bashrc
 source ~/.bashrc
 # launch clash 
-clash
+crash
 ```
 ```shell
 echo "alias clash=\"bash /usr/share/clash/clash.sh\"" >> ~/.bashrc
@@ -49,6 +50,7 @@ v1.8.0
 
 v1.9.1
 - 2 内核功能设置 -> 2 切换DNS运行模式 -> 4 DNS进阶设置 -> 7 禁用DNS劫持
+- 7 内核进阶设置 ->  5 自定义端口及秘钥 -> 8 自定义本机host地址
 <!-- 
 1. install shellclash:
 from vyos, run 

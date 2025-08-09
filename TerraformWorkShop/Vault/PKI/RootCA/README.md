@@ -11,15 +11,17 @@ Prepare a root cert key bundle first, see [../../../TLS/RootCA/](../../../TLS/Ro
 
 
 ### apply the whole tf resource 
-To create offline root ca, uncomment 
-```
+To create offline root ca, in [terraform.tfvars](./terraform.tfvars) uncomment 
+```h
 ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
 ```
 and comment 
-```
+```h
 ref_cert_bundle_path           = ""
 ```
-in tfvars, then run terraform apply
+then save the file.
+
+Run terraform apply
 ```powershell
 terraform plan
 terraform apply --auto-approve

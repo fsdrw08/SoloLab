@@ -1,0 +1,1 @@
+if this is the first time to deploy zot, in [../../../HelmWorkShop/helm-charts/charts/pdns](../../../HelmWorkShop/helm-charts/charts/pdns), run `helm dependency build`

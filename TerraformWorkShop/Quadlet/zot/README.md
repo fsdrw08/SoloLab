@@ -1,0 +1,1 @@
+if this is the first time to deploy zot, build helm dependency in [../../../HelmWorkShop/helm-charts/charts/zot](../../../HelmWorkShop/helm-charts/charts/zot)

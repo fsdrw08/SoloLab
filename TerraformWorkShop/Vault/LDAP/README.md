@@ -1,3 +1,5 @@
+TF resources in this dir are used to config Vault LDAP auth, and sync LDAP user/group to Vault
+
 ```powershell
 terraform init
 terraform state rm $(terraform state list)

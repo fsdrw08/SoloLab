@@ -1,0 +1,1 @@
+Before run script to sync the image, install skopeo first, download skopeo for windows from https://github.com/passcod/winskopeo/releases, then put it in C:\Windows\
