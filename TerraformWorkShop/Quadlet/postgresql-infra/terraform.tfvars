@@ -5,41 +5,45 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "tfbackend-pg"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
-    value_file = "./podman-postgresql/values-sololab.yaml"
-    value_sets = [
-      {
-        name         = "fullnameOverride"
-        value_string = "tfbackend-pg"
-      }
-    ]
-    tls = {
+podman_kubes = [
+  {
+    helm = {
+      name       = "tfbackend-pg"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
+      value_file = "./podman-postgresql/values-sololab.yaml"
       value_sets = [
         {
-          name          = "postgresql.ssl.contents.tls\\.crt"
-          value_ref_key = "cert_pem_chain"
-        },
-        {
-          name          = "postgresql.ssl.contents.tls\\.key"
-          value_ref_key = "key_pem"
+          name         = "fullnameOverride"
+          value_string = "tfbackend-pg"
         }
       ]
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+      tls = [
+        {
+          value_sets = [
+            {
+              name          = "postgresql.ssl.contents.tls\\.crt"
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "postgresql.ssl.contents.tls\\.key"
+              value_ref_key = "key_pem"
+            }
+          ]
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "tfbackend-pg"
           }
         }
-        cert_name = "tfbackend-pg"
-      }
+      ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/tfbackend-pg-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/tfbackend-pg-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -83,12 +87,14 @@ prov_pdns = {
   insecure_https = true
 }
 
-dns_record = {
-  zone = "day0.sololab."
-  name = "tfbackend-pg.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
-  ]
-}
+dns_records = [
+  {
+    zone = "day0.sololab."
+    name = "tfbackend-pg.day0.sololab."
+    type = "A"
+    ttl  = 86400
+    records = [
+      "192.168.255.10"
+    ]
+  }
+]

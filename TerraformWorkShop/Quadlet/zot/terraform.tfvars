@@ -5,39 +5,43 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "zot"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/zot"
-    value_file = "./podman-zot/values-sololab.yaml"
-    tls = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "zot"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/zot"
+      value_file = "./podman-zot/values-sololab.yaml"
+      tls = [
         {
-          name          = "zot.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "zot.tls.contents.server\\.crt"
-          value_ref_key = "cert_pem_chain"
-        },
-        {
-          name          = "zot.tls.contents.server\\.key"
-          value_ref_key = "key_pem"
-        }
-      ]
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
+          value_sets = [
+            {
+              name          = "zot.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "zot.tls.contents.server\\.crt"
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "zot.tls.contents.server\\.key"
+              value_ref_key = "key_pem"
+            }
+          ]
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "zot"
           }
         }
-        cert_name = "zot"
-      }
+      ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/zot-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/zot-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"

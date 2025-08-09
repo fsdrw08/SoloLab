@@ -7,8 +7,8 @@ variable "prov_remote" {
   })
 }
 
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -24,7 +24,7 @@ variable "podman_kube" {
         ), null
       )
       tls = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -48,11 +48,12 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
@@ -82,12 +83,13 @@ variable "prov_pdns" {
   })
 }
 
-variable "dns_record" {
-  type = object({
+variable "dns_records" {
+  type = list(object({
     zone    = string
     name    = string
     type    = string
     ttl     = number
     records = list(string)
-  })
+  }))
+  default = []
 }
