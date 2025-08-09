@@ -33,8 +33,8 @@ vm = {
   power_state        = "Off"
   memory = {
     dynamic       = true
-    startup_bytes = 2046820352
-    maximum_bytes = 2046820352
+    startup_bytes = 4093640704
+    maximum_bytes = 4093640704
     minimum_bytes = 1023410176
   }
 }
