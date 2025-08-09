@@ -2,11 +2,11 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.2.1"
+      version = ">= 1.2.1"
     }
     null = {
       source  = "hashicorp/null"
-      version = ">=3.2.2"
+      version = ">= 3.2.2"
     }
     # ignition = {
     #   source  = "community-terraform-providers/ignition"
@@ -14,15 +14,15 @@ terraform {
     # }
     ct = {
       source  = "poseidon/ct"
-      version = ">=0.13.0"
+      version = ">= 0.13.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = ">=2.5.1"
+      version = ">= 2.5.1"
     }
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
   }
   backend "pg" {

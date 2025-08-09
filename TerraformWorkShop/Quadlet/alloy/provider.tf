@@ -6,7 +6,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -22,7 +22,7 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 3.25.1"
+      version = ">= 4.3.0"
     }
   }
   backend "pg" {

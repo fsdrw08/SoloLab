@@ -1,5 +1,9 @@
 terraform {
   required_providers {
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">= 4.0.5"
+    }
     hyperv = {
       source  = "taliesins/hyperv"
       version = ">= 1.2.1"
@@ -44,6 +48,10 @@ terraform {
       source  = "l-with/ldap"
       version = "<= 0.9.1"
     }
+    consul = {
+      source  = "hashicorp/consul"
+      version = ">= 2.22.0"
+    }
     nomad = {
       source  = "hashicorp/nomad"
       version = ">= 2.5.0"
@@ -54,7 +62,7 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 3.25.1"
+      version = ">= 4.3.0"
     }
     system = {
       source  = "neuspaces/system"

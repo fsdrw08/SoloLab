@@ -22,7 +22,7 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 3.25.1"
+      version = ">= 4.3.0"
     }
   }
   backend "pg" {

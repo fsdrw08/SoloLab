@@ -2,19 +2,19 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.13.2"
+      version = ">= 3.0.2"
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.1.3"
+      version = ">= 0.1.3"
     }
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
   }
   # backend "pg" {

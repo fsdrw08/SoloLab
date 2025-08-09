@@ -6,7 +6,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -14,15 +14,15 @@ terraform {
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.1.3"
+      version = ">= 0.1.3"
     }
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 3.25.1"
+      version = ">= 4.3.0"
     }
   }
   backend "pg" {
