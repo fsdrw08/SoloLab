@@ -40,6 +40,12 @@ module "consul_jwt_auth_policy_bindings" {
   ]
 }
 
+resource "vault_mount" "kvv2" {
+  path        = "kvv2/consul"
+  type        = "kv-v2"
+  description = "kvv2 secret backend for consul"
+}
+
 # resource "vault_consul_secret_backend_role" "admin" {
 #   name    = "admin"
 #   backend = vault_consul_secret_backend.backend.path

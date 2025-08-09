@@ -38,8 +38,3 @@ module "consul_auto_config_policy_bindings" {
 
 }
 
-resource "vault_mount" "kvv2" {
-  path        = "kvv2/consul"
-  type        = "kv-v2"
-  description = "kvv2 secret backend for consul"
-}
