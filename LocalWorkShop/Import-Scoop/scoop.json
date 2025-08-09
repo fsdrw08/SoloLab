@@ -1,0 +1,60 @@
+{
+    "apps": [
+        {
+            "Version": "25.01",
+            "Name": "7zip",
+            "Info": "",
+            "Source": "main",
+            "Updated": "2025-08-09T12:17:54.7824524+08:00"
+        },
+        {
+            "Version": "1.6.1",
+            "Name": "clash-nyanpasu",
+            "Info": "",
+            "Source": "extras",
+            "Updated": "2025-08-09T11:36:39.6029563+08:00"
+        },
+        {
+            "Version": "1.2.3",
+            "Name": "oras",
+            "Info": "",
+            "Source": "extras",
+            "Updated": "2025-08-09T11:51:22.206329+08:00"
+        },
+        {
+            "Version": "2.56",
+            "Name": "oscdimg",
+            "Info": "",
+            "Source": "main",
+            "Updated": "2025-08-09T12:17:56.3044602+08:00"
+        },
+        {
+            "Version": "1.14.1",
+            "Name": "packer",
+            "Info": "",
+            "Source": "main",
+            "Updated": "2025-08-09T11:52:50.269005+08:00"
+        },
+        {
+            "Version": "1.12.2",
+            "Name": "terraform",
+            "Info": "",
+            "Source": "main",
+            "Updated": "2025-08-09T11:52:57.6710421+08:00"
+        }
+    ],
+    "buckets": [
+        {
+            "Name": "main",
+            "Source": "https://github.com/ScoopInstaller/Main",
+            "Updated": "2025-08-09T08:42:14+08:00",
+            "Manifests": 1398
+        },
+        {
+            "Name": "extras",
+            "Source": "https://github.com/ScoopInstaller/Extras",
+            "Updated": "2025-08-09T08:40:32+08:00",
+            "Manifests": 2177
+        }
+    ]
+}

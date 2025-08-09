@@ -1,10 +1,14 @@
-$syncList = Get-Content .\Day0.jsonc
-$syncList = Get-Content .\Day1.jsonc
+$repoDir = git rev-parse --show-toplevel
+$syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day0.jsonc")
+# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day1.jsonc")
 
 $localDir="$env:PUBLIC/Downloads/containers"
 # $localDir="C:/Users/Public/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
-# Test-Path -Path $localDir
+if (-not (Test-Path -Path $localDir)) {
+    New-Item -ItemType Directory -Path $localDir -Force
+}
+
 
 $proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"

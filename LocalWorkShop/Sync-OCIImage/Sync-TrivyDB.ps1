@@ -21,6 +21,9 @@ $syncList = @"
 $localDir = "$env:PUBLIC/Downloads/containers/trivy"
 # $localDir="D:/Users/Public/Downloads/containers"
 # go to local oci archive dir
+if (-not (Test-Path $localDir)) {
+    New-Item -ItemType Directory -Path $localDir -Force
+}
 Set-Location -Path $localDir
 
 # set internet proxy for download

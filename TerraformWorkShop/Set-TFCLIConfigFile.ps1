@@ -2,7 +2,8 @@
 
 # $projectPath = git rev-parse --show-toplevel
 # $mirrorPath = "$projectPath/TerraformWorkShop/terraform.d/mirror" 
-# set up terraform provider mirror dir "C:/Users/Public/Downloads/terraform.d/mirror" 
+# run command: (should run by powershell 7+):
+# terraform providers mirror "C:/Users/Public/Downloads/terraform.d/mirror" 
 $mirrorPathWin = Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/mirror"
 if (-not (Test-Path -Path $mirrorPathWin)) {
   New-Item -ItemType Directory -Path $mirrorPathWin
