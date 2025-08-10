@@ -6,7 +6,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -18,7 +18,7 @@ terraform {
     }
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
     grafana = {
       source  = "grafana/grafana"

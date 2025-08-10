@@ -29,7 +29,7 @@ services {
 services {
   id   = "prometheus-blackbox-exporter"
   name = "prometheus-blackbox-exporter"
-  port = 9115
+  port = 443 # 9115
 
   checks = [
     {

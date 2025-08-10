@@ -67,26 +67,26 @@ podman_kubes = [
             name  = "token-prometheus"
           }
         },
-        {
-          value_sets = [
-            # {
-            #   name          = "prometheus.containers.blackboxExporter.tls.contents.ca\\.crt"
-            #   value_ref_key = "ca"
-            # },
-            {
-              name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.key"
-              value_ref_key = "private_key"
-            },
-          ]
-          vault_kvv2 = {
-            mount = "kvv2/certs"
-            name  = "prometheus-blackbox-exporter.day1.sololab"
-          }
-        }
+        # {
+        #   value_sets = [
+        #     # {
+        #     #   name          = "prometheus.containers.blackboxExporter.tls.contents.ca\\.crt"
+        #     #   value_ref_key = "ca"
+        #     # },
+        #     {
+        #       name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.crt"
+        #       value_ref_key = "cert"
+        #     },
+        #     {
+        #       name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.key"
+        #       value_ref_key = "private_key"
+        #     },
+        #   ]
+        #   vault_kvv2 = {
+        #     mount = "kvv2/certs"
+        #     name  = "prometheus-blackbox-exporter.day1.sololab"
+        #   }
+        # }
       ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
