@@ -1,4 +1,10 @@
 http:
+  # serversTransports:
+  #   loki:
+  #     serverName: loki.day1.sololab
+  #     rootcas:
+  #       - "/etc/traefik/tls/ca.crt"
+  #   insecureSkipVerify: true
   routers:
     loki-redirect:
       entryPoints:
@@ -13,9 +19,6 @@ http:
       rule: Host(`loki.day1.sololab`)
       service: loki
       tls: true
-  # serversTransports:
-  #   loki:
-  #     insecureSkipVerify: true
   services:
     loki:
       loadBalancer:

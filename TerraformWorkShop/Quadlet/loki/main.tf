@@ -178,13 +178,15 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-  content = file("./podman-loki/loki-traefik.yaml")
+  depends_on = [module.podman_quadlet]
+  path       = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
+  content    = file("./podman-loki/loki-traefik.yaml")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-loki.hcl"
-  content = file("./podman-loki/service.hcl")
+  depends_on = [module.podman_quadlet]
+  path       = "/var/home/podmgr/consul-services/service-loki.hcl"
+  content    = file("./podman-loki/service.hcl")
 }
 
 resource "grafana_data_source" "data_source" {
