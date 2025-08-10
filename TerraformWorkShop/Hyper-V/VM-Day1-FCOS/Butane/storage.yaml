@@ -6,13 +6,22 @@ storage:
     - device: /dev/sdb
       wipe_table: false
       partitions:
-        - label: data
+        - label: 1000
           number: 1
-          size_mib: 0
+          size_mib: 40959
+        - label: 1001
+          number: 2
+          size_mib: 40959
   filesystems:
-    - device: /dev/disk/by-partlabel/data
+    - device: /dev/disk/by-partlabel/1000
+      format: xfs
+      path: /var/home/core
+      wipe_filesystem: false
+      label: 1000
+      with_mount_unit: true
+    - device: /dev/disk/by-partlabel/1001
       format: xfs
       path: /var/home/podmgr
       wipe_filesystem: false
-      label: data
+      label: 1001
       with_mount_unit: true

@@ -4,26 +4,17 @@ version: 1.5.0
 # config users
 passwd:
   users:
-    # set core user password and ssh key
-    - name: core
-      groups:
-        - wheel
-        - sudo
-      # to gen password hash
-      # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
-      password_hash: ${core_password_hash}
-      ssh_authorized_keys:
-        - "${core_ssh_authorized_keys}"
     # set rootless user password and ssh key
     - name: podmgr
       uid: 1001
       # to gen password hash
       # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
-      password_hash: ${podmgr_password_hash}
+      password_hash: ${password_hash_1001}
       ssh_authorized_keys:
-        - "${podmgr_ssh_authorized_keys}"
+        - "${ssh_authorized_keys_1001}"
 storage:
   files:
+    # podmgr
     # enable lingering to make user level service able to auto start on boot
     - path: /var/lib/systemd/linger/podmgr
     # source bash auto completion
@@ -64,12 +55,6 @@ storage:
   # set rootless user home dir to external disk
   directories:
     - path: /var/home/podmgr
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
-    - path: /var/home/podmgr/traefik-file-provider
       mode: 0700
       user:
         id: 1001
