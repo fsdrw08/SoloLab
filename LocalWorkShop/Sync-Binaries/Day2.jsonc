@@ -1,0 +1,19 @@
+[
+    {
+        "publicRegistry": "https://releases.hashicorp.com",
+        "publicRepo": "consul/1.21.3/consul_1.21.3_linux_amd64.zip",
+        "archive": "consul_1.21.3_linux_amd64.zip",
+        "privateRegistry": "https://dufs.day0.sololab/",
+        "privateRepo": "binaries/consul_1.21.3_linux_amd64.zip",
+        "description": "https://releases.hashicorp.com/consul",
+    },
+    {
+        // https://releases.hashicorp.com/nomad/1.10.3/nomad_1.10.3_linux_amd64.zip
+        "publicRegistry": "https://releases.hashicorp.com",
+        "publicRepo": "nomad/1.10.3/nomad_1.10.3_linux_amd64.zip",
+        "archive": "nomad_1.10.3_linux_amd64.zip",
+        "privateRegistry": "https://dufs.day0.sololab/",
+        "privateRepo": "binaries/nomad_1.10.3_linux_amd64.zip",
+        "description": "https://releases.hashicorp.com/nomad",
+    },
+]
