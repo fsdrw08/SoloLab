@@ -25,7 +25,7 @@ vault_pki_secret_backend = {
     key_type         = "rsa"
     key_bits         = 4096
     allow_ip_sans    = true
-    allowed_domains  = ["day1.sololab", "day1.service.consul"]
+    allowed_domains  = ["sololab", "consul"]
     allow_subdomains = true
     allow_any_name   = true
   }
