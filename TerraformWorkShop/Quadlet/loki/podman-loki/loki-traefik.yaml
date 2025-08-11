@@ -4,7 +4,7 @@ http:
   #     serverName: loki.day1.sololab
   #     rootcas:
   #       - "/etc/traefik/tls/ca.crt"
-  #   insecureSkipVerify: true
+  #     insecureSkipVerify: true
   routers:
     loki-redirect:
       entryPoints:
