@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -12,31 +12,42 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-podman_kube = {
-  helm = {
-    name       = "consul"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
-    value_file = "./podman-consul/values-sololab.yaml"
-    tls = {
-      tfstate = {
-        backend = {
-          type = "local"
-          config = {
-            path = "../../TLS/RootCA/terraform.tfstate"
-          }
-        }
-        cert_name = "consul"
-      }
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "consul"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
+      value_file = "./podman-consul/values-sololab.yaml"
+      tls = [
         {
-          name          = "consul.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
+          value_sets = [
+            {
+              name          = "consul.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+          ]
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "root"
+          }
+        },
+        {
+          value_sets = [
+            {
+              name          = "consul.configFiles.main.acl.tokens.default"
+              value_ref_key = "token"
+            },
+          ]
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "token-consul_client"
+          }
         },
       ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -61,9 +72,11 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration\""
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run consul-agent\""
-            Restart       = "on-failure"
+            # ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration\""
+            # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run consul-agent\""
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = ""
           }
         }
       ]
@@ -91,13 +104,22 @@ prov_pdns = {
 }
 
 dns_records = [
+  # {
+  #   zone = "day1.sololab."
+  #   name = "consul-client.day1.sololab."
+  #   type = "CNAME"
+  #   ttl  = 86400
+  #   records = [
+  #     "day1.node.consul."
+  #   ]
+  # },
   {
-    zone = "day1.sololab."
-    name = "consul-client.day1.sololab."
-    type = "CNAME"
+    zone = "day0.sololab."
+    name = "consul-client.day0.sololab."
+    type = "A"
     ttl  = 86400
     records = [
-      "day1.node.consul."
+      "192.168.255.10"
     ]
-  },
+  }
 ]

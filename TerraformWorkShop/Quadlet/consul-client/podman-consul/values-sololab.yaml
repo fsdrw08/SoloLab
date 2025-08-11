@@ -40,24 +40,30 @@ consul:
     main:
       acl:
         tokens:
-          default: e95b599e-166e-7d80-08ad-aee76e7ddf19
-      auto_config:
-        enabled: true
-        server_addresses:
-          - consul.day0.sololab
+          default: # set by terraform data
+      # auto_config:
+      #   enabled: true
+      #   server_addresses:
+      #     - consul.day0.sololab
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
       client_addr: "0.0.0.0"
+      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
       ports:
         https: 8501
+      retry_join:
+        - consul.day1.sololab
       server: false
       tls:
         defaults:
           ca_file: /consul/config/certs/ca.crt
           verify_incoming: false
           verify_outgoing: true
+          verify_server_hostname: true
         internal_rpc:
           verify_server_hostname: true
+      auto_encrypt:
+        tls: true
   ## @param consul.command Override default container command (useful when using custom images)
   ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
   ## this command is used to set the advertise ip to host ip when consul start
@@ -111,12 +117,12 @@ consul:
   podLabels:
     traefik.enable: true
     traefik.http.routers.consul-redirect.entrypoints: web
-    traefik.http.routers.consul-redirect.rule: Host(`consul-client.day1.sololab`)
+    traefik.http.routers.consul-redirect.rule: Host(`consul-client.day0.sololab`)
     traefik.http.routers.consul-redirect.middlewares: toHttps@file
     traefik.http.routers.consul-redirect.service: consul
 
     traefik.http.routers.consul.entrypoints: webSecure
-    traefik.http.routers.consul.rule: Host(`consul-client.day1.sololab`)
+    traefik.http.routers.consul.rule: Host(`consul-client.day0.sololab`)
     traefik.http.routers.consul.tls.certresolver: internal
     traefik.http.routers.consul.service: consul
 
@@ -124,7 +130,7 @@ consul:
     traefik.http.services.consul.loadbalancer.server.scheme: https
     traefik.http.services.consul.loadbalancer.server.port: 8501
     # traefik.tcp.routers.consul-web.entrypoints: webSecure
-    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day1.sololab`)
+    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day0.sololab`)
     # traefik.tcp.routers.consul-web.tls.passthrough: true
     # traefik.tcp.routers.consul-web.service: consul-web
     # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501

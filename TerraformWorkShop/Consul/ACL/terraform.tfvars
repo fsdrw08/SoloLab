@@ -78,4 +78,25 @@ policy_bindings = [
       vault_kvv2_path = "kvv2/consul"
     }
   },
+  {
+    name        = "consul_client"
+    description = "Policy for consul client to work with consul server"
+    rules       = <<-EOT
+      node_prefix "" {
+        policy = "write"
+      }
+      service_prefix "" {
+        policy = "write"
+      }
+      key_prefix "" {
+        policy = "read"
+      }
+      agent_prefix "" {
+        policy = "read"
+      }
+    EOT
+    token = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
 ]
