@@ -12,9 +12,9 @@ passwd:
         - sudo
       # to gen password hash
       # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
-      password_hash: ${1000_password_hash}
+      password_hash: ${password_hash_1000}
       ssh_authorized_keys:
-        - "${1000_ssh_authorized_keys}"
+        - "${ssh_authorized_keys_1000}"
 storage:
   files:
     # core

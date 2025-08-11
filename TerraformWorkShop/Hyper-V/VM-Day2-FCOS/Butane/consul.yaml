@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+
+storage:
+  directories:
+    - path: /var/home/podmgr/.local/etc/consul.d
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
+  files:
+    - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: https://releases.hashicorp.com/consul/1.21.3/consul_1.21.3_linux_amd64.zip
+    - path: /var/home/podmgr/.local/etc/consul.d/consul.hcl
+      contents:
+        inline: |
+          acl = {
+            tokens {
+              default = ${consul_token}
+            }
+          }
+          ui_config {
+            enabled = true
+          }
+    - path: /var/home/podmgr/.config/systemd/user/consul.service
+      overwrite: true
+      user:
+        id: 1001
+      group:
+        id: 1001
+      contents:
+        inline: |
+          [Unit]
+          Description=Consul
+          Documentation=https://www.consul.io/docs
+          After=network-online.target prepare-consul-binary.service
+          Wants=network-online.target
+          Requires=prepare-consul-binary.service
+
+          [Service]
+          ExecStart=/opt/bin/consul \
+            agent \
+            -server \
+            -ui \
+            -node="nomad-node" \
+            -bootstrap-expect=1 \
+            -client=0.0.0.0 \
+            -datacenter=homelab \
+            -data-dir=/var/lib/consul
+          Restart=always
+          RestartSec=2
+          TasksMax=infinity
+          OOMScoreAdjust=-1000
+
+          [Install]
+          WantedBy=multi-user.target
+systemd:
+  units:
+    - name: prepare-consul-binary.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Unpack Consul binary to /opt/bin
+        ConditionPathExists=!/opt/bin/consul
+
+        [Service]
+        Type=oneshot
+        Restart=on-failure
+        RemainAfterExit=yes
+        Environment=CONSUL_VERSION=1.21.3
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/consul_${CONSUL_VERSION}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/consul_${CONSUL_VERSION}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /opt/bin/consul
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/consul
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: consul.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Consul
+        Documentation=https://www.consul.io/docs
+        After=network-online.target prepare-consul-binary.service
+        Wants=network-online.target
+        Requires=prepare-consul-binary.service
+
+        [Service]
+        ExecStart=/opt/bin/consul \
+          agent \
+          -server \
+          -ui \
+          -node="nomad-node" \
+          -bootstrap-expect=1 \
+          -client=0.0.0.0 \
+          -datacenter=homelab \
+          -data-dir=/var/lib/consul
+        Restart=always
+        RestartSec=2
+        TasksMax=infinity
+        OOMScoreAdjust=-1000
+
+        [Install]
+        WantedBy=multi-user.target

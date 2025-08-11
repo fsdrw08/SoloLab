@@ -71,6 +71,18 @@ storage:
         id: 1001
       group:
         id: 1001
+    - path: /var/home/podmgr/.local
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
+    - path: /var/home/podmgr/.local/etc
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
     - path: /var/home/podmgr/.config
       mode: 0755
       user:
