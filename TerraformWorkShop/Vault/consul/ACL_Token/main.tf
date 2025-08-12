@@ -46,47 +46,13 @@ resource "vault_mount" "kvv2" {
   description = "kvv2 secret backend for consul"
 }
 
-# resource "vault_consul_secret_backend_role" "admin" {
-#   name    = "admin"
-#   backend = vault_consul_secret_backend.backend.path
-#   consul_policies = [
-#     "global-management"
-#   ]
-#   ttl = 3600
-# }
-
-# resource "vault_consul_secret_backend_role" "user" {
-#   name    = "user"
-#   backend = vault_consul_secret_backend.backend.path
-#   consul_policies = [
-#     "builtin/global-read-only"
-#   ]
-#   ttl = 3600
-# }
-
-# module "consul_jwt_auth_policy_bindings" {
-#   source = "../../../modules/vault-policy_binding"
-#   policy_bindings = [
-#     {
-#       policy_name     = "consul-acl_token-admin"
-#       policy_content  = <<-EOT
-#       path "consul/creds/admin" {
-#         capabilities = ["read"]
-#       }
-#       EOT
-#       policy_group    = "Policy-Consul-Creds_admin"
-#       external_groups = ["app-consul-admin"]
-#     },
-#     {
-#       policy_name     = "consul-acl_token-user"
-#       policy_content  = <<-EOT
-#       path "consul/creds/user" {
-#         capabilities = ["read"]
-#       }
-#       EOT
-#       policy_group    = "Policy-Consul-Creds_user"
-#       external_groups = ["app-consul-user"]
-#     }
-#   ]
-
-# }
+resource "vault_kv_secret_v2" "secret" {
+  depends_on = [vault_mount.kvv2]
+  mount      = "kvv2/consul"
+  name       = "key-gossip_encryption"
+  data_json = jsonencode(
+    {
+      key = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+    }
+  )
+}
