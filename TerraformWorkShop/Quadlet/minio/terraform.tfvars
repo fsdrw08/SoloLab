@@ -11,34 +11,38 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "minio"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/minio"
-    value_file = "./attachments/values-sololab.yaml"
-    secrets = {
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "minio"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/minio"
+      value_file = "./attachments/values-sololab.yaml"
+      secrets = [
         {
-          name          = "minio.tls.contents.public\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "minio.tls.contents.private\\.key"
-          value_ref_key = "private_key"
-        },
-        {
-          name          = "minio.tls.contents.CAs.sololab\\.crt"
-          value_ref_key = "ca"
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "minio-api.day1.sololab"
+          }
+          value_sets = [
+            {
+              name          = "minio.tls.contents.public\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "minio.tls.contents.private\\.key"
+              value_ref_key = "private_key"
+            },
+            {
+              name          = "minio.tls.contents.CAs.sololab\\.crt"
+              value_ref_key = "ca"
+            }
+          ]
         }
       ]
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "minio-api.day1.sololab"
-      }
     }
-  }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/minio-aio.yaml"
-}
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/minio-aio.yaml"
+
+}]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"

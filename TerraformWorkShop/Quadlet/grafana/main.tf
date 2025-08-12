@@ -6,6 +6,7 @@ data "vault_identity_oidc_client_creds" "creds" {
   name = "grafana"
 }
 
+# load secret from vault kvv2 or load cert from tfstate
 locals {
   secrets_vault_kvv2 = flatten([
     for podman_kube in var.podman_kubes : [
@@ -27,7 +28,7 @@ locals {
   ])
 }
 
-# load cert from vault
+# load secret from vault
 data "vault_kv_secret_v2" "secrets" {
   for_each = local.secrets_vault_kvv2 == null ? null : {
     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
@@ -71,27 +72,6 @@ data "helm_template" "podman_kubes" {
   values = [
     "${file(each.value.helm.value_file)}"
   ]
-
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
 
   # v3 helm provider
   set = flatten([

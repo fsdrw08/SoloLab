@@ -24,6 +24,10 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "loki.day1.sololab"
+          }
           value_sets = [
             {
               name          = "loki.tls.contents.ca\\.crt"
@@ -38,10 +42,6 @@ podman_kubes = [
               value_ref_key = "private_key"
             },
           ]
-          vault_kvv2 = {
-            mount = "kvv2/certs"
-            name  = "loki.day1.sololab"
-          }
         }
       ]
     }

@@ -17,6 +17,10 @@ podman_kube = {
     chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
     value_file = "./attachments/values-sololab.yaml"
     secrets = {
+      vault_kvv2 = {
+        mount = "kvv2/certs"
+        name  = "*.day1.sololab"
+      }
       value_sets = [
         {
           name          = "traefik.tls.contents.ca\\.crt"
@@ -31,10 +35,6 @@ podman_kube = {
           value_ref_key = "private_key"
         }
       ]
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "*.day1.sololab"
-      }
     }
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"

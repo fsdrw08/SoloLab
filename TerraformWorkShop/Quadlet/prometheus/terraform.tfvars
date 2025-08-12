@@ -24,6 +24,10 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "prometheus.day1.sololab"
+          }
           value_sets = [
             {
               name          = "prometheus.containers.server.tls.contents.ca\\.crt"
@@ -38,34 +42,30 @@ podman_kubes = [
               value_ref_key = "private_key"
             },
           ]
-          vault_kvv2 = {
-            mount = "kvv2/certs"
-            name  = "prometheus.day1.sololab"
-          }
         },
         {
+          vault_kvv2 = {
+            mount = "kvv2/vault_token"
+            name  = "prometheus-metrics"
+          }
           value_sets = [
             {
               name          = "prometheus.containers.server.tls.contents.vault-token"
               value_ref_key = "token"
             },
           ]
-          vault_kvv2 = {
-            mount = "kvv2/vault_token"
-            name  = "prometheus-metrics"
-          }
         },
         {
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "token-prometheus"
+          }
           value_sets = [
             {
               name          = "prometheus.containers.server.tls.contents.consul-token"
               value_ref_key = "token"
             },
           ]
-          vault_kvv2 = {
-            mount = "kvv2/consul"
-            name  = "token-prometheus"
-          }
         },
         # {
         #   value_sets = [
