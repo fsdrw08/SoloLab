@@ -162,6 +162,9 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-postgresql.hcl"
-  content = file("./podman-postgresql/service.hcl")
+  for_each = toset([
+    "./attachments/tfbackend-pg.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

@@ -140,13 +140,19 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/prometheus-traefik.yaml"
-  content = file("./podman-prometheus/prometheus-traefik.yaml")
+  for_each = toset([
+    "./attachments/prometheus.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-prometheus.hcl"
-  content = file("./podman-prometheus/service.hcl")
+  for_each = toset([
+    "./attachments/prometheus.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "grafana_data_source" "data_source" {
@@ -166,14 +172,14 @@ resource "grafana_data_source" "data_source" {
 
 resource "grafana_dashboard" "dashboards" {
   for_each = toset([
-    "./podman-prometheus/podman-exporter-dashboard.json",
-    "./podman-prometheus/Blackbox-Exporter-Full.json",
-    "./podman-prometheus/traefik-dashboard.json",
-    "./podman-prometheus/vault-dashboard.json",
-    "./podman-prometheus/consul-dashboard.json",
-    "./podman-prometheus/minio-dashboard.json",
-    "./podman-prometheus/zot-dashboard.json",
-    "./podman-prometheus/loki-dashboard.json",
+    "./attachments/podman-exporter-dashboard.json",
+    "./attachments/Blackbox-Exporter-Full.json",
+    "./attachments/traefik-dashboard.json",
+    "./attachments/vault-dashboard.json",
+    "./attachments/consul-dashboard.json",
+    "./attachments/minio-dashboard.json",
+    "./attachments/zot-dashboard.json",
+    "./attachments/loki-dashboard.json",
   ])
   config_json = templatefile(
     each.key,

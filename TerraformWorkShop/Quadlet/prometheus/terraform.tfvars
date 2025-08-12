@@ -21,7 +21,7 @@ podman_kubes = [
     helm = {
       name       = "prometheus"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
-      value_file = "./podman-prometheus/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
           value_sets = [

@@ -16,7 +16,7 @@ podman_kubes = [
     helm = {
       name       = "gitea-redis"
       chart      = "../../../HelmWorkShop/helm-charts/charts/redis"
-      value_file = "./podman-redis/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/gitea-redis-aio.yaml"
   },

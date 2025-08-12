@@ -182,14 +182,17 @@ resource "powerdns_record" "records" {
 resource "remote_file" "traefik_file_provider" {
   depends_on = [null_resource.init]
   for_each = toset([
-    "traefik-traefik.yaml",
-    "zot-traefik.yaml"
+    "./attachments/traefik.traefik.yaml",
+    "./attachments/zot.traefik.yaml"
   ])
-  path    = "/var/home/podmgr/traefik-file-provider/${each.key}"
-  content = file("./podman-traefik/${each.key}")
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-#   content = file("./podman-traefik/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  for_each = toset([
+    "./attachments/traefik.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

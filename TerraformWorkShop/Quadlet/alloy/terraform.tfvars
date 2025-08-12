@@ -21,7 +21,7 @@ podman_kubes = [
     helm = {
       name       = "alloy"
       chart      = "../../../HelmWorkShop/helm-charts/charts/alloy"
-      value_file = "./podman-alloy/values-sololab.yaml"
+      value_file = "./attachments-alloy/values-sololab.yaml"
       secrets = [
         {
           value_sets = [
@@ -51,7 +51,7 @@ podman_kubes = [
     helm = {
       name       = "prometheus-podman-exporter"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-podman-exporter"
-      value_file = "./podman-exporter/values-sololab.yaml"
+      value_file = "./attachments-podman-exporter/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-podman-exporter-aio.yaml"
   }

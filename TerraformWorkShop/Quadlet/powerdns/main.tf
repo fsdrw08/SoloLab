@@ -178,6 +178,9 @@ resource "null_resource" "post_process" {
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-powerdns.hcl"
-  content = file("./podman-powerdns/service.hcl")
+  for_each = toset([
+    "./attachments/powerdns.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

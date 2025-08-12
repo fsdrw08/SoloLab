@@ -17,31 +17,43 @@ podman_kubes = [
     helm = {
       name       = "consul"
       chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
-      value_file = "./podman-consul/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "root"
+          }
           value_sets = [
             {
               name          = "consul.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
           ]
-          vault_kvv2 = {
-            mount = "kvv2/certs"
-            name  = "root"
-          }
         },
         {
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "token-consul_client"
+          }
           value_sets = [
             {
               name          = "consul.configFiles.main.acl.tokens.default"
               value_ref_key = "token"
             },
           ]
+        },
+        {
           vault_kvv2 = {
             mount = "kvv2/consul"
-            name  = "token-consul_client"
+            name  = "key-gossip_encryption"
           }
+          value_sets = [
+            {
+              name          = "consul.configFiles.main.encrypt"
+              value_ref_key = "key"
+            },
+          ]
         },
       ]
     }
@@ -90,7 +102,7 @@ podman_quadlet = {
 
 # post_process = {
 #   "Enable-DNSAnonymousAccess.sh" = {
-#     script_path = "./podman-consul/Enable-DNSAnonymousAccess.sh"
+#     script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
 #     vars = {
 #       CONSUL_HTTP_ADDR = "https://consul.day0.sololab:8501"
 #       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"

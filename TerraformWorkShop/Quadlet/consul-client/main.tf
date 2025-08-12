@@ -11,7 +11,7 @@ resource "null_resource" "init" {
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/podman-consul/init.sh", {
+      templatefile("${path.root}/attachments/init.sh", {
         dirs = self.triggers.dirs
       })
     ]
@@ -189,12 +189,18 @@ resource "null_resource" "post_process" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/consul-traefik.yaml"
-  content = file("./podman-consul/consul-traefik.yaml")
+  for_each = toset([
+    "./attachments/consul.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
   depends_on = [null_resource.init]
-  path       = "/var/home/podmgr/consul-services/service-consul.hcl"
-  content    = file("./podman-consul/service.hcl")
+  for_each = toset([
+    "./attachments/consul.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

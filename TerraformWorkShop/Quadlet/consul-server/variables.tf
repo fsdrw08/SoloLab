@@ -16,8 +16,8 @@ variable "prov_vault" {
   })
 }
 
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -33,7 +33,7 @@ variable "podman_kube" {
         ), null
       )
       secrets = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -57,11 +57,12 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
@@ -99,6 +100,7 @@ variable "dns_records" {
     ttl     = number
     records = list(string)
   }))
+  default = []
 }
 
 variable "post_process" {

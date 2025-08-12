@@ -1,6 +1,6 @@
 services {
-  id   = "lldap-web"
   name = "lldap"
+  id   = "lldap-web"
   port = 17170
 
   checks = [

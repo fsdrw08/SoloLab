@@ -141,11 +141,17 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/cockpit-traefik.yaml"
-  content = file("./podman-cockpit/cockpit-traefik.yaml")
+  for_each = toset([
+    "./attachments/cockpit.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-cockpit.hcl"
-  content = file("./podman-cockpit/service.hcl")
+  for_each = toset([
+    "./attachments/cockpit.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

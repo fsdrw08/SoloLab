@@ -68,7 +68,7 @@ consul:
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       client_addr: "0.0.0.0"
       datacenter: dc1
-      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
+      encrypt: # set by terraform vault secret data
       ports:
         https: 8501
       # https://discuss.hashicorp.com/t/failed-to-receive-encryption-is-configured-but-remote-state-is-not-encrypted/41222

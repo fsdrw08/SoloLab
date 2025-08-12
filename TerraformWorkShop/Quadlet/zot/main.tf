@@ -151,6 +151,9 @@ module "podman_quadlet" {
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-zot.hcl"
-  content = file("./podman-zot/service.hcl")
+  for_each = toset([
+    "./attachments/zot.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

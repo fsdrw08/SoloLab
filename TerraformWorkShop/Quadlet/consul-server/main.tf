@@ -11,69 +11,111 @@ resource "null_resource" "init" {
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/podman-consul/init.sh", {
+      templatefile("${path.root}/attachments/init.sh", {
         dirs = self.triggers.dirs
       })
     ]
   }
 }
 
-data "terraform_remote_state" "root_ca" {
-  count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
-  backend = var.podman_kube.helm.secrets.tfstate.backend.type
-  config  = var.podman_kube.helm.secrets.tfstate.backend.config
+# load cert from tfstate or load secret from vault
+locals {
+  secrets_vault_kvv2 = flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
+        mount = secret.vault_kvv2.mount
+        name  = secret.vault_kvv2.name
+      }
+      if secret.vault_kvv2 != null
+    ]
+  ])
+  tls_tfstate = flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
+        backend = secret.tfstate.backend
+        name    = secret.tfstate.cert_name
+      }
+      if secret.tfstate != null
+    ]
+  ])
+}
+
+data "vault_kv_secret_v2" "secrets" {
+  for_each = local.secrets_vault_kvv2 == null ? null : {
+    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+  }
+  mount = each.value.mount
+  name  = each.value.name
+}
+
+# load cert from local tls
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tls_tfstate == null ? null : {
+    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
 }
 
 locals {
-  cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
-    for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-    if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
-  ]
+  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : [
+        for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
+        if cert.name == secret.tfstate.cert_name
+      ]
+      if secret.tfstate != null
+    ]
+  ])
+  certs = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.cert_list : cert.name => cert
+  }
 }
 
-data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
-  mount = var.podman_kube.helm.secrets.vault_kvv2.mount
-  name  = var.podman_kube.helm.secrets.vault_kvv2.name
-}
-
-data "helm_template" "podman_kube" {
-  name  = var.podman_kube.helm.name
-  chart = var.podman_kube.helm.chart
+data "helm_template" "podman_kubes" {
+  for_each = {
+    for podman_kube in var.podman_kubes : podman_kube.helm.name => podman_kube
+  }
+  name  = each.value.helm.name
+  chart = each.value.helm.chart
 
   values = [
-    "${file(var.podman_kube.helm.value_file)}"
+    "${file(each.value.helm.value_file)}"
   ]
 
   # v3 helm provider
   set = flatten([
-    var.podman_kube.helm.value_sets == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.value_sets]) : {
+    each.value.helm.value_sets == null ? [] : [
+      for value_set in flatten([each.value.helm.value_sets]) : {
         name = value_set.name
         value = value_set.value_string != null ? value_set.value_string : templatefile(
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
     ],
-    var.podman_kube.helm.secrets == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.secrets.value_sets]) : {
-        name = value_set.name
-        # value = local.cert[0][value_set.value_ref_key]
-        value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]
-      }
-    ]
+    each.value.helm.secrets == null ? [] : [
+      for secret in each.value.helm.secrets : [
+        for value_set in secret.value_sets : {
+          name  = value_set.name
+          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          # value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+        }
+      ]
+    ],
   ])
 }
 
-resource "remote_file" "podman_kube" {
-  depends_on = [null_resource.init]
-  path       = var.podman_kube.manifest_dest_path
-  content    = data.helm_template.podman_kube.manifest
+resource "remote_file" "podman_kubes" {
+  for_each = {
+    for podman_kube in var.podman_kubes : podman_kube.helm.name => podman_kube
+  }
+  path    = each.value.manifest_dest_path
+  content = data.helm_template.podman_kubes[each.key].manifest
 }
 
 module "podman_quadlet" {
   depends_on = [
-    remote_file.podman_kube,
+    remote_file.podman_kubes,
   ]
   source  = "../../modules/system-systemd_quadlet"
   vm_conn = var.prov_remote
@@ -101,7 +143,7 @@ module "podman_quadlet" {
       {
         name           = unit.service.name
         status         = unit.service.status
-        custom_trigger = md5(remote_file.podman_kube.content)
+        custom_trigger = md5(remote_file.podman_kubes[unit.service.name].content)
       }
     ]
   }
@@ -142,12 +184,17 @@ resource "null_resource" "post_process" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/consul-traefik.yaml"
-  content = file("./podman-consul/consul-traefik.yaml")
+  for_each = toset([
+    "./attachments/consul.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  depends_on = [null_resource.init]
-  path       = "/var/home/podmgr/consul-services/service-consul.hcl"
-  content    = file("./podman-consul/service.hcl")
+  for_each = toset([
+    "./attachments/consul.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

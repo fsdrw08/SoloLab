@@ -7,8 +7,8 @@ data "vault_identity_oidc_client_creds" "creds" {
 }
 
 # resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/minio-traefik.yaml"
-#   content = file("./podman-minio/minio-traefik.yaml")
+#   path    = "/var/home/podmgr/traefik-file-provider/minio.traefik.yaml"
+#   content = file("./attachments/minio.traefik.yaml")
 # }
 
 # load cert from vault
@@ -162,11 +162,17 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/minio-traefik.yaml"
-  content = file("./podman-minio/minio-traefik.yaml")
+  for_each = toset([
+    "./attachments/minio.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-minio.hcl"
-  content = file("./podman-minio/service.hcl")
+  for_each = toset([
+    "./attachments/minio.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

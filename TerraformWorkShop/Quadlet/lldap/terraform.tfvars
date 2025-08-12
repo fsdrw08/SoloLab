@@ -10,7 +10,7 @@ podman_kubes = [
     helm = {
       name       = "lldap"
       chart      = "../../../HelmWorkShop/helm-charts/charts/lldap"
-      value_file = "./podman-lldap/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       value_sets = [
         {
           # https://github.com/microsoft/farmvibes-ai/blob/a9e999fcfaf9a90f147257bbdf7221b8a8b7ce52/src/vibe_core/vibe_core/terraform/local/modules/kubernetes/rabbitmq.tf#L57

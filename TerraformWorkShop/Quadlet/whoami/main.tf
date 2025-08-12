@@ -35,7 +35,7 @@
 resource "remote_file" "podman_kube" {
   # depends_on = [null_resource.init]
   path    = var.podman_kube.manifest_dest_path
-  content = file("./podman-whoami/whoami-aio.yaml")
+  content = file("./attachments/whoami-aio.yaml")
 }
 
 module "podman_quadlet" {
@@ -107,5 +107,5 @@ resource "null_resource" "post_process" {
 
 # resource "remote_file" "consul_service" {
 #   path    = "/var/home/podmgr/consul-services/service-whoami.hcl"
-#   content = file("./podman-whoami/service.hcl")
+#   content = file("./attachments/service.hcl")
 # }

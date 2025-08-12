@@ -1,6 +1,6 @@
 services {
+  name = "tfbackend"
   id   = "postgresql-tcp"
-  name = "postgresql"
   port = 5432
 
   # https://developer.hashicorp.com/consul/docs/services/usage/checks

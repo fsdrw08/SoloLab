@@ -23,7 +23,7 @@ podman_kube = {
   helm = {
     name       = "keycloak"
     chart      = "../../../HelmWorkShop/helm-charts/charts/keycloak"
-    value_file = "./podman-keycloak/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
   }
   manifest_dest_path = "/home/podmgr/.config/containers/systemd/keycloak-aio.yaml"
 }
@@ -32,7 +32,7 @@ podman_quadlet = {
   quadlet = {
     file_contents = [
       {
-        file_source = "./podman-keycloak/keycloak-container.kube"
+        file_source = "./attachments/keycloak-container.kube"
         # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
         vars = {
           yaml          = "keycloak-aio.yaml"

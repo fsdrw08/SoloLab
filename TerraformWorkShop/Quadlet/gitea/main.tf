@@ -141,7 +141,7 @@ resource "powerdns_record" "records" {
 
 resource "remote_file" "consul_service" {
   for_each = toset([
-    "./podman-redis/redis.hcl",
+    "./attachments-redis/redis.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")

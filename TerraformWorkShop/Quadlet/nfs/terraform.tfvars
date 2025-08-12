@@ -11,7 +11,7 @@ podman_kubes = [
     helm = {
       name       = "nfs"
       chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
-      value_file = "./podman-nfs/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/etc/containers/systemd/nfs-aio.yaml"
   }

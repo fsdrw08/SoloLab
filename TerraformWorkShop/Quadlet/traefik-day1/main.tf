@@ -136,11 +136,14 @@ resource "powerdns_record" "records" {
 
 # resource "remote_file" "traefik_file_provider" {
 #   depends_on = [null_resource.init]
-#   path       = "/var/home/podmgr/traefik-file-provider/traefik-traefik.yaml"
-#   content    = file("./podman-traefik/traefik-traefik.yaml")
+#   path       = "/var/home/podmgr/traefik-file-provider/traefik.traefik.yaml"
+#   content    = file("./attachments/traefik.traefik.yaml")
 # }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-traefik.hcl"
-  content = file("./podman-traefik/service.hcl")
+  for_each = toset([
+    "./attachments/traefik.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

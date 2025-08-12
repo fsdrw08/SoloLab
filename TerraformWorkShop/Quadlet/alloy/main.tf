@@ -140,14 +140,17 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/alloy-traefik.yaml"
-  content = file("./podman-alloy/alloy-traefik.yaml")
+  for_each = toset([
+    "./attachments-alloy/alloy.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
   for_each = toset([
-    "./podman-alloy/service-alloy.hcl",
-    "./podman-exporter/service-podman-exporter.hcl"
+    "./attachments-alloy/alloy.consul.hcl",
+    "./attachments-podman-exporter/podman-exporter.consul.hcl"
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
@@ -159,8 +162,8 @@ data "grafana_data_source" "data_source" {
 
 resource "grafana_dashboard" "dashboards" {
   for_each = toset([
-    # "./podman-alloy/podman-exporter-dashboard.json",
-    "./podman-alloy/Node-Exporter-Full.json",
+    # "./attachments-alloy/podman-exporter-dashboard.json",
+    "./attachments-alloy/Node-Exporter-Full.json",
   ])
   config_json = templatefile(
     each.key,

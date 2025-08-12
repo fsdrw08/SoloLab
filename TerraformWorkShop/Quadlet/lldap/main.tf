@@ -161,7 +161,10 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-lldap.hcl"
-#   content = file("./podman-lldap/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  for_each = toset([
+    "./attachments/lldap.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

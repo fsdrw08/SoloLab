@@ -10,7 +10,7 @@ podman_kubes = [
     helm = {
       name       = "vault"
       chart      = "../../../HelmWorkShop/helm-charts/charts/vault"
-      value_file = "./podman-vault/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
           value_sets = [
@@ -95,7 +95,7 @@ dns_records = [{
 
 post_process = {
   New-VaultStaticToken = {
-    script_path = "./podman-vault/New-VaultStaticToken.sh"
+    script_path = "./attachments/New-VaultStaticToken.sh"
     vars = {
       VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets_b64"
       # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"

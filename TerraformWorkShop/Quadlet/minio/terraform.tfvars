@@ -15,7 +15,7 @@ podman_kube = {
   helm = {
     name       = "minio"
     chart      = "../../../HelmWorkShop/helm-charts/charts/minio"
-    value_file = "./podman-minio/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
     secrets = {
       value_sets = [
         {

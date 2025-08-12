@@ -180,8 +180,8 @@ resource "powerdns_record" "record" {
 # }
 
 # resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/nomad-traefik.yaml"
-#   content = file("./podman-nomad/nomad-traefik.yaml")
+#   path    = "/var/home/podmgr/traefik-file-provider/nomad.traefik.yaml"
+#   content = file("./podman-nomad/nomad.traefik.yaml")
 # }
 
 # resource "remote_file" "consul_service" {

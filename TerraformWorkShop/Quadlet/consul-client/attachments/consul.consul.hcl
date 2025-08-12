@@ -7,7 +7,7 @@ services {
     {
       id              = "consul-https-check"
       name            = "consul-https-check"
-      http            = "https://consul-client.day1.sololab/v1/status/leader"
+      http            = "https://consul-client.day0.sololab/v1/status/leader"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"

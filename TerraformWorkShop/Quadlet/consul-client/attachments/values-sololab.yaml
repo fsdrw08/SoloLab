@@ -48,7 +48,7 @@ consul:
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
       client_addr: "0.0.0.0"
-      encrypt: aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w=
+      encrypt: # set by terraform vault data
       ports:
         https: 8501
       retry_join:

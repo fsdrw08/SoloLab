@@ -194,11 +194,17 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/grafana-traefik.yaml"
-  content = file("./podman-grafana/grafana-traefik.yaml")
+  for_each = toset([
+    "./attachments/grafana.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-grafana.hcl"
-  content = file("./podman-grafana/service.hcl")
+  for_each = toset([
+    "./attachments/grafana.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

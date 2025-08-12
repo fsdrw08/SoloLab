@@ -12,38 +12,54 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-podman_kube = {
-  helm = {
-    name       = "consul"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
-    value_file = "./podman-consul/values-sololab.yaml"
-    secrets = {
-      vault_kvv2 = {
-        mount = "kvv2/certs"
-        name  = "consul.day1.sololab"
-      }
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "consul"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
+      value_file = "./attachments/values-sololab.yaml"
+      secrets = [
         {
-          name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
-          value_ref_key = "ca"
+          vault_kvv2 = {
+            mount = "kvv2/certs"
+            name  = "consul.day1.sololab"
+          }
+          value_sets = [
+            {
+              name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "consul.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "consul.tls.contents.server\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "consul.tls.contents.server\\.key"
+              value_ref_key = "private_key"
+            },
+          ]
         },
         {
-          name          = "consul.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "consul.tls.contents.server\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "consul.tls.contents.server\\.key"
-          value_ref_key = "private_key"
+          vault_kvv2 = {
+            mount = "kvv2/consul"
+            name  = "key-gossip_encryption"
+          }
+          value_sets = [
+            {
+              name          = "consul.configFiles.main.encrypt"
+              value_ref_key = "key"
+            },
+          ]
         },
       ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/consul-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -84,7 +100,7 @@ podman_quadlet = {
 
 post_process = {
   "Enable-DNSAnonymousAccess.sh" = {
-    script_path = "./podman-consul/Enable-DNSAnonymousAccess.sh"
+    script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
     vars = {
       CONSUL_HTTP_ADDR = "https://192.168.255.20:8501"
       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"

@@ -20,13 +20,13 @@ locals {
 }
 
 # load cert from vault
-data "vault_kv_secret_v2" "secrets" {
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
-  }
-  mount = each.value.mount
-  name  = each.value.name
-}
+# data "vault_kv_secret_v2" "secrets" {
+#   for_each = local.secrets_vault_kvv2 == null ? null : {
+#     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+#   }
+#   mount = each.value.mount
+#   name  = each.value.name
+# }
 
 # load cert from local tls
 data "terraform_remote_state" "tfstate" {
@@ -98,8 +98,9 @@ data "helm_template" "podman_kubes" {
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
-          name  = value_set.name
-          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          name = value_set.name
+          # value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],
@@ -161,12 +162,10 @@ resource "powerdns_record" "records" {
   records = each.value.records
 }
 
-# resource "remote_file" "traefik_file_provider" {
-#   path    = "/var/home/podmgr/traefik-file-provider/grafana-traefik.yaml"
-#   content = file("./podman-grafana/grafana-traefik.yaml")
-# }
-
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-grafana.hcl"
-#   content = file("./podman-grafana/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  for_each = toset([
+    "./attachments/podman-exporter.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

@@ -1,6 +1,6 @@
 services {
-  id   = "dufs-web"
   name = "dufs"
+  id   = "dufs-web"
   port = 5001
 
   checks = [

@@ -63,27 +63,6 @@ data "helm_template" "podman_kubes" {
     "${file(each.value.helm.value_file)}"
   ]
 
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
-
   # v3 helm provider
   set = flatten([
     each.value.helm.value_sets == null ? [] : [
@@ -189,11 +168,17 @@ resource "null_resource" "post_process" {
 }
 
 resource "remote_file" "traefik_file_provider" {
-  path    = "/var/home/podmgr/traefik-file-provider/vault-traefik.yaml"
-  content = file("./podman-vault/vault-traefik.yaml")
+  for_each = toset([
+    "./attachments/vault.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-vault.hcl"
-  content = file("./podman-vault/service.hcl")
+  for_each = toset([
+    "./attachments/vault.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

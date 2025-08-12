@@ -20,14 +20,14 @@ locals {
   ])
 }
 
-data "vault_kv_secret_v2" "secrets" {
-  # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
-  }
-  mount = each.value.mount
-  name  = each.value.name
-}
+# data "vault_kv_secret_v2" "secrets" {
+#   # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
+#   for_each = local.secrets_vault_kvv2 == null ? null : {
+#     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+#   }
+#   mount = each.value.mount
+#   name  = each.value.name
+# }
 
 data "terraform_remote_state" "tfstate" {
   # count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
@@ -98,8 +98,9 @@ data "helm_template" "podman_kubes" {
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
-          name  = value_set.name
-          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          name = value_set.name
+          # value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],
@@ -159,6 +160,9 @@ resource "powerdns_record" "records" {
 }
 
 resource "remote_file" "consul_service" {
-  path    = "/var/home/podmgr/consul-services/service-dufs.hcl"
-  content = file("./podman-dufs/service.hcl")
+  for_each = toset([
+    "./attachments/dufs.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }

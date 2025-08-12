@@ -10,7 +10,7 @@ podman_kubes = [
     helm = {
       name       = "prometheus-podman-exporter"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-podman-exporter"
-      value_file = "./podman-exporters/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-podman-exporter-aio.yaml"
   }

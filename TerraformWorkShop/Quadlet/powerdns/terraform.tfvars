@@ -10,7 +10,7 @@ podman_kubes = [
     helm = {
       name       = "powerdns"
       chart      = "../../../HelmWorkShop/helm-charts/charts/pdns"
-      value_file = "./podman-powerdns/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/powerdns-aio.yaml"
   }

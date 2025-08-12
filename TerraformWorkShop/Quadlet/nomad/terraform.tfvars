@@ -17,7 +17,7 @@ podman_kubes = [
     helm = {
       name       = "nomad"
       chart      = "../../../HelmWorkShop/helm-charts/charts/nomad"
-      value_file = "./podman-nomad/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       # value_sets = [
       #   {
       #     name         = "nomad.configFiles.main.advertise.http"
@@ -111,7 +111,7 @@ podman_quadlet = {
 
 post_process = {
   "New-NomadAnonymousPolicy.sh" = {
-    script_path = "./podman-nomad/New-NomadAnonymousPolicy.sh"
+    script_path = "./attachments/New-NomadAnonymousPolicy.sh"
     vars = {
       NOMAD_ADDR       = "https://192.168.255.20:4646"
       NOMAD_TOKEN_FILE = "/var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc/_data/server/nomad_token"

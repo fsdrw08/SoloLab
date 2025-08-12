@@ -179,14 +179,19 @@ resource "powerdns_record" "records" {
 
 resource "remote_file" "traefik_file_provider" {
   depends_on = [module.podman_quadlet]
-  path       = "/var/home/podmgr/traefik-file-provider/loki-traefik.yaml"
-  content    = file("./podman-loki/loki-traefik.yaml")
+  for_each = toset([
+    "./attachments/loki.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {
-  depends_on = [module.podman_quadlet]
-  path       = "/var/home/podmgr/consul-services/service-loki.hcl"
-  content    = file("./podman-loki/service.hcl")
+  for_each = toset([
+    "./attachments/loki.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }
 
 resource "grafana_data_source" "data_source" {

@@ -16,7 +16,7 @@ podman_kube = {
   helm = {
     name       = "whoami"
     chart      = "../../../HelmWorkShop/helm-charts/charts/whoami"
-    value_file = "./podman-whoami/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
     value_sets = [
       {
         name         = "whoami.configFiles.main.advertise.http"
@@ -63,7 +63,7 @@ podman_quadlet = {
     {
       files = [
         {
-          template = "./podman-whoami/whoami-container.kube"
+          template = "./attachments/whoami-container.kube"
           # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
           vars = {
             Description   = "Tiny Go webserver that prints OS information and HTTP request to output."

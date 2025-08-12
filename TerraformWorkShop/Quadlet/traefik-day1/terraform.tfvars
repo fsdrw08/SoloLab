@@ -15,7 +15,7 @@ podman_kube = {
   helm = {
     name       = "traefik"
     chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
-    value_file = "./podman-traefik/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
     secrets = {
       value_sets = [
         {
@@ -46,7 +46,7 @@ podman_quadlet = {
     {
       files = [
         {
-          template = "./podman-traefik/quadlet.kube"
+          template = "./attachments/quadlet.kube"
           vars = {
             # unit
             Description           = "Traefik Proxy"

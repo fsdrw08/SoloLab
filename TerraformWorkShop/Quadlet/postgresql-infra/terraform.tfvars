@@ -10,7 +10,7 @@ podman_kubes = [
     helm = {
       name       = "tfbackend-pg"
       chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
-      value_file = "./podman-postgresql/values-sololab.yaml"
+      value_file = "./attachments/values-sololab.yaml"
       value_sets = [
         {
           name         = "fullnameOverride"

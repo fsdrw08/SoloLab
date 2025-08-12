@@ -16,32 +16,32 @@ podman_kube = {
   helm = {
     name       = "opendj"
     chart      = "../../../HelmWorkShop/helm-charts/charts/opendj"
-    value_file = "./podman-opendj/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
     value_sets = [
       {
         name                = "opendj.schemas.\"44-domain_base\\.ldif\""
-        value_template_path = "./podman-opendj/44-domain_base.ldif"
+        value_template_path = "./attachments/44-domain_base.ldif"
         value_template_vars = {
           baseDN = "dc=root\\,dc=sololab"
         }
       },
       {
         name                = "opendj.schemas.\"45-groups\\.ldif\""
-        value_template_path = "./podman-opendj/45-groups.ldif"
+        value_template_path = "./attachments/45-groups.ldif"
         value_template_vars = {
           baseDN = "dc=root\\,dc=sololab"
         }
       },
       {
         name                = "opendj.schemas.\"46-people\\.ldif\""
-        value_template_path = "./podman-opendj/46-people.ldif"
+        value_template_path = "./attachments/46-people.ldif"
         value_template_vars = {
           baseDN = "dc=root\\,dc=sololab"
         }
       },
       {
         name                = "opendj.schemas.\"47-services\\.ldif\""
-        value_template_path = "./podman-opendj/47-services.ldif"
+        value_template_path = "./attachments/47-services.ldif"
         value_template_vars = {
           baseDN = "dc=root\\,dc=sololab"
         }
@@ -111,7 +111,7 @@ podman_quadlet = {
 
 post_process = {
   "Enable-PreEncodedPassword.sh" = {
-    script_path = "./podman-opendj/Enable-PreEncodedPassword.sh"
+    script_path = "./attachments/Enable-PreEncodedPassword.sh"
     vars = {
       CONTAINER_NAME = "opendj-opendj"
       hostname       = "localhost"
