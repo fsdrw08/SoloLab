@@ -79,8 +79,8 @@ data "helm_template" "podman_kubes" {
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
           name = value_set.name
-          # value = local.cert[0][value_set.value_ref_key]
-          value = data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key]
+          # value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],
