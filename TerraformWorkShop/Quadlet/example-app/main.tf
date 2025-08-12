@@ -114,7 +114,10 @@ resource "null_resource" "post_process" {
   }
 }
 
-# resource "remote_file" "consul_service" {
-#   path    = "/var/home/podmgr/consul-services/service-example-app.hcl"
-#   content = file("./podman-example-app/service.hcl")
-# }
+resource "remote_file" "consul_service" {
+  for_each = toset([
+    "./attachments/example.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

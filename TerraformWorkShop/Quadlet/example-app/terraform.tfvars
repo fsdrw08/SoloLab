@@ -16,7 +16,7 @@ podman_kube = {
   helm = {
     # name       = "example-app"
     # chart      = "../../../HelmWorkShop/helm-charts/charts/example-app"
-    value_file = "./podman-example-app/values-sololab.yaml"
+    value_file = "./attachments/values-sololab.yaml"
     # value_sets = [
     #   {
     #     name         = "example-app.configFiles.main.advertise.http"
