@@ -1,3 +1,3 @@
 #!/bin/bash
 mkdir -p ${dirs}
-chmod -R 700 ${dirs}
+chmod -R 644 ${dirs}
