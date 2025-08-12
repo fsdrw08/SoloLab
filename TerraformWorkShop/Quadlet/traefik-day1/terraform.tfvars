@@ -16,7 +16,7 @@ podman_kube = {
     name       = "traefik"
     chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
     value_file = "./podman-traefik/values-sololab.yaml"
-    tls = {
+    secrets = {
       value_sets = [
         {
           name          = "traefik.tls.contents.ca\\.crt"

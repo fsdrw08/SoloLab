@@ -1,28 +1,28 @@
 data "terraform_remote_state" "root_ca" {
-  count   = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? 0 : 1
-  backend = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.type
-  config  = var.podman_kube.helm.tls_value_sets.value_ref.tfstate.backend.config
+  count   = var.podman_kube.helm.secrets_value_sets.value_ref.tfstate == null ? 0 : 1
+  backend = var.podman_kube.helm.secrets_value_sets.value_ref.tfstate.backend.type
+  config  = var.podman_kube.helm.secrets_value_sets.value_ref.tfstate.backend.config
 }
 
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2 == null ? 0 : 1
-  mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.name
+  count = var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2 == null ? 0 : 1
+  mount = var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.mount
+  name  = var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.name
 }
 
 locals {
-  cert = var.podman_kube.helm.tls_value_sets.value_ref.tfstate == null ? null : [
+  cert = var.podman_kube.helm.secrets_value_sets.value_ref.tfstate == null ? null : [
     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-    if cert.name == var.podman_kube.helm.tls_value_sets.value_ref.tfstate.cert_name
+    if cert.name == var.podman_kube.helm.secrets_value_sets.value_ref.tfstate.cert_name
   ]
 }
 
 resource "pkcs12_from_pem" "keystore" {
   password = "changeit"
   # from vault
-  # ca_pem          = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.ca]
-  # cert_pem        = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.cert]
-  # private_key_pem = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.data_key.private_key]
+  # ca_pem          = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.data_key.ca]
+  # cert_pem        = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.data_key.cert]
+  # private_key_pem = data.vault_kv_secret_v2.cert[0].data[var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.data_key.private_key]
 
   # from tfstate
   ca_pem          = data.terraform_remote_state.root_ca[0].outputs.int_ca_pem
@@ -49,10 +49,10 @@ data "helm_template" "podman_kube" {
   }
   # tls
   dynamic "set" {
-    for_each = var.podman_kube.helm.tls_value_sets == null ? [] : [
+    for_each = var.podman_kube.helm.secrets_value_sets == null ? [] : [
       # pkcs12
       tomap({
-        "name"  = var.podman_kube.helm.tls_value_sets.name,
+        "name"  = var.podman_kube.helm.secrets_value_sets.name,
         "value" = pkcs12_from_pem.keystore.result
       })
     ]

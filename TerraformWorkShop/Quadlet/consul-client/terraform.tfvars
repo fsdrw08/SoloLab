@@ -18,7 +18,7 @@ podman_kubes = [
       name       = "consul"
       chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
       value_file = "./podman-consul/values-sololab.yaml"
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

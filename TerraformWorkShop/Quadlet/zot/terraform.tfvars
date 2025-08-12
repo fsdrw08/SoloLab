@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "zot"
       chart      = "../../../HelmWorkShop/helm-charts/charts/zot"
       value_file = "./podman-zot/values-sololab.yaml"
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

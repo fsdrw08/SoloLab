@@ -17,7 +17,7 @@ podman_kubes = [
           value_string = "tfbackend-pg"
         }
       ]
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

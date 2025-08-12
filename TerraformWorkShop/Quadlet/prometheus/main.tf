@@ -1,19 +1,19 @@
 # load cert from vault
 locals {
-  tls_vault_kvv2 = flatten([
+  secrets_vault_kvv2 = flatten([
     for podman_kube in var.podman_kubes : [
-      for tls in podman_kube.helm.tls == null ? [] : podman_kube.helm.tls : {
-        mount = tls.vault_kvv2.mount
-        name  = tls.vault_kvv2.name
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
+        mount = secret.vault_kvv2.mount
+        name  = secret.vault_kvv2.name
       }
     ]
   ])
 }
 
-data "vault_kv_secret_v2" "certs" {
-  # count = var.podman_kube.helm.tls == null ? 0 : var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-  for_each = local.tls_vault_kvv2 == null ? null : {
-    for tls_vault_kvv2 in local.tls_vault_kvv2 : tls_vault_kvv2.name => tls_vault_kvv2
+data "vault_kv_secret_v2" "secrets" {
+  # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
+  for_each = local.secrets_vault_kvv2 == null ? null : {
+    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
   }
   mount = each.value.mount
   name  = each.value.name
@@ -21,15 +21,15 @@ data "vault_kv_secret_v2" "certs" {
 
 # load cert from local tls
 # data "terraform_remote_state" "root_ca" {
-#   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
-#   backend = var.podman_kube.helm.tls.tfstate.backend.type
-#   config  = var.podman_kube.helm.tls.tfstate.backend.config
+#   count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
+#   backend = var.podman_kube.helm.secrets.tfstate.backend.type
+#   config  = var.podman_kube.helm.secrets.tfstate.backend.config
 # }
 
 # locals {
-#   cert = var.podman_kube.helm.tls.tfstate == null ? null : [
+#   cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
 #     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-#     if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+#     if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
 #   ]
 # }
 
@@ -58,7 +58,7 @@ data "helm_template" "podman_kubes" {
   # }
   # # tls
   # dynamic "set" {
-  #   for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
+  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
   #   content {
   #     name  = set.value.name
   #     value = local.cert[0][set.value.value_ref_key]
@@ -75,12 +75,12 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
-    each.value.helm.tls == null ? [] : [
-      for tls in each.value.helm.tls : [
-        for value_set in tls.value_sets : {
+    each.value.helm.secrets == null ? [] : [
+      for secret in each.value.helm.secrets : [
+        for value_set in secret.value_sets : {
           name = value_set.name
           # value = local.cert[0][value_set.value_ref_key]
-          value = data.vault_kv_secret_v2.certs[tls.vault_kvv2.name].data[value_set.value_ref_key]
+          value = data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key]
         }
       ]
     ],
@@ -156,7 +156,7 @@ resource "grafana_data_source" "data_source" {
   url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
 
   secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.certs["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
+    tlsCACert = data.vault_kv_secret_v2.secrets["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
   })
 
   json_data_encoded = jsonencode({

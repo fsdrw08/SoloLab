@@ -32,7 +32,7 @@ podman_kubes = [
       #     value_string = "192.168.255.10"
       #   },
       # ]
-      tls = [
+      secrets = [
         {
           vault_kvv2 = {
             mount = "kvv2/certs"

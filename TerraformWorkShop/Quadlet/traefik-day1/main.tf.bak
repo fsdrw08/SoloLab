@@ -28,22 +28,22 @@
 # }
 
 # # data "terraform_remote_state" "root_ca" {
-# #   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
-# #   backend = var.podman_kube.helm.tls.tfstate.backend.type
-# #   config  = var.podman_kube.helm.tls.tfstate.backend.config
+# #   count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
+# #   backend = var.podman_kube.helm.secrets.tfstate.backend.type
+# #   config  = var.podman_kube.helm.secrets.tfstate.backend.config
 # # }
 
 # # locals {
-# #   # cert = var.podman_kube.helm.tls.tfstate == null ? null : flatten([
+# #   # cert = var.podman_kube.helm.secrets.tfstate == null ? null : flatten([
 # #   #   for cert_name in ["pdns-auth", "traefik"] : [
 # #   #     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
 # #   #     if cert.name == cert_name
-# #   #     # if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+# #   #     # if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
 # #   #   ]
 # #   # ])
-# #   cert = var.podman_kube.helm.tls.tfstate == null ? null : [
+# #   cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
 # #     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-# #     if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+# #     if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
 # #   ]
 # # }
 

@@ -38,7 +38,7 @@ podman_kubes = [
           value_string = "Asia/Shanghai"
         },
       ]
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

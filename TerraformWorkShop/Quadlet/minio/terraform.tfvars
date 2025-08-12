@@ -16,7 +16,7 @@ podman_kube = {
     name       = "minio"
     chart      = "../../../HelmWorkShop/helm-charts/charts/minio"
     value_file = "./podman-minio/values-sololab.yaml"
-    tls = {
+    secrets = {
       value_sets = [
         {
           name          = "minio.tls.contents.public\\.crt"

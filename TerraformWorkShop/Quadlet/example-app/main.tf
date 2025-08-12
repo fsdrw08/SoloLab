@@ -22,7 +22,7 @@ data "vault_kv_secret_v2" "cert" {
 #   }
 #   # tls values
 #   dynamic "set" {
-#     for_each = var.podman_kube.helm.tls_value_sets == null ? [] : flatten([var.podman_kube.helm.tls_value_sets.value_sets])
+#     for_each = var.podman_kube.helm.secrets_value_sets == null ? [] : flatten([var.podman_kube.helm.secrets_value_sets.value_sets])
 #     content {
 #       name  = set.value.name
 #       value = data.vault_kv_secret_v2.cert[0].data[set.value.value_ref_key]

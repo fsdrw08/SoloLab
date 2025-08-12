@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "grafana"
       chart      = "../../../HelmWorkShop/helm-charts/charts/grafana"
       value_file = "./podman-grafana/values-sololab.yaml"
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

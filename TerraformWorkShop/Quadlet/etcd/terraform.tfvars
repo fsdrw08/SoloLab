@@ -10,7 +10,7 @@ podman_kube = {
     name       = "etcd"
     chart      = "../../../HelmWorkShop/helm-charts/charts/etcd"
     value_file = "./podman-etcd/values-sololab.yaml"
-    tls = {
+    secrets = {
       value_sets = [
         {
           name          = "etcd.tls.contents.server\\.crt"

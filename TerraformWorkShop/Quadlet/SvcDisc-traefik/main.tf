@@ -46,9 +46,9 @@ resource "null_resource" "service_stop" {
 }
 
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls_value_sets == null ? 0 : 1
-  mount = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls_value_sets.value_ref.vault_kvv2.name
+  count = var.podman_kube.helm.secrets_value_sets == null ? 0 : 1
+  mount = var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.mount
+  name  = var.podman_kube.helm.secrets_value_sets.value_ref.vault_kvv2.name
 }
 
 module "podman_quadlet" {

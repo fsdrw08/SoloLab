@@ -13,22 +13,22 @@ data "vault_identity_oidc_client_creds" "creds" {
 
 # load cert from vault
 data "vault_kv_secret_v2" "cert" {
-  count = var.podman_kube.helm.tls.vault_kvv2 == null ? 0 : 1
-  mount = var.podman_kube.helm.tls.vault_kvv2.mount
-  name  = var.podman_kube.helm.tls.vault_kvv2.name
+  count = var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
+  mount = var.podman_kube.helm.secrets.vault_kvv2.mount
+  name  = var.podman_kube.helm.secrets.vault_kvv2.name
 }
 
 # load cert from local tls
 # data "terraform_remote_state" "root_ca" {
-#   count   = var.podman_kube.helm.tls.tfstate == null ? 0 : 1
-#   backend = var.podman_kube.helm.tls.tfstate.backend.type
-#   config  = var.podman_kube.helm.tls.tfstate.backend.config
+#   count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
+#   backend = var.podman_kube.helm.secrets.tfstate.backend.type
+#   config  = var.podman_kube.helm.secrets.tfstate.backend.config
 # }
 
 # locals {
-#   cert = var.podman_kube.helm.tls.tfstate == null ? null : [
+#   cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
 #     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-#     if cert.name == var.podman_kube.helm.tls.tfstate.cert_name
+#     if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
 #   ]
 # }
 
@@ -54,7 +54,7 @@ data "helm_template" "podman_kube" {
   # }
   # # tls
   # dynamic "set" {
-  #   for_each = var.podman_kube.helm.tls == null ? [] : flatten([var.podman_kube.helm.tls.value_sets])
+  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
   #   content {
   #     name  = set.value.name
   #     value = local.cert[0][set.value.value_ref_key]
@@ -71,8 +71,8 @@ data "helm_template" "podman_kube" {
         )
       }
     ],
-    var.podman_kube.helm.tls == null ? [] : [
-      for value_set in flatten([var.podman_kube.helm.tls.value_sets]) : {
+    var.podman_kube.helm.secrets == null ? [] : [
+      for value_set in flatten([var.podman_kube.helm.secrets.value_sets]) : {
         name = value_set.name
         # value = local.cert[0][value_set.value_ref_key]
         value = data.vault_kv_secret_v2.cert[0].data[value_set.value_ref_key]

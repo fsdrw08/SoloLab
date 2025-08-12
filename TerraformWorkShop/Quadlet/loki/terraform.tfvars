@@ -22,7 +22,7 @@ podman_kubes = [
       name       = "loki"
       chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
       value_file = "./podman-loki/values-sololab.yaml"
-      tls = [
+      secrets = [
         {
           value_sets = [
             {

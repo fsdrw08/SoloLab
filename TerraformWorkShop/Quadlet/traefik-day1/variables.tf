@@ -31,7 +31,7 @@ variable "podman_kube" {
           })
         ), null
       )
-      tls = optional(
+      secrets = optional(
         object({
           value_sets = list(
             object({

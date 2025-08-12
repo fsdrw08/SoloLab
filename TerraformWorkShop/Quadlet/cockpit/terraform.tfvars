@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "cockpit"
       chart      = "../../../HelmWorkShop/helm-charts/charts/cockpit"
       value_file = "./podman-cockpit/values-sololab.yaml"
-      tls = [
+      secrets = [
         {
           value_sets = [
             {
