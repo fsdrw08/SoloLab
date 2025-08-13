@@ -16,6 +16,10 @@ terraform {
       source  = "poseidon/ct"
       version = ">= 0.13.0"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.0.0"
+    }
     local = {
       source  = "hashicorp/local"
       version = ">= 2.5.1"
@@ -27,7 +31,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate"
-    schema_name = "HyperV-Day1-VM-FCOS"
+    schema_name = "HyperV-Day2-VM-FCOS"
   }
   # backend "s3" {
   #   bucket = "tfstate"                 # Name of the S3 bucket
@@ -71,4 +75,11 @@ provider "powerdns" {
   api_key        = var.prov_pdns.api_key
   server_url     = var.prov_pdns.server_url
   insecure_https = var.prov_pdns.insecure_https
+}
+
+provider "vault" {
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }

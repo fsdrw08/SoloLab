@@ -5,6 +5,13 @@ prov_hyperv = {
   password = "P@ssw0rd"
 }
 
+prov_vault = {
+  schema          = "https"
+  address         = "vault.day1.sololab:8200"
+  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  skip_tls_verify = true
+}
+
 vm = {
   count     = 1
   base_name = "Day2-FCOS"
@@ -48,6 +55,7 @@ butane = {
       "./Butane/storage.yaml",
       "./Butane/user-1000.yaml",
       "./Butane/user-1001.yaml",
+      "./Butane/consul.yaml",
     ]
   }
   vars = {
@@ -56,7 +64,7 @@ butane = {
       "interface"                = "eth0"
       "prefix"                   = 24
       "gateway"                  = "192.168.255.1"
-      "general_dns"              = "192.168.255.1;192.168.255.10"
+      "general_dns"              = "192.168.255.10"
       "domain"                   = "sololab."
       "domain_dns"               = "192.168.255.10"
       "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge"
@@ -67,9 +75,39 @@ butane = {
     }
     local = [
       {
-        "vm_name" = "Day2-FCOS"
-        "ip"      = "192.168.255.30"
+        "vm_name"             = "Day2-FCOS"
+        "ip"                  = "192.168.255.30"
+        "consul_download_url" = "http://dufs.day0.sololab/binaries/consul_1.21.3_linux_amd64.zip"
+        "consul_version"      = "1.21.3"
+        "consul_server_fqdn"  = "consul.day1.sololab"
+        "ca_download_url"     = "http://dufs.day0.sololab/certs/root.crt"
       }
+    ]
+    secrets = [
+      {
+        vault_kvv2 = {
+          mount = "kvv2/consul"
+          name  = "token-consul_client"
+        }
+        value_sets = [
+          {
+            name          = "consul_acl_token"
+            value_ref_key = "token"
+          }
+        ]
+      },
+      {
+        vault_kvv2 = {
+          mount = "kvv2/consul"
+          name  = "key-gossip_encryption"
+        }
+        value_sets = [
+          {
+            name          = "consul_encrypt_key"
+            value_ref_key = "key"
+          }
+        ]
+      },
     ]
   }
 }

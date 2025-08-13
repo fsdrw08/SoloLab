@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+
+# https://github.com/lancehampton/nomad-on-coreos/blob/main/coreos/ignition/nomad.yaml
+storage:
+  directories:
+    - path: /var/home/core/.local/etc/nomad.d
+      mode: 0700
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # nomad data dir
+    - path: /var/home/podmgr/.local/opt/nomad
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
+  files:
+    - path: /opt/bin/nomad_${nomad_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: ${nomad_download_url}
+    - path: /var/home/core/.local/etc/nomad.d/ca.crt
+      overwrite: true
+      user:
+        id: 1000
+      group:
+        id: 1000
+      mode: 0600
+      contents:
+        source: ${ca_download_url}
+    - path: /var/home/core/.local/etc/nomad.d/nomad.hcl
+      contents:
+        inline: |
+          client {
+            enabled = true
+            servers = ["${nomad_server_fqdn}"]
+            drain_on_shutdown {
+              deadline           = "20s"
+              ignore_system_jobs = true
+            }
+          }
+
+          leave_on_interrupt = true
+          leave_on_terminate = true
+          data_dir           = "${nomad_data_dir}"
+
+          ports {
+            http = 4746
+            rpc  = 4747
+            serf = 4748
+          }
+
+          tls {
+            http = true
+            rpc  = true
+
+            ca_file   = "${ca_file}"
+            cert_file = "${cert_file}"
+            key_file  = "${key_file}"
+
+            # verify_server_hostname = true
+            verify_https_client = true
+          }
+    - path: /var/home/core/.config/systemd/user/nomad.service
+      overwrite: true
+      user:
+        id: 1000
+      group:
+        id: 1000
+      contents:
+        inline: |
+          [Unit]
+          Description="HashiCorp nomad - A service mesh solution"
+          Documentation=https://developer.hashicorp.com/
+          Requires=network-online.target
+          After=network-online.target
+          Requires=prepare-nomad-binary.service
+          ConditionFileNotEmpty=/var/home/core/.local/etc/nomad.d/nomad.hcl
+          ConditionFileNotEmpty=/opt/bin/nomad
+
+          [Service]
+          ExecStart=/opt/bin/nomad agent \
+            -config-dir=/var/home/core/.local/etc/nomad.d \
+            -config-dir=/var/home/core/nomad-services
+          ExecReload=/bin/kill --signal HUP $MAINPID
+          KillMode=process
+          KillSignal=SIGTERM
+          Restart=on-failure
+          LimitNOFILE=65536
+
+          [Install]
+          WantedBy=default.target
+  links:
+    # link the socket in this dir for socket auto start when user login
+    - path: /var/home/core/.config/systemd/user/default.target.wants/nomad.service
+      target: /var/home/core/.config/systemd/user/nomad.service
+      overwrite: true
+      user:
+        id: 1000
+      group:
+        id: 1000
+systemd:
+  units:
+    - name: prepare-nomad-binary.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Unpack Nomad binary and Podman driver to /opt/bin
+        ConditionPathExists=!/opt/bin/nomad
+
+        [Service]
+        Type=oneshot
+        Restart=on-failure
+        RemainAfterExit=yes
+        Environment=NOMAD_VERSION=1.10.3
+        Environment=PODMAN_DRIVER_VERSION=0.6.3
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_${NOMAD_VERSION}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${PODMAN_DRIVER_VERSION}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad_${NOMAD_VERSION}_linux_amd64.zip"
+        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${PODMAN_DRIVER_VERSION}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /opt/bin/nomad /opt/bin/nomad-driver-podman
+        # Fix ownership to root:root for proper permissions
+        ExecStart=/usr/bin/chown root:root /opt/bin/nomad /opt/bin/nomad-driver-podman
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad /opt/bin/nomad-driver-podman
+
+        [Install]
+        WantedBy=multi-user.target

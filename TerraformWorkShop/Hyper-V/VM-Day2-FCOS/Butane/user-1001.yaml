@@ -9,13 +9,13 @@ passwd:
       uid: 1001
       # to gen password hash
       # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
-      password_hash: ${1001_password_hash}
+      password_hash: ${password_hash_1001}
       ssh_authorized_keys:
-        - "${1001_ssh_authorized_keys}"
+        - "${ssh_authorized_keys_1001}"
 storage:
   files:
     # enable lingering to make user level service able to auto start on boot
-    - path: /var/lib/systemd/linger/1001
+    - path: /var/lib/systemd/linger/podmgr
     # source bash auto completion
     - path: /var/home/podmgr/.bashrc
       overwrite: true
@@ -65,12 +65,6 @@ storage:
         id: 1001
       group:
         id: 1001
-    - path: /var/home/podmgr/consul-services
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
     - path: /var/home/podmgr/.local
       mode: 0700
       user:
@@ -78,6 +72,12 @@ storage:
       group:
         id: 1001
     - path: /var/home/podmgr/.local/etc
+      mode: 0700
+      user:
+        id: 1001
+      group:
+        id: 1001
+    - path: /var/home/podmgr/.local/opt
       mode: 0700
       user:
         id: 1001

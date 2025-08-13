@@ -85,7 +85,29 @@ zones = [
         type = "A"
         ttl  = 86400
         results = [
-          "192.168.255.20"
+          "192.168.255.10"
+        ]
+      },
+    ]
+  },
+  {
+    name        = "day2.sololab."
+    nameservers = ["ns1.day2.sololab."]
+    records = [
+      {
+        fqdn = "day2.sololab."
+        type = "SOA"
+        ttl  = 86400
+        results = [
+          "ns1.day2.sololab. day2.sololab. 2025081301 3600 600 1814400 7200"
+        ]
+      },
+      {
+        fqdn = "ns1.day2.sololab."
+        type = "A"
+        ttl  = 86400
+        results = [
+          "192.168.255.10"
         ]
       },
     ]
