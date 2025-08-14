@@ -96,3 +96,49 @@ resource "nomad_acl_binding_rule" "admin" {
   bind_name   = nomad_acl_role.admin.name
   selector    = "\"app-nomad-admin\" in list.roles"
 }
+
+resource "nomad_acl_policy" "policy" {
+  for_each = {
+    for policy in var.policy_bindings : policy.name => policy
+  }
+  name        = each.value.name
+  description = each.value.description
+  rules_hcl   = each.value.rules
+}
+
+resource "nomad_acl_role" "role" {
+  for_each = {
+    for policy in var.policy_bindings : policy.name => policy
+  }
+  name        = each.value.name
+  description = each.value.description
+  policy {
+    name = nomad_acl_policy.policy[each.key].name
+  }
+}
+
+resource "nomad_acl_token" "token" {
+  for_each = {
+    for policy in var.policy_bindings : policy.name => policy
+  }
+  type = each.value.token.type
+  # policies = [nomad_acl_policy.policy[each.key].name]
+  role {
+    id = nomad_acl_role.role[each.key].id
+  }
+}
+
+resource "vault_kv_secret_v2" "secret" {
+  for_each = {
+    for policy in var.policy_bindings : policy.name => policy
+    if policy.token != null
+  }
+  mount               = each.value.token.vault_kvv2_path
+  name                = "token-${replace(each.value.name, "-", "_")}"
+  delete_all_versions = true
+  data_json = jsonencode(
+    {
+      token = nomad_acl_token.token[each.key].secret_id
+    }
+  )
+}
