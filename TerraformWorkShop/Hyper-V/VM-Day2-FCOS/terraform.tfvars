@@ -56,6 +56,7 @@ butane = {
       "./Butane/user-1000.yaml",
       "./Butane/user-1001.yaml",
       "./Butane/consul.yaml",
+      "./Butane/nomad.yaml",
     ]
   }
   vars = {
@@ -75,12 +76,19 @@ butane = {
     }
     local = [
       {
-        "vm_name"             = "Day2-FCOS"
-        "ip"                  = "192.168.255.30"
-        "consul_download_url" = "http://dufs.day0.sololab/binaries/consul_1.21.3_linux_amd64.zip"
-        "consul_version"      = "1.21.3"
-        "consul_server_fqdn"  = "consul.day1.sololab"
-        "ca_download_url"     = "http://dufs.day0.sololab/certs/root.crt"
+        "vm_name"                            = "Day2-FCOS"
+        "ip"                                 = "192.168.255.30"
+        "ca_download_url"                    = "http://dufs.day0.sololab/certs/root.crt"
+        "consul_download_url"                = "http://dufs.day0.sololab/binaries/consul_1.21.3_linux_amd64.zip"
+        "consul_version"                     = "1.21.3"
+        "consul_server_fqdn"                 = "consul.day1.sololab"
+        "nomad_download_url"                 = "http://dufs.day0.sololab/binaries/nomad_1.10.4_linux_amd64.zip"
+        "nomad_version"                      = "1.10.4"
+        "nomad_server_fqdn"                  = "nomad.day1.sololab"
+        "nomad_podman_driver_download_url"   = "http://dufs.day0.sololab/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip"
+        "nomad_podman_driver_version"        = "0.6.3"
+        "nomad_client_cert_download_url"     = "http://dufs.day0.sololab/certs/client.global.nomad.crt"
+        "nomad_client_cert_key_download_url" = "http://dufs.day0.sololab/certs/client.global.nomad.key"
       }
     ]
     secrets = [
@@ -105,6 +113,18 @@ butane = {
           {
             name          = "consul_encrypt_key"
             value_ref_key = "key"
+          }
+        ]
+      },
+      {
+        vault_kvv2 = {
+          mount = "kvv2/consul"
+          name  = "token-nomad_client"
+        }
+        value_sets = [
+          {
+            name          = "nomad_consul_acl_token"
+            value_ref_key = "token"
           }
         ]
       },
