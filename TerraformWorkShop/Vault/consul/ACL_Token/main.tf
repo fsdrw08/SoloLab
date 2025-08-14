@@ -40,16 +40,9 @@ module "consul_jwt_auth_policy_bindings" {
   ]
 }
 
-resource "vault_mount" "kvv2" {
-  path        = "kvv2/consul"
-  type        = "kv-v2"
-  description = "kvv2 secret backend for consul"
-}
-
 resource "vault_kv_secret_v2" "secret" {
-  depends_on = [vault_mount.kvv2]
-  mount      = "kvv2/consul"
-  name       = "key-gossip_encryption"
+  mount = "kvv2/consul"
+  name  = "key-gossip_encryption"
   data_json = jsonencode(
     {
       key = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="

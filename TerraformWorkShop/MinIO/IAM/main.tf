@@ -48,17 +48,11 @@ resource "minio_iam_user_policy_attachment" "attachments" {
   policy_name = minio_iam_policy.policies[element(split(":", each.key), 1)].id
 }
 
-resource "vault_mount" "kvv2" {
-  path        = "kvv2/minio"
-  type        = "kv-v2"
-  description = "kvv2 secret backend for minio"
-}
-
 resource "vault_kv_secret_v2" "secret" {
   for_each = {
     for user in var.users : user.name => user
   }
-  mount               = vault_mount.kvv2.path
+  mount               = "kvv2/minio"
   name                = each.value.name
   delete_all_versions = true
   data_json = jsonencode(

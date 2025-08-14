@@ -1,9 +1,3 @@
-resource "vault_mount" "kvv2" {
-  path        = var.vault_kvv2.secret_engine.path
-  type        = "kv-v2"
-  description = var.vault_kvv2.secret_engine.description
-}
-
 resource "vault_pki_secret_backend_cert" "cert" {
   for_each = {
     for cert in var.vault_certs : cert.common_name => cert
@@ -26,7 +20,7 @@ data "vault_pki_secret_backend_issuer" "issuer" {
 }
 
 resource "vault_kv_secret_v2" "root_cert" {
-  mount = vault_mount.kvv2.path
+  mount = var.vault_kvv2.secret_engine.path
   name  = "root"
   data_json = jsonencode({
     "ca" = data.vault_pki_secret_backend_issuer.issuer.certificate
