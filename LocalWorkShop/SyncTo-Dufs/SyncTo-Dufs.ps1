@@ -1,6 +1,6 @@
 $repoDir = git rev-parse --show-toplevel
-$syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-Binaries\Day2.jsonc")
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-Binaries\Day1.jsonc")
+$syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day2.jsonc")
+# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day1.jsonc")
 
 $localDir="$env:PUBLIC/Downloads/bin"
 # $localDir="C:/Users/Public/Downloads/containers"
@@ -33,11 +33,11 @@ $syncList | ConvertFrom-Json | ForEach-Object {
     if ($_.archive -and (Test-Path -Path $localDir/$($_.archive))) {
         $localPath="$localDir/$($_.archive)"
         $url="$($_.privateRegistry)/$($_.privateRepo)"
-        $privateDir="$($_.privateRegistry)/$(Split-Path -Path $url -Parent)"
+        $privateDir="$($_.privateRegistry)/$(Split-Path -Path $_.privateRepo -Parent)"
         Write-Host "Create directory $privateDir if not exit"
-        curl -k -X MKCOL $privateDir --user $credential
+        curl.exe -k -X MKCOL $privateDir --user $credential
         Write-Host "Upload $localPath to $url"
-        curl -k -T $localPath $url --user $credential
+        curl.exe -k -T $localPath $url --user $credential
         ""
     }
     Start-Sleep -Seconds 1
