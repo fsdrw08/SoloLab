@@ -1,0 +1,1 @@
+config vault as OIDC identity provider

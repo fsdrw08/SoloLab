@@ -1,16 +1,18 @@
-This terraform resources are used to config Vault as jwt auth provider to consul.
+This terraform resources are used to config Vault as jwt identity provider to consul  
+ref: https://developer.hashicorp.com/vault/docs/secrets/identity/identity-token
 
 There are 2 scenarios while consul require jwt auth:
-## 1. Auto Config
+## 1. Consul auto config
+### deprecated, use auto_encrypt instead, just don't want to prepare the jwt token manually
 Used to distribute secure properties such as Access Control List (ACL) tokens, TLS certificates, gossip encryption keys, and other configuration settings to all Consul agents in a datacenter.  
-ref: [Automate Consul agent security with auto config](https://developer.hashicorp.com/consul/tutorials/archive/docker-compose-auto-config)  
+ref: [Automate Consul agent security with auto config](https://developer.hashicorp.com/consul/docs/secure/auto-config/docker#generate-jwts)  
 
 After apply resource in this dir, login vault ui with user who is a member of group `app-consul-auto_config`(in this project, the group and user are managed in LDAP server, and use the [LDAP](../../LDAP/) terraform resource to sync them to vault), put meta data key value: `consul_agent: <host name>` in user it self's entry,  
 then run a query in vault ui `API Explorer` to get the token from path `identity/oidc/token`
 ![](api_explorer.png)
 
-## 2. User Auth
-deprecated, use vault consul secret engine instead  
+## 2. Consul User Auth
+### deprecated, use vault consul secret engine instead  
 
 Used to auth user access into consul via jwt token  
 ref: https://github.com/gitrgoliveira/vault-consul-auth/blob/356687425d9ee5bbdc03134e372e9b16a5791a07/01.demo.sh
