@@ -16,22 +16,22 @@ variable "prov_consul" {
   })
 }
 
-variable "policy_bindings" {
+variable "policies" {
   type = list(object({
     name        = string
+    datacenters = optional(list(string), null)
     description = optional(string, null)
     rules       = string
-    datacenters = optional(list(string), null)
-    role = optional(object({
-      name        = string
-      description = optional(string, null)
-      }),
-      null
-    )
-    token = optional(object({
-      vault_kvv2_path = string
-      }),
-      null
-    )
+  }))
+}
+
+variable "roles" {
+  type = list(object({
+    name         = string
+    description  = optional(string, null)
+    policy_names = list(string)
+    token_store = optional(object({
+      vault_kvv2_path = optional(string, null)
+    }), null)
   }))
 }

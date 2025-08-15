@@ -12,7 +12,7 @@ prov_consul = {
   insecure_https = true
 }
 
-policy_bindings = [
+policies = [
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
     name        = "nomad_server"
@@ -33,9 +33,6 @@ policy_bindings = [
       acl  = "write"
       mesh = "write"
     EOT
-    token = {
-      vault_kvv2_path = "kvv2/consul"
-    }
   },
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
@@ -54,9 +51,6 @@ policy_bindings = [
         policy = "write"
       }
     EOT
-    token = {
-      vault_kvv2_path = "kvv2/consul"
-    }
   },
   {
     name        = "prometheus"
@@ -74,9 +68,6 @@ policy_bindings = [
         policy = "read"
       }
     EOT
-    token = {
-      vault_kvv2_path = "kvv2/consul"
-    }
   },
   {
     name        = "consul_client"
@@ -95,7 +86,39 @@ policy_bindings = [
         policy = "read"
       }
     EOT
-    token = {
+  },
+]
+
+roles = [
+  {
+    name         = "nomad_server"
+    description  = "Role of nomad server"
+    policy_names = ["nomad_server"]
+    token_store = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
+  {
+    name         = "nomad_client"
+    description  = "Role of nomad client"
+    policy_names = ["nomad_client"]
+    token_store = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
+  {
+    name         = "prometheus"
+    description  = "Role of Prometheus"
+    policy_names = ["prometheus"]
+    token_store = {
+      vault_kvv2_path = "kvv2/consul"
+    }
+  },
+  {
+    name         = "consul_client"
+    description  = "Role of consul client"
+    policy_names = ["consul_client"]
+    token_store = {
       vault_kvv2_path = "kvv2/consul"
     }
   },
