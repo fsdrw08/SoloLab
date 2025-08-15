@@ -11,6 +11,40 @@ prov_vault = {
 
 policies = [
   {
+    name        = "admin"
+    description = "admin policy"
+    rules       = <<-EOT
+      namespace "*" {
+        policy = "write"
+      }
+
+      node {
+        policy = "write"
+      }
+
+      agent {
+        policy = "write"
+      }
+
+      operator {
+        policy = "write"
+      }
+
+      quota {
+        policy = "write"
+      }
+
+      # this is a host_volume rule, with a wildcard label
+      host_volume "*" {
+        policy = "write"
+      }
+
+      plugin {
+        policy = "write"
+      }
+    EOT
+  },
+  {
     name        = "node-write"
     description = "Policy for nomad node write action"
     rules       = <<-EOT
@@ -22,6 +56,12 @@ policies = [
 ]
 
 roles = [
+  {
+    name                  = "admin"
+    description           = "admin role"
+    policy_names          = ["admin"]
+    auth_binding_selector = "\"app-nomad-admin\" in list.roles"
+  },
   {
     name         = "node-write"
     description  = "Role of nomad node"

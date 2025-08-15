@@ -44,59 +44,6 @@ resource "nomad_acl_auth_method" "oidc" {
   }
 }
 
-resource "nomad_acl_policy" "admin" {
-  name        = "admin"
-  description = "admin policy"
-
-  rules_hcl = <<EOT
-namespace "*" {
-  policy = "write"
-}
-
-node {
-  policy = "write"
-}
-
-agent {
-  policy = "write"
-}
-
-operator {
-  policy = "write"
-}
-
-quota {
-  policy = "write"
-}
-
-# this is a host_volume rule, with a wildcard label
-host_volume "*" {
-  policy = "write"
-}
-
-plugin {
-  policy = "write"
-}
-EOT
-}
-
-resource "nomad_acl_role" "admin" {
-  name        = "app-nomad-admin"
-  description = "admin role"
-
-  policy {
-    name = nomad_acl_policy.admin.name
-  }
-}
-
-resource "nomad_acl_binding_rule" "admin" {
-  description = "admin binding rule"
-  auth_method = nomad_acl_auth_method.oidc.name
-  bind_type   = "role"
-  bind_name   = nomad_acl_role.admin.name
-  selector    = "\"app-nomad-admin\" in list.roles"
-}
-
 resource "nomad_acl_policy" "policy" {
   for_each = {
     for policy in var.policies : policy.name => policy
@@ -120,6 +67,19 @@ resource "nomad_acl_role" "role" {
       name = policy.value
     }
   }
+}
+
+# bind nomad acl role to auth identity
+resource "nomad_acl_binding_rule" "binding" {
+  for_each = {
+    for role in var.roles : role.name => role
+    if role.auth_binding_selector != null
+  }
+  auth_method = nomad_acl_auth_method.oidc.name
+  bind_type   = "role"
+  bind_name   = each.value.name
+  description = each.value.description
+  selector    = each.value.auth_binding_selector
 }
 
 resource "nomad_acl_token" "token" {

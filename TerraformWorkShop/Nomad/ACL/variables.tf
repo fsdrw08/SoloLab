@@ -27,9 +27,10 @@ variable "policies" {
 
 variable "roles" {
   type = list(object({
-    name         = string
-    description  = optional(string, null)
-    policy_names = list(string)
+    name                  = string
+    description           = optional(string, null)
+    policy_names          = list(string)
+    auth_binding_selector = optional(string, null)
     token = optional(object({
       type = optional(string, "client")
       store = optional(object({
