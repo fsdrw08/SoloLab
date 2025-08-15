@@ -9,48 +9,8 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-policy_bindings = [
-
-  # {
-  #   # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-  #   name        = "admin"
-  #   description = "Policy for nomad admin"
-  #   rules       = <<-EOT
-  #     namespace "*" {
-  #       policy = "write"
-  #     }
-
-  #     node {
-  #       policy = "write"
-  #     }
-
-  #     agent {
-  #       policy = "write"
-  #     }
-
-  #     operator {
-  #       policy = "write"
-  #     }
-
-  #     quota {
-  #       policy = "write"
-  #     }
-
-  #     # this is a host_volume rule, with a wildcard label
-  #     host_volume "*" {
-  #       policy = "write"
-  #     }
-
-  #     plugin {
-  #       policy = "write"
-  #     }
-  #   EOT
-  #   token = {
-  #     vault_kvv2_path = "kvv2/nomad"
-  #   }
-  # },
+policies = [
   {
-    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
     name        = "node-write"
     description = "Policy for nomad node write action"
     rules       = <<-EOT
@@ -58,8 +18,18 @@ policy_bindings = [
         policy = "write"
       }
     EOT
+  },
+]
+
+roles = [
+  {
+    name         = "node-write"
+    description  = "Role of nomad node"
+    policy_names = ["node-write"]
     token = {
-      vault_kvv2_path = "kvv2/nomad"
+      store = {
+        vault_kvv2_path = "kvv2/nomad"
+      }
     }
   },
 ]

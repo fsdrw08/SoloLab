@@ -99,7 +99,7 @@ resource "nomad_acl_binding_rule" "admin" {
 
 resource "nomad_acl_policy" "policy" {
   for_each = {
-    for policy in var.policy_bindings : policy.name => policy
+    for policy in var.policies : policy.name => policy
   }
   name        = each.value.name
   description = each.value.description
@@ -107,22 +107,27 @@ resource "nomad_acl_policy" "policy" {
 }
 
 resource "nomad_acl_role" "role" {
+  depends_on = [nomad_acl_policy.policy]
   for_each = {
-    for policy in var.policy_bindings : policy.name => policy
+    for role in var.roles : role.name => role
   }
   name        = each.value.name
   description = each.value.description
-  policy {
-    name = nomad_acl_policy.policy[each.key].name
+  dynamic "policy" {
+    iterator = policy
+    for_each = each.value.policy_names
+    content {
+      name = policy.value
+    }
   }
 }
 
 resource "nomad_acl_token" "token" {
   for_each = {
-    for policy in var.policy_bindings : policy.name => policy
+    for role in var.roles : role.name => role
+    if role.token != null
   }
   type = each.value.token.type
-  # policies = [nomad_acl_policy.policy[each.key].name]
   role {
     id = nomad_acl_role.role[each.key].id
   }
@@ -130,10 +135,10 @@ resource "nomad_acl_token" "token" {
 
 resource "vault_kv_secret_v2" "secret" {
   for_each = {
-    for policy in var.policy_bindings : policy.name => policy
-    if policy.token != null
+    for role in var.roles : role.name => role
+    if role.token != null && role.token.store != null && role.token.store.vault_kvv2_path != null
   }
-  mount               = each.value.token.vault_kvv2_path
+  mount               = each.value.token.store.vault_kvv2_path
   name                = "token-${replace(each.value.name, "-", "_")}"
   delete_all_versions = true
   data_json = jsonencode(
