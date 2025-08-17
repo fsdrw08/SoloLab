@@ -40,15 +40,23 @@ output "int_ca_pem" {
 # }
 
 output "signed_certs" {
-  value = [
-    for key in var.certs : {
-      name           = key.name
-      ca             = tls_locally_signed_cert.int_ca.cert_pem
-      cert_pem       = "${tls_locally_signed_cert.cert[key.name].cert_pem}"
-      cert_pem_chain = "${tls_locally_signed_cert.cert[key.name].cert_pem}${tls_locally_signed_cert.int_ca.cert_pem}"
-      key_pem        = tls_private_key.key[key.name].private_key_pem
-      key_pkcs8      = tls_private_key.key[key.name].private_key_pem_pkcs8
-    }
-  ]
+  value = concat(
+    [
+      {
+        name = "root"
+        ca   = tls_locally_signed_cert.int_ca.cert_pem
+      }
+    ],
+    [
+      for key in var.certs : {
+        name           = key.name
+        ca             = tls_locally_signed_cert.int_ca.cert_pem
+        cert_pem       = "${tls_locally_signed_cert.cert[key.name].cert_pem}"
+        cert_pem_chain = "${tls_locally_signed_cert.cert[key.name].cert_pem}${tls_locally_signed_cert.int_ca.cert_pem}"
+        key_pem        = tls_private_key.key[key.name].private_key_pem
+        key_pkcs8      = tls_private_key.key[key.name].private_key_pem_pkcs8
+      }
+    ]
+  )
   sensitive = true
 }

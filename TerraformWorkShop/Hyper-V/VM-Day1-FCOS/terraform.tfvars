@@ -67,10 +67,31 @@ butane = {
     }
     local = [
       {
-        "vm_name" = "Day1-FCOS"
-        "ip"      = "192.168.255.20"
+        "vm_name"     = "Day1-FCOS"
+        "ip"          = "192.168.255.20"
+        "ca_cert_url" = "http://dufs.day0.sololab/certs/root.crt"
+        "registry"    = "zot.day0.sololab/fedora/fedora-coreos:stable"
       }
     ]
+    # secrets = [
+    #   {
+    #     tfstate = {
+    #       backend = {
+    #         type = "local"
+    #         config = {
+    #           path = "../../TLS/RootCA/terraform.tfstate"
+    #         }
+    #       }
+    #       cert_name = "root"
+    #     }
+    #     value_sets = [
+    #       {
+    #         name          = "ca_content"
+    #         value_ref_key = "ca"
+    #       }
+    #     ]
+    #   },
+    # ]
   }
 }
 
