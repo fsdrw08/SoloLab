@@ -78,7 +78,8 @@ butane = {
       {
         "vm_name"                            = "Day2-FCOS"
         "ip"                                 = "192.168.255.30"
-        "ca_download_url"                    = "http://dufs.day0.sololab/certs/root.crt"
+        "ca_cert_url"                        = "http://dufs.day0.sololab/certs/root.crt"
+        "fcos_image_mirror"                  = "zot.day0.sololab/fedora/fedora-coreos"
         "consul_download_url"                = "http://dufs.day0.sololab/binaries/consul_1.21.3_linux_amd64.zip"
         "consul_version"                     = "1.21.3"
         "consul_server_fqdn"                 = "consul.day1.sololab"
@@ -89,6 +90,7 @@ butane = {
         "nomad_podman_driver_version"        = "0.6.3"
         "nomad_client_cert_download_url"     = "http://dufs.day0.sololab/certs/client.global.nomad.crt"
         "nomad_client_cert_key_download_url" = "http://dufs.day0.sololab/certs/client.global.nomad.key"
+        "vault_server_address"               = "https://vault.day1.sololab"
       }
     ]
     secrets = [

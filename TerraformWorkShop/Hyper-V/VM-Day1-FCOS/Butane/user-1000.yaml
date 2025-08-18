@@ -53,6 +53,12 @@ storage:
         id: 1000
       group:
         id: 1000
+    - path: /var/home/core/.config
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
     # config user level systemd
     - path: /var/home/core/.config/systemd
       mode: 0755

@@ -45,7 +45,7 @@ storage:
         id: 1001
       mode: 0600
       contents:
-        source: ${ca_download_url}
+        source: ${ca_cert_url}
     - path: /var/home/podmgr/.local/etc/nomad.d/client.pem
       overwrite: true
       user:
@@ -120,6 +120,18 @@ storage:
               }
             }
           }
+
+          vault {
+            enabled = true
+            address = "${vault_server_address}"
+            ca_file = "/var/home/podmgr/.local/etc/nomad.d/ca.crt"
+
+            default_identity {
+              aud = ["vault.io"]
+              ttl = "1h"
+            }
+          }
+
     - path: /var/home/podmgr/.config/systemd/user/nomad.service
       overwrite: true
       user:

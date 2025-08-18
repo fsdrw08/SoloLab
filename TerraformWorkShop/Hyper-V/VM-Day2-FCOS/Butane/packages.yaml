@@ -3,6 +3,18 @@ variant: fcos
 version: 1.5.0
 storage:
   files:
+    # mirror system image
+    # https://bootc-dev.github.io/bootc/registries-and-offline.html#pulling-updates-from-a-local-mirror
+    # https://github.com/chenzhiwei/linux/blob/8cdb9aa837747b12ea6efb240e7ebab89ec7a767/podman/README.md#setup-mirrors
+    - path: /etc/containers/registries.conf.d/local-registry.conf
+      contents:
+        inline: |
+          [[registry]]
+          prefix=""
+          location="quay.io/fedora/fedora-coreos"
+          mirror-by-digest-only=false
+          [[registry.mirror]]
+            location="${fcos_image_mirror}"
     # mirror_fedora_repo
     # https://mirrors.tuna.tsinghua.edu.cn/help/fedora/
     # https://mirrors.ustc.edu.cn/help/fedora.html

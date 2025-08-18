@@ -6,13 +6,13 @@ version: 1.5.0
 storage:
   directories:
     # consul config dir
-    - path: /var/home/podmgr/.local/etc/consul.d
+    - path: /var/home/podmgr/consul-services
       mode: 0700
       user:
         id: 1001
       group:
         id: 1001
-    - path: /var/home/podmgr/consul-services
+    - path: /var/home/podmgr/.local/etc/consul.d
       mode: 0700
       user:
         id: 1001
@@ -38,7 +38,7 @@ storage:
         id: 1001
       mode: 0600
       contents:
-        source: ${ca_download_url}
+        source: ${ca_cert_url}
     - path: /var/home/podmgr/.local/etc/consul.d/consul.hcl
       overwrite: true
       user:
