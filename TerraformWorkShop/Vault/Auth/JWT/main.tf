@@ -1,9 +1,15 @@
 # Copyright (c) HashiCorp, Inc.
 # SPDX-License-Identifier: MPL-2.0
 
+# https://github.com/hashicorp-modules/terraform-vault-nomad-setup/blob/main/main.tf
 locals {
   create_default_policy = length(var.policy_names) == 0
   policy_names          = local.create_default_policy ? vault_policy.nomad_workload[*].name : var.policy_names
+}
+
+data "vault_kv_secret_v2" "root_cert" {
+  mount = "kvv2/certs"
+  name  = "root"
 }
 
 # vault_jwt_auth_backend.nomad is the JWT auth method used by Nomad tasks to
@@ -11,6 +17,7 @@ locals {
 resource "vault_jwt_auth_backend" "nomad" {
   path               = var.jwt_auth_path
   description        = "JWT auth backend for Nomad"
+  jwks_ca_pem        = data.vault_kv_secret_v2.root_cert.data["ca"]
   jwks_url           = var.nomad_jwks_url
   jwt_supported_algs = ["RS256", "EdDSA"]
 
@@ -72,7 +79,7 @@ resource "vault_jwt_auth_backend_role" "nomad_workload" {
 }
 
 # vault_policy.nomad_workload is a sample ACL policy that grants tasks read
-# access to secrets in the path "secret/<job namespace>/<job ID>/*" to
+# access to secrets in the path "kvv2/nomad/<job namespace>/<job ID>/*" to
 # illustrate how policies can reference values from the claim_mappings defined
 # in vault_jwt_auth_backend_role.nomad_workload.
 #
@@ -87,19 +94,19 @@ resource "vault_policy" "nomad_workload" {
 
   name   = var.default_policy_name
   policy = <<EOT
-path "secret/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
+path "kvv2/nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
   capabilities = ["read"]
 }
 
-path "secret/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}" {
+path "kvv2/nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}" {
   capabilities = ["read"]
 }
 
-path "secret/metadata/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/*" {
+path "kvv2/nomad/metadata/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/*" {
   capabilities = ["list"]
 }
 
-path "secret/metadata/*" {
+path "kvv2/nomad/metadata/*" {
   capabilities = ["list"]
 }
 EOT

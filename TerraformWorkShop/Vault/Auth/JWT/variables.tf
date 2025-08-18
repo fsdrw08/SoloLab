@@ -1,7 +1,10 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
-# Required variables.
+variable "prov_vault" {
+  type = object({
+    address         = string
+    token           = string
+    skip_tls_verify = bool
+  })
+}
 
 variable "nomad_jwks_url" {
   description = "The URL used by Vault to access Nomad's JWKS information. It should be reachable by all Vault servers and resolve to multiple Nomad agents for high-availability, such as through a proxy or a DNS entry with multiple IP addresses."
