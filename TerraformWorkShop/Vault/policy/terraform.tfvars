@@ -5,6 +5,7 @@ prov_vault = {
 }
 
 policy_bindings = [
+  # vault-admin
   {
     policy_name = "vault-admin"
     # ref: https://github.com/kencx/homelab/blob/1c451e1634f818e9d912bb054db47988cb083989/terraform/vault/policies/admin.hcl#L75
@@ -121,9 +122,13 @@ policy_bindings = [
     }
   },
   # https://github.com/doohee323/tz-k8s-vagrant/blob/9149105349fdd6bf045fbea598f1b01f17ba899b/tz-local/resource/vault/data/read-role.hcl#L4
+  # vault-user
   {
     policy_name    = "vault-user"
     policy_content = <<-EOT
+      path "auth/*" {
+        capabilities = ["list", "read"]
+      }
       path "identity/group/*" {
         capabilities = ["list", "read"]
       }
@@ -133,8 +138,20 @@ policy_bindings = [
       path "identity/entity/id/{{identity.entity.id}}" {
         capabilities = ["read"]
       }
-      path "auth/*" {
-        capabilities = ["list", "read"]
+      path "kvv2/certs/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2/certs/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2/certs/metadata/*" {
+        capabilities = ["list"]
+      }
+
+      path "kvv2/certs/metadata/*" {
+        capabilities = ["list"]
       }
       path "sys/*" {
         capabilities = ["list", "read"]

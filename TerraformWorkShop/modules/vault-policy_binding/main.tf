@@ -23,11 +23,9 @@ resource "vault_identity_group" "internal" {
     for binding in var.policy_bindings : binding.group_binding.policy_group => binding
     if binding.group_binding != null
   }
-  name = each.value.group_binding.policy_group
-  type = "internal"
-  policies = [
-    vault_policy.policy[each.value.policy_name].name
-  ]
+  name     = each.value.group_binding.policy_group
+  type     = "internal"
+  policies = [vault_policy.policy[each.value.policy_name].name]
   member_group_ids = [
     for group in each.value.group_binding.external_groups : data.vault_identity_group.external[group].group_id
   ]
