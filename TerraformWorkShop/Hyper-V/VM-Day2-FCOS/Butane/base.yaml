@@ -19,6 +19,11 @@ storage:
       contents:
         inline: |
           net.ipv4.ip_unprivileged_port_start = 53
+    # trust custom cert
+    - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
+      mode: 0644
+      contents:
+        source: ${ca_cert_url}
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/${timezone}

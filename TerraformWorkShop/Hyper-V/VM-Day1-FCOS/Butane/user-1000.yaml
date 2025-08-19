@@ -59,6 +59,20 @@ storage:
         id: 1000
       group:
         id: 1000
+    # config podman quadlet
+    # https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+    - path: /var/home/core/.config/containers
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.config/containers/systemd
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
     # config user level systemd
     - path: /var/home/core/.config/systemd
       mode: 0755
