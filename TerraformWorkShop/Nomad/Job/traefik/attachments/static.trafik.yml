@@ -1,0 +1,60 @@
+accessLog: {}
+api:
+  dashboard: true
+certificatesResolvers:
+  external:
+    acme:
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      certificatesDuration: 2160
+      email: ""
+      storage: /mnt/acmeStorage/external.json
+      tlsChallenge: {}
+  internal:
+    acme:
+      caServer: https://vault.day1.sololab/v1/pki/day1/acme/directory
+      certificatesDuration: 2160
+      email: ""
+      storage: /mnt/acmeStorage/internal.json
+      tlsChallenge: {}
+entryPoints:
+  traefik:
+    address: :8080
+  web:
+    address: :80
+    forwardedHeaders:
+      trustedIPs:
+        - 0.0.0.0/0
+  webSecure:
+    address: :443
+    forwardedHeaders:
+      trustedIPs:
+        - 0.0.0.0/0
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+log:
+  level: INFO
+metrics:
+  prometheus:
+    manualRouting: true
+ping: {}
+providers:
+  consulCatalog:
+    endpoint:
+      address: consul.day1.sololab:8501
+      datacenter: dc1
+      scheme: https
+      tls:
+        ca: /etc/traefik/tls/ca.crt
+    exposedByDefault: false
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    useBindPortIP: false
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+serversTransport:
+  insecureSkipVerify: false
+  rootCAs:
+    - /etc/traefik/tls/ca.crt
