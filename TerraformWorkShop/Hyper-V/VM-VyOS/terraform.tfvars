@@ -41,10 +41,10 @@ vm = {
   enable_secure_boot = "Off"
   power_state        = "Running"
   memory = {
-    static        = true
-    startup_bytes = 2046820352
-    maximum_bytes = 2046820352
-    minimum_bytes = 1023410176
+    dynamic       = true
+    startup_bytes = 1023410176
+    maximum_bytes = 1023410176
+    minimum_bytes = 511705088
   }
 }
 
