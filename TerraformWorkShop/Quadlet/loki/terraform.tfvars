@@ -63,7 +63,7 @@ podman_quadlet = {
             After                 = ""
             Wants                 = ""
             StartLimitIntervalSec = 120
-            StartLimitBurst       = 3
+            StartLimitBurst       = 5
             # kube
             yaml          = "loki-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
@@ -74,7 +74,7 @@ podman_quadlet = {
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
             # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 80-90 -n 1) && podman healthcheck run loki-server \"" # || sleep $(shuf -i 30-35 -n 1) && podman healthcheck run loki-server \""
             ExecStartPost = ""
-            Restart       = "" # on-failure
+            Restart       = "on-failure"
           }
         },
       ]

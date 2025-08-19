@@ -75,7 +75,7 @@ podman_quadlet = {
             After                 = ""
             Wants                 = ""
             StartLimitIntervalSec = 120
-            StartLimitBurst       = 3
+            StartLimitBurst       = 5
             # kube
             yaml          = "consul-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
