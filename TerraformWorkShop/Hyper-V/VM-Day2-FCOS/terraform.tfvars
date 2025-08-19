@@ -130,6 +130,18 @@ butane = {
           }
         ]
       },
+      {
+        vault_kvv2 = {
+          mount = "kvv2/nomad"
+          name  = "token-node_write"
+        }
+        value_sets = [
+          {
+            name          = "nomad_acl_token"
+            value_ref_key = "token"
+          }
+        ]
+      },
     ]
   }
 }

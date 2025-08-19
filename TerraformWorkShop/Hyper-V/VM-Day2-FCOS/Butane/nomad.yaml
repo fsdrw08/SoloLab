@@ -125,11 +125,6 @@ storage:
             enabled = true
             address = "${vault_server_address}"
             ca_file = "/var/home/podmgr/.local/etc/nomad.d/ca.crt"
-
-            default_identity {
-              aud = ["vault.io"]
-              ttl = "1h"
-            }
           }
 
     - path: /var/home/podmgr/.config/systemd/user/nomad.service
@@ -161,7 +156,7 @@ storage:
           ExecStart=/opt/bin/nomad agent \
             -config /var/home/podmgr/.local/etc/nomad.d/nomad.hcl
           # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
-          ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self\""
+          ExecStartPost = /bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
           KillMode=process
           KillSignal=SIGINT
           LimitNOFILE=65536

@@ -28,17 +28,22 @@ nomad:
     main:
       acl:
         enabled: true
+      consul:
+        address: consul.day1.sololab:8501
+        ca_file: /nomad/config/certs/ca.crt
+        ssl: true
+        token: # set by vault data
       tls:
         http: true
         rpc: true
-        ca_file: "/nomad/config/certs/ca.crt"
-        cert_file: "/nomad/config/certs/server.crt"
-        key_file: "/nomad/config/certs/server.key"
-      consul:
-        address: "consul.day1.sololab:8501"
-        ca_file: "/nomad/config/certs/ca.crt"
-        ssl: true
-        token: # set by vault data
+        ca_file: /nomad/config/certs/ca.crt
+        cert_file: /nomad/config/certs/server.crt
+        key_file: /nomad/config/certs/server.key
+      vault:
+        enabled: true
+        default_identity:
+          aud: ["vault.io"]
+          ttl: 1h
 
   args:
     - agent
