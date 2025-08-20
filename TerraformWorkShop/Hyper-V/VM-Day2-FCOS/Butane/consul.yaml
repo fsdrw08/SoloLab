@@ -6,45 +6,18 @@ version: 1.5.0
 storage:
   directories:
     # consul config dir
-    - path: /var/home/podmgr/consul-services
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
-    - path: /var/home/podmgr/.local/etc/consul.d
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /etc/consul.d
     # consul data dir
-    - path: /var/home/podmgr/.local/opt/consul
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /var/mnt/data/consul
+  links:
+    - path: /var/lib/consul
+      target: /var/mnt/data/consul
   files:
     - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
       mode: 0644
       contents:
         source: ${consul_download_url}
-    - path: /var/home/podmgr/.local/etc/consul.d/ca.crt
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
-      mode: 0600
-      contents:
-        source: ${ca_cert_url}
-    - path: /var/home/podmgr/.local/etc/consul.d/consul.hcl
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /etc/consul.d/consul.hcl
       contents:
         inline: |
           acl {
@@ -54,7 +27,7 @@ storage:
           }
           bind_addr = "0.0.0.0"
           client_addr = "{{ GetInterfaceIP \"eth0\" }}"
-          data_dir = "/var/home/podmgr/.local/opt/consul"
+          data_dir = "/var/lib/consul"
           encrypt = "${consul_encrypt_key}"
           ports {
             https = 8501
@@ -62,7 +35,7 @@ storage:
           retry_join = ["${consul_server_fqdn}"]
           tls {
             defaults {
-              ca_file = "/var/home/podmgr/.local/etc/consul.d/ca.crt"
+              ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
               verify_incoming = false
               verify_outgoing = true
               verify_server_hostname = true
@@ -74,44 +47,6 @@ storage:
           auto_encrypt {
             tls = true
           }
-    - path: /var/home/podmgr/.config/systemd/user/consul.service
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
-      contents:
-        inline: |
-          [Unit]
-          Description="HashiCorp Consul - A service mesh solution"
-          Documentation=https://developer.hashicorp.com/
-          Wants=podman-user-wait-network-online.service
-          After=podman-user-wait-network-online.service
-          ConditionFileNotEmpty=/opt/bin/consul
-          ConditionFileNotEmpty=/var/home/podmgr/.local/etc/consul.d/consul.hcl
-          ConditionPathIsDirectory=/var/home/podmgr/.local/opt/consul
-
-          [Service]
-          ExecStart=/opt/bin/consul agent \
-            -config-dir=/var/home/podmgr/.local/etc/consul.d \
-            -config-dir=/var/home/podmgr/consul-services
-          ExecReload=/bin/kill --signal HUP $MAINPID
-          KillMode=process
-          KillSignal=SIGTERM
-          Restart=on-failure
-          LimitNOFILE=65536
-
-          [Install]
-          WantedBy=default.target
-  links:
-    # link the service under default.target.wants for auto start when user login
-    - path: /var/home/podmgr/.config/systemd/user/default.target.wants/consul.service
-      target: /var/home/podmgr/.config/systemd/user/consul.service
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
 systemd:
   units:
     - name: prepare-consul-binary.service
@@ -134,3 +69,27 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: consul.service
+      enabled: true
+      contents: |
+        [Unit]
+          Description="HashiCorp Consul - A service mesh solution"
+          Documentation=https://developer.hashicorp.com/
+          Wants=podman-user-wait-network-online.service
+          After=podman-user-wait-network-online.service
+          ConditionFileNotEmpty=/opt/bin/consul
+          ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+          ConditionPathIsDirectory=/var/lib/consul
+
+          [Service]
+          ExecStart=/opt/bin/consul agent \
+            -config-dir=/etc/consul.d
+          ExecReload=/bin/kill --signal HUP $MAINPID
+          KillMode=process
+          KillSignal=SIGTERM
+          Restart=on-failure
+          LimitNOFILE=65536
+
+          [Install]
+          WantedBy=multi-user.target

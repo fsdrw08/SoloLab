@@ -5,27 +5,16 @@ version: 1.5.0
 # https://github.com/lancehampton/nomad-on-coreos/blob/main/coreos/ignition/nomad.yaml
 storage:
   directories:
-    - path: /var/home/podmgr/.local/etc/nomad.d
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
+    # nomad config dir
+    - path: /etc/nomad.d
     # nomad data dir
-    - path: /var/home/podmgr/.local/opt/nomad
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /var/mnt/data/nomad
     # nomad plugin dir, Nomad will generate the path using the top-level data_dir suffixed with plugins
     # https://developer.hashicorp.com/nomad/docs/configuration#plugin_dir
-    - path: /var/home/podmgr/.local/opt/nomad/plugins
-      mode: 0700
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /var/mnt/data/nomad/plugins
+  links:
+    - path: /var/lib/nomad
+      target: /var/mnt/data/nomad
   files:
     - path: /opt/bin/nomad_${nomad_version}_linux_amd64.zip
       mode: 0644
@@ -37,39 +26,15 @@ storage:
       contents:
         source: ${nomad_podman_driver_download_url}
         # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
-    - path: /var/home/podmgr/.local/etc/nomad.d/ca.crt
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
-      mode: 0600
-      contents:
-        source: ${ca_cert_url}
-    - path: /var/home/podmgr/.local/etc/nomad.d/client.pem
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /etc/nomad.d/client.pem
       mode: 0600
       contents:
         source: ${nomad_client_cert_download_url}
-    - path: /var/home/podmgr/.local/etc/nomad.d/client-key.pem
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /etc/nomad.d/client-key.pem
       mode: 0600
       contents:
         source: ${nomad_client_cert_key_download_url}
-    - path: /var/home/podmgr/.local/etc/nomad.d/nomad.hcl
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
+    - path: /etc/nomad.d/nomad.hcl
       contents:
         inline: |
           client {
@@ -83,12 +48,12 @@ storage:
 
           consul {
             address = "{{ GetInterfaceIP \"eth0\" }}:8501"
-            ca_file = "/var/home/podmgr/.local/etc/nomad.d/ca.crt"
+            ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
             ssl = true
             token = "${nomad_consul_acl_token}"
           }
 
-          data_dir           = "/var/home/podmgr/.local/opt/nomad"
+          data_dir           = "/var/lib/nomad"
           leave_on_interrupt = true
           leave_on_terminate = true
 
@@ -102,9 +67,9 @@ storage:
             http = true
             rpc  = true
 
-            ca_file   = "/var/home/podmgr/.local/etc/nomad.d/ca.crt"
-            cert_file = "/var/home/podmgr/.local/etc/nomad.d/client.pem"
-            key_file  = "/var/home/podmgr/.local/etc/nomad.d/client-key.pem"
+            ca_file   = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+            cert_file = "/etc/nomad.d/client.pem"
+            key_file  = "/etc/nomad.d/client-key.pem"
 
             # verify_server_hostname = true
             verify_https_client = true
@@ -114,7 +79,7 @@ storage:
           # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
           plugin "nomad-driver-podman" {
             config {
-              socket_path = "unix:///run/user/1001/podman/podman.sock"
+              socket_path = "unix:///run/podman/podman.sock"
               volumes {
                 enabled = true
               }
@@ -124,59 +89,9 @@ storage:
           vault {
             enabled = true
             address = "${vault_server_address}"
-            ca_file = "/var/home/podmgr/.local/etc/nomad.d/ca.crt"
+            ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
           }
 
-    - path: /var/home/podmgr/.config/systemd/user/nomad.service
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
-      contents:
-        inline: |
-          [Unit]
-          Description="Nomad Client Agent"
-          Documentation=https://developer.hashicorp.com/
-          Wants=podman-user-wait-network-online.service
-          After=podman-user-wait-network-online.service
-          ConditionFileNotEmpty=/opt/bin/nomad
-          ConditionFileNotEmpty=/var/home/podmgr/.local/etc/nomad.d/nomad.hcl
-          ConditionPathIsDirectory=/var/home/podmgr/.local/opt/nomad
-
-          [Service]
-          # https://developer.hashicorp.com/nomad/commands#environment-variables
-          Environment="NOMAD_ADDR=https://127.0.0.1:4646"
-          Environment="NOMAD_CACERT=/var/home/podmgr/.local/etc/nomad.d/ca.crt"
-          Environment="NOMAD_CLIENT_CERT=/var/home/podmgr/.local/etc/nomad.d/client.pem" 
-          Environment="NOMAD_CLIENT_KEY=/var/home/podmgr/.local/etc/nomad.d/client-key.pem"
-          Environment="NOMAD_TOKEN=${nomad_acl_token}" 
-
-          ExecReload=/bin/kill -HUP $MAINPID
-          ExecStart=/opt/bin/nomad agent \
-            -config /var/home/podmgr/.local/etc/nomad.d/nomad.hcl
-          # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
-          ExecStartPost = /bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
-          KillMode=process
-          KillSignal=SIGINT
-          LimitNOFILE=65536
-          LimitNPROC=infinity
-          TasksMax=infinity
-          Restart=on-failure
-          RestartSec=2
-          OOMScoreAdjust=-999
-
-          [Install]
-          WantedBy=default.target
-  links:
-    # link the service under default.target.wants for auto start when user login
-    - path: /var/home/podmgr/.config/systemd/user/default.target.wants/nomad.service
-      target: /var/home/podmgr/.config/systemd/user/nomad.service
-      overwrite: true
-      user:
-        id: 1001
-      group:
-        id: 1001
 systemd:
   units:
     - name: prepare-nomad-binary.service
@@ -191,14 +106,50 @@ systemd:
         Restart=on-failure
         RemainAfterExit=yes
         ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_${nomad_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /var/home/podmgr/.local/opt/nomad/plugins
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /var/mnt/data/nomad/plugins
         ExecStart=/usr/bin/rm "/opt/bin/nomad_${nomad_version}_linux_amd64.zip"
         ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
-        ExecStart=/usr/bin/chmod +x /opt/bin/nomad /var/home/podmgr/.local/opt/nomad/plugins/nomad-driver-podman
+        ExecStart=/usr/bin/chmod +x /opt/bin/nomad /var/mnt/data/nomad/plugins/nomad-driver-podman
         # Fix ownership to root:root for proper permissions
-        ExecStart=/usr/bin/chown root:root /opt/bin/nomad /var/home/podmgr/.local/opt/nomad/plugins/nomad-driver-podman
+        ExecStart=/usr/bin/chown root:root /opt/bin/nomad /var/mnt/data/nomad/plugins/nomad-driver-podman
         # Fix SELinux contexts for systemd execution
-        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad /var/home/podmgr/.local/opt/nomad/plugins/nomad-driver-podman
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad /var/mnt/data/nomad/plugins/nomad-driver-podman
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: nomad.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description="Nomad Client Agent"
+        Documentation=https://developer.hashicorp.com/
+        Wants=podman-user-wait-network-online.service
+        After=podman-user-wait-network-online.service
+        ConditionFileNotEmpty=/opt/bin/nomad
+        ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
+        ConditionPathIsDirectory=/var/lib/nomad
+
+        [Service]
+        # https://developer.hashicorp.com/nomad/commands#environment-variables
+        Environment="NOMAD_ADDR=https://127.0.0.1:4646"
+        Environment="NOMAD_CACERT=/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+        Environment="NOMAD_CLIENT_CERT=/etc/nomad.d/client.pem"
+        Environment="NOMAD_CLIENT_KEY=/etc/nomad.d/client-key.pem"
+        Environment="NOMAD_TOKEN=${nomad_acl_token}" 
+
+        ExecReload=/bin/kill -HUP $MAINPID
+        ExecStart=/opt/bin/nomad agent \
+          -config /etc/nomad.d/nomad.hcl
+        # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
+        ExecStartPost = /bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
+        KillMode=process
+        KillSignal=SIGINT
+        LimitNOFILE=65536
+        LimitNPROC=infinity
+        TasksMax=infinity
+        Restart=on-failure
+        RestartSec=2
+        OOMScoreAdjust=-999
 
         [Install]
         WantedBy=multi-user.target
