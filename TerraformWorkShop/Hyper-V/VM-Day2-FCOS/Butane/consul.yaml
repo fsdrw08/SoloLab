@@ -25,8 +25,11 @@ storage:
               default = "${consul_acl_token}"
             }
           }
-          bind_addr = "0.0.0.0"
-          client_addr = "{{ GetInterfaceIP \"eth0\" }}"
+          auto_encrypt {
+            tls = true
+          }
+          bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
+          client_addr = "0.0.0.0"
           data_dir = "/var/lib/consul"
           encrypt = "${consul_encrypt_key}"
           ports {
@@ -43,9 +46,6 @@ storage:
             internal_rpc {
               verify_server_hostname = true
             }
-          }
-          auto_encrypt {
-            tls = true
           }
 systemd:
   units:
