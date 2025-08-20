@@ -3,11 +3,11 @@ resource "nomad_job" "traefik" {
   jobspec = file("${path.module}/attachments/traefik.nomad.hcl")
 
   hcl2 {
+    allow_fs = true
     vars = {
-      static_config = templatefile("${path.module}/attachments/static.traefik.yml", {
-        domain = "hardwood.cloud"
-      })
-      dynamic_config = file("${path.module}/attachments/dynamic.traefik.yml")
+      static_config = file("${path.module}/attachments/static.traefik.yml")
     }
   }
+
+  purge_on_destroy = true
 }
