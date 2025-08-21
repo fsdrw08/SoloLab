@@ -76,6 +76,8 @@ data "vault_pki_secret_backend_issuers" "issuers" {
   backend    = vault_mount.pki.path
 }
 
+# issuer means the pair of public key (the cert) + private key, 
+# with this pair, we can issue(sign) certs
 # https://developer.hashicorp.com/vault/api-docs/secret/pki#notice-about-new-multi-issuer-functionality
 # Vault since 1.11.0 allows a single PKI mount to have multiple Certificate Authority (CA) certificates ("issuers") in a single mount, 
 # for the purpose of facilitating rotation.
