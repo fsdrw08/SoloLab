@@ -25,10 +25,10 @@ podman_kubes = [
             name  = "consul.day1.sololab"
           }
           value_sets = [
-            {
-              name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
-              value_ref_key = "ca"
-            },
+            # {
+            #   name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
+            #   value_ref_key = "ca"
+            # },
             {
               name          = "consul.tls.contents.ca\\.crt"
               value_ref_key = "ca"
@@ -52,6 +52,18 @@ podman_kubes = [
             {
               name          = "consul.configFiles.main.encrypt"
               value_ref_key = "key"
+            },
+          ]
+        },
+        {
+          vault_kvv2 = {
+            mount = "kvv2-vault_token"
+            name  = "consul-ca"
+          }
+          value_sets = [
+            {
+              name          = "consul.configFiles.main.connect.ca_config.token"
+              value_ref_key = "token"
             },
           ]
         },

@@ -1,7 +1,9 @@
 http:
   serversTransports:
     consul:
-      serverName: consul-client.day1.sololab
+      # as we use auto_config to let consul server generate consul client cert
+      # the common name of the client cert will not match with our custom FQDN
+      # just skip the verify for web ui web route in consul client
       insecureSkipVerify: true
       # rootcas:
       #   - "/etc/traefik/tls/ca.crt"

@@ -87,7 +87,6 @@ podman_quadlet = {
             # ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab:8200/v1/identity/oidc/.well-known/openid-configuration\""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run consul-agent\""
             ExecStartPre  = ""
-            ExecStartPost = ""
             Restart       = "on-failure"
           }
         }

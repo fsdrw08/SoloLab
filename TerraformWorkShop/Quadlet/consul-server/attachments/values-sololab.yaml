@@ -67,8 +67,23 @@ consul:
       # log_level: trace
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       client_addr: "0.0.0.0"
+      # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/service-mesh
+      connect:
+        enabled: true
+        ca_provider: vault
+        ca_config:
+          address: https://vault.day1.sololab:8200
+          ca_file: /consul/config/certs/ca.crt
+          token: # set by terraform get data from vault secret
+          root_pki_path: pki-sololab_root
+          intermediate_pki_path: pki-sololab_consul
+          leaf_cert_ttl: 72h
+          rotation_period: 2160h
+          intermediate_cert_ttl: 8760h
+          private_key_type: rsa
+          private_key_bits: 2048
       datacenter: dc1
-      encrypt: # set by terraform vault secret data
+      encrypt: # set by terraform get data from vault secret
       ports:
         https: 8501
       # https://discuss.hashicorp.com/t/failed-to-receive-encryption-is-configured-but-remote-state-is-not-encrypted/41222

@@ -40,7 +40,7 @@ consul:
     main:
       acl:
         tokens:
-          default: # set by terraform data
+          default: # set by terraform get data from vault secret
       # auto_config:
       #   enabled: true
       #   server_addresses:
@@ -48,7 +48,7 @@ consul:
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
       client_addr: "0.0.0.0"
-      encrypt: # set by terraform vault data
+      encrypt: # set by terraform get data from vault secret
       ports:
         https: 8501
       retry_join:
@@ -123,7 +123,7 @@ consul:
 
     traefik.http.routers.consul.entrypoints: webSecure
     traefik.http.routers.consul.rule: Host(`consul-client.day0.sololab`)
-    traefik.http.routers.consul.tls.certresolver: internal
+    traefik.http.routers.consul.tls: true
     traefik.http.routers.consul.service: consul
 
     traefik.http.services.consul.loadBalancer.serversTransport: consul@file

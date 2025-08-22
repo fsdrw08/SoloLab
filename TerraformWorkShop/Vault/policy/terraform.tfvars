@@ -67,9 +67,12 @@ policy_bindings = [
       path "identity/oidc/*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
-      ## KV Secrets Engine
-      # manage kv secrets engine
-      path "kvv2/*" {
+      # manage pki secrets engine, the path is related to path name
+      path "pki*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
+      # manage kv secrets engine, the path is related to path name
+      path "kvv2*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
       # Manage secrets engine
@@ -81,7 +84,7 @@ policy_bindings = [
         capabilities = ["read"]
       }
       ## PKI - Intermediate CA
-      path "pki/config/urls" {
+      path "pki_int/config/urls" {
         capabilities = ["read"]
       }
       # Create, update roles
@@ -138,19 +141,19 @@ policy_bindings = [
       path "identity/entity/id/{{identity.entity.id}}" {
         capabilities = ["read"]
       }
-      path "kvv2/certs/data/*" {
+      path "kvv2-certs/data/*" {
         capabilities = ["read"]
       }
 
-      path "kvv2/certs/data/" {
+      path "kvv2-certs/data/" {
         capabilities = ["read"]
       }
 
-      path "kvv2/certs/metadata/*" {
+      path "kvv2-certs/metadata/*" {
         capabilities = ["list"]
       }
 
-      path "kvv2/certs/metadata/*" {
+      path "kvv2-certs/metadata/*" {
         capabilities = ["list"]
       }
       path "sys/*" {
@@ -175,6 +178,47 @@ policy_bindings = [
     # https://discuss.hashicorp.com/t/help-why-do-tokens-always-expire-at-32-days-even-when-renewed/50351/8
     token_binding = {
       display_name = "prometheus-metrics"
+      no_parent    = true
+    }
+  },
+  # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca
+  # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
+  {
+    policy_name    = "consul-ca"
+    policy_content = <<-EOT
+      # Allow Consul to read both PKI mounts and to manage the intermediate PKI mount configuration:
+      path "/sys/mounts/pki-sololab_root" {
+        capabilities = [ "read" ]
+      }
+      path "/sys/mounts/pki-sololab_consul" {
+        capabilities = [ "read" ]
+      }
+      path "/sys/mounts/pki-sololab_consul/tune" {
+        capabilities = [ "update" ]
+      }
+      
+      # Allow Consul read-only access to the root PKI engine, to automatically rotate intermediate CAs as needed, and full use of the intermediate PKI engine:
+      path "/pki-sololab_root/" {
+        capabilities = [ "read" ]
+      }
+      path "/pki-sololab_root/root/sign-intermediate" {
+        capabilities = [ "update" ]
+      }
+      path "/pki-sololab_consul/*" {
+        capabilities = [ "create", "read", "update", "delete", "list" ]
+      }
+      
+      # Allow Consul to renew its Vault token if the token is renewable. 
+      # The rule enables the token to be renewed whether it is provided directly in the CA provider configuration or presented in an auth method.
+      path "auth/token/renew-self" {
+        capabilities = [ "update" ]
+      }
+      path "auth/token/lookup-self" {
+        capabilities = [ "read" ]
+      }
+    EOT
+    token_binding = {
+      display_name = "consul-ca"
       no_parent    = true
     }
   }
