@@ -6,6 +6,16 @@ locals {
         mount = secret.vault_kvv2.mount
         name  = secret.vault_kvv2.name
       }
+      if secret.vault_kvv2 != null
+    ]
+  ])
+  tls_tfstate = flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
+        backend = secret.tfstate.backend
+        name    = secret.tfstate.cert_name
+      }
+      if secret.tfstate != null
     ]
   ])
 }
@@ -20,18 +30,28 @@ data "vault_kv_secret_v2" "secrets" {
 }
 
 # load cert from local tls
-# data "terraform_remote_state" "root_ca" {
-#   count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
-#   backend = var.podman_kube.helm.secrets.tfstate.backend.type
-#   config  = var.podman_kube.helm.secrets.tfstate.backend.config
-# }
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tls_tfstate == null ? null : {
+    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
 
-# locals {
-#   cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
-#     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-#     if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
-#   ]
-# }
+locals {
+  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : [
+        for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
+        if cert.name == secret.tfstate.cert_name
+      ]
+      if secret.tfstate != null
+    ]
+  ])
+  certs = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.cert_list : cert.name => cert
+  }
+}
 
 data "helm_template" "podman_kubes" {
   for_each = {
@@ -43,27 +63,6 @@ data "helm_template" "podman_kubes" {
   values = [
     "${file(each.value.helm.value_file)}"
   ]
-
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
 
   # v3 helm provider
   set = flatten([
