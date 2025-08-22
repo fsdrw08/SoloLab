@@ -1,6 +1,9 @@
 resource "tls_private_key" "root" {
   algorithm = var.root_ca.key.algorithm
   rsa_bits  = var.root_ca.key.rsa_bits
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "tls_self_signed_cert" "root" {
@@ -23,6 +26,10 @@ resource "tls_self_signed_cert" "root" {
   validity_period_hours = var.root_ca.cert.validity_period_hours
 
   allowed_uses = var.root_ca.cert.allowed_uses
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "local_file" "root" {
