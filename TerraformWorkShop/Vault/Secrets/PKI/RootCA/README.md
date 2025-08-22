@@ -7,18 +7,21 @@ ref:
 - [mount.tf](https://github.com/arpanrecme/vault_monorepo/blob/main/codified_vault/pki/mount.tf)
 
 ### Pre-request
-Prepare a root cert key bundle first, see [../../../TLS/RootCA/](../../../TLS/RootCA)
+Prepare a root cert key bundle first, see [../../../../TLS/RootCA/](../../../../TLS/RootCA)
 
 
 ### apply the whole tf resource 
+#### Import root cert key bundle
 To create offline root ca, in [terraform.tfvars](./terraform.tfvars) uncomment 
 ```h
-ref_cert_bundle_path = "../../../TLS/RootCA/RootCA_bundle.pem"
+ref_cert_bundle_path = "../../../../TLS/RootCA/RootCA_bundle.pem"
 ```
+
 and comment 
 ```h
 ref_cert_bundle_path           = ""
 ```
+
 then save the file.
 
 Run terraform apply
@@ -26,6 +29,27 @@ Run terraform apply
 terraform plan
 terraform apply --auto-approve
 ```
+
+#### Revert the code change
+After apply, delete the root cert key bundle cert file in  [../../../../TLS/RootCA/](../../../../TLS/RootCA), revert above change:  
+comment out
+```h
+ref_cert_bundle_path = "../../../../TLS/RootCA/RootCA_bundle.pem"
+```
+
+and uncomment 
+```h
+ref_cert_bundle_path           = ""
+```
+
+then save the file.
+
+Run terraform apply again
+```powershell
+terraform plan
+terraform apply --auto-approve
+```
+
 
 ### have a check with the csr of intermediate ca
 - ref: 
@@ -40,14 +64,14 @@ terraform show -json | ConvertFrom-Json | Select-Object -ExpandProperty values |
 ### have a check with the cert chain
 have a check
 ```powershell
-$VAULT_ADDR="https://vault.infra.sololab"
+$VAULT_ADDR="https://vault.day1.sololab"
 curl -k --request LIST $VAULT_ADDR/pki/issuers
 Invoke-RestMethod -URI $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/pem | step certificate inspect
 Invoke-RestMethod -URI $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca_chain | step certificate inspect
 ```
 run in linux
 ```shell
-VAULT_ADDR="http://192.168.255.31:8200" 
+VAULT_ADDR="http://vault.day1.sololab:8200" 
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/ca_chain | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile  /dev/stdin  | openssl pkcs7 -print_certs -noout
@@ -59,14 +83,14 @@ curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca_chain | openssl crl2pkcs7 -nocr
 have a check
 ref: https://developer.hashicorp.com/vault/docs/commands#vault_cacert
 ```powershell
-$env:VAULT_ADDR="https://vault.infra.sololab"
+$env:VAULT_ADDR="https://vault.day1.sololab"
 $env:VAULT_TOKEN="hvs.pqibSbWZDHGmY2ZBlT0IHKXG"
 $env:VAULT_CACERT=join-path (git rev-parse --show-toplevel) -ChildPath "KubeWorkShop\Traefik\conf\root_ca.crt"
 vault login
 vault auth list
 
 # https://developer.hashicorp.com/vault/docs/secrets/pki/considerations#role-based-access
-$env:VAULT_ADDR="https://vault.infra.sololab"
+$env:VAULT_ADDR="https://vault.day1.sololab"
 $env:VAULT_TOKEN="hvs.pqibSbWZDHGmY2ZBlT0IHKXG"
 $ca1="sololab-pki/v1/ica1/v1"
 $ca2="sololab-pki/v1/ica2/v1"

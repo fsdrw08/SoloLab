@@ -18,7 +18,7 @@ resource "vault_mount" "pki" {
 resource "vault_pki_secret_backend_intermediate_cert_request" "intermediate_cert_request" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
-    if var.root_ca_ref.internal != null
+    if ca.csr != null
   }
   backend     = vault_mount.pki[each.key].path
   type        = "internal"
@@ -35,7 +35,7 @@ data "vault_pki_secret_backend_issuers" "root_ca" {
 resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermediate" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
-    if var.root_ca_ref.internal != null
+    if ca.csr != null
   }
   backend     = var.root_ca_ref.internal.backend
   csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request[each.key].csr
@@ -48,7 +48,7 @@ resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermedia
 resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate_set_signed" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
-    if var.root_ca_ref.internal != null
+    if ca.csr != null
   }
   backend     = vault_mount.pki[each.key].path
   certificate = vault_pki_secret_backend_root_sign_intermediate.root_sign_intermediate[each.key].certificate
@@ -59,7 +59,7 @@ resource "vault_pki_secret_backend_intermediate_set_signed" "intermediate_set_si
 resource "vault_pki_secret_backend_issuer" "issuer" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
-    if var.root_ca_ref.internal != null
+    if ca.issuer != null
   }
   backend                        = vault_mount.pki[each.key].path
   issuer_ref                     = vault_pki_secret_backend_intermediate_set_signed.intermediate_set_signed[each.key].imported_issuers[0]
@@ -71,7 +71,7 @@ resource "vault_pki_secret_backend_issuer" "issuer" {
 resource "vault_pki_secret_backend_config_issuers" "issuer" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
-    if var.root_ca_ref.internal != null
+    if ca.issuer != null
   }
   backend                       = vault_mount.pki[each.key].path
   default                       = vault_pki_secret_backend_issuer.issuer[each.key].issuer_id
@@ -82,6 +82,7 @@ resource "vault_pki_secret_backend_config_issuers" "issuer" {
 resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.public_fqdn != null
   }
   backend  = vault_mount.pki[each.key].path
   path     = "https://${each.value.public_fqdn}/v1/${vault_mount.pki[each.key].path}"
@@ -97,6 +98,7 @@ resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
 resource "vault_pki_secret_backend_config_urls" "config_urls" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.enable_backend_config == true
   }
   backend           = vault_mount.pki[each.key].path
   enable_templating = true
@@ -115,6 +117,7 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
 resource "vault_pki_secret_backend_crl_config" "crl_config" {
   for_each = {
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.enable_backend_config == true
   }
   backend      = vault_mount.pki[each.key].path
   expiry       = "72h"
@@ -125,12 +128,13 @@ resource "vault_pki_secret_backend_crl_config" "crl_config" {
 
 locals {
   roles = flatten([
-    for key, ca in var.intermediate_cas : [
+    for ca in var.intermediate_cas : [
       for role in ca.roles : {
-        path   = key
+        path   = ca.secret_engine.path
         config = role
       }
     ]
+    if ca.roles != null
   ])
 }
 
@@ -147,7 +151,7 @@ resource "vault_pki_secret_backend_role" "role" {
   # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
   # https://pkg.go.dev/crypto/x509#ExtKeyUsage
   ext_key_usage    = each.value.config.ext_key_usage
-  ttl              = (each.value.config.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+  ttl              = (each.value.config.ttl_months * 60 * 60 * 24 * 31)
   allow_ip_sans    = each.value.config.allow_ip_sans
   key_type         = each.value.config.key_type
   key_bits         = each.value.config.key_bits
@@ -157,20 +161,6 @@ resource "vault_pki_secret_backend_role" "role" {
 }
 
 # acme
-resource "vault_pki_secret_backend_role" "role_acme" {
-  for_each = {
-    for ca in var.intermediate_cas : ca.secret_engine.path => ca
-  }
-  backend          = vault_mount.pki[each.key].path
-  name             = "IntCA-Day1-v1-role-acme"
-  ttl              = (60 * 60 * 24 * 91) # 91 days in seconds
-  allow_ip_sans    = true
-  key_type         = "rsa"
-  key_bits         = 4096
-  allowed_domains  = ["day1.sololab", "day1.service.consul"]
-  allow_subdomains = true
-  allow_any_name   = true
-}
 
 # enable the acme configuration.
 # https://www.infralovers.com/blog/2023-10-16-hashicorp-vault-acme-terraform-configuration/#:~:text=apply%20the%20secrets,1
@@ -181,17 +171,24 @@ resource "vault_pki_secret_backend_role" "role_acme" {
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/pki_secret_backend_config_acme
 resource "vault_pki_secret_backend_config_acme" "config_acme" {
-  backend         = vault_mount.pki.path
-  enabled         = true
-  allowed_roles   = [vault_pki_secret_backend_role.role_acme.name]
-  allowed_issuers = [vault_pki_secret_backend_issuer.issuer.issuer_id]
+  for_each = {
+    for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.acme_allowed_roles != null
+  }
+  backend       = vault_mount.pki[each.key].path
+  enabled       = true
+  allowed_roles = each.value.acme_allowed_roles
 }
 
 # apply the secrets engine tuning parameter
 # ref: https://developer.hashicorp.com/vault/api-docs/secret/pki#acme-required-headers
 # https://developer.hashicorp.com/vault/api-docs/secret/pki/issuance#acme-required-headers
 resource "vault_generic_endpoint" "tune_acme" {
-  path                 = "sys/mounts/${vault_mount.pki.path}/tune"
+  for_each = {
+    for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.acme_allowed_roles != null
+  }
+  path                 = "sys/mounts/${vault_mount.pki[each.key].path}/tune"
   ignore_absent_fields = true
   disable_delete       = true
   write_fields         = ["passthrough_request_headers", "allowed_response_headers", "audit_non_hmac_request_keys", "audit_non_hmac_response_keys"]
