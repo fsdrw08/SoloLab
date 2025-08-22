@@ -8,7 +8,7 @@ locals {
 }
 
 data "vault_kv_secret_v2" "root_cert" {
-  mount = "kvv2/certs"
+  mount = "kvv2-certs"
   name  = "root"
 }
 
@@ -79,7 +79,7 @@ resource "vault_jwt_auth_backend_role" "nomad_workload" {
 }
 
 # vault_policy.nomad_workload is a sample ACL policy that grants tasks read
-# access to secrets in the path "kvv2/nomad/<job namespace>/<job ID>/*" to
+# access to secrets in the path "kvv2-nomad/<job namespace>/<job ID>/*" to
 # illustrate how policies can reference values from the claim_mappings defined
 # in vault_jwt_auth_backend_role.nomad_workload.
 #
@@ -94,19 +94,19 @@ resource "vault_policy" "nomad_workload" {
 
   name   = var.default_policy_name
   policy = <<EOT
-path "kvv2/nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
+path "kvv2-nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
   capabilities = ["read"]
 }
 
-path "kvv2/nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}" {
+path "kvv2-nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}" {
   capabilities = ["read"]
 }
 
-path "kvv2/nomad/metadata/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/*" {
+path "kvv2-nomad/metadata/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/*" {
   capabilities = ["list"]
 }
 
-path "kvv2/nomad/metadata/*" {
+path "kvv2-nomad/metadata/*" {
   capabilities = ["list"]
 }
 EOT

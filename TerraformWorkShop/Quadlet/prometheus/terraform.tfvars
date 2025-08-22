@@ -25,7 +25,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2/certs"
+            mount = "kvv2-certs"
             name  = "prometheus.day1.sololab"
           }
           value_sets = [
@@ -45,7 +45,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2/vault_token"
+            mount = "kvv2-vault_token"
             name  = "prometheus-metrics"
           }
           value_sets = [
@@ -57,7 +57,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2/consul"
+            mount = "kvv2-consul"
             name  = "token-prometheus"
           }
           value_sets = [
@@ -83,7 +83,7 @@ podman_kubes = [
         #     },
         #   ]
         #   vault_kvv2 = {
-        #     mount = "kvv2/certs"
+        #     mount = "kvv2-certs"
         #     name  = "prometheus-blackbox-exporter.day1.sololab"
         #   }
         # }

@@ -21,7 +21,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2/certs"
+            mount = "kvv2-certs"
             name  = "root"
           }
           value_sets = [
@@ -33,7 +33,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2/consul"
+            mount = "kvv2-consul"
             name  = "token-consul_client"
           }
           value_sets = [
@@ -45,7 +45,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2/consul"
+            mount = "kvv2-consul"
             name  = "key-gossip_encryption"
           }
           value_sets = [

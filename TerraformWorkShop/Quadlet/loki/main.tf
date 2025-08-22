@@ -1,6 +1,6 @@
 # get minio access id and secret id from vault
 data "vault_kv_secret_v2" "minio" {
-  mount = "kvv2/minio"
+  mount = "kvv2-minio"
   name  = "loki"
 }
 

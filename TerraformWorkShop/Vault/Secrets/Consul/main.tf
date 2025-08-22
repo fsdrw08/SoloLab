@@ -1,5 +1,5 @@
 data "vault_kv_secret_v2" "ca_cert" {
-  mount = "kvv2/certs"
+  mount = "kvv2-certs"
   name  = "root"
 }
 
@@ -41,7 +41,7 @@ module "consul_jwt_auth_policy_bindings" {
 }
 
 resource "vault_kv_secret_v2" "secret" {
-  mount = "kvv2/consul"
+  mount = "kvv2-consul"
   name  = "key-gossip_encryption"
   data_json = jsonencode(
     {

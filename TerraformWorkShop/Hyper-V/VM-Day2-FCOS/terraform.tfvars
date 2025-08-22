@@ -96,7 +96,7 @@ butane = {
     secrets = [
       {
         vault_kvv2 = {
-          mount = "kvv2/consul"
+          mount = "kvv2-consul"
           name  = "token-consul_client"
         }
         value_sets = [
@@ -108,7 +108,7 @@ butane = {
       },
       {
         vault_kvv2 = {
-          mount = "kvv2/consul"
+          mount = "kvv2-consul"
           name  = "key-gossip_encryption"
         }
         value_sets = [
@@ -120,7 +120,7 @@ butane = {
       },
       {
         vault_kvv2 = {
-          mount = "kvv2/consul"
+          mount = "kvv2-consul"
           name  = "token-nomad_client"
         }
         value_sets = [
@@ -132,7 +132,7 @@ butane = {
       },
       {
         vault_kvv2 = {
-          mount = "kvv2/nomad"
+          mount = "kvv2-nomad"
           name  = "token-node_write"
         }
         value_sets = [

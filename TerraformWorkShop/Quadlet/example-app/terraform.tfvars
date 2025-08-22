@@ -34,7 +34,7 @@ podman_kube = {
     # tls_value_sets = {
     #   value_ref = {
     #     vault_kvv2 = {
-    #       mount = "kvv2/certs"
+    #       mount = "kvv2-certs"
     #       name  = "example-app.day1.sololab"
     #     }
     #   }

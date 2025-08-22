@@ -1,5 +1,5 @@
 data "vault_kv_secret_v2" "cert" {
-  mount = "kvv2/certs"
+  mount = "kvv2-certs"
   name  = "root"
 }
 

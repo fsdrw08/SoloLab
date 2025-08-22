@@ -31,7 +31,7 @@ Exec=--accessLog=true \
   --certificatesResolvers.external.acme.certificatesDuration=2160 \
   --certificatesResolvers.external.acme.storage=/etc/traefik/tls/external.json \
   --certificatesResolvers.external.acme.tlsChallenge=true \
-  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab/v1/pki/day1/acme/directory \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab/v1/pki-sololab_day1/acme/directory \
   --certificatesResolvers.internal.acme.certificatesDuration=2160 \
   --certificatesResolvers.internal.acme.storage=/etc/traefik/tls/internal.json \
   --certificatesResolvers.internal.acme.tlsChallenge=true \

@@ -95,7 +95,7 @@ roles = [
     description  = "Role of nomad server"
     policy_names = ["nomad_server"]
     token_store = {
-      vault_kvv2_path = "kvv2/consul"
+      vault_kvv2_path = "kvv2-consul"
     }
   },
   {
@@ -103,7 +103,7 @@ roles = [
     description  = "Role of nomad client"
     policy_names = ["nomad_client"]
     token_store = {
-      vault_kvv2_path = "kvv2/consul"
+      vault_kvv2_path = "kvv2-consul"
     }
   },
   {
@@ -111,7 +111,7 @@ roles = [
     description  = "Role of Prometheus"
     policy_names = ["prometheus"]
     token_store = {
-      vault_kvv2_path = "kvv2/consul"
+      vault_kvv2_path = "kvv2-consul"
     }
   },
   {
@@ -119,7 +119,7 @@ roles = [
     description  = "Role of consul client"
     policy_names = ["consul_client"]
     token_store = {
-      vault_kvv2_path = "kvv2/consul"
+      vault_kvv2_path = "kvv2-consul"
     }
   },
 ]

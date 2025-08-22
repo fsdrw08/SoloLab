@@ -11,11 +11,11 @@ resource "vault_pki_secret_backend_cert" "cert" {
 }
 
 data "vault_pki_secret_backend_issuers" "issuers" {
-  backend = "pki/root"
+  backend = "pki-sololab_root"
 }
 
 data "vault_pki_secret_backend_issuer" "issuer" {
-  backend    = "pki/root"
+  backend    = "pki-sololab_root"
   issuer_ref = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
 }
 

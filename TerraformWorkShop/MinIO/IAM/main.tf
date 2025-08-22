@@ -52,7 +52,7 @@ resource "vault_kv_secret_v2" "secret" {
   for_each = {
     for user in var.users : user.name => user
   }
-  mount               = "kvv2/minio"
+  mount               = "kvv2-minio"
   name                = each.value.name
   delete_all_versions = true
   data_json = jsonencode(

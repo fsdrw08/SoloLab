@@ -7,7 +7,7 @@ prov_vault = {
 
 vault_kvv2 = {
   secret_engine = {
-    path = "kvv2/certs"
+    path = "kvv2-certs"
   }
   data_key_name = {
     ca          = "ca"
@@ -19,7 +19,7 @@ vault_kvv2 = {
 vault_certs = [
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -27,7 +27,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -41,7 +41,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -52,7 +52,7 @@ vault_certs = [
   # https://github.com/livioribeiro/nomad-lxd-terraform/blob/0c792716c9824c4c59de349d27b6aa1d1c16b09d/certs.tf#L197
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -65,7 +65,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -76,7 +76,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -84,7 +84,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -92,7 +92,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -103,7 +103,7 @@ vault_certs = [
   },
   {
     secret_engine = {
-      backend   = "pki/day1"
+      backend   = "pki-sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -111,7 +111,7 @@ vault_certs = [
   },
   # {
   #   secret_engine = {
-  #     backend   = "pki/day1"
+  #     backend   = "pki-sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3

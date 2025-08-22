@@ -23,7 +23,7 @@
 # }
 
 # data "vault_kv_secret_v2" "root_ca" {
-#   mount = "kvv2/certs"
+#   mount = "kvv2-certs"
 #   name  = "root"
 # }
 

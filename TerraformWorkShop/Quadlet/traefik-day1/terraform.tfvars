@@ -18,7 +18,7 @@ podman_kube = {
     value_file = "./attachments/values-sololab.yaml"
     secrets = {
       vault_kvv2 = {
-        mount = "kvv2/certs"
+        mount = "kvv2-certs"
         name  = "*.day1.sololab"
       }
       value_sets = [

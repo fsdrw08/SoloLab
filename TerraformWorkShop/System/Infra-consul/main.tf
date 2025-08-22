@@ -35,7 +35,7 @@ resource "vault_pki_secret_backend_cert" "consul" {
 }
 
 data "vault_generic_secret" "rootca" {
-  path = "pki/root/cert/ca"
+  path = "pki-sololab_root/cert/ca"
 }
 
 # output "test" {

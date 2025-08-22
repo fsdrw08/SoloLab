@@ -26,7 +26,7 @@ Exec=--accessLog=true \
   --certificatesResolvers.external.acme.certificatesDuration=2160 \
   --certificatesResolvers.external.acme.storage=/mnt/acmeStorage/external.json \
   --certificatesResolvers.external.acme.tlsChallenge=true \
-  --certificatesResolvers.internal.acme.caServer=https://vault.day1.sololab:8200/v1/pki/day1/acme/directory \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day1.sololab:8200/v1/pki-sololab_day1/acme/directory \
   --certificatesResolvers.internal.acme.certificatesDuration=2160 \
   --certificatesResolvers.internal.acme.storage=/mnt/acmeStorage/internal.json \
   --certificatesResolvers.internal.acme.tlsChallenge=true \

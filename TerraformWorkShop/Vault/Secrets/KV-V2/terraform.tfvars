@@ -7,22 +7,22 @@ prov_vault = {
 
 kvv2 = [
   {
-    mount_path = "kvv2/certs"
+    mount_path = "kvv2-certs"
   },
   {
-    mount_path  = "kvv2/consul"
+    mount_path  = "kvv2-consul"
     description = "kvv2 secret backend for consul"
   },
   {
-    mount_path  = "kvv2/minio"
+    mount_path  = "kvv2-minio"
     description = "kvv2 secret backend for minio"
   },
   {
-    mount_path  = "kvv2/vault_token"
+    mount_path  = "kvv2-vault_token"
     description = "kvv2 secret backend for vault token"
   },
   {
-    mount_path  = "kvv2/nomad"
+    mount_path  = "kvv2-nomad"
     description = "kvv2 secret backend for nomad"
   },
 ]

@@ -68,7 +68,7 @@ roles = [
     policy_names = ["node-write"]
     token = {
       store = {
-        vault_kvv2_path = "kvv2/nomad"
+        vault_kvv2_path = "kvv2-nomad"
       }
     }
   },

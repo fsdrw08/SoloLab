@@ -20,7 +20,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2/certs"
+            mount = "kvv2-certs"
             name  = "minio-api.day1.sololab"
           }
           value_sets = [

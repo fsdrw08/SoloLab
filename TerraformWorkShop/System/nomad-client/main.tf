@@ -26,7 +26,7 @@ resource "null_resource" "nomad_init" {
 
 # load cert from vault
 data "vault_kv_secret_v2" "cert" {
-  mount = "kvv2/certs"
+  mount = "kvv2-certs"
   name  = "client.global.nomad"
 }
 
