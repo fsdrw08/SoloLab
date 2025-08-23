@@ -64,9 +64,9 @@ powerdns:
         local-address: 192.168.255.10
         local-port: 53
         # https://doc.powerdns.com/recursor/settings.html#dnssec
-        forward-zones: sololab=192.168.255.10:1053,consul=192.168.255.20:8600
+        forward-zones: sololab=192.168.255.10:1053,consul=192.168.255.20:53
         # https://github.com/hashicorp/consul/issues/1267
         # https://developer.hashicorp.com/consul/docs/reference/dns#consul-dns-syntax
-        forward-zones+: consul=192.168.255.20:8600,dc.consul=192.168.255.20:8600,node.consul=192.168.255.20:8600,service.consul=192.168.255.20:8600
+        forward-zones+: consul=192.168.255.20:53,dc.consul=192.168.255.20:53,node.consul=192.168.255.20:53,service.consul=192.168.255.20:53
         max-negative-ttl: 10
         webserver-address: 192.168.255.10

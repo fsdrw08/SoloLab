@@ -61,6 +61,8 @@ consul:
       #         /consul/hostname: node_name
       #       claim_assertions:
       #         - value.node_name == "${node}"
+      addresses:
+        dns: '{{ GetInterfaceIP "eth0" }}'
       auto_encrypt:
         allow_tls: true
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
@@ -85,6 +87,7 @@ consul:
       datacenter: dc1
       encrypt: # set by terraform get data from vault secret
       ports:
+        dns: 53
         https: 8501
       # https://discuss.hashicorp.com/t/failed-to-receive-encryption-is-configured-but-remote-state-is-not-encrypted/41222
       # encrypt_verify_incoming: true
