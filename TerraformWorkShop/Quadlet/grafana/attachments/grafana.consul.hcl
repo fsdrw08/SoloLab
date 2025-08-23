@@ -1,7 +1,8 @@
+# https://developer.hashicorp.com/consul/docs/reference/service
 services {
+  name = "grafana-day1"
   id   = "grafana"
-  name = "grafana"
-  port = 9000
+  port = 3000
 
   checks = [
     {
@@ -12,20 +13,19 @@ services {
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 
   # tags = [
   #   "traefik.enable=true",
-  #   "traefik.tcp.routers.minio-console-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.minio-console-web.rule=HostSNI(`minio-console.day1.sololab`)",
-  #   "traefik.tcp.routers.minio-console-web.tls.passthrough=true",
-  #   # "traefik.http.routers.minio-console-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.minio-console-web-redirect.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.minio-console-web.entrypoints=websecure",
-  #   # "traefik.http.routers.minio-console-web.rule=Host(`minio-console.day1.sololab`)",
-  #   # "traefik.http.routers.minio-console-web.tls=true",
-  #   # "traefik.http.services.minio-console-web.loadbalancer.server.scheme=https",
+  #   "traefik.http.routers.grafana-redirect.entrypoints=web",
+  #   "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day1.sololab`)",
+  #   "traefik.http.routers.grafana-redirect.middlewares=toHttps@file",
+  #   "traefik.http.routers.grafana.entrypoints=webSecure",
+  #   "traefik.http.routers.grafana.rule=Host(`grafana.day1.sololab`)",
+  #   "traefik.http.routers.grafana.tls=true",
+  #   "traefik.http.services.grafana.loadBalancer.serversTransport=grafana@file",
+  #   "traefik.http.services.grafana.loadbalancer.server.scheme=https",
   # ]
 }

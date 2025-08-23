@@ -1,6 +1,7 @@
+# https://developer.hashicorp.com/consul/docs/reference/service
 services {
+  name = "prometheus-day1"
   id   = "prometheus"
-  name = "prometheus"
   port = 9090
 
   checks = [
@@ -12,11 +13,22 @@ services {
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 
   tags = [
     "exporter",
+
+    # "traefik.enable=true",
+    # "traefik.http.routers.prometheus-redirect.entrypoints=web",
+    # "traefik.http.routers.prometheus-redirect.rule=Host(`prometheus.day1.sololab`)",
+    # "traefik.http.routers.prometheus-redirect.middlewares=toHttps@file",
+    # "traefik.http.routers.prometheus.entryPoints=webSecure",
+    # "traefik.http.routers.prometheus.rule=Host(`prometheus.day1.sololab`)",
+    # "traefik.http.routers.prometheus.tls=true",
+    # "traefik.http.services.prometheus.loadBalancer.serversTransport=prometheus@file",
+    # "traefik.http.services.prometheus.loadbalancer.server.scheme=https",
   ]
   meta = {
     scheme            = "https"
@@ -29,7 +41,7 @@ services {
 services {
   id   = "prometheus-blackbox-exporter"
   name = "prometheus-blackbox-exporter"
-  port = 443 # 9115
+  port = 9115
 
   checks = [
     {
@@ -40,14 +52,23 @@ services {
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 
   tags = [
     "exporter",
+
+    # "traefik.enable=true",
+    # "traefik.http.routers.prometheus-blackbox-exporter-redirect.entrypoints=web",
+    # "traefik.http.routers.prometheus-blackbox-exporter-redirect.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    # "traefik.http.routers.prometheus-blackbox-exporter-redirect.middlewares=toHttps@file",
+    # "traefik.http.routers.prometheus-blackbox-exporter.entryPoints=webSecure",
+    # "traefik.http.routers.prometheus-blackbox-exporter.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    # "traefik.http.routers.prometheus-blackbox-exporter.tls=true",
   ]
   meta = {
-    scheme            = "https"
+    scheme            = "http"
     address           = "prometheus-blackbox-exporter.day1.sololab"
     health_check_path = "metrics"
     metrics_path      = "metrics"

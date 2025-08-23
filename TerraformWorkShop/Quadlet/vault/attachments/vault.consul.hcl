@@ -1,6 +1,7 @@
+# https://developer.hashicorp.com/consul/docs/reference/service
 services {
+  name = "vault-day1"
   id   = "vault-web"
-  name = "vault"
   port = 8200
 
   checks = [
@@ -12,12 +13,24 @@ services {
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 
   tags = [
     "vault-exporter",
+
+    # "traefik.enable=true",
+    # "traefik.http.routers.vault-redirect.entrypoints=web",
+    # "traefik.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`)",
+    # "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
+    # "traefik.http.routers.vault.entrypoints=webSecure",
+    # "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`)",
+    # "traefik.http.routers.vault.tls=true",
+    # "traefik.http.services.vault.loadBalancer.serversTransport=vault@file",
+    # "traefik.http.services.vault.loadbalancer.server.scheme=https",
   ]
+
   meta = {
     scheme                    = "https"
     address                   = "vault.day1.sololab"

@@ -151,8 +151,8 @@ prometheus:
                   scheme: https
                   tls_config:
                     ca_file: /etc/prometheus/certs/ca.crt
-                  services:
-                    - vault
+                  # services:
+                  #   - vault
               relabel_configs:
                 - source_labels: ["__meta_consul_tags"]
                   regex: .*vault-exporter.*
