@@ -23,6 +23,6 @@
         "archive": "nomad-driver-podman_0.6.3_linux_amd64.zip",
         "privateRegistry": "https://dufs.day0.sololab",
         "privateRepo": "binaries/nomad-driver-podman_0.6.3_linux_amd64.zip",
-        "description": "https://releases.hashicorp.com/nomad",
+        "description": "https://releases.hashicorp.com/nomad-driver-podman/",
     },
 ]
