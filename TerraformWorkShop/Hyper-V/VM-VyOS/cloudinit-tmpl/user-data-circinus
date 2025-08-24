@@ -45,12 +45,13 @@ vyos_config_commands:
   # - set service dhcp-server shared-network-name ${int_desc} ping-check https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L22
   - set service dhcp-server hostfile-update
   # - set service dhcp-server host-decl-name https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L21
-  # DNS
+  # DNS https://docs.vyos.io/en/latest/configuration/service/dns.html
   - set service dns forwarding cache-size '0'
-  - set service dns forwarding listen-address '${int_addr}'
+  - set service dns forwarding listen-address '${dns_listen_addr}'
   - set service dns forwarding allow-from '${int_cidr}'
   - set service dns forwarding name-server '${dns_forward_1}'
   - set service dns forwarding name-server '${dns_forward_2}'
+  - set service dns forwarding domain ${private_domain} name-server ${private_domain_forward_addr} port '${private_domain_forward_port}'
   # ssh
   - set service ssh port '22'
   # import ca and cert for vyos api
