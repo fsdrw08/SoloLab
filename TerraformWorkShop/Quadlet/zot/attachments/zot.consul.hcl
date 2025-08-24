@@ -1,6 +1,6 @@
 services {
-  id   = "zot-web"
-  name = "zot"
+  name = "zot-day0"
+  id   = "zot-registry"
   port = 5000
 
   checks = [
@@ -8,10 +8,11 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "zot-https-check"
       name            = "zot-https-check"
-      http            = "https://zot.day0.sololab/v2/"
+      http            = "https://localhost:5000/v2/"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 
@@ -20,6 +21,7 @@ services {
   # tags = [
   #   "exporter",
   # ]
+
   meta = {
     scheme            = "https"
     address           = "zot.day0.sololab"

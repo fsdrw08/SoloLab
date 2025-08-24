@@ -1,7 +1,7 @@
 services {
+  name = "cockpit-day0"
   id   = "cockpit-web"
-  name = "cockpit"
-  port = 9000
+  port = 9090
 
   checks = [
     # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
@@ -9,10 +9,11 @@ services {
       id   = "cockpit-https-check"
       name = "cockpit-https-check"
       # https://cockpit-project.org/guide/latest/https.html
-      http            = "https://cockpit.day0.sololab/ping"
+      http            = "https://localhost:9090/ping"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 

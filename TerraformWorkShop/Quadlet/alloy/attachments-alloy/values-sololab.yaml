@@ -123,25 +123,27 @@ alloy:
       http:
         listen-addr: 0.0.0.0:12345
   podLabels:
-    traefik.enable: true
+    # traefik.enable: true
+    # traefik.http.routers.alloy-redirect.entrypoints: web
+    # traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day0.sololab`)
+    # traefik.http.routers.alloy-redirect.middlewares: toHttps@file
+    # traefik.http.routers.alloy-redirect.service: alloy
+
+    # traefik.http.routers.alloy.entryPoints: webSecure
+    # traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day0.sololab`)
+    # traefik.http.routers.alloy.tls: true
+    # traefik.http.routers.alloy.service: alloy
+
+    # traefik.http.services.alloy.loadBalancer.serversTransport: alloy@file
+    # traefik.http.services.alloy.loadbalancer.server.scheme: https
+    # traefik.http.services.alloy.loadbalancer.server.port: 12345
+
+    # deprecated
     # traefik.tcp.routers.alloy.entrypoints: webSecure
     # traefik.tcp.routers.alloy.rule: HostSNI(`alloy.day1.sololab`) || HostSNI(`alloy.day0.sololab`)
     # traefik.tcp.routers.alloy.tls.passthrough: true
     # traefik.tcp.routers.alloy.service: alloy
     # traefik.tcp.services.alloy.loadbalancer.server.port: 12345
-    traefik.http.routers.alloy-redirect.entrypoints: web
-    traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day0.sololab`)
-    traefik.http.routers.alloy-redirect.middlewares: toHttps@file
-    traefik.http.routers.alloy-redirect.service: alloy
-
-    traefik.http.routers.alloy.entryPoints: webSecure
-    traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day0.sololab`)
-    traefik.http.routers.alloy.tls: true
-    traefik.http.routers.alloy.service: alloy
-
-    traefik.http.services.alloy.loadBalancer.serversTransport: alloy@file
-    traefik.http.services.alloy.loadbalancer.server.scheme: https
-    traefik.http.services.alloy.loadbalancer.server.port: 12345
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

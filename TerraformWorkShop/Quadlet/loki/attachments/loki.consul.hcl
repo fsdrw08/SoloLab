@@ -1,6 +1,6 @@
 services {
-  id   = "loki"
-  name = "loki"
+  name = "loki-day1"
+  id   = "loki-server"
   port = 443 # 3100
 
   checks = [
@@ -8,7 +8,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "loki-https-check"
       name            = "loki-https-check"
-      http            = "https://loki.day1.sololab/ready"
+      http            = "http://localhost:3100/ready"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"

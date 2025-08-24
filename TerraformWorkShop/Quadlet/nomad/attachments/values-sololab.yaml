@@ -49,20 +49,20 @@ nomad:
     - agent
 
   podLabels:
-    traefik.enable: true
-    traefik.http.routers.nomad-redirect.entrypoints: web
-    traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
-    traefik.http.routers.nomad-redirect.middlewares: toHttps@file
-    traefik.http.routers.nomad-redirect.service: nomad
+    # traefik.enable: true
+    # traefik.http.routers.nomad-redirect.entrypoints: web
+    # traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad-redirect.middlewares: toHttps@file
+    # traefik.http.routers.nomad-redirect.service: nomad
 
-    traefik.http.routers.nomad.entrypoints: webSecure
-    traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
-    traefik.http.routers.nomad.tls: true
-    traefik.http.routers.nomad.service: nomad
+    # traefik.http.routers.nomad.entrypoints: webSecure
+    # traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad.tls: true
+    # traefik.http.routers.nomad.service: nomad
 
-    traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
-    traefik.http.services.nomad.loadbalancer.server.scheme: https
-    traefik.http.services.nomad.loadbalancer.server.port: 4646
+    # traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
+    # traefik.http.services.nomad.loadbalancer.server.scheme: https
+    # traefik.http.services.nomad.loadbalancer.server.port: 4646
 
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT

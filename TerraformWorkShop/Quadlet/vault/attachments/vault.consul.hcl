@@ -1,7 +1,7 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
   name = "vault-day1"
-  id   = "vault-web"
+  id   = "vault-server"
   port = 8200
 
   checks = [
@@ -9,7 +9,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "vault-https-check"
       name            = "vault-https-check"
-      http            = "https://vault.day1.sololab:8200/v1/sys/health"
+      http            = "https://localhost:8200/v1/sys/health"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
@@ -20,15 +20,15 @@ services {
   tags = [
     "vault-exporter",
 
-    # "traefik.enable=true",
-    # "traefik.http.routers.vault-redirect.entrypoints=web",
-    # "traefik.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`)",
-    # "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.vault.entrypoints=webSecure",
-    # "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`)",
-    # "traefik.http.routers.vault.tls=true",
-    # "traefik.http.services.vault.loadBalancer.serversTransport=vault@file",
-    # "traefik.http.services.vault.loadbalancer.server.scheme=https",
+    "traefik.enable=true",
+    "traefik.http.routers.vault-redirect.entrypoints=web",
+    "traefik.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`)",
+    "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.vault.entrypoints=webSecure",
+    "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`)",
+    "traefik.http.routers.vault.tls=true",
+    "traefik.http.services.vault.loadBalancer.serversTransport=vault@file",
+    "traefik.http.services.vault.loadbalancer.server.scheme=https",
   ]
 
   meta = {

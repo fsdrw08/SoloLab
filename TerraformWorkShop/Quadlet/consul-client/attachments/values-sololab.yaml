@@ -45,6 +45,8 @@ consul:
       #   enabled: true
       #   server_addresses:
       #     - consul.day0.sololab
+      auto_encrypt:
+        tls: true
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
       client_addr: "0.0.0.0"
@@ -62,8 +64,6 @@ consul:
           verify_server_hostname: true
         internal_rpc:
           verify_server_hostname: true
-      auto_encrypt:
-        tls: true
   ## @param consul.command Override default container command (useful when using custom images)
   ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
   ## this command is used to set the advertise ip to host ip when consul start
@@ -129,6 +129,8 @@ consul:
     traefik.http.services.consul.loadBalancer.serversTransport: consul@file
     traefik.http.services.consul.loadbalancer.server.scheme: https
     traefik.http.services.consul.loadbalancer.server.port: 8501
+
+    # tcp route, deprecated
     # traefik.tcp.routers.consul-web.entrypoints: webSecure
     # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day0.sololab`)
     # traefik.tcp.routers.consul-web.tls.passthrough: true

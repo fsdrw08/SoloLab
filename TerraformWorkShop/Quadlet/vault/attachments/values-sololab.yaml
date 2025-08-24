@@ -37,20 +37,20 @@ vault:
         enable_host_metrics: true
 
   podLabels:
-    traefik.enable: true
-    traefik.http.routers.vault-redirect.entrypoints: web
-    traefik.http.routers.vault-redirect.rule: Host(`vault.day1.sololab`)
-    traefik.http.routers.vault-redirect.middlewares: toHttps@file
-    traefik.http.routers.vault-redirect.service: vault
+    # traefik.enable: true
+    # traefik.http.routers.vault-redirect.entrypoints: web
+    # traefik.http.routers.vault-redirect.rule: Host(`vault.day1.sololab`)
+    # traefik.http.routers.vault-redirect.middlewares: toHttps@file
+    # traefik.http.routers.vault-redirect.service: vault
 
-    traefik.http.routers.vault.entrypoints: webSecure
-    traefik.http.routers.vault.rule: Host(`vault.day1.sololab`)
-    traefik.http.routers.vault.tls: true
-    traefik.http.routers.vault.service: vault
+    # traefik.http.routers.vault.entrypoints: webSecure
+    # traefik.http.routers.vault.rule: Host(`vault.day1.sololab`)
+    # traefik.http.routers.vault.tls: true
+    # traefik.http.routers.vault.service: vault
 
-    traefik.http.services.vault.loadBalancer.serversTransport: vault@file
-    traefik.http.services.vault.loadbalancer.server.scheme: https
-    traefik.http.services.vault.loadbalancer.server.port: 8200
+    # traefik.http.services.vault.loadBalancer.serversTransport: vault@file
+    # traefik.http.services.vault.loadbalancer.server.scheme: https
+    # traefik.http.services.vault.loadbalancer.server.port: 8200
 
     # traefik.tcp.routers.vault-web.entrypoints: webSecure
     # traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)

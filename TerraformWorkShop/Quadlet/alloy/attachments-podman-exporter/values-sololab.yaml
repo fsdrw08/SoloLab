@@ -2,18 +2,18 @@ global:
   imageRegistry: zot.day0.sololab
 exporter:
   podLabels:
-    traefik.enable: true
-    traefik.http.routers.podman-exporter-redirect.entrypoints: web
-    traefik.http.routers.podman-exporter-redirect.rule: Host(`prometheus-podman-exporter.day1.sololab`)
-    traefik.http.routers.podman-exporter-redirect.middlewares: toHttps@file
-    traefik.http.routers.podman-exporter-redirect.service: podman-exporter
+    # traefik.enable: true
+    # traefik.http.routers.podman-exporter-redirect.entrypoints: web
+    # traefik.http.routers.podman-exporter-redirect.rule: Host(`prometheus-podman-exporter.day1.sololab`)
+    # traefik.http.routers.podman-exporter-redirect.middlewares: toHttps@file
+    # traefik.http.routers.podman-exporter-redirect.service: podman-exporter
 
-    traefik.http.routers.podman-exporter.entrypoints: webSecure
-    traefik.http.routers.podman-exporter.rule: Host(`prometheus-podman-exporter.day1.sololab`)
-    traefik.http.routers.podman-exporter.tls: true
-    traefik.http.routers.podman-exporter.service: podman-exporter
+    # traefik.http.routers.podman-exporter.entrypoints: webSecure
+    # traefik.http.routers.podman-exporter.rule: Host(`prometheus-podman-exporter.day1.sololab`)
+    # traefik.http.routers.podman-exporter.tls: true
+    # traefik.http.routers.podman-exporter.service: podman-exporter
 
-    traefik.http.services.podman-exporter.loadbalancer.server.port: 9882
+    # traefik.http.services.podman-exporter.loadbalancer.server.port: 9882
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

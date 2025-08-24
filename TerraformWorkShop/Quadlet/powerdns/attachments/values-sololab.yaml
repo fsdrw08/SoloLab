@@ -43,7 +43,7 @@ powerdns:
         ## If a port number is specified, it must be separated from the address with a ‘:’; for an IPv6 address the address must be enclosed in square brackets.
         ## ref: https://doc.powerdns.com/authoritative/settings.html#local-address
         ##
-        local-address: 192.168.255.10
+        local-address: 0.0.0.0
         ## @param powerdns.containers.auth.config.local-port Local port to bind to. If an address in local-address does not have an explicit port, this port is used.
         ## rootless user cannot bind 53 port, so use 1053 instead
         ## ref: https://doc.powerdns.com/authoritative/settings.html#local-port
@@ -52,7 +52,7 @@ powerdns:
         ## @param powerdns.containers.auth.config.webserver-address IP Address for webserver/API to listen on.
         ## ref: https://doc.powerdns.com/authoritative/settings.html#webserver-address
         ##
-        webserver-address: 192.168.255.10
+        webserver-address: 0.0.0.0
         # ddns:
         allow-dnsupdate-from: 0.0.0.0/0
         dnsupdate: yes
@@ -69,4 +69,4 @@ powerdns:
         # https://developer.hashicorp.com/consul/docs/reference/dns#consul-dns-syntax
         forward-zones+: consul=192.168.255.20:53,dc.consul=192.168.255.20:53,node.consul=192.168.255.20:53,service.consul=192.168.255.20:53
         max-negative-ttl: 10
-        webserver-address: 192.168.255.10
+        webserver-address: 0.0.0.0

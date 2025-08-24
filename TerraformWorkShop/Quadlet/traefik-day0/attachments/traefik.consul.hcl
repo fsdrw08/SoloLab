@@ -1,6 +1,6 @@
 services {
-  name = "traefik"
-  id   = "traefik-day0-ping"
+  name = "traefik-day0"
+  id   = "traefik-proxy"
   port = 443
 
   checks = [
@@ -8,9 +8,10 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id       = "traefik-http-check-8080"
       name     = "traefik-http-check-8080"
-      http     = "http://traefik.day0.sololab:8080/ping"
+      http     = "http://localhost:8080/ping"
       interval = "300s"
       timeout  = "2s"
+      status   = "passing"
     }
   ]
 

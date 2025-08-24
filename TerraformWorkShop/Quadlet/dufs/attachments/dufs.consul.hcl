@@ -1,16 +1,17 @@
 services {
-  name = "dufs"
-  id   = "dufs-web"
+  name = "dufs-day0"
+  id   = "dufs-server"
   port = 5001
 
   checks = [
     {
       id              = "dufs-http-check"
       name            = "dufs-http-check"
-      http            = "http://dufs.day0.sololab/__dufs__/health"
+      http            = "http://localhost:5001/__dufs__/health"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
+      status          = "passing"
     }
   ]
 

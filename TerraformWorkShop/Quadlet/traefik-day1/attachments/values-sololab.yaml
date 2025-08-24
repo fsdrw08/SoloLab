@@ -25,14 +25,14 @@ traefik:
         sendAnonymousUsage: false
       entryPoints:
         traefik:
-          address: "192.168.255.20:8080"
+          address: ":8080"
         web:
-          address: "192.168.255.20:80"
+          address: ":80"
           forwardedHeaders:
             trustedIPs:
               - "0.0.0.0/0"
         webSecure:
-          address: "192.168.255.20:443"
+          address: ":443"
           forwardedHeaders:
             trustedIPs:
               - "0.0.0.0/0"
@@ -72,24 +72,24 @@ traefik:
                 users:
                   - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
   podLabels:
-    traefik.enable: true
-    traefik.http.routers.dashboard-redirect.entrypoints: web
-    traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-    traefik.http.routers.dashboard-redirect.middlewares: toHttps@file
-    traefik.http.routers.dashboard-redirect.service: api@internal
+    # traefik.enable: true
+    # traefik.http.routers.dashboard-redirect.entrypoints: web
+    # traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    # traefik.http.routers.dashboard-redirect.middlewares: toHttps@file
+    # traefik.http.routers.dashboard-redirect.service: api@internal
 
-    traefik.http.routers.dashboard.entryPoints: webSecure
-    traefik.http.routers.dashboard.tls: true
-    traefik.http.routers.dashboard.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-    traefik.http.routers.dashboard.service: api@internal
-    traefik.http.routers.dashboard.middlewares: userPass@file
-    # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
-    traefik.http.services.dashboard.loadbalancer.server.port: 443
+    # traefik.http.routers.dashboard.entryPoints: webSecure
+    # traefik.http.routers.dashboard.tls: true
+    # traefik.http.routers.dashboard.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    # traefik.http.routers.dashboard.service: api@internal
+    # traefik.http.routers.dashboard.middlewares: userPass@file
+    # # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
+    # traefik.http.services.dashboard.loadbalancer.server.port: 443
 
-    traefik.http.routers.metrics.entryPoints: webSecure
-    traefik.http.routers.metrics.tls: true
-    traefik.http.routers.metrics.rule: "Host(`traefik.day1.sololab`) && PathPrefix(`/metrics`)"
-    traefik.http.routers.metrics.service: prometheus@internal
+    # traefik.http.routers.metrics.entryPoints: webSecure
+    # traefik.http.routers.metrics.tls: true
+    # traefik.http.routers.metrics.rule: "Host(`traefik.day1.sololab`) && PathPrefix(`/metrics`)"
+    # traefik.http.routers.metrics.service: prometheus@internal
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
