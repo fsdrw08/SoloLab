@@ -153,9 +153,6 @@ policy_bindings = [
         capabilities = ["list"]
       }
 
-      path "kvv2-certs/metadata/*" {
-        capabilities = ["list"]
-      }
       path "sys/*" {
         capabilities = ["list", "read"]
       }
@@ -221,5 +218,21 @@ policy_bindings = [
       display_name = "consul-ca"
       no_parent    = true
     }
+  },
+  {
+    policy_name    = "cert-read"
+    policy_content = <<-EOT
+      path "kvv2-certs/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2-certs/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2-certs/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
   }
 ]

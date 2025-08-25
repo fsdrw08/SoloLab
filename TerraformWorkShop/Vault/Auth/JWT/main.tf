@@ -3,8 +3,7 @@
 
 # https://github.com/hashicorp-modules/terraform-vault-nomad-setup/blob/main/main.tf
 locals {
-  create_default_policy = length(var.policy_names) == 0
-  policy_names          = local.create_default_policy ? vault_policy.nomad_workload[*].name : var.policy_names
+  policy_names = concat([vault_policy.nomad_workload.name], var.policy_names)
 }
 
 data "vault_kv_secret_v2" "root_cert" {
@@ -90,8 +89,6 @@ resource "vault_jwt_auth_backend_role" "nomad_workload" {
 # This is the policy used in vault_jwt_auth_backend_role.nomad_workload if the
 # variable policy_names is not set.
 resource "vault_policy" "nomad_workload" {
-  count = local.create_default_policy ? 1 : 0
-
   name   = var.default_policy_name
   policy = <<EOT
 path "kvv2-nomad/data/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_namespace}}/{{identity.entity.aliases.${vault_jwt_auth_backend.nomad.accessor}.metadata.nomad_job_id}}/*" {
