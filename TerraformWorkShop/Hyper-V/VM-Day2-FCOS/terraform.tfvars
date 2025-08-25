@@ -80,6 +80,7 @@ butane = {
         "ip"                                 = "192.168.255.30"
         "ca_cert_url"                        = "http://dufs.day0.sololab/certs/root.crt"
         "fcos_image_mirror"                  = "zot.day0.sololab/fedora/fedora-coreos"
+        "fcos_rebase_mirror"                 = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
         "consul_download_url"                = "http://dufs.day0.sololab/binaries/consul_1.21.3_linux_amd64.zip"
         "consul_version"                     = "1.21.3"
         "consul_server_fqdn"                 = "consul.day1.sololab"

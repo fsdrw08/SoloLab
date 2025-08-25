@@ -109,6 +109,38 @@ storage:
           Environment=RPMS="${packages}"
 systemd:
   units:
+    # zincati service use cincinnati protocol to fetch latest system image information from remote server
+    # zincati service in fcos almost meaning tie the registry endpoint of system upgrade to the external container registry, e.g. quay.io/fedora/fedora-coreos
+    # in order to use private container registry to upgrade system image, we have to disable zincati service
+    # ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
+    - name: zincati.service
+      enabled: false
+    - name: rpm-ostreed-automatic.timer
+      enabled: true
+    # ref: https://github.com/krestomatio/terraform-ct-butane-snippets/blob/9c077717430e19175e27a14d65a11f535dcc8bd0/modules/common/butane.tf#L453
+    # https://github.com/coreos/rpm-ostree/blob/main/docs/container.md#rebasing-a-client-system
+    - name: rpm-ostree-rebase.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Rebase rpm-ostree
+        Wants=network-online.target
+        After=network-online.target
+        After=systemd-machine-id-commit.service
+        # We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+        Before=zincati.service
+        Before=shutdown.target
+        Before=rpm-ostree-install.service
+        ConditionPathExists=!/var/lib/%N.stamp
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
+        ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStart=/usr/bin/systemctl --no-block reboot
+        [Install]
+        WantedBy=multi-user.target
+
     # install packages during ignition process
     # https://docs.fedoraproject.org/en-US/fedora-coreos/os-extensions/
     # https://github.com/coreos/fedora-coreos-tracker/issues/681#issuecomment-974301872
@@ -121,6 +153,7 @@ systemd:
         After=network-online.target
         # We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
         Before=zincati.service
+        ConditionPathExists=/var/lib/rpm-ostree-rebase.stamp
         ConditionPathExists=!/var/lib/%N.stamp
         [Service]
         Type=oneshot
@@ -131,6 +164,7 @@ systemd:
         # prevent the service from failing.
         ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive $RPMS
         ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStart=/bin/systemctl disable coreos-oci-migration-motd.service
         ExecStart=/bin/systemctl --no-block reboot
 
         [Install]

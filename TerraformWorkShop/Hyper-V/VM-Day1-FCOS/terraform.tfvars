@@ -67,10 +67,11 @@ butane = {
     }
     local = [
       {
-        "vm_name"           = "Day1-FCOS"
-        "ip"                = "192.168.255.20"
-        "ca_cert_url"       = "http://dufs.day0.sololab/certs/root.crt"
-        "fcos_image_mirror" = "zot.day0.sololab/fedora/fedora-coreos"
+        "vm_name"            = "Day1-FCOS"
+        "ip"                 = "192.168.255.20"
+        "ca_cert_url"        = "http://dufs.day0.sololab/certs/root.crt"
+        "fcos_image_mirror"  = "zot.day0.sololab/fedora/fedora-coreos"
+        "fcos_rebase_mirror" = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
       }
     ]
     # secrets = [
