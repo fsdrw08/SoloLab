@@ -19,14 +19,14 @@ services {
   tags = [
     "exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.podman-exporter-redirect.entrypoints=web",
-    "traefik.http.routers.podman-exporter-redirect.rule=Host(`prometheus-podman-exporter.day1.sololab`)",
-    "traefik.http.routers.podman-exporter-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.podman-exporter.entrypoints=webSecure",
-    "traefik.http.routers.podman-exporter.rule=Host(`prometheus-podman-exporter.day1.sololab`)",
-    "traefik.http.routers.podman-exporter.tls=true",
-    "traefik.http.services.podman-exporter.loadbalancer.server.port=9882",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.podman-exporter-redirect.entrypoints=web",
+    "traefik-day1.http.routers.podman-exporter-redirect.rule=Host(`prometheus-podman-exporter.day1.sololab`)",
+    "traefik-day1.http.routers.podman-exporter-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.podman-exporter.entrypoints=webSecure",
+    "traefik-day1.http.routers.podman-exporter.rule=Host(`prometheus-podman-exporter.day1.sololab`)",
+    "traefik-day1.http.routers.podman-exporter.tls=true",
+    "traefik-day1.http.services.podman-exporter.loadbalancer.server.port=9882",
   ]
   meta = {
     scheme            = "http"

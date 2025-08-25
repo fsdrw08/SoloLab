@@ -19,15 +19,15 @@ services {
   tags = [
     "consul-exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.consul-redirect.entrypoints=web",
-    "traefik.http.routers.consul-redirect.rule=Host(`consul.day1.sololab`)",
-    "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.consul.entrypoints=webSecure",
-    "traefik.http.routers.consul.rule=Host(`consul.day1.sololab`)",
-    "traefik.http.routers.consul.tls=true",
-    "traefik.http.services.consul.loadBalancer.serversTransport=consul@file",
-    "traefik.http.services.consul.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.consul-redirect.entrypoints=web",
+    "traefik-day1.http.routers.consul-redirect.rule=Host(`consul.day1.sololab`)",
+    "traefik-day1.http.routers.consul-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.consul.entrypoints=webSecure",
+    "traefik-day1.http.routers.consul.rule=Host(`consul.day1.sololab`)",
+    "traefik-day1.http.routers.consul.tls=true",
+    "traefik-day1.http.services.consul.loadBalancer.serversTransport=consul@file",
+    "traefik-day1.http.services.consul.loadbalancer.server.scheme=https",
   ]
 
   meta = {

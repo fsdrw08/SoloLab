@@ -1,5 +1,5 @@
 services {
-  name = "consul-day1"
+  name = "consul-day0"
   id   = "consul-agent"
   port = 8501
 

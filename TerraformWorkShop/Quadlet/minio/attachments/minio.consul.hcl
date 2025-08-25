@@ -20,15 +20,15 @@ services {
   tags = [
     "exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.minio-api-redirect.entrypoints=web",
-    "traefik.http.routers.minio-api-redirect.rule=Host(`minio-api.day1.sololab`)",
-    "traefik.http.routers.minio-api-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.minio-api.entrypoints=webSecure",
-    "traefik.http.routers.minio-api.rule=Host(`minio-api.day1.sololab`)",
-    "traefik.http.routers.minio-api.tls=true",
-    "traefik.http.services.minio-api.loadBalancer.serversTransport=minio-api@file",
-    "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.minio-api-redirect.entrypoints=web",
+    "traefik-day1.http.routers.minio-api-redirect.rule=Host(`minio-api.day1.sololab`)",
+    "traefik-day1.http.routers.minio-api-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.minio-api.entrypoints=webSecure",
+    "traefik-day1.http.routers.minio-api.rule=Host(`minio-api.day1.sololab`)",
+    "traefik-day1.http.routers.minio-api.tls=true",
+    "traefik-day1.http.services.minio-api.loadBalancer.serversTransport=minio-api@file",
+    "traefik-day1.http.services.minio-api.loadbalancer.server.scheme=https",
   ]
   meta = {
     scheme            = "https"
@@ -57,14 +57,14 @@ services {
   ]
 
   tags = [
-    "traefik.enable=true",
-    "traefik.http.routers.minio-console-redirect.entrypoints=web",
-    "traefik.http.routers.minio-console-redirect.rule=Host(`minio-console.day1.sololab`)",
-    "traefik.http.routers.minio-console-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.minio-console.entrypoints=webSecure",
-    "traefik.http.routers.minio-console.rule=Host(`minio-console.day1.sololab`)",
-    "traefik.http.routers.minio-console.tls=true",
-    "traefik.http.services.minio-console.loadBalancer.serversTransport=minio-console@file",
-    "traefik.http.services.minio-console.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.minio-console-redirect.entrypoints=web",
+    "traefik-day1.http.routers.minio-console-redirect.rule=Host(`minio-console.day1.sololab`)",
+    "traefik-day1.http.routers.minio-console-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.minio-console.entrypoints=webSecure",
+    "traefik-day1.http.routers.minio-console.rule=Host(`minio-console.day1.sololab`)",
+    "traefik-day1.http.routers.minio-console.tls=true",
+    "traefik-day1.http.services.minio-console.loadBalancer.serversTransport=minio-console@file",
+    "traefik-day1.http.services.minio-console.loadbalancer.server.scheme=https",
   ]
 }

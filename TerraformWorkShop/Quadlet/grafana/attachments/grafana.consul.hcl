@@ -18,14 +18,14 @@ services {
   ]
 
   tags = [
-    "traefik.enable=true",
-    "traefik.http.routers.grafana-redirect.entrypoints=web",
-    "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day1.sololab`)",
-    "traefik.http.routers.grafana-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.grafana.entrypoints=webSecure",
-    "traefik.http.routers.grafana.rule=Host(`grafana.day1.sololab`)",
-    "traefik.http.routers.grafana.tls=true",
-    "traefik.http.services.grafana.loadBalancer.serversTransport=grafana@file",
-    "traefik.http.services.grafana.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.grafana-redirect.entrypoints=web",
+    "traefik-day1.http.routers.grafana-redirect.rule=Host(`grafana.day1.sololab`)",
+    "traefik-day1.http.routers.grafana-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.grafana.entrypoints=webSecure",
+    "traefik-day1.http.routers.grafana.rule=Host(`grafana.day1.sololab`)",
+    "traefik-day1.http.routers.grafana.tls=true",
+    "traefik-day1.http.services.grafana.loadBalancer.serversTransport=grafana@file",
+    "traefik-day1.http.services.grafana.loadbalancer.server.scheme=https",
   ]
 }

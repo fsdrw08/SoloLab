@@ -20,15 +20,15 @@ services {
   tags = [
     "exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.prometheus-redirect.entrypoints=web",
-    "traefik.http.routers.prometheus-redirect.rule=Host(`prometheus.day1.sololab`)",
-    "traefik.http.routers.prometheus-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.prometheus.entryPoints=webSecure",
-    "traefik.http.routers.prometheus.rule=Host(`prometheus.day1.sololab`)",
-    "traefik.http.routers.prometheus.tls=true",
-    "traefik.http.services.prometheus.loadBalancer.serversTransport=prometheus@file",
-    "traefik.http.services.prometheus.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.prometheus-redirect.entrypoints=web",
+    "traefik-day1.http.routers.prometheus-redirect.rule=Host(`prometheus.day1.sololab`)",
+    "traefik-day1.http.routers.prometheus-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.prometheus.entryPoints=webSecure",
+    "traefik-day1.http.routers.prometheus.rule=Host(`prometheus.day1.sololab`)",
+    "traefik-day1.http.routers.prometheus.tls=true",
+    "traefik-day1.http.services.prometheus.loadBalancer.serversTransport=prometheus@file",
+    "traefik-day1.http.services.prometheus.loadbalancer.server.scheme=https",
   ]
   meta = {
     scheme            = "https"
@@ -59,13 +59,13 @@ services {
   tags = [
     "exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.prometheus-blackbox-exporter-redirect.entrypoints=web",
-    "traefik.http.routers.prometheus-blackbox-exporter-redirect.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
-    "traefik.http.routers.prometheus-blackbox-exporter-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.prometheus-blackbox-exporter.entryPoints=webSecure",
-    "traefik.http.routers.prometheus-blackbox-exporter.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
-    "traefik.http.routers.prometheus-blackbox-exporter.tls=true",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter-redirect.entrypoints=web",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter-redirect.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter.entryPoints=webSecure",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    "traefik-day1.http.routers.prometheus-blackbox-exporter.tls=true",
   ]
   meta = {
     scheme            = "http"

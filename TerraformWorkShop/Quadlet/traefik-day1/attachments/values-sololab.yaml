@@ -17,6 +17,7 @@ traefik:
             tls:
               ca: /etc/traefik/tls/ca.crt
           exposedByDefault: false
+          prefix: traefik-day1
       serversTransport:
         rootCAs:
           - /etc/traefik/tls/ca.crt

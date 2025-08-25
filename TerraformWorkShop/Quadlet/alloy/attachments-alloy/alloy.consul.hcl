@@ -17,14 +17,14 @@ services {
   ]
 
   tags = [
-    "traefik.enable=true",
-    "traefik.http.routers.alloy-redirect.entrypoints=web",
-    "traefik.http.routers.alloy-redirect.rule=Host(`alloy.day1.sololab`)",
-    "traefik.http.routers.alloy-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.alloy.entrypoints=webSecure",
-    "traefik.http.routers.alloy.rule=Host(`alloy.day1.sololab`)",
-    "traefik.http.routers.alloy.tls=true",
-    "traefik.http.services.alloy.loadBalancer.serversTransport=alloy@file",
-    "traefik.http.services.alloy.loadbalancer.server.scheme=https",
+    "traefik-day1.enable=true",
+    "traefik-day1.http.routers.alloy-redirect.entrypoints=web",
+    "traefik-day1.http.routers.alloy-redirect.rule=Host(`alloy.day1.sololab`)",
+    "traefik-day1.http.routers.alloy-redirect.middlewares=toHttps@file",
+    "traefik-day1.http.routers.alloy.entrypoints=webSecure",
+    "traefik-day1.http.routers.alloy.rule=Host(`alloy.day1.sololab`)",
+    "traefik-day1.http.routers.alloy.tls=true",
+    "traefik-day1.http.services.alloy.loadBalancer.serversTransport=alloy@file",
+    "traefik-day1.http.services.alloy.loadbalancer.server.scheme=https",
   ]
 }
