@@ -4,7 +4,7 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-jwt_auth_path  = "jwt/nomad"
+jwt_auth_path  = "jwt-nomad"
 nomad_jwks_url = "https://nomad.day1.sololab/.well-known/jwks.json"
 policy_names = [
   "cert-read",
