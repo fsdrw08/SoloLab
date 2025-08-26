@@ -1,0 +1,10 @@
+[
+    {
+        "publicRegistry": "registry.k8s.io",
+        "publicRepo": "pause-amd64:3.3",
+        "archive": "registry.k8s.io_pause-amd64_3.3.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "pause-amd64:3.3",
+        "description": "https://quay.io/repository/giantswarm/pause-amd64?tab=tags",
+    },
+]

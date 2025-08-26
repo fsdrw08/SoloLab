@@ -76,8 +76,9 @@ systemd:
         [Unit]
           Description="HashiCorp Consul - A service mesh solution"
           Documentation=https://developer.hashicorp.com/
-          Wants=podman-user-wait-network-online.service
-          After=podman-user-wait-network-online.service
+          After=network-online.target prepare-consul-binary.service
+          Wants=network-online.target
+          Requires=prepare-consul-binary.service
           ConditionFileNotEmpty=/opt/bin/consul
           ConditionFileNotEmpty=/etc/consul.d/consul.hcl
           ConditionPathIsDirectory=/var/lib/consul
