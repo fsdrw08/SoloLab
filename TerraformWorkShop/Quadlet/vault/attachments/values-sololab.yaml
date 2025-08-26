@@ -32,6 +32,8 @@ vault:
             tls_key_file: /vault/userconfig/vault-server-tls/tls.key
             tls_client_ca_file: /vault/userconfig/vault-server-tls/ca.crt
             tls_disable_client_certs: true
+      # https://developer.hashicorp.com/vault/docs/configuration/log-requests-level
+      log_requests_level: info
       telemetry:
         disable_hostname: true
         enable_host_metrics: true
