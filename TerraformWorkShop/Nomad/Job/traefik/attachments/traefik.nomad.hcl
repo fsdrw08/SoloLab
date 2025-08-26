@@ -3,6 +3,7 @@ variable "static_config" {
 }
 
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
+# https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-traefik
 job "traefik" {
   datacenters = ["dc1"]
   region      = "global"
@@ -14,37 +15,40 @@ job "traefik" {
       port "web" {
         static = 80
       }
-
       port "webSecure" {
         static = 443
+      }
+      port "traefik" {
+        static = 8080
       }
     }
 
     service {
       name     = "traefik"
-      port     = "web"
       provider = "consul"
 
       check {
         type     = "http"
         path     = "/ping"
-        port     = "web"
+        port     = "traefik"
         interval = "10s"
         timeout  = "2s"
       }
     }
 
+    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "traefik" {
-      driver = "podman"
+      driver = "docker"
 
+      vault {}
       config {
-        image        = "zot.day0.sololab/library/traefik:v3.5.0"
-        ports        = ["web", "webSecure"]
+        image = "zot.day0.sololab/library/traefik:v3.5.0"
+        # ports        = ["web", "webSecure", "traefik"]
         network_mode = "host"
 
         volumes = [
-          "r:local/traefik.yaml:/etc/traefik/traefik.yaml",
-          "r:secrets/ca.crt:/etc/traefik/tls/ca.crt"
+          "local/traefik.yaml:/etc/traefik/traefik.yml",
+          "secrets/ca.crt:/etc/traefik/tls/ca.crt"
         ]
       }
 
