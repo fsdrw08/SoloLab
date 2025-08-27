@@ -36,11 +36,15 @@ job "traefik" {
       }
     }
 
+    volume "certs" {
+      type   = "host"
+      source = "acme-certs"
+    }
+
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "traefik" {
       driver = "docker"
 
-      vault {}
       config {
         image = "zot.day0.sololab/library/traefik:v3.5.0"
         # ports        = ["web", "webSecure", "traefik"]
@@ -60,6 +64,13 @@ job "traefik" {
         LEGO_CA_SYSTEM_CERT_POOL = "true"
       }
 
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 200
+        # Specifies the memory required in MB
+        memory = 128
+      }
+
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
         data        = var.static_config
@@ -67,18 +78,17 @@ job "traefik" {
       }
 
       template {
-        data        = <<EOF
+        data        = <<-EOF
           {{ with secret "kvv2-certs/data/root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/ca.crt"
         change_mode = "restart"
       }
 
-      resources {
-        # Specifies the CPU required to run this task in MHz
-        cpu = 200
-        # Specifies the memory required in MB
-        memory = 128
+      # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
+      volume_mount {
+        volume      = "certs"
+        destination = "/mnt/acmeStorage"
       }
     }
   }

@@ -39,18 +39,18 @@ metrics:
     manualRouting: true
 ping: {}
 providers:
-  consulCatalog:
-    endpoint:
-      address: consul.day1.sololab:8501
-      datacenter: dc1
-      scheme: https
-      tls:
-        ca: /etc/traefik/tls/ca.crt
-    exposedByDefault: false
-  # docker:
-  #   endpoint: unix:///var/run/docker.sock
+  # consulCatalog:
+  #   endpoint:
+  #     address: consul.day1.sololab:8501
+  #     datacenter: dc1
+  #     scheme: https
+  #     tls:
+  #       ca: /etc/traefik/tls/ca.crt
   #   exposedByDefault: false
-  #   useBindPortIP: false
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    useBindPortIP: false
   file:
     directory: /etc/traefik/dynamic
     watch: true
