@@ -78,7 +78,8 @@ podman_quadlet = {
             PodmanArgs    = "--tls-verify=false"
             Network       = "host"
             # service
-            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
+            # ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://loki.day1.sololab/ready"
+            ExecStartPre = ""
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
             ExecStartPost = ""
             Restart       = "on-failure"
