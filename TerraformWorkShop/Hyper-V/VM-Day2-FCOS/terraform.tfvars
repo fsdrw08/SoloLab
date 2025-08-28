@@ -76,7 +76,7 @@ butane = {
     }
     local = [
       {
-        "vm_name"                            = "Day2-FCOS"
+        "vm_name"                            = "day2"
         "ip"                                 = "192.168.255.30"
         "ca_cert_url"                        = "http://dufs.day0.sololab/certs/root.crt"
         "fcos_image_mirror"                  = "zot.day0.sololab/fedora/fedora-coreos"
