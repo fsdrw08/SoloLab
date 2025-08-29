@@ -1,5 +1,5 @@
 services {
-  name = "gitea"
+  name = "gitea-redis"
   id   = "redis"
   port = 6379
 
@@ -7,7 +7,7 @@ services {
     {
       id       = "redis-tcp-check"
       name     = "redis-tcp-check"
-      tcp      = "gitea-redis.day1.sololab:6379"
+      tcp      = "localhost:6379"
       interval = "300s"
       timeout  = "2s"
     }

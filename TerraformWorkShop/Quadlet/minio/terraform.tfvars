@@ -93,7 +93,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1-fcos.node.consul."
+      "minio-day1.service.consul."
     ]
   },
   {
@@ -102,7 +102,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1-fcos.node.consul."
+      "minio-day1.service.consul."
     ]
   },
 ]

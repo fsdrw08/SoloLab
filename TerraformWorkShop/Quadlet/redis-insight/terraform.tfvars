@@ -95,7 +95,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "Day1-FCOS.node.consul."
+      "redis-insight.service.consul."
     ]
   }
 ]

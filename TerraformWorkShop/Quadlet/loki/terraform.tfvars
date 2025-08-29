@@ -98,7 +98,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "day1-fcos.node.consul."
+      "loki-day1.service.consul."
     ]
   }
 ]

@@ -135,7 +135,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "Day1-FCOS.node.consul."
+      "alloy-day1.service.consul."
     ]
   },
   {
@@ -144,7 +144,7 @@ dns_records = [
     type = "CNAME"
     ttl  = 86400
     records = [
-      "Day1-FCOS.node.consul."
+      "prometheus-podman-exporter-day1.service.consul."
     ]
   }
 ]
