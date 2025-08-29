@@ -18,7 +18,7 @@ Restart=${Restart}
 [Container]
 ContainerName=prometheus-podman-exporter
 
-Image=zot.day0.sololab/navidys/prometheus-podman-exporter:v1.17.2
+Image=zot.day0.sololab/navidys/prometheus-podman-exporter:v1.18.0
 
 SecurityLabelType=spc_t
 
