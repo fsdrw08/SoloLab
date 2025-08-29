@@ -393,30 +393,30 @@ certs = [
   #   }
   # },
   # etcd
-  # {
-  #   name = "etcd-server"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "etcd-0.day1.sololab",
-  #     ]
-  #     subject = {
-  #       common_name  = "etcd.day1.sololab"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
-  #       # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
-  #       "client_auth",
-  #     ]
-  #   }
-  # },
+  {
+    name = "etcd-server"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "etcd-0.day0.sololab",
+      ]
+      subject = {
+        common_name  = "etcd.day0.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+        # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
+        "client_auth",
+      ]
+    }
+  },
   # {
   #   name = "etcd-guest"
   #   key = {

@@ -19,18 +19,19 @@ etcd:
   ##     protocol: TCP
   ##
   containerPorts:
-    - name: client
-      containerPort: 2379
-      hostPort: 2379
-      protocol: TCP
-    - name: peer
-      containerPort: 2380
-      hostPort: 2380
-      protocol: TCP
-    - name: health
-      containerPort: 2381
-      hostPort: 2381
-      protocol: TCP
+    []
+    # - name: client
+    #   containerPort: 2379
+    #   hostPort: 2379
+    #   protocol: TCP
+    # - name: peer
+    #   containerPort: 2380
+    #   hostPort: 2380
+    #   protocol: TCP
+    # - name: health
+    #   containerPort: 2381
+    #   hostPort: 2381
+    #   protocol: TCP
   ## Configure extra options for etcd containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param etcd.livenessProbe.enabled Enable livenessProbe on etcd containers
@@ -53,9 +54,10 @@ etcd:
     exec:
       command:
         - etcdctl
-        - endpoint
-        - status
         - --endpoints=unix://localhost:0
+        - --user=monitor:monitor
+        - endpoint
+        - health
   configFile:
     ### Member
     ## @param etcd.configFile.name Human-readable name for this member.
@@ -81,17 +83,17 @@ etcd:
     ### Clustering
     ## @param etcd.configFile.initial-advertise-peer-urls List of this member's peer URLs to advertise to the rest of the cluster.
     ##
-    initial-advertise-peer-urls: https://etcd-0.day1.sololab:2380
+    initial-advertise-peer-urls: https://etcd-0.day0.sololab:2380
     ## @param etcd.configFile.initial-cluster-token Initial cluster token for the etcd cluster during bootstrap.
     ## Specifying this can protect you from unintended cross-cluster interaction when running multiple clusters.
     initial-cluster-token: "day1-etcd-cluster"
     ## @param etcd.configFile.advertise-client-urls List of this member's client URLs to advertise to the public.
     ## The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
     ##
-    advertise-client-urls: https://etcd-0.day1.sololab:2379
-    ## @param etcd.configFile.discovery-srv DNS srv domain used to bootstrap the cluster.
+    advertise-client-urls: https://etcd-0.day0.sololab:2379
+    ## @param etcd.configFile.discovery Discovery URL used to bootstrap the cluster.
     ##
-    discovery-srv: "day1.sololab"
+    # discovery: "day1.sololab"
     ### Security
     ## @param etcd.configFile.client-transport-security Block to config the client transport security
     client-transport-security:
@@ -106,12 +108,12 @@ etcd:
       ## It's recommended to enable client cert authentication to prevent attacks from unauthenticated clients (e.g. CVE-2023-44487), especially when running etcd as a public service.
       ## aka --client-cert-auth
       ##
-      # client-cert-auth: true
+      client-cert-auth: false
       ## @param etcd.configFile.client-transport-security.trusted-ca-file Path to the client server TLS trusted CA cert file.
       ## Note setting this parameter will also automatically enable client cert authentication no matter what value is set for `--client-cert-auth`.
       ## aka --trusted-ca-file
       ##
-      # trusted-ca-file: /etc/etcd/pki/ca.crt
+      trusted-ca-file: /etc/etcd/pki/ca.crt
     ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
     peer-transport-security:
       ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.

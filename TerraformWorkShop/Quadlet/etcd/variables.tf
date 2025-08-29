@@ -7,8 +7,8 @@ variable "prov_remote" {
   })
 }
 
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -24,7 +24,7 @@ variable "podman_kube" {
         ), null
       )
       secrets = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -48,11 +48,12 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
@@ -72,4 +73,12 @@ variable "podman_quadlet" {
       )
     }))
   })
+}
+
+variable "post_process" {
+  type = map(object({
+    script_path = string
+    vars        = map(string)
+  }))
+  default = null
 }

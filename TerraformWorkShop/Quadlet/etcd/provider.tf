@@ -2,21 +2,21 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">=3.2.2"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.13.2"
+      version = ">= 3.0.2"
     }
     remote = {
       source  = "tenstad/remote"
       version = ">=0.1.3"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "System-SvcDisc-Quadlet-etcd"
-  }
+  # backend "pg" {
+  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
+  #   schema_name = "System-Day0-Quadlet-etcd"
+  # }
 }
 
 provider "remote" {
