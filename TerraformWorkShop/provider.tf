@@ -32,6 +32,10 @@ terraform {
       source  = "tenstad/remote"
       version = ">= 0.1.3"
     }
+    etcd = {
+      source  = "Ferlab-Ste-Justine/etcd"
+      version = ">= 0.11.0"
+    }
     powerdns = {
       source  = "pyama86/powerdns"
       version = ">= 1.5.1"
