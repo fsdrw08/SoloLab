@@ -2,13 +2,13 @@
 resource "nomad_job" "whoami" {
   jobspec = file("${path.module}/attachments/whoami.nomad.hcl")
 
-  hcl2 {
-    allow_fs = true
-    vars = {
-      install_config = file("${path.module}/attachments/install.whoami.yml")
-      routing_config = file("${path.module}/attachments/routing.whoami.yml")
-    }
-  }
+  # hcl2 {
+  #   allow_fs = true
+  #   vars = {
+  #     install_config = file("${path.module}/attachments/install.whoami.yml")
+  #     routing_config = file("${path.module}/attachments/routing.whoami.yml")
+  #   }
+  # }
 
   purge_on_destroy = true
 }

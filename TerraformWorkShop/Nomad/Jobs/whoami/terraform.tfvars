@@ -11,11 +11,11 @@ prov_pdns = {
 dns_records = [
   {
     zone = "day2.sololab."
-    name = "traefik.day2.sololab."
+    name = "whoami.day2.sololab."
     type = "CNAME"
     ttl  = 86400
     records = [
-      "traefik-day2.service.consul."
+      "whoami-day2.service.consul."
     ]
   },
 ]
