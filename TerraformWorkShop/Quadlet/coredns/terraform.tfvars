@@ -1,18 +1,39 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "coredns"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/coredns"
-    value_file = "./podman-coredns/values-sololab.yaml"
+podman_kubes = [
+  {
+    helm = {
+      name       = "coredns"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/coredns"
+      value_file = "./attachments/values-sololab.yaml"
+      secrets = [
+        {
+          value_sets = [
+            {
+              name          = "coredns.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+          ]
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "root"
+          }
+        }
+      ]
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/coredns-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/coredns-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -20,19 +41,31 @@ podman_quadlet = {
     {
       files = [
         {
-          template = "./podman-coredns/coredns-container.kube"
+          template = "../templates/quadlet.kube"
           # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
           vars = {
+            # unit
+            Description           = "CoreDNS"
+            Documentation         = "https://coredns.io/manual/toc/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 5
+            # kube
             yaml          = "coredns-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "true"
-            Network       = "pasta"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
           }
           dir = "/home/podmgr/.config/containers/systemd"
         }
       ]
       service = {
-        name   = "coredns-container"
+        name   = "coredns"
         status = "start"
       }
     },

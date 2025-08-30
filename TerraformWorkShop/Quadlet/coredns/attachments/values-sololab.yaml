@@ -1,0 +1,79 @@
+global:
+  imageRegistry: 192.168.255.10:5000
+coredns:
+  containerPorts: []
+  livenessProbe:
+    enabled: false
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  hostIP: 192.168.255.10
+  servers:
+    - zones:
+        - zone: .
+      port: 53
+      plugins:
+        - name: bind
+          parameters: "{{ .Values.coredns.hostIP }}"
+        - name: errors
+        # Serves a /health endpoint on :8080, required for livenessProbe
+        - name: health
+          parameters: :5380
+          configBlock: |-
+            lameduck 5s
+        # Serves a /ready endpoint on :8181, required for readinessProbe
+        - name: ready
+        # Serves a /metrics endpoint on :9153, required for serviceMonitor
+        - name: prometheus
+          parameters: 0.0.0.0:9153
+        - name: forward
+          parameters: . 192.168.255.1
+        - name: cache
+          parameters: 30
+        # The loop plugin will send a random probe query to ourselves and will then keep track of how many times we see it.
+        # If we see it more than twice, we assume CoreDNS has seen a forwarding loop and we halt the process.
+        - name: loop
+        # This plugin allows automatic reload of a changed Corefile.
+        # To enable automatic reloading of zone file changes, use the auto plugin.
+        - name: reload
+        - name: log
+    - zones:
+        - zone: sololab
+      port: 53
+      plugins:
+        - name: bind
+          parameters: "{{ .Values.coredns.hostIP }}"
+        - name: errors
+        - name: log
+        - name: hosts
+          configBlock: |-
+            {{ .Values.coredns.hostIP }} zot.day0.sololab
+            {{ .Values.coredns.hostIP }} coredns.day0.sololab
+            {{ .Values.coredns.hostIP }} etcd-0.day0.sololab
+            ttl 60
+            fallthrough
+        - name: etcd
+          configBlock: |-
+            stubzones
+            path /skydns
+            endpoint https://localhost:2379
+            credentials monitor monitor
+            tls /etc/coredns/tls/ca.crt
+  # zoneFiles:
+  #   - filename: day0.sololab.db
+  #     domain: day0.sololab
+  #     contents: |
+  #       $ORIGIN day0.sololab.
+  #       $TTL 1h
+  #       @         IN SOA  ns.day0.sololab. admin.james.sololab. (
+  #                         2025083001 ; Serial
+  #                         1h         ; Refresh
+  #                         10m        ; Retry
+  #                         1w         ; Expire
+  #                         1h         ; Minimum TTL
+  #                         )
+  #       @         IN  NS  ns.day0.sololab.
+  #       ns        IN  A   {{ .Values.coredns.hostIP }}
+  #       zot       IN  A   {{ .Values.coredns.hostIP }}
+  #       coredns   IN  A   {{ .Values.coredns.hostIP }}
+  #       etcd-0    IN  A   {{ .Values.coredns.hostIP }}
