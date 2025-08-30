@@ -113,7 +113,7 @@ etcd:
       ## Note setting this parameter will also automatically enable client cert authentication no matter what value is set for `--client-cert-auth`.
       ## aka --trusted-ca-file
       ##
-      trusted-ca-file: /etc/etcd/pki/ca.crt
+      # trusted-ca-file: /etc/etcd/pki/ca.crt
     ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
     peer-transport-security:
       ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.
@@ -124,6 +124,7 @@ etcd:
       ## @param etcd.configFile.peer-transport-security.key-file Path to the peer server TLS key file. Must be unencrypted.
       ##
       key-file: /etc/etcd/pki/server.key
+    auth-token-ttl: 86400
     ### Profiling and monitoring
     ## @param etcd.configFile.listen-metrics-urls List of URLs to listen on for the metrics and health endpoints.
     ##

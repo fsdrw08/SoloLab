@@ -402,6 +402,7 @@ certs = [
     cert = {
       dns_names = [
         "etcd-0.day0.sololab",
+        "localhost",
       ]
       subject = {
         common_name  = "etcd.day0.sololab"

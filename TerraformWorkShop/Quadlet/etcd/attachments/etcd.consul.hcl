@@ -1,14 +1,14 @@
 services {
   name = "etcd-day0"
   id   = "etcd-server"
-  port = 5000
+  port = 2379
 
   checks = [
     {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "etcd-https-check"
       name            = "etcd-https-check"
-      http            = "https://localhost:5000/v2/"
+      http            = "https://localhost:2379/health"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
