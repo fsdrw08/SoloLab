@@ -1,17 +1,19 @@
 prov_etcd = {
-  endpoints = "https://192.168.255.10:2379"
-  ca_cert   = "../../TLS/RootCA/root.crt"
+  endpoints = "https://etcd-0.day0.sololab:2379"
   username  = "root"
   password  = "P@ssw0rd"
-  skip_tls  = false
+  skip_tls  = true
 }
 
 # https://coredns.io/plugins/etcd/
 kv_pairs = [{
-  key = "/skydns/sololab/day0/zot/"
-  #   value = "{\"host\":\"192.168.255.10\",\"ttl\":60}"
+  hostname = "traefik.day0.sololab"
   value = {
-    host = "192.168.255.10"
-    ttl  = 60
+    string_map = {
+      host = "192.168.255.10"
+    }
+    number_map = {
+      ttl = 60
+    }
   }
 }]
