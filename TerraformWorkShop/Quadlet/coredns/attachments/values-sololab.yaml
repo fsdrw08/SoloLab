@@ -59,6 +59,20 @@ coredns:
             endpoint https://localhost:2379
             credentials monitor monitor
             tls /etc/coredns/tls/ca.crt
+        - name: forward
+          parameters: consul 192.168.255.20
+        - name: forward
+          parameters: . 192.168.255.1
+    - zones:
+        - zone: consul
+      port: 53
+      plugins:
+        - name: bind
+          parameters: "{{ .Values.coredns.hostIP }}"
+        - name: errors
+        - name: log
+        - name: forward
+          parameters: . 192.168.255.20
   # zoneFiles:
   #   - filename: day0.sololab.db
   #     domain: day0.sololab
