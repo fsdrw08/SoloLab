@@ -47,8 +47,8 @@ module "nomad" {
     gid         = "1000"
   }
   install = {
-    zip_file_source = "http://dufs.day0.sololab/bin/nomad_1.10.3_linux_amd64.zip"
-    zip_file_path   = "/var/home/core/nomad_1.10.3_linux_amd64.zip"
+    zip_file_source = "http://dufs.day0.sololab/bin/nomad_1.10.4_linux_amd64.zip"
+    zip_file_path   = "/var/home/core/nomad_1.10.4_linux_amd64.zip"
     bin_file_dir    = "/var/home/core/.local/bin"
   }
   config = {
