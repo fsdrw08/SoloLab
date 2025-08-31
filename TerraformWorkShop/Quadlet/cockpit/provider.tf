@@ -12,9 +12,9 @@ terraform {
       source  = "tenstad/remote"
       version = ">=0.1.3"
     }
-    powerdns = {
-      source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+    etcd = {
+      source  = "Ferlab-Ste-Justine/etcd"
+      version = ">= 0.11.0"
     }
   }
   backend "pg" {
@@ -35,8 +35,10 @@ provider "remote" {
   }
 }
 
-provider "powerdns" {
-  api_key        = var.prov_pdns.api_key
-  server_url     = var.prov_pdns.server_url
-  insecure_https = var.prov_pdns.insecure_https
+provider "etcd" {
+  endpoints = var.prov_etcd.endpoints
+  ca_cert   = var.prov_etcd.ca_cert
+  username  = var.prov_etcd.username
+  password  = var.prov_etcd.password
+  skip_tls  = var.prov_etcd.skip_tls
 }

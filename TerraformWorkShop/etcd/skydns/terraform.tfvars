@@ -6,14 +6,16 @@ prov_etcd = {
 }
 
 # https://coredns.io/plugins/etcd/
-kv_pairs = [{
-  hostname = "traefik.day0.sololab"
-  value = {
-    string_map = {
-      host = "192.168.255.10"
-    }
-    number_map = {
-      ttl = 60
+dns_records = [
+  {
+    hostname = "traefik.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
     }
   }
-}]
+]

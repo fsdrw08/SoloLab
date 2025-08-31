@@ -1,6 +1,6 @@
-resource "etcd_key" "keys" {
+resource "etcd_key" "dns_records" {
   for_each = {
-    for kv in var.kv_pairs : kv.hostname => kv
+    for dns_record in var.dns_records : dns_record.hostname => dns_record
   }
   key = join("/", flatten([each.value.path, reverse(split(".", each.value.hostname)), ""]))
   value = jsonencode(

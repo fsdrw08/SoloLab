@@ -1,6 +1,9 @@
 global:
   imageRegistry: zot.day0.sololab
 exporter:
+  flags:
+    web:
+      listen-address: 127.0.0.1:9882
   podLabels:
     traefik.enable: true
     traefik.http.routers.podman-exporter-redirect.entrypoints: web

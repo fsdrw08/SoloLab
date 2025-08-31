@@ -75,21 +75,24 @@ variable "podman_quadlet" {
   })
 }
 
-variable "prov_pdns" {
+variable "prov_etcd" {
   type = object({
-    api_key        = string
-    server_url     = string
-    insecure_https = optional(bool, null)
+    endpoints = string
+    ca_cert   = optional(string, null)
+    username  = string
+    password  = string
+    skip_tls  = bool
   })
 }
 
 variable "dns_records" {
   type = list(object({
-    zone    = string
-    name    = string
-    type    = string
-    ttl     = number
-    records = list(string)
+    path     = optional(string, "/skydns")
+    hostname = string
+    value = object({
+      string_map = map(string)
+      number_map = map(number)
+    })
   }))
   default = []
 }

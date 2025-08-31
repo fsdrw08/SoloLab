@@ -21,7 +21,7 @@ lldap:
     # health check function only support localhost
     # ldap_host: 192.168.255.10
     # ldap_port: 389
-    # http_host: 192.168.255.10
+    http_host: 127.0.0.1
     # http_port: 17170
     jwt_secret: REPLACE_WITH_RANDOM
     ldap_base_dn: dc=root,dc=sololab

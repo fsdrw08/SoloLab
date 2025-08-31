@@ -1,31 +1,28 @@
 services {
   name = "coredns-day0"
   id   = "coredns-server"
-  port = 5000
+  port = 443
 
-  # checks = [
-  #   {
-  #     # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
-  #     id              = "coredns-https-check"
-  #     name            = "coredns-https-check"
-  #     http            = "https://localhost:5000/v2/"
-  #     tls_skip_verify = true
-  #     interval        = "300s"
-  #     timeout         = "2s"
-  #     status          = "passing"
-  #   }
-  # ]
+  checks = [
+    {
+      # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
+      id       = "coredns-http-check"
+      name     = "coredns-http-check"
+      http     = "http://localhost:5380/health"
+      interval = "300s"
+      timeout  = "2s"
+      status   = "passing"
+    }
+  ]
 
-  # https://github.com/project-etcd/etcd/issues/2149
-  # not able to scrape metric as http 401
-  # tags = [
-  #   "exporter",
-  # ]
+  tags = [
+    "exporter",
+  ]
 
-  # meta = {
-  #   scheme            = "https"
-  #   address           = "etcd.day0.sololab"
-  #   health_check_path = "v2/"
-  #   metrics_path      = "metrics"
-  # }
+  meta = {
+    scheme            = "https"
+    address           = "coredns.day0.sololab"
+    health_check_path = "health"
+    metrics_path      = "metrics"
+  }
 }

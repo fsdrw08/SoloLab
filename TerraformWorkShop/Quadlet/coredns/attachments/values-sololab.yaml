@@ -18,14 +18,14 @@ coredns:
         - name: errors
         # Serves a /health endpoint on :8080, required for livenessProbe
         - name: health
-          parameters: :5380
+          parameters: localhost:5380
           configBlock: |-
             lameduck 5s
         # Serves a /ready endpoint on :8181, required for readinessProbe
         - name: ready
         # Serves a /metrics endpoint on :9153, required for serviceMonitor
         - name: prometheus
-          parameters: 0.0.0.0:9153
+          parameters: localhost:9153
         - name: forward
           parameters: . 192.168.255.1
         - name: cache
@@ -77,3 +77,30 @@ coredns:
   #       zot       IN  A   {{ .Values.coredns.hostIP }}
   #       coredns   IN  A   {{ .Values.coredns.hostIP }}
   #       etcd-0    IN  A   {{ .Values.coredns.hostIP }}
+  podLabels:
+    traefik.enable: true
+    # health
+    traefik.http.routers.coredns-health-redirect.entrypoints: web
+    traefik.http.routers.coredns-health-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health-redirect.middlewares: toHttps@file
+    traefik.http.routers.coredns-health-redirect.service: coredns-health
+
+    traefik.http.routers.coredns-health.entrypoints: webSecure
+    traefik.http.routers.coredns-health.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health.tls: true
+    traefik.http.routers.coredns-health.service: coredns-health
+
+    traefik.http.services.coredns-health.loadbalancer.server.port: 5380
+
+    # metric
+    traefik.http.routers.coredns-metrics-redirect.entrypoints: web
+    traefik.http.routers.coredns-metrics-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics-redirect.middlewares: toHttps@file
+    traefik.http.routers.coredns-metrics-redirect.service: coredns-metrics
+
+    traefik.http.routers.coredns-metrics.entrypoints: webSecure
+    traefik.http.routers.coredns-metrics.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics.tls: true
+    traefik.http.routers.coredns-metrics.service: coredns-metrics
+
+    traefik.http.services.coredns-metrics.loadbalancer.server.port: 9153

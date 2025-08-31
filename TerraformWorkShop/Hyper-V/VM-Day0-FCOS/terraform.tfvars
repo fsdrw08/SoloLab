@@ -67,7 +67,7 @@ butane = {
     }
     local = [
       {
-        "vm_name" = "Day0-FCOS"
+        "vm_name" = "day0"
         "ip"      = "192.168.255.10"
       }
     ]

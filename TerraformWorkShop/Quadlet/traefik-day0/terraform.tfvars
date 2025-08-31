@@ -60,7 +60,7 @@ podman_quadlet = {
             StartLimitBurst       = 3
             # kube
             yaml          = "traefik-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
+            PodmanArgs    = "--tls-verify=false --no-hosts"
             KubeDownForce = "false"
             Network       = "host"
             # service
@@ -78,19 +78,23 @@ podman_quadlet = {
   ]
 }
 
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "http://pdns-auth.day0.sololab:8081"
+prov_etcd = {
+  endpoints = "https://etcd-0.day0.sololab:2379"
+  username  = "root"
+  password  = "P@ssw0rd"
+  skip_tls  = true
 }
 
 dns_records = [
   {
-    zone = "day0.sololab."
-    name = "traefik.day0.sololab."
-    type = "A"
-    ttl  = 86400
-    records = [
-      "192.168.255.10"
-    ]
+    hostname = "traefik.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
   }
 ]

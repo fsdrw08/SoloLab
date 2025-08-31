@@ -8,7 +8,7 @@ variable "prov_etcd" {
   })
 }
 
-variable "kv_pairs" {
+variable "dns_records" {
   type = list(object({
     path     = optional(string, "/skydns")
     hostname = string

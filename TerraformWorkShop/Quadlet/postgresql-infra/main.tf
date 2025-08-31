@@ -63,27 +63,6 @@ data "helm_template" "podman_kubes" {
     "${file(each.value.helm.value_file)}"
   ]
 
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
-
   # v3 helm provider
   set = flatten([
     each.value.helm.value_sets == null ? [] : [
@@ -150,18 +129,21 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "records" {
+resource "etcd_key" "dns_records" {
+  depends_on = [module.podman_quadlet]
   for_each = {
-    for record in var.dns_records : record.name => record
+    for dns_record in var.dns_records : dns_record.hostname => dns_record
   }
-  zone    = each.value.zone
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = each.value.ttl
-  records = each.value.records
+  key = join("/", flatten([each.value.path, reverse(split(".", each.value.hostname)), ""]))
+  value = jsonencode(
+    merge(each.value.value.string_map, each.value.value.number_map)
+  )
 }
 
-resource "remote_file" "consul_service" {
+resource "remote_file" "traefik_file_provider" {
+  depends_on = [
+    module.podman_quadlet
+  ]
   for_each = toset([
     "./attachments/tfbackend-pg.consul.hcl",
   ])

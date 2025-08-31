@@ -150,18 +150,19 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "records" {
+resource "etcd_key" "dns_records" {
+  depends_on = [module.podman_quadlet]
   for_each = {
-    for record in var.dns_records : record.name => record
+    for dns_record in var.dns_records : dns_record.hostname => dns_record
   }
-  zone    = each.value.zone
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = each.value.ttl
-  records = each.value.records
+  key = join("/", flatten([each.value.path, reverse(split(".", each.value.hostname)), ""]))
+  value = jsonencode(
+    merge(each.value.value.string_map, each.value.value.number_map)
+  )
 }
 
 resource "remote_file" "consul_service" {
+  depends_on = [module.podman_quadlet]
   for_each = toset([
     "./attachments/lldap.consul.hcl",
   ])

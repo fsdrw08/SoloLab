@@ -177,19 +177,20 @@ certs = [
       ]
     }
   },
-  # PowerDNS Authoritative api
+  # etcd
   {
-    name = "pdns-auth"
+    name = "etcd-server"
     key = {
       algorithm = "RSA"
-      rsa_bits  = 2048
+      rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "pdns-auth.day0.sololab"
+        "etcd-0.day0.sololab",
+        "localhost",
       ]
       subject = {
-        common_name  = "PowerDNS Authoritative"
+        common_name  = "etcd.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -197,32 +198,76 @@ certs = [
         "key_encipherment",
         "digital_signature",
         "server_auth",
+        # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
+        "client_auth",
       ]
     }
   },
-  # PowerDNS Recursor api
-  {
-    name = "pdns-recursor"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 2048
-    }
-    cert = {
-      dns_names = [
-        "pdns-recursor.day0.sololab"
-      ]
-      subject = {
-        common_name  = "PowerDNS Recursor"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
+  # {
+  #   name = "etcd-guest"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 4096
+  #   }
+  #   cert = {
+  #     subject = {
+  #       common_name  = "guest"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "cert_signing",
+  #       "key_encipherment",
+  #       "client_auth",
+  #     ]
+  #   }
+  # },
+  # # PowerDNS Authoritative api
+  # {
+  #   name = "pdns-auth"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 2048
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "pdns-auth.day0.sololab"
+  #     ]
+  #     subject = {
+  #       common_name  = "PowerDNS Authoritative"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #     ]
+  #   }
+  # },
+  # # PowerDNS Recursor api
+  # {
+  #   name = "pdns-recursor"
+  #   key = {
+  #     algorithm = "RSA"
+  #     rsa_bits  = 2048
+  #   }
+  #   cert = {
+  #     dns_names = [
+  #       "pdns-recursor.day0.sololab"
+  #     ]
+  #     subject = {
+  #       common_name  = "PowerDNS Recursor"
+  #       organization = "Sololab"
+  #     }
+  #     validity_period_hours = 43800
+  #     allowed_uses = [
+  #       "key_encipherment",
+  #       "digital_signature",
+  #       "server_auth",
+  #     ]
+  #   }
+  # },
   # cockpit
   {
     name = "cockpit"
@@ -392,51 +437,7 @@ certs = [
   #     ]
   #   }
   # },
-  # etcd
-  {
-    name = "etcd-server"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 4096
-    }
-    cert = {
-      dns_names = [
-        "etcd-0.day0.sololab",
-        "localhost",
-      ]
-      subject = {
-        common_name  = "etcd.day0.sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-        # https://blog.csdn.net/IT_DREAM_ER/article/details/107007186
-        "client_auth",
-      ]
-    }
-  },
-  # {
-  #   name = "etcd-guest"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     subject = {
-  #       common_name  = "guest"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "cert_signing",
-  #       "key_encipherment",
-  #       "client_auth",
-  #     ]
-  #   }
-  # },
+
   # opendj
   # {
   #   name = "opendj"
