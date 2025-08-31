@@ -129,6 +129,17 @@ module "podman_quadlet" {
   }
 }
 
+resource "remote_file" "traefik_file_provider" {
+  depends_on = [
+    module.podman_quadlet
+  ]
+  for_each = toset([
+    "./attachments/etcd.traefik.yaml"
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
+}
+
 resource "remote_file" "consul_service" {
   for_each = toset([
     "./attachments/etcd.consul.hcl",

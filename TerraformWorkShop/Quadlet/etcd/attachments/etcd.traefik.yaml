@@ -1,0 +1,6 @@
+http:
+  serversTransports:
+    etcd:
+      serverName: etcd-0.day0.sololab
+      rootcas:
+        - "/etc/traefik/tls/ca.crt"

@@ -1,7 +1,7 @@
 services {
   name = "etcd-day0"
   id   = "etcd-server"
-  port = 2379
+  port = 443 # 2379
 
   checks = [
     {
@@ -18,14 +18,14 @@ services {
 
   # https://github.com/project-etcd/etcd/issues/2149
   # not able to scrape metric as http 401
-  # tags = [
-  #   "exporter",
-  # ]
+  tags = [
+    "exporter",
+  ]
 
-  # meta = {
-  #   scheme            = "https"
-  #   address           = "etcd.day0.sololab"
-  #   health_check_path = "v2/"
-  #   metrics_path      = "metrics"
-  # }
+  meta = {
+    scheme            = "https"
+    address           = "etcd-0.day0.sololab"
+    health_check_path = "health"
+    metrics_path      = "metrics"
+  }
 }

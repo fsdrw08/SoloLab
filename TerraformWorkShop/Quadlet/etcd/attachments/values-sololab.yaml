@@ -43,10 +43,10 @@ etcd:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 300
-    timeoutSeconds: 5
-    failureThreshold: 3
+    initialDelaySeconds: 3
+    periodSeconds: 600
+    timeoutSeconds: 10
+    failureThreshold: 5
     successThreshold: 1
     ## https://github.com/openshift/microshift/blob/80d5b311cf012acc0cb33b9178d148198a64c2d3/ansible/roles/install-microshift/files/etcd.service
     ## note: after enable auth ("etcdctl auth enable"), the `endpoint health` command will require credential,
@@ -128,7 +128,36 @@ etcd:
     ### Profiling and monitoring
     ## @param etcd.configFile.listen-metrics-urls List of URLs to listen on for the metrics and health endpoints.
     ##
-    listen-metrics-urls: http://0.0.0.0:2381
-  ## @param etcd.tls secret setting of cert and key or whatever tls content will set in the container
-  ## @param etcd.tls.mountPath secret mount path setting of cert and key or whatever tls content will set in the container
+    listen-metrics-urls: http://localhost:2381
+  ## @param etcd.podLabels Extra labels for etcd pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
+  podLabels:
+    traefik.enable: true
+    # web
+    traefik.http.routers.etcd-redirect.entrypoints: web
+    traefik.http.routers.etcd-redirect.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd-redirect.middlewares: toHttps@file
+    traefik.http.routers.etcd-redirect.service: etcd
+
+    traefik.http.routers.etcd.entrypoints: webSecure
+    traefik.http.routers.etcd.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd.tls: true
+    traefik.http.routers.etcd.service: etcd
+
+    traefik.http.services.etcd.loadBalancer.serversTransport: etcd@file
+    traefik.http.services.etcd.loadbalancer.server.scheme: https
+    traefik.http.services.etcd.loadbalancer.server.port: 2379
+
+    # metric
+    traefik.http.routers.etcd-metrics-redirect.entrypoints: web
+    traefik.http.routers.etcd-metrics-redirect.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics-redirect.middlewares: toHttps@file
+    traefik.http.routers.etcd-metrics-redirect.service: etcd-metrics
+
+    traefik.http.routers.etcd-metrics.entrypoints: webSecure
+    traefik.http.routers.etcd-metrics.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics.tls: true
+    traefik.http.routers.etcd-metrics.service: etcd-metrics
+
+    traefik.http.services.etcd-metrics.loadbalancer.server.port: 2381
