@@ -66,7 +66,7 @@ podman_quadlet = {
             Network       = "host"
             # service
             ExecStartPre  = ""
-            ExecStartPost = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run etcd-server\""
             Restart       = "on-failure"
           }
         },
