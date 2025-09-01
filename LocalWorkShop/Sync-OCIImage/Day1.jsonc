@@ -39,14 +39,6 @@
         "privateRepo": "hashicorp/consul:1.21.4",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
-    // {
-    //     "publicRegistry": "docker.io",
-    //     "publicRepo": "hashicorp/nomad:1.10.4",
-    //     "archive": "docker.io_hashicorp_nomad_1.10.4.tar",
-    //     "privateRegistry": "192.168.255.10:5000",
-    //     "privateRepo": "hashicorp/nomad:1.10.4",
-    //     "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
-    // },
     {
         "publicRegistry": "docker.io",
         "publicRepo": "multani/nomad:1.10.4",
@@ -71,14 +63,6 @@
         "privateRepo": "grafana/loki:3.5.3",
         "description": "https://hub.docker.com/r/grafana/loki/tags, https://quay.io/repository/giantswarm/loki?tab=tags",
     },
-    // {
-    //     "publicRegistry": "docker.io",
-    //     "publicRepo": "bitnami/grafana-loki:3.5.3",
-    //     "archive": "docker.io_bitnami_grafana-loki_3.5.3.tar",
-    //     "privateRegistry": "192.168.255.10:5000",
-    //     "privateRepo": "bitnami/grafana-loki:3.5.3",
-    //     "description": "https://hub.docker.com/r/bitnami/grafana-loki/tags",
-    // },
     {
         "publicRegistry": "docker.io",
         "publicRepo": "grafana/alloy:v1.10.2",
@@ -95,14 +79,6 @@
         "privateRepo": "prometheus/prometheus:v3.5.0",
         "description": "https://hub.docker.com/r/prom/prometheus/tags, https://quay.io/repository/prometheus/prometheus?tab=tags",
     },
-    // {
-    //     "publicRegistry": "docker.io",
-    //     "publicRepo": "bitnami/prometheus:3.5.0",
-    //     "archive": "docker.io_bitnami_prometheus_3.5.0.tar",
-    //     "privateRegistry": "192.168.255.10:5000",
-    //     "privateRepo": "bitnami/prometheus:3.5.0",
-    //     "description": "https://hub.docker.com/r/bitnami/prometheus/tags",
-    // },
     {
         "publicRegistry": "quay.io",
         "publicRepo": "prometheus/alertmanager:v0.28.1",
@@ -119,14 +95,6 @@
         "privateRepo": "prometheus/blackbox-exporter:v0.27.0",
         "description": "https://quay.io/repository/prometheus/blackbox-exporter?tab=tags",
     },
-    // {
-    //     "publicRegistry": "docker.io",
-    //     "publicRepo": "bitnami/blackbox-exporter:0.26.0",
-    //     "archive": "docker.io_bitnami_blackbox-exporter_0.26.0.tar",
-    //     "privateRegistry": "192.168.255.10:5000",
-    //     "privateRepo": "bitnami/blackbox-exporter:0.26.0",
-    //     "description": "https://hub.docker.com/r/bitnami/blackbox-exporter/tags",
-    // },
     {
         "publicRegistry": "docker.io",
         "publicRepo": "library/redis:8.2.1-alpine",

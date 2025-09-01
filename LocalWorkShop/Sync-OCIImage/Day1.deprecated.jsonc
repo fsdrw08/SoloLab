@@ -1,0 +1,34 @@
+[
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/nomad:1.10.4",
+        "archive": "docker.io_hashicorp_nomad_1.10.4.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "hashicorp/nomad:1.10.4",
+        "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/grafana-loki:3.5.3",
+        "archive": "docker.io_bitnami_grafana-loki_3.5.3.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/grafana-loki:3.5.3",
+        "description": "https://hub.docker.com/r/bitnami/grafana-loki/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/prometheus:3.5.0",
+        "archive": "docker.io_bitnami_prometheus_3.5.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/prometheus:3.5.0",
+        "description": "https://hub.docker.com/r/bitnami/prometheus/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "bitnami/blackbox-exporter:0.26.0",
+        "archive": "docker.io_bitnami_blackbox-exporter_0.26.0.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "bitnami/blackbox-exporter:0.26.0",
+        "description": "https://hub.docker.com/r/bitnami/blackbox-exporter/tags",
+    },
+]
