@@ -13,20 +13,27 @@ resource "system_user" "user" {
 
 # download nomad zip
 resource "system_file" "zip" {
-  source = var.install.zip_file_source
-  path   = var.install.zip_file_path
+  for_each = {
+    for install in var.install : install.zip_file_path => install
+  }
+  source = each.value.zip_file_source
+  path   = each.value.zip_file_path
 }
 
-# unzip and put it to /usr/bin/
+# unzip and put it to ${each.value.bin_file_dir}
 resource "null_resource" "bin" {
   depends_on = [system_file.zip]
+  for_each = {
+    for install in var.install : install.zip_file_path => install
+  }
   triggers = {
-    file_source = var.install.zip_file_source
-    file_dir    = var.install.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
+    file_source   = each.value.zip_file_source
+    file_dir      = each.value.bin_file_dir
+    bin_file_name = each.value.bin_file_name
+    host          = var.vm_conn.host
+    port          = var.vm_conn.port
+    user          = var.vm_conn.user
+    password      = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -37,8 +44,8 @@ resource "null_resource" "bin" {
   }
   provisioner "remote-exec" {
     inline = [
-      "unzip -o ${system_file.zip.path} nomad -d ${var.install.bin_file_dir}",
-      "chmod 755 ${var.install.bin_file_dir}/nomad",
+      "/usr/bin/bsdtar -x -f ${each.value.zip_file_path} -C ${each.value.bin_file_dir} ${each.value.bin_file_name}",
+      "chmod +x ${each.value.bin_file_dir}/${each.value.bin_file_name}",
       # https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443
       # "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.install.bin_file_dir}/vault"
     ]
@@ -47,7 +54,7 @@ resource "null_resource" "bin" {
     when = destroy
     inline = [
       "systemctl --user daemon-reload",
-      "rm -f ${self.triggers.file_dir}/nomad",
+      "rm -f ${self.triggers.file_dir}/${self.triggers.bin_file_name}",
     ]
   }
 }
@@ -58,7 +65,6 @@ resource "system_folder" "config" {
   path  = var.config.dir
   user  = var.runas.user
   group = var.runas.group
-  mode  = "777"
 }
 
 # persist nomad config file in dir
@@ -68,7 +74,6 @@ resource "system_file" "config" {
   content    = var.config.main.content
   user       = var.runas.user
   group      = var.runas.group
-  mode       = "666"
 }
 
 
@@ -184,7 +189,8 @@ resource "null_resource" "service_mgmt" {
     service_name   = trimsuffix(system_file.service.basename, ".service")
     service_status = var.service.status
     config_md5     = md5(system_file.config.content)
-    bin_md5        = md5(system_file.zip.content)
+    # bin_md5        = md5(system_file.zip[*].content)
+    # bin_md5 = md5(join("\n", [for file in system_file.zip[*] : file.md5sum]))
   }
   connection {
     type        = "ssh"

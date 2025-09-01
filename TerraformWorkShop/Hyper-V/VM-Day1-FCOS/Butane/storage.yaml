@@ -12,6 +12,11 @@ storage:
         - label: 1001
           number: 2
           size_mib: 40959
+        - label: data
+          number: 3
+          size_mib: 40959
+  directories:
+    - path: /var/mnt/data
   filesystems:
     - device: /dev/disk/by-partlabel/1000
       format: xfs
@@ -24,4 +29,10 @@ storage:
       path: /var/home/podmgr
       wipe_filesystem: false
       label: 1001
+      with_mount_unit: true
+    - device: /dev/disk/by-partlabel/data
+      format: xfs
+      path: /var/mnt/data
+      wipe_filesystem: false
+      label: data
       with_mount_unit: true

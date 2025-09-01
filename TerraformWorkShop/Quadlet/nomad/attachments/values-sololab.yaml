@@ -28,22 +28,31 @@ nomad:
     main:
       acl:
         enabled: true
+      # https://developer.hashicorp.com/nomad/docs/configuration/consul
       consul:
         address: consul.day1.sololab:8501
         ca_file: /nomad/config/certs/ca.crt
         ssl: true
         token: # set by vault data
+        service_identity:
+          aud: ["consul.io"]
+          ttl: "1h"
+        task_identity:
+          aud: ["consul.io"]
+          ttl: "1h"
       tls:
         http: true
         rpc: true
         ca_file: /nomad/config/certs/ca.crt
         cert_file: /nomad/config/certs/server.crt
         key_file: /nomad/config/certs/server.key
+      # https://developer.hashicorp.com/nomad/docs/configuration/vault
+      # https://developer.hashicorp.com/nomad/docs/secure/workload-identity/vault#start-the-nomad-agent
       vault:
         enabled: true
         default_identity:
           aud: ["vault.io"]
-          # ttl: 1h
+          ttl: 1h
 
   args:
     - agent

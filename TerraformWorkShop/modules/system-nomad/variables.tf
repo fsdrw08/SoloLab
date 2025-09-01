@@ -9,11 +9,12 @@ variable "vm_conn" {
 }
 
 variable "install" {
-  type = object({
+  type = list(object({
     zip_file_source = string
     zip_file_path   = string
+    bin_file_name   = string
     bin_file_dir    = string
-  })
+  }))
 }
 
 variable "runas" {

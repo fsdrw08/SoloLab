@@ -7,14 +7,14 @@ resource "null_resource" "nomad_init" {
     password = var.prov_system.password
   }
   triggers = {
-    dirs        = "/var/home/core/.local/bin /var/home/core/nomad.d/data"
-    chown_user  = "core"
-    chown_group = "core"
-    chown_dir   = "/var/home/core/nomad.d/data"
+    dirs        = "/var/home/core/.local/bin /var/mnt/data/nomad"
+    chown_user  = "root"
+    chown_group = "root"
+    chown_dir   = "/var/mnt/data/nomad"
   }
   provisioner "remote-exec" {
     inline = [
-      templatefile("${path.root}/nomad/init.sh", {
+      templatefile("${path.root}/attachments/init.sh", {
         dirs        = self.triggers.dirs
         chown_user  = self.triggers.chown_user
         chown_group = self.triggers.chown_group
@@ -28,6 +28,11 @@ resource "null_resource" "nomad_init" {
 data "vault_kv_secret_v2" "cert" {
   mount = "kvv2-certs"
   name  = "client.global.nomad"
+}
+
+data "vault_kv_secret_v2" "token" {
+  mount = "kvv2-consul"
+  name  = "token-nomad_client"
 }
 
 module "nomad" {
@@ -46,20 +51,32 @@ module "nomad" {
     group       = "core"
     gid         = "1000"
   }
-  install = {
-    zip_file_source = "http://dufs.day0.sololab/bin/nomad_1.10.4_linux_amd64.zip"
-    zip_file_path   = "/var/home/core/nomad_1.10.4_linux_amd64.zip"
-    bin_file_dir    = "/var/home/core/.local/bin"
-  }
+  install = [
+    {
+      zip_file_source = "http://dufs.day0.sololab/binaries/nomad_1.10.4_linux_amd64.zip"
+      zip_file_path   = "/var/home/core/nomad_1.10.4_linux_amd64.zip"
+      bin_file_name   = "nomad"
+      bin_file_dir    = "/var/home/core/.local/bin"
+    },
+    {
+      zip_file_source = "http://dufs.day0.sololab/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip"
+      zip_file_path   = "/var/home/core/nomad-driver-podman_0.6.3_linux_amd64.zip"
+      bin_file_name   = "nomad-driver-podman"
+      bin_file_dir    = "/var/home/core/.local/bin"
+    },
+  ]
   config = {
     main = {
       basename = "client.hcl"
-      content = templatefile("./nomad/client.hcl", {
-        servers   = "nomad.day1.sololab"
-        data_dir  = "/var/home/core/nomad.d/data"
-        ca_file   = "/var/home/core/nomad.d/tls/ca.pem"
-        cert_file = "/var/home/core/nomad.d/tls/client.pem"
-        key_file  = "/var/home/core/nomad.d/tls/client-key.pem"
+      content = templatefile("./attachments/client.hcl", {
+        servers                = "nomad.day1.sololab"
+        vault_server_address   = "https://vault.service.consul:8200"
+        nomad_consul_acl_token = data.vault_kv_secret_v2.token.data["token"]
+        data_dir               = "/var/home/core/.local/etc/nomad.d/data"
+        plugin_dir             = "/var/home/core/.local/bin"
+        ca_file                = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
+        cert_file              = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
+        key_file               = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
       })
     }
     tls = {
@@ -71,18 +88,18 @@ module "nomad" {
       key_basename  = "client-key.pem"
       key_content   = data.vault_kv_secret_v2.cert.data["private_key"]
     }
-    dir        = "/var/home/core/nomad.d"
+    dir        = "/var/mnt/data/nomad"
     create_dir = false
   }
   service = {
     status  = "start"
     enabled = true
     systemd_service_unit = {
-      content = templatefile("${path.root}/nomad/nomad-client.service", {
+      content = templatefile("${path.root}/attachments/nomad-client.service", {
         user        = "core"
         group       = "core"
         bin_path    = "/var/home/core/.local/bin/nomad"
-        config_file = "/var/home/core/nomad.d/client.hcl"
+        config_file = "/var/home/core/.local/nomad.d/client.hcl"
       })
       path = "/var/home/core/.config/systemd/user/nomad.service"
     }
