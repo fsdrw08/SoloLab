@@ -70,7 +70,7 @@ module "nomad" {
       basename = "client.hcl"
       content = templatefile("./attachments/client.hcl", {
         servers                = "nomad.day1.sololab"
-        vault_server_address   = "https://vault.service.consul:8200"
+        vault_server_address   = "https://vault-day1.service.consul:8200"
         nomad_consul_acl_token = data.vault_kv_secret_v2.token.data["token"]
         data_dir               = "/var/home/core/.local/etc/nomad.d/data"
         plugin_dir             = "/var/home/core/.local/bin"
