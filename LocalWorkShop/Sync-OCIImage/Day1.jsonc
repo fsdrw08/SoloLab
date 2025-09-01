@@ -39,14 +39,14 @@
         "privateRepo": "hashicorp/consul:1.21.4",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/nomad:1.10.4",
-        "archive": "docker.io_hashicorp_nomad_1.10.4.tar",
-        "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/nomad:1.10.4",
-        "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
-    },
+    // {
+    //     "publicRegistry": "docker.io",
+    //     "publicRepo": "hashicorp/nomad:1.10.4",
+    //     "archive": "docker.io_hashicorp_nomad_1.10.4.tar",
+    //     "privateRegistry": "192.168.255.10:5000",
+    //     "privateRepo": "hashicorp/nomad:1.10.4",
+    //     "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
+    // },
     {
         "publicRegistry": "docker.io",
         "publicRepo": "multani/nomad:1.10.4",

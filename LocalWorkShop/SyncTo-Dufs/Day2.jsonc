@@ -1,10 +1,10 @@
 [
     {
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "consul/1.21.3/consul_1.21.3_linux_amd64.zip",
-        "archive": "consul_1.21.3_linux_amd64.zip",
+        "publicRepo": "consul/1.21.4/consul_1.21.4_linux_amd64.zip",
+        "archive": "consul_1.21.4_linux_amd64.zip",
         "privateRegistry": "https://dufs.day0.sololab",
-        "privateRepo": "binaries/consul_1.21.3_linux_amd64.zip",
+        "privateRepo": "binaries/consul_1.21.4_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/consul",
     },
     {
