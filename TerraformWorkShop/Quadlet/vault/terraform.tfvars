@@ -77,29 +77,13 @@ podman_quadlet = {
   ]
 }
 
-prov_pdns = {
-  api_key        = "powerdns"
-  server_url     = "https://pdns-auth.day0.sololab"
-  insecure_https = true
-}
-
-dns_records = [{
-  zone = "day1.sololab."
-  name = "vault.day1.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.20"
-  ]
-}]
-
 post_process = {
   New-VaultStaticToken = {
     script_path = "./attachments/New-VaultStaticToken.sh"
     vars = {
       VAULT_OPERATOR_SECRETS_JSON_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-unseal/_data/vault_operator_secrets_b64"
       # VAULT_OPERATOR_SECRETS_PATH = "/home/podmgr/.local/share/containers/storage/volumes/vault-pvc-file/_data/vault_operator_secret"
-      VAULT_ADDR   = "https://192.168.255.20:8200"
+      VAULT_ADDR   = "https://localhost:8200"
       STATIC_TOKEN = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
     }
   }

@@ -98,39 +98,3 @@ podman_quadlet = {
     },
   ]
 }
-
-# post_process = {
-#   "Enable-DNSAnonymousAccess.sh" = {
-#     script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
-#     vars = {
-#       CONSUL_HTTP_ADDR = "https://consul.day0.sololab:8501"
-#       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-#     }
-#   }
-# }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_records = [
-  # {
-  #   zone = "day1.sololab."
-  #   name = "consul-client.day1.sololab."
-  #   type = "CNAME"
-  #   ttl  = 86400
-  #   records = [
-  #     "day1.node.consul."
-  #   ]
-  # },
-  {
-    zone = "day0.sololab."
-    name = "consul-client.day0.sololab."
-    type = "A"
-    ttl  = 86400
-    records = [
-      "192.168.255.10"
-    ]
-  }
-]

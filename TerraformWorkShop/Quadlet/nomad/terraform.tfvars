@@ -113,24 +113,9 @@ post_process = {
   "New-NomadAnonymousPolicy.sh" = {
     script_path = "./attachments/New-NomadAnonymousPolicy.sh"
     vars = {
-      NOMAD_ADDR       = "https://192.168.255.20:4646"
+      NOMAD_ADDR       = "https://localhost:4646"
       NOMAD_TOKEN_FILE = "/var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc/_data/server/nomad_token"
       WORKLOAD         = "nomad-agent"
     }
   }
-}
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_record = {
-  zone = "day1.sololab."
-  name = "nomad.day1.sololab."
-  type = "CNAME"
-  ttl  = 86400
-  records = [
-    "nomad-day1.service.consul."
-  ]
 }

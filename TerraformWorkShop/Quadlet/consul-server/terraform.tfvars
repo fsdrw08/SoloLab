@@ -114,25 +114,8 @@ post_process = {
   "Enable-DNSAnonymousAccess.sh" = {
     script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
     vars = {
-      CONSUL_HTTP_ADDR = "https://192.168.255.20:8501"
+      CONSUL_HTTP_ADDR = "https://localhost:8501"
       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     }
   }
 }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "consul.day1.sololab."
-    type = "A"
-    ttl  = 86400
-    records = [
-      "192.168.255.20"
-    ]
-  }
-]

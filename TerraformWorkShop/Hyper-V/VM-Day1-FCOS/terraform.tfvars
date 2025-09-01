@@ -95,18 +95,3 @@ butane = {
     # ]
   }
 }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_record = {
-  zone = "day1.sololab."
-  name = "FCOS.day1.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.20"
-  ]
-}

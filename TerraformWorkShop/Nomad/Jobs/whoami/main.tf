@@ -12,14 +12,3 @@ resource "nomad_job" "whoami" {
 
   purge_on_destroy = true
 }
-
-resource "powerdns_record" "records" {
-  for_each = {
-    for record in var.dns_records : record.name => record
-  }
-  zone    = each.value.zone
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = each.value.ttl
-  records = each.value.records
-}

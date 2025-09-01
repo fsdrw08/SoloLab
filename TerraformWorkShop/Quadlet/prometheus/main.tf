@@ -128,17 +128,6 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "records" {
-  for_each = {
-    for record in var.dns_records : record.name => record
-  }
-  zone    = each.value.zone
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = each.value.ttl
-  records = each.value.records
-}
-
 resource "remote_file" "traefik_file_provider" {
   for_each = toset([
     "./attachments/prometheus.traefik.yaml"
@@ -156,7 +145,7 @@ resource "remote_file" "consul_service" {
 }
 
 resource "grafana_data_source" "data_source" {
-  depends_on = [module.podman_quadlet, powerdns_record.records]
+  depends_on = [module.podman_quadlet]
   type       = "prometheus"
   name       = "prometheus"
   url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"

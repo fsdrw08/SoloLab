@@ -130,11 +130,6 @@ podman_quadlet = {
   ]
 }
 
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
 dns_records = [
   {
     zone = "day1.sololab."

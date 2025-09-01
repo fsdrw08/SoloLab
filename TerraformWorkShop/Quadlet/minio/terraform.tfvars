@@ -80,29 +80,3 @@ podman_quadlet = {
     },
   ]
 }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "minio-api.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "minio-day1.service.consul."
-    ]
-  },
-  {
-    zone = "day1.sololab."
-    name = "minio-console.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "minio-day1.service.consul."
-    ]
-  },
-]
