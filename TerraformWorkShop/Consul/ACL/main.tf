@@ -9,6 +9,7 @@ resource "consul_acl_policy" "policy" {
 }
 
 resource "consul_acl_role" "role" {
+  depends_on = [consul_acl_policy.policy]
   for_each = {
     for role in var.roles : role.name => role
   }
@@ -20,6 +21,7 @@ resource "consul_acl_role" "role" {
 resource "consul_acl_token" "token" {
   for_each = {
     for role in var.roles : role.name => role
+    if role.token_store != null
   }
   roles = [consul_acl_role.role[each.value.name].name]
 }
@@ -27,6 +29,7 @@ resource "consul_acl_token" "token" {
 data "consul_acl_token_secret_id" "secret_id" {
   for_each = {
     for role in var.roles : role.name => role
+    if role.token_store != null
   }
   accessor_id = consul_acl_token.token[each.key].id
 }

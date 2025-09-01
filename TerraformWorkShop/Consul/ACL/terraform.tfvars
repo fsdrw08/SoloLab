@@ -53,6 +53,24 @@ policies = [
     EOT
   },
   {
+    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
+    name        = "nomad_task"
+    description = "Policy for nomad workload(task) to interact with Consul"
+    rules       = <<-EOT
+      agent_prefix "" {
+        policy = "read"
+      }
+
+      node_prefix "" {
+        policy = "write"
+      }
+
+      service_prefix "" {
+        policy = "write"
+      }
+    EOT
+  },
+  {
     name        = "prometheus"
     description = "Policy for Prometheus to read node information"
     rules       = <<-EOT
@@ -106,6 +124,21 @@ roles = [
       vault_kvv2_path = "kvv2-consul"
     }
   },
+  {
+    name         = "nomad_task"
+    description  = "Role of nomad tasks"
+    policy_names = ["nomad_task"]
+  },
+  # {
+  #   name         = "consul_admin"
+  #   description  = "Role of consul admin"
+  #   policy_names = ["global-management"]
+  # },
+  # {
+  #   name         = "consul_user"
+  #   description  = "Role of consul user"
+  #   policy_names = ["builtin/global-read-only"]
+  # },
   {
     name         = "prometheus"
     description  = "Role of Prometheus"
