@@ -49,6 +49,14 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "hectorm/nfs-ganesha:v9",
+        "archive": "docker.io_hectorm_nfs-ganesha_v9.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "hectorm/nfs-ganesha:v9",
+        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "grafana/grafana:12.1.1",
         "archive": "docker.io_grafana_grafana_12.1.1.tar",
         "privateRegistry": "192.168.255.10:5000",
