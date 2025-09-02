@@ -42,9 +42,19 @@ data "vault_kv_secret_v2" "nomad_token" {
   name  = "token-node_write"
 }
 
+resource "system_systemd_unit" "podman_socket" {
+  type    = "socket"
+  name    = "podman"
+  enabled = true
+  status  = "started"
+}
+
 module "nomad" {
-  depends_on = [null_resource.nomad_init]
-  source     = "../../modules/system-nomad"
+  depends_on = [
+    null_resource.nomad_init,
+    system_systemd_unit.podman_socket
+  ]
+  source = "../../modules/system-nomad"
   vm_conn = {
     host     = var.prov_system.host
     port     = var.prov_system.port
@@ -82,7 +92,7 @@ module "nomad" {
         ca_file              = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
         cert_file            = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
         key_file             = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
-        podman_socket        = "unix:///run/user/1001/podman/podman.sock"
+        podman_socket        = "unix:///run/podman/podman.sock"
         CONSUL_HTTP_ADDR     = "127.0.0.1:8501"
         CONSUL_HTTP_TOKEN    = data.vault_kv_secret_v2.consul_token.data["token"]
         vault_server_address = "https://vault-day1.service.consul:8200"

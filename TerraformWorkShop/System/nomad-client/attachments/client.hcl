@@ -10,10 +10,11 @@ client {
 }
 
 consul {
-  address = "${CONSUL_HTTP_ADDR}"
-  ca_file = "${ca_file}"
-  ssl     = true
-  token   = "${CONSUL_HTTP_TOKEN}"
+  address    = "${CONSUL_HTTP_ADDR}"
+  ca_file    = "${ca_file}"
+  ssl        = true
+  verify_ssl = false
+  token      = "${CONSUL_HTTP_TOKEN}"
 }
 
 data_dir = "${data_dir}"

@@ -130,6 +130,9 @@ resource "system_file" "key" {
 
 # persist nomad systemd unit file
 resource "system_file" "service" {
+  depends_on = [
+    null_resource.bin
+  ]
   path    = var.service.systemd_service_unit.path
   content = var.service.systemd_service_unit.content
   uid     = var.runas.uid
@@ -137,12 +140,15 @@ resource "system_file" "service" {
 }
 
 resource "system_link" "service" {
-  depends_on = [system_file.service]
-  count      = var.service.auto_start.enabled == true ? 1 : 0
-  path       = var.service.auto_start.link_path
-  target     = var.service.auto_start.link_target
-  uid        = var.runas.uid
-  gid        = var.runas.gid
+  depends_on = [
+    system_file.service,
+    null_resource.bin
+  ]
+  count  = var.service.auto_start.enabled == true ? 1 : 0
+  path   = var.service.auto_start.link_path
+  target = var.service.auto_start.link_target
+  uid    = var.runas.uid
+  gid    = var.runas.gid
 }
 
 # debug service: journalctl -u nomad.service
