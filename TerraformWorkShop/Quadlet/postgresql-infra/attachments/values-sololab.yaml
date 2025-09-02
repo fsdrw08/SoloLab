@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day0.sololab:5000
 postgresql:
   containerPorts: []
   extraEnvVars:

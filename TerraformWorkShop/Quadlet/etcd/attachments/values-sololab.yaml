@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: 192.168.255.10:5000
 etcd:
   extraEnvVars:
     - name: TZ
