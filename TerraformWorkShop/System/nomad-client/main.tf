@@ -7,18 +7,20 @@ resource "null_resource" "nomad_init" {
     password = var.prov_system.password
   }
   triggers = {
-    dirs        = "/var/home/core/.local/bin /var/mnt/data/nomad"
-    chown_user  = "root"
-    chown_group = "root"
-    chown_dir   = "/var/mnt/data/nomad"
+    rootless_dirs    = "/var/home/core/.local/bin"
+    root_dirs        = "/var/mnt/data/nomad"
+    root_chown_dirs  = "/var/mnt/data/nomad"
+    root_chown_user  = "root"
+    root_chown_group = "root"
   }
   provisioner "remote-exec" {
     inline = [
       templatefile("${path.root}/attachments/init.sh", {
-        dirs        = self.triggers.dirs
-        chown_user  = self.triggers.chown_user
-        chown_group = self.triggers.chown_group
-        chown_dir   = self.triggers.chown_dir
+        rootless_dirs    = split(",", self.triggers.rootless_dirs)
+        root_dirs        = split(",", self.triggers.root_dirs)
+        root_chown_dirs  = split(",", self.triggers.root_chown_dirs)
+        root_chown_user  = self.triggers.root_chown_user
+        root_chown_group = self.triggers.root_chown_group
       })
     ]
   }
@@ -30,9 +32,14 @@ data "vault_kv_secret_v2" "cert" {
   name  = "client.global.nomad"
 }
 
-data "vault_kv_secret_v2" "token" {
+data "vault_kv_secret_v2" "consul_token" {
   mount = "kvv2-consul"
   name  = "token-nomad_client"
+}
+
+data "vault_kv_secret_v2" "nomad_token" {
+  mount = "kvv2-nomad"
+  name  = "token-node_write"
 }
 
 module "nomad" {
@@ -69,14 +76,16 @@ module "nomad" {
     main = {
       basename = "client.hcl"
       content = templatefile("./attachments/client.hcl", {
-        servers                = "nomad.day1.sololab"
-        vault_server_address   = "https://vault-day1.service.consul:8200"
-        nomad_consul_acl_token = data.vault_kv_secret_v2.token.data["token"]
-        data_dir               = "/var/home/core/.local/etc/nomad.d/data"
-        plugin_dir             = "/var/home/core/.local/bin"
-        ca_file                = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
-        cert_file              = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
-        key_file               = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
+        servers              = "nomad.day1.sololab"
+        data_dir             = "/var/mnt/data/nomad"
+        plugin_dir           = "/var/home/core/.local/bin"
+        ca_file              = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
+        cert_file            = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
+        key_file             = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
+        podman_socket        = "unix:///run/user/1001/podman/podman.sock"
+        CONSUL_HTTP_ADDR     = "127.0.0.1:8501"
+        CONSUL_HTTP_TOKEN    = data.vault_kv_secret_v2.consul_token.data["token"]
+        vault_server_address = "https://vault-day1.service.consul:8200"
       })
     }
     tls = {
@@ -88,18 +97,25 @@ module "nomad" {
       key_basename  = "client-key.pem"
       key_content   = data.vault_kv_secret_v2.cert.data["private_key"]
     }
-    dir        = "/var/mnt/data/nomad"
+    dir        = "/var/home/core/.local/etc/nomad.d"
     create_dir = false
   }
   service = {
-    status  = "start"
-    enabled = true
+    status = "start"
+    auto_start = {
+      enabled     = true
+      link_path   = "/var/home/core/.config/systemd/user/default.target.wants/nomad.service"
+      link_target = "/var/home/core/.config/systemd/user/nomad.service"
+    }
     systemd_service_unit = {
       content = templatefile("${path.root}/attachments/nomad-client.service", {
-        user        = "core"
-        group       = "core"
-        bin_path    = "/var/home/core/.local/bin/nomad"
-        config_file = "/var/home/core/.local/nomad.d/client.hcl"
+        bin_path          = "/var/home/core/.local/bin/nomad"
+        config_file       = "/var/home/core/.local/etc/nomad.d/client.hcl"
+        NOMAD_ADDR        = "https://127.0.0.1:14646"
+        NOMAD_TOKEN       = data.vault_kv_secret_v2.nomad_token.data["token"]
+        NOMAD_CACERT      = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
+        NOMAD_CLIENT_CERT = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
+        NOMAD_CLIENT_KEY  = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
       })
       path = "/var/home/core/.config/systemd/user/nomad.service"
     }

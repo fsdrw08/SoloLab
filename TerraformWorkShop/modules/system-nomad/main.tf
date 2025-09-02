@@ -8,7 +8,8 @@ resource "system_user" "user" {
   count      = var.runas.take_charge == true ? 1 : 0
   depends_on = [system_group.group]
   name       = var.runas.user
-  group      = var.runas.group
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 # download nomad zip
@@ -18,6 +19,8 @@ resource "system_file" "zip" {
   }
   source = each.value.zip_file_source
   path   = each.value.zip_file_path
+  uid    = var.runas.uid
+  gid    = var.runas.gid
 }
 
 # unzip and put it to ${each.value.bin_file_dir}
@@ -63,8 +66,8 @@ resource "null_resource" "bin" {
 resource "system_folder" "config" {
   count = var.config.create_dir == true ? 1 : 0
   path  = var.config.dir
-  user  = var.runas.user
-  group = var.runas.group
+  uid   = var.runas.uid
+  gid   = var.runas.gid
 }
 
 # persist nomad config file in dir
@@ -72,8 +75,8 @@ resource "system_file" "config" {
   depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, basename(var.config.main.basename)])
   content    = var.config.main.content
-  user       = var.runas.user
-  group      = var.runas.group
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 
@@ -129,6 +132,17 @@ resource "system_file" "key" {
 resource "system_file" "service" {
   path    = var.service.systemd_service_unit.path
   content = var.service.systemd_service_unit.content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
+}
+
+resource "system_link" "service" {
+  depends_on = [system_file.service]
+  count      = var.service.auto_start.enabled == true ? 1 : 0
+  path       = var.service.auto_start.link_path
+  target     = var.service.auto_start.link_target
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 # debug service: journalctl -u nomad.service
@@ -186,11 +200,11 @@ resource "null_resource" "service_mgmt" {
     null_resource.service_stop
   ]
   triggers = {
-    service_name   = trimsuffix(system_file.service.basename, ".service")
-    service_status = var.service.status
-    config_md5     = md5(system_file.config.content)
-    # bin_md5        = md5(system_file.zip[*].content)
-    # bin_md5 = md5(join("\n", [for file in system_file.zip[*] : file.md5sum]))
+    service_name    = trimsuffix(system_file.service.basename, ".service")
+    service_status  = var.service.status
+    service_content = md5(system_file.service.content)
+    config_md5      = md5(system_file.config.content)
+    bin_url         = md5(join("\n", [for file in system_file.zip : file.path]))
   }
   connection {
     type        = "ssh"

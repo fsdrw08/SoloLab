@@ -10,10 +10,10 @@ client {
 }
 
 consul {
-  address = "127.0.0.1:8501"
+  address = "${CONSUL_HTTP_ADDR}"
   ca_file = "${ca_file}"
   ssl     = true
-  token   = "${nomad_consul_acl_token}"
+  token   = "${CONSUL_HTTP_TOKEN}"
 }
 
 data_dir = "${data_dir}"
@@ -26,7 +26,7 @@ plugin_dir = "${plugin_dir}"
 # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
 plugin "nomad-driver-podman" {
   config {
-    socket_path = "unix:///run/podman/podman.sock"
+    socket_path = "${podman_socket}"
     volumes {
       enabled      = true
       selinuxlabel = "z"
@@ -35,9 +35,9 @@ plugin "nomad-driver-podman" {
 }
 
 ports {
-  http = 4746
-  rpc  = 4747
-  serf = 4748
+  http = 14646
+  rpc  = 14647
+  serf = 14648
 }
 
 tls {

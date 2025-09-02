@@ -53,8 +53,12 @@ variable "config" {
 
 variable "service" {
   type = object({
-    status  = string
-    enabled = bool
+    status = string
+    auto_start = object({
+      enabled     = bool
+      link_path   = string
+      link_target = string
+    })
     systemd_service_unit = object({
       path    = string
       content = string

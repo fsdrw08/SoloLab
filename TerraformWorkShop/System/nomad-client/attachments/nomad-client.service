@@ -12,9 +12,15 @@ StartLimitBurst=3
 # After=consul.service
 
 [Service]
+Environment="NOMAD_ADDR=${NOMAD_ADDR}"
+Environment="NOMAD_CACERT=${NOMAD_CACERT}"
+Environment="NOMAD_CLIENT_CERT=${NOMAD_CLIENT_CERT}"
+Environment="NOMAD_CLIENT_KEY=${NOMAD_CLIENT_KEY}"
+Environment="NOMAD_TOKEN=${NOMAD_TOKEN}"
+
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=sudo ${bin_path} agent -config ${config_file}
-EnvironmentFile=-/etc/nomad.d/.environment
+ExecStartPost = /bin/bash -c "sleep $(shuf -i 30-40 -n 1) &&  ${bin_path} node eligibility -enable -self"
 KillMode=process
 KillSignal=SIGINT
 LimitNOFILE=65536
@@ -25,4 +31,4 @@ RestartSec=2
 OOMScoreAdjust=-999
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
