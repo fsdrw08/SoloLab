@@ -57,6 +57,16 @@ policies = [
 
 roles = [
   {
+    name        = "management"
+    description = "management token"
+    token = {
+      type = "management"
+      store = {
+        vault_kvv2_path = "kvv2-nomad"
+      }
+    }
+  },
+  {
     name                  = "admin"
     description           = "admin role"
     policy_names          = ["admin"]

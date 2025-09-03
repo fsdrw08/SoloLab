@@ -57,6 +57,7 @@ resource "nomad_acl_role" "role" {
   depends_on = [nomad_acl_policy.policy]
   for_each = {
     for role in var.roles : role.name => role
+    if role.policy_names != null
   }
   name        = each.value.name
   description = each.value.description
@@ -88,8 +89,11 @@ resource "nomad_acl_token" "token" {
     if role.token != null
   }
   type = each.value.token.type
-  role {
-    id = nomad_acl_role.role[each.key].id
+  dynamic "role" {
+    for_each = each.value.token.type == "management" ? [] : [1]
+    content {
+      id = nomad_acl_role.role[each.key].id
+    }
   }
 }
 
