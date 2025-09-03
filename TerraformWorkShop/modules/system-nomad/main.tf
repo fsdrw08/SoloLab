@@ -203,7 +203,8 @@ resource "null_resource" "service_mgmt" {
     system_file.cert,
     system_file.key,
     system_file.service,
-    null_resource.service_stop
+    null_resource.service_stop,
+    system_link.service
   ]
   triggers = {
     service_name    = trimsuffix(system_file.service.basename, ".service")
