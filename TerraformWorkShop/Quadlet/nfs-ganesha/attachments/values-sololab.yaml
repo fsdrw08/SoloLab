@@ -2,6 +2,9 @@ global:
   imageRegistry: zot.day0.sololab
 nfs:
   containerPorts: []
+  containerSecurityContext:
+    seLinuxOptions:
+      type: spc_t
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

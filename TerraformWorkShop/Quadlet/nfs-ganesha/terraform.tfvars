@@ -9,11 +9,11 @@ prov_remote = {
 podman_kubes = [
   {
     helm = {
-      name       = "nfs"
+      name       = "nfs-ganesha"
       chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
       value_file = "./attachments/values-sololab.yaml"
     }
-    manifest_dest_path = "/etc/containers/systemd/nfs-aio.yaml"
+    manifest_dest_path = "/etc/containers/systemd/nfs-ganesha-aio.yaml"
   }
 ]
 
@@ -34,7 +34,7 @@ podman_quadlet = {
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
             # kube
-            yaml          = "nfs-aio.yaml"
+            yaml          = "nfs-ganesha-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
             Network       = "host"
@@ -47,25 +47,9 @@ podman_quadlet = {
         },
       ]
       service = {
-        name   = "nfs"
+        name   = "nfs-ganesha"
         status = "start"
       }
     }
-  ]
-}
-
-prov_pdns = {
-  api_key        = "powerdns"
-  server_url     = "https://pdns-auth.day0.sololab"
-  insecure_https = true
-}
-
-dns_record = {
-  zone = "day0.sololab."
-  name = "nfs.day0.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.10"
   ]
 }

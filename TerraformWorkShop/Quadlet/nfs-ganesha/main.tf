@@ -148,14 +148,6 @@ module "podman_quadlet" {
   }
 }
 
-resource "powerdns_record" "record" {
-  zone    = var.dns_record.zone
-  name    = var.dns_record.name
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
-}
-
 # resource "null_resource" "post_process" {
 #   depends_on = [
 #     powerdns_record.record,
