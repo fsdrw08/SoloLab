@@ -4,11 +4,22 @@ variable "prov_nomad" {
     skip_verify = bool
   })
 }
-variable "dynamic_host_volumes" {
-  type = list(object({
-    name = string
-    capability = object({
-      access_mode = optional(string, "single-node-writer")
-    })
-  }))
+
+variable "volumes" {
+  type = object({
+    dynamic_host_volumes = optional(
+      list(object({
+        name = string
+        capability = object({
+          access_mode = optional(string, "single-node-writer")
+        })
+      })),
+      []
+    )
+    csi_volume = optional(
+      list(object({
+
+      }))
+    )
+  })
 }

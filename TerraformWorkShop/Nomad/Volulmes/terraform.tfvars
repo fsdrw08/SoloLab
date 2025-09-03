@@ -3,11 +3,13 @@ prov_nomad = {
   skip_verify = true
 }
 
-dynamic_host_volumes = [
-  {
-    name = "traefik"
-    capability = {
-      access_mode = "single-node-writer"
-    }
-  }
-]
+volumes = {
+  # dynamic_host_volumes = [
+  #   {
+  #     name = "traefik"
+  #     capability = {
+  #       access_mode = "single-node-writer"
+  #     }
+  #   }
+  # ]
+}

@@ -23,6 +23,11 @@ leave_on_interrupt = true
 leave_on_terminate = true
 
 plugin_dir = "${plugin_dir}"
+plugin "docker" {
+  config {
+    endpoint = "unix:///disable/docker.sock"
+  }
+}
 # Podman driver plugin configuration
 # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
 plugin "nomad-driver-podman" {

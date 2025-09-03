@@ -30,7 +30,7 @@ job "nfs-ganesha" {
       check {
         type     = "tcp"
         port     = "nfs"
-        interval = "10s"
+        interval = "600s"
         timeout  = "2s"
       }
 
@@ -58,6 +58,17 @@ job "nfs-ganesha" {
         ]
         network_mode = "host"
         # ports        = ["web", "webSecure", "whoami"]
+        readonly_rootfs = true
+        security_opt = [
+          "label=type:spc_t",
+        ]
+        tmpfs = [
+          "/run/",
+          "/tmp/",
+          "/recovery/",
+          "/dev/"
+        ]
+
         volumes = [
           "local/ganesha.conf:/etc/ganesha/ganesha.conf:ro",
           "/var/mnt/data/nfs:/export"
