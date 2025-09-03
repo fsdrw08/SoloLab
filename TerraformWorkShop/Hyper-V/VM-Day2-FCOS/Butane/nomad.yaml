@@ -79,6 +79,7 @@ storage:
 
           plugin "docker" {
             config {
+              allow_privileged = true
               infra_image = "zot.day0.sololab/pause-amd64:3.3"
               volumes {
                 enabled      = true
