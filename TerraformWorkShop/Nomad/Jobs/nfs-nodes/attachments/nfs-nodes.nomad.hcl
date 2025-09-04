@@ -11,6 +11,11 @@ job "nfs-nodes" {
   }
 
   group "nfs-nodes" {
+    service {
+      provider = "consul"
+      name     = "nfs-csi-plugin-node"
+    }
+
     task "plugin" {
       driver = "docker"
       config {
