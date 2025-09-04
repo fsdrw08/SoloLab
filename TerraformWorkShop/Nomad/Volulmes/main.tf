@@ -1,7 +1,7 @@
 resource "nomad_dynamic_host_volume" "volumes" {
   for_each = {
-    for volume in var.volumes.dynamic_host_volumes : volume.name => volume
-    if var.volumes.dynamic_host_volumes != []
+    for volume in var.dynamic_host_volumes : volume.name => volume
+    if var.dynamic_host_volumes != []
   }
   name      = each.value.name
   plugin_id = "mkdir"
@@ -13,30 +13,30 @@ resource "nomad_dynamic_host_volume" "volumes" {
   }
 }
 
-# https://github.com/livioribeiro/nomad-lxd-terraform/blob/0c792716c9824c4c59de349d27b6aa1d1c16b09d/modules/nomad_jobs/jobs/rocketduck-nfs/controller.nomad.hcl
-
+# https://github.com/basher83/andromeda-orchestration/blob/97df48241fefaf8288357dc2a9cd47526a17ce83/docs/implementation/nomad/storage-patterns.md#pattern-3-stateful-applications-with-csi
 # https://support.hashicorp.com/hc/en-us/articles/22557185128083-Nomad-NFS-CSI-Volume
 resource "nomad_csi_volume" "volumes" {
-  name      = "nfs-day1-volume"
-  plugin_id = "nfs"
-  volume_id = "traefik"
+  for_each = {
+    for volume in var.csi_volumes : volume.name => volume
+  }
+  name      = each.value.name
+  plugin_id = each.value.plugin_id
+  volume_id = each.value.volume_id
 
-  capability {
-    access_mode     = "multi-node-multi-writer"
-    attachment_mode = "file-system"
+  dynamic "capability" {
+    for_each = each.value.capabilities
+    content {
+      access_mode     = lookup(capability.value, "access_mode", null)
+      attachment_mode = lookup(capability.value, "attachment_mode", null)
+    }
   }
 
-  capability {
-    access_mode     = "single-node-writer"
-    attachment_mode = "file-system"
-  }
+  capacity_min = each.value.capacity_min
+  capacity_max = each.value.capacity_max
 
-  context = {
-    server = "192.168.255.20"
-    share  = "/traefik/acme"
-  }
-
+  parameters = each.value.parameters
   mount_options {
-    fs_type = "nfs"
+    fs_type     = each.value.mount_options.fs_type
+    mount_flags = each.value.mount_options.mount_flags
   }
 }
