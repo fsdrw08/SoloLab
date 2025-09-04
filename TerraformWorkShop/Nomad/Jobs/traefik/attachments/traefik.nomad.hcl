@@ -14,6 +14,12 @@ job "traefik" {
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
   type = "system"
 
+  constraint {
+    attribute = "${attr.unique.hostname}"
+    operator  = "!="
+    value     = "day1"
+  }
+
   group "traefik" {
     network {
       port "web" {
@@ -54,8 +60,11 @@ job "traefik" {
     }
 
     volume "certs" {
-      type   = "host"
-      source = "traefik"
+      type            = "csi"
+      source          = "traefik-acme"
+      read_only       = false
+      attachment_mode = "file-system"
+      access_mode     = "multi-node-multi-writer"
     }
 
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
@@ -63,17 +72,17 @@ job "traefik" {
       driver = "docker"
 
       config {
-        image = "zot.day0.sololab/library/traefik:v3.5.0"
+        image = "zot.day0.sololab/library/traefik:v3.5.1"
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
-          "traefik.http.routers.dashboard-redirect.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`) || Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard-redirect.rule"        = "Host(`traefik-${attr.unique.hostname}.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.dashboard-redirect.service"     = "api@internal"
 
           "traefik.http.routers.dashboard.entryPoints"      = "webSecure"
           "traefik.http.routers.dashboard.tls.certresolver" = "internal"
-          "traefik.http.routers.dashboard.rule"             = "(Host(`traefik.${attr.unique.hostname}.sololab`) || Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard.rule"             = "Host(`traefik-${attr.unique.hostname}.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard.service"          = "api@internal"
           "traefik.http.routers.dashboard.middlewares"      = "userPass@file"
           # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2,
@@ -81,7 +90,7 @@ job "traefik" {
 
           "traefik.http.routers.metrics.entryPoints" = "webSecure"
           "traefik.http.routers.metrics.tls"         = "true"
-          "traefik.http.routers.metrics.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`) || Host(`traefik-${attr.unique.hostname}.service.consul`)) && PathPrefix(`/metrics`)"
+          "traefik.http.routers.metrics.rule"        = "Host(`traefik-${attr.unique.hostname}.service.consul`) && PathPrefix(`/metrics`)"
           "traefik.http.routers.metrics.service"     = "prometheus@internal"
         }
         network_mode = "host"
