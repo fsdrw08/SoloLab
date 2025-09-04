@@ -21,6 +21,7 @@ storage:
       contents:
         inline: |
           acl {
+            enabled = true
             tokens {
               default = "${consul_acl_token}"
             }
