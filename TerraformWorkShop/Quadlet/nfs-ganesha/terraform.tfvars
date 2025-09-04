@@ -3,7 +3,7 @@ prov_remote = {
   port     = 22
   user     = "core"
   password = "P@ssw0rd"
-  sudo     = true
+  sudo     = false
 }
 
 podman_kubes = [
@@ -13,17 +13,19 @@ podman_kubes = [
       chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
       value_file = "./attachments/values-sololab.yaml"
     }
-    manifest_dest_path = "/etc/containers/systemd/nfs-ganesha-aio.yaml"
+    manifest_dest_path = "/var/home/core/.config/containers/systemd/nfs-ganesha-aio.yaml"
   }
 ]
 
 podman_quadlet = {
-  dir = "/etc/containers/systemd"
+  # dir = "/var/home/core/.config/containers/systemd"
+  dir = "/var/home/core/.local/etc/containers/systemd"
   units = [
     {
       files = [
         {
-          template = "../templates/quadlet.kube"
+          # template = "../templates/quadlet.kube"
+          template = "./attachments/nfs-ganesha.container"
           # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
           vars = {
             # unit

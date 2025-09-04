@@ -1,0 +1,32 @@
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+# https://github.com/hectorm/docker-nfs-ganesha/blob/master/compose.yaml
+[Container]
+ContainerName=nfs-ganesha
+
+Image=zot.day0.sololab/hectorm/nfs-ganesha:v9
+
+AddCapability=CHOWN
+AddCapability=DAC_OVERRIDE
+AddCapability=DAC_READ_SEARCH
+AddCapability=FOWNER
+AddCapability=FSETID
+AddCapability=SETGID
+AddCapability=SETUID
+AddCapability=SYS_RESOURCE
+DropCapability=ALL
+
+SecurityLabelType=spc_t
+
+Environment=TZ=Asia/Shanghai
+
+Volume=nfs-ganesha-vol:/export
+
+PodmanArgs=${PodmanArgs}
+Network=${Network}
+
+[Install]
+WantedBy=multi-user.target
