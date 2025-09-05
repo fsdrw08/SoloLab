@@ -18,6 +18,7 @@ $syncList = @"
 ]
 "@
 
+$currentLocation=Get-Location | Select-Object -ExpandProperty Path
 $localDir = "$env:PUBLIC/Downloads/containers/trivy"
 # $localDir="D:/Users/Public/Downloads/containers"
 # go to local oci archive dir
@@ -70,3 +71,4 @@ $syncList | ConvertFrom-Json | ForEach-Object {
     "oras manifest fetch"
     oras manifest fetch --insecure $privateRegistry/$($_.privateRepo)
 }
+Set-Location -Path $currentLocation
