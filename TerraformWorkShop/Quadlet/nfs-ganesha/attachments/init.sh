@@ -4,8 +4,7 @@ set -e
 
 # 定义变量
 TARGET_DIR="${TARGET_DIR}"
-LINK_DIR="${LINK_DIR}"
-LINK_PATH="$LINK_DIR/link"
+LINK_PATH="${LINK_PATH}"
 
 # 创建目标目录（如果不存在）
 sudo mkdir -p "$TARGET_DIR"

@@ -14,7 +14,7 @@ resource "null_resource" "link_init" {
     inline = [
       templatefile("${path.root}/attachments/init.sh", {
         TARGET_DIR = "/var/home/core/.local/etc/containers/systemd"
-        LINK_DIR   = "/etc/containers/systemd"
+        LINK_PATH  = "/etc/containers/systemd/1000"
       })
     ]
   }
