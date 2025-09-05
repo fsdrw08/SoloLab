@@ -50,6 +50,7 @@ coredns:
             {{ .Values.coredns.hostIP }} zot.day0.sololab
             {{ .Values.coredns.hostIP }} coredns.day0.sololab
             {{ .Values.coredns.hostIP }} etcd-0.day0.sololab
+            {{ .Values.coredns.hostIP }} tfbackend-pg.day0.sololab
             ttl 60
             fallthrough
         - name: etcd
