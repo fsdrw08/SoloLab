@@ -80,12 +80,22 @@ podman_quadlet = {
 }
 
 post_process = {
-  "Add-EtcdUser.sh" = {
-    script_path = "./attachments/Add-EtcdUser.sh"
+  # "Add-EtcdUser.sh" = {
+  #   script_path = "./attachments/Add-EtcdUser.sh"
+  #   vars = {
+  #     CONTAINER_NAME = "etcd-server"
+  #     ENDPOINTS      = "unix://localhost:0"
+  #     ROOT_PASSWORD  = "P@ssw0rd"
+  #   }
+  # }
+  "Enable-UserAuth.sh" = {
+    script_path = "./attachments/Enable-UserAuth.sh"
     vars = {
-      CONTAINER_NAME = "etcd-server"
-      ENDPOINTS      = "unix://localhost:0"
-      ROOT_PASSWORD  = "P@ssw0rd"
+      ETCD_ENDPOINT    = "https://localhost:2379"
+      ROOT_USERNAME    = "root"
+      ROOT_PASSWORD    = "P@ssw0rd"
+      MONITOR_USERNAME = "monitor"
+      MONITOR_PASSWORD = "monitor"
     }
   }
 }
