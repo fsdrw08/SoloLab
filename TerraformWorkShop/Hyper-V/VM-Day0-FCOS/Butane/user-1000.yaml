@@ -141,7 +141,36 @@ storage:
         id: 1000
       group:
         id: 1000
+    # create user level /etc/containers/systemd dir then create /etc/containers/systemd/1000 link to here
+    - path: /var/home/core/.local
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.local/etc
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.local/etc/containers
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.local/etc/containers/systemd
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
   links:
+    # link the custom quadlet dir to root level quadlet dir
+    - path: /etc/containers/systemd/1000
+      target: /var/home/core/.local/etc/containers/systemd
+      overwrite: true
     # link the socket in this dir for socket auto start when user login
     - path: /var/home/core/.config/systemd/user/sockets.target.wants/podman.socket
       target: /usr/lib/systemd/user/podman.socket
