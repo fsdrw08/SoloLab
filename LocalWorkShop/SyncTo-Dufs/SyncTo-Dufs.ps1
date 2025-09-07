@@ -3,6 +3,7 @@ $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkSho
 # $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day1.jsonc")
 
 $localDir="$env:PUBLIC/Downloads/bin"
+# $localDir="D:/Users/Public/Downloads/bin"
 # $localDir="C:/Users/Public/Downloads/containers"
 # $localDir="D:/Users/Public/Downloads/containers"
 if (-not (Test-Path -Path $localDir)) {
