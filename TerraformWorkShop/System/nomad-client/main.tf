@@ -7,7 +7,7 @@ resource "null_resource" "nomad_init" {
     password = var.prov_system.password
   }
   triggers = {
-    rootless_dirs    = "/var/home/core/.local/bin"
+    rootless_dirs    = "/var/home/core/.local/bin,/var/home/core/.local/etc" # "/var/home/podmgr/.local/bin,/var/home/podmgr/.local/etc,/var/home/podmgr/.local/opt/nomad/data"
     root_dirs        = "/var/mnt/data/nomad"
     root_chown_dirs  = "/var/mnt/data/nomad"
     root_chown_user  = "root"
@@ -87,7 +87,7 @@ module "nomad" {
       basename = "client.hcl"
       content = templatefile("./attachments/client.hcl", {
         servers              = "nomad.day1.sololab"
-        data_dir             = "/var/mnt/data/nomad"
+        data_dir             = "/var/mnt/data/nomad" # /var/home/podmgr/.local/opt/nomad/data
         plugin_dir           = "/var/home/core/.local/bin"
         ca_file              = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
         cert_file            = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
@@ -108,14 +108,14 @@ module "nomad" {
       key_content   = data.vault_kv_secret_v2.cert.data["private_key"]
     }
     dir        = "/var/home/core/.local/etc/nomad.d"
-    create_dir = false
+    create_dir = true
   }
   service = {
     status = "start"
     auto_start = {
       enabled     = true
-      link_path   = "/var/home/core/.config/systemd/user/default.target.wants/nomad.service"
-      link_target = "/var/home/core/.config/systemd/user/nomad.service"
+      link_path   = "/var/home/core/.config/systemd/user/default.target.wants/nomad-client.service"
+      link_target = "/var/home/core/.config/systemd/user/nomad-client.service"
     }
     systemd_service_unit = {
       content = templatefile("${path.root}/attachments/nomad-client.service", {
@@ -127,7 +127,7 @@ module "nomad" {
         NOMAD_CLIENT_CERT = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
         NOMAD_CLIENT_KEY  = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
       })
-      path = "/var/home/core/.config/systemd/user/nomad.service"
+      path = "/var/home/core/.config/systemd/user/nomad-client.service"
     }
   }
 }

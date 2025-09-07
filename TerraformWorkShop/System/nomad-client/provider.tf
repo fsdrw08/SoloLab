@@ -23,7 +23,7 @@ provider "system" {
     user     = var.prov_system.user
     password = var.prov_system.password
   }
-  sudo = true
+  sudo = var.prov_system.sudo
 }
 
 provider "vault" {
