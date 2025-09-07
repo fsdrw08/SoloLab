@@ -48,14 +48,6 @@
         "description": "https://hub.docker.com/r/multani/nomad/tags",
     },
     {
-        "publicRegistry": "docker.io",
-        "publicRepo": "hectorm/nfs-ganesha:v9",
-        "archive": "docker.io_hectorm_nfs-ganesha_v9.tar",
-        "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hectorm/nfs-ganesha:v9",
-        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
-    },
-    {
         "publicRegistry": "registry.k8s.io",
         "publicRepo": "sig-storage/nfsplugin:v4.11.0",
         "archive": "registry.k8s.io_sig-storage_nfsplugin_v4.11.0.tar",

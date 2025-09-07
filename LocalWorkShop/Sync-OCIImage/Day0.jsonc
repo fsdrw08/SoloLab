@@ -81,10 +81,10 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "sigoden/dufs:v0.44.0",
-        "archive": "docker.io_sigoden_dufs_v0.44.0.tar",
+        "publicRepo": "sigoden/dufs:v0.45.0",
+        "archive": "docker.io_sigoden_dufs_v0.45.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "sigoden/dufs:v0.44.0",
+        "privateRepo": "sigoden/dufs:v0.45.0",
         "description": "https://hub.docker.com/r/sigoden/dufs/tags",
     },
     {
@@ -150,5 +150,13 @@
         "privateRegistry": "192.168.255.10:5000",
         "privateRepo": "navidys/prometheus-podman-exporter:v1.18.0",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
-    }
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hectorm/nfs-ganesha:v9",
+        "archive": "docker.io_hectorm_nfs-ganesha_v9.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "hectorm/nfs-ganesha:v9",
+        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+    },
 ]
