@@ -88,7 +88,7 @@ dns_records = [
     hostname = "consul.day1.sololab"
     value = {
       string_map = {
-        host = "consul-day1.service.consul"
+        host = "consul.service.consul"
       }
       number_map = {
         ttl = 60
@@ -110,18 +110,7 @@ dns_records = [
     hostname = "nomad.day1.sololab"
     value = {
       string_map = {
-        host = "nomad-day1.service.consul"
-      }
-      number_map = {
-        ttl = 60
-      }
-    }
-  },
-  {
-    hostname = "grafana.day1.sololab"
-    value = {
-      string_map = {
-        host = "grafana-day1.service.consul"
+        host = "nomad.service.consul"
       }
       number_map = {
         ttl = 60
@@ -132,7 +121,7 @@ dns_records = [
     hostname = "minio-api.day1.sololab"
     value = {
       string_map = {
-        host = "minio-day1.service.consul"
+        host = "minio.service.consul"
       }
       number_map = {
         ttl = 60
@@ -143,22 +132,33 @@ dns_records = [
     hostname = "minio-console.day1.sololab"
     value = {
       string_map = {
-        host = "minio-day1.service.consul"
+        host = "minio.service.consul"
       }
       number_map = {
         ttl = 60
       }
     }
   },
-  {
-    hostname = "loki.day1.sololab"
-    value = {
-      string_map = {
-        host = "loki-day1.service.consul"
-      }
-      number_map = {
-        ttl = 60
-      }
-    }
-  },
+  # {
+  #   hostname = "grafana.day1.sololab"
+  #   value = {
+  #     string_map = {
+  #       host = "grafana.service.consul"
+  #     }
+  #     number_map = {
+  #       ttl = 60
+  #     }
+  #   }
+  # },
+  # {
+  #   hostname = "loki.day1.sololab"
+  #   value = {
+  #     string_map = {
+  #       host = "loki-day1.service.consul"
+  #     }
+  #     number_map = {
+  #       ttl = 60
+  #     }
+  #   }
+  # },
 ]
