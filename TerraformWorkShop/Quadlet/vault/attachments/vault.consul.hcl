@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
-  name = "vault-day1"
+  name = "vault"
   id   = "vault-server"
   port = 8200
 
@@ -18,17 +18,18 @@ services {
   ]
 
   tags = [
-    "vault-exporter",
+    "exporter-vault",
+    "host=day1",
 
-    "traefik-day1.enable=true",
-    "traefik-day1.http.routers.vault-redirect.entrypoints=web",
-    "traefik-day1.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`)",
-    "traefik-day1.http.routers.vault-redirect.middlewares=toHttps@file",
-    "traefik-day1.http.routers.vault.entrypoints=webSecure",
-    "traefik-day1.http.routers.vault.rule=Host(`vault.day1.sololab`)",
-    "traefik-day1.http.routers.vault.tls=true",
-    "traefik-day1.http.services.vault.loadBalancer.serversTransport=vault@file",
-    "traefik-day1.http.services.vault.loadbalancer.server.scheme=https",
+    "traefik.enable=true",
+    "traefik.http.routers.vault-redirect.entrypoints=web",
+    "traefik.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`) || Host(`vault.service.consul`)",
+    "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.vault.entrypoints=webSecure",
+    "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`) || Host(`vault.service.consul`)",
+    "traefik.http.routers.vault.tls=true",
+    "traefik.http.services.vault.loadBalancer.serversTransport=vault@file",
+    "traefik.http.services.vault.loadbalancer.server.scheme=https",
   ]
 
   meta = {

@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
-  name = "consul-day1"
+  name = "consul"
   id   = "consul-agent"
   port = 8501
 
@@ -17,22 +17,23 @@ services {
   ]
 
   tags = [
-    "consul-exporter",
+    "exporter-consul",
+    "host=day1",
 
-    "traefik-day1.enable=true",
-    "traefik-day1.http.routers.consul-redirect.entrypoints=web",
-    "traefik-day1.http.routers.consul-redirect.rule=Host(`consul.day1.sololab`)",
-    "traefik-day1.http.routers.consul-redirect.middlewares=toHttps@file",
-    "traefik-day1.http.routers.consul.entrypoints=webSecure",
-    "traefik-day1.http.routers.consul.rule=Host(`consul.day1.sololab`)",
-    "traefik-day1.http.routers.consul.tls=true",
-    "traefik-day1.http.services.consul.loadBalancer.serversTransport=consul@file",
-    "traefik-day1.http.services.consul.loadbalancer.server.scheme=https",
+    "traefik.enable=true",
+    "traefik.http.routers.consul-redirect.entrypoints=web",
+    "traefik.http.routers.consul-redirect.rule=Host(`consul.day1.sololab`) || Host(`consul.service.consul`)",
+    "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.consul.entrypoints=webSecure",
+    "traefik.http.routers.consul.rule=Host(`consul.day1.sololab`) || Host(`consul.service.consul`)",
+    "traefik.http.routers.consul.tls=true",
+    "traefik.http.services.consul.loadBalancer.serversTransport=consul@file",
+    "traefik.http.services.consul.loadbalancer.server.scheme=https",
   ]
 
   meta = {
     scheme            = "https"
-    address           = "consul.day1.sololab"
+    address           = "consul.service.consul"
     health_check_path = "v1/status/leader"
     # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
     metrics_path              = "v1/agent/metrics"

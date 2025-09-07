@@ -64,7 +64,7 @@ podman_quadlet = {
             # Network = "pasta:--map-host-loopback=169.254.1.3"
             # service
             ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
-            ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.day1.sololab:8501/v1/catalog/services"
+            ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services"
             ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
             Restart            = "on-failure"
           }

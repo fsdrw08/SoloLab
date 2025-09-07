@@ -17,25 +17,26 @@ services {
 
   tags = [
     "exporter",
+    "host=day1",
 
-    "traefik-day1.enable=true",
-    "traefik-day1.http.routers.dashboard-redirect.entrypoints=web",
-    "traefik-day1.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`)&&(PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
-    "traefik-day1.http.routers.dashboard-redirect.middlewares=toHttps@file",
-    "traefik-day1.http.routers.dashboard-redirect.service=api@internal",
-    "traefik-day1.http.routers.dashboard.entryPoints=webSecure",
-    "traefik-day1.http.routers.dashboard.tls=true",
-    "traefik-day1.http.routers.dashboard.rule=Host(`traefik.day1.sololab`)&&(PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
-    "traefik-day1.http.routers.dashboard.service=api@internal",
-    "traefik-day1.http.routers.dashboard.middlewares=userPass@file",
-    "traefik-day1.http.routers.metrics.entryPoints=webSecure",
-    "traefik-day1.http.routers.metrics.tls=true",
-    "traefik-day1.http.routers.metrics.rule=Host(`traefik.day1.sololab`)&&PathPrefix(`/metrics`)",
-    "traefik-day1.http.routers.metrics.service=prometheus@internal",
+    "traefik.enable=true",
+    "traefik.http.routers.trafik-dashboard-redirect.entryPoints=web",
+    "traefik.http.routers.trafik-dashboard-redirect.rule=(Host(`traefik.day1.sololab`)||Host(`traefik-day1.service.consul`)) && (PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
+    "traefik.http.routers.trafik-dashboard-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.trafik-dashboard-redirect.service=api@internal",
+    "traefik.http.routers.trafik-dashboard.entryPoints=webSecure",
+    "traefik.http.routers.trafik-dashboard.tls=true",
+    "traefik.http.routers.trafik-dashboard.rule=(Host(`traefik.day1.sololab`)||Host(`traefik-day1.service.consul`)) && (PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
+    "traefik.http.routers.trafik-dashboard.service=api@internal",
+    "traefik.http.routers.trafik-dashboard.middlewares=userPass@file",
+    "traefik.http.routers.metrics.entryPoints=webSecure",
+    "traefik.http.routers.metrics.rule=(Host(`traefik.day1.sololab`)||Host(`traefik-day1.service.consul`)) && PathPrefix(`/metrics`)",
+    "traefik.http.routers.metrics.tls=true",
+    "traefik.http.routers.metrics.service=prometheus@internal",
   ]
   meta = {
     scheme            = "https"
-    address           = "traefik.day1.sololab"
+    address           = "traefik-day1.service.consul"
     health_check_path = "metrics"
     metrics_path      = "metrics"
   }

@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
-  name = "nomad-day1"
+  name = "nomad"
   id   = "nomad-agent"
   port = 4646
 
@@ -17,14 +17,16 @@ services {
   ]
 
   tags = [
-    "traefik-day1.enable=true",
-    "traefik-day1.http.routers.nomad-redirect.entrypoints=web",
-    "traefik-day1.http.routers.nomad-redirect.rule=Host(`nomad.day1.sololab`)",
-    "traefik-day1.http.routers.nomad-redirect.middlewares=toHttps@file",
-    "traefik-day1.http.routers.nomad.entrypoints=webSecure",
-    "traefik-day1.http.routers.nomad.rule=Host(`nomad.day1.sololab`)",
-    "traefik-day1.http.routers.nomad.tls=true",
-    "traefik-day1.http.services.nomad.loadBalancer.serversTransport=nomad@file",
-    "traefik-day1.http.services.nomad.loadbalancer.server.scheme=https",
+    "host=day1",
+
+    "traefik.enable=true",
+    "traefik.http.routers.nomad-redirect.entrypoints=web",
+    "traefik.http.routers.nomad-redirect.rule=Host(`nomad.day1.sololab`)||Host(`nomad.service.consul`)",
+    "traefik.http.routers.nomad-redirect.middlewares=toHttps@file",
+    "traefik.http.routers.nomad.entrypoints=webSecure",
+    "traefik.http.routers.nomad.rule=Host(`nomad.day1.sololab`)||Host(`nomad.service.consul`)",
+    "traefik.http.routers.nomad.tls=true",
+    "traefik.http.services.nomad.loadBalancer.serversTransport=nomad@file",
+    "traefik.http.services.nomad.loadbalancer.server.scheme=https",
   ]
 }

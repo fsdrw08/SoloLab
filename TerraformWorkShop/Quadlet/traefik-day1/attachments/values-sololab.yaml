@@ -10,14 +10,14 @@ traefik:
     static:
       providers:
         consulCatalog:
+          constraints: "Tag(`host=day1`)"
           endpoint:
-            address: consul.day1.sololab:8501
+            address: consul.service.consul:8501
             datacenter: dc1
             scheme: https
             tls:
               ca: /etc/traefik/tls/ca.crt
           exposedByDefault: false
-          prefix: traefik-day1
       serversTransport:
         rootCAs:
           - /etc/traefik/tls/ca.crt
