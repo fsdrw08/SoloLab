@@ -33,8 +33,8 @@ vm = {
   power_state        = "Off"
   memory = {
     dynamic       = true
-    startup_bytes = 4093640704
-    maximum_bytes = 4093640704
+    startup_bytes = 2046820352
+    maximum_bytes = 2046820352
     minimum_bytes = 1023410176
   }
 }
@@ -59,7 +59,7 @@ butane = {
       "general_dns"              = "192.168.255.1;192.168.255.10"
       "domain"                   = "sololab."
       "domain_dns"               = "192.168.255.10"
-      "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge xfsdump"
+      "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge pcp-zeroconf xfsdump"
       "password_hash_1000"       = "$y$j9T$cDLwsV9ODTV31Dt4SuVGa.$FU0eRT9jawPhIV3IV24W7obZ3PaJuBCVp7C9upDCcgD"
       "ssh_authorized_keys_1000" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
       "password_hash_1001"       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
