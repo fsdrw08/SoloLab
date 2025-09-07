@@ -21,17 +21,17 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "minio-api.day1.sololab"
+            name  = "root"
           }
           value_sets = [
-            {
-              name          = "minio.tls.contents.public\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "minio.tls.contents.private\\.key"
-              value_ref_key = "private_key"
-            },
+            # {
+            #   name          = "minio.tls.contents.public\\.crt"
+            #   value_ref_key = "cert"
+            # },
+            # {
+            #   name          = "minio.tls.contents.private\\.key"
+            #   value_ref_key = "private_key"
+            # },
             {
               name          = "minio.tls.contents.CAs.sololab\\.crt"
               value_ref_key = "ca"

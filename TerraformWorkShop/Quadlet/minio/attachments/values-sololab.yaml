@@ -10,35 +10,36 @@ minio:
         - ready
         - sololab
   podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.minio-api-redirect.entrypoints: web
-    # traefik.http.routers.minio-api-redirect.rule: Host(`minio-api.day1.sololab`)
-    # traefik.http.routers.minio-api-redirect.middlewares: toHttps@file
-    # traefik.http.routers.minio-api-redirect.service: minio-api
+    traefik.enable: true
+    traefik.http.routers.minio-api-redirect.entrypoints: web
+    traefik.http.routers.minio-api-redirect.rule: Host(`minio-api.day1.sololab`)
+    traefik.http.routers.minio-api-redirect.middlewares: toHttps@file
+    traefik.http.routers.minio-api-redirect.service: minio-api
 
-    # traefik.http.routers.minio-api.entrypoints: webSecure
-    # traefik.http.routers.minio-api.rule: Host(`minio-api.day1.sololab`)
-    # traefik.http.routers.minio-api.tls: true
-    # traefik.http.routers.minio-api.service: minio-api
+    traefik.http.routers.minio-api.entrypoints: webSecure
+    traefik.http.routers.minio-api.rule: Host(`minio-api.day1.sololab`)
+    traefik.http.routers.minio-api.tls: true
+    traefik.http.routers.minio-api.service: minio-api
 
-    # traefik.http.services.minio-api.loadBalancer.serversTransport: minio-api@file
+    traefik.http.services.minio-api.loadBalancer.serversTransport: minio-api@file
     # traefik.http.services.minio-api.loadbalancer.server.scheme: https
-    # traefik.http.services.minio-api.loadbalancer.server.port: 9000
+    traefik.http.services.minio-api.loadbalancer.server.port: 9000
 
-    # traefik.http.routers.minio-console-redirect.entrypoints: web
-    # traefik.http.routers.minio-console-redirect.rule: Host(`minio-console.day1.sololab`)
-    # traefik.http.routers.minio-console-redirect.service: minio-console
-    # traefik.http.routers.minio-console-redirect.middlewares: toHttps@file
+    traefik.http.routers.minio-console-redirect.entrypoints: web
+    traefik.http.routers.minio-console-redirect.rule: Host(`minio-console.day1.sololab`)
+    traefik.http.routers.minio-console-redirect.service: minio-console
+    traefik.http.routers.minio-console-redirect.middlewares: toHttps@file
 
-    # traefik.http.routers.minio-console.entrypoints: webSecure
-    # traefik.http.routers.minio-console.rule: Host(`minio-console.day1.sololab`)
-    # traefik.http.routers.minio-console.tls: true
-    # traefik.http.routers.minio-console.service: minio-console
+    traefik.http.routers.minio-console.entrypoints: webSecure
+    traefik.http.routers.minio-console.rule: Host(`minio-console.day1.sololab`)
+    traefik.http.routers.minio-console.tls: true
+    traefik.http.routers.minio-console.service: minio-console
 
-    # traefik.http.services.minio-console.loadBalancer.serversTransport: minio-console@file
+    traefik.http.services.minio-console.loadBalancer.serversTransport: minio-console@file
     # traefik.http.services.minio-console.loadbalancer.server.scheme: https
-    # traefik.http.services.minio-console.loadbalancer.server.port: 9001
+    traefik.http.services.minio-console.loadbalancer.server.port: 9001
 
+    # deprecated
     # traefik.http.routers.minio-console.entrypoints: webSecure
     # traefik.http.routers.minio-console.rule: Host(`minio.day0.sololab`) && PathPrefix(`/ui`)
     # traefik.http.routers.minio-console.middlewares: minio-console-stripprefix@docker
@@ -51,7 +52,6 @@ minio:
     # traefik.http.services.minio-console.loadbalancer.server.scheme: https
     # traefik.http.services.minio-console.loadbalancer.server.port: 9001
 
-    # deprecated
     # traefik.tcp.routers.minio-api.entrypoints: webSecure
     # traefik.tcp.routers.minio-api.rule: HostSNI(`minio-api.day1.sololab`)
     # traefik.tcp.routers.minio-api.tls.passthrough: true
@@ -65,9 +65,14 @@ minio:
     # traefik.tcp.services.minio-console.loadbalancer.server.port: 9001
   config:
     MINIO_OPTS: >-
-      --address=:9000
-      --console-address=:9001
+      --address=127.0.0.1:9000
+      --console-address=127.0.0.1:9001
       --certs-dir=/etc/minio/certs
+    MINIO_IDENTITY_OPENID_CONFIG_URL: # get from vault, by terraform
+    MINIO_IDENTITY_OPENID_CLIENT_ID: # get from vault, by terraform
+    MINIO_IDENTITY_OPENID_CLIENT_SECRET: # get from vault, by terraform
+    MINIO_IDENTITY_OPENID_DISPLAY_NAME: # get from vault, by terraform
+    MINIO_IDENTITY_OPENID_CLAIM_NAME: # get from vault, by terraform
     MINIO_SERVER_URL: https://minio-api.day1.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
     MINIO_BROWSER_REDIRECT_URL: https://minio-console.day1.sololab
@@ -78,4 +83,4 @@ minio:
       value: Asia/Shanghai
       # https://min.io/docs/minio/linux/reference/minio-mc/minio-client-settings.html#id2
     - name: MC_HOST_sololab
-      value: https://{{ .Values.minio.config.MINIO_ROOT_USER }}:{{ .Values.minio.config.MINIO_ROOT_PASSWORD }}@localhost:9000
+      value: http://{{ .Values.minio.config.MINIO_ROOT_USER }}:{{ .Values.minio.config.MINIO_ROOT_PASSWORD }}@localhost:9000

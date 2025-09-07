@@ -17,6 +17,7 @@ vault_kvv2 = {
 }
 
 vault_certs = [
+  # consul service wild card cert hosting in reverse proxy
   {
     secret_engine = {
       backend   = "pki-sololab_day1"
@@ -33,7 +34,6 @@ vault_certs = [
     ttl_years   = 3
     common_name = "consul.day1.sololab"
     alt_names = [
-      "consul.day1.sololab",
       "consul.service.consul",
       "server.dc1.consul",
       "localhost"
@@ -46,6 +46,9 @@ vault_certs = [
     }
     ttl_years   = 3
     common_name = "nomad.day1.sololab"
+    alt_names = [
+      "nomad.service.consul",
+    ]
   },
   # https://developer.hashicorp.com/nomad/tutorials/archive/security-enable-tls#agent-certificates
   # https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad#create-and-populate-the-templates-directory
@@ -58,57 +61,57 @@ vault_certs = [
     ttl_years   = 3
     common_name = "client.global.nomad"
     alt_names = [
-      "nomad.service.consul",
+      "nomad-client.service.consul",
       "localhost",
     ]
     ip_sans = ["127.0.0.1"]
   },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "minio-api.day1.sololab"
-    alt_names = [
-      "minio-console.day1.sololab",
-    ]
-  },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "grafana.day1.sololab"
-  },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "loki.day1.sololab"
-  },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "alloy.day1.sololab"
-    alt_names = [
-      "alloy.day0.sololab",
-    ]
-  },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "prometheus.day1.sololab"
-  },
+  # {
+  #   secret_engine = {
+  #     backend   = "pki-sololab_day1"
+  #     role_name = "IntCA-Day1-v1-role-default"
+  #   }
+  #   ttl_years   = 3
+  #   common_name = "minio-api.day1.sololab"
+  #   alt_names = [
+  #     "minio-console.day1.sololab",
+  #   ]
+  # },
+  # {
+  #   secret_engine = {
+  #     backend   = "pki-sololab_day1"
+  #     role_name = "IntCA-Day1-v1-role-default"
+  #   }
+  #   ttl_years   = 3
+  #   common_name = "grafana.day1.sololab"
+  # },
+  # {
+  #   secret_engine = {
+  #     backend   = "pki-sololab_day1"
+  #     role_name = "IntCA-Day1-v1-role-default"
+  #   }
+  #   ttl_years   = 3
+  #   common_name = "loki.day1.sololab"
+  # },
+  # {
+  #   secret_engine = {
+  #     backend   = "pki-sololab_day1"
+  #     role_name = "IntCA-Day1-v1-role-default"
+  #   }
+  #   ttl_years   = 3
+  #   common_name = "alloy.day1.sololab"
+  #   alt_names = [
+  #     "alloy.day0.sololab",
+  #   ]
+  # },
+  # {
+  #   secret_engine = {
+  #     backend   = "pki-sololab_day1"
+  #     role_name = "IntCA-Day1-v1-role-default"
+  #   }
+  #   ttl_years   = 3
+  #   common_name = "prometheus.day1.sololab"
+  # },
   # {
   #   secret_engine = {
   #     backend   = "pki-sololab_day1"
