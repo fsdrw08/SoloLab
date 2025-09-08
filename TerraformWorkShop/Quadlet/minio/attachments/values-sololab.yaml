@@ -21,7 +21,7 @@ minio:
     traefik.http.routers.minio-api.tls: true
     traefik.http.routers.minio-api.service: minio-api
 
-    traefik.http.services.minio-api.loadBalancer.serversTransport: minio-api@file
+    # traefik.http.services.minio-api.loadBalancer.serversTransport: minio-api@file
     # traefik.http.services.minio-api.loadbalancer.server.scheme: https
     traefik.http.services.minio-api.loadbalancer.server.port: 9000
 
@@ -35,7 +35,7 @@ minio:
     traefik.http.routers.minio-console.tls: true
     traefik.http.routers.minio-console.service: minio-console
 
-    traefik.http.services.minio-console.loadBalancer.serversTransport: minio-console@file
+    # traefik.http.services.minio-console.loadBalancer.serversTransport: minio-console@file
     # traefik.http.services.minio-console.loadbalancer.server.scheme: https
     traefik.http.services.minio-console.loadbalancer.server.port: 9001
 

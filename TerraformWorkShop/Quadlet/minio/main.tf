@@ -170,13 +170,13 @@ module "podman_quadlet" {
   }
 }
 
-resource "remote_file" "traefik_file_provider" {
-  for_each = toset([
-    "./attachments/minio.traefik.yaml"
-  ])
-  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
-  content = file("${each.key}")
-}
+# resource "remote_file" "traefik_file_provider" {
+#   for_each = toset([
+#     "./attachments/minio.traefik.yaml"
+#   ])
+#   path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+#   content = file("${each.key}")
+# }
 
 resource "remote_file" "consul_service" {
   for_each = toset([
