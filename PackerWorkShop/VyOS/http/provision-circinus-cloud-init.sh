@@ -41,6 +41,7 @@ EOF
 yq -iy '.cloud_init_modules += ["disk_setup", "mounts"]' /etc/cloud/cloud.cfg.d/10_vyos.cfg
 
 # run dpkg-reconfigure cloud-init
+# ref: https://github.com/vyos/vyos-cloud-init/blob/11d4c4719c45807c9fa4449479b359402f9c054b/tests/unittests/config/test_apt_source_v3.py#L1423
 dpkg-reconfigure -f noninteractive cloud-init
 
 # Add source-directory to the /etc/network/interfaces
