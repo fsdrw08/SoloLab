@@ -28,7 +28,7 @@ csi_volumes = [
       }
     ]
     parameters = {
-      server = "192.168.255.20"
+      server = "192.168.255.10"
       share  = "/"
     }
     mount_options = {
