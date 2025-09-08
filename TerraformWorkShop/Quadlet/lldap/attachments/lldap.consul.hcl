@@ -1,5 +1,5 @@
 services {
-  name = "lldap-day0"
+  name = "lldap"
   id   = "lldap-server"
   port = 17170
 

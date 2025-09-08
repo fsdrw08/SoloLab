@@ -1,5 +1,5 @@
 services {
-  name = "coredns-day0"
+  name = "coredns"
   id   = "coredns-server"
   port = 443
 

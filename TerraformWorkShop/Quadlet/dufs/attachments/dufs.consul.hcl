@@ -1,5 +1,5 @@
 services {
-  name = "dufs-day0"
+  name = "dufs"
   id   = "dufs-server"
   port = 5001
 

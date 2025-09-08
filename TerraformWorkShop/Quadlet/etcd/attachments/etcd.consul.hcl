@@ -1,6 +1,6 @@
 services {
-  name = "etcd-day0"
-  id   = "etcd-server"
+  name = "etcd"
+  id   = "etcd-0"
   port = 443 # 2379
 
   checks = [

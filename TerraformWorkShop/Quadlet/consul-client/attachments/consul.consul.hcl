@@ -1,6 +1,6 @@
 services {
-  name = "consul-day0"
-  id   = "consul-agent"
+  name = "consul-client"
+  id   = "day0"
   port = 8501
 
   checks = [

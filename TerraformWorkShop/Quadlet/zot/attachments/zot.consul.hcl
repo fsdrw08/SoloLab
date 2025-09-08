@@ -1,5 +1,5 @@
 services {
-  name = "zot-day0"
+  name = "zot"
   id   = "zot-registry"
   port = 5000
 

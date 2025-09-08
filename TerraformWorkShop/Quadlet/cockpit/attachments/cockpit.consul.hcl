@@ -1,5 +1,5 @@
 services {
-  name = "cockpit-day0"
+  name = "cockpit"
   id   = "cockpit-web"
   port = 9090
 

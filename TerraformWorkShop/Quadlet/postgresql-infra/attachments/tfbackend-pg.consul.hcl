@@ -1,5 +1,5 @@
 services {
-  name = "tfbackend-day0"
+  name = "tfbackend-pg"
   id   = "tfbackend-pg-postgresql"
   port = 5432
 
