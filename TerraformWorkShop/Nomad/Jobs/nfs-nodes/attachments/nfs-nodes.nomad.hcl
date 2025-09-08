@@ -16,8 +16,9 @@ job "nfs-nodes" {
       name     = "nfs-csi-plugin-node"
     }
 
+    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#socket
     task "plugin" {
-      driver = "docker"
+      driver = "podman"
       config {
         image = "zot.day0.sololab/sig-storage/nfsplugin:v4.11.0"
         args = [

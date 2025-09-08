@@ -69,7 +69,7 @@ job "traefik" {
 
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "traefik" {
-      driver = "docker"
+      driver = "podman"
 
       config {
         image = "zot.day0.sololab/library/traefik:v3.5.1"
@@ -104,7 +104,7 @@ job "traefik" {
           "local/install.traefik.yaml:/etc/traefik/traefik.yml",
           "local/routing.traefik.yaml:/etc/traefik/dynamic/routing.yml",
           "secrets/ca.crt:/etc/traefik/tls/ca.crt",
-          "/var/run/docker.sock:/var/run/docker.sock:ro"
+          "/run/podman/podman.sock:/var/run/docker.sock"
         ]
       }
 
