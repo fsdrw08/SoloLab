@@ -24,8 +24,8 @@ vault_pki = {
   }
   ca = {
     external_import = {
-      # ref_cert_bundle_path = "../../../../TLS/RootCA/RootCA_bundle.pem"
-      ref_cert_bundle_path = ""
+      ref_cert_bundle_path = "../../../../TLS/RootCA/RootCA_bundle.pem"
+      # ref_cert_bundle_path = ""
     }
   }
   issuer = {

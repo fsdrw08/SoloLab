@@ -95,7 +95,7 @@ module "nomad" {
         podman_socket        = "unix:///run/podman/podman.sock"
         CONSUL_HTTP_ADDR     = "127.0.0.1:8501"
         CONSUL_HTTP_TOKEN    = data.vault_kv_secret_v2.consul_token.data["token"]
-        vault_server_address = "https://vault-day1.service.consul:8200"
+        vault_server_address = "https://vault.service.consul:8200"
       })
     }
     tls = {

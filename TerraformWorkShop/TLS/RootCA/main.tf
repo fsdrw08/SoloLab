@@ -37,13 +37,13 @@ resource "local_file" "root" {
   filename = "${path.root}/root.crt"
 }
 
-# resource "local_file" "rootca_pem_bundle" {
-#   content = join("", [
-#     tls_private_key.root.private_key_pem,
-#     tls_self_signed_cert.root.cert_pem
-#   ])
-#   filename = "${path.root}/RootCA_bundle.pem"
-# }
+resource "local_file" "rootca_pem_bundle" {
+  content = join("", [
+    tls_private_key.root.private_key_pem,
+    tls_self_signed_cert.root.cert_pem
+  ])
+  filename = "${path.root}/RootCA_bundle.pem"
+}
 
 # resource "local_file" "intca_pem_bundle" {
 #   content = join("", [

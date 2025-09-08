@@ -2,6 +2,7 @@ global:
   imageRegistry: zot.day0.sololab:5000
 traefik:
   containerPorts: []
+  # https://developer.hashicorp.com/terraform/enterprise/deploy/prepare-host#set-the-security-context-for-podman-on-rhel-and-selinux
   containerSecurityContext:
     enabled: true
     seLinuxOptions:
