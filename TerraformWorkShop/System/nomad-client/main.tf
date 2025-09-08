@@ -119,13 +119,15 @@ module "nomad" {
     }
     systemd_service_unit = {
       content = templatefile("${path.root}/attachments/nomad-client.service", {
-        bin_path          = "/var/home/core/.local/bin/nomad"
-        config_file       = "/var/home/core/.local/etc/nomad.d/client.hcl"
-        NOMAD_ADDR        = "https://127.0.0.1:14646"
-        NOMAD_TOKEN       = data.vault_kv_secret_v2.nomad_token.data["token"]
-        NOMAD_CACERT      = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
-        NOMAD_CLIENT_CERT = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
-        NOMAD_CLIENT_KEY  = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
+        bin_path           = "/var/home/core/.local/bin/nomad"
+        config_file        = "/var/home/core/.local/etc/nomad.d/client.hcl"
+        ExecStartPreNomad  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://nomad.day1.sololab:4646/v1/status/leader"
+        ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://127.0.0.1:8501/v1/catalog/services"
+        NOMAD_ADDR         = "https://127.0.0.1:14646"
+        NOMAD_TOKEN        = data.vault_kv_secret_v2.nomad_token.data["token"]
+        NOMAD_CACERT       = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
+        NOMAD_CLIENT_CERT  = "/var/home/core/.local/etc/nomad.d/tls/client.pem"
+        NOMAD_CLIENT_KEY   = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
       })
       path = "/var/home/core/.config/systemd/user/nomad-client.service"
     }

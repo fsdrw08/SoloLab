@@ -1,0 +1,28 @@
+# https://www.freedesktop.org/software/systemd/man/257/systemd.unit.html
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+After=${After}
+Wants=${Wants}
+StartLimitIntervalSec=${StartLimitIntervalSec}
+StartLimitBurst=${StartLimitBurst}
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
+[Kube]
+# Point to the yaml file in the same directory
+Yaml=${yaml}
+PodmanArgs=${PodmanArgs}
+KubeDownForce=${KubeDownForce}
+# https://github.com/containers/podman/issues/24970#issuecomment-2582792692
+Network=${Network}
+
+# https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
+[Service]
+ExecStartPre=${ExecStartPreVault}
+ExecStartPre=${ExecStartPreConsul}
+ExecStartPost=${ExecStartPost}
+Restart=${Restart}
+
+# https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#%5BInstall%5D%20Section%20Options
+[Install]
+WantedBy=default.target
