@@ -34,6 +34,28 @@ csi_volumes = [
     mount_options = {
       fs_type = "nfs"
     }
+  },
+  {
+    name      = "nomad-grafana-data"
+    plugin_id = "nfs"
+    volume_id = "grafana-data"
+    capabilities = [
+      {
+        access_mode     = "multi-node-multi-writer"
+        attachment_mode = "file-system"
+      },
+      {
+        access_mode     = "single-node-writer"
+        attachment_mode = "file-system"
+      }
+    ]
+    parameters = {
+      server = "192.168.255.10"
+      share  = "/"
+    }
+    mount_options = {
+      fs_type = "nfs"
+    }
   }
 ]
 
