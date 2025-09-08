@@ -96,7 +96,7 @@ storage:
           plugin "nomad-driver-podman" {
             config {
               socket { 
-                name        = "root"
+                name        = "default"
                 socket_path = "unix://run/podman/podman.sock"
               }
               socket {

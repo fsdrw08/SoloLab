@@ -91,7 +91,7 @@ butane = {
         "nomad_podman_driver_version"        = "0.6.3"
         "nomad_client_cert_download_url"     = "http://dufs.day0.sololab/certs/client.global.nomad.crt"
         "nomad_client_cert_key_download_url" = "http://dufs.day0.sololab/certs/client.global.nomad.key"
-        "vault_server_address"               = "https://vault.service.consul:8200"
+        "vault_server_address"               = "https://vault.day1.sololab:8200"
       }
     ]
     secrets = [
