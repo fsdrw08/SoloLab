@@ -8,10 +8,7 @@ storage:
     # consul config dir
     - path: /etc/consul.d
     # consul data dir
-    - path: /var/mnt/data/consul
-  links:
     - path: /var/lib/consul
-      target: /var/mnt/data/consul
   files:
     - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
       mode: 0644

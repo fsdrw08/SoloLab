@@ -19,14 +19,14 @@ vm = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
-    data_disk_tfstate = {
-      backend = {
-        type = "local"
-        config = {
-          path = "../Disks-Data/terraform.tfstate"
-        }
-      }
-    }
+    # data_disk_tfstate = {
+    #   backend = {
+    #     type = "local"
+    #     config = {
+    #       path = "../Disks-Data/terraform.tfstate"
+    #     }
+    #   }
+    # }
   }
   nic = [
     {
@@ -50,9 +50,9 @@ butane = {
   files = {
     base = "./Butane/base.yaml"
     others = [
-      "./Butane/network.yaml",
+      # "./Butane/network.yaml",
       "./Butane/packages.yaml",
-      "./Butane/storage.yaml",
+      # "./Butane/storage.yaml",
       "./Butane/user-1000.yaml",
       "./Butane/user-1001.yaml",
       "./Butane/consul.yaml",
@@ -61,14 +61,14 @@ butane = {
   }
   vars = {
     global = {
-      "timezone"                 = "Asia/Shanghai"
-      "interface"                = "eth0"
-      "prefix"                   = 24
-      "gateway"                  = "192.168.255.1"
-      "general_dns"              = "192.168.255.1;192.168.255.10"
-      "domain"                   = "sololab."
-      "domain_dns"               = "192.168.255.10"
-      "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge"
+      "timezone" = "Asia/Shanghai"
+      # "interface"                = "eth0"
+      # "prefix"                   = 24
+      # "gateway"                  = "192.168.255.1"
+      # "general_dns"              = "192.168.255.1;192.168.255.10"
+      # "domain"                   = "sololab."
+      # "domain_dns"               = "192.168.255.10"
+      "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge pcp-zeroconf"
       "password_hash_1000"       = "$y$j9T$cDLwsV9ODTV31Dt4SuVGa.$FU0eRT9jawPhIV3IV24W7obZ3PaJuBCVp7C9upDCcgD"
       "ssh_authorized_keys_1000" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
       "password_hash_1001"       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
@@ -76,22 +76,22 @@ butane = {
     }
     local = [
       {
+        # "ip"                                 = "192.168.255.30"
         "vm_name"                            = "day2"
-        "ip"                                 = "192.168.255.30"
         "ca_cert_url"                        = "http://dufs.day0.sololab/certs/root.crt"
         "fcos_image_mirror"                  = "zot.day0.sololab/fedora/fedora-coreos"
         "fcos_rebase_mirror"                 = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
         "consul_download_url"                = "http://dufs.day0.sololab/binaries/consul_1.21.4_linux_amd64.zip"
         "consul_version"                     = "1.21.4"
-        "consul_server_fqdn"                 = "consul.day1.sololab"
+        "consul_server_fqdn"                 = "consul.service.consul"
         "nomad_download_url"                 = "http://dufs.day0.sololab/binaries/nomad_1.10.4_linux_amd64.zip"
         "nomad_version"                      = "1.10.4"
-        "nomad_server_fqdn"                  = "nomad.day1.sololab"
+        "nomad_server_fqdn"                  = "nomad.service.consul"
         "nomad_podman_driver_download_url"   = "http://dufs.day0.sololab/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip"
         "nomad_podman_driver_version"        = "0.6.3"
         "nomad_client_cert_download_url"     = "http://dufs.day0.sololab/certs/client.global.nomad.crt"
         "nomad_client_cert_key_download_url" = "http://dufs.day0.sololab/certs/client.global.nomad.key"
-        "vault_server_address"               = "https://vault.day1.sololab"
+        "vault_server_address"               = "https://vault.service.consul:8200"
       }
     ]
     secrets = [
@@ -145,19 +145,4 @@ butane = {
       },
     ]
   }
-}
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_record = {
-  zone = "day2.sololab."
-  name = "FCOS.day2.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.30"
-  ]
 }

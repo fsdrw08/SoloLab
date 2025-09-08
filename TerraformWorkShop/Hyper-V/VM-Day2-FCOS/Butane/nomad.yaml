@@ -8,10 +8,7 @@ storage:
     # nomad config dir
     - path: /etc/nomad.d
     # nomad data dir
-    - path: /var/mnt/data/nomad
-    # nomad plugin dir, Nomad will generate the path using the top-level data_dir suffixed with plugins
-    # https://developer.hashicorp.com/nomad/docs/configuration#plugin_dir
-    - path: /var/mnt/data/nomad/plugins
+    - path: /var/lib/nomad
   # dont use symlink for data_dir
   # https://discuss.hashicorp.com/t/cant-read-allocation-logs-path-escapes-the-alloc-directory/72841/2
   # links:
@@ -23,11 +20,11 @@ storage:
       contents:
         source: ${nomad_download_url}
     # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#installation
-    # - path: /opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
-    #   mode: 0644
-    #   contents:
-    #     source: ${nomad_podman_driver_download_url}
-    #     source: https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
+    - path: /opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: ${nomad_podman_driver_download_url}
+        # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
     - path: /etc/nomad.d/client.pem
       mode: 0600
       contents:
@@ -55,7 +52,7 @@ storage:
             token = "${nomad_consul_acl_token}"
           }
 
-          data_dir           = "/var/mnt/data/nomad"
+          data_dir           = "/var/lib/nomad"
           leave_on_interrupt = true
           leave_on_terminate = true
 
@@ -79,26 +76,41 @@ storage:
 
           plugin "docker" {
             config {
-              allow_privileged = true
-              infra_image = "zot.day0.sololab/pause-amd64:3.3"
+              endpoint = "unix:///disable/docker.sock"
+            }
+          }
+
+          # plugin "docker" {
+          #   config {
+          #     allow_privileged = true
+          #     infra_image = "zot.day0.sololab/pause-amd64:3.3"
+          #     volumes {
+          #       enabled      = true
+          #       selinuxlabel = "z"
+          #     }
+          #   }
+          # }
+
+          # Podman driver plugin configuration
+          # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
+          plugin "nomad-driver-podman" {
+            config {
+              socket { 
+                name        = "root"
+                socket_path = "unix://run/podman/podman.sock"
+              }
+              socket {
+                name        = "1001"
+                socket_path = "unix://run/user/1001/podman/podman.sock"
+              }
               volumes {
-                enabled      = true
+                enabled = true
                 selinuxlabel = "z"
               }
             }
           }
 
-          # Podman driver plugin configuration
-          # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
-          # plugin "nomad-driver-podman" {
-          #   config {
-          #     socket_path = "unix:///run/podman/podman.sock"
-          #     volumes {
-          #       enabled = true
-          #       selinuxlabel = "z"
-          #     }
-          #   }
-          # }
+          plugin_dir = "/opt/bin"
 
           vault {
             enabled = true
@@ -128,13 +140,13 @@ systemd:
         # Fix SELinux contexts for systemd execution
         ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad
 
-        # ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /var/mnt/data/nomad/plugins
-        # ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
-        # ExecStart=/usr/bin/chmod +x /var/mnt/data/nomad/plugins/nomad-driver-podman
-        # # Fix ownership to root:root for proper permissions
-        # ExecStart=/usr/bin/chown root:root /var/mnt/data/nomad/plugins/nomad-driver-podman
-        # # Fix SELinux contexts for systemd execution
-        # ExecStart=/usr/bin/chcon -t bin_t /var/mnt/data/nomad/plugins/nomad-driver-podman
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /var/mnt/data/nomad/plugins/nomad-driver-podman
+        # Fix ownership to root:root for proper permissions
+        ExecStart=/usr/bin/chown root:root /opt/bin/nomad-driver-podman
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad-driver-podman
 
         [Install]
         WantedBy=multi-user.target
@@ -152,7 +164,7 @@ systemd:
 
         ConditionFileNotEmpty=/opt/bin/nomad
         ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
-        ConditionPathIsDirectory=/var/mnt/data/nomad
+        ConditionPathIsDirectory=/var/lib/nomad
 
         [Service]
         # https://developer.hashicorp.com/nomad/commands#environment-variables

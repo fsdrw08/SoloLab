@@ -30,3 +30,6 @@ storage:
     # link the socket in this dir for socket auto start after machine boot
     - path: /etc/systemd/system/sockets.target.wants/podman.socket
       target: /usr/lib/systemd/system/podman.socket
+  directories:
+    - path: /opt/bin
+      mode: 0755

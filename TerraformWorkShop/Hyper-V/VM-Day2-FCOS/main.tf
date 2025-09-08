@@ -272,11 +272,3 @@ resource "null_resource" "kvpctl" {
     ]
   }
 }
-
-resource "powerdns_record" "record" {
-  zone    = lower(var.dns_record.zone)
-  name    = lower(var.dns_record.name)
-  type    = var.dns_record.type
-  ttl     = var.dns_record.ttl
-  records = var.dns_record.records
-}
