@@ -15,13 +15,22 @@ buckets = [
   {
     bucket = "loki"
   },
+  {
+    bucket = "tfstate"
+  },
 ]
 
 users = [
   {
     name     = "loki"
     policies = ["loki-readwrite"]
-  }
+  },
+  {
+    name       = "tfstate"
+    policies   = ["tfstate-readwrite"]
+    access_key = "terraform"
+    secret_key = "terraform"
+  },
 ]
 
 policies = [
@@ -88,6 +97,25 @@ policies = [
                 ],
                 "Resource": [
                     "arn:aws:s3:::loki/*"
+                ]
+            }
+        ]
+    }
+    EOF
+  },
+  {
+    name   = "tfstate-readwrite"
+    policy = <<-EOF
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::tfstate/*"
                 ]
             }
         ]
