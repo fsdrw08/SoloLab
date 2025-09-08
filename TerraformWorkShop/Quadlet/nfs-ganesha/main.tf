@@ -13,6 +13,7 @@ resource "null_resource" "link_init" {
   provisioner "remote-exec" {
     inline = [
       templatefile("${path.root}/attachments/init.sh", {
+        DATA_DIR   = "/mnt/data/nfs"
         TARGET_DIR = "/var/home/core/.local/etc/containers/systemd"
         LINK_PATH  = "/etc/containers/systemd/1000"
       })

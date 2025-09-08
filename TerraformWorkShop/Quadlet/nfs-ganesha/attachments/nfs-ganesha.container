@@ -23,7 +23,7 @@ SecurityLabelType=spc_t
 
 Environment=TZ=Asia/Shanghai
 
-Volume=nfs-ganesha-vol:/export
+Volume=/mnt/data/nfs:/export
 
 PodmanArgs=${PodmanArgs}
 Network=${Network}

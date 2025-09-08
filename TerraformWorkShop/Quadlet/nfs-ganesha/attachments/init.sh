@@ -2,6 +2,8 @@
 
 set -e
 
+sudo mkdir -p ${DATA_DIR}
+
 # 定义变量
 TARGET_DIR="${TARGET_DIR}"
 LINK_PATH="${LINK_PATH}"
