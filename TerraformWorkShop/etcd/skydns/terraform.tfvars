@@ -110,7 +110,7 @@ dns_records = [
     hostname = "nomad.day1.sololab"
     value = {
       string_map = {
-        host = "nomad.service.consul"
+        host = "192.168.255.20"
       }
       number_map = {
         ttl = 60

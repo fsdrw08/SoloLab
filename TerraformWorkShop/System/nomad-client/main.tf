@@ -1,4 +1,4 @@
-resource "null_resource" "nomad_init" {
+resource "null_resource" "init" {
   connection {
     type     = "ssh"
     host     = var.prov_system.host
@@ -51,7 +51,7 @@ resource "system_systemd_unit" "podman_socket" {
 
 module "nomad" {
   depends_on = [
-    null_resource.nomad_init,
+    null_resource.init,
     system_systemd_unit.podman_socket
   ]
   source = "../../modules/system-nomad"

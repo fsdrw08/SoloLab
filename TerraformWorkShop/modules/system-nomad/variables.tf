@@ -8,15 +8,6 @@ variable "vm_conn" {
   })
 }
 
-variable "install" {
-  type = list(object({
-    zip_file_source = string
-    zip_file_path   = string
-    bin_file_name   = string
-    bin_file_dir    = string
-  }))
-}
-
 variable "runas" {
   type = object({
     take_charge = optional(bool, false)
@@ -25,6 +16,15 @@ variable "runas" {
     group       = string
     gid         = string
   })
+}
+
+variable "install" {
+  type = list(object({
+    zip_file_source = string
+    zip_file_path   = string
+    bin_file_name   = string
+    bin_file_dir    = string
+  }))
 }
 
 variable "config" {
