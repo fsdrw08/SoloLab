@@ -7,25 +7,32 @@ resource "system_user" "user" {
   count      = var.runas.take_charge == true ? 1 : 0
   depends_on = [system_group.group]
   name       = var.runas.user
-  group      = var.runas.group
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 # download consul zip
 resource "system_file" "zip" {
   source = var.install.zip_file_source
   path   = var.install.zip_file_path
+  uid    = var.runas.uid
+  gid    = var.runas.gid
 }
 
 # unzip and put it to /usr/bin/
 resource "null_resource" "bin" {
   depends_on = [system_file.zip]
+  for_each = {
+    for install in var.install : install.zip_file_path => install
+  }
   triggers = {
-    file_source = var.install.zip_file_source
-    file_dir    = var.install.bin_file_dir
-    host        = var.vm_conn.host
-    port        = var.vm_conn.port
-    user        = var.vm_conn.user
-    password    = sensitive(var.vm_conn.password)
+    file_source   = each.value.zip_file_source
+    file_dir      = each.value.bin_file_dir
+    bin_file_name = each.value.bin_file_name
+    host          = var.vm_conn.host
+    port          = var.vm_conn.port
+    user          = var.vm_conn.user
+    password      = sensitive(var.vm_conn.password)
   }
   connection {
     type     = "ssh"
@@ -36,8 +43,9 @@ resource "null_resource" "bin" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo unzip ${system_file.zip.path} -d ${var.install.bin_file_dir} -o",
-      "sudo chmod 755 ${var.install.bin_file_dir}/consul",
+      "command -v unzip >/dev/null 2>&1 && unzip ${each.value.zip_file_path} ${each.value.bin_file_name} -d ${each.value.bin_file_dir} -o",
+      "command -v bsdtar >/dev/null 2>&1 && bsdtarbsdtar -x -f ${each.value.zip_file_path} -C ${each.value.bin_file_dir} ${each.value.bin_file_name}",
+      "chmod +x ${var.install.bin_file_dir}/${each.value.bin_file_name}",
       # https://superuser.com/questions/710253/allow-non-root-process-to-bind-to-port-80-and-443
       # "sudo setcap CAP_NET_BIND_SERVICE=+eip ${var.install.bin_file_dir}/vault"
     ]
@@ -45,35 +53,35 @@ resource "null_resource" "bin" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "sudo systemctl daemon-reload",
-      "sudo rm -f ${self.triggers.file_dir}/consul",
+      "systemctl --user daemon-reload",
+      "rm -f ${self.triggers.file_dir}/${self.triggers.bin_file_name}",
     ]
   }
 }
 
 # prepare consul config dir
 resource "system_folder" "config" {
+  count = var.config.create_dir == true ? 1 : 0
   path  = var.config.dir
-  user  = var.runas.user
-  group = var.runas.group
-  mode  = "700"
+  uid   = var.runas.uid
+  gid   = var.runas.gid
 }
 
-# persist consul config file in dir
+# persist nomad config file in dir
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, var.config.main.basename])
+  path       = join("/", [var.config.dir, basename(var.config.main.basename)])
   content    = var.config.main.content
-  user       = var.runas.user
-  group      = var.runas.group
-  mode       = "600"
+  uid        = var.runas.uid
+  gid        = var.runas.gid
 }
 
 resource "system_folder" "certs" {
   depends_on = [system_folder.config]
+  count      = var.config.tls == null ? 0 : 1
   path       = join("/", [var.config.dir, var.config.tls.sub_dir])
-  user       = var.runas.user
-  group      = var.runas.group
+  uid        = var.runas.uid
+  gid        = var.runas.gid
   mode       = "700"
 }
 
@@ -83,10 +91,10 @@ resource "system_file" "ca" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.ca_basename])
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.ca_basename])
   content = var.config.tls.ca_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -96,10 +104,10 @@ resource "system_file" "cert" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.cert_basename])
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.cert_basename])
   content = var.config.tls.cert_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
@@ -109,38 +117,115 @@ resource "system_file" "key" {
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [var.config.dir, var.config.tls.sub_dir, var.config.tls.key_basename])
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.key_basename])
   content = var.config.tls.key_content
-  user    = var.runas.user
-  group   = var.runas.group
+  uid     = var.runas.uid
+  gid     = var.runas.gid
   mode    = "600"
 }
 
-resource "system_link" "data" {
-  path   = var.storage.dir_link
-  target = var.storage.dir_target
-  user   = var.runas.user
-  group  = var.runas.group
-}
-
 # persist systemd unit file
-# https://developer.hashicorp.com/consul/tutorials/production-deploy/deployment-guide#configure-systemd
-# https://github.com/hashicorp/consul/blob/main/.release/linux/package/usr/lib/systemd/system/consul.service
 resource "system_file" "service" {
-  path    = var.service.systemd_unit_service.target_path
-  content = templatefile(var.service.systemd_unit_service.templatefile_path, var.service.systemd_unit_service.templatefile_vars)
+  depends_on = [
+    null_resource.bin
+  ]
+  path    = var.service.systemd_service_unit.path
+  content = var.service.systemd_service_unit.content
+  uid     = var.runas.uid
+  gid     = var.runas.gid
 }
 
-# sudo systemctl list-unit-files --type=service --state=disabled
-# debug service: journalctl -u consul.service
-# debug from boot log: journalctl -b
-resource "system_service_systemd" "service" {
+resource "system_link" "service" {
+  depends_on = [
+    system_file.service,
+    null_resource.bin
+  ]
+  count  = var.service.auto_start.enabled == true ? 1 : 0
+  path   = var.service.auto_start.link_path
+  target = var.service.auto_start.link_target
+  uid    = var.runas.uid
+  gid    = var.runas.gid
+}
+
+# this resource is only in charge to stop the service when tf resource destroy
+resource "null_resource" "service_stop" {
+  depends_on = [system_file.service]
+  triggers = {
+    service_name = trimsuffix(system_file.service.basename, ".service")
+    host         = var.vm_conn.host
+    port         = var.vm_conn.port
+    user         = var.vm_conn.user
+    password     = sensitive(var.vm_conn.password)
+    private_key  = sensitive(var.vm_conn.private_key)
+  }
+  connection {
+    type        = "ssh"
+    host        = self.triggers.host
+    port        = self.triggers.port
+    user        = self.triggers.user
+    password    = self.triggers.password
+    private_key = self.triggers.private_key
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "systemctl --user stop ${self.triggers.service_name}",
+    ]
+  }
+}
+
+# this resource is in charge to start/restart service if the trigger status change, 
+# or stop the service if the value of service state set to stop, 
+# but NOT to stop the service when the tf resource destroy, to stop the service when destroy, use null_resource.service_stop
+resource "null_resource" "service_mgmt" {
   depends_on = [
     null_resource.bin,
     system_file.config,
+    system_file.ca,
+    system_file.cert,
+    system_file.key,
     system_file.service,
+    null_resource.service_stop,
+    system_link.service
   ]
-  name    = trimsuffix(system_file.service.basename, ".service")
-  status  = var.service.status
-  enabled = var.service.enabled
+  triggers = {
+    service_name    = trimsuffix(system_file.service.basename, ".service")
+    service_status  = var.service.status
+    service_content = md5(system_file.service.content)
+    config_md5      = md5(system_file.config.content)
+    bin_url         = md5(join("\n", [for file in system_file.zip : file.path]))
+  }
+  connection {
+    type        = "ssh"
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
+    private_key = sensitive(var.vm_conn.private_key)
+  }
+  provisioner "remote-exec" {
+    inline = [
+      <<-EOF
+      systemctl --user daemon-reload
+      if [ "${self.triggers.service_status}" = "start" ]; then
+          service_status=$(systemctl --user is-active ${self.triggers.service_name})
+          if [ "$service_status" != "active" ]; then
+              echo "${self.triggers.service_name} is stop, start it"
+              systemctl --user start ${self.triggers.service_name}
+          elif [ "$service_status" = "active" ]; then
+              echo "${self.triggers.service_name} is start, restart it"
+              systemctl --user restart ${self.triggers.service_name}
+          else
+              echo "${self.triggers.service_name} status unknown"
+          fi
+      elif [ "${self.triggers.service_status}" = "stop" ]; then
+          echo "stop ${self.triggers.service_name}"
+          systemctl --user stop ${self.triggers.service_name}
+      else
+          echo "var $status invalid, should 'start' or 'stop'"
+      fi
+      EOF
+      ,
+    ]
+  }
 }

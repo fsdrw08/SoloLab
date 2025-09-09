@@ -84,7 +84,7 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://consul.day1.sololab/v1/status/leader\""
+            ExecStartPre = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://consul.service.consul/v1/status/leader\""
             # ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run consul-agent\""
             Restart       = "on-failure"

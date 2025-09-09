@@ -96,6 +96,7 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
+            # ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://nomad.day1.sololab:4646/v1/status/leader"
             ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab:8200/v1/identity/oidc/.well-known/openid-configuration\""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-12 -n 1) && podman healthcheck run consul-agent\""
             Restart       = ""
@@ -110,12 +111,12 @@ podman_quadlet = {
   ]
 }
 
-post_process = {
-  "Enable-DNSAnonymousAccess.sh" = {
-    script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
-    vars = {
-      CONSUL_HTTP_ADDR = "https://localhost:8501"
-      INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-    }
-  }
-}
+# post_process = {
+#   "Enable-DNSAnonymousAccess.sh" = {
+#     script_path = "./attachments/Enable-DNSAnonymousAccess.sh"
+#     vars = {
+#       CONSUL_HTTP_ADDR = "https://localhost:8501"
+#       INIT_TOKEN       = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+#     }
+#   }
+# }
