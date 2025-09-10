@@ -17,6 +17,7 @@ traefik:
             scheme: https
             tls:
               ca: /etc/traefik/tls/ca.crt
+            token: # set by terraform get value from vault
           exposedByDefault: false
       serversTransport:
         rootCAs:

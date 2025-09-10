@@ -13,6 +13,15 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "traefik.day0"
+          }
           value_sets = [
             {
               name          = "traefik.tls.contents.\"ca\\.crt\""
@@ -27,15 +36,6 @@ podman_kubes = [
               value_ref_key = "key_pem"
             }
           ]
-          tfstate = {
-            backend = {
-              type = "local"
-              config = {
-                path = "../../TLS/RootCA/terraform.tfstate"
-              }
-            }
-            cert_name = "traefik.day0"
-          }
         }
       ]
     }

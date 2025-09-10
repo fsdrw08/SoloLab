@@ -15,6 +15,38 @@ prov_consul = {
 policies = [
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
+    name        = "traefik"
+    description = "Policy for traefik proxy consul catalog provoider to read service"
+    rules       = <<-EOT
+      node_prefix "" {
+        policy = "read"
+      }
+
+      service_prefix "" {
+        policy = "read"
+      }
+    EOT
+  },
+  {
+    name        = "consul_client"
+    description = "Policy for consul client to work with consul server"
+    rules       = <<-EOT
+      node_prefix "" {
+        policy = "write"
+      }
+      service_prefix "" {
+        policy = "write"
+      }
+      key_prefix "" {
+        policy = "read"
+      }
+      agent_prefix "" {
+        policy = "read"
+      }
+    EOT
+  },
+  {
+    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
     name        = "nomad_server"
     description = "Policy for nomad server to interact with Consul"
     rules       = <<-EOT
@@ -87,27 +119,25 @@ policies = [
       }
     EOT
   },
-  {
-    name        = "consul_client"
-    description = "Policy for consul client to work with consul server"
-    rules       = <<-EOT
-      node_prefix "" {
-        policy = "write"
-      }
-      service_prefix "" {
-        policy = "write"
-      }
-      key_prefix "" {
-        policy = "read"
-      }
-      agent_prefix "" {
-        policy = "read"
-      }
-    EOT
-  },
 ]
 
 roles = [
+  {
+    name         = "traefik"
+    description  = "Role of traefik proxy"
+    policy_names = ["traefik"]
+    token_store = {
+      vault_kvv2_path = "kvv2-consul"
+    }
+  },
+  {
+    name         = "consul_client"
+    description  = "Role of consul client"
+    policy_names = ["consul_client"]
+    token_store = {
+      vault_kvv2_path = "kvv2-consul"
+    }
+  },
   {
     name         = "nomad_server"
     description  = "Role of nomad server"
@@ -143,14 +173,6 @@ roles = [
     name         = "prometheus"
     description  = "Role of Prometheus"
     policy_names = ["prometheus"]
-    token_store = {
-      vault_kvv2_path = "kvv2-consul"
-    }
-  },
-  {
-    name         = "consul_client"
-    description  = "Role of consul client"
-    policy_names = ["consul_client"]
     token_store = {
       vault_kvv2_path = "kvv2-consul"
     }

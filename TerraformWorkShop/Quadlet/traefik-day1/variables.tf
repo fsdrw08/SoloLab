@@ -5,7 +5,6 @@ variable "prov_vault" {
     skip_tls_verify = bool
   })
 }
-
 variable "prov_remote" {
   type = object({
     host     = string
@@ -15,8 +14,8 @@ variable "prov_remote" {
   })
 }
 
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
@@ -32,7 +31,7 @@ variable "podman_kube" {
         ), null
       )
       secrets = optional(
-        object({
+        list(object({
           value_sets = list(
             object({
               name          = string
@@ -56,11 +55,12 @@ variable "podman_kube" {
             }),
             null
           )
-        }), null
+        })),
+        null
       )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {

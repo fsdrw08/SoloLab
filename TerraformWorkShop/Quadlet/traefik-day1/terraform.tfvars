@@ -11,34 +11,50 @@ prov_remote = {
   password = "podmgr"
 }
 
-podman_kube = {
-  helm = {
-    name       = "traefik"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
-    value_file = "./attachments/values-sololab.yaml"
-    secrets = {
-      vault_kvv2 = {
-        mount = "kvv2-certs"
-        name  = "*.service.consul"
-      }
-      value_sets = [
+podman_kubes = [
+  {
+    helm = {
+      name       = "traefik"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
+      value_file = "./attachments/values-sololab.yaml"
+      secrets = [
         {
-          name          = "traefik.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
+          vault_kvv2 = {
+            mount = "kvv2-certs"
+            name  = "*.service.consul"
+          }
+          value_sets = [
+            {
+              name          = "traefik.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "traefik.tls.contents.day1\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "traefik.tls.contents.day1\\.key"
+              value_ref_key = "private_key"
+            }
+          ]
         },
         {
-          name          = "traefik.tls.contents.day1\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "traefik.tls.contents.day1\\.key"
-          value_ref_key = "private_key"
+          vault_kvv2 = {
+            mount = "kvv2-consul"
+            name  = "token-traefik"
+          }
+          value_sets = [
+            {
+              name          = "traefik.configFiles.static.providers.consulCatalog.endpoint.token"
+              value_ref_key = "token"
+            }
+          ]
         }
       ]
     }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
   }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/traefik-aio.yaml"
-}
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
