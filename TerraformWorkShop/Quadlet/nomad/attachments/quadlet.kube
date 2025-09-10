@@ -19,6 +19,7 @@ Network=${Network}
 # https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
 [Service]
 ExecStartPre=${ExecStartPreVault}
+ExecStartPre=${ExecStartPreConsul}
 ExecStartPost=${ExecStartPost}
 Restart=${Restart}
 
