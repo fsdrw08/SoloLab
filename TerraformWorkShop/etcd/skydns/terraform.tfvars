@@ -74,6 +74,17 @@ dns_records = [
     }
   },
   {
+    hostname = "consul-client.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "vault.day1.sololab"
     value = {
       string_map = {

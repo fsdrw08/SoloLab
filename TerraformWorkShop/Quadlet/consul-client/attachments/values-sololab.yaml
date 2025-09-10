@@ -63,6 +63,7 @@ consul:
           verify_outgoing: true
           verify_server_hostname: true
         internal_rpc:
+          verify_incoming: true
           verify_server_hostname: true
   ## @param consul.command Override default container command (useful when using custom images)
   ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75

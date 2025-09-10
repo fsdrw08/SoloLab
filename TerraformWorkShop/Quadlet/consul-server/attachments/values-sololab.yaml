@@ -104,7 +104,7 @@ consul:
           verify_outgoing: true
           verify_server_hostname: true
         internal_rpc:
-          # verify_incoming: true
+          verify_incoming: true
           verify_server_hostname: true
       # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry
       telemetry:
