@@ -3,7 +3,7 @@ prov_remote = {
   port     = 22
   user     = "core"
   password = "P@ssw0rd"
-  sudo     = false
+  sudo     = true
 }
 
 podman_kubes = [
@@ -13,13 +13,12 @@ podman_kubes = [
       chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
       value_file = "./attachments/values-sololab.yaml"
     }
-    manifest_dest_path = "/var/home/core/.config/containers/systemd/nfs-ganesha-aio.yaml"
+    manifest_dest_path = "/etc/containers/systemd/nfs-ganesha-aio.yaml"
   }
 ]
 
 podman_quadlet = {
-  # dir = "/var/home/core/.config/containers/systemd"
-  dir = "/var/home/core/.local/etc/containers/systemd"
+  dir = "/etc/containers/systemd"
   units = [
     {
       files = [
