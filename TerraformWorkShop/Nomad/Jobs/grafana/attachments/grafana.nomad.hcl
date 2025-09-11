@@ -50,7 +50,7 @@ job "grafana" {
       config {
         image = "zot.day0.sololab/grafana/grafana:12.1.1"
         labels = {
-          "grafana.enable"                                    = "true"
+          "traefik.enable"                                    = "true"
           "traefik.http.routers.grafana-redirect.entrypoints" = "web"
           "traefik.http.routers.grafana-redirect.rule"        = "Host(`grafana.service.consul`)"
           "traefik.http.routers.grafana-redirect.middlewares" = "toHttps@file"

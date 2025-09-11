@@ -50,8 +50,9 @@ csi_volumes = [
       }
     ]
     parameters = {
-      server = "192.168.255.10"
-      share  = "/"
+      server           = "192.168.255.10"
+      share            = "/"
+      mountPermissions = "777"
     }
     mount_options = {
       fs_type = "nfs"
