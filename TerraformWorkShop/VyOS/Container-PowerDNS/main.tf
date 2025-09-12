@@ -1,9 +1,9 @@
 resource "null_resource" "init" {
   triggers = {
-    host      = var.vm_conn.host
-    port      = var.vm_conn.port
-    user      = var.vm_conn.user
-    password  = var.vm_conn.password
+    host      = var.prov_system.host
+    port      = var.prov_system.port
+    user      = var.prov_system.user
+    password  = var.prov_system.password
     uid       = var.runas.uid
     gid       = var.runas.gid
     data_dirs = var.data_dirs
@@ -32,11 +32,18 @@ resource "null_resource" "init" {
   # }
 }
 
-data "terraform_remote_state" "root_ca" {
+data "terraform_remote_state" "cert" {
   backend = "local"
   config = {
     path = var.certs.cert_content_tfstate_ref
   }
+}
+
+locals {
+  cert = [
+    for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
+    if cert.name == var.certs.cert_content_tfstate_entity
+  ]
 }
 
 resource "system_folder" "config" {
@@ -76,8 +83,8 @@ resource "system_file" "entry_script" {
 #   depends_on = [system_folder.certs]
 #   path       = "${system_folder.certs.path}/tls.crt"
 #   content = join("", [
-#     lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
-#     data.terraform_remote_state.root_ca.outputs.int_ca_pem
+#     lookup((data.terraform_remote_state.cert.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
+#     data.terraform_remote_state.cert.outputs.int_ca_pem
 #   ])
 #   uid  = var.runas.uid
 #   gid  = var.runas.gid
@@ -87,7 +94,7 @@ resource "system_file" "entry_script" {
 # resource "system_file" "key" {
 #   depends_on = [system_folder.certs]
 #   path       = "${system_folder.certs.path}/tls.key"
-#   content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
+#   content    = lookup((data.terraform_remote_state.cert.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
 #   uid        = var.runas.uid
 #   gid        = var.runas.gid
 #   mode       = 600
@@ -102,7 +109,7 @@ module "vyos_container" {
     # system_file.key,
   ]
   source   = "../../modules/vyos-container"
-  vm_conn  = var.vm_conn
+  vm_conn  = var.prov_system
   network  = var.container.network
   workload = var.container.workload
 }
@@ -112,19 +119,19 @@ resource "vyos_config_block_tree" "pki" {
   configs = {
     "certificate" = join("",
       slice(
-        split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, var.certs.cert_content_tfstate_entity, null)),
+        split("\n", local.cert.0["cert_pem"]),
         1,
         length(
-          split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, var.certs.cert_content_tfstate_entity, null))
+          split("\n", local.cert.0["cert_pem"])
         ) - 2
       )
     )
     "private key" = join("",
       slice(
-        split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, var.certs.cert_content_tfstate_entity, null)),
+        split("\n", local.cert.0["key_pkcs8"]),
         1,
         length(
-          split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, var.certs.cert_content_tfstate_entity, null))
+          split("\n", local.cert.0["key_pkcs8"])
         ) - 2
       )
     )

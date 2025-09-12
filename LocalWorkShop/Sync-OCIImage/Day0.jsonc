@@ -25,11 +25,11 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "powerdns/pdns-auth-49:4.9.4",
-        "archive": "docker.io_powerdns_pdns-auth-49_4.9.4.tar",
+        "publicRepo": "powerdns/pdns-auth-50:5.0.0",
+        "archive": "docker.io_powerdns_pdns-auth-50_5.0.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "powerdns/pdns-auth-49:4.9.4",
-        "description": "https://hub.docker.com/r/powerdns/pdns-auth-49",
+        "privateRepo": "powerdns/pdns-auth-50:5.0.0",
+        "description": "https://hub.docker.com/r/powerdns/pdns-auth-50",
     },
     {
         "publicRegistry": "docker.io",

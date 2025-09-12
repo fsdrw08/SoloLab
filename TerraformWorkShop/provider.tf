@@ -8,6 +8,10 @@ terraform {
       source  = "taliesins/hyperv"
       version = ">= 1.2.1"
     }
+    vyos = {
+      source  = "Foltik/vyos"
+      version = ">= 0.3.4"
+    }
     null = {
       source  = "hashicorp/null"
       version = ">= 3.2.2"

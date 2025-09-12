@@ -63,10 +63,33 @@ certs = [
     }
     cert = {
       dns_names = [
-        "vyos-api.day0.sololab"
+        "api.vyos.sololab"
       ]
       subject = {
         common_name  = "vyos api"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # PowerDNS Authoritative api
+  {
+    name = "pdns-auth"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "pdns-auth.vyos.sololab"
+      ]
+      subject = {
+        common_name  = "PowerDNS Authoritative"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -219,29 +242,6 @@ certs = [
   #       "cert_signing",
   #       "key_encipherment",
   #       "client_auth",
-  #     ]
-  #   }
-  # },
-  # # PowerDNS Authoritative api
-  # {
-  #   name = "pdns-auth"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 2048
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "pdns-auth.day0.sololab"
-  #     ]
-  #     subject = {
-  #       common_name  = "PowerDNS Authoritative"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
   #     ]
   #   }
   # },

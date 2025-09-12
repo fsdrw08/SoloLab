@@ -1,12 +1,12 @@
-vm_conn = {
+prov_system = {
   host     = "192.168.255.1"
   port     = 22
   user     = "vyos"
   password = "vyos"
 }
 
-vyos_conn = {
-  url = "https://vyos-api.day0.sololab"
+prov_vyos = {
+  url = "https://api.vyos.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
 
@@ -20,7 +20,7 @@ data_dirs = "/mnt/data/powerdns"
 
 certs = {
   cert_content_tfstate_ref    = "../../TLS/RootCA/terraform.tfstate"
-  cert_content_tfstate_entity = "pdns"
+  cert_content_tfstate_entity = "pdns-auth"
 }
 
 config = {
@@ -50,10 +50,10 @@ container = {
     name        = "powerdns"
     cidr_prefix = "172.16.2.0/24"
   }
-  # https://hub.docker.com/r/powerdns/pdns-auth-49/tags
+  # https://hub.docker.com/r/powerdns/pdns-auth-50/tags
   workload = {
     name      = "powerdns"
-    image     = "zot.day0.sololab/powerdns/pdns-auth-49:4.9.3"
+    image     = "zot.day0.sololab/powerdns/pdns-auth-50:5.0.0"
     pull_flag = "--tls-verify=false"
 
     # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
@@ -83,29 +83,11 @@ container = {
 }
 
 reverse_proxy = {
-  api_frontend = {
-    path = "load-balancing haproxy service tcp8081"
-    configs = {
-      "listen-address"  = "192.168.255.1"
-      "port"            = "8081"
-      "mode"            = "tcp"
-      "backend"         = "pdns_8081"
-      "ssl certificate" = "pdns"
-    }
-  }
-  api_backend = {
-    path = "load-balancing haproxy backend pdns_8081"
-    configs = {
-      "mode"                = "http"
-      "server pdns address" = "172.16.2.10"
-      "server pdns port"    = "8081"
-    }
-  }
   web_frontend = {
     path = "load-balancing haproxy service tcp443 rule 20"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "pdns.day0.sololab"
+      "domain-name" = "pdns-auth.vyos.sololab"
       "set backend" = "pdns_web"
     }
   }
@@ -115,6 +97,24 @@ reverse_proxy = {
       "mode"                = "tcp"
       "server vyos address" = "192.168.255.1"
       "server vyos port"    = "8081"
+    }
+  }
+  api_frontend = {
+    path = "load-balancing haproxy service tcp8081"
+    configs = {
+      "listen-address"  = "192.168.255.1"
+      "port"            = "8081"
+      "mode"            = "tcp"
+      "backend"         = "pdns_8081"
+      "ssl certificate" = "pdns-auth"
+    }
+  }
+  api_backend = {
+    path = "load-balancing haproxy backend pdns_8081"
+    configs = {
+      "mode"                = "http"
+      "server pdns address" = "172.16.2.10"
+      "server pdns port"    = "8081"
     }
   }
 }
@@ -127,7 +127,7 @@ dns_records = [
 ]
 
 dns_forwarding = {
-  path = "service dns forwarding domain day1.sololab"
+  path = "service dns forwarding domain sololab"
   configs = {
     "name-server 172.16.2.10 port" = "1053"
   }

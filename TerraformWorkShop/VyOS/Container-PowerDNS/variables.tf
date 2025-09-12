@@ -1,4 +1,4 @@
-variable "vm_conn" {
+variable "prov_system" {
   type = object({
     host     = string
     port     = number
@@ -7,7 +7,7 @@ variable "vm_conn" {
   })
 }
 
-variable "vyos_conn" {
+variable "prov_vyos" {
   type = object({
     url = string
     key = string
