@@ -13,12 +13,6 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
-          value_sets = [
-            {
-              name          = "coredns.tls.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-          ]
           tfstate = {
             backend = {
               type = "local"
@@ -28,6 +22,12 @@ podman_kubes = [
             }
             cert_name = "root"
           }
+          value_sets = [
+            {
+              name          = "coredns.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+          ]
         }
       ]
     }

@@ -47,6 +47,7 @@ coredns:
         - name: log
         - name: hosts
           configBlock: |-
+            192.168.255.1 api.vyos.sololab
             {{ .Values.coredns.hostIP }} zot.day0.sololab
             {{ .Values.coredns.hostIP }} coredns.day0.sololab
             {{ .Values.coredns.hostIP }} etcd-0.day0.sololab
