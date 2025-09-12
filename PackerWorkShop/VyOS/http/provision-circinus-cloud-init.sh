@@ -39,6 +39,7 @@ EOF
 # this config add disk_setup and mounts in cloud_init_modules, in order to mount disk in vm
 # origin file: https://github.com/vyos/vyos-cloud-init/blob/current/config/cloud.cfg.d/10_vyos.cfg
 yq -iy '.cloud_init_modules += ["disk_setup", "mounts"]' /etc/cloud/cloud.cfg.d/10_vyos.cfg
+yq -iy '.cloud_final_modules += ["power-state-change"]' /etc/cloud/cloud.cfg.d/10_vyos.cfg
 
 # run dpkg-reconfigure cloud-init
 # ref: https://github.com/vyos/vyos-cloud-init/blob/11d4c4719c45807c9fa4449479b359402f9c054b/tests/unittests/config/test_apt_source_v3.py#L1423

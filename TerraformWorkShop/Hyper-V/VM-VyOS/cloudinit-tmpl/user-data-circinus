@@ -3,22 +3,22 @@
 # https://docs.vyos.io/en/stable/automation/cloud-init.html
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
-# disk_setup:
-#   /dev/sdb:
-#     table_type: gpt
-#     layout: True
-#     overwrite: False
-# fs_setup:
-#   - label: data
-#     filesystem: "ext4"
-#     device: "/dev/sdb1"
-#     partition: auto
-#     overwrite: false
+disk_setup:
+  /dev/sdb:
+    table_type: gpt
+    layout: True
+    overwrite: False
+fs_setup:
+  - label: data
+    filesystem: "ext4"
+    device: "/dev/sdb1"
+    partition: auto
+    overwrite: false
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
 # https://zhuanlan.zhihu.com/p/250658106
-# mounts:
-#   - [/dev/disk/by-label/data, /mnt/data, auto, "nofail,exec"]
-# mount_default_fields: [None, None, "auto", "nofail", "0", "2"]
+mounts:
+  - [/dev/disk/by-label/data, /mnt/data, auto, "nofail,exec"]
+mount_default_fields: [None, None, "auto", "nofail", "0", "2"]
 
 # !!! one command per line
 # !!! if command ends in a value, it must be inside single quotes
@@ -37,10 +37,10 @@ vyos_config_commands:
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} subnet-id '${dhcp_subnet_id}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option default-router '${int_addr}'
   - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${int_addr}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${name_server}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option domain-name 'sololab'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 start '${dhcp_start}'
-  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 stop '${dhcp_stop}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option name-server '${dhcp_name_server}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} option domain-name '${dhcp_domain_name}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 start '${dhcp_start_ip}'
+  - set service dhcp-server shared-network-name ${int_desc} subnet ${int_cidr} range 0 stop '${dhcp_stop_ip}'
   - set service dhcp-server shared-network-name ${int_desc} authoritative
   # - set service dhcp-server shared-network-name ${int_desc} ping-check https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L22
   - set service dhcp-server hostfile-update
@@ -51,7 +51,7 @@ vyos_config_commands:
   - set service dns forwarding allow-from '${int_cidr}'
   - set service dns forwarding name-server '${dns_forward_1}'
   - set service dns forwarding name-server '${dns_forward_2}'
-  - set service dns forwarding domain ${private_domain} name-server ${private_domain_forward_addr} port '${private_domain_forward_port}'
+  # - set service dns forwarding domain ${dns_private_domain} name-server ${dns_private_domain_forward_addr} port '${dns_private_domain_forward_port}'
   # ssh
   - set service ssh port '22'
   # import ca and cert for vyos api

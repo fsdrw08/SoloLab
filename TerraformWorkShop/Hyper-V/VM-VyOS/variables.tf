@@ -14,10 +14,12 @@ variable "vm" {
     vhd = object({
       dir    = string
       source = string
-      data_disk_ref = optional(
+      data_disk_tfstate = optional(
         object({
-          backend = string
-          config  = map(string)
+          backend = object({
+            type   = string
+            config = map(string)
+          })
         }), null
       )
     })
@@ -29,6 +31,7 @@ variable "vm" {
     }))
     enable_secure_boot = optional(string, "On")
     power_state        = optional(string, "Off")
+    checkpoint_type    = optional(string, "Disabled")
     memory = object({
       static        = optional(bool, null)
       dynamic       = optional(bool, null)

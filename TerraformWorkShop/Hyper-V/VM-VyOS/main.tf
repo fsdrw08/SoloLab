@@ -13,6 +13,16 @@ locals {
     for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
     if cert.name == "vyos"
   ]
+  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
+    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
+    if regex("^[^.]+", vhd.name) == var.vm.base_name
+    ]) : flatten([
+    for count in range(var.vm.count) : [
+      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
+    ]
+  ])
 }
 
 # for debug
@@ -105,9 +115,9 @@ module "cloudinit_nocloud_iso" {
 
 # fetch data disk info
 data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_ref == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_ref.backend
-  config  = var.vm.vhd.data_disk_ref.config
+  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
+  backend = var.vm.vhd.data_disk_tfstate.backend.type
+  config  = var.vm.vhd.data_disk_tfstate.backend.config
 }
 
 # prepare boot disk path
@@ -145,18 +155,18 @@ module "hyperv_machine_instance" {
     path                = terraform_data.boot_disk[count.index].input
   }
 
-  additional_disk_drives = var.vm.vhd.data_disk_ref == null ? null : [
+  additional_disk_drives = var.vm.vhd.data_disk_tfstate == null ? null : [
     {
       controller_type     = "Scsi"
       controller_number   = "0"
       controller_location = "2"
-      path                = var.vm.count <= 1 ? data.terraform_remote_state.data_disk[0].outputs.path : data.terraform_remote_state.data_disk[0].outputs.path[count.index]
+      path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
     }
   ]
 
   vm_instance = {
     name                 = local.vm_names[count.index]
-    checkpoint_type      = "Standard"
+    checkpoint_type      = var.vm.checkpoint_type
     static_memory        = var.vm.memory.static
     dynamic_memory       = var.vm.memory.dynamic
     generation           = 2

@@ -7,6 +7,12 @@ prov_hyperv = {
 
 vhds = [
   {
+    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\VyOS.vhdx"
+    block_size = 0
+    type       = "Dynamic"
+    size       = 128849018880
+  },
+  {
     path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-FCOS.vhdx"
     block_size = 0
     type       = "Dynamic"
@@ -18,12 +24,12 @@ vhds = [
     type       = "Dynamic"
     size       = 128849018880
   },
-  {
-    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day2-FCOS.vhdx"
-    block_size = 0
-    type       = "Dynamic"
-    size       = 128849018880
-  },
+  # {
+  #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day2-FCOS.vhdx"
+  #   block_size = 0
+  #   type       = "Dynamic"
+  #   size       = 128849018880
+  # },
   # {
   #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-FCOS01.vhdx"
   #   block_size = 0
