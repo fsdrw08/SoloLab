@@ -19,6 +19,31 @@ storage:
       contents:
         inline: |
           net.ipv4.ip_unprivileged_port_start = 53
+    # prevent zincati service reboot system immediately
+    - path: /etc/zincati/config.d/30-updates-strategy.toml
+      contents:
+        inline: |
+          # How to finalize updates.
+          [updates]
+
+          # String to customize update strategy.
+          # Default strategy is to immediately finalize updates as soon as available,
+          # and reboot the node.
+          #strategy = "immediate"
+
+          # Update strategy which uses an external reboot coordinator (FleetLock protocol).
+          #strategy = "fleet_lock"
+          # Base URL for the FleetLock service.
+          #fleet_lock.base_url = "https://fleet-lock.example.com/"
+
+          # Update strategy which uses a periodic schedule for reboot/maintenance
+          # windows, on a weekly basis.
+          strategy = "periodic"
+          # Example of reboot windows: weekend days, between 01:00 and 02:00 UTC.
+          [[updates.periodic.window]]
+          days = [ "Sat", "Sun" ]
+          start_time = "01:00"
+          length_minutes = 60
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/${timezone}
