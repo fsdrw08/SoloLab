@@ -14,7 +14,7 @@ variable "runas" {
     user        = string
     uid         = number
     group       = string
-    gid         = string
+    gid         = number
   })
 }
 
@@ -33,19 +33,18 @@ variable "config" {
       basename = string
       content  = string
     })
-    tls = optional(object({
-      ca_basename   = string
-      ca_content    = string
-      cert_basename = string
-      cert_content  = string
-      key_basename  = string
-      key_content   = string
-      sub_dir       = string
-    }))
-    env = optional(object({
-      basename = string
-      content  = string
-    }))
+    tls = optional(
+      object({
+        ca_basename   = string
+        ca_content    = string
+        cert_basename = string
+        cert_content  = string
+        key_basename  = string
+        key_content   = string
+        sub_dir       = string
+      }),
+      null
+    )
     dir        = string
     create_dir = bool
   })
