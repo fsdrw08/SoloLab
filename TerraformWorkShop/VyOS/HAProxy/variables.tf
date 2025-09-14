@@ -5,13 +5,6 @@ variable "prov_vyos" {
   })
 }
 
-variable "services" {
-  type = map(object({
-    path    = string
-    configs = map(string)
-  }))
-}
-
 variable "reverse_proxy" {
   type = map(object({
     path    = string
