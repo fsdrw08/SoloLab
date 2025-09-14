@@ -56,7 +56,7 @@ int_ca = {
 certs = [
   # vyos api
   {
-    name = "vyos"
+    name = "api.vyos"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
@@ -79,7 +79,7 @@ certs = [
   },
   # PowerDNS Authoritative api
   {
-    name = "pdns-auth"
+    name = "pdns-auth.vyos"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
@@ -90,6 +90,32 @@ certs = [
       ]
       subject = {
         common_name  = "PowerDNS Authoritative"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # CoreDNS external
+  {
+    name = "coredns.vyos"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "coredns.vyos.sololab"
+      ]
+      ip_addresses = [
+        "192.168.255.1",
+      ]
+      subject = {
+        common_name  = "CoreDNS DoH"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -179,7 +205,7 @@ certs = [
   # },
   # zot
   {
-    name = "zot"
+    name = "zot.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
@@ -202,7 +228,7 @@ certs = [
   },
   # etcd
   {
-    name = "etcd-server"
+    name = "etcd-server.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
@@ -270,7 +296,7 @@ certs = [
   # },
   # cockpit
   {
-    name = "cockpit"
+    name = "cockpit.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
@@ -316,7 +342,7 @@ certs = [
   },
   # lldap
   {
-    name = "lldap"
+    name = "lldap.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
@@ -339,7 +365,7 @@ certs = [
   },
   # vault
   {
-    name = "vault"
+    name = "vault.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
