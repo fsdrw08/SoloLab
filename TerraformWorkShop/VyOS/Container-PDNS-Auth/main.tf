@@ -148,18 +148,6 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   configs  = each.value.configs
 }
 
-resource "vyos_static_host_mapping" "host_mappings" {
-  depends_on = [
-    module.vyos_container,
-    vyos_config_block_tree.reverse_proxy,
-  ]
-  for_each = {
-    for dns_record in var.dns_records : dns_record.host => dns_record
-  }
-  host = each.value.host
-  ip   = each.value.ip
-}
-
 resource "vyos_config_block_tree" "dns_forwarding" {
   depends_on = [
     module.vyos_container,

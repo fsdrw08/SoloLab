@@ -53,7 +53,7 @@ container = {
   # https://hub.docker.com/r/powerdns/pdns-auth-50/tags
   workload = {
     name      = "powerdns"
-    image     = "zot.day0.sololab/powerdns/pdns-auth-50:5.0.0"
+    image     = "192.168.255.10:5000/powerdns/pdns-auth-50:5.0.0"
     pull_flag = "--tls-verify=false"
 
     # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
@@ -118,13 +118,6 @@ reverse_proxy = {
     }
   }
 }
-
-dns_records = [
-  {
-    host = "pdns.day0.sololab"
-    ip   = "192.168.255.1"
-  },
-]
 
 dns_forwarding = {
   path = "service dns forwarding domain sololab"
