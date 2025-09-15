@@ -11,7 +11,7 @@ locals {
   ]
   cert = [
     for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
-    if cert.name == "vyos"
+    if cert.name == "api.vyos"
   ]
   data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
     for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
