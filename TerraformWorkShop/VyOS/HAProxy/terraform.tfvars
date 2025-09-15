@@ -4,22 +4,6 @@ prov_vyos = {
 }
 
 reverse_proxy = {
-  coredns_ext_frontend = {
-    path = "load-balancing haproxy service tcp443 rule 30"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "192.168.255.1"
-      "set backend" = "coredns_ext_http"
-    }
-  }
-  coredns_ext_backend = {
-    path = "load-balancing haproxy backend coredns_ext_http"
-    configs = {
-      "mode"                = "tcp"
-      "server vyos address" = "172.16.5.10"
-      "server vyos port"    = "443"
-    }
-  }
   zot_frontend = {
     path = "load-balancing haproxy service tcp443 rule 100"
     configs = {

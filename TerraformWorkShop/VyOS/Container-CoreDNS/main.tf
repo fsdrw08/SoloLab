@@ -29,9 +29,16 @@ module "config_map" {
     main = {
       basename = "Corefile"
       content  = <<-EOT
-      https://. {
+      (common) {
+        reload 2s
+        log
+      }
+      https://.:44353 {
+        bind 127.0.0.1
         tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
         forward sololab 172.16.2.10:1053
+        forward . 192.168.255.1
+        import common
       }
       EOT
     }
@@ -62,6 +69,7 @@ module "vyos_container" {
     image     = "zot.day0.sololab/coredns/coredns:1.12.4"
     pull_flag = "--tls-verify=false"
     others = {
+      "allow-host-networks"  = ""
       "arguments"            = "-conf /etc/coredns/Corefile"
       "uid"                  = 1002
       "gid"                  = 100
@@ -74,68 +82,73 @@ module "vyos_container" {
   }
 }
 
-resource "vyos_config_block_tree" "pki" {
-  path = "pki certificate coredns.vyos"
-  configs = {
-    "certificate" = join("",
-      slice(
-        split("\n", local.certs.0["cert_pem"]),
-        1,
-        length(
-          split("\n", local.certs.0["cert_pem"])
-        ) - 2
-      )
-    )
-    "private key" = join("",
-      slice(
-        split("\n", local.certs.0["key_pkcs8"]),
-        1,
-        length(
-          split("\n", local.certs.0["key_pkcs8"])
-        ) - 2
-      )
-    )
-  }
-}
+# resource "vyos_config_block_tree" "pki" {
+#   path = "pki certificate coredns.vyos"
+#   configs = {
+#     "certificate" = join("",
+#       slice(
+#         split("\n", local.certs.0["cert_pem"]),
+#         1,
+#         length(
+#           split("\n", local.certs.0["cert_pem"])
+#         ) - 2
+#       )
+#     )
+#     "private key" = join("",
+#       slice(
+#         split("\n", local.certs.0["key_pkcs8"]),
+#         1,
+#         length(
+#           split("\n", local.certs.0["key_pkcs8"])
+#         ) - 2
+#       )
+#     )
+#   }
+# }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
     module.vyos_container,
-    vyos_config_block_tree.pki
+    # vyos_config_block_tree.pki
   ]
   for_each = {
-    # web_frontend = {
-    #   path = "load-balancing haproxy service tcp443 rule 30"
-    #   configs = {
-    #     "ssl"         = "req-ssl-sni"
-    #     "domain-name" = "192.168.255.1"
-    #     "set backend" = "coredns_redirect"
-    #   }
-    # }
-    # web_backend = {
-    #   path = "load-balancing haproxy backend coredns_redirect"
-    #   configs = {
-    #     "mode"                = "tcp"
-    #     "server vyos address" = "127.0.0.1"
-    #     "server vyos port"    = "44353"
-    #   }
-    # }
-    api_frontend = {
-      path = "load-balancing haproxy service tcp44353"
+    web_frontend = {
+      # when send doh request to doh server by ip address,
+      # it means no SNI information in the tcp request,
+      # have to set default backend for this kind of request in haproxy
+      path = "load-balancing haproxy service tcp443 backend"
       configs = {
-        "port"                = "44353"
-        "mode"                = "tcp"
-        "rule 10 set backend" = "coredns_doh"
+        "" = "coredns_ext_http"
       }
     }
-    api_backend = {
-      path = "load-balancing haproxy backend coredns_doh"
+    web_backend = {
+      path = "load-balancing haproxy backend coredns_ext_http"
       configs = {
-        "mode"                   = "tcp"
-        "server coredns address" = "172.16.3.10"
-        "server coredns port"    = "443"
+        "mode" = "tcp"
+        # "server vyos address" = "172.16.3.10"
+        "server vyos port"    = "44353"
+        "server vyos address" = "127.0.0.1"
       }
     }
+    # api_frontend = {
+    #   path = "load-balancing haproxy service tcp44353"
+    #   configs = {
+    #     "listen-address"         = "127.0.0.1"
+    #     "port"                   = "44353"
+    #     "mode"                   = "http"
+    #     "ssl certificate"        = "coredns.vyos"
+    #     "rule 10 url-path exact" = "/dns-query"
+    #     "rule 10 set backend"    = "coredns_doh"
+    #   }
+    # }
+    # api_backend = {
+    #   path = "load-balancing haproxy backend coredns_doh"
+    #   configs = {
+    #     "mode"                   = "tcp"
+    #     "server coredns address" = "172.16.3.10"
+    #     "server coredns port"    = "443"
+    #   }
+    # }
   }
   path    = each.value.path
   configs = each.value.configs
