@@ -43,8 +43,8 @@ $syncList | ConvertFrom-Json | ForEach-Object {
 }
 
 # push
-# $privateRegistry = "zot.day0.sololab"
 $privateRegistry = "192.168.255.10:5000"
+# $privateRegistry = "zot.vyos.sololab.dev"
 $env:HTTP_PROXY=$null; $env:HTTPS_PROXY=$null
 # login to zot
 oras login --insecure -u admin $privateRegistry
