@@ -63,10 +63,61 @@ certs = [
     }
     cert = {
       dns_names = [
-        "api.vyos.sololab"
+        "api.vyos.sololab",
+        "api.vyos.sololab.dev",
       ]
       subject = {
         common_name  = "vyos api"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # vyos zot
+  {
+    name = "zot.vyos"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "zot.vyos.sololab",
+        "zot.vyos.sololab.dev",
+      ]
+      subject = {
+        common_name  = "zot oci registry"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth",
+      ]
+    }
+  },
+  # CoreDNS external
+  {
+    name = "doh.vyos"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 2048
+    }
+    cert = {
+      dns_names = [
+        "doh.sololab.dev"
+      ]
+      ip_addresses = [
+        "192.168.255.1",
+      ]
+      subject = {
+        common_name  = "DoH@Sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -86,36 +137,10 @@ certs = [
     }
     cert = {
       dns_names = [
-        "pdns-auth.vyos.sololab"
+        "pdns-auth.vyos.sololab",
       ]
       subject = {
         common_name  = "PowerDNS Authoritative"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  # CoreDNS external
-  {
-    name = "coredns.vyos"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 2048
-    }
-    cert = {
-      dns_names = [
-        "coredns.vyos.sololab"
-      ]
-      ip_addresses = [
-        "192.168.255.1",
-      ]
-      subject = {
-        common_name  = "CoreDNS DoH"
         organization = "Sololab"
       }
       validity_period_hours = 43800

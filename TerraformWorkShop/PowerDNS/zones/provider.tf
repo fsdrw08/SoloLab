@@ -2,7 +2,7 @@ terraform {
   required_providers {
     powerdns = {
       source  = "pyama86/powerdns"
-      version = ">=1.5.1"
+      version = ">= 1.5.1"
     }
   }
 }

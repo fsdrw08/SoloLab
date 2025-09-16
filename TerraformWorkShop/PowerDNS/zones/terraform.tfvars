@@ -1,6 +1,6 @@
 prov_pdns = {
   api_key        = "powerdns"
-  server_url     = "https://192.168.255.1:8081"
+  server_url     = "https://pdns-auth.vyos.sololab"
   insecure_https = true
 }
 

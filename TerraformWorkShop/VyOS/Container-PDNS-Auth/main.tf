@@ -6,7 +6,7 @@ resource "null_resource" "init" {
     password  = var.prov_system.password
     uid       = var.runas.uid
     gid       = var.runas.gid
-    data_dirs = var.data_dirs
+    data_dirs = "/mnt/data/powerdns"
   }
   connection {
     type     = "ssh"
@@ -19,8 +19,8 @@ resource "null_resource" "init" {
     inline = [
       <<-EOT
         #!/bin/bash
-        sudo mkdir -p ${var.data_dirs}
-        sudo chown ${var.runas.uid}:${var.runas.gid} ${var.data_dirs}
+        sudo mkdir -p ${self.triggers.data_dirs}
+        sudo chown ${var.runas.uid}:${var.runas.gid} ${self.triggers.data_dirs}
       EOT
     ]
   }
@@ -32,106 +32,100 @@ resource "null_resource" "init" {
   # }
 }
 
-data "terraform_remote_state" "cert" {
-  backend = "local"
+module "config_map" {
+  source  = "../../modules/system-powerdns_auth"
+  vm_conn = var.prov_system
+  runas   = var.runas
+  install = []
   config = {
-    path = var.certs.cert_content_tfstate_ref
+    create_dir = true
+    dir        = "/etc/powerdns"
+    # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
+    main = {
+      basename = "entrypoint.sh"
+      content  = <<EOT
+#!/bin/sh
+if [ ! -f "/var/lib/powerdns/pdns.sqlite3" ]; then
+    sqlite3 /var/lib/powerdns/pdns.sqlite3 < /usr/local/share/doc/pdns/schema.sqlite3.sql
+fi
+
+/usr/local/sbin/pdns_server-startup
+      EOT
+      mode     = 755
+    }
   }
 }
-
-locals {
-  cert = [
-    for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-    if cert.name == var.certs.cert_content_tfstate_entity
-  ]
-}
-
-resource "system_folder" "config" {
-  path = var.config.dir
-  uid  = var.runas.uid
-  gid  = var.runas.gid
-}
-
-resource "system_file" "config" {
-  depends_on = [system_folder.config]
-  for_each = var.config.files == null ? {} : {
-    for file in var.config.files : file.basename => file
-  }
-  path    = "${system_folder.config.path}/${each.value.basename}"
-  content = each.value.content
-  uid     = var.runas.uid
-  gid     = var.runas.gid
-}
-
-resource "system_file" "entry_script" {
-  depends_on = [system_folder.config]
-  path       = "${system_folder.config.path}/entrypoint.sh"
-  content    = var.config.entry_script
-  uid        = var.runas.uid
-  gid        = var.runas.gid
-  mode       = 755
-}
-
-# resource "system_folder" "certs" {
-#   depends_on = [system_folder.config]
-#   path       = var.certs.dir
-#   uid        = var.runas.uid
-#   gid        = var.runas.gid
-# }
-
-# resource "system_file" "cert" {
-#   depends_on = [system_folder.certs]
-#   path       = "${system_folder.certs.path}/tls.crt"
-#   content = join("", [
-#     lookup((data.terraform_remote_state.cert.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
-#     data.terraform_remote_state.cert.outputs.int_ca_pem
-#   ])
-#   uid  = var.runas.uid
-#   gid  = var.runas.gid
-#   mode = 600
-# }
-
-# resource "system_file" "key" {
-#   depends_on = [system_folder.certs]
-#   path       = "${system_folder.certs.path}/tls.key"
-#   content    = lookup((data.terraform_remote_state.cert.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
-#   uid        = var.runas.uid
-#   gid        = var.runas.gid
-#   mode       = 600
-# }
 
 module "vyos_container" {
   depends_on = [
     null_resource.init,
-    system_file.config,
-    system_file.entry_script,
-    # system_file.cert,
-    # system_file.key,
+    module.config_map,
   ]
-  source   = "../../modules/vyos-container"
-  vm_conn  = var.prov_system
-  network  = var.container.network
-  workload = var.container.workload
+  source  = "../../modules/vyos-container"
+  vm_conn = var.prov_system
+  network = {
+    create      = true
+    name        = "powerdns"
+    cidr_prefix = "172.16.30.0/24"
+  }
+  workload = {
+    name      = "powerdns"
+    image     = "172.16.20.10:5000/powerdns/pdns-auth-50:5.0.0"
+    pull_flag = "--tls-verify=false"
+
+    local_image = ""
+    others = {
+      # "memory"                   = "1024"
+
+      "environment TZ value"                = "Asia/Shanghai"
+      "environment PDNS_AUTH_API_KEY value" = "powerdns"
+      "environment PNDS_DNSUPDATE value"    = "yes"
+
+      "network powerdns address"                                   = "172.16.30.10"
+      "sysctl parameter net.ipv4.ip_unprivileged_port_start value" = "53"
+
+      "volume pdns_entrypoint source"      = "/etc/powerdns/entrypoint.sh"
+      "volume pdns_entrypoint destination" = "/etc/powerdns/entrypoint.sh"
+      "volume pdns_data source"            = "/mnt/data/powerdns"
+      "volume pdns_data destination"       = "/var/lib/powerdns"
+
+      "entrypoint" = "/usr/bin/tini -- /etc/powerdns/entrypoint.sh"
+    }
+  }
+}
+
+data "terraform_remote_state" "cert" {
+  backend = "local"
+  config = {
+    path = "../../TLS/RootCA/terraform.tfstate"
+  }
+}
+
+locals {
+  certs = [
+    for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
+    if cert.name == "pdns-auth.vyos"
+  ]
 }
 
 resource "vyos_config_block_tree" "pki" {
-  path = "pki certificate ${var.certs.cert_content_tfstate_entity}"
+  path = "pki certificate pdns-auth.vyos"
   configs = {
     "certificate" = join("",
       slice(
-        split("\n", local.cert.0["cert_pem"]),
+        split("\n", local.certs.0["cert_pem"]),
         1,
         length(
-          split("\n", local.cert.0["cert_pem"])
+          split("\n", local.certs.0["cert_pem"])
         ) - 2
       )
     )
     "private key" = join("",
       slice(
-        split("\n", local.cert.0["key_pkcs8"]),
+        split("\n", local.certs.0["key_pkcs8"]),
         1,
         length(
-          split("\n", local.cert.0["key_pkcs8"])
+          split("\n", local.certs.0["key_pkcs8"])
         ) - 2
       )
     )
@@ -143,15 +137,42 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     module.vyos_container,
     vyos_config_block_tree.pki
   ]
-  for_each = var.reverse_proxy
-  path     = each.value.path
-  configs  = each.value.configs
-}
-
-resource "vyos_config_block_tree" "dns_forwarding" {
-  depends_on = [
-    module.vyos_container,
-  ]
-  path    = var.dns_forwarding.path
-  configs = var.dns_forwarding.configs
+  for_each = {
+    web_frontend = {
+      path = "load-balancing haproxy service tcp443 rule 30"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "pdns-auth.vyos.sololab.dev"
+        "set backend" = "pdns_web"
+      }
+    }
+    web_backend = {
+      path = "load-balancing haproxy backend pdns_web"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "8081"
+      }
+    }
+    api_frontend = {
+      path = "load-balancing haproxy service tcp8081"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "8081"
+        "mode"            = "tcp"
+        "backend"         = "pdns_8081"
+        "ssl certificate" = "pdns-auth.vyos"
+      }
+    }
+    api_backend = {
+      path = "load-balancing haproxy backend pdns_8081"
+      configs = {
+        "mode"                = "http"
+        "server pdns address" = "172.16.30.10"
+        "server pdns port"    = "8081"
+      }
+    }
+  }
+  path    = each.value.path
+  configs = each.value.configs
 }
