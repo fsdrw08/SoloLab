@@ -10,10 +10,10 @@ variable "vm_conn" {
 
 variable "network" {
   type = object({
-    create      = bool
     name        = string
-    cidr_prefix = optional(string)
+    cidr_prefix = string
   })
+  default = null
 }
 
 variable "workload" {

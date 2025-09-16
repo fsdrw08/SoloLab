@@ -57,7 +57,7 @@ resource "null_resource" "load_image" {
 }
 
 resource "vyos_config_block_tree" "container_network" {
-  count = var.network.create == true ? 1 : 0
+  count = var.network == null ? 0 : 1
   path  = "container network ${var.network.name}"
 
   configs = {
