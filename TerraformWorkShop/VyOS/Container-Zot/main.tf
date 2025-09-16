@@ -100,7 +100,6 @@ module "vyos_container" {
   source     = "../../modules/vyos-container"
   vm_conn    = var.prov_system
   network = {
-    create      = true
     name        = "zot"
     cidr_prefix = "172.16.20.0/24"
   }

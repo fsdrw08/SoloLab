@@ -1,12 +1,12 @@
 prov_system = {
-  host     = "192.168.255.1"
+  host     = "api.vyos.sololab.dev"
   port     = 22
   user     = "vyos"
   password = "vyos"
 }
 
 prov_vyos = {
-  url = "https://api.vyos.sololab"
+  url = "https://api.vyos.sololab.dev"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
 
