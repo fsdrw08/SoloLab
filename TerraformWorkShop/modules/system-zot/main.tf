@@ -10,86 +10,16 @@ resource "system_user" "user" {
   depends_on = [system_group.group]
   name       = var.runas.user
   uid        = var.runas.uid
-  group      = var.runas.group
+  gid        = var.runas.gid
 }
 
-# present zot server bin
-resource "system_file" "server_bin" {
-  count  = var.install.server == null ? 0 : 1
-  path   = "${var.install.server.bin_file_dir}/zot"
-  source = var.install.server.bin_file_source
+resource "system_file" "bin" {
+  for_each = {
+    for install in var.install : install.bin_file_source => install
+  }
+  source = each.value.bin_file_source
+  path   = "${each.value.bin_file_dir}/${each.value.bin_file_name}"
   mode   = 755
-}
-
-resource "null_resource" "server_bin" {
-  count      = var.install.server == null ? 0 : 1
-  depends_on = [system_file.server_bin]
-  triggers = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = sensitive(var.vm_conn.password)
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo systemctl daemon-reload",
-    ]
-  }
-}
-
-# present zot client bin
-resource "system_file" "client_bin" {
-  count  = var.install.client == null ? 0 : 1
-  path   = "${var.install.client.bin_file_dir}/zli"
-  source = var.install.client.bin_file_source
-  mode   = 755
-}
-
-resource "system_file" "oras_tar" {
-  count  = var.install.oras == null ? 0 : 1
-  source = var.install.oras.tar_file_source
-  path   = var.install.oras.tar_file_path
-}
-
-resource "null_resource" "oras_bin" {
-  count      = var.install.oras == null ? 0 : 1
-  depends_on = [system_file.oras_tar]
-  triggers = {
-    host     = var.vm_conn.host
-    port     = var.vm_conn.port
-    user     = var.vm_conn.user
-    password = sensitive(var.vm_conn.password)
-    file_dir = var.install.oras.bin_file_dir
-  }
-  connection {
-    type     = "ssh"
-    host     = self.triggers.host
-    port     = self.triggers.port
-    user     = self.triggers.user
-    password = self.triggers.password
-  }
-  provisioner "remote-exec" {
-    inline = [
-      # https://oras.land/docs/installation#linux
-      # https://www.man7.org/linux/man-pages/man1/tar.1.html
-      "sudo tar --verbose --extract --file=${system_file.oras_tar.0.path} --directory=${var.install.oras.bin_file_dir} --overwrite oras",
-      "sudo chmod 755 ${var.install.oras.bin_file_dir}/oras",
-    ]
-  }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo rm -f ${self.triggers.file_dir}/oras",
-    ]
-  }
 }
 
 # prepare zot config dir
@@ -97,64 +27,61 @@ resource "system_folder" "config" {
   path = var.config.dir
   uid  = var.runas.uid
   gid  = var.runas.gid
-  mode = "755"
 }
 
 # persist zot config file in dir
-resource "system_file" "main" {
+resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, var.config.basename])
-  content    = var.config.content
+  path       = join("/", [var.config.dir, var.config.main.basename])
+  content    = var.config.main.content
   uid        = var.runas.uid
   gid        = var.runas.gid
-  mode       = "644"
 }
 
 resource "system_folder" "certs" {
-  count      = var.certs == null ? 0 : 1
+  count      = var.config.tls == null ? 0 : 1
   depends_on = [system_folder.config]
-  path       = var.certs.dir
+  path       = join("/", [var.config.dir, var.config.tls.sub_dir])
   uid        = var.runas.uid
   gid        = var.runas.gid
-  mode       = "755"
+  mode       = "700"
 }
 
-resource "system_file" "cacert" {
-  count = var.certs == null ? 0 : 1
+resource "system_file" "ca" {
+  count = var.config.tls == null ? 0 : var.config.tls.ca_content == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs[0].path, var.certs.cacert_basename])
-  content = var.certs.cacert_content
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.ca_basename])
+  content = var.config.tls.ca_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
 }
 
 resource "system_file" "cert" {
-  count = var.certs == null ? 0 : 1
+  count = var.config.tls == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs[0].path, var.certs.cert_basename])
-  content = var.certs.cert_content
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.cert_basename])
+  content = var.config.tls.cert_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
 }
 
 resource "system_file" "key" {
-  count = var.certs == null ? 0 : 1
+  count = var.config.tls == null ? 0 : 1
   depends_on = [
     system_folder.config,
     system_folder.certs
   ]
-  path    = join("/", [system_folder.certs[0].path, var.certs.key_basename])
-  content = var.certs.key_content
+  path    = join("/", [system_folder.certs[0].path, var.config.tls.key_basename])
+  content = var.config.tls.key_content
   uid     = var.runas.uid
   gid     = var.runas.gid
   mode    = "600"
 }
-

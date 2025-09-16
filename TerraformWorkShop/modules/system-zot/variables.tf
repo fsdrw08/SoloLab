@@ -18,39 +18,39 @@ variable "runas" {
 }
 
 variable "install" {
-  type = object({
-    server = object({
-      bin_file_dir    = string
-      bin_file_source = string
-    })
-    client = optional(object({
-      bin_file_dir    = string
-      bin_file_source = string
-    }))
-    oras = optional(object({
-      tar_file_source = string
-      tar_file_path   = string
-      bin_file_dir    = string
-    }))
-  })
+  type = list(object({
+    bin_file_dir    = string
+    bin_file_name   = string
+    bin_file_source = string
+  }))
+  default = [
+    {
+      bin_file_dir    = "/usr/bin"
+      bin_file_name   = "zot"
+      bin_file_source = "https://github.com/project-zot/zot/releases/download/v2.1.8/zot-linux-amd64"
+    }
+  ]
 }
 
 variable "config" {
   type = object({
-    basename = string
-    content  = string
-    dir      = string
-  })
-}
-
-variable "certs" {
-  type = object({
-    dir             = optional(string)
-    cacert_basename = optional(string)
-    cacert_content  = optional(string)
-    cert_basename   = optional(string)
-    cert_content    = optional(string)
-    key_basename    = optional(string)
-    key_content     = optional(string)
+    create_dir = bool
+    dir        = string
+    main = object({
+      basename = string
+      content  = string
+    })
+    tls = optional(
+      object({
+        ca_basename   = optional(string, null)
+        ca_content    = optional(string, null)
+        cert_basename = string
+        cert_content  = string
+        key_basename  = string
+        key_content   = string
+        sub_dir       = string
+      }),
+      null
+    )
   })
 }
