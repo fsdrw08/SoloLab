@@ -62,15 +62,15 @@ resource "system_folder" "config" {
 
 resource "system_file" "config" {
   depends_on = [system_folder.config]
-  path       = join("/", [var.config.dir, basename(var.config.main.basename)])
+  path       = join("/", [var.config.dir, var.config.main.basename])
   content    = var.config.main.content
   uid        = var.runas.uid
   gid        = var.runas.gid
 }
 
 resource "system_folder" "certs" {
-  depends_on = [system_folder.config]
   count      = var.config.tls == null ? 0 : 1
+  depends_on = [system_folder.config]
   path       = join("/", [var.config.dir, var.config.tls.sub_dir])
   uid        = var.runas.uid
   gid        = var.runas.gid
@@ -115,13 +115,3 @@ resource "system_file" "key" {
   gid     = var.runas.gid
   mode    = "600"
 }
-
-# presist coredns zones config sub dir
-# resource "system_folder" "snippets" {
-#   depends_on = [system_folder.config]
-#   count      = var.config.snippets == null ? 0 : 1
-#   path       = join("/", [var.config.dir, var.config.snippets.sub_dir])
-#   user       = var.runas.user
-#   group      = var.runas.group
-#   mode       = "755"
-# }
