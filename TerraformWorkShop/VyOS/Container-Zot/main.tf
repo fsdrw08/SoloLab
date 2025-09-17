@@ -4,8 +4,8 @@ resource "null_resource" "init" {
     port      = var.prov_system.port
     user      = var.prov_system.user
     password  = var.prov_system.password
-    uid       = var.runas.uid
-    gid       = var.runas.gid
+    uid       = var.owner.uid
+    gid       = var.owner.gid
     data_dirs = "/mnt/data/zot /mnt/data/zot-tmp"
   }
   connection {
@@ -42,33 +42,49 @@ data "terraform_remote_state" "cert" {
 locals {
   certs = [
     for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-    if cert.name == "zot.vyos"
+    if cert.name == "root"
   ]
 }
 
 # zot config
 module "config_map" {
-  source  = "../../modules/system-zot"
-  vm_conn = var.prov_system
-  runas   = var.runas
-  install = []
+  source      = "../../modules/system-config_files"
+  prov_system = var.prov_system
+  owner       = var.owner
   config = {
     create_dir = true
     dir        = "/etc/zot"
     # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
-    main = {
-      basename = "config.json"
-      content  = jsonencode(yamldecode(file("${path.module}/attachments/config-htpasswd.yaml")))
-    }
-    tls = {
-      ca_basename   = "ca.crt"
-      ca_content    = local.certs.0["ca"]
-      cert_basename = "server.crt"
-      cert_content  = local.certs.0["cert_pem_chain"]
-      key_basename  = "server.key"
-      key_content   = local.certs.0["key_pem"]
-      sub_dir       = "certs"
-    }
+    files = [
+      {
+        basename = "config.json"
+        content  = jsonencode(yamldecode(file("${path.module}/attachments/config-htpasswd.yaml")))
+      },
+      # for htpasswd auth
+      {
+        basename = "htpasswd"
+        content  = "admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa"
+      },
+    ]
+    secrets = [
+      {
+        sub_dir = "certs"
+        files = [
+          {
+            basename = "ca.crt"
+            content  = local.certs.0["ca"]
+          },
+          # {
+          #   basename = "server.crt"
+          #   content  = local.certs.0["cert_pem_chain"]
+          # },
+          # {
+          #   basename = "server.key"
+          #   content  = local.certs.0["key_pem"]
+          # }
+        ]
+      }
+    ]
   }
 }
 
@@ -82,18 +98,9 @@ module "config_map" {
 #     bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
 #     bindPassword = "P@ssw0rd"
 #   })
-#   uid = var.runas.uid
-#   gid = var.runas.gid
+#   uid = var.owner.uid
+#   gid = var.owner.gid
 # }
-
-# for htpasswd auth
-resource "system_file" "htpasswd" {
-  depends_on = [module.config_map]
-  path       = "/etc/zot/htpasswd"
-  content    = "admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa"
-  uid        = var.runas.uid
-  gid        = var.runas.gid
-}
 
 module "vyos_container" {
   depends_on = [module.config_map]
@@ -109,10 +116,12 @@ module "vyos_container" {
     local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.8.tar"
     pull_flag   = "--tls-verify=false"
     others = {
-      "uid"                  = var.runas.uid
-      "gid"                  = var.runas.gid
+      "uid"                  = var.owner.uid
+      "gid"                  = var.owner.gid
       "environment TZ value" = "Asia/Shanghai"
-      "network zot address"  = "172.16.20.10"
+      # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
+      "environment SSL_CERT_DIR value" = "/etc/zot/certs"
+      "network zot address"            = "172.16.20.10"
 
       "volume zot_config source"      = "/etc/zot"
       "volume zot_config destination" = "/etc/zot"
@@ -128,28 +137,46 @@ module "vyos_container" {
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [module.vyos_container]
   for_each = {
-    web_frontend = {
+    l4_frontend = {
       path = "load-balancing haproxy service tcp443 rule 20"
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "zot.vyos.sololab.dev"
-        "set backend" = "zot_vyos"
+        "set backend" = "zot_vyos_ssl"
       }
     }
-    web_frontend2 = {
+    l4_frontend2 = {
       path = "load-balancing haproxy service tcp443 rule 21"
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "zot.vyos.sololab"
-        "set backend" = "zot_vyos"
+        "set backend" = "zot_vyos_ssl"
       }
     }
-    web_backend = {
-      path = "load-balancing haproxy backend zot_vyos"
+    l4_backend = {
+      path = "load-balancing haproxy backend zot_vyos_ssl"
       configs = {
         "mode"                = "tcp"
-        "server vyos address" = "172.16.20.10"
+        "server vyos address" = "127.0.0.1"
         "server vyos port"    = "5000"
+      }
+    }
+    l7_frontend = {
+      path = "load-balancing haproxy service tcp5000"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "5000"
+        "mode"            = "tcp"
+        "backend"         = "zot_vyos"
+        "ssl certificate" = "vyos"
+      }
+    }
+    l7_backend = {
+      path = "load-balancing haproxy backend zot_vyos"
+      configs = {
+        "mode"                = "http"
+        "server pdns address" = "172.16.20.10"
+        "server pdns port"    = "5000"
       }
     }
   }

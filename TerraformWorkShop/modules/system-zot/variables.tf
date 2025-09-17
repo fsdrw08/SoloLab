@@ -32,25 +32,3 @@ variable "install" {
   ]
 }
 
-variable "config" {
-  type = object({
-    create_dir = bool
-    dir        = string
-    main = object({
-      basename = string
-      content  = string
-    })
-    tls = optional(
-      object({
-        ca_basename   = optional(string, null)
-        ca_content    = optional(string, null)
-        cert_basename = string
-        cert_content  = string
-        key_basename  = string
-        key_content   = string
-        sub_dir       = string
-      }),
-      null
-    )
-  })
-}

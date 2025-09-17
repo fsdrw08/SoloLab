@@ -1,12 +1,10 @@
 resource "null_resource" "init" {
   triggers = {
-    host      = var.vm_conn.host
-    port      = var.vm_conn.port
-    user      = var.vm_conn.user
-    password  = var.vm_conn.password
-    uid       = var.runas.uid
-    gid       = var.runas.gid
-    data_dirs = var.data_dirs
+    host      = var.prov_system.host
+    port      = var.prov_system.port
+    user      = var.prov_system.user
+    password  = var.prov_system.password
+    data_dirs = "/mnt/data/postgresql"
   }
   connection {
     type     = "ssh"
@@ -19,8 +17,8 @@ resource "null_resource" "init" {
     inline = [
       <<-EOT
         #!/bin/bash
-        sudo mkdir -p ${var.data_dirs}
-        sudo chown ${var.runas.uid}:${var.runas.gid} ${var.data_dirs}
+        sudo mkdir -p ${self.triggers.data_dirs}
+        sudo chown ${var.owner.uid}:${var.owner.gid} ${self.triggers.data_dirs}
       EOT
     ]
   }
@@ -32,86 +30,136 @@ resource "null_resource" "init" {
   # }
 }
 
-data "terraform_remote_state" "root_ca" {
+data "terraform_remote_state" "cert" {
   backend = "local"
   config = {
-    path = var.certs.cert_content_tfstate_ref
+    path = "../../TLS/RootCA/terraform.tfstate"
   }
 }
 
-resource "system_folder" "config" {
-  path = var.config.dir
-  uid  = var.runas.uid
-  gid  = var.runas.gid
+locals {
+  certs = [
+    for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
+    if cert.name == "tfbackend-pg"
+  ]
 }
 
-resource "system_file" "config" {
-  depends_on = [system_folder.config]
-  for_each = {
-    for file in var.config.files : file.basename => file
-  }
-  path    = "${system_folder.config.path}/${each.value.basename}"
-  content = each.value.content
-}
-
-resource "system_folder" "certs" {
-  depends_on = [system_folder.config]
-  path       = var.certs.dir
-  uid        = var.runas.uid
-  gid        = var.runas.gid
-}
-
-resource "system_file" "cert" {
-  depends_on = [system_folder.certs]
-  path       = "${system_folder.certs.path}/tls.crt"
-  content = join("", [
-    lookup((data.terraform_remote_state.root_ca.outputs.signed_cert_pem), var.certs.cert_content_tfstate_entity, null),
-    data.terraform_remote_state.root_ca.outputs.int_ca_pem
-  ])
-  uid  = var.runas.uid
-  gid  = var.runas.gid
-  mode = 600
-}
-
-resource "system_file" "key" {
-  depends_on = [system_folder.certs]
-  path       = "${system_folder.certs.path}/tls.key"
-  content    = lookup((data.terraform_remote_state.root_ca.outputs.signed_key), var.certs.cert_content_tfstate_entity, null)
-  uid        = var.runas.uid
-  gid        = var.runas.gid
-  mode       = 600
-}
+# module "config_map" {
+#   source      = "../../modules/system-config_files"
+#   prov_system = var.prov_system
+#   owner = {
+#     uid = 26
+#     gid = 26
+#   }
+#   config = {
+#     create_dir = true
+#     dir        = "/etc/postgresql"
+#     files = [
+#       {
+#         basename = "ssl.conf"
+#         content  = <<-EOT
+#           ssl = on
+#           ssl_cert_file = '/opt/app-root/src/certs/tls.crt' # server certificate
+#           ssl_key_file =  '/opt/app-root/src/certs/tls.key' # server private key
+#         EOT
+#       }
+#     ]
+#     secrets = [
+#       {
+#         sub_dir = "certs"
+#         files = [
+#           {
+#             basename = "tls.crt"
+#             content  = local.certs.0["cert_pem_chain"]
+#           },
+#           {
+#             basename = "tls.key"
+#             content  = local.certs.0["key_pem"]
+#           }
+#         ]
+#       }
+#     ]
+#   }
+# }
 
 module "vyos_container" {
   depends_on = [
     null_resource.init,
-    system_file.cert,
-    system_file.key,
+    # module.config_map,
   ]
-  source   = "../../modules/vyos-container"
-  vm_conn  = var.vm_conn
-  network  = var.container.network
-  workload = var.container.workload
+  source  = "../../modules/vyos-container"
+  vm_conn = var.prov_system
+  network = {
+    create      = true
+    name        = "postgresql"
+    cidr_prefix = "172.16.50.0/24"
+  }
+  workload = {
+    name      = "postgresql"
+    image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
+    pull_flag = "--tls-verify=false"
+
+    # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
+    others = {
+      "environment TZ value"                        = "Asia/Shanghai"
+      "environment POSTGRESQL_USER value"           = "terraform"
+      "environment POSTGRESQL_PASSWORD value"       = "terraform"
+      "environment POSTGRESQL_DATABASE value"       = "tfstate"
+      "environment POSTGRESQL_ADMIN_PASSWORD value" = "P@ssw0rd"
+
+      "network postgresql address" = "172.16.50.10"
+
+      # "volume postgresql_conf source"      = "/etc/postgresql/ssl.conf"
+      # "volume postgresql_conf destination" = "/opt/app-root/src/postgresql-cfg"
+      # "volume postgresql_cert source"      = "/etc/postgresql/certs"
+      # "volume postgresql_cert destination" = "/opt/app-root/src/certs"
+      "volume postgresql_data source"      = "/mnt/data/postgresql"
+      "volume postgresql_data destination" = "/var/lib/pgsql/data"
+    }
+  }
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
     module.vyos_container,
-    # module.vyos_container_adminer
-  ]
-  for_each = var.reverse_proxy
-  path     = each.value.path
-  configs  = each.value.configs
-}
-
-resource "vyos_static_host_mapping" "host_mappings" {
-  depends_on = [
-    module.vyos_container,
-    vyos_config_block_tree.reverse_proxy,
   ]
   for_each = {
-    for dns_record in var.dns_records : dns_record.host => dns_record
+    l4_frontend = {
+      path = "load-balancing haproxy service tcp443 rule 50"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "tfbackend-pg.vyos.sololab"
+        "set backend" = "pgsql_vyos_ssl"
+      }
+    }
+    l4_backend = {
+      path = "load-balancing haproxy backend pgsql_vyos_ssl"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "5432"
+      }
+    }
+    l7_frontend = {
+      path = "load-balancing haproxy service tcp5432"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "5432"
+        "mode"            = "tcp"
+        "backend"         = "pgsql_vyos"
+        "ssl certificate" = "vyos"
+      }
+    }
+    l7_backend = {
+      path = "load-balancing haproxy backend pgsql_vyos"
+      configs = {
+        "mode"                = "http"
+        "server vyos address" = "172.16.50.10"
+        "server vyos port"    = "5432"
+      }
+    }
   }
-  host = each.value.host
-  ip   = each.value.ip
+  path    = each.value.path
+  configs = each.value.configs
 }
+

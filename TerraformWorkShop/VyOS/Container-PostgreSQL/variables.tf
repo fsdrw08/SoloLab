@@ -1,4 +1,4 @@
-variable "vm_conn" {
+variable "prov_system" {
   type = object({
     host     = string
     port     = number
@@ -7,73 +7,16 @@ variable "vm_conn" {
   })
 }
 
-variable "vyos_conn" {
+variable "prov_vyos" {
   type = object({
     url = string
     key = string
   })
 }
 
-variable "runas" {
+variable "owner" {
   type = object({
-    user        = optional(string)
-    group       = optional(string)
-    uid         = number
-    gid         = number
-    take_charge = optional(bool, false)
+    uid = number
+    gid = number
   })
-}
-
-variable "config" {
-  type = object({
-    dir = string
-    files = list(object({
-      basename = string
-      content  = string
-    }))
-  })
-}
-
-variable "certs" {
-  type = object({
-    dir                         = string
-    cert_content_tfstate_ref    = string
-    cert_content_tfstate_entity = string
-  })
-}
-
-variable "data_dirs" {
-  type        = string
-  description = "the data dir to store cockroachdb data"
-}
-
-variable "container" {
-  type = object({
-    network = object({
-      create      = bool
-      name        = optional(string)
-      cidr_prefix = optional(string)
-    })
-    workload = object({
-      name        = string
-      image       = string
-      local_image = optional(string, "")
-      pull_flag   = optional(string, "")
-      others      = map(string)
-    })
-  })
-}
-
-variable "reverse_proxy" {
-  type = map(object({
-    path    = string
-    configs = map(string)
-  }))
-}
-
-variable "dns_records" {
-  type = list(object({
-    host = string
-    ip   = string
-  }))
 }

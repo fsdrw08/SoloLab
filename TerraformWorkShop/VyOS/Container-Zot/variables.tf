@@ -14,12 +14,9 @@ variable "prov_vyos" {
   })
 }
 
-variable "runas" {
+variable "owner" {
   type = object({
-    user        = string
-    group       = string
-    uid         = number
-    gid         = number
-    take_charge = bool
+    uid = number
+    gid = number
   })
 }

@@ -10,8 +10,7 @@ prov_vyos = {
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
 
-runas = {
-  uid         = 953
-  gid         = 953
-  take_charge = false
+owner = {
+  uid = 953
+  gid = 953
 }

@@ -13,60 +13,66 @@ locals {
 }
 
 module "config_map" {
-  source  = "../../modules/system-coredns"
-  vm_conn = var.prov_system
-  runas = {
-    take_charge = false
-    user        = "vyos"
-    uid         = 1002
-    group       = "users"
-    gid         = 100
+  source      = "../../modules/system-config_files"
+  prov_system = var.prov_system
+  owner = {
+    uid = 1002
+    gid = 100
   }
-  install = null
   config = {
     create_dir = true
     dir        = "/etc/coredns"
-    main = {
-      basename = "Corefile"
-      content  = <<-EOT
-      (common) {
-        reload 2s
-        log
+    files = [
+      {
+        basename = "Corefile"
+        content  = <<-EOT
+          (common) {
+            reload 2s
+            log
+          }
+          .:53 {
+            bind 127.0.0.1
+            hosts {
+              192.168.255.1 api.vyos.sololab
+              192.168.255.1 zot.vyos.sololab
+              192.168.255.1 pdns-auth.vyos.sololab
+              192.168.255.1 tfbackend-pg.vyos.sololab
+            }
+            forward sololab 172.16.2.10:1053
+            forward . 192.168.255.1
+            import common
+          }
+          https://.:44353 {
+            bind 127.0.0.1
+            tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
+            hosts {
+              192.168.255.1 api.vyos.sololab
+              192.168.255.1 zot.vyos.sololab
+              192.168.255.1 pdns-auth.vyos.sololab
+              192.168.255.1 tfbackend-pg.vyos.sololab
+            }
+            forward sololab 172.16.2.10:1053
+            forward . 192.168.255.1
+            import common
+          }
+        EOT
       }
-      .:53 {
-        bind 127.0.0.1
-        hosts {
-          192.168.255.1 api.vyos.sololab
-          192.168.255.1 zot.vyos.sololab
-          192.168.255.1 pdns-auth.vyos.sololab
-          192.168.255.1 tfbackend-pg.vyos.sololab
-        }
-        forward sololab 172.16.2.10:1053
-        forward . 192.168.255.1
-        import common
+    ]
+    secrets = [
+      {
+        sub_dir = "tls"
+        files = [
+          {
+            basename = "cert.pem"
+            content  = local.certs.0["cert_pem_chain"]
+          },
+          {
+            basename = "key.pem"
+            content  = local.certs.0["key_pem"]
+          }
+        ]
       }
-      https://.:44353 {
-        bind 127.0.0.1
-        tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
-        hosts {
-          192.168.255.1 api.vyos.sololab
-          192.168.255.1 zot.vyos.sololab
-          192.168.255.1 pdns-auth.vyos.sololab
-          192.168.255.1 tfbackend-pg.vyos.sololab
-        }
-        forward sololab 172.16.2.10:1053
-        forward . 192.168.255.1
-        import common
-      }
-      EOT
-    }
-    tls = {
-      cert_basename = "cert.pem"
-      cert_content  = local.certs.0["cert_pem_chain"]
-      key_basename  = "key.pem"
-      key_content   = local.certs.0["key_pem"]
-      sub_dir       = "tls"
-    }
+    ]
   }
 }
 
@@ -86,7 +92,6 @@ module "vyos_container" {
       "uid"                  = 1002
       "gid"                  = 100
       "environment TZ value" = "Asia/Shanghai"
-      # "network coredns address" = "172.16.30.10"
 
       "volume coredns source"      = "/etc/coredns"
       "volume coredns destination" = "/etc/coredns"
@@ -124,23 +129,22 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     # vyos_config_block_tree.pki
   ]
   for_each = {
-    web_frontend = {
+    l4_frontend = {
       # when send doh request to doh server by ip address,
       # it means no SNI information in the tcp request,
       # have to set default backend for this kind of request in haproxy
       # update: use public dns recode to point to private ip instead
-      path = "load-balancing haproxy service tcp443 rule 20"
+      path = "load-balancing haproxy service tcp443 rule 30"
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "doh.sololab.dev"
         "set backend" = "coredns_vyos"
       }
     }
-    web_backend = {
+    l4_backend = {
       path = "load-balancing haproxy backend coredns_vyos"
       configs = {
-        "mode" = "tcp"
-        # "server vyos address" = "172.16.3.10"
+        "mode"                = "tcp"
         "server vyos port"    = "44353"
         "server vyos address" = "127.0.0.1"
       }
