@@ -54,44 +54,20 @@ int_ca = {
 }
 
 certs = [
-  # vyos api
+  # wildcard vyos
   {
-    name = "api.vyos"
+    name = "wildcard.vyos"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
     }
     cert = {
       dns_names = [
-        "api.vyos.sololab",
-        "api.vyos.sololab.dev",
+        "*.vyos.sololab",
+        "*.vyos.sololab.dev",
       ]
       subject = {
-        common_name  = "vyos api"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  # vyos zot
-  {
-    name = "zot.vyos"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 2048
-    }
-    cert = {
-      dns_names = [
-        "zot.vyos.sololab",
-        "zot.vyos.sololab.dev",
-      ]
-      subject = {
-        common_name  = "zot oci registry"
+        common_name  = "*.vyos.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -117,30 +93,7 @@ certs = [
         "192.168.255.1",
       ]
       subject = {
-        common_name  = "DoH@Sololab"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  # PowerDNS Authoritative api
-  {
-    name = "pdns-auth.vyos"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 2048
-    }
-    cert = {
-      dns_names = [
-        "pdns-auth.vyos.sololab",
-      ]
-      subject = {
-        common_name  = "PowerDNS Authoritative"
+        common_name  = "doh.sololab.dev"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -160,10 +113,11 @@ certs = [
     }
     cert = {
       dns_names = [
+        "tf-backend-pg.vyos.sololab",
         "tf-backend-pg.day0.sololab"
       ]
       subject = {
-        common_name  = "tfbackend-pg.day0.sololab"
+        common_name  = "tfbackend-pg"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -228,7 +182,7 @@ certs = [
   #     ]
   #   }
   # },
-  # zot
+  # day0
   {
     name = "zot.day0"
     key = {
@@ -251,7 +205,6 @@ certs = [
       ]
     }
   },
-  # etcd
   {
     name = "etcd-server.day0"
     key = {
@@ -293,29 +246,6 @@ certs = [
   #       "cert_signing",
   #       "key_encipherment",
   #       "client_auth",
-  #     ]
-  #   }
-  # },
-  # # PowerDNS Recursor api
-  # {
-  #   name = "pdns-recursor"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 2048
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "pdns-recursor.day0.sololab"
-  #     ]
-  #     subject = {
-  #       common_name  = "PowerDNS Recursor"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
   #     ]
   #   }
   # },
@@ -465,30 +395,6 @@ certs = [
   #     ]
   #   }
   # },
-  # {
-  #   name = "minio"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "minio-api.day0.sololab",
-  #       "minio-console.day0.sololab"
-  #     ]
-  #     subject = {
-  #       common_name  = "minio-api.day0.sololab"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
-  #     ]
-  #   }
-  # },
-
   # opendj
   # {
   #   name = "opendj"
@@ -532,26 +438,6 @@ certs = [
   #       "key_encipherment",
   #       "digital_signature",
   #       "server_auth"
-  #     ]
-  #   }
-  # },
-  # {
-  #   name = "wildcard"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = ["*.service.consul"]
-  #     subject = {
-  #       common_name  = "service.consul"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
   #     ]
   #   }
   # },

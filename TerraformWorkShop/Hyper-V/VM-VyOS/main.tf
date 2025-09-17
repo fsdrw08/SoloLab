@@ -11,7 +11,7 @@ locals {
   ]
   cert = [
     for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
-    if cert.name == "api.vyos"
+    if cert.name == "wildcard.vyos"
   ]
   data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
     for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
@@ -66,12 +66,17 @@ locals {
 
 module "cloudinit_nocloud_iso" {
   source   = "../../modules/hyperv-cloudinit-nocloud"
-  count    = var.vm.count
+  count    = var.vm.count == null ? 0 : var.cloudinit_nocloud == null ? 0 : var.vm.count
   iso_name = "cloud-init-${local.vm_names[count.index]}"
   files = [
     for content in var.cloudinit_nocloud : {
       content = templatefile(content.content_source, merge(content.content_vars,
         {
+          # https://docs.vyos.io/en/latest/configuration/pki/index.html#key-usage-cli
+          # When loading the certificate you need to manually strip the -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- tags.
+          # Also, the certificate/key needs to be presented in a single line without line breaks (\n), this can be done using the following shell command:
+          # $ tail -n +2 ca.pem | head -n -1 | tr -d '\n'
+          # https://developer.hashicorp.com/terraform/language/functions/slice
           ca_cert = join("",
             slice(
               split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
@@ -81,7 +86,6 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
-          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
           vyos_cert = join("",
             slice(
               split("\n", local.cert.0["cert_pem"]),
@@ -91,7 +95,6 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
-
           vyos_key = join("",
             slice(
               split("\n", local.cert.0["key_pkcs8"]),
@@ -101,6 +104,7 @@ module "cloudinit_nocloud_iso" {
               ) - 2
             )
           )
+          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
         }
       ))
       filename = content.filename

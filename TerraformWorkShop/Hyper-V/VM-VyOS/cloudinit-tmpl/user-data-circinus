@@ -47,7 +47,7 @@ vyos_config_commands:
   # - set service dhcp-server host-decl-name https://github.com/vyos/vyos-1x/blob/ff82bd5cfd1719c31f8169309566e5c8e8d43571/src/migration-scripts/dhcp-server/7-to-8#L21
   # DNS https://docs.vyos.io/en/latest/configuration/service/dns.html
   - set service dns forwarding cache-size '0'
-  - set service dns forwarding listen-address '${dns_listen_addr}'
+  - set service dns forwarding listen-address '${dns_forward_listen_addr}'
   - set service dns forwarding allow-from '${int_cidr}'
   - set service dns forwarding name-server '${dns_forward_1}'
   - set service dns forwarding name-server '${dns_forward_2}'
@@ -61,30 +61,33 @@ vyos_config_commands:
   # config vyos api
   - set service https certificates ca-certificate 'sololab'
   - set service https certificates certificate 'vyos'
-  - set service https listen-address '${int_addr}'
-  - set service https port '8443'
+  - set service https listen-address '${api_listen_addr}'
+  - set service https port '${api_listen_port}'
   - set service https api keys id ${api_key_id} key '${api_key_content}'
   - set service https api rest
   # dns record for vyos api
-  - set system static-host-mapping host-name ${api_fqdn} inet '${int_addr}'
+  - set system static-host-mapping host-name ${dns_api_fqdn} inet '${dns_api_ip}'
   # load-balancing reverse-proxy (name changed to haproxy in 1.5) for vyos api
-  - set load-balancing haproxy service http listen-address '${int_addr}'
+  - set load-balancing haproxy service http listen-address '${haproxy_listen_addr_int}'
+  # - set load-balancing haproxy service http listen-address '${haproxy_listen_addr_ext}'
   - set load-balancing haproxy service http port '80'
   - set load-balancing haproxy service http mode 'http'
-  # - set load-balancing haproxy service https listen-address '${int_addr}'
+  # - set load-balancing haproxy service https listen-address '${haproxy_listen_addr_int}'
   # - set load-balancing haproxy service https port '443'
   # - set load-balancing haproxy service https mode 'http'
-  - set load-balancing haproxy service tcp443 listen-address '${int_addr}'
+  - set load-balancing haproxy service tcp443 listen-address '${haproxy_listen_addr_int}'
+  # - set load-balancing haproxy service tcp443 listen-address '${haproxy_listen_addr_ext}'
   - set load-balancing haproxy service tcp443 port '443'
   - set load-balancing haproxy service tcp443 mode 'tcp'
   - set load-balancing haproxy service tcp443 tcp-request inspect-delay '5000'
+  # reverse proxy rule for vyos api
   - set load-balancing haproxy service tcp443 rule 10 ssl 'req-ssl-sni'
-  - set load-balancing haproxy service tcp443 rule 10 domain-name '${api_fqdn}'
+  - set load-balancing haproxy service tcp443 rule 10 domain-name '${dns_api_fqdn}'
   - set load-balancing haproxy service tcp443 rule 10 set backend 'vyos-api'
   - set load-balancing haproxy backend vyos-api balance 'round-robin'
   - set load-balancing haproxy backend vyos-api mode 'tcp'
-  - set load-balancing haproxy backend vyos-api server vyos address '${int_addr}'
-  - set load-balancing haproxy backend vyos-api server vyos port '8443'
+  - set load-balancing haproxy backend vyos-api server vyos address '${api_listen_addr}'
+  - set load-balancing haproxy backend vyos-api server vyos port '${api_listen_port}'
   # System
   # hostname
   - set system host-name '${local_hostname}'
@@ -133,3 +136,10 @@ write_files:
     permissions: "0644"
     content: |
       ${indent(6, root_ca)}
+
+power_state:
+  delay: now
+  mode: reboot
+  message: reboot
+  timeout: 2
+  condition: true
