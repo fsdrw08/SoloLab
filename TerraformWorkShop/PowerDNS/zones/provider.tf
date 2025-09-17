@@ -5,6 +5,10 @@ terraform {
       version = ">= 1.5.1"
     }
   }
+  backend "pg" {
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.vyos.sololab:443/tfstate?sslmode=require&sslrootcert="
+    schema_name = "PowerDNS-zones"
+  }
 }
 
 provider "powerdns" {
