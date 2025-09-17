@@ -24,9 +24,11 @@ resource "null_resource" "load_image" {
         AVAILABLE_IMAGES=($(sudo podman image list --format "{{.Repository}}:{{.Tag}}"))
 
         if [[ ! " $${AVAILABLE_IMAGES[*]} " =~ " $CONTAINER_IMAGE " ]]; then
+          echo "image not in podman"
           if [[ -n "$ARCHIVE_IMAGE" ]]; then
             echo "Loading image $CONTAINER_IMAGE"
             if [ -f "$ARCHIVE_IMAGE" ]; then
+                echo "load image from file"
                 sudo podman load --input $ARCHIVE_IMAGE
             else
                 sudo podman pull ${var.workload.pull_flag} $CONTAINER_IMAGE

@@ -111,8 +111,9 @@ module "vyos_container" {
     cidr_prefix = "172.16.20.0/24"
   }
   workload = {
-    name        = "zot"
-    image       = "quay.io/giantswarm/zot-linux-amd64:v2.1.8"
+    name = "zot"
+    # image       = "quay.io/giantswarm/zot-linux-amd64:v2.1.8"
+    image       = "192.168.255.10:5000/giantswarm/zot:v2.1.7"
     local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.8.tar"
     pull_flag   = "--tls-verify=false"
     others = {
