@@ -61,10 +61,20 @@ module "config_map" {
         content  = jsonencode(yamldecode(file("${path.module}/attachments/config-htpasswd.yaml")))
       },
       # for htpasswd auth
+      # https://zotregistry.dev/v2.1.8/articles/authn-authz/#htpasswd
       {
         basename = "htpasswd"
         content  = "admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa"
       },
+      # for ldap auth
+      # https://zotregistry.dev/v2.1.8/articles/authn-authz/#server-side-authentication
+      # {
+      #   basename = "config-ldap-credentials.json"
+      #   content = jsonencode({
+      #     bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
+      #     bindPassword = "P@ssw0rd"
+      #   })
+      # }
     ]
     secrets = [
       {
@@ -88,20 +98,6 @@ module "config_map" {
   }
 }
 
-# for ldap auth
-# To allow for separation of configuration and credentials, 
-# the credentials for the LDAP server are specified in a separate file, as shown in the following example.
-# resource "system_file" "ldap_credential" {
-#   depends_on = module.config_map[]
-#   path       = "/etc/zot/config-ldap-credentials.json"
-#   content = jsonencode({
-#     bindDN       = "uid=readonly,ou=Services,dc=root,dc=sololab"
-#     bindPassword = "P@ssw0rd"
-#   })
-#   uid = var.owner.uid
-#   gid = var.owner.gid
-# }
-
 module "vyos_container" {
   depends_on = [module.config_map]
   source     = "../../modules/vyos-container"
@@ -110,29 +106,31 @@ module "vyos_container" {
     name        = "zot"
     cidr_prefix = "172.16.20.0/24"
   }
-  workload = {
-    name = "zot"
-    # image       = "quay.io/giantswarm/zot-linux-amd64:v2.1.8"
-    image       = "192.168.255.10:5000/giantswarm/zot:v2.1.7"
-    local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.8.tar"
-    pull_flag   = "--tls-verify=false"
-    others = {
-      "uid"                  = var.owner.uid
-      "gid"                  = var.owner.gid
-      "environment TZ value" = "Asia/Shanghai"
-      # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
-      "environment SSL_CERT_DIR value" = "/etc/zot/certs"
-      "network zot address"            = "172.16.20.10"
+  workloads = [
+    {
+      name  = "zot"
+      image = "quay.io/giantswarm/zot-linux-amd64:v2.1.8"
+      # image       = "192.168.255.10:5000/giantswarm/zot:v2.1.8"
+      local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.8.tar"
+      pull_flag   = "--tls-verify=false"
+      others = {
+        "uid"                  = var.owner.uid
+        "gid"                  = var.owner.gid
+        "environment TZ value" = "Asia/Shanghai"
+        # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
+        "environment SSL_CERT_DIR value" = "/etc/zot/certs"
+        "network zot address"            = "172.16.20.10"
 
-      "volume zot_config source"      = "/etc/zot"
-      "volume zot_config destination" = "/etc/zot"
-      "volume zot_config mode"        = "ro"
-      "volume zot_data source"        = "/mnt/data/zot"
-      "volume zot_data destination"   = "/var/lib/registry"
-      "volume zot_tmp source"         = "/mnt/data/zot-tmp"
-      "volume zot_tmp destination"    = "/tmp"
+        "volume zot_config source"      = "/etc/zot"
+        "volume zot_config destination" = "/etc/zot"
+        "volume zot_config mode"        = "ro"
+        "volume zot_data source"        = "/mnt/data/zot"
+        "volume zot_data destination"   = "/var/lib/registry"
+        "volume zot_tmp source"         = "/mnt/data/zot-tmp"
+        "volume zot_tmp destination"    = "/tmp"
+      }
     }
-  }
+  ]
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
@@ -176,8 +174,8 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy backend zot_vyos"
       configs = {
         "mode"                = "http"
-        "server pdns address" = "172.16.20.10"
-        "server pdns port"    = "5000"
+        "server vyos address" = "172.16.20.10"
+        "server vyos port"    = "5000"
       }
     }
   }

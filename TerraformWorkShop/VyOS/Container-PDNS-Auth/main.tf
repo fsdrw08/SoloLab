@@ -69,30 +69,29 @@ module "vyos_container" {
     name        = "powerdns"
     cidr_prefix = "172.16.40.0/24"
   }
-  workload = {
-    name      = "powerdns"
-    image     = "172.16.20.10:5000/powerdns/pdns-auth-50:5.0.0"
-    pull_flag = "--tls-verify=false"
+  workloads = [
+    {
+      name      = "powerdns"
+      image     = "172.16.20.10:5000/powerdns/pdns-auth-50:5.0.0"
+      pull_flag = "--tls-verify=false"
+      # local_image = ""
+      others = {
+        "environment TZ value"                = "Asia/Shanghai"
+        "environment PDNS_AUTH_API_KEY value" = "powerdns"
+        "environment PNDS_DNSUPDATE value"    = "yes"
 
-    local_image = ""
-    others = {
-      # "memory"                   = "1024"
+        "network powerdns address"                                   = "172.16.40.10"
+        "sysctl parameter net.ipv4.ip_unprivileged_port_start value" = "53"
 
-      "environment TZ value"                = "Asia/Shanghai"
-      "environment PDNS_AUTH_API_KEY value" = "powerdns"
-      "environment PNDS_DNSUPDATE value"    = "yes"
+        "volume pdns_entrypoint source"      = "/etc/powerdns/entrypoint.sh"
+        "volume pdns_entrypoint destination" = "/etc/powerdns/entrypoint.sh"
+        "volume pdns_data source"            = "/mnt/data/powerdns"
+        "volume pdns_data destination"       = "/var/lib/powerdns"
 
-      "network powerdns address"                                   = "172.16.40.10"
-      "sysctl parameter net.ipv4.ip_unprivileged_port_start value" = "53"
-
-      "volume pdns_entrypoint source"      = "/etc/powerdns/entrypoint.sh"
-      "volume pdns_entrypoint destination" = "/etc/powerdns/entrypoint.sh"
-      "volume pdns_data source"            = "/mnt/data/powerdns"
-      "volume pdns_data destination"       = "/var/lib/powerdns"
-
-      "entrypoint" = "/usr/bin/tini -- /etc/powerdns/entrypoint.sh"
+        "entrypoint" = "/usr/bin/tini -- /etc/powerdns/entrypoint.sh"
+      }
     }
-  }
+  ]
 }
 
 data "terraform_remote_state" "cert" {
@@ -102,41 +101,40 @@ data "terraform_remote_state" "cert" {
   }
 }
 
-locals {
-  certs = [
-    for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-    if cert.name == "wildcard.vyos"
-  ]
-}
+# locals {
+#   certs = [
+#     for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
+#     if cert.name == "wildcard.vyos"
+#   ]
+# }
 
-resource "vyos_config_block_tree" "pki" {
-  path = "pki certificate wildcard.vyos"
-  configs = {
-    "certificate" = join("",
-      slice(
-        split("\n", local.certs.0["cert_pem"]),
-        1,
-        length(
-          split("\n", local.certs.0["cert_pem"])
-        ) - 2
-      )
-    )
-    "private key" = join("",
-      slice(
-        split("\n", local.certs.0["key_pkcs8"]),
-        1,
-        length(
-          split("\n", local.certs.0["key_pkcs8"])
-        ) - 2
-      )
-    )
-  }
-}
+# resource "vyos_config_block_tree" "pki" {
+#   path = "pki certificate wildcard.vyos"
+#   configs = {
+#     "certificate" = join("",
+#       slice(
+#         split("\n", local.certs.0["cert_pem"]),
+#         1,
+#         length(
+#           split("\n", local.certs.0["cert_pem"])
+#         ) - 2
+#       )
+#     )
+#     "private key" = join("",
+#       slice(
+#         split("\n", local.certs.0["key_pkcs8"]),
+#         1,
+#         length(
+#           split("\n", local.certs.0["key_pkcs8"])
+#         ) - 2
+#       )
+#     )
+#   }
+# }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
     module.vyos_container,
-    vyos_config_block_tree.pki
   ]
   for_each = {
     l4_frontend = {

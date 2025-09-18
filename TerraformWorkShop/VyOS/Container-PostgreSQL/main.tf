@@ -94,72 +94,60 @@ module "vyos_container" {
     name        = "postgresql"
     cidr_prefix = "172.16.50.0/24"
   }
-  workload = {
-    name      = "postgresql"
-    image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
-    pull_flag = "--tls-verify=false"
+  workloads = [
+    {
+      name      = "postgresql"
+      image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
+      pull_flag = "--tls-verify=false"
 
-    # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
-    others = {
-      "environment TZ value"                        = "Asia/Shanghai"
-      "environment POSTGRESQL_USER value"           = "terraform"
-      "environment POSTGRESQL_PASSWORD value"       = "terraform"
-      "environment POSTGRESQL_DATABASE value"       = "tfstate"
-      "environment POSTGRESQL_ADMIN_PASSWORD value" = "P@ssw0rd"
+      # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
+      others = {
+        "environment TZ value"                        = "Asia/Shanghai"
+        "environment POSTGRESQL_ADMIN_PASSWORD value" = "P@ssw0rd"
+        "environment POSTGRESQL_DATABASE value"       = "tfstate"
+        "environment POSTGRESQL_USER value"           = "terraform"
+        "environment POSTGRESQL_PASSWORD value"       = "terraform"
 
-      "network postgresql address" = "172.16.50.10"
+        "network postgresql address" = "172.16.50.10"
 
-      # "volume postgresql_conf source"      = "/etc/postgresql/ssl.conf"
-      # "volume postgresql_conf destination" = "/opt/app-root/src/postgresql-cfg"
-      # "volume postgresql_cert source"      = "/etc/postgresql/certs"
-      # "volume postgresql_cert destination" = "/opt/app-root/src/certs"
-      "volume postgresql_data source"      = "/mnt/data/postgresql"
-      "volume postgresql_data destination" = "/var/lib/pgsql/data"
+        # "volume postgresql_conf source"      = "/etc/postgresql/ssl.conf"
+        # "volume postgresql_conf destination" = "/opt/app-root/src/postgresql-cfg"
+        # "volume postgresql_cert source"      = "/etc/postgresql/certs"
+        # "volume postgresql_cert destination" = "/opt/app-root/src/certs"
+        "volume postgresql_data source"      = "/mnt/data/postgresql"
+        "volume postgresql_data destination" = "/var/lib/pgsql/data"
+      }
     }
-  }
-}
-
-resource "vyos_config_block_tree" "reverse_proxy" {
-  depends_on = [
-    module.vyos_container,
   ]
-  for_each = {
-    l4_frontend = {
-      path = "load-balancing haproxy service tcp443 rule 50"
-      configs = {
-        "ssl"         = "req-ssl-sni"
-        "domain-name" = "tfbackend-pg.vyos.sololab"
-        "set backend" = "pgsql_vyos_ssl"
-      }
-    }
-    l4_backend = {
-      path = "load-balancing haproxy backend pgsql_vyos_ssl"
-      configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "127.0.0.1"
-        "server vyos port"    = "5432"
-      }
-    }
-    l7_frontend = {
-      path = "load-balancing haproxy service tcp5432"
-      configs = {
-        "listen-address"  = "127.0.0.1"
-        "port"            = "5432"
-        "mode"            = "tcp"
-        "backend"         = "pgsql_vyos"
-        "ssl certificate" = "vyos"
-      }
-    }
-    l7_backend = {
-      path = "load-balancing haproxy backend pgsql_vyos"
-      configs = {
-        "mode"                = "http"
-        "server vyos address" = "172.16.50.10"
-        "server vyos port"    = "5432"
-      }
-    }
-  }
-  path    = each.value.path
-  configs = each.value.configs
 }
+
+# resource "vyos_config_block_tree" "reverse_proxy" {
+#   depends_on = [
+#     module.vyos_container,
+#   ]
+#   for_each = {
+#     l4_frontend = {
+#       path = "load-balancing haproxy service tcp15432"
+#       configs = {
+#         "mode"                      = "tcp"
+#         "port"                      = "15432"
+#         "tcp-request inspect-delay" = "5000"
+#         "ssl certificate"           = "vyos"
+#         "rule 10 ssl"               = "ssl-fc-sni"
+#         "rule 10 domain-name"       = "tf-backend-pg.vyos.sololab"
+#         "rule 10 set backend"       = "psql_vyos"
+#       }
+#     }
+#     l4_backend = {
+#       path = "load-balancing haproxy backend psql_vyos"
+#       configs = {
+#         "mode"                = "tcp"
+#         "server vyos address" = "172.16.50.10"
+#         "server vyos port"    = "5432"
+#       }
+#     }
+#   }
+#   path    = each.value.path
+#   configs = each.value.configs
+# }
 

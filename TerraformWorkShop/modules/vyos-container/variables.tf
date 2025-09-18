@@ -16,12 +16,12 @@ variable "network" {
   default = null
 }
 
-variable "workload" {
-  type = object({
+variable "workloads" {
+  type = list(object({
     name        = string
     image       = string
     local_image = optional(string, "")
     pull_flag   = optional(string, "")
     others      = map(string)
-  })
+  }))
 }

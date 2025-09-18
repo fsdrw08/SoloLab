@@ -25,37 +25,13 @@ module "config_map" {
     files = [
       {
         basename = "Corefile"
-        content  = <<-EOT
-          (common) {
-            reload 2s
-            log
-          }
-          .:53 {
-            bind 127.0.0.1
-            hosts {
-              192.168.255.1 api.vyos.sololab
-              192.168.255.1 zot.vyos.sololab
-              192.168.255.1 pdns-auth.vyos.sololab
-              192.168.255.1 tfbackend-pg.vyos.sololab
-            }
-            forward sololab 172.16.2.10:1053
-            forward . 192.168.255.1
-            import common
-          }
-          https://.:44353 {
-            bind 127.0.0.1
-            tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
-            hosts {
-              192.168.255.1 api.vyos.sololab
-              192.168.255.1 zot.vyos.sololab
-              192.168.255.1 pdns-auth.vyos.sololab
-              192.168.255.1 tfbackend-pg.vyos.sololab
-            }
-            forward sololab 172.16.2.10:1053
-            forward . 192.168.255.1
-            import common
-          }
-        EOT
+        content = templatefile("./attachments/Corefile.tftpl", {
+          int_facing_addr = "192.168.255.1"
+          int_facing_ns   = "192.168.255.10:53"
+          ext_facing_addr = "192.168.255.2"
+          ext_facing_ns   = "172.16.40.10:53"
+          public_ns       = "119.29.29.29"
+        })
       }
     ]
     secrets = [
@@ -82,21 +58,23 @@ module "vyos_container" {
   ]
   source  = "../../modules/vyos-container"
   vm_conn = var.prov_system
-  workload = {
-    name      = "coredns"
-    image     = "172.16.20.10:5000/coredns/coredns:1.12.4"
-    pull_flag = "--tls-verify=false"
-    others = {
-      "allow-host-networks"  = ""
-      "arguments"            = "-conf /etc/coredns/Corefile"
-      "uid"                  = 1002
-      "gid"                  = 100
-      "environment TZ value" = "Asia/Shanghai"
+  workloads = [
+    {
+      name      = "coredns"
+      image     = "172.16.20.10:5000/coredns/coredns:1.12.4"
+      pull_flag = "--tls-verify=false"
+      others = {
+        "allow-host-networks"  = ""
+        "arguments"            = "-conf /etc/coredns/Corefile"
+        "uid"                  = 1002
+        "gid"                  = 100
+        "environment TZ value" = "Asia/Shanghai"
 
-      "volume coredns source"      = "/etc/coredns"
-      "volume coredns destination" = "/etc/coredns"
+        "volume coredns source"      = "/etc/coredns"
+        "volume coredns destination" = "/etc/coredns"
+      }
     }
-  }
+  ]
 }
 
 # resource "vyos_config_block_tree" "pki" {
