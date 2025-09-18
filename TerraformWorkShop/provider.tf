@@ -20,6 +20,10 @@ terraform {
       source  = "hashicorp/archive"
       version = ">= 2.7.1"
     }
+    lynx = {
+      source  = "Clivern/lynx"
+      version = ">= 0.3.0"
+    }
     ct = {
       source  = "poseidon/ct"
       version = ">= 0.13.0"

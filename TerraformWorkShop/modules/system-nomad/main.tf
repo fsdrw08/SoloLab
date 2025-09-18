@@ -2,6 +2,7 @@
 resource "system_group" "group" {
   count = var.runas.take_charge == true ? 1 : 0
   name  = var.runas.group
+  gid   = var.runas.gid
 }
 
 resource "system_user" "user" {
