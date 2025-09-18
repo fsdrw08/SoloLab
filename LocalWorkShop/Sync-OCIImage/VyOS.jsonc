@@ -40,6 +40,14 @@
         "description": "https://quay.io/repository/sclorg/postgresql-16-c10s?tab=tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "clivern/lynx:0.12.9",
+        "archive": "docker.io_clivern_lynx_0.12.9.tar",
+        "privateRegistry": "zot.vyos.sololab.dev",
+        "privateRepo": "clivern/lynx:0.12.9",
+        "description": "https://hub.docker.com/r/clivern/lynx?tab=tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "cockpit/ws:346",
         "archive": "quay.io_cockpit_ws_346.tar",

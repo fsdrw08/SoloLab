@@ -33,19 +33,19 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20250827",
-        "archive": "quay.io_fedora_postgresql-16_20250827.tar",
-        "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "fedora/postgresql-16:20250827",
-        "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
-    },
-    {
-        "publicRegistry": "quay.io",
         "publicRepo": "sclorg/postgresql-16-c10s:20250827",
         "archive": "quay.io_sclorg_postgresql-16-c10s_20250827.tar",
         "privateRegistry": "192.168.255.10:5000",
         "privateRepo": "sclorg/postgresql-16-c10s:20250827",
         "description": "https://quay.io/repository/sclorg/postgresql-16-c10s?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "clivern/lynx:0.12.9",
+        "archive": "docker.io_clivern_lynx_0.12.9.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "clivern/lynx:0.12.9",
+        "description": "https://hub.docker.com/r/clivern/lynx?tab=tags",
     },
     {
         "publicRegistry": "quay.io",

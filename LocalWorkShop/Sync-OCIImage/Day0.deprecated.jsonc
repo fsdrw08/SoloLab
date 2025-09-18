@@ -8,6 +8,14 @@
         "description": "https://hub.docker.com/r/powerdns/pdns-recursor-49",
     },
     {
+        "publicRegistry": "quay.io",
+        "publicRepo": "fedora/postgresql-16:20250827",
+        "archive": "quay.io_fedora_postgresql-16_20250827.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "fedora/postgresql-16:20250827",
+        "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
+    },
+    {
         "publicRegistry": "docker.cloudsmith.io",
         "publicRepo": "isc/docker/kea-dhcp4:2.7.7-20250326",
         "archive": "docker.cloudsmith.io_isc_docker_kea-dhcp4_2.7.7-20250326.tar",
