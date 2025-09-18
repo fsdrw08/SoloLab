@@ -33,12 +33,12 @@ vm = {
       dynamic_mac_address = false
       static_mac_address  = "0000FEE1600D"
     },
-    # {
-    #   name                = "LAN1-P2"
-    #   switch_name         = "Internal Switch"
-    #   dynamic_mac_address = false
-    #   static_mac_address  = "0000FEE1900D"
-    # },
+    {
+      name                = "LAN1-P2"
+      switch_name         = "Internal Switch"
+      dynamic_mac_address = false
+      static_mac_address  = "0000FEE1900D"
+    },
   ]
   enable_secure_boot = "Off"
   power_state        = "Running"
@@ -62,33 +62,34 @@ cloudinit_nocloud = [
   {
     content_source = "./cloudinit-tmpl/user-data-circinus"
     content_vars = {
-      int_desc                        = "MGMT"
-      int_addr                        = "192.168.255.1"
-      int_cidr                        = "192.168.255.0/24"
-      dhcp_subnet_id                  = "1"
-      dhcp_name_server                = "192.168.255.10"
-      dhcp_domain_name                = "sololab"
-      dhcp_start_ip                   = "192.168.255.100"
-      dhcp_stop_ip                    = "192.168.255.200"
-      dns_forward_listen_addr         = "192.168.255.1" # only receive internal dns request
-      dns_forward_allow_from          = "192.168.255.0/24"
-      dns_forward_1                   = "223.5.5.5"
-      dns_forward_2                   = "114.114.114.114"
-      dns_private_domain              = "sololab"
-      dns_private_domain_forward_addr = "192.168.255.1"
-      dns_private_domain_forward_port = "1053"
-      dns_api_fqdn                    = "api.vyos.sololab"
-      dns_api_ip                      = "192.168.255.1"
-      haproxy_listen_addr_int         = "192.168.255.1"
-      haproxy_listen_addr_ext         = "192.168.255.1"
-      api_key_id                      = "MY-HTTPS-API-ID"
-      api_key_content                 = "MY-HTTPS-API-PLAINTEXT-KEY"
-      api_listen_addr                 = "127.0.0.1"
-      api_listen_port                 = "8443"
-      local_hostname                  = "VyOS"
-      user_ssh_key                    = "AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=="
-      ntp_server                      = "cn.ntp.org.cn"
-      time_zone                       = "Asia/Shanghai"
+      eth1_desc               = "MGMT"
+      eth1_cidr               = "192.168.255.1/24"
+      eth1_addr               = "192.168.255.1"
+      eth2_cidr               = "192.168.255.2/24"
+      eth2_desc               = "dummy ext"
+      int_range               = "192.168.255.0/24"
+      dhcp_network_name       = "MGMT"
+      dhcp_subnet_id          = "1"
+      dhcp_name_server        = "192.168.255.10"
+      dhcp_domain_name        = "sololab"
+      dhcp_range_start        = "192.168.255.100"
+      dhcp_range_stop         = "192.168.255.200"
+      dns_forward_listen_addr = "192.168.255.1" # only receive internal dns request
+      dns_forward_allow_from  = "192.168.255.0/24"
+      dns_forward_1           = "223.5.5.5"
+      dns_forward_2           = "114.114.114.114"
+      dns_api_fqdn            = "api.vyos.sololab"
+      dns_api_ip              = "192.168.255.1"
+      haproxy_listen_addr_int = "192.168.255.1"
+      haproxy_listen_addr_ext = "192.168.255.1"
+      api_key_id              = "MY-HTTPS-API-ID"
+      api_key_content         = "MY-HTTPS-API-PLAINTEXT-KEY"
+      api_listen_addr         = "127.0.0.1"
+      api_listen_port         = "8443"
+      local_hostname          = "VyOS"
+      user_ssh_key            = "AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ=="
+      ntp_server              = "cn.ntp.org.cn"
+      time_zone               = "Asia/Shanghai"
     }
     filename = "user-data"
   }
