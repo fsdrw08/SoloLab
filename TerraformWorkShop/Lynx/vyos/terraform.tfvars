@@ -1,8 +1,5 @@
 # https://github.com/Clivern/terraform-provider-lynx?tab=readme-ov-file#usage
-prov_lynx = {
-  api_url = "https://lynx.vyos.sololab/api/v1"
-  api_key = ""
-}
+prov_lynx_api_url = "https://lynx.vyos.sololab/api/v1"
 
 # one user can be assigned to multi teams
 users = [
@@ -34,13 +31,13 @@ projects = [
     environments = [
       {
         iac_id   = "cd10b85e"
-        name     = "prod"
+        name     = "PowerDNS"
         username = "terraform"
         secret   = "terraform"
       },
       {
         iac_id   = "de0d6901"
-        name     = "test"
+        name     = "HAProxy"
         username = "terraform"
         secret   = "terraform"
       },

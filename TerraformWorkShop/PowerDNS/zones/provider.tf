@@ -5,9 +5,16 @@ terraform {
       version = ">= 1.5.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@tfbackend-pg.vyos.sololab:443/tfstate?sslmode=require&sslrootcert="
-    schema_name = "PowerDNS-zones"
+  backend "http" {
+    // Best to define as environment variable $ export TF_HTTP_USERNAME=terraform
+    username = "terraform"
+    // Best to define as environment variable $ export TF_HTTP_PASSWORD=terraform
+    password       = "terraform"
+    address        = "https://lynx.vyos.sololab/client/devops/sololab-vyos/powerdns/state"
+    lock_address   = "https://lynx.vyos.sololab/client/devops/sololab-vyos/powerdns/lock"
+    unlock_address = "https://lynx.vyos.sololab/client/devops/sololab-vyos/powerdns/unlock"
+    lock_method    = "POST"
+    unlock_method  = "POST"
   }
 }
 

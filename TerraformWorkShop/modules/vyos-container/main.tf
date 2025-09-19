@@ -69,12 +69,12 @@ resource "null_resource" "load_image" {
       EOT
     ]
   }
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "sudo podman image rm ${self.triggers.image}"
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   when = destroy
+  #   inline = [
+  #     "sudo podman image rm ${self.triggers.image}"
+  #   ]
+  # }
   lifecycle {
     create_before_destroy = true
   }

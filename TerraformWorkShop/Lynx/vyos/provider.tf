@@ -8,6 +8,6 @@ terraform {
 }
 
 provider "lynx" {
-  api_url = var.prov_lynx.api_url
-  api_key = var.prov_lynx.api_key
+  api_url = var.prov_lynx_api_url
+  api_key = var.prov_lynx_api_key
 }

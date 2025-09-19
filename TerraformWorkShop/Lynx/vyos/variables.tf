@@ -1,8 +1,9 @@
-variable "prov_lynx" {
-  type = object({
-    api_url = string
-    api_key = string
-  })
+variable "prov_lynx_api_url" {
+  type = string
+}
+
+variable "prov_lynx_api_key" {
+  type = string
 }
 
 variable "users" {
