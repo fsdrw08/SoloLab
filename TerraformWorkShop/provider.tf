@@ -20,6 +20,10 @@ terraform {
       source  = "hashicorp/archive"
       version = ">= 2.7.1"
     }
+    tfe = {
+      source  = "hashicorp/tfe"
+      version = ">= 0.69.0"
+    }
     lynx = {
       source  = "Clivern/lynx"
       version = ">= 0.3.0"

@@ -41,6 +41,14 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "leg100/otfd:0.4.1",
+        "archive": "docker.io_leg100_oftd_0.4.1.tar",
+        "privateRegistry": "zot.vyos.sololab.dev",
+        "privateRepo": "leg100/otfd:0.4.1",
+        "description": "https://hub.docker.com/r/leg100/otfd?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "clivern/lynx:0.12.9",
         "archive": "docker.io_clivern_lynx_0.12.9.tar",
         "privateRegistry": "zot.vyos.sololab.dev",
