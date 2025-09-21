@@ -57,6 +57,14 @@
     },
     {
         "publicRegistry": "quay.io",
+        "publicRepo": "minio/minio:RELEASE.2025-09-07T16-13-09Z",
+        "archive": "quay.io_minio_minio_RELEASE.2025-09-07T16-13-09Z.tar",
+        "privateRegistry": "zot.vyos.sololab.dev",
+        "privateRepo": "minio/minio:RELEASE.2025-09-07T16-13-09Z",
+        "description": "https://quay.io/repository/minio/minio?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
         "publicRepo": "cockpit/ws:346",
         "archive": "quay.io_cockpit_ws_346.tar",
         "privateRegistry": "zot.vyos.sololab.dev",

@@ -76,7 +76,8 @@ minio:
     MINIO_SERVER_URL: https://minio-api.day1.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
     MINIO_BROWSER_REDIRECT_URL: https://minio-console.day1.sololab
-    # https://min.io/docs/minio/linux/reference/minio-server/settings/metrics-and-logging.html#id14
+    # https://docs.min.io/community/minio-object-store/operations/monitoring/collect-minio-metrics-using-prometheus.html?_gl=1*18d2nvn*_gcl_au*MTEwOTU2NjM0NS4xNzU4MzcyNjA5*_ga*NjcwMTcwNzIyLjE3NDQ1NTMxNTM.*_ga_SY0M3KFH50*czE3NTgzNzI2MDEkbzckZzEkdDE3NTgzNzQ5MzckajU0JGwwJGgxNDE0ODk1Nzgz#configure-prometheus-to-collect-and-alert-using-minio-metrics
+    # https://docs.min.io/community/minio-object-store/reference/minio-server/settings/metrics-and-logging.html#envvar.MINIO_PROMETHEUS_AUTH_TYPE
     MINIO_PROMETHEUS_AUTH_TYPE: public
   extraEnvVars:
     - name: TZ
