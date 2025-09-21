@@ -1,6 +1,7 @@
 (common) {
   reload 2s
   log
+  errors
 }
 .:53 {
   bind 127.0.0.1
@@ -8,10 +9,11 @@
     ${int_facing_addr} api.vyos.sololab
     ${int_facing_addr} zot.vyos.sololab
     ${int_facing_addr} pdns-auth.vyos.sololab
-    ${int_facing_addr} lynx.vyos.sololab
+    ${int_facing_addr} minio-api.vyos.sololab
+    ${int_facing_addr} minio-console.vyos.sololab
     fallthrough
   }
-  forward sololab ${int_facing_ns}
+  forward sololab ${ext_facing_ns}
   forward . ${public_ns}
   import common
 }
@@ -22,7 +24,8 @@ https://.:44353 {
     ${ext_facing_addr} api.vyos.sololab
     ${ext_facing_addr} zot.vyos.sololab
     ${ext_facing_addr} pdns-auth.vyos.sololab
-    ${ext_facing_addr} lynx.vyos.sololab
+    ${ext_facing_addr} minio-api.vyos.sololab
+    ${ext_facing_addr} minio-console.vyos.sololab
     fallthrough
   }
   forward sololab ${ext_facing_ns}
