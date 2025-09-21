@@ -72,7 +72,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "powerdns"
-      image     = "172.16.20.10:5000/powerdns/pdns-auth-50:5.0.0"
+      image     = "zot.vyos.sololab/powerdns/pdns-auth-50:5.0.0"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
@@ -94,44 +94,6 @@ module "vyos_container" {
   ]
 }
 
-data "terraform_remote_state" "cert" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
-  }
-}
-
-# locals {
-#   certs = [
-#     for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-#     if cert.name == "wildcard.vyos"
-#   ]
-# }
-
-# resource "vyos_config_block_tree" "pki" {
-#   path = "pki certificate wildcard.vyos"
-#   configs = {
-#     "certificate" = join("",
-#       slice(
-#         split("\n", local.certs.0["cert_pem"]),
-#         1,
-#         length(
-#           split("\n", local.certs.0["cert_pem"])
-#         ) - 2
-#       )
-#     )
-#     "private key" = join("",
-#       slice(
-#         split("\n", local.certs.0["key_pkcs8"]),
-#         1,
-#         length(
-#           split("\n", local.certs.0["key_pkcs8"])
-#         ) - 2
-#       )
-#     )
-#   }
-# }
-
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [
     module.vyos_container,
@@ -142,11 +104,11 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "pdns-auth.vyos.sololab"
-        "set backend" = "pdns_vyos_ssl"
+        "set backend" = "vyos_pdns_ssl"
       }
     }
     l4_backend = {
-      path = "load-balancing haproxy backend pdns_vyos_ssl"
+      path = "load-balancing haproxy backend vyos_pdns_ssl"
       configs = {
         "mode"                = "tcp"
         "server vyos address" = "127.0.0.1"
@@ -154,17 +116,17 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       }
     }
     l7_frontend = {
-      path = "load-balancing haproxy service tcp8081"
+      path = "load-balancing haproxy service vyos_pdns_ssl"
       configs = {
         "listen-address"  = "127.0.0.1"
         "port"            = "8081"
         "mode"            = "tcp"
-        "backend"         = "pdns_vyos"
+        "backend"         = "vyos_pdns"
         "ssl certificate" = "vyos"
       }
     }
     l7_backend = {
-      path = "load-balancing haproxy backend pdns_vyos"
+      path = "load-balancing haproxy backend vyos_pdns"
       configs = {
         "mode"                = "http"
         "server pdns address" = "172.16.40.10"

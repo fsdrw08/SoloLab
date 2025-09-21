@@ -141,7 +141,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "zot.vyos.sololab.dev"
-        "set backend" = "zot_vyos_ssl"
+        "set backend" = "vyos_zot_ssl"
       }
     }
     l4_frontend2 = {
@@ -149,11 +149,11 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "zot.vyos.sololab"
-        "set backend" = "zot_vyos_ssl"
+        "set backend" = "vyos_zot_ssl"
       }
     }
     l4_backend = {
-      path = "load-balancing haproxy backend zot_vyos_ssl"
+      path = "load-balancing haproxy backend vyos_zot_ssl"
       configs = {
         "mode"                = "tcp"
         "server vyos address" = "127.0.0.1"
@@ -161,17 +161,17 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       }
     }
     l7_frontend = {
-      path = "load-balancing haproxy service tcp5000"
+      path = "load-balancing haproxy service vyos_zot_ssl"
       configs = {
         "listen-address"  = "127.0.0.1"
         "port"            = "5000"
         "mode"            = "tcp"
-        "backend"         = "zot_vyos"
+        "backend"         = "vyos_zot"
         "ssl certificate" = "vyos"
       }
     }
     l7_backend = {
-      path = "load-balancing haproxy backend zot_vyos"
+      path = "load-balancing haproxy backend vyos_zot"
       configs = {
         "mode"                = "http"
         "server vyos address" = "172.16.20.10"

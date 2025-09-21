@@ -5,16 +5,24 @@ terraform {
       version = ">= 0.3.4"
     }
   }
-  backend "http" {
-    // Best to define as environment variable $ export TF_HTTP_USERNAME=terraform
-    username = "terraform"
-    // Best to define as environment variable $ export TF_HTTP_PASSWORD=terraform
-    password       = "terraform"
-    address        = "https://lynx.vyos.sololab/client/devops/sololab-vyos/haproxy/state"
-    lock_address   = "https://lynx.vyos.sololab/client/devops/sololab-vyos/haproxy/lock"
-    unlock_address = "https://lynx.vyos.sololab/client/devops/sololab-vyos/haproxy/unlock"
-    lock_method    = "POST"
-    unlock_method  = "POST"
+  backend "s3" {
+    bucket = "tfstate"      # Name of the S3 bucket
+    key    = "VyOS/HAProxy" # Name of the tfstate file
+
+    endpoints = {
+      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
+    }
+
+    access_key = "minioadmin" # Access and secret keys
+    secret_key = "minioadmin"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
+    insecure                    = true
   }
 }
 

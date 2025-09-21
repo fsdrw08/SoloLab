@@ -4,98 +4,80 @@ prov_vyos = {
 }
 
 reverse_proxy = {
-  zot_frontend = {
+  day0_zot_frontend = {
     path = "load-balancing haproxy service tcp443 rule 100"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "zot.day0.sololab"
-      "set backend" = "zot_http"
+      "set backend" = "day0_zot"
     }
   }
-  zot_backend = {
-    path = "load-balancing haproxy backend zot_http"
+  day0_zot_backend = {
+    path = "load-balancing haproxy backend day0_zot"
     configs = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"
       "server day0 port"    = "443"
     }
   }
-  tcp5432 = {
-    path = "load-balancing haproxy service tcp5432"
-    configs = {
-      mode                  = "tcp"
-      port                  = "5432"
-      "rule 10 ssl"         = "req-ssl-sni"
-      "rule 10 domain-name" = "tfbackend-pg.day0.sololab"
-      "rule 10 set backend" = "tfbackend_pg"
-    }
-  }
-  tfbackend_pg_backend = {
-    path = "load-balancing haproxy backend tfbackend_pg"
-    configs = {
-      "mode"                = "tcp"
-      "server day0 address" = "192.168.255.10"
-      "server day0 port"    = "5432"
-    }
-  }
-  etcd_frontend = {
+  day0_etcd_frontend = {
     path = "load-balancing haproxy service tcp443 rule 110"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "etcd-0.day0.sololab"
-      "set backend" = "etcd_http"
+      "set backend" = "day0_etcd"
     }
   }
-  etcd_backend = {
-    path = "load-balancing haproxy backend etcd_http"
+  day0_etcd_backend = {
+    path = "load-balancing haproxy backend day0_etcd"
     configs = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"
       "server day0 port"    = "443"
     }
   }
-  traefik_day0_frontend = {
+  day0_traefik_frontend = {
     path = "load-balancing haproxy service tcp443 rule 120"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "traefik.day0.sololab"
-      "set backend" = "traefik_day0_http"
+      "set backend" = "day0_traefik"
     }
   }
-  traefik_day0_backend = {
-    path = "load-balancing haproxy backend traefik_day0_http"
+  day0_traefik_backend = {
+    path = "load-balancing haproxy backend day0_traefik"
     configs = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"
       "server day0 port"    = "443"
     }
   }
-  cockpit_frontend = {
+  day0_cockpit_frontend = {
     path = "load-balancing haproxy service tcp443 rule 130"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "cockpit.day0.sololab"
-      "set backend" = "cockpit_http"
+      "set backend" = "day0_cockpit"
     }
   }
-  cockpit_backend = {
-    path = "load-balancing haproxy backend cockpit_http"
+  day0_cockpit_backend = {
+    path = "load-balancing haproxy backend day0_cockpit"
     configs = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"
       "server day0 port"    = "443"
     }
   }
-  lldap_frontend = {
+  day0_lldap_frontend = {
     path = "load-balancing haproxy service tcp443 rule 140"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "lldap.day0.sololab"
-      "set backend" = "lldap_http"
+      "set backend" = "day0_lldap"
     }
   }
-  lldap_backend = {
-    path = "load-balancing haproxy backend lldap_http"
+  day0_lldap_backend = {
+    path = "load-balancing haproxy backend day0_lldap"
     configs = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"

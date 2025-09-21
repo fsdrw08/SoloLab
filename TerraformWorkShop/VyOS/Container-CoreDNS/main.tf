@@ -116,11 +116,11 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "doh.sololab.dev"
-        "set backend" = "coredns_vyos"
+        "set backend" = "vyos_coredns"
       }
     }
     l4_backend = {
-      path = "load-balancing haproxy backend coredns_vyos"
+      path = "load-balancing haproxy backend vyos_coredns"
       configs = {
         "mode"                = "tcp"
         "server vyos port"    = "44353"
