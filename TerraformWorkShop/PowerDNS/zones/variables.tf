@@ -19,19 +19,19 @@ variable "zones" {
   }))
 }
 
-variable "prov_remote" {
-  type = object({
-    host     = string
-    port     = number
-    user     = string
-    password = string
-  })
-}
+# variable "prov_remote" {
+#   type = object({
+#     host     = string
+#     port     = number
+#     user     = string
+#     password = string
+#   })
+# }
 
-variable "post_process" {
-  type = map(object({
-    script_path = string
-    vars        = map(string)
-  }))
-  default = null
-}
+# variable "post_process" {
+#   type = map(object({
+#     script_path = string
+#     vars        = map(string)
+#   }))
+#   default = null
+# }
