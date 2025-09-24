@@ -96,6 +96,39 @@ module "vyos_container" {
   }
   workloads = [
     {
+      name      = "postgrest"
+      image     = "zot.vyos.sololab/postgrest/postgrest:v13.0.7"
+      pull_flag = "--tls-verify=false"
+
+      # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
+      others = {
+        "environment TZ value"           = "Asia/Shanghai"
+        "environment PGRST_DB_URI value" = "postgres://terraform:terraform@postgresql/tfstate"
+        # https://postgrest.org/en/stable/references/configuration.html#openapi-server-proxy-uri
+        "environment PGRST_DB_SCHEMAS value"               = "public"
+        "environment PGRST_DB_ANON_ROLE value"             = "terraform"
+        "environment PGRST_OPENAPI_SERVER_PROXY_URI value" = "http://172.16.50.20:3000"
+        "environment PGRST_OPENAPI_MODE value"             = "ignore-privileges"
+
+        "network postgresql address" = "172.16.50.20"
+
+      }
+    },
+    {
+      name      = "swagger"
+      image     = "zot.vyos.sololab/swaggerapi/swagger-ui:v5.29.0"
+      pull_flag = "--tls-verify=false"
+
+      # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
+      others = {
+        "environment TZ value" = "Asia/Shanghai"
+
+        "environment API_URL value" = "https://postgrest.vyos.sololab/"
+
+        "network postgresql address" = "172.16.50.30"
+      }
+    },
+    {
       name      = "postgresql"
       image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
       pull_flag = "--tls-verify=false"
@@ -110,6 +143,10 @@ module "vyos_container" {
 
         "network postgresql address" = "172.16.50.10"
 
+        "port pgsql source"      = "5432"
+        "port pgsql destination" = "5432"
+        "port pgsql protocol"    = "tcp"
+
         # "volume postgresql_conf source"      = "/etc/postgresql/ssl.conf"
         # "volume postgresql_conf destination" = "/opt/app-root/src/postgresql-cfg"
         # "volume postgresql_cert source"      = "/etc/postgresql/certs"
@@ -121,33 +158,80 @@ module "vyos_container" {
   ]
 }
 
-# resource "vyos_config_block_tree" "reverse_proxy" {
-#   depends_on = [
-#     module.vyos_container,
-#   ]
-#   for_each = {
-#     l4_frontend = {
-#       path = "load-balancing haproxy service tcp15432"
-#       configs = {
-#         "mode"                      = "tcp"
-#         "port"                      = "15432"
-#         "tcp-request inspect-delay" = "5000"
-#         "ssl certificate"           = "vyos"
-#         "rule 10 ssl"               = "ssl-fc-sni"
-#         "rule 10 domain-name"       = "tf-backend-pg.vyos.sololab"
-#         "rule 10 set backend"       = "psql_vyos"
-#       }
-#     }
-#     l4_backend = {
-#       path = "load-balancing haproxy backend psql_vyos"
-#       configs = {
-#         "mode"                = "tcp"
-#         "server vyos address" = "172.16.50.10"
-#         "server vyos port"    = "5432"
-#       }
-#     }
-#   }
-#   path    = each.value.path
-#   configs = each.value.configs
-# }
-
+resource "vyos_config_block_tree" "reverse_proxy" {
+  depends_on = [
+    module.vyos_container,
+  ]
+  for_each = {
+    l4_frontend_postgrest = {
+      path = "load-balancing haproxy service tcp443 rule 50"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "postgrest.vyos.sololab"
+        "set backend" = "vyos_postgrest_ssl"
+      }
+    }
+    l4_backend_postgrest = {
+      path = "load-balancing haproxy backend vyos_postgrest_ssl"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "3000"
+      }
+    }
+    l7_frontend_postgrest = {
+      path = "load-balancing haproxy service vyos_postgrest_ssl"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "3000"
+        "mode"            = "tcp"
+        "backend"         = "vyos_postgrest"
+        "ssl certificate" = "vyos"
+      }
+    }
+    l7_backend_postgrest = {
+      path = "load-balancing haproxy backend vyos_postgrest"
+      configs = {
+        "mode"                = "http"
+        "server vyos address" = "172.16.50.20"
+        "server vyos port"    = "3000"
+      }
+    }
+    l4_frontend_swagger = {
+      path = "load-balancing haproxy service tcp443 rule 55"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "swagger.vyos.sololab"
+        "set backend" = "vyos_swagger_ssl"
+      }
+    }
+    l4_backend_swagger = {
+      path = "load-balancing haproxy backend vyos_swagger_ssl"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "8080"
+      }
+    }
+    l7_frontend_swagger = {
+      path = "load-balancing haproxy service vyos_swagger_ssl"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "8080"
+        "mode"            = "tcp"
+        "backend"         = "vyos_swagger"
+        "ssl certificate" = "vyos"
+      }
+    }
+    l7_backend_swagger = {
+      path = "load-balancing haproxy backend vyos_swagger"
+      configs = {
+        "mode"                = "http"
+        "server vyos address" = "172.16.50.30"
+        "server vyos port"    = "8080"
+      }
+    }
+  }
+  path    = each.value.path
+  configs = each.value.configs
+}

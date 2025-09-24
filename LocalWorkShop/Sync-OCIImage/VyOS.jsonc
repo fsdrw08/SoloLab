@@ -41,6 +41,22 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "postgrest/postgrest:v13.0.7",
+        "archive": "docker.io_postgrest_postgrest_v13.0.7.tar",
+        "privateRegistry": "zot.vyos.sololab.dev",
+        "privateRepo": "postgrest/postgrest:v13.0.7",
+        "description": "https://hub.docker.com/r/postgrest/postgrest/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "swaggerapi/swagger-ui:v5.29.0",
+        "archive": "docker.io_swaggerapi_swagger-ui_v5.29.0.tar",
+        "privateRegistry": "zot.vyos.sololab.dev",
+        "privateRepo": "swaggerapi/swagger-ui:v5.29.0",
+        "description": "https://hub.docker.com/r/swaggerapi/swagger-ui/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "leg100/otfd:0.4.1",
         "archive": "docker.io_leg100_oftd_0.4.1.tar",
         "privateRegistry": "zot.vyos.sololab.dev",
