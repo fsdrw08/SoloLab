@@ -1,10 +1,3 @@
-# fetch data disk info
-data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_tfstate.backend.type
-  config  = var.vm.vhd.data_disk_tfstate.backend.config
-}
-
 # load secret from vault
 locals {
   secrets_vault_kvv2 = flatten([
@@ -62,6 +55,13 @@ locals {
   certs = data.terraform_remote_state.tfstate == null ? null : {
     for cert in local.cert_list : cert.name => cert
   }
+}
+
+# fetch data disk info
+data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
+  backend = var.vm.vhd.data_disk_tfstate.backend.type
+  config  = var.vm.vhd.data_disk_tfstate.backend.config
 }
 
 locals {

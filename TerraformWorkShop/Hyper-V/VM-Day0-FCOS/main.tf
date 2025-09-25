@@ -1,3 +1,63 @@
+
+# load secret from vault
+locals {
+  secrets_vault_kvv2 = flatten([
+    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : {
+      mount = secret.vault_kvv2.mount
+      name  = secret.vault_kvv2.name
+    }
+    if secret.vault_kvv2 != null
+  ])
+  secret_var_keys = flatten([
+    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
+      for value_set in secret.value_sets : [
+        value_set.name
+      ]
+    ]
+    # if secret.vault_kvv2 != null
+    if secret.tfstate != null
+  ])
+  tls_tfstate = flatten([
+    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : {
+      backend = secret.tfstate.backend
+      name    = secret.tfstate.cert_name
+    }
+    if secret.tfstate != null
+  ])
+}
+
+# load cert from local tls
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tls_tfstate == null ? null : {
+    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
+
+locals {
+  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
+      for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
+      if cert.name == secret.tfstate.cert_name
+    ]
+    if secret.tfstate != null
+  ])
+  certs = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.cert_list : cert.name => cert
+  }
+  secret_var_values = flatten([
+    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
+      for value_set in secret.value_sets : [
+        # data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key]
+        local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+      ]
+    ]
+    # if secret.vault_kvv2 != null
+    if secret.tfstate != null
+  ])
+}
+
 # fetch data disk info
 data "terraform_remote_state" "data_disk" {
   count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
@@ -25,7 +85,11 @@ data "ct_config" "ignition" {
   count = var.vm.count
   content = templatefile(
     var.butane.files.base,
-    merge(var.butane.vars.global, var.butane.vars.local[count.index])
+    merge(
+      var.butane.vars.global,
+      var.butane.vars.local[count.index],
+      zipmap(local.secret_var_keys, local.secret_var_values)
+    )
   )
   strict       = true
   pretty_print = false
@@ -34,7 +98,11 @@ data "ct_config" "ignition" {
     for file in var.butane.files.others :
     templatefile(
       file,
-      merge(var.butane.vars.global, var.butane.vars.local[count.index])
+      merge(
+        var.butane.vars.global,
+        var.butane.vars.local[count.index],
+        zipmap(local.secret_var_keys, local.secret_var_values)
+      )
     )
   ]
 }

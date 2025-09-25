@@ -57,8 +57,10 @@ butane = {
       "prefix"                   = 24
       "gateway"                  = "192.168.255.1"
       "general_dns"              = "192.168.255.1;192.168.255.10"
-      "domain"                   = "sololab."
-      "domain_dns"               = "192.168.255.10"
+      "domain_vyos"              = "vyos.sololab."
+      "domain_vyos_dns"          = "192.168.255.1"
+      "domain_sololab"           = "sololab."
+      "domain_sololab_dns"       = "192.168.255.10"
       "packages"                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge pcp-zeroconf xfsdump"
       "password_hash_1000"       = "$y$j9T$cDLwsV9ODTV31Dt4SuVGa.$FU0eRT9jawPhIV3IV24W7obZ3PaJuBCVp7C9upDCcgD"
       "ssh_authorized_keys_1000" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
@@ -67,9 +69,30 @@ butane = {
     }
     local = [
       {
-        "vm_name" = "day0"
-        "ip"      = "192.168.255.10"
+        "vm_name"            = "day0"
+        "ip"                 = "192.168.255.10"
+        "fcos_image_mirror"  = "zot.vyos.sololab/fedora/fedora-coreos"
+        "fcos_rebase_mirror" = "ostree-unverified-registry:zot.vyos.sololab/fedora/fedora-coreos:stable"
       }
+    ]
+    secrets = [
+      {
+        tfstate = {
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
+          }
+          cert_name = "root"
+        }
+        value_sets = [
+          {
+            name          = "ca_content"
+            value_ref_key = "ca"
+          }
+        ]
+      },
     ]
   }
 }

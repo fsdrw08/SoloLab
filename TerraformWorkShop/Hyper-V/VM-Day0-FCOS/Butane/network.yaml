@@ -37,5 +37,7 @@ storage:
       contents:
         inline: |
           [Resolve]
-          DNS=${domain_dns}
-          Domains=${domain}
+          DNS=${domain_vyos_dns}
+          Domains=${domain_vyos}
+          DNS=${domain_sololab_dns}
+          Domains=${domain_sololab}
