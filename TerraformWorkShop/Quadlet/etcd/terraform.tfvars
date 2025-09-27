@@ -34,7 +34,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "etcd-server"
+            cert_name = "etcd-server.day0"
           }
         }
       ]
@@ -67,7 +67,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run etcd-server\""
-            Restart       = "on-failure"
+            Restart       = "no"
           }
         },
       ]
@@ -80,14 +80,6 @@ podman_quadlet = {
 }
 
 post_process = {
-  # "Add-EtcdUser.sh" = {
-  #   script_path = "./attachments/Add-EtcdUser.sh"
-  #   vars = {
-  #     CONTAINER_NAME = "etcd-server"
-  #     ENDPOINTS      = "unix://localhost:0"
-  #     ROOT_PASSWORD  = "P@ssw0rd"
-  #   }
-  # }
   "Enable-UserAuth.sh" = {
     script_path = "./attachments/Enable-UserAuth.sh"
     vars = {

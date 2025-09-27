@@ -18,8 +18,7 @@ etcd:
   ##     hostIP: 192.168.255.10
   ##     protocol: TCP
   ##
-  containerPorts:
-    []
+  containerPorts: []
     # - name: client
     #   containerPort: 2379
     #   hostPort: 2379
