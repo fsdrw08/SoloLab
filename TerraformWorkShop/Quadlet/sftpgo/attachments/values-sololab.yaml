@@ -1,0 +1,40 @@
+global:
+  imageRegistry: zot.day0.sololab
+sftpgo:
+  configFiles:
+    sftpgo:
+      data_provider:
+        create_default_admin: true
+      httpd:
+        bindings:
+          - address: 127.0.0.1
+            port: 2080
+      # plugins:
+      #   - type: auth
+      #     auth_options:
+      #       scope: 5
+      #     cmd: /usr/local/bin/sftpgo-plugin-auth
+      #     args:
+      #       - serve
+      #       - --config-file=/etc/sftpgo/sftp-plugin-auth.json
+    # https://github.com/chris2fr/nixops/blob/ec7a97ab16b8c13aee43c1332e440a365bb3bf2a/hetzner/etc/sftpgo/sftpgo-plugin-auth.json
+    # sftp-plugin-auth: {}
+
+  extraEnvVars:
+    - name: SFTPGO_DEFAULT_ADMIN_USERNAME
+      value: admin
+    - name: SFTPGO_DEFAULT_ADMIN_PASSWORD
+      value: P@ssw0rd
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.sftpgo-http.entrypoints: web
+    traefik.http.routers.sftpgo-http.rule: Host(`sftpgo.day0.sololab`)
+    traefik.http.routers.sftpgo-http.service: sftpgo
+
+    traefik.http.routers.sftpgo.entrypoints: webSecure
+    traefik.http.routers.sftpgo.rule: Host(`sftpgo.day0.sololab`)
+    traefik.http.routers.sftpgo.tls: true
+    traefik.http.routers.sftpgo.service: sftpgo
+
+    traefik.http.services.sftpgo.loadbalancer.server.port: 2080

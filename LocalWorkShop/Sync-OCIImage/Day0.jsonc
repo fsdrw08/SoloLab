@@ -65,6 +65,14 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "drakkan/sftpgo:v2.6.6-plugins",
+        "archive": "docker.io_drakkan_sftpgo_v2.6.6-plugins.tar",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "drakkan/sftpgo:v2.6.6-plugins",
+        "description": "https://hub.docker.com/r/drakkan/sftpgo/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "lldap/lldap:v0.6.2-alpine-rootless",
         "archive": "docker.io_lldap_lldap_v0.6.2-alpine-rootless.tar",
         "privateRegistry": "192.168.255.10:5000",

@@ -110,7 +110,7 @@ zones = [
         type = "A"
         ttl  = 60
         results = [
-          "192.168.255.2"
+          "192.168.255.10"
         ]
       },
       {
@@ -139,6 +139,22 @@ zones = [
       },
       {
         fqdn = "dufs.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "sftpgo.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "whoami.day0.sololab."
         type = "A"
         ttl  = 60
         results = [
