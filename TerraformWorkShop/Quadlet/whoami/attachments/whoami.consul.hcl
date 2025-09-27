@@ -1,29 +1,19 @@
 services {
-  id      = "whoami-web"
-  name    = "whoami"
-  port    = 4646
+  id   = "whoami"
+  name = "whoami"
+  port = 443 # 8081
 
   checks = [
     {
-      id       = "whoami-tcp-check-4646"
-      name     = "whoami-tcp-check-4646"
-      tcp      = "192.168.255.20:4646"
-      interval = "20s"
-      timeout  = "2s"
+      # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
+      id              = "whoami-http-check"
+      name            = "whoami-http-check"
+      http            = "http://localhost:8081/"
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
+      status          = "passing"
     }
   ]
 
-  tags = [
-    "traefik.enable=true",
-    "traefik.tcp.routers.whoami-web.entrypoints=webSecure",
-    "traefik.tcp.routers.whoami-web.rule=HostSNI(`whoami.day1.sololab`)",
-    "traefik.tcp.routers.whoami-web.tls.passthrough=true",
-    # "traefik.http.routers.whoami-web-redirect.entrypoints=web",
-    # "traefik.http.routers.whoami-web-redirect.rule=Host(`whoami.day1.sololab`)",
-    # "traefik.http.routers.whoami-web-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.whoami-web.entrypoints=websecure",
-    # "traefik.http.routers.whoami-web.rule=Host(`whoami.day1.sololab`)",
-    # "traefik.http.routers.whoami-web.tls=true",
-    # "traefik.http.services.whoami-web.loadbalancer.server.scheme=https",
-  ]
 }

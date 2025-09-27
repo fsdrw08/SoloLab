@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -12,68 +12,33 @@ prov_vault = {
   skip_tls_verify = true
 }
 
-podman_kube = {
-  helm = {
-    name       = "whoami"
-    chart      = "../../../HelmWorkShop/helm-charts/charts/whoami"
-    value_file = "./attachments/values-sololab.yaml"
-    value_sets = [
-      {
-        name         = "whoami.configFiles.main.advertise.http"
-        value_string = "192.168.255.20"
-      },
-      {
-        name         = "whoami.configFiles.main.advertise.rpc"
-        value_string = "192.168.255.20"
-      },
-      {
-        name         = "whoami.configFiles.main.advertise.serf"
-        value_string = "192.168.255.20"
-      },
-    ]
-    tls_value_sets = {
-      value_ref = {
-        vault_kvv2 = {
-          mount = "kvv2-certs"
-          name  = "whoami.day1.sololab"
-        }
-      }
-      value_sets = [
-        {
-          name          = "whoami.tls.contents.ca\\.crt"
-          value_ref_key = "ca"
-        },
-        {
-          name          = "whoami.tls.contents.server\\.crt"
-          value_ref_key = "cert"
-        },
-        {
-          name          = "whoami.tls.contents.server\\.key"
-          value_ref_key = "private_key"
-        },
-      ]
-    }
-  }
-  manifest_dest_path = "/home/podmgr/.config/containers/systemd/whoami-aio.yaml"
-}
-
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
   units = [
     {
       files = [
         {
-          template = "./attachments/whoami-container.kube"
+          template = "./attachments/whoami.container"
           # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
           vars = {
-            Description   = "Tiny Go webserver that prints OS information and HTTP request to output."
-            Documentation = "https://github.com/traefik/whoami, https://hub.docker.com/r/traefik/whoami"
+            # unit
+            Description           = "Tiny Go webserver that prints OS information and HTTP request to output."
+            Documentation         = "https://github.com/traefik/whoami, https://hub.docker.com/r/traefik/whoami"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            # kube
             yaml          = "whoami-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
-            ExecStartPre  = "sleep 3"
             KubeDownForce = "false"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "no"
           }
-          dir = "/home/podmgr/.config/containers/systemd"
         },
       ]
       service = {
@@ -81,20 +46,5 @@ podman_quadlet = {
         status = "start"
       }
     },
-  ]
-}
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns.day0.sololab"
-}
-
-dns_record = {
-  zone = "day1.sololab."
-  name = "whoami.day1.sololab."
-  type = "A"
-  ttl  = 86400
-  records = [
-    "192.168.255.20"
   ]
 }

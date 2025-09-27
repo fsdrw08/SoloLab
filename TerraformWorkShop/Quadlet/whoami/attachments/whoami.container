@@ -1,0 +1,41 @@
+# https://www.freedesktop.org/software/systemd/man/257/systemd.unit.html
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+After=${After}
+Wants=${Wants}
+StartLimitIntervalSec=${StartLimitIntervalSec}
+StartLimitBurst=${StartLimitBurst}
+
+# https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
+[Service]
+ExecStartPre=${ExecStartPre}
+ExecStartPost=${ExecStartPost}
+Restart=${Restart}
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+# https://github.com/containers/prometheus-podman-exporter/blob/main/install.md#container-image
+[Container]
+ContainerName=whoami
+
+Image=zot.day0.sololab/traefik/whoami:v1.10
+Exec="--port=8081"
+
+Label="traefik.enable=true"
+
+Label="traefik.http.routers.whoami-redirect.entrypoints=web"
+Label="traefik.http.routers.whoami-redirect.rule=Host(`whoami.day0.sololab`)"
+Label="traefik.http.routers.whoami-redirect.middlewares=toHttps@file"
+Label="traefik.http.routers.whoami-redirect.service=whoami"
+
+Label="traefik.http.routers.whoami.entryPoints=webSecure"
+Label="traefik.http.routers.whoami.rule=Host(`whoami.day0.sololab`)"
+Label="traefik.http.routers.whoami.tls=true"
+Label="traefik.http.routers.whoami.service=whoami"
+
+Label="traefik.http.services.whoami.loadbalancer.server.port=8081"
+
+PodmanArgs=${PodmanArgs}
+Network=${Network}
+[Install]
+WantedBy=default.target
