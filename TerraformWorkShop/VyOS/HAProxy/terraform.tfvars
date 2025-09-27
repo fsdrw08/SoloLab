@@ -10,6 +10,7 @@ reverse_proxy = {
       "mode"                = "tcp"
       "server day0 address" = "192.168.255.10"
       "server day0 port"    = "443"
+      "server day0"         = "send-proxy-v2"
     }
   }
   day0_frontend_zot = {
@@ -57,6 +58,22 @@ reverse_proxy = {
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "dufs.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
+  day0_frontend_sftpgo = {
+    path = "load-balancing haproxy service tcp443 rule 160"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "sftpgo.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
+  day0_frontend_whoami = {
+    path = "load-balancing haproxy service tcp443 rule 170"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "whoami.day0.sololab"
       "set backend" = "day0"
     }
   }
