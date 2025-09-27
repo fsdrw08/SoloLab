@@ -1,0 +1,22 @@
+[
+    {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "aquasecurity/trivy-db:2",
+        "archive": "db.tar.gz",
+        "ociFileMediaType": "application/vnd.aquasec.trivy.db.layer.v1.tar+gzip",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "aquasecurity/trivy-db:2",
+        "manifestFile": "trivy-db-manifest.json",
+        "description": "https://github.com/aquasecurity/trivy-db/pkgs/container/trivy-db"
+    },
+    {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "aquasecurity/trivy-java-db:1",
+        "archive": "javadb.tar.gz",
+        "ociFileMediaType": "application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip",
+        "privateRegistry": "192.168.255.10:5000",
+        "privateRepo": "aquasecurity/trivy-java-db:1",
+        "manifestFile": "trivy-javadb-manifest.json",
+        "description": "https://github.com/aquasecurity/trivy-java-db/pkgs/container/trivy-java-db"
+    }
+]

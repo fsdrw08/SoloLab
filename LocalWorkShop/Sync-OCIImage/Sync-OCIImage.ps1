@@ -77,9 +77,9 @@ if (-not (Test-Path -Path $LocalStore)) {
 
 
 ## pull
-# $proxy="127.0.0.1:7890"
+$proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"
-# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
         if (-not (Test-Path -Path $LocalStore/$($_.archive))) {

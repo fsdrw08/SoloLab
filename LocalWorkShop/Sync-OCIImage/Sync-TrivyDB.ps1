@@ -68,6 +68,7 @@ $syncList | ConvertFrom-Json | ForEach-Object {
     }
 }
 
+## ensuer dir exist
 # $LocalStore = "$env:PUBLIC/Downloads/containers/trivy"
 # $LocalStore="D:/Users/Public/Downloads/containers"
 if (-not (Test-Path $LocalStore)) {
@@ -78,9 +79,9 @@ $currentLocation=Get-Location | Select-Object -ExpandProperty Path
 
 ## pull
 ## https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
-# $proxy="127.0.0.1:7890"
+$proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"
-# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
         if (-not (Test-Path -Path $LocalStore/$($_.archive))) {
