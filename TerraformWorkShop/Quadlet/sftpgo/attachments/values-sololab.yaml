@@ -2,24 +2,64 @@ global:
   imageRegistry: zot.day0.sololab
 sftpgo:
   configFiles:
+    # https://github.com/drakkan/sftpgo/blob/v2.6.6/sftpgo.json
     sftpgo:
+      # https://docs.sftpgo.com/2.6/config-file/#common
+      common:
+        # The built-in defender allows you to configure an auto-blocking policy for SFTPGo and thus helps to prevent DoS (Denial of Service) and brute force password guessing.
+        defender:
+          enabled: true
       data_provider:
         create_default_admin: true
+        # https://github.com/drakkan/sftpgo/issues/1341#issuecomment-1658761001
+        users_base_dir: /srv/sftpgo/data
       httpd:
         bindings:
           - address: 127.0.0.1
             port: 2080
-      # plugins:
-      #   - type: auth
-      #     auth_options:
-      #       scope: 5
-      #     cmd: /usr/local/bin/sftpgo-plugin-auth
-      #     args:
-      #       - serve
-      #       - --config-file=/etc/sftpgo/sftp-plugin-auth.json
+      plugins:
+        - type: auth
+          auth_options:
+            scope: 5
+          cmd: /usr/local/bin/sftpgo-plugin-auth
+          args:
+            - serve
+            - --config-file=/etc/sftpgo/sftp-plugin-auth.json
     # https://github.com/chris2fr/nixops/blob/ec7a97ab16b8c13aee43c1332e440a365bb3bf2a/hetzner/etc/sftpgo/sftpgo-plugin-auth.json
-    # sftp-plugin-auth: {}
-
+    # https://github.com/sftpgo/sftpgo-plugin-auth
+    sftp-plugin-auth:
+      configs:
+        - dial_urls:
+            - ldaps://lldap.day0.sololab
+          # List of absolute paths to extra CA certificates to trust
+          ca_certificates:
+            - /etc/sftpgo/certs/ca.crt
+          base_dn: dc=root,dc=sololab
+          bind_dn: cn=readonly,ou=people,dc=root,dc=sololab
+          password: readonly
+          ## lldap use uid as immutable user id
+          search_query: (&(uid=%username%)(objectClass=person)(memberOf=cn=sso_allow,ou=groups,dc=root,dc=sololab))
+          ## ref: https://docs.sftpgo.com/2.6/groups/
+          ## ref: https://github.com/sftpgo/sftpgo-plugin-auth/tree/v1.0.11?tab=readme-ov-file#configuration
+          ## sftpgo ldap authenticator will:
+          ## 1. auth user from ldap,
+          ## 2. get ldap user group info from attribute `memberof`
+          ## 3. map sftpgo's primary group, secondary groups, membership groups
+          ##    to user's ldap groups by:
+          ##      primary_group_prefix
+          ##      secondary_group_prefix
+          ##      membership_group_prefix
+          group_attributes:
+            - memberOf
+          sftpgo_user_requirements: 0
+          require_groups: true
+          primary_group_prefix: app-sftpgo-prim
+          secondary_group_prefix: app-sftpgo-sec
+          membership_group_prefix: app-sftpgo-mem
+  tls:
+    mountPath: /etc/sftpgo/certs
+    contents:
+      ca.crt: # set by terraform data
   extraEnvVars:
     - name: SFTPGO_DEFAULT_ADMIN_USERNAME
       value: admin
@@ -28,9 +68,10 @@ sftpgo:
 
   podLabels:
     traefik.enable: true
-    traefik.http.routers.sftpgo-http.entrypoints: web
-    traefik.http.routers.sftpgo-http.rule: Host(`sftpgo.day0.sololab`)
-    traefik.http.routers.sftpgo-http.service: sftpgo
+    traefik.http.routers.sftpgo-redirect.entrypoints: web
+    traefik.http.routers.sftpgo-redirect.rule: Host(`sftpgo.day0.sololab`)
+    traefik.http.routers.sftpgo-redirect.middlewares: toHttps@file
+    traefik.http.routers.sftpgo-redirect.service: sftpgo
 
     traefik.http.routers.sftpgo.entrypoints: webSecure
     traefik.http.routers.sftpgo.rule: Host(`sftpgo.day0.sololab`)

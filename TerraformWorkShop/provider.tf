@@ -28,6 +28,10 @@ terraform {
       source  = "Clivern/lynx"
       version = ">= 0.3.0"
     }
+    powerdns = {
+      source  = "pyama86/powerdns"
+      version = ">= 1.5.1"
+    }
     ct = {
       source  = "poseidon/ct"
       version = ">= 0.13.0"
@@ -48,13 +52,13 @@ terraform {
       source  = "Ferlab-Ste-Justine/etcd"
       version = ">= 0.11.0"
     }
-    powerdns = {
-      source  = "pyama86/powerdns"
-      version = ">= 1.5.1"
-    }
     lldap = {
       source  = "tasansga/lldap"
       version = ">= 0.3.0"
+    }
+    sftpgo = {
+      source  = "drakkan/sftpgo"
+      version = ">= 0.0.18"
     }
     vault = {
       source  = "hashicorp/vault"

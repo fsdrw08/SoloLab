@@ -11,6 +11,25 @@ podman_kubes = [
       name       = "sftpgo"
       chart      = "../../../HelmWorkShop/helm-charts/charts/sftpgo"
       value_file = "./attachments/values-sololab.yaml"
+      secrets = [
+        {
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "root"
+          }
+          value_sets = [
+            {
+              name          = "sftpgo.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            }
+          ]
+        }
+      ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/sftpgo-aio.yaml"
   },
