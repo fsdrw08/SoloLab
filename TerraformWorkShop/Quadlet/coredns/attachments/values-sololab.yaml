@@ -38,6 +38,16 @@ coredns:
         - name: reload
         - name: log
     - zones:
+        - zone: vyos.sololab
+      port: 53
+      plugins:
+        - name: bind
+          parameters: "{{ .Values.coredns.hostIP }}"
+        - name: errors
+        - name: log
+        - name: forward
+          parameters: . 192.168.255.1
+    - zones:
         - zone: sololab
       port: 53
       plugins:

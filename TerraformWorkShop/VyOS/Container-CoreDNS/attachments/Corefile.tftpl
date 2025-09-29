@@ -13,7 +13,8 @@
     ${int_facing_addr} minio-console.vyos.sololab
     fallthrough
   }
-  forward sololab ${ext_facing_ns}
+  forward vyos.sololab ${ext_facing_ns}
+  forward sololab ${int_facing_ns}
   forward . ${public_ns}
   import common
 }
