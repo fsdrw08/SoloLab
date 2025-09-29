@@ -7,10 +7,10 @@ reverse_proxy = {
   day0_backend = {
     path = "load-balancing haproxy backend day0"
     configs = {
-      "mode"                = "tcp"
-      "server day0 address" = "192.168.255.10"
-      "server day0 port"    = "443"
-      "server day0"         = "send-proxy-v2"
+      "mode"                      = "tcp"
+      "server day0 address"       = "192.168.255.10"
+      "server day0 port"          = "443"
+      "server day0 send-proxy-v2" = ""
     }
   }
   day0_frontend_zot = {
