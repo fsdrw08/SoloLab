@@ -4,6 +4,16 @@ prov_sftpgo = {
   password = "P@ssw0rd"
 }
 
+virtual_folders = [
+  {
+    name        = "ignition"
+    mapped_path = "/srv/sftpgo/data/ignition"
+    filesystem = {
+      provider = 0
+    }
+  }
+]
+
 groups = [
   {
     name = "app-sftpgo-prim-ignition"
@@ -12,11 +22,13 @@ groups = [
         provider = 0
       }
     }
-    virtual_folders = [{
-      name         = "ignition"
-      virtual_path = "/ignition"
-      quota_size   = 0
-      quota_files  = 0
-    }]
+    virtual_folders = [
+      {
+        name         = "ignition"
+        virtual_path = "/ignition"
+        quota_size   = 0
+        quota_files  = 0
+      }
+    ]
   }
 ]

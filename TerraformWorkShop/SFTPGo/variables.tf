@@ -7,6 +7,20 @@ variable "prov_sftpgo" {
   })
 }
 
+variable "virtual_folders" {
+  type = list(object({
+    name = string
+    filesystem = object({
+      # 0 = local filesystem, 
+      # 1 = S3 Compatible, 2 = Google Cloud, 3 = Azure Blob,
+      # 4 = Local encrypted, 5 = SFTP, 6 = HTTP
+      provider = number
+    })
+    description = optional(string, null)
+    mapped_path = optional(string, null)
+  }))
+}
+
 variable "groups" {
   type = list(object({
     name = string
