@@ -13,6 +13,15 @@ reverse_proxy = {
       "server day0 send-proxy-v2" = ""
     }
   }
+  day1_backend = {
+    path = "load-balancing haproxy backend day1"
+    configs = {
+      "mode"                      = "tcp"
+      "server day0 address"       = "192.168.255.20"
+      "server day0 port"          = "443"
+      "server day0 send-proxy-v2" = ""
+    }
+  }
   day0_frontend_zot = {
     path = "load-balancing haproxy service tcp443 rule 100"
     configs = {
@@ -75,6 +84,22 @@ reverse_proxy = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "whoami.day0.sololab"
       "set backend" = "day0"
+    }
+  }
+  day1_frontend_vault = {
+    path = "load-balancing haproxy service tcp443 rule 200"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "vault.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
+  day1_frontend_consul = {
+    path = "load-balancing haproxy service tcp443 rule 210"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "consul.day1.sololab"
+      "set backend" = "day1"
     }
   }
 }

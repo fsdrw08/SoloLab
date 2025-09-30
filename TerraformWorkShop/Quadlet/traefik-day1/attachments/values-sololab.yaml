@@ -33,11 +33,17 @@ traefik:
           forwardedHeaders:
             trustedIPs:
               - "0.0.0.0/0"
+          proxyProtocol:
+            trustedIPs:
+              - 192.168.255.1
         webSecure:
           address: ":443"
           forwardedHeaders:
             trustedIPs:
               - "0.0.0.0/0"
+          proxyProtocol:
+            trustedIPs:
+              - 192.168.255.1
       certificatesResolvers:
         external:
           acme:
