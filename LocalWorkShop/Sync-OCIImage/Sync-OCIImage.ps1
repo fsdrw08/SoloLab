@@ -28,6 +28,14 @@ param (
     )]
     $Upload=$true,
 
+    [Parameter()]
+    [string]
+    [ValidateSet(
+        "zot.vyos.sololab.dev",
+        "192.168.255.10:5000"
+    )]
+    $PrivateRegistry = "192.168.255.10:5000",
+
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]
     [System.Management.Automation.Credential()]
@@ -40,18 +48,12 @@ if (!(Get-Command skopeo.exe)) {
 }
 
 $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile)
-# $repoDir = git rev-parse --show-toplevel
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\VyOS.jsonc")
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day0.jsonc")
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day1.jsonc")
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day2.jsonc")
 
 ## validate json
 $referenceObject = @(
     "publicRegistry"
     "publicRepo"
     "archive"
-    "privateRegistry"
     "privateRepo"
     )
 $syncList | ConvertFrom-Json | ForEach-Object {
@@ -97,15 +99,14 @@ if ($Download) {
 $proxy=$null
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Upload) {
-    
     $syncList | ConvertFrom-Json | ForEach-Object {
         if (Test-Path -Path $LocalStore/$($_.archive)) {
-            Write-Host "Upload OCI image OCI archive $LocalStore/$($_.archive) to $($_.privateRegistry)/$($_.privateRepo)"
+            Write-Host "Upload OCI image OCI archive $LocalStore/$($_.archive) to $($PrivateRegistry)/$($_.privateRepo)"
             skopeo copy --insecure-policy `
-            --dest-tls-verify=false `
-            --dest-creds="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)" `
-            oci-archive:$LocalStore/$($_.archive) `
-            docker://$($_.privateRegistry)/$($_.privateRepo)
+                --dest-tls-verify=false `
+                --dest-creds="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)" `
+                oci-archive:$LocalStore/$($_.archive) `
+                docker://$($PrivateRegistry)/$($_.privateRepo)
         }
         Start-Sleep -Seconds 1
     }
