@@ -69,29 +69,28 @@ butane = {
       {
         "vm_name"            = "day1"
         "ip"                 = "192.168.255.20"
-        "ca_cert_url"        = "http://dufs.day0.sololab/certs/root.crt"
         "fcos_image_mirror"  = "zot.day0.sololab/fedora/fedora-coreos"
         "fcos_rebase_mirror" = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
       }
     ]
-    # secrets = [
-    #   {
-    #     tfstate = {
-    #       backend = {
-    #         type = "local"
-    #         config = {
-    #           path = "../../TLS/RootCA/terraform.tfstate"
-    #         }
-    #       }
-    #       cert_name = "root"
-    #     }
-    #     value_sets = [
-    #       {
-    #         name          = "ca_content"
-    #         value_ref_key = "ca"
-    #       }
-    #     ]
-    #   },
-    # ]
+    secrets = [
+      {
+        tfstate = {
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
+          }
+          cert_name = "root"
+        }
+        value_sets = [
+          {
+            name          = "ca_content"
+            value_ref_key = "ca"
+          }
+        ]
+      },
+    ]
   }
 }
