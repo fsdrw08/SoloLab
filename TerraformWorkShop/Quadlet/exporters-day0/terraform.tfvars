@@ -31,11 +31,12 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "prometheus-podman-exporter-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
             # service
             ExecStartPre  = ""
             ExecStartPost = ""

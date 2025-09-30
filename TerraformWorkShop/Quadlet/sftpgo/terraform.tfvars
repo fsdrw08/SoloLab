@@ -51,11 +51,12 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "sftpgo-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run sftpgo-server\""
