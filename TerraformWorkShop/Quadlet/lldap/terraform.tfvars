@@ -57,7 +57,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "lldap"
+            cert_name = "lldap.day0"
           }
         }
       ]

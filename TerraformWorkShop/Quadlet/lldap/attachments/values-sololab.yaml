@@ -17,10 +17,10 @@ lldap:
       - name: net.ipv4.ip_unprivileged_port_start
         value: "389"
   config:
-    # https://github.com/lldap/lldap/blob/1f89059c84d700ca198b2785657f33f438ea3e11/server/src/healthcheck.rs#L74
-    # health check function only support localhost
     # ldap_host: 192.168.255.10
     # ldap_port: 389
+    # https://github.com/lldap/lldap/blob/1f89059c84d700ca198b2785657f33f438ea3e11/server/src/healthcheck.rs#L74
+    # health check function only support localhost
     http_host: 127.0.0.1
     # http_port: 17170
     jwt_secret: REPLACE_WITH_RANDOM
