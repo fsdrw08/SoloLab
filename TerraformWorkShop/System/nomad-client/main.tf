@@ -70,23 +70,25 @@ module "nomad" {
   }
   install = [
     {
-      zip_file_source = "http://dufs.day0.sololab/binaries/nomad_1.10.4_linux_amd64.zip"
+      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad_1.10.4_linux_amd64.zip"
       zip_file_path   = "/var/home/core/nomad_1.10.4_linux_amd64.zip"
       bin_file_name   = "nomad"
       bin_file_dir    = "/var/home/core/.local/bin"
     },
     {
-      zip_file_source = "http://dufs.day0.sololab/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip"
+      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip"
       zip_file_path   = "/var/home/core/nomad-driver-podman_0.6.3_linux_amd64.zip"
       bin_file_name   = "nomad-driver-podman"
       bin_file_dir    = "/var/home/core/.local/bin"
     },
   ]
   config = {
+    create_dir = true
+    dir        = "/var/home/core/.local/etc/nomad.d"
     main = {
       basename = "client.hcl"
       content = templatefile("./attachments/client.hcl", {
-        servers              = "nomad.day1.sololab"
+        servers              = "nomad.service.consul"
         data_dir             = "/var/mnt/data/nomad" # /var/home/podmgr/.local/opt/nomad/data
         plugin_dir           = "/var/home/core/.local/bin"
         ca_file              = "/var/home/core/.local/etc/nomad.d/tls/ca.pem"
@@ -107,8 +109,6 @@ module "nomad" {
       key_basename  = "client-key.pem"
       key_content   = data.vault_kv_secret_v2.cert.data["private_key"]
     }
-    dir        = "/var/home/core/.local/etc/nomad.d"
-    create_dir = true
   }
   service = {
     status = "start"
@@ -121,7 +121,7 @@ module "nomad" {
       content = templatefile("${path.root}/attachments/nomad-client.service", {
         bin_path           = "/var/home/core/.local/bin/nomad"
         config_file        = "/var/home/core/.local/etc/nomad.d/client.hcl"
-        ExecStartPreNomad  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://nomad.day1.sololab:4646/v1/status/leader"
+        ExecStartPreNomad  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://nomad.service.consul:4646/v1/status/leader"
         ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://127.0.0.1:8501/v1/catalog/services"
         NOMAD_ADDR         = "https://127.0.0.1:14646"
         NOMAD_TOKEN        = data.vault_kv_secret_v2.nomad_token.data["token"]

@@ -46,6 +46,7 @@ ports {
   serf = 14648
 }
 
+# https://developer.hashicorp.com/nomad/docs/configuration/tls
 tls {
   http = true
   rpc  = true
@@ -58,6 +59,7 @@ tls {
   verify_https_client = true
 }
 
+# https://developer.hashicorp.com/nomad/docs/configuration/vault#parameters-for-nomad-clients
 vault {
   enabled               = true
   address               = "${vault_server_address}"
