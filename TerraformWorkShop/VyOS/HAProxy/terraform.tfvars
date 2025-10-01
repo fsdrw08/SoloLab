@@ -110,4 +110,20 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day1_frontend_traefik = {
+    path = "load-balancing haproxy service tcp443 rule 220"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "traefik.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
+  day1_frontend_nomad = {
+    path = "load-balancing haproxy service tcp443 rule 230"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "nomad.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
 }
