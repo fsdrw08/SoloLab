@@ -104,4 +104,18 @@
         "privateRepo": "navidys/prometheus-podman-exporter:v1.18.1",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
     },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "coreos/etcd:v3.6.5",
+        "archive": "quay.io_coreos_etcd_v3.6.5.tar",
+        "privateRepo": "coreos/etcd:v3.6.5",
+        "description": "https://quay.io/repository/coreos/etcd?tab=tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "library/traefik:v3.5.3",
+        "archive": "docker.io_library_traefik_v3.5.3.tar",
+        "privateRepo": "library/traefik:v3.5.3",
+        "description": "https://hub.docker.com/r/library/traefik/tags",
+    },
 ]

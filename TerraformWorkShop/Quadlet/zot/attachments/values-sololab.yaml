@@ -1,6 +1,6 @@
 zot:
   image:
-    registry: quay.io
+    registry: zot.vyos.sololab
     repository: giantswarm/zot
   containerPorts: []
   resourcesPreset: medium
@@ -15,8 +15,8 @@ zot:
           updateInterval: "168h"
           # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
           trivy:
-            javadbrepository: "zot.day0.sololab:5000/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
-            dbrepository: "zot.day0.sololab:5000/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
+            javadbrepository: "zot.day0.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+            dbrepository: "zot.day0.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
       # Mgmt is enabled when the Search extension is enabled
       mgmt:
         enable: true
@@ -32,13 +32,13 @@ zot:
     # Network configuration
     # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#network-configuration
     http:
-      address: "0.0.0.0"
+      address: "127.0.0.1"
       port: "5000"
       realm: "zot"
-      tls:
-        cert: "/etc/zot/certs/server.crt"
-        key: "/etc/zot/certs/server.key"
-        cacert: "/etc/zot/certs/ca.crt"
+      # tls:
+      #   cert: "/etc/zot/certs/server.crt"
+      #   key: "/etc/zot/certs/server.key"
+      #   cacert: "/etc/zot/certs/ca.crt"
       # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#authentication
       auth:
         # https://zotregistry.dev/v2.1.8/articles/authn-authz/#htpasswd
@@ -81,8 +81,8 @@ zot:
     traefik.http.routers.zot.tls: true
     traefik.http.routers.zot.service: zot
 
-    traefik.http.services.zot.loadBalancer.serversTransport: zot@file
-    traefik.http.services.zot.loadbalancer.server.scheme: https
+    # traefik.http.services.zot.loadBalancer.serversTransport: zot@file
+    # traefik.http.services.zot.loadbalancer.server.scheme: https
     traefik.http.services.zot.loadbalancer.server.port: 5000
     traefik.http.services.zot.loadbalancer.healthCheck.path: /v2/
 

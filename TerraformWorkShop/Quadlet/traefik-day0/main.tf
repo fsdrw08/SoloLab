@@ -163,7 +163,6 @@ resource "remote_file" "traefik_file_provider" {
   ]
   for_each = toset([
     "./attachments/traefik.traefik.yaml",
-    "./attachments/zot.traefik.yaml"
   ])
   path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
   content = file("${each.key}")

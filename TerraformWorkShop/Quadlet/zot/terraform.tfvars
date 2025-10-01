@@ -18,14 +18,14 @@ podman_kubes = [
               name          = "zot.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
-            {
-              name          = "zot.tls.contents.server\\.crt"
-              value_ref_key = "cert_pem_chain"
-            },
-            {
-              name          = "zot.tls.contents.server\\.key"
-              value_ref_key = "key_pem"
-            }
+            # {
+            #   name          = "zot.tls.contents.server\\.crt"
+            #   value_ref_key = "cert_pem_chain"
+            # },
+            # {
+            #   name          = "zot.tls.contents.server\\.key"
+            #   value_ref_key = "key_pem"
+            # }
           ]
           tfstate = {
             backend = {
@@ -34,7 +34,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "zot"
+            cert_name = "root"
           }
         }
       ]

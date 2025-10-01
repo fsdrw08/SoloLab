@@ -9,11 +9,6 @@ http:
       basicAuth:
         users:
           - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
-  serversTransports:
-    zot:
-      serverName: zot.day0.sololab
-      rootcas:
-        - "/etc/traefik/tls/ca.crt"
 tls:
   certificates:
     - certFile: /etc/traefik/tls/day0.crt
