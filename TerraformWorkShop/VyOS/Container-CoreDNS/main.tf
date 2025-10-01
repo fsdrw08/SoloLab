@@ -21,7 +21,7 @@ module "config_map" {
   }
   config = {
     create_dir = true
-    dir        = "/etc/coredns"
+    dir        = "/mnt/data/etc/coredns"
     files = [
       {
         basename = "Corefile"
@@ -70,7 +70,7 @@ module "vyos_container" {
         "gid"                  = 100
         "environment TZ value" = "Asia/Shanghai"
 
-        "volume coredns source"      = "/etc/coredns"
+        "volume coredns source"      = "/mnt/data/etc/coredns"
         "volume coredns destination" = "/etc/coredns"
       }
     }

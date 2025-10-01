@@ -6,7 +6,7 @@ resource "null_resource" "init" {
     password  = var.prov_system.password
     uid       = var.owner.uid
     gid       = var.owner.gid
-    data_dirs = "/mnt/data/zot /mnt/data/zot-tmp"
+    data_dirs = "/mnt/data/etc /mnt/data/zot /mnt/data/zot-tmp"
   }
   connection {
     type     = "ssh"
@@ -53,7 +53,7 @@ module "config_map" {
   owner       = var.owner
   config = {
     create_dir = true
-    dir        = "/etc/zot"
+    dir        = "/mnt/data/etc/zot"
     # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
     files = [
       {
@@ -121,7 +121,7 @@ module "vyos_container" {
         "environment SSL_CERT_DIR value" = "/etc/zot/certs"
         "network zot address"            = "172.16.20.10"
 
-        "volume zot_config source"      = "/etc/zot"
+        "volume zot_config source"      = "/mnt/data/etc/zot"
         "volume zot_config destination" = "/etc/zot"
         "volume zot_config mode"        = "ro"
         "volume zot_data source"        = "/mnt/data/zot"

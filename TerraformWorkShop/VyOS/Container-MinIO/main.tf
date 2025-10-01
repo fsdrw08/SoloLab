@@ -38,7 +38,7 @@ module "config_map" {
   owner       = var.owner
   config = {
     create_dir = true
-    dir        = "/etc/minio"
+    dir        = "/mnt/data/etc/minio"
     files = [
       {
         basename = "config.env"
@@ -79,7 +79,7 @@ module "vyos_container" {
         "environment MINIO_CONFIG_ENV_FILE value" = "/etc/config.env"
         "network minio address"                   = "172.16.70.10"
 
-        "volume minio_config source"      = "/etc/minio/config.env"
+        "volume minio_config source"      = "/mnt/data/etc/minio/config.env"
         "volume minio_config destination" = "/etc/config.env"
         "volume minio_data source"        = "/mnt/data/minio"
         "volume minio_data destination"   = "/data"

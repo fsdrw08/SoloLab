@@ -38,7 +38,7 @@ module "config_map" {
   owner       = var.owner
   config = {
     create_dir = true
-    dir        = "/etc/powerdns"
+    dir        = "/mnt/data/etc/powerdns"
     # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
     files = [
       {
@@ -83,7 +83,7 @@ module "vyos_container" {
         "network powerdns address"                                   = "172.16.40.10"
         "sysctl parameter net.ipv4.ip_unprivileged_port_start value" = "53"
 
-        "volume pdns_entrypoint source"      = "/etc/powerdns/entrypoint.sh"
+        "volume pdns_entrypoint source"      = "/mnt/data/etc/powerdns/entrypoint.sh"
         "volume pdns_entrypoint destination" = "/etc/powerdns/entrypoint.sh"
         "volume pdns_data source"            = "/mnt/data/powerdns"
         "volume pdns_data destination"       = "/var/lib/powerdns"

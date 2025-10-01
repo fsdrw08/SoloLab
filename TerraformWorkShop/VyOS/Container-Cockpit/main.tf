@@ -21,7 +21,7 @@ module "config_map" {
   }
   config = {
     create_dir = true
-    dir        = "/etc/cockpit"
+    dir        = "/mnt/data/etc/cockpit"
     files = [
       #   {
       #     basename = "Corefile"
@@ -72,7 +72,7 @@ module "vyos_container" {
 
         "network cockpit address" = "172.16.80.10"
 
-        "volume cockpit_cert source"      = "/etc/cockpit/ws-certs.d"
+        "volume cockpit_cert source"      = "/mnt/data/etc/cockpit/ws-certs.d"
         "volume cockpit_cert destination" = "/etc/cockpit/ws-certs.d"
       }
     }
