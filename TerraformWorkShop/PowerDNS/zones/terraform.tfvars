@@ -146,7 +146,7 @@ zones = [
         ]
       },
       {
-        fqdn = "sftpgo.day0.sololab."
+        fqdn = "prometheus-podman-exporter.day0.sololab."
         type = "A"
         ttl  = 60
         results = [

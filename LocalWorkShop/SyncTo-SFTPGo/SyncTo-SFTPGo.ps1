@@ -72,9 +72,9 @@ if (-not (Test-Path -Path $LocalStore)) {
 
 
 ## download
-$proxy="127.0.0.1:7890"
+# $proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
         if ((-not (Test-Path -Path $LocalStore/$($_.archive))) -and $_.publicRegistry ) {
@@ -87,11 +87,10 @@ if ($Download) {
 }
 
 ## upload
-$proxy=""
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
-
 $credential="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)"
 if ($Upload) {
+    $proxy=""
+    $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
     Write-Host "Login ..."
     $token = curl -s --request GET `
         -k --url "$PrivateRegistry/api/v2/user/token" `

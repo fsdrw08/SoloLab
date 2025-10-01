@@ -17,9 +17,9 @@ reverse_proxy = {
     path = "load-balancing haproxy backend day1"
     configs = {
       "mode"                      = "tcp"
-      "server day0 address"       = "192.168.255.20"
-      "server day0 port"          = "443"
-      "server day0 send-proxy-v2" = ""
+      "server day1 address"       = "192.168.255.20"
+      "server day1 port"          = "443"
+      "server day1 send-proxy-v2" = ""
     }
   }
   day0_frontend_zot = {
@@ -70,19 +70,27 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
-  day0_frontend_sftpgo = {
-    path = "load-balancing haproxy service tcp443 rule 160"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "sftpgo.day0.sololab"
-      "set backend" = "day0"
-    }
-  }
+  # day0_frontend_sftpgo = {
+  #   path = "load-balancing haproxy service tcp443 rule 160"
+  #   configs = {
+  #     "ssl"         = "req-ssl-sni"
+  #     "domain-name" = "sftpgo.day0.sololab"
+  #     "set backend" = "day0"
+  #   }
+  # }
   day0_frontend_whoami = {
     path = "load-balancing haproxy service tcp443 rule 170"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "whoami.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
+  day0_frontend_consul = {
+    path = "load-balancing haproxy service tcp443 rule 180"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "consul-client.day0.sololab"
       "set backend" = "day0"
     }
   }
