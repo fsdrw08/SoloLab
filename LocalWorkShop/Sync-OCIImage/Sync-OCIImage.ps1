@@ -32,9 +32,9 @@ param (
     [string]
     [ValidateSet(
         "zot.vyos.sololab.dev",
-        "192.168.255.10:5000"
+        "zot.day0.sololab"
     )]
-    $PrivateRegistry = "192.168.255.10:5000",
+    $PrivateRegistry = "zot.vyos.sololab.dev",
 
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]
@@ -79,9 +79,9 @@ if (-not (Test-Path -Path $LocalStore)) {
 
 
 ## pull
-$proxy="127.0.0.1:7890"
+# $proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
         if (-not (Test-Path -Path $LocalStore/$($_.archive))) {

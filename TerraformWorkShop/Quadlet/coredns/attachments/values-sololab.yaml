@@ -1,5 +1,5 @@
 global:
-  imageRegistry: 192.168.255.10:5000
+  imageRegistry: zot.vyos.sololab
 coredns:
   containerPorts: []
   livenessProbe:

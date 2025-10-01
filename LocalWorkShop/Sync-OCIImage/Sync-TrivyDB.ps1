@@ -27,6 +27,14 @@ param (
         $false
     )]
     $Upload=$true,
+
+    [Parameter()]
+    [string]
+    [ValidateSet(
+        "zot.vyos.sololab.dev",
+        "zot.day0.sololab"
+    )]
+    $PrivateRegistry = "zot.vyos.sololab.dev",
         
     [Parameter()]
     [System.Management.Automation.PSCredential]
@@ -50,7 +58,6 @@ $referenceObject = @(
     "publicRepo"
     "archive"
     "ociFileMediaType"
-    "privateRegistry"
     "privateRepo"
     "manifestFile"
     )
@@ -79,13 +86,13 @@ $currentLocation=Get-Location | Select-Object -ExpandProperty Path
 
 ## pull
 ## https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
-$proxy="127.0.0.1:7890"
+# $proxy="127.0.0.1:7890"
 # $proxy="192.168.255.1:7890"
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
-        if (-not (Test-Path -Path $LocalStore/$($_.archive))) {
-            # go to local oci archive dir
+        # if (-not (Test-Path -Path $LocalStore/$($_.archive))) {
+            "go to local oci archive dir"
             Set-Location -Path $LocalStore
             oras pull "$($_.publicRegistry)/$($_.publicRepo)"
             
@@ -93,7 +100,7 @@ if ($Download) {
             oras manifest fetch `
             --output $_.ManifestFile `
             "$($_.publicRegistry)/$($_.publicRepo)"
-        }
+        # }
     }
 }
 
@@ -112,24 +119,26 @@ if ($Upload) {
             oras login --insecure `
                 --username $($PrivateRegistryCredential.UserName) `
                 --password $($PrivateRegistryCredential.GetNetworkCredential().Password) `
-                $_.privateRegistry
+                $PrivateRegistry
             
             "oras push"
+            $artifactPath = Join-Path -Path $LocalStore -ChildPath $_.archive
             oras push `
                 --insecure `
                 --disable-path-validation `
                 --artifact-type $trivyArtifactType `
-                "$($_.privateRegistry)/$($_.privateRepo)" `
-                "$($_.archive):$($_.ociFileMediaType)"
+                "$($PrivateRegistry)/$($_.privateRepo)" `
+                "$($artifactPath):$($_.ociFileMediaType)"
             
             "oras manifest push"
+            $manifestFilePath = Join-Path -Path $LocalStore -ChildPath $_.manifestFile
             oras manifest push `
                 --insecure `
-                "$($_.privateRegistry)/$($_.privateRepo)" `
-                $_.manifestFile
+                "$($PrivateRegistry)/$($_.privateRepo)" `
+                $manifestFilePath
             
             "oras manifest fetch"
-            oras manifest fetch --insecure "$($_.privateRegistry)/$($_.privateRepo)"
+            oras manifest fetch --insecure "$($PrivateRegistry)/$($_.privateRepo)"
         }
     }
 }
