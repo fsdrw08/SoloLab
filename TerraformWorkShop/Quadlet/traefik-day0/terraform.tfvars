@@ -20,7 +20,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "traefik.day0"
+            cert_name = "wildcard.day0"
           }
           value_sets = [
             {
@@ -66,7 +66,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
-            Restart       = "on-failure"
+            Restart       = "no"
           }
         },
       ]
