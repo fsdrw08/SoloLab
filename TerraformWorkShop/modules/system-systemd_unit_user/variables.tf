@@ -1,20 +1,34 @@
 variable "vm_conn" {
   type = object({
-    host     = string
-    port     = number
-    user     = string
-    password = string
+    host        = string
+    port        = number
+    user        = string
+    password    = optional(string, null)
+    private_key = optional(string, null)
   })
 }
 
-variable "systemd_unit_files" {
-  type = list(object({
-    path    = string
-    content = string
-  }))
+variable "runas" {
+  type = object({
+    take_charge = optional(bool, false)
+    user        = string
+    uid         = number
+    group       = string
+    gid         = number
+  })
 }
 
-variable "systemd_unit_name" {
-  type    = string
-  default = ""
+variable "service" {
+  type = object({
+    status = string
+    auto_start = object({
+      enabled     = bool
+      link_path   = string
+      link_target = string
+    })
+    systemd_service_unit = object({
+      path    = string
+      content = string
+    })
+  })
 }
