@@ -4,6 +4,10 @@ dufs:
   config:
     bind: 127.0.0.1
     port: 5001
+    auth:
+      - admin:admin@/:rw
+      - user:pass@/private:ro
+      - "@/public"
 
   podLabels:
     traefik.enable: true

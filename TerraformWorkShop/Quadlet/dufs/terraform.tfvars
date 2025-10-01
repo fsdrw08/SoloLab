@@ -42,7 +42,7 @@ podman_quadlet = {
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
             ExecStartPre  = ""
             ExecStartPost = ""
-            Restart       = "on-failure"
+            Restart       = "no"
           }
         },
       ]
