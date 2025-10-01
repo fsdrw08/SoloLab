@@ -331,6 +331,7 @@ certs = [
       ]
       dns_names = [
         "vault.day1.sololab",
+        "vault.service.consul",
       ]
       subject = {
         common_name  = "vault.day1.sololab"
