@@ -34,7 +34,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "cockpit"
+            cert_name = "cockpit.day0"
           }
         }
       ]
