@@ -6,7 +6,7 @@ resource "null_resource" "init" {
     password  = var.prov_system.password
     uid       = var.owner.uid
     gid       = var.owner.gid
-    data_dirs = "/mnt/data/etc /mnt/data/zot /mnt/data/zot-tmp"
+    data_dirs = "/mnt/data/etc /mnt/data/consul-services /mnt/data/zot /mnt/data/zot-tmp"
   }
   connection {
     type     = "ssh"
@@ -181,4 +181,13 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   }
   path    = each.value.path
   configs = each.value.configs
+}
+
+resource "system_file" "secret" {
+  depends_on = [null_resource.init]
+  for_each = toset([
+    "./attachments/zot.consul.hcl",
+  ])
+  path    = "/mnt/data/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }
