@@ -1,8 +1,8 @@
 prov_system = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.1"
   port     = 22
-  user     = "core"
-  password = "P@ssw0rd"
+  user     = "vyos"
+  password = "vyos"
   sudo     = true
 }
 
