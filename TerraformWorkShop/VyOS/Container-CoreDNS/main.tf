@@ -136,8 +136,9 @@ resource "vyos_config_block_tree" "dns_forwarding" {
   depends_on = [
     module.vyos_container,
   ]
-  path = "service dns forwarding domain sololab"
+  path = "service dns forwarding domain"
   configs = {
-    "name-server 127.0.0.1 port" = "53"
+    "sololab name-server 127.0.0.1 port" = "53"
+    "consul name-server 127.0.0.1 port"  = "53"
   }
 }
