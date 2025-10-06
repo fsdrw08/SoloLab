@@ -183,7 +183,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   configs = each.value.configs
 }
 
-resource "system_file" "secret" {
+resource "system_file" "consul_service" {
   depends_on = [null_resource.init]
   for_each = toset([
     "./attachments/zot.consul.hcl",

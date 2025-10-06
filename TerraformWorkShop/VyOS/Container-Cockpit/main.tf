@@ -132,3 +132,11 @@ resource "vyos_config_block_tree" "snat" {
     "translation address"     = "masquerade"
   }
 }
+
+resource "system_file" "consul_service" {
+  for_each = toset([
+    "./attachments/cockpit.consul.hcl",
+  ])
+  path    = "/mnt/data/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

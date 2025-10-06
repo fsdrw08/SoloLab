@@ -165,3 +165,12 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   path    = each.value.path
   configs = each.value.configs
 }
+
+resource "system_file" "consul_service" {
+  depends_on = [null_resource.init]
+  for_each = toset([
+    "./attachments/minio.consul.hcl",
+  ])
+  path    = "/mnt/data/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}
