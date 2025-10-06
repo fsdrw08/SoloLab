@@ -1,8 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 consul:
-  containerPorts:
-    []
+  containerPorts: []
     # - name: server
     #   containerPort: 8300
     #   hostPort: 8300

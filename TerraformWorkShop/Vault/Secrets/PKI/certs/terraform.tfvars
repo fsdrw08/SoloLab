@@ -17,6 +17,20 @@ vault_kvv2 = {
 }
 
 vault_certs = [
+  # consul server cert
+  {
+    secret_engine = {
+      backend   = "pki-sololab_day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "consul.service.consul"
+    alt_names = [
+      "consul.day1.sololab",
+      "server.dc1.consul",
+      "localhost"
+    ]
+  },
   # consul service wild card cert hosting in reverse proxy
   {
     secret_engine = {
@@ -27,19 +41,6 @@ vault_certs = [
     common_name = "*.service.consul"
     alt_names = [
       "*.day1.sololab"
-    ]
-  },
-  {
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "consul.day1.sololab"
-    alt_names = [
-      "consul.service.consul",
-      "server.dc1.consul",
-      "localhost"
     ]
   },
   {
