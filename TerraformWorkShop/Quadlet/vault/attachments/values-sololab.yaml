@@ -27,6 +27,10 @@ vault:
             tls_disable: false
             address: "[::]:8200"
             cluster_address: "[::]:8201"
+            proxy_protocol_behavior: allow_authorized
+            proxy_protocol_authorized_addrs:
+              - 192.168.255.1
+              - 192.168.255.20
             # https://github.com/hashicorp/vault/blob/2718994242f94df3dc90215b2ecbc5d4198d9e3c/website/content/docs/platform/k8s/helm/examples/standalone-tls.mdx#L191
             tls_cert_file: /vault/userconfig/vault-server-tls/tls.crt
             tls_key_file: /vault/userconfig/vault-server-tls/tls.key
