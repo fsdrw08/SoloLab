@@ -2,11 +2,14 @@
   reload 2s
   log
   errors
+  prometheus localhost:9153
+  health localhost:5380
 }
 .:53 {
   bind 127.0.0.1
   hosts {
     ${int_facing_addr} api.vyos.sololab
+    ${int_facing_addr} coredns.vyos.sololab
     ${int_facing_addr} zot.vyos.sololab
     ${int_facing_addr} pdns-auth.vyos.sololab
     ${int_facing_addr} minio-api.vyos.sololab
@@ -24,6 +27,7 @@ https://.:44353 {
   tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
   hosts {
     ${ext_facing_addr} api.vyos.sololab
+    ${ext_facing_addr} coredns.vyos.sololab
     ${ext_facing_addr} zot.vyos.sololab
     ${ext_facing_addr} pdns-auth.vyos.sololab
     ${ext_facing_addr} minio-api.vyos.sololab

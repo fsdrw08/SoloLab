@@ -127,6 +127,40 @@ resource "vyos_config_block_tree" "reverse_proxy" {
         "server vyos address" = "127.0.0.1"
       }
     }
+    l4_frontend_metrics = {
+      path = "load-balancing haproxy service tcp443 rule 35"
+      configs = {
+        "ssl"         = "req-ssl-sni"
+        "domain-name" = "coredns.vyos.sololab"
+        "set backend" = "vyos_coredns_metrics_ssl"
+      }
+    }
+    l4_backend_metrics = {
+      path = "load-balancing haproxy backend vyos_coredns_metrics_ssl"
+      configs = {
+        "mode"                = "tcp"
+        "server vyos port"    = "19153"
+        "server vyos address" = "127.0.0.1"
+      }
+    }
+    l7_frontend_metrics = {
+      path = "load-balancing haproxy service vyos_coredns_metrics_ssl"
+      configs = {
+        "listen-address"  = "127.0.0.1"
+        "port"            = "19153"
+        "mode"            = "tcp"
+        "backend"         = "vyos_coredns_metrics"
+        "ssl certificate" = "vyos"
+      }
+    }
+    l7_backend_metrics = {
+      path = "load-balancing haproxy backend vyos_coredns_metrics"
+      configs = {
+        "mode"                = "http"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "9153"
+      }
+    }
   }
   path    = each.value.path
   configs = each.value.configs
@@ -141,4 +175,12 @@ resource "vyos_config_block_tree" "dns_forwarding" {
     "sololab name-server 127.0.0.1 port" = "53"
     "consul name-server 127.0.0.1 port"  = "53"
   }
+}
+
+resource "system_file" "secret" {
+  for_each = toset([
+    "./attachments/coredns.consul.hcl",
+  ])
+  path    = "/mnt/data/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
 }
