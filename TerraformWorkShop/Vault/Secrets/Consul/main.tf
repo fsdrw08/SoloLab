@@ -41,11 +41,21 @@ module "consul_jwt_auth_policy_bindings" {
 }
 
 resource "vault_kv_secret_v2" "secret" {
-  mount = "kvv2-consul"
-  name  = "key-gossip_encryption"
-  data_json = jsonencode(
-    {
-      key = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+  for_each = {
+    "key-gossip_encryption" = {
+      data = {
+        key = "aPuGh+5UDskRAbkLaXRzFoSOcSM+5vAK+NEYOWHJH7w="
+      }
     }
+    "token-init_management" = {
+      data = {
+        token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+      }
+    }
+  }
+  mount = "kvv2-consul"
+  name  = each.key
+  data_json = jsonencode(
+    each.value.data
   )
 }

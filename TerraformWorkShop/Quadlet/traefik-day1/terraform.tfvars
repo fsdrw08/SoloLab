@@ -41,7 +41,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-consul"
-            name  = "token-traefik"
+            name  = "token-consul_dns"
           }
           value_sets = [
             {

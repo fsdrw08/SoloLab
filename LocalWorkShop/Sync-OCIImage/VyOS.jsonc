@@ -118,4 +118,11 @@
         "privateRepo": "library/traefik:v3.5.3",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/consul:1.21.4",
+        "archive": "docker.io_hashicorp_consul_1.21.4.tar",
+        "privateRepo": "hashicorp/consul:1.21.4",
+        "description": "https://hub.docker.com/r/hashicorp/consul/tags",
+    },
 ]

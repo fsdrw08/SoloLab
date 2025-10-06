@@ -15,7 +15,7 @@ prov_consul = {
 policies = [
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-    name        = "traefik"
+    name        = "consul_dns"
     description = "Policy for traefik proxy consul catalog provoider to read service"
     rules       = <<-EOT
       node_prefix "" {
@@ -123,9 +123,9 @@ policies = [
 
 roles = [
   {
-    name         = "traefik"
-    description  = "Role of traefik proxy"
-    policy_names = ["traefik"]
+    name         = "consul_dns"
+    description  = "Role to read node and service"
+    policy_names = ["consul_dns"]
     token_store = {
       vault_kvv2_path = "kvv2-consul"
     }
