@@ -18,25 +18,26 @@ Restart=${Restart}
 [Container]
 ContainerName=prometheus-podman-exporter
 
+Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
+Exec=--web.listen-address=127.0.0.1:9882
+
 Image=zot.day0.sololab/navidys/prometheus-podman-exporter:v1.18.1
+
+Label="traefik.enable=true"
+Label="traefik.http.routers.podman-exporter-redirect.entrypoints=web"
+Label="traefik.http.routers.podman-exporter-redirect.rule=Host(`prometheus-podman-exporter.day0.sololab`)"
+Label="traefik.http.routers.podman-exporter-redirect.middlewares=toHttps@file"
+Label="traefik.http.routers.podman-exporter.entrypoints=webSecure"
+Label="traefik.http.routers.podman-exporter.rule=Host(`prometheus-podman-exporter.day0.sololab`)"
+Label="traefik.http.routers.podman-exporter.tls=true"
+Label="traefik.http.services.prometheus-podman-exporter.loadbalancer.server.port=9882"
 
 SecurityLabelType=spc_t
 
-Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
-
+UserNS=keep-id:uid=65534
 Volume=%t/podman/podman.sock:/run/podman/podman.sock
 
-UserNS=keep-id:uid=65534
-
-Label="traefik.enable=true"
-
-Label="traefik.http.routers.prometheus-podman-exporter.entrypoints=web"
-Label="traefik.http.routers.prometheus-podman-exporter.rule=Host(`prometheus-podman-exporter.day0.sololab`) || Host(`prometheus-podman-exporter.day1.sololab`)"
-Label="traefik.http.routers.prometheus-podman-exporter.service=prometheus-podman-exporter"
-Label="traefik.http.services.prometheus-podman-exporter.loadbalancer.server.port=9882"
-
-SecurityLabelDisable=true
-
+# podman prams
 PodmanArgs=${PodmanArgs}
 Network=${Network}
 [Install]

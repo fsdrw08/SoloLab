@@ -94,6 +94,14 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
+  day0_frontend_podman_exporter = {
+    path = "load-balancing haproxy service tcp443 rule 190"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "prometheus-podman-exporter.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
   day1_frontend_vault = {
     path = "load-balancing haproxy service tcp443 rule 200"
     configs = {
