@@ -26,12 +26,12 @@ storage:
       contents:
         inline: |
           source /etc/profile.d/bash_completion.sh
-    # stop container before machine halt/poweroff/shutdown/reboot
+    # stop service before machine halt/poweroff/shutdown/reboot
     # https://askubuntu.com/questions/952363/how-do-i-properly-run-this-systemd-service-on-shutdown
     # https://github.com/iree-org/iree/blob/65bbc4b4d56f3e752cc14fd8c8f53796a80bb0bf/build_tools/github_actions/runner/config/systemd/system/gh-runner-deregister.service#L12
     # https://github.com/osmc/osmc/blob/20990a86bb956e8bedf036884a94dc76e2867e7d/package/rbp-userland-osmc/files/lib/systemd/system/rpi-display-backlight.service#L6
     # %t means the path "$XDG_RUNTIME_DIR" resolves to (for user managers). https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers
-    - path: /var/home/podmgr/.config/systemd/user/stop-container.service
+    - path: /var/home/podmgr/.config/systemd/user/stop-service.service
       overwrite: true
       user:
         id: 1001
@@ -40,7 +40,7 @@ storage:
       contents:
         inline: |
           [Unit]
-          Description=Stop container before shutdown
+          Description=Stop service before shutdown
           DefaultDependencies=no
           Before=umount.target
 
