@@ -177,7 +177,7 @@ resource "vyos_config_block_tree" "dns_forwarding" {
   }
 }
 
-resource "system_file" "secret" {
+resource "system_file" "consul_service" {
   for_each = toset([
     "./attachments/coredns.consul.hcl",
   ])

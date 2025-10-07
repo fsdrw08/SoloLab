@@ -137,3 +137,11 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   path    = each.value.path
   configs = each.value.configs
 }
+
+resource "system_file" "consul_service" {
+  for_each = toset([
+    "./attachments/powerdns.consul.hcl",
+  ])
+  path    = "/mnt/data/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}
