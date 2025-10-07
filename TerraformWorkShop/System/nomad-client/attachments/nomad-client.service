@@ -4,6 +4,8 @@ Description=Nomad Client Agent
 After=podman-user-wait-network-online.service
 StartLimitIntervalSec=0
 StartLimitBurst=3
+Before=umount.target
+Conflicts=umount.target
 
 # Nomad and Consul are started very closely together. This helps ensure Consul
 # is already running before Nomad starts and avoids having to SIGHUP the Nomad

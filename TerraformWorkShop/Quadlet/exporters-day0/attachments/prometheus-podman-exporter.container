@@ -6,6 +6,8 @@ After=${After}
 Wants=${Wants}
 StartLimitIntervalSec=${StartLimitIntervalSec}
 StartLimitBurst=${StartLimitBurst}
+Before=${Before}
+Conflicts=${Conflicts}
 
 # https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
 [Service]

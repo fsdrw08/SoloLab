@@ -25,19 +25,19 @@ users = [
     display_name = "root"
     member_of = [
       "lldap_admin",
-      "sso_allow",                # "02999e39" 
-      "app-sftpgo-prim-ignition", # c4bf67c5
-      "app-vault-user",           # "9d1dbb70" 
-      "app-vault-admin",          # "751b1e41" 
-      "app-minio-user",           # "94a5e552" 
-      "app-minio-admin",          # "4d620c35" 
-      "app-consul-auto_config",   # "e91c1a23" 
-      "app-consul-user",          # "c2826a4f" 
-      "app-consul-admin",         # "0f898573" 
-      "app-nomad-user",           # "091a24fe" 
-      "app-nomad-admin",          # "ca4dde60" 
-      "app-grafana-user",         # "a4019ca3" 
-      "app-grafana-root",         # "a3d0b5af" 
+      "sso_allow", # "02999e39" 
+      # "app-sftpgo-prim-ignition", # c4bf67c5
+      "app-vault-user",         # "9d1dbb70" 
+      "app-vault-admin",        # "751b1e41" 
+      "app-minio-user",         # "94a5e552" 
+      "app-minio-admin",        # "4d620c35" 
+      "app-consul-auto_config", # "e91c1a23" 
+      "app-consul-user",        # "c2826a4f" 
+      "app-consul-admin",       # "0f898573" 
+      "app-nomad-user",         # "091a24fe" 
+      "app-nomad-admin",        # "ca4dde60" 
+      "app-grafana-user",       # "a4019ca3" 
+      "app-grafana-root",       # "a3d0b5af" 
     ]
   },
   {
@@ -68,10 +68,10 @@ groups = [
     iac_id       = "02999e39"
     display_name = "sso_allow"
   },
-  {
-    iac_id       = "c4bf67c5"
-    display_name = "app-sftpgo-prim-ignition"
-  },
+  # {
+  #   iac_id       = "c4bf67c5"
+  #   display_name = "app-sftpgo-prim-ignition"
+  # },
   {
     iac_id       = "9d1dbb70"
     display_name = "app-vault-user"

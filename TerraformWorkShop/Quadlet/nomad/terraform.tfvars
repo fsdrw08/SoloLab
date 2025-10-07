@@ -87,6 +87,8 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 5
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
             # kube
             yaml          = "nomad-aio.yaml"
             PodmanArgs    = "--tls-verify=false"

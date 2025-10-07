@@ -6,6 +6,8 @@ After=${After}
 Wants=${Wants}
 StartLimitIntervalSec=${StartLimitIntervalSec}
 StartLimitBurst=${StartLimitBurst}
+Before=${Before}
+Conflicts=${Conflicts}
 
 # https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
 [Service]
@@ -17,8 +19,9 @@ Restart=${Restart}
 [Kube]
 # Point to the yaml file in the same directory
 Yaml=${yaml}
-PodmanArgs=${PodmanArgs}
 KubeDownForce=${KubeDownForce}
+# podman params
+PodmanArgs=${PodmanArgs}
 # https://github.com/containers/podman/issues/24970#issuecomment-2582792692
 Network=${Network}
 

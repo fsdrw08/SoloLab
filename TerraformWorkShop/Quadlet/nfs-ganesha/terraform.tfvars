@@ -34,6 +34,8 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
             # podman
             PodmanArgs = "--tls-verify=false"
             Network    = ""
