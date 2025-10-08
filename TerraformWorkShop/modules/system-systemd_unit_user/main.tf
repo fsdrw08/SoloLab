@@ -1,13 +1,12 @@
 # ref: https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#:~:text=For%20each%20path,(see%20below).
 # this resource is only in charge to stop the service when tf resource destroy
-resource "null_resource" "service_remove" {
+resource "null_resource" "unit_remove" {
   triggers = {
-    service_name = trimsuffix(system_file.service.basename, ".service")
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
-    private_key  = sensitive(var.vm_conn.private_key)
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
+    private_key = sensitive(var.vm_conn.private_key)
   }
   connection {
     type        = "ssh"
@@ -26,37 +25,42 @@ resource "null_resource" "service_remove" {
 }
 
 # persist systemd unit files
-resource "system_file" "service" {
+resource "system_file" "unit" {
   depends_on = [
-    null_resource.service_remove
+    null_resource.unit_remove
   ]
-  path    = var.service.systemd_service_unit.path
-  content = var.service.systemd_service_unit.content
-  uid     = var.runas.uid
-  gid     = var.runas.gid
+  for_each = {
+    for unit in var.units : unit.file.path => unit
+  }
+  content = each.value.file.content
+  path    = each.value.file.path
 }
 
 resource "system_link" "service" {
   depends_on = [
-    system_file.service,
+    system_file.unit,
   ]
-  count  = var.service.auto_start.enabled == true ? 1 : 0
-  path   = var.service.auto_start.link_path
-  target = var.service.auto_start.link_target
-  uid    = var.runas.uid
-  gid    = var.runas.gid
+  for_each = {
+    for unit in var.units : unit.file.path => unit
+    if unit.auto_start.enabled == true
+  }
+  path   = each.value.auto_start.link_path
+  target = each.value.auto_start.link_target
 }
 
 # this resource is only in charge to stop the service when tf resource destroy
-resource "null_resource" "service_stop" {
-  depends_on = [system_file.service]
+resource "null_resource" "unit_stop" {
+  depends_on = [system_file.unit]
+  for_each = {
+    for unit in var.units : unit.file.path => unit
+  }
   triggers = {
-    service_name = trimsuffix(system_file.service.basename, ".service")
-    host         = var.vm_conn.host
-    port         = var.vm_conn.port
-    user         = var.vm_conn.user
-    password     = sensitive(var.vm_conn.password)
-    private_key  = sensitive(var.vm_conn.private_key)
+    unit_name   = basename(each.value.file.path)
+    host        = var.vm_conn.host
+    port        = var.vm_conn.port
+    user        = var.vm_conn.user
+    password    = sensitive(var.vm_conn.password)
+    private_key = sensitive(var.vm_conn.private_key)
   }
   connection {
     type        = "ssh"
@@ -69,26 +73,26 @@ resource "null_resource" "service_stop" {
   provisioner "remote-exec" {
     when = destroy
     inline = [
-      "systemctl --user stop ${self.triggers.service_name}",
+      "systemctl --user stop ${self.triggers.unit_name}",
     ]
   }
 }
 
 # this resource is in charge to start/restart service if the trigger status change, 
 # or stop the service if the value of service state set to stop, 
-# but NOT to stop the service when the tf resource destroy, to stop the service when destroy, use null_resource.service_stop
-resource "null_resource" "service_mgmt" {
+# but NOT to stop the service when the tf resource destroy, to stop the service when destroy, use null_resource.unit_stop
+resource "null_resource" "unit_mgmt" {
   depends_on = [
-    system_file.service,
-    null_resource.service_stop,
-    system_link.service
+    null_resource.unit_stop
   ]
+  for_each = {
+    for unit in var.units : unit.file.path => unit
+    if unit.status != ""
+  }
   triggers = {
-    service_name    = trimsuffix(system_file.service.basename, ".service")
-    service_status  = var.service.status
-    service_content = md5(system_file.service.content)
-    config_md5      = md5(system_file.config.content)
-    bin_url         = md5(join("\n", [for file in system_file.zip : file.path]))
+    unit_name    = basename(each.value.file.path)
+    unit_status  = each.value.status
+    unit_content = each.value.file.content
   }
   connection {
     type        = "ssh"
@@ -102,22 +106,22 @@ resource "null_resource" "service_mgmt" {
     inline = [
       <<-EOF
       systemctl --user daemon-reload
-      if [ "${self.triggers.service_status}" = "start" ]; then
-          service_status=$(systemctl --user is-active ${self.triggers.service_name})
-          if [ "$service_status" != "active" ]; then
-              echo "${self.triggers.service_name} is stop, start it"
-              systemctl --user start ${self.triggers.service_name}
-          elif [ "$service_status" = "active" ]; then
-              echo "${self.triggers.service_name} is start, restart it"
-              systemctl --user restart ${self.triggers.service_name}
+      if [ "${each.value.status}" = "start" ]; then
+          unit_status=$(systemctl --user is-active ${self.triggers.unit_name})
+          if [ "$unit_status" != "active" ]; then
+              echo "${self.triggers.unit_name} is stop, start it"
+              systemctl --user start ${self.triggers.unit_name}
+          elif [ "$unit_status" = "active" ]; then
+              echo "${self.triggers.unit_name} is start, restart it"
+              systemctl --user restart ${self.triggers.unit_name}
           else
-              echo "${self.triggers.service_name} status unknown"
+              echo "${self.triggers.unit_name} status unknown"
           fi
-      elif [ "${self.triggers.service_status}" = "stop" ]; then
-          echo "stop ${self.triggers.service_name}"
-          systemctl --user stop ${self.triggers.service_name}
+      elif [ "${each.value.status}" = "stop" ]; then
+          echo "stop ${self.triggers.unit_name}"
+          systemctl --user stop ${self.triggers.unit_name}
       else
-          echo "var $status invalid, should 'start' or 'stop'"
+          echo "var \$status is not 'start' nor 'stop', skip"
       fi
       EOF
       ,

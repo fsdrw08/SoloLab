@@ -8,27 +8,19 @@ variable "vm_conn" {
   })
 }
 
-variable "runas" {
-  type = object({
-    take_charge = optional(bool, false)
-    user        = string
-    uid         = number
-    group       = string
-    gid         = number
-  })
-}
-
-variable "service" {
-  type = object({
-    status = string
-    auto_start = object({
-      enabled     = bool
-      link_path   = string
-      link_target = string
+variable "units" {
+  type = list(
+    object({
+      file = object({
+        path    = string
+        content = string
+      })
+      status = optional(string, "")
+      auto_start = object({
+        enabled     = bool
+        link_path   = optional(string, null)
+        link_target = optional(string, null)
+      })
     })
-    systemd_service_unit = object({
-      path    = string
-      content = string
-    })
-  })
+  )
 }
