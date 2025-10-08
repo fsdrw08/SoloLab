@@ -7,31 +7,21 @@
 }
 .:53 {
   bind 127.0.0.1
-  hosts {
-    ${int_facing_addr} api.vyos.sololab
-    ${int_facing_addr} coredns.vyos.sololab
-    ${int_facing_addr} zot.vyos.sololab
-    ${int_facing_addr} pdns-auth.vyos.sololab
-    ${int_facing_addr} minio-api.vyos.sololab
-    ${int_facing_addr} minio-console.vyos.sololab
+  file /etc/coredns/vyos.sololab.zone vyos.sololab {
+    reload 5s
     fallthrough
   }
   forward vyos.sololab ${ext_facing_ns}
-  forward sololab ${int_facing_ns}
-  forward consul ${int_facing_ns}
+  forward sololab ${int_facing_ns_sololab}
+  forward consul ${int_facing_ns_consul}
   forward . ${public_ns}
   import common
 }
 https://.:44353 {
   bind 127.0.0.1
   tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
-  hosts {
-    ${ext_facing_addr} api.vyos.sololab
-    ${ext_facing_addr} coredns.vyos.sololab
-    ${ext_facing_addr} zot.vyos.sololab
-    ${ext_facing_addr} pdns-auth.vyos.sololab
-    ${ext_facing_addr} minio-api.vyos.sololab
-    ${ext_facing_addr} minio-console.vyos.sololab
+  file /etc/coredns/vyos.sololab.zone vyos.sololab {
+    reload 5s
     fallthrough
   }
   forward sololab ${ext_facing_ns}

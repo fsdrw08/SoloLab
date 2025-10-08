@@ -26,12 +26,17 @@ module "config_map" {
       {
         basename = "Corefile"
         content = templatefile("./attachments/Corefile.tftpl", {
-          int_facing_addr = "192.168.255.1"
-          int_facing_ns   = "192.168.255.10:53"
-          ext_facing_addr = "192.168.255.2"
-          ext_facing_ns   = "172.16.40.10:53"
-          public_ns       = "119.29.29.29"
+          int_facing_addr       = "192.168.255.1"
+          int_facing_ns_sololab = "192.168.255.10:53"
+          int_facing_ns_consul  = "192.168.255.20:53"
+          ext_facing_addr       = "192.168.255.2"
+          ext_facing_ns         = "172.16.40.10:53"
+          public_ns             = "119.29.29.29"
         })
+      },
+      {
+        basename = "vyos.sololab.zone"
+        content  = file("./attachments/vyos.sololab.zone")
       }
     ]
     secrets = [
