@@ -62,13 +62,14 @@ podman_quadlet = {
             Conflicts             = "umount.target"
             # kube
             yaml          = "cockpit-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
-            Restart       = "on-failure"
+            Restart       = "no"
           }
         }
       ]

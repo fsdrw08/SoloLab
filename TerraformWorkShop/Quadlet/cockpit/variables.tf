@@ -54,6 +54,7 @@ variable "podman_kubes" {
     })
     manifest_dest_path = string
   }))
+  default = []
 }
 
 variable "podman_quadlet" {

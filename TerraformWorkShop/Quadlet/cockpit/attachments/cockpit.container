@@ -1,0 +1,48 @@
+# https://www.freedesktop.org/software/systemd/man/257/systemd.unit.html
+[Unit]
+Description="${Description}"
+Documentation="${Documentation}"
+Requires=${Requires}
+After=${After}
+Wants=${Wants}
+StartLimitIntervalSec=${StartLimitIntervalSec}
+StartLimitBurst=${StartLimitBurst}
+Before=${Before}
+Conflicts=${Conflicts}
+
+# https://www.freedesktop.org/software/systemd/man/251/systemd.service.html
+[Service]
+ExecStartPre=${ExecStartPre}
+ExecStartPost=${ExecStartPost}
+Restart=${Restart}
+Sockets=${Sockets}
+
+# https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container
+# https://github.com/containers/prometheus-podman-exporter/blob/main/install.md#container-image
+[Container]
+ContainerName=cockpit
+
+Environment=TZ=Asia/Shanghai
+
+Image=zot.day0.sololab/cockpit/ws:346
+
+# Label="traefik.enable=true"
+# Label="traefik.http.routers.cockpit-redirect.entrypoints=web"
+# Label="traefik.http.routers.cockpit-redirect.rule=Host(`cockpit.day0.sololab`)"
+# Label="traefik.http.routers.cockpit-redirect.middlewares=toHttps@file"
+# Label="traefik.http.routers.cockpit.entrypoints=webSecure"
+# Label="traefik.http.routers.cockpit.rule=Host(`cockpit.day0.sololab`)"
+# Label="traefik.http.routers.cockpit.tls=true"
+# Label="traefik.http.services.cockpit.loadbalancer.server.port=9090"
+# Label="traefik.http.services.cockpit.loadbalancer.healthCheck.path=/ping"
+# Label="traefik.http.services.cockpit.loadbalancer.healthCheck.interval=10s"
+
+Memory=200m
+
+Volume=cockpit-pvc:/etc/ssh/ssh_known_hosts
+
+# podman prams
+PodmanArgs=${PodmanArgs}
+Network=${Network}
+[Install]
+WantedBy=default.target

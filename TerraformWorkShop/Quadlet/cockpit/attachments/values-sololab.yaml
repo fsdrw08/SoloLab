@@ -1,7 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 cockpit:
-  containerPorts: []
   podLabels:
     traefik.enable: true
     traefik.http.routers.cockpit-redirect.entrypoints: web

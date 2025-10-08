@@ -250,28 +250,28 @@ certs = [
   #   }
   # },
   # cockpit
-  # {
-  #   name = "cockpit.day0"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "cockpit.day0.sololab",
-  #     ]
-  #     subject = {
-  #       common_name  = "cockpit.day0.sololab"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth"
-  #     ]
-  #   }
-  # },
+  {
+    name = "cockpit.day0"
+    key = {
+      algorithm = "RSA"
+      rsa_bits  = 4096
+    }
+    cert = {
+      dns_names = [
+        "cockpit.day0.sololab",
+      ]
+      subject = {
+        common_name  = "cockpit.day0.sololab"
+        organization = "Sololab"
+      }
+      validity_period_hours = 43800
+      allowed_uses = [
+        "key_encipherment",
+        "digital_signature",
+        "server_auth"
+      ]
+    }
+  },
   # day0 wildcard
   {
     name = "wildcard.day0"
