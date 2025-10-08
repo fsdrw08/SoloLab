@@ -21,6 +21,8 @@ Restart=${Restart}
 ContainerName=prometheus-podman-exporter
 
 Environment=CONTAINER_HOST=unix:///run/podman/podman.sock
+Environment=TZ=Asia/Shanghai
+
 Exec=--web.listen-address=127.0.0.1:9882
 
 Image=zot.day0.sololab/navidys/prometheus-podman-exporter:v1.18.1
@@ -34,9 +36,12 @@ Label="traefik.http.routers.podman-exporter.rule=Host(`prometheus-podman-exporte
 Label="traefik.http.routers.podman-exporter.tls=true"
 Label="traefik.http.services.prometheus-podman-exporter.loadbalancer.server.port=9882"
 
+Memory=64m
+
 SecurityLabelType=spc_t
 
 UserNS=keep-id:uid=65534
+
 Volume=%t/podman/podman.sock:/run/podman/podman.sock
 
 # podman prams
