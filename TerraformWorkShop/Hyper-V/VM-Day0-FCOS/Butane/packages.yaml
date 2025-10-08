@@ -164,7 +164,6 @@ systemd:
         RemainAfterExit=yes
         ExecStart=/usr/bin/rpm-ostree install -y --allow-inactive $RPMS
         ExecStart=/bin/touch /var/lib/%N.stamp
-        ExecStart=/bin/systemctl disable coreos-oci-migration-motd.service
         ExecStart=/bin/systemctl --no-block reboot
 
         [Install]
