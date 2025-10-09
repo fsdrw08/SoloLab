@@ -3,7 +3,7 @@ prov_system = {
   port     = 22
   user     = "core"
   password = "P@ssw0rd"
-  sudo     = true
+  sudo     = false
 }
 
 prov_vault = {

@@ -8,15 +8,15 @@ variable "vm_conn" {
   })
 }
 
-variable "runas" {
-  type = object({
-    take_charge = optional(bool, false)
-    user        = string
-    uid         = number
-    group       = string
-    gid         = number
-  })
-}
+# variable "runas" {
+#   type = object({
+#     take_charge = optional(bool, false)
+#     user        = string
+#     uid         = number
+#     group       = string
+#     gid         = number
+#   })
+# }
 
 variable "install" {
   type = list(object({
@@ -25,42 +25,4 @@ variable "install" {
     bin_file_name   = string
     bin_file_dir    = string
   }))
-}
-
-variable "config" {
-  type = object({
-    main = object({
-      basename = string
-      content  = string
-    })
-    tls = optional(
-      object({
-        ca_basename   = string
-        ca_content    = string
-        cert_basename = string
-        cert_content  = string
-        key_basename  = string
-        key_content   = string
-        sub_dir       = string
-      }),
-      null
-    )
-    dir        = string
-    create_dir = bool
-  })
-}
-
-variable "service" {
-  type = object({
-    status = string
-    auto_start = object({
-      enabled     = bool
-      link_path   = string
-      link_target = string
-    })
-    systemd_service_unit = object({
-      path    = string
-      content = string
-    })
-  })
 }

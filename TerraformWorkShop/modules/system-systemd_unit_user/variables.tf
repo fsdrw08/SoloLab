@@ -11,16 +11,15 @@ variable "vm_conn" {
 variable "units" {
   type = list(
     object({
+      auto_start = object({
+        enabled   = bool
+        link_path = optional(string, null)
+      })
       file = object({
         path    = string
         content = string
       })
       status = optional(string, "")
-      auto_start = object({
-        enabled     = bool
-        link_path   = optional(string, null)
-        link_target = optional(string, null)
-      })
     })
   )
 }

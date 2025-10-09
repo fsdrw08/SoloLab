@@ -23,8 +23,8 @@ Environment="NOMAD_TOKEN=${NOMAD_TOKEN}"
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStartPre=${ExecStartPreNomad}
 ExecStartPre=${ExecStartPreConsul}
-ExecStart=sudo ${bin_path} agent -config ${config_file}
-ExecStartPost = /bin/bash -c "sleep $(shuf -i 10-20 -n 1) &&  ${bin_path} node eligibility -enable -self"
+ExecStart=/bin/bash -c "sudo systemctl start podman.socket && sudo ${bin_path} agent -config ${config_file}"
+ExecStartPost=/bin/bash -c "sleep $(shuf -i 10-20 -n 1) &&  ${bin_path} node eligibility -enable -self"
 KillMode=process
 KillSignal=SIGINT
 LimitNOFILE=65536

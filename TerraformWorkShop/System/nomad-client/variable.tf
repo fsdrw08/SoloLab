@@ -4,7 +4,7 @@ variable "prov_system" {
     port     = number
     user     = string
     password = string
-    sudo     = bool
+    sudo     = optional(bool, false)
   })
 }
 

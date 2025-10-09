@@ -1,5 +1,6 @@
 # ref: https://www.freedesktop.org/software/systemd/man/latest/systemd.path.html#:~:text=For%20each%20path,(see%20below).
-# this resource is only in charge to stop the service when tf resource destroy
+# this resource is only in charge to refresh systemd to mark sure systemd unit absent in the list
+# when tf resource destroy
 resource "null_resource" "unit_remove" {
   triggers = {
     host        = var.vm_conn.host
@@ -45,7 +46,7 @@ resource "system_link" "service" {
     if unit.auto_start.enabled == true
   }
   path   = each.value.auto_start.link_path
-  target = each.value.auto_start.link_target
+  target = each.value.file.path
 }
 
 # this resource is only in charge to stop the service when tf resource destroy

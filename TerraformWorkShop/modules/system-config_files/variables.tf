@@ -1,12 +1,3 @@
-variable "prov_system" {
-  type = object({
-    host     = string
-    port     = number
-    user     = string
-    password = string
-  })
-}
-
 variable "owner" {
   type = object({
     uid = number
