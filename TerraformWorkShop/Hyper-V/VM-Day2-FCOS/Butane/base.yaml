@@ -23,7 +23,8 @@ storage:
     - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
       mode: 0644
       contents:
-        source: ${ca_cert_url}
+        inline: |
+          ${indent(10, ca_content)}
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/${timezone}

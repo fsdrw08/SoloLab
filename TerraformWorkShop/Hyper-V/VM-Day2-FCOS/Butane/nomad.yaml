@@ -29,10 +29,16 @@ storage:
       mode: 0600
       contents:
         source: ${nomad_client_cert_download_url}
+        http_headers:
+          - name: Authorization
+            value: Basic ${nomad_client_cert_download_url_cred}
     - path: /etc/nomad.d/client-key.pem
       mode: 0600
       contents:
         source: ${nomad_client_cert_key_download_url}
+        http_headers:
+          - name: Authorization
+            value: Basic ${nomad_client_cert_download_url_cred}
     - path: /etc/nomad.d/nomad.hcl
       contents:
         inline: |
