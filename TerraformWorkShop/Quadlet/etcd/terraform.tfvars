@@ -13,6 +13,15 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "etcd-server.day0"
+          }
           value_sets = [
             {
               name          = "etcd.tls.contents.ca\\.crt"
@@ -27,15 +36,6 @@ podman_kubes = [
               value_ref_key = "key_pem"
             },
           ]
-          tfstate = {
-            backend = {
-              type = "local"
-              config = {
-                path = "../../TLS/RootCA/terraform.tfstate"
-              }
-            }
-            cert_name = "etcd-server.day0"
-          }
         }
       ]
     }
@@ -63,13 +63,14 @@ podman_quadlet = {
             Conflicts             = "umount.target"
             # kube
             yaml          = "etcd-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run etcd-server\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         },
       ]

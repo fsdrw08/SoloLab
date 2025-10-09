@@ -68,7 +68,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         },
       ]

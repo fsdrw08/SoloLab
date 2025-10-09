@@ -4,20 +4,6 @@ etcd:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
-  ## @param etcd.containerPorts etcd container port to expose to host
-  ## e.g.
-  ## containerPorts:
-  ##   - name: http
-  ##     containerPort: 80
-  ##     hostPort: 80
-  ##     hostIP: 192.168.255.10
-  ##     protocol: TCP
-  ##   - name: https
-  ##     containerPort: 443
-  ##     hostPort: 443
-  ##     hostIP: 192.168.255.10
-  ##     protocol: TCP
-  ##
   containerPorts: []
     # - name: client
     #   containerPort: 2379

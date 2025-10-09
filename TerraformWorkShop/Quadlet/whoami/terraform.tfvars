@@ -37,7 +37,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         },
       ]
