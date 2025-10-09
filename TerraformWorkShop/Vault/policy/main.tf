@@ -13,7 +13,8 @@ resource "vault_kv_secret_v2" "secret" {
   delete_all_versions = true
   data_json = jsonencode(
     {
-      token = each.value.token
+      token  = each.value.token
+      policy = each.value.name
     }
   )
 }

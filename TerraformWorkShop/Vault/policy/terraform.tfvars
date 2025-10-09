@@ -234,5 +234,9 @@ policy_bindings = [
         capabilities = ["list"]
       }
     EOT
+    token_binding = {
+      display_name = "cert-read"
+      no_parent    = true
+    }
   }
 ]

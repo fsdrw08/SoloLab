@@ -20,6 +20,22 @@ param (
     )]
     $Download=$true,
         
+    # Parameter help description
+    [Parameter()]
+    [string]
+    $VaultToken = $(if (
+        (
+            (Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile) `
+                | ConvertFrom-Json | Select-Object -ExpandProperty "type" -Unique
+            ) -contains "vault-kvv2"
+        ) `
+        -and (
+            $Download -eq $true
+        )
+    ){
+        Read-Host "Require vault token"
+    }),
+
     [Parameter()]
     [bool]
     [ValidateSet(
@@ -39,11 +55,13 @@ param (
 )
 
 $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile)
+
 # $repoDir = git rev-parse --show-toplevel
 # $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day1.jsonc")
 
 ## validate json
 $referenceObject = @(
+    "type"
     "publicRegistry"
     "publicRepo"
     "archive"
@@ -52,6 +70,7 @@ $referenceObject = @(
 $syncList | ConvertFrom-Json | ForEach-Object {
     $differenceObject = $_ | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty name 
     $compareResult = Compare-Object -ReferenceObject $referenceObject -DifferenceObject $differenceObject
+    
     if ($compareResult -ne $null ) {
         $resultDetail = $compareResult | Select-Object -ExpandProperty SideIndicator
         if ($resultDetail -eq "<=") {
@@ -63,36 +82,50 @@ $syncList | ConvertFrom-Json | ForEach-Object {
     }
 }
 
-# $localDir="$env:PUBLIC/Downloads/bin"
-# $localDir="D:/Users/Public/Downloads/bin"
-# $localDir="C:/Users/Public/Downloads/containers"
-# $localDir="D:/Users/Public/Downloads/containers"
 if (-not (Test-Path -Path $LocalStore)) {
     New-Item -ItemType Directory -Path $LocalStore -Force
 }
 
 
 ## download
-# $proxy="127.0.0.1:7890"
-# $proxy="192.168.255.1:7890"
-# $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
         if ((-not (Test-Path -Path $LocalStore/$($_.archive))) -and $_.publicRegistry ) {
-            $url="$($_.publicRegistry)/$($_.publicRepo)"
+            $baseUri = New-Object System.Uri("$($_.publicRegistry)")
+            $relativeUri = New-Object System.Uri($baseUri, "$($_.publicRepo)")
+            $fullUri=$relativeUri.AbsoluteUri
+
             $localPath="$LocalStore/$($_.archive)"
-            Write-Host "Download $url to $localPath"
-            curl.exe --output $localPath $url
+            $data = $_.data
+
+            switch ($_.type) {
+                "general" { 
+                    Write-Host "Download $fullUri to $localPath"
+                    curl.exe --output $localPath $fullUri
+                }
+                "vault-kvv2" {
+                    if ($VaultToken -ne "") {
+                        Write-Host "From $fullUri Fetch `"$data`" Save to $localPath"
+                        $content = $(curl.exe `
+                            -s `
+                            -H "X-Vault-Token: $VaultToken" `
+                            -X GET `
+                            $fullUri | jq.exe "$data")
+                        Set-Content -Path $localPath -Value $content.Replace('"','').Replace('\n',"`r`n")
+                    } else {
+                        Write-Host "`$VaultToken empty, skip fetch from vault"
+                    }
+                }
+                Default {}
+            }
         }
     }
 }
 
 
 ## upload
-$credential="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)"
 if ($Upload) {
-    $proxy=""
-    $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
+    $credential="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)"
 
     $syncList | ConvertFrom-Json | ForEach-Object {
         if ($_.archive -and (Test-Path -Path $LocalStore/$($_.archive))) {
@@ -101,9 +134,17 @@ if ($Upload) {
             # curl.exe -k -X MKCOL $privateDir --user $credential
             # ""
             $localPath="$LocalStore/$($_.archive)"
-            $url="$($PrivateRegistry)/$($_.privateRepo)"
-            Write-Host "Upload $localPath to $url"
-            curl.exe -k -T $localPath $url --user $credential
+            
+            $baseUri = New-Object System.Uri("$PrivateRegistry")
+            $relativeUri = New-Object System.Uri($baseUri, "$($_.privateRepo)")
+            $fullUri=$relativeUri.AbsoluteUri
+
+            Write-Host "Upload $localPath to $fullUri"
+            curl.exe -k -T $localPath $fullUri --user $credential
+            if ($_.type -eq "vault-kvv2") {
+                Write-Host "Remove sensitive data file $localPath"
+                Remove-Item -Path $localPath -Force
+            }
             ""
         }
         Start-Sleep -Seconds 1

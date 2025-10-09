@@ -1,5 +1,6 @@
 [
     {
+        "type": "general",
         "publicRegistry": "https://releases.hashicorp.com",
         "publicRepo": "consul/1.21.4/consul_1.21.4_linux_amd64.zip",
         "archive": "consul_1.21.4_linux_amd64.zip",
@@ -7,19 +8,30 @@
         "description": "https://releases.hashicorp.com/consul",
     },
     {
-        // https://releases.hashicorp.com/nomad/1.10.4/nomad_1.10.4_linux_amd64.zip
-        "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad/1.10.4/nomad_1.10.4_linux_amd64.zip",
-        "archive": "nomad_1.10.4_linux_amd64.zip",
-        "privateRepo": "public/binaries/nomad_1.10.4_linux_amd64.zip",
-        "description": "https://releases.hashicorp.com/nomad",
+        "type": "vault-kvv2",
+        "publicRegistry": "https://vault.day1.sololab",
+        "publicRepo": "/v1/kvv2-certs/data/root",
+        "data": ".data.data.ca",
+        "archive": "root.crt",
+        "privateRepo": "public/certs/root.crt",
+        "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2-certs/kv/client.global.nomad/paths",
     },
     {
-        // https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
-        "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip",
-        "archive": "nomad-driver-podman_0.6.3_linux_amd64.zip",
-        "privateRepo": "public/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip",
-        "description": "https://releases.hashicorp.com/nomad-driver-podman/",
+        "type": "vault-kvv2",
+        "publicRegistry": "https://vault.day1.sololab",
+        "publicRepo": "/v1/kvv2-certs/data/client.global.nomad",
+        "data": ".data.data.cert",
+        "archive": "client.global.nomad.crt",
+        "privateRepo": "private/certs/client.global.nomad.crt",
+        "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2-certs/kv/client.global.nomad/paths",
+    },
+    {
+        "type": "vault-kvv2",
+        "publicRegistry": "https://vault.day1.sololab",
+        "publicRepo": "/v1/kvv2-certs/data/client.global.nomad",
+        "data": ".data.data.private_key",
+        "archive": "client.global.nomad.key",
+        "privateRepo": "private/certs/client.global.nomad.key",
+        "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2-certs/kv/client.global.nomad/paths",
     },
 ]
