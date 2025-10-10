@@ -105,10 +105,6 @@ storage:
                 name        = "default"
                 socket_path = "unix://run/podman/podman.sock"
               }
-              socket {
-                name        = "1001"
-                socket_path = "unix://run/user/1001/podman/podman.sock"
-              }
               volumes {
                 enabled = true
                 selinuxlabel = "z"

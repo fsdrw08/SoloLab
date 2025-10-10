@@ -63,6 +63,7 @@ data "ct_config" "ignition" {
     merge(
       var.butane.vars.global,
       var.butane.vars.local[count.index],
+      zipmap(local.secret_var_keys, local.secret_var_values)
     )
   )
   strict       = true

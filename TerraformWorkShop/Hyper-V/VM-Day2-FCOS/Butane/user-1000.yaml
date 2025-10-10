@@ -30,31 +30,6 @@ storage:
       contents:
         inline: |
           source /etc/profile.d/bash_completion.sh
-    # stop container before machine halt/poweroff/shutdown/reboot
-    # https://askubuntu.com/questions/952363/how-do-i-properly-run-this-systemd-service-on-shutdown
-    # https://github.com/iree-org/iree/blob/65bbc4b4d56f3e752cc14fd8c8f53796a80bb0bf/build_tools/github_actions/runner/config/systemd/system/gh-runner-deregister.service#L12
-    # https://github.com/osmc/osmc/blob/20990a86bb956e8bedf036884a94dc76e2867e7d/package/rbp-userland-osmc/files/lib/systemd/system/rpi-display-backlight.service#L6
-    # %t means the path "$XDG_RUNTIME_DIR" resolves to (for user managers). https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#Specifiers
-    - path: /var/home/core/.config/systemd/user/stop-container.service
-      overwrite: true
-      user:
-        id: 1000
-      group:
-        id: 1000
-      contents:
-        inline: |
-          [Unit]
-          Description=Stop container before shutdown
-          DefaultDependencies=no
-          Before=umount.target
-
-          [Service]
-          Type=oneshot
-          ExecStart=/bin/sh -c "for svc in $(ls %t/systemd/generator/ | grep service); do systemctl --user stop $svc; done"
-          RemainAfterExit=no
-
-          [Install]
-          WantedBy=halt.target poweroff.target shutdown.target reboot.target
   # set rootless user home dir to external disk
   directories:
     - path: /var/home/core
@@ -145,38 +120,6 @@ storage:
     # link the socket in this dir for socket auto start when user login
     - path: /var/home/core/.config/systemd/user/sockets.target.wants/podman.socket
       target: /usr/lib/systemd/user/podman.socket
-      overwrite: true
-      user:
-        id: 1000
-      group:
-        id: 1000
-    # link the user level stop container service to halt.target.wants dir for container service auto stop when halt
-    - path: /var/home/core/.config/systemd/user/halt.target.wants/stop-container.service
-      target: /var/home/core/.config/systemd/user/stop-container.service
-      overwrite: true
-      user:
-        id: 1000
-      group:
-        id: 1000
-    # link the user level stop container service to poweroff.target.wants dir for container service auto stop when halt
-    - path: /var/home/core/.config/systemd/user/poweroff.target.wants/stop-container.service
-      target: /var/home/core/.config/systemd/user/stop-container.service
-      overwrite: true
-      user:
-        id: 1000
-      group:
-        id: 1000
-    # link the user level stop container service to shutdown.target.wants dir for container service auto stop when halt
-    - path: /var/home/core/.config/systemd/user/shutdown.target.wants/stop-container.service
-      target: /var/home/core/.config/systemd/user/stop-container.service
-      overwrite: true
-      user:
-        id: 1000
-      group:
-        id: 1000
-    # link the user level stop container service to reboot.target.wants dir for container service auto stop when halt
-    - path: /var/home/core/.config/systemd/user/reboot.target.wants/stop-container.service
-      target: /var/home/core/.config/systemd/user/stop-container.service
       overwrite: true
       user:
         id: 1000

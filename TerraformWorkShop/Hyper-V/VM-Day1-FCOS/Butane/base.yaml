@@ -4,10 +4,12 @@ version: 1.5.0
 storage:
   files:
     - path: /etc/hostname
+      overwrite: true
       contents:
         inline: ${vm_name}
     # https://github.com/coreos/coreos-tutorials/blob/97376716dce47080dd9e8f016753c55c5c79da96/fedora-coreos/provisioning/fcos-lab-tutorial.bu#L48
     - path: /etc/ssh/sshd_config.d/20-enable-passwords.conf
+      overwrite: true
       contents:
         inline: |
           # Fedora CoreOS disables SSH password login by default.
@@ -16,11 +18,13 @@ storage:
           PasswordAuthentication yes
     # low down the unprivilege port
     - path: /etc/sysctl.d/90-unprivileged_port_start.conf
+      overwrite: true
       contents:
         inline: |
           net.ipv4.ip_unprivileged_port_start = 53
     # trust custom cert
     - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
+      overwrite: true
       mode: 0644
       contents:
         inline: |
