@@ -13,8 +13,7 @@ locals {
 }
 
 module "config_map" {
-  source      = "../../modules/system-config_files"
-  prov_system = var.prov_system
+  source = "../../modules/system-config_files"
   owner = {
     uid = 0
     gid = 0

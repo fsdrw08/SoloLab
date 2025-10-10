@@ -63,9 +63,8 @@ data "vault_kv_secret_v2" "secrets" {
 # }
 
 module "config_map" {
-  depends_on  = [null_resource.init]
-  source      = "../../modules/system-config_files"
-  prov_system = var.prov_system
+  depends_on = [null_resource.init]
+  source     = "../../modules/system-config_files"
   owner = {
     uid = 100
     gid = 1000

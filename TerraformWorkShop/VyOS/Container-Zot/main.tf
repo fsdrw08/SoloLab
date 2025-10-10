@@ -48,9 +48,8 @@ locals {
 
 # zot config
 module "config_map" {
-  source      = "../../modules/system-config_files"
-  prov_system = var.prov_system
-  owner       = var.owner
+  source = "../../modules/system-config_files"
+  owner  = var.owner
   config = {
     create_dir = true
     dir        = "/mnt/data/etc/zot"
