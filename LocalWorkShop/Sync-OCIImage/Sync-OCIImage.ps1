@@ -96,9 +96,9 @@ if ($Download) {
 }
 
 ## push
-$proxy=$null
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 if ($Upload) {
+    # $proxy=$null
+    # $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
     $syncList | ConvertFrom-Json | ForEach-Object {
         if (Test-Path -Path $LocalStore/$($_.archive)) {
             Write-Host "Upload OCI image OCI archive $LocalStore/$($_.archive) to $($PrivateRegistry)/$($_.privateRepo)"

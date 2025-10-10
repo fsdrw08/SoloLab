@@ -54,6 +54,13 @@ param (
     $PrivateRegistryCredential = $(if ($Upload) {Get-Credential} else {$null})
 )
 
+@("curl", "jq") | ForEach-Object {
+    if (!(Get-Command $_)) {
+        "Download/Install $_ first"
+        exit 1
+    }
+}
+
 $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile)
 
 # $repoDir = git rev-parse --show-toplevel
