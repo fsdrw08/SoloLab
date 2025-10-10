@@ -17,8 +17,6 @@ services {
   ]
 
   tags = [
-    "host=day1",
-
     "traefik.enable=true",
     "traefik.http.routers.nomad-redirect.entrypoints=web",
     "traefik.http.routers.nomad-redirect.rule=Host(`nomad.day1.sololab`)||Host(`nomad.service.consul`)",

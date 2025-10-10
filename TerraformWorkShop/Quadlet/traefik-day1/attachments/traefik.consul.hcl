@@ -17,7 +17,6 @@ services {
 
   tags = [
     "exporter",
-    "host=day1",
 
     "traefik.enable=true",
     "traefik.http.routers.trafik-dashboard-redirect.entryPoints=web",

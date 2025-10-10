@@ -19,7 +19,6 @@ services {
 
   tags = [
     "exporter-vault",
-    "host=day1",
 
     "traefik.enable=true",
     "traefik.http.routers.vault-redirect.entrypoints=web",

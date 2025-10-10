@@ -10,7 +10,7 @@ traefik:
     static:
       providers:
         consulCatalog:
-          constraints: "Tag(`host=day1`)"
+          # constraints: "Tag(`host=day1`)"
           endpoint:
             address: consul.service.consul:8501
             datacenter: dc1

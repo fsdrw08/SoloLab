@@ -18,7 +18,6 @@ services {
 
   tags = [
     "exporter-consul",
-    "host=day1",
 
     "traefik.enable=true",
     "traefik.http.routers.consul-redirect.entrypoints=web",
