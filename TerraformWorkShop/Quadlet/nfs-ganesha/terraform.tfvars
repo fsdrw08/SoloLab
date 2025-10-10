@@ -38,10 +38,7 @@ podman_quadlet = {
             Conflicts             = "umount.target"
             # podman
             PodmanArgs = "--tls-verify=false"
-            Network    = ""
-            # kube
-            yaml          = "nfs-ganesha-aio.yaml"
-            KubeDownForce = "false"
+            Network    = "host"
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
