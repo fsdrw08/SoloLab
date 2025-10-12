@@ -40,7 +40,7 @@ job "grafana" {
           port           = 3000
           type           = "http"
           path           = "/api/health"
-          interval       = "10s"
+          interval       = "180s"
           timeout        = "2s"
           initial_status = "passing"
         }
