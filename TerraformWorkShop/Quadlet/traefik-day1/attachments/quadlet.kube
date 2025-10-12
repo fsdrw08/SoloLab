@@ -6,6 +6,8 @@ After=${After}
 Wants=${Wants}
 StartLimitIntervalSec=${StartLimitIntervalSec}
 StartLimitBurst=${StartLimitBurst}
+Before=${Before}
+Conflicts=${Conflicts}
 
 # https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#kube-units-kube
 [Kube]
