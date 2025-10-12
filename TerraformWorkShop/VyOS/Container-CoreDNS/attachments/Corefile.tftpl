@@ -13,6 +13,9 @@
   }
   forward vyos.sololab ${ext_facing_ns}
   forward sololab ${int_facing_ns_sololab}
+  forward dc.consul ${int_facing_ns_consul}
+  forward node.consul ${int_facing_ns_consul}
+  forward service.consul ${int_facing_ns_consul}
   forward consul ${int_facing_ns_consul}
   forward . ${public_ns}
   import common

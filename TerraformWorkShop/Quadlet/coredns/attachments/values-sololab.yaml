@@ -72,8 +72,6 @@ coredns:
             credentials monitor monitor
             tls /etc/coredns/tls/ca.crt
         - name: forward
-          parameters: consul 192.168.255.20
-        - name: forward
           parameters: . 192.168.255.1
     - zones:
         - zone: consul
@@ -83,6 +81,14 @@ coredns:
           parameters: "{{ .Values.coredns.hostIP }}"
         - name: errors
         - name: log
+        - name: forward
+          parameters: dc.consul 192.168.255.20
+        - name: forward
+          parameters: node.consul 192.168.255.20
+        - name: forward
+          parameters: service.consul 192.168.255.20
+        - name: forward
+          parameters: consul 192.168.255.20
         - name: forward
           parameters: . 192.168.255.20
   # zoneFiles:
