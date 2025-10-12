@@ -17,23 +17,6 @@ job "grafana" {
   }
 
   group "grafana" {
-    service {
-      provider = "consul"
-      name     = "grafana"
-
-      # check {
-      #   type     = "http"
-      #   path     = "/api/health"
-      #   port     = "grafana"
-      #   interval = "10s"
-      #   timeout  = "2s"
-      # }
-
-      # tags = [
-      #   "exporter",
-      # ]
-
-    }
 
     volume "data" {
       type            = "csi"
@@ -45,6 +28,34 @@ job "grafana" {
 
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "grafana" {
+      # https://developer.hashicorp.com/nomad/docs/job-specification/service
+      service {
+        provider     = "consul"
+        name         = "grafana"
+        address_mode = "host"
+
+        # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
+        check {
+          address_mode   = "driver"
+          port           = 3000
+          type           = "http"
+          path           = "/api/health"
+          interval       = "10s"
+          timeout        = "2s"
+          initial_status = "passing"
+        }
+
+        tags = [
+          "exporter",
+
+          "traefik.enable=true",
+          "traefik.tcp.routers.grafana.entryPoints=webSecure",
+          "traefik.tcp.routers.grafana.rule=HostSNI(`grafana.day2.sololab`)",
+          "traefik.tcp.routers.grafana.tls.passthrough=true",
+          "traefik.tcp.services.grafana.loadbalancer.server.port=443",
+        ]
+      }
+
       driver = "podman"
 
       config {
@@ -52,21 +63,18 @@ job "grafana" {
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.grafana-redirect.entrypoints" = "web"
-          "traefik.http.routers.grafana-redirect.rule"        = "Host(`grafana.service.consul`)"
+          "traefik.http.routers.grafana-redirect.rule"        = "Host(`grafana.day2.sololab`)"
           "traefik.http.routers.grafana-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.grafana-redirect.service"     = "grafana"
 
           "traefik.http.routers.grafana.entrypoints"      = "webSecure"
           "traefik.http.routers.grafana.tls.certresolver" = "internal"
-          "traefik.http.routers.grafana.rule"             = "Host(`grafana.service.consul`)"
+          "traefik.http.routers.grafana.rule"             = "Host(`grafana.day2.sololab`)"
 
           "traefik.http.services.grafana.loadbalancer.server.port" = "3000"
         }
-        # network_mode = "host"
-        # ports        = ["web", "webSecure", "grafana"]
-        security_opt = [
-          "label=type:spc_t",
-        ]
+
+        ## userns can only apply when network_mode is not host
         userns = "keep-id:uid=472,gid=0"
 
         volumes = [
@@ -77,7 +85,9 @@ job "grafana" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        TZ = "Asia/Shanghai"
+        TZ                 = "Asia/Shanghai"
+        GF_SERVER_DOMAIN   = "grafana.day2.sololab"
+        GF_SERVER_ROOT_URL = "https://grafana.day2.sololab"
       }
 
       resources {

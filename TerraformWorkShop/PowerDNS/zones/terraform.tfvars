@@ -269,6 +269,14 @@ zones = [
           "192.168.255.2"
         ]
       },
+      {
+        fqdn = "grafana.day2.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
     ]
   }
 ]

@@ -172,6 +172,17 @@ dns_records = [
       }
     }
   },
+  {
+    hostname = "grafana.day2.sololab"
+    value = {
+      string_map = {
+        host = "grafana.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
   # {
   #   hostname = "grafana.day1.sololab"
   #   value = {
