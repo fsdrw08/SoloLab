@@ -18,20 +18,6 @@ podman_kubes = [
       name       = "nomad"
       chart      = "../../../HelmWorkShop/helm-charts/charts/nomad"
       value_file = "./attachments/values-sololab.yaml"
-      # value_sets = [
-      #   {
-      #     name         = "nomad.configFiles.main.advertise.http"
-      #     value_string = "192.168.255.10"
-      #   },
-      #   {
-      #     name         = "nomad.configFiles.main.advertise.rpc"
-      #     value_string = "192.168.255.10"
-      #   },
-      #   {
-      #     name         = "nomad.configFiles.main.advertise.serf"
-      #     value_string = "192.168.255.10"
-      #   },
-      # ]
       secrets = [
         {
           vault_kvv2 = {

@@ -28,6 +28,10 @@ nomad:
     main:
       acl:
         enabled: true
+      advertise:
+        http: '{{ GetInterfaceIP "eth0" }}'
+        rpc: '{{ GetInterfaceIP "eth0" }}'
+        serf: '{{ GetInterfaceIP "eth0" }}'
       # https://developer.hashicorp.com/nomad/docs/configuration/consul
       consul:
         address: consul.day1.sololab:8501
