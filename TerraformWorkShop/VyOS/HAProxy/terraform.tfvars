@@ -151,4 +151,12 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day2_frontend_traefik = {
+    path = "load-balancing haproxy service tcp443 rule 300"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "traefik.day2.sololab"
+      "set backend" = "day1"
+    }
+  }
 }

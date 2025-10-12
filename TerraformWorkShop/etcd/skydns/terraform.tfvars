@@ -161,6 +161,17 @@ dns_records = [
       }
     }
   },
+  {
+    hostname = "traefik.day2.sololab"
+    value = {
+      string_map = {
+        host = "traefik-day2.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
   # {
   #   hostname = "grafana.day1.sololab"
   #   value = {
