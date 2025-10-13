@@ -38,9 +38,9 @@ vault_certs = [
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "*.service.consul"
+    common_name = "*.day1.sololab"
     alt_names = [
-      "*.day1.sololab"
+      "*.service.consul"
     ]
   },
   {

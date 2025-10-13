@@ -58,7 +58,7 @@ policies = [
 roles = [
   {
     name        = "management"
-    description = "management token"
+    description = "management token (token-management)"
     token = {
       type = "management"
       store = {
@@ -74,7 +74,7 @@ roles = [
   },
   {
     name         = "node-write"
-    description  = "Role of nomad node"
+    description  = "Role of nomad node (token-node_write)"
     policy_names = ["node-write"]
     token = {
       store = {
