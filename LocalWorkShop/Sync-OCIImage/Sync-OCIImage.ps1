@@ -39,7 +39,7 @@ param (
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]
     [System.Management.Automation.Credential()]
-    $PrivateRegistryCredential = $(if ($Upload) {Get-Credential} else {$null})
+    $PrivateRegistryCredential = $(if ($Upload) {Get-Credential -Message "credential for private registry"} else {$null})
 )
 
 if (!(Get-Command skopeo.exe)) {

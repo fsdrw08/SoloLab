@@ -33,7 +33,7 @@ param (
             $Download -eq $true
         )
     ){
-        Read-Host "Require vault token"
+        Read-Host "Require vault token to get cert content"
     }),
 
     [Parameter()]
@@ -51,7 +51,7 @@ param (
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]
     [System.Management.Automation.Credential()]
-    $PrivateRegistryCredential = $(if ($Upload) {Get-Credential} else {$null})
+    $PrivateRegistryCredential = $(if ($Upload) {Get-Credential -Message "dufs credential"} else {$null})
 )
 
 @("curl", "jq") | ForEach-Object {

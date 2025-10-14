@@ -10,7 +10,6 @@ variable "routing_config" {
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-traefik
 job "traefik" {
   datacenters = ["dc1"]
-  region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
   type = "system"
 
@@ -42,7 +41,7 @@ job "traefik" {
         type     = "http"
         path     = "/ping"
         port     = "traefik"
-        interval = "600s"
+        interval = "180s"
         timeout  = "2s"
       }
 
@@ -164,6 +163,12 @@ job "traefik" {
         volume      = "certs"
         destination = "/mnt/acmeStorage"
       }
+
+      restart {
+        attempts = 3
+        delay    = "10s"
+      }
+
     }
   }
 }
