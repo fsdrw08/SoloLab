@@ -16,6 +16,8 @@ job "nfs-nodes" {
       name     = "nfs-csi-plugin-node"
     }
 
+    shutdown_delay = "10s"
+
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#socket
     task "plugin" {
       driver = "podman"
