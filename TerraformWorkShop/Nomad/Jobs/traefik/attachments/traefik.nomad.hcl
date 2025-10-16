@@ -56,11 +56,14 @@ job "traefik" {
         "exporter",
 
         "traefik.enable=true",
-        "traefik.tcp.routers.trafik-dashboard.entryPoints=webSecure",
-        "traefik.tcp.routers.trafik-dashboard.rule=HostSNI(`traefik.${attr.unique.hostname}.sololab`)",
-        "traefik.tcp.routers.trafik-dashboard.tls.passthrough=true",
-        "traefik.tcp.services.trafik-dashboard.loadbalancer.server.port=443",
+        "traefik.http.routers.trafik-dashboard-redirect.entryPoints=web",
+        "traefik.http.routers.trafik-dashboard-redirect.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
+        "traefik.http.routers.trafik-dashboard-redirect.middlewares=toHttps@file",
 
+        "traefik.http.routers.trafik-dashboard.entryPoints=webSecure",
+        "traefik.http.routers.trafik-dashboard.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
+        "traefik.http.routers.trafik-dashboard.tls.certresolver=internal",
+        "traefik.http.services.trafik-dashboard.loadbalancer.server.scheme=https",
       ]
 
     }
