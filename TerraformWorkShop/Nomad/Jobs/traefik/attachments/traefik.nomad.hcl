@@ -38,11 +38,12 @@ job "traefik" {
       port     = "webSecure"
 
       check {
-        type     = "http"
-        path     = "/ping"
-        port     = "traefik"
-        interval = "180s"
-        timeout  = "2s"
+        type           = "http"
+        path           = "/ping"
+        port           = "traefik"
+        interval       = "180s"
+        timeout        = "2s"
+        initial_status = "passing"
       }
 
       meta {
@@ -63,7 +64,10 @@ job "traefik" {
         "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.entryPoints=webSecure",
         "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
         "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.tls.certresolver=internal",
+
         "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.scheme=https",
+        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.port=443",
+        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadBalancer.serversTransport=traefik-${attr.unique.hostname}@file",
       ]
 
     }
@@ -85,20 +89,22 @@ job "traefik" {
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
-          "traefik.http.routers.dashboard-redirect.rule"        = "Host(`traefik-${attr.unique.hostname}.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard-redirect.rule"        = "Host(`traefik.${attr.unique.hostname}.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.dashboard-redirect.service"     = "api@internal"
 
           "traefik.http.routers.dashboard.entryPoints" = "webSecure"
-          "traefik.http.routers.dashboard.rule"        = "Host(`traefik-${attr.unique.hostname}.service.consul`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard.tls"         = "true"
+          "traefik.http.routers.dashboard.rule"        = "Host(`traefik.${attr.unique.hostname}.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard.service"     = "api@internal"
           "traefik.http.routers.dashboard.middlewares" = "userPass@file"
+
           # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2,
           "traefik.http.services.dashboard.loadbalancer.server.port" = "443"
 
           "traefik.http.routers.metrics.entryPoints" = "webSecure"
           "traefik.http.routers.metrics.tls"         = "true"
-          "traefik.http.routers.metrics.rule"        = "Host(`traefik-${attr.unique.hostname}.service.consul`) && PathPrefix(`/metrics`)"
+          "traefik.http.routers.metrics.rule"        = "Host(`traefik-${attr.unique.hostname}.sololab`) && PathPrefix(`/metrics`)"
           "traefik.http.routers.metrics.service"     = "prometheus@internal"
         }
         network_mode = "host"

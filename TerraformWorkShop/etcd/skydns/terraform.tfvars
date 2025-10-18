@@ -165,7 +165,7 @@ dns_records = [
     hostname = "traefik.day2.sololab"
     value = {
       string_map = {
-        host = "traefik-day2.service.consul"
+        host = "192.168.255.20"
       }
       number_map = {
         ttl = 60
@@ -176,7 +176,7 @@ dns_records = [
     hostname = "grafana.day2.sololab"
     value = {
       string_map = {
-        host = "grafana.service.consul"
+        host = "192.168.255.20"
       }
       number_map = {
         ttl = 60

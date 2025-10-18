@@ -49,10 +49,17 @@ job "grafana" {
           "exporter",
 
           "traefik.enable=true",
-          "traefik.tcp.routers.grafana.entryPoints=webSecure",
-          "traefik.tcp.routers.grafana.rule=HostSNI(`grafana.day2.sololab`)",
-          "traefik.tcp.routers.grafana.tls.passthrough=true",
-          "traefik.tcp.services.grafana.loadbalancer.server.port=443",
+          "traefik.http.routers.grafana-redirect.entryPoints=web",
+          "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day2.sololab`)",
+          "traefik.http.routers.grafana-redirect.middlewares=toHttps@file",
+
+          "traefik.http.routers.grafana.entryPoints=webSecure",
+          "traefik.http.routers.grafana.rule=Host(`grafana.day2.sololab`)",
+          "traefik.http.routers.grafana.tls.certresolver=internal",
+
+          "traefik.http.services.grafana.loadbalancer.server.scheme=https",
+          "traefik.http.services.grafana.loadbalancer.server.port=443",
+          "traefik.http.services.grafana.loadBalancer.serversTransport=grafana@file",
         ]
       }
 
@@ -67,9 +74,10 @@ job "grafana" {
           "traefik.http.routers.grafana-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.grafana-redirect.service"     = "grafana"
 
-          "traefik.http.routers.grafana.entrypoints"      = "webSecure"
-          "traefik.http.routers.grafana.tls.certresolver" = "internal"
-          "traefik.http.routers.grafana.rule"             = "Host(`grafana.day2.sololab`)"
+          "traefik.http.routers.grafana.entrypoints" = "webSecure"
+          "traefik.http.routers.grafana.rule"        = "Host(`grafana.day2.sololab`)"
+          "traefik.http.routers.grafana.tls"         = "true"
+          "traefik.http.routers.grafana.service"     = "grafana"
 
           "traefik.http.services.grafana.loadbalancer.server.port" = "3000"
         }
