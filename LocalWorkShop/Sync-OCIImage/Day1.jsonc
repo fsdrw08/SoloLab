@@ -29,6 +29,13 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/consul-template:0.41.2",
+        "archive": "docker.io_hashicorp_consul-template_0.41.2.tar",
+        "privateRepo": "hashicorp/consul-template:0.41.2",
+        "description": "https://hub.docker.com/r/hashicorp/consul-template",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "hashicorp/consul:1.21.4",
         "archive": "docker.io_hashicorp_consul_1.21.4.tar",
         "privateRepo": "hashicorp/consul:1.21.4",

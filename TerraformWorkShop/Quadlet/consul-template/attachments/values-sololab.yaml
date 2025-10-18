@@ -1,0 +1,55 @@
+global:
+  imageRegistry: zot.day0.sololab
+consulTemplate:
+  ## @param consulTemplate.configFiles
+  configFiles:
+    main:
+      log_level: INFO
+      consul:
+        address: consul.service.consul:8501
+        ssl:
+          ca_cert: /consul-template/tls/ca.crt
+        token: # set by terraform data
+      template:
+        - source: /consul-template/templates/serversTransports.ctmpl
+          destination: /consul-template/data/serversTransports.yaml
+  templates:
+    - name: serversTransports.ctmpl
+      content: |
+        http:
+          serversTransports:
+            {{- range $service := services }}
+            {{ $service.Name }}:
+              serverName: "{{ $service.Name }}.service.consul"
+              rootcas:
+                - "/etc/traefik/tls/ca.crt"
+            {{- end }}
+  ## @param consulTemplate.podAnnotations Annotations for consul pods
+  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
+  ## the userns annotation only work podman v4.9+
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ## ref: https://github.com/containers/podman/discussions/22378
+  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/Dockerfile#L271-L273
+  ## e.g.
+  ## podAnnotations:
+  ##   io.podman.annotations.userns: keep-id:uid=100,gid=1000
+  ##
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  ## @param consulTemplate.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the consul container(s)
+  ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
+  ##
+  extraVolumeMounts:
+    - name: destination
+      mountPath: "/consul-template/data:Z"
+  ## @param consulTemplate.extraVolumes Optionally specify extra list of additional volumes for the consul pod(s)
+  ##
+  extraVolumes:
+    - name: destination
+      hostPath:
+        path: /var/home/podmgr/traefik-file-provider
+        type: Directory
