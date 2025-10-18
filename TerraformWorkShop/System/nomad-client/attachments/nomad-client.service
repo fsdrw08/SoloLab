@@ -25,6 +25,7 @@ ExecStartPre=${ExecStartPreNomad}
 ExecStartPre=${ExecStartPreConsul}
 ExecStart=/bin/bash -c "sudo systemctl start podman.socket && sudo ${bin_path} agent -config ${config_file}"
 ExecStartPost=/bin/bash -c "sleep $(shuf -i 10-20 -n 1) &&  ${bin_path} node eligibility -enable -self"
+ExecStop=/bin/bash -c "sudo systemctl start podman.socket && ${bin_path} node drain -enable -self"
 KillMode=process
 KillSignal=SIGINT
 LimitNOFILE=65536
