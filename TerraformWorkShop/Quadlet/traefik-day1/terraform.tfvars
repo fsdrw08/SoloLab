@@ -21,7 +21,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "*.day1.sololab"
+            name  = "*.service.consul"
           }
           value_sets = [
             {
