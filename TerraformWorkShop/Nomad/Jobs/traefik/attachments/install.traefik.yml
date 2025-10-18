@@ -1,21 +1,6 @@
 accessLog: {}
 api:
   dashboard: true
-certificatesResolvers:
-  external:
-    acme:
-      caServer: https://acme-v02.api.letsencrypt.org/directory
-      certificatesDuration: 2160
-      email: ""
-      storage: /mnt/acmeStorage/external.json
-      tlsChallenge: {}
-  internal:
-    acme:
-      caServer: https://vault.day1.sololab/v1/pki-sololab_day1/acme/directory
-      certificatesDuration: 2160
-      email: ""
-      storage: /mnt/acmeStorage/internal.json
-      tlsChallenge: {}
 entryPoints:
   traefik:
     address: :8080

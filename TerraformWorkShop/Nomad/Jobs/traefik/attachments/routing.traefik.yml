@@ -8,3 +8,8 @@ http:
       basicAuth:
         users:
           - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+
+tls:
+  certificates:
+    - certFile: /etc/traefik/tls/consul.crt
+      keyFile: /etc/traefik/tls/consul.key
