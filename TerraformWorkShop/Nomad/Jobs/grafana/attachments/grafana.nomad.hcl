@@ -59,7 +59,7 @@ job "grafana" {
 
           "traefik.http.services.grafana.loadbalancer.server.scheme=https",
           "traefik.http.services.grafana.loadbalancer.server.port=443",
-          "traefik.http.services.grafana.loadBalancer.serversTransport=grafana@file",
+          "traefik.http.services.grafana.loadBalancer.serversTransport=consul-service@file",
         ]
       }
 

@@ -67,7 +67,7 @@ job "traefik" {
 
         "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.scheme=https",
         "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.port=443",
-        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadBalancer.serversTransport=traefik-${attr.unique.hostname}@file",
+        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadBalancer.serversTransport=consul-service@file",
       ]
 
     }
