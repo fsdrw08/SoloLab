@@ -31,7 +31,7 @@ vault_certs = [
       "localhost"
     ]
   },
-  # consul service wild card cert hosting in reverse proxy
+  # day1 and consul service wild card cert hosting in reverse proxy
   {
     secret_engine = {
       backend   = "pki-sololab_day1"

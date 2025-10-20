@@ -48,3 +48,31 @@ resource "vault_kv_secret_v2" "secret" {
     }
   )
 }
+
+data "vault_kv_secret_v2" "secret" {
+  mount = "kvv2-vault_token"
+  name  = "consul-ca"
+}
+
+data "consul_service" "vault" {
+  name = "vault"
+}
+
+resource "consul_certificate_authority" "connect_ca" {
+  connect_provider = "vault"
+  # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault?page=connect&page=ca&page=vault#enable-vault-as-the-ca
+  config_json = jsonencode({
+    Address                  = "https://${data.consul_service.vault.service[0].address}:${data.consul_service.vault.service[0].port}"
+    TLSServerName            = "vault.service.consul"
+    CAFile                   = "/consul/config/certs/ca.crt"
+    Token                    = data.vault_kv_secret_v2.secret.data["token"]
+    RootPkiPath              = "pki-consul_root"
+    IntermediatePkiPath      = "pki-consul_int"
+    LeafCertTTL              = "72h"
+    RotationPeriod           = "2160h"
+    IntermediateCertTTL      = "8760h"
+    ForceWithoutCrossSigning = true
+    PrivateKeyType           = "rsa"
+    PrivateKeyBits           = 2048
+  })
+}

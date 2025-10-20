@@ -33,3 +33,56 @@ vault_pki = {
     revocation_signature_algorithm = "SHA256WithRSA"
   }
 }
+
+root_cas = [
+  {
+    secret_engine = {
+      path                    = "pki-sololab_root"
+      description             = "PKI engine hosting root CA v1 for sololab"
+      default_lease_ttl_years = 5
+      max_lease_ttl_years     = 5
+    }
+    roles = [
+      {
+        name             = "RootCA-Sololab-v1-role-default"
+        ttl_years        = 5
+        key_type         = "rsa"
+        key_bits         = 4096
+        allow_ip_sans    = true
+        allowed_domains  = ["sololab", "consul"]
+        allow_subdomains = true
+        allow_any_name   = true
+      }
+    ]
+    cert = {
+      external_import = {
+        ref_cert_bundle_path = "../../../../TLS/RootCA/RootCA_bundle.pem"
+        # ref_cert_bundle_path = ""
+      }
+    }
+    issuer = {
+      name                           = "RootCA-v1"
+      revocation_signature_algorithm = "SHA256WithRSA"
+    }
+  },
+  {
+    secret_engine = {
+      path                    = "pki-consul_root"
+      description             = "PKI engine hosting root CA for Consul"
+      default_lease_ttl_years = 5
+      max_lease_ttl_years     = 5
+    }
+    roles = [
+      {
+        name             = "RootCA-Consul-v1-role-default"
+        ttl_years        = 5
+        key_type         = "rsa"
+        key_bits         = 4096
+        allow_ip_sans    = true
+        allowed_domains  = ["consul"]
+        allow_subdomains = true
+        allow_any_name   = true
+      }
+    ]
+  }
+]

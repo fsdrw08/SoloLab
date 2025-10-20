@@ -184,24 +184,24 @@ policy_bindings = [
     policy_name    = "consul-ca"
     policy_content = <<-EOT
       # Allow Consul to read both PKI mounts and to manage the intermediate PKI mount configuration:
-      path "/sys/mounts/pki-sololab_root" {
+      path "/sys/mounts/pki-consul_root" {
         capabilities = [ "read" ]
       }
-      path "/sys/mounts/pki-sololab_consul" {
+      path "/sys/mounts/pki-consul_int" {
         capabilities = [ "read" ]
       }
-      path "/sys/mounts/pki-sololab_consul/tune" {
+      path "/sys/mounts/pki-consul_int/tune" {
         capabilities = [ "update" ]
       }
       
       # Allow Consul read-only access to the root PKI engine, to automatically rotate intermediate CAs as needed, and full use of the intermediate PKI engine:
-      path "/pki-sololab_root/" {
+      path "/pki-consul_root/" {
         capabilities = [ "read" ]
       }
-      path "/pki-sololab_root/root/sign-intermediate" {
+      path "/pki-consul_root/root/sign-intermediate" {
         capabilities = [ "update" ]
       }
-      path "/pki-sololab_consul/*" {
+      path "/pki-consul_int/*" {
         capabilities = [ "create", "read", "update", "delete", "list" ]
       }
       

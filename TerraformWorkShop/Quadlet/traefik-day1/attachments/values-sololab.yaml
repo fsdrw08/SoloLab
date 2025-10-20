@@ -54,7 +54,7 @@ traefik:
             tlsChallenge: {}
         internal:
           acme:
-            caServer: https://vault.day1.sololab:8200/v1/pki-sololab_day1/acme/directory
+            caServer: https://vault.day1.sololab:8200/v1/pki-sololab_day2/acme/directory
             certificatesDuration: 2160
             email: ""
             storage: /mnt/acmeStorage/internal.json
@@ -83,7 +83,7 @@ traefik:
         http:
           serversTransports:
             consul-service:
-              serverName: wildcard.service.consul
+              serverName: "*.service.consul"
               rootcas:
                 - "/etc/traefik/tls/ca.crt"
 
