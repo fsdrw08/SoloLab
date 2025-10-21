@@ -84,5 +84,16 @@ root_cas = [
         allow_any_name   = true
       }
     ]
+    cert = {
+      internal_sign = {
+        type        = "internal"
+        common_name = "Consul Root CA"
+        ttl_years   = 5
+      }
+    }
+    issuer = {
+      name                           = "RootCA-v1"
+      revocation_signature_algorithm = "SHA256WithRSA"
+    }
   }
 ]

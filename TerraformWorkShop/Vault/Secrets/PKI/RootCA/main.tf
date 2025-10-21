@@ -92,9 +92,9 @@ resource "vault_pki_secret_backend_role" "role" {
 resource "vault_pki_secret_backend_config_ca" "config_ca" {
   for_each = {
     for ca in var.root_cas : ca.secret_engine.path => ca
-    if ca.cert != null
+    if ca.cert.external_import != null
   }
-  # count = var.vault_pki.ca.external_import.ref_cert_bundle_path == "" ? 0 : 1
+  # count = var.vault_pki.cert.external_import.ref_cert_bundle_path == "" ? 0 : 1
 
   depends_on = [vault_mount.pki]
   backend    = vault_mount.pki[each.key].path
@@ -102,9 +102,28 @@ resource "vault_pki_secret_backend_config_ca" "config_ca" {
   pem_bundle = file("${path.module}/${each.value.cert.external_import.ref_cert_bundle_path}")
 }
 
+resource "vault_pki_secret_backend_root_cert" "root_cert" {
+  for_each = {
+    for ca in var.root_cas : ca.secret_engine.path => ca
+    if ca.cert.internal_sign != null
+  }
+  depends_on  = [vault_mount.pki]
+  backend     = vault_mount.pki[each.key].path
+  type        = each.value.cert.internal_sign.type
+  common_name = each.value.cert.internal_sign.common_name
+  ttl         = (each.value.cert.internal_sign.ttl_years * 365 * 24 * 60 * 60) # years in seconds
+}
+
 data "vault_pki_secret_backend_issuers" "issuers" {
-  depends_on = [vault_pki_secret_backend_config_ca.config_ca]
-  backend    = vault_mount.pki.path
+  for_each = {
+    for ca in var.root_cas : ca.secret_engine.path => ca
+    if ca.issuer != null
+  }
+  depends_on = [
+    vault_pki_secret_backend_config_ca.config_ca,
+    vault_pki_secret_backend_root_cert.root_cert
+  ]
+  backend = vault_mount.pki[each.key].path
 }
 
 # issuer means the pair of public key (the cert) + private key, 
@@ -113,9 +132,13 @@ data "vault_pki_secret_backend_issuers" "issuers" {
 # Vault since 1.11.0 allows a single PKI mount to have multiple Certificate Authority (CA) certificates ("issuers") in a single mount, 
 # for the purpose of facilitating rotation.
 resource "vault_pki_secret_backend_issuer" "issuer" {
+  for_each = {
+    for ca in var.root_cas : ca.secret_engine.path => ca
+    if ca.issuer != null
+  }
   depends_on                     = [data.vault_pki_secret_backend_issuers.issuers]
-  backend                        = vault_mount.pki.path
-  issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
-  revocation_signature_algorithm = var.vault_pki.issuer.revocation_signature_algorithm
-  issuer_name                    = var.vault_pki.issuer.name
+  backend                        = vault_mount.pki[each.key].path
+  issuer_ref                     = element(keys(data.vault_pki_secret_backend_issuers.issuers[each.key].key_info), 0)
+  revocation_signature_algorithm = each.value.issuer.revocation_signature_algorithm
+  issuer_name                    = each.value.issuer.name
 }

@@ -63,7 +63,7 @@ variable "root_cas" {
       })), null)
       cert = optional(object({
         internal_sign = optional(object({
-          backend     = string
+          type        = string
           common_name = string
           ttl_years   = number
         }), null)
