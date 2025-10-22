@@ -42,7 +42,7 @@ data "terraform_remote_state" "data_disk" {
 
 locals {
   vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
-    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
+    for count in range(var.vm.count) : "${var.vm.base_name}-${count + 1}"
   ]
   data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
     for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
@@ -241,15 +241,15 @@ resource "null_resource" "kvpctl" {
     module.hyperv_machine_instance,
     null_resource.remote
   ]
-  count = var.vm.count
+  # count = var.vm.count
 
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
-    vhd_dir       = var.vm.vhd.dir
-    vm_name       = local.vm_names[count.index]
+    # manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
+    # vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
-    filename = local_file.ignition[count.index].filename
+    # filename = local_file.ignition[count.index].filename
+    # vm_count = range(1, var.vm.count + 1)
     host     = var.prov_hyperv.host
     user     = var.prov_hyperv.user
     password = sensitive(var.prov_hyperv.password)
@@ -267,8 +267,12 @@ resource "null_resource" "kvpctl" {
   }
 
   provisioner "remote-exec" {
+    # inline = [<<-EOT
+    #   Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
+    # EOT
+    # ]
     inline = [<<-EOT
-      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
+      Powershell -Command "1..${var.vm.count} | ForEach-Object { $ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath ${var.vm.base_name}-$_\ignition$_.json); kvpctl.exe ${var.vm.base_name}-$_ add-ign $ignitionFile}"
     EOT
     ]
   }

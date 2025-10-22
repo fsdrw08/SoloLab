@@ -34,6 +34,7 @@ storage:
             https = 8501
           }
           retry_join = ["${consul_server_fqdn}"]
+          server = false
           tls {
             defaults {
               ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
