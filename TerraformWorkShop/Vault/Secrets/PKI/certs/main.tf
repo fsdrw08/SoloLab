@@ -11,19 +11,37 @@ resource "vault_pki_secret_backend_cert" "cert" {
 }
 
 data "vault_pki_secret_backend_issuers" "issuers" {
-  backend = "pki-sololab_root"
+  for_each = {
+    for backend in [
+      "pki-sololab_root",
+      "pki-consul_root",
+    ] : backend => backend
+  }
+  backend = each.key
 }
 
 data "vault_pki_secret_backend_issuer" "issuer" {
-  backend    = "pki-sololab_root"
-  issuer_ref = element(keys(data.vault_pki_secret_backend_issuers.issuers.key_info), 0)
+  for_each = {
+    for backend in [
+      "pki-sololab_root",
+      "pki-consul_root",
+    ] : backend => backend
+  }
+  backend    = each.key
+  issuer_ref = element(keys(data.vault_pki_secret_backend_issuers.issuers[each.key].key_info), 0)
 }
 
 resource "vault_kv_secret_v2" "root_cert" {
+  for_each = {
+    for backend in [
+      "pki-sololab_root",
+      "pki-consul_root",
+    ] : backend => backend
+  }
   mount = var.vault_kvv2.secret_engine.path
-  name  = "root"
+  name  = element(split("-", each.key), 1)
   data_json = jsonencode({
-    "ca" = data.vault_pki_secret_backend_issuer.issuer.certificate
+    "ca" = data.vault_pki_secret_backend_issuer.issuer[each.key].certificate
   })
 }
 
@@ -34,7 +52,8 @@ resource "vault_kv_secret_v2" "cert" {
   mount = var.vault_kvv2.secret_engine.path
   name  = each.value.common_name
   data_json = jsonencode({
-    "${var.vault_kvv2.data_key_name.ca}"          = data.vault_pki_secret_backend_issuer.issuer.certificate
+    # "${var.vault_kvv2.data_key_name.ca}"          = data.vault_pki_secret_backend_issuer.issuer.certificate
+    "${var.vault_kvv2.data_key_name.ca}"          = data.vault_pki_secret_backend_issuer.issuer[each.value.root_ca_backend].certificate
     "${var.vault_kvv2.data_key_name.cert}"        = "${vault_pki_secret_backend_cert.cert[each.key].certificate}\n${vault_pki_secret_backend_cert.cert[each.key].ca_chain}"
     "${var.vault_kvv2.data_key_name.private_key}" = vault_pki_secret_backend_cert.cert[each.key].private_key
     serial_number                                 = vault_pki_secret_backend_cert.cert[each.key].serial_number

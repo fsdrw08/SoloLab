@@ -12,6 +12,15 @@ resource "vault_mount" "pki" {
   description               = each.value.secret_engine.description
   default_lease_ttl_seconds = (each.value.secret_engine.default_lease_ttl_years * 365 * 24 * 60 * 60)
   max_lease_ttl_seconds     = (each.value.secret_engine.max_lease_ttl_years * 365 * 24 * 60 * 60)
+  allowed_response_headers = [
+    "Last-Modified",
+    "Location",
+    "Replay-Nonce",
+    "Link",
+  ]
+  passthrough_request_headers = [
+    "If-Modified-Since",
+  ]
 }
 
 # intermediate CSR
@@ -27,8 +36,11 @@ resource "vault_pki_secret_backend_intermediate_cert_request" "intermediate_cert
 
 # get root ca info
 data "vault_pki_secret_backend_issuers" "root_ca" {
-  count   = var.root_ca_ref.internal == null ? 0 : 1
-  backend = var.root_ca_ref.internal.backend
+  for_each = {
+    for ca in var.intermediate_cas : ca.secret_engine.path => ca
+    if ca.csr != null
+  }
+  backend = each.value.csr.root_ca_backend
 }
 
 # sign cert by root ca
@@ -37,10 +49,10 @@ resource "vault_pki_secret_backend_root_sign_intermediate" "root_sign_intermedia
     for ca in var.intermediate_cas : ca.secret_engine.path => ca
     if ca.csr != null
   }
-  backend     = var.root_ca_ref.internal.backend
+  backend     = each.value.csr.root_ca_backend
   csr         = vault_pki_secret_backend_intermediate_cert_request.intermediate_cert_request[each.key].csr
   common_name = each.value.csr.common_name
-  issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca[0].key_info), 0)
+  issuer_ref  = element(keys(data.vault_pki_secret_backend_issuers.root_ca[each.key].key_info), 0)
   ttl         = (each.value.csr.ttl_years * 365 * 24 * 60 * 60) # years in seconds
 }
 

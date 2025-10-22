@@ -7,17 +7,6 @@ variable "prov_vault" {
   })
 }
 
-variable "root_ca_ref" {
-  type = object({
-    internal = optional(object({
-      backend = string
-    }), null)
-    external = optional(object({
-      ref_cert_bundle_path = string
-    }), null)
-  })
-}
-
 variable "intermediate_cas" {
   type = list(object({
     secret_engine = object({
@@ -28,8 +17,9 @@ variable "intermediate_cas" {
     })
     enable_backend_config = bool
     csr = optional(object({
-      common_name = string
-      ttl_years   = number
+      root_ca_backend = string
+      common_name     = string
+      ttl_years       = number
     }), null)
     issuer = optional(object({
       name                           = string

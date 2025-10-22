@@ -27,6 +27,7 @@ variable "vault_kvv2" {
 
 variable "vault_certs" {
   type = list(object({
+    root_ca_backend = optional(string, null)
     secret_engine = object({
       backend   = string
       role_name = string
