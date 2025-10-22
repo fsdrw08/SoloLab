@@ -27,7 +27,7 @@ services {
     "traefik.http.routers.vault.entrypoints=webSecure",
     "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`) || Host(`vault.service.consul`)",
     "traefik.http.routers.vault.tls=true",
-    "traefik.http.services.vault.loadBalancer.serversTransport=vault-day1@file",
+    "traefik.http.services.vault.loadBalancer.serversTransport=vault@file",
     "traefik.http.services.vault.loadbalancer.server.scheme=https",
   ]
 

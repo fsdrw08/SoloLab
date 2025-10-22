@@ -26,7 +26,7 @@ services {
     "traefik.http.routers.consul.entrypoints=webSecure",
     "traefik.http.routers.consul.rule=Host(`consul.day1.sololab`) || Host(`consul.service.consul`)",
     "traefik.http.routers.consul.tls=true",
-    "traefik.http.services.consul.loadBalancer.serversTransport=consul-day1@file",
+    "traefik.http.services.consul.loadBalancer.serversTransport=consul@file",
     "traefik.http.services.consul.loadbalancer.server.scheme=https",
   ]
 

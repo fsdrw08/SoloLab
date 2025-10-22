@@ -1,6 +1,6 @@
 http:
   serversTransports:
-    vault-day1:
+    vault:
       serverName: vault.day1.sololab
       rootcas:
         - "/etc/traefik/tls/ca.crt"

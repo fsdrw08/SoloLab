@@ -1,6 +1,6 @@
 http:
   serversTransports:
-    nomad-day1:
+    nomad:
       serverName: nomad.day1.sololab
       rootcas:
         - "/etc/traefik/tls/ca.crt"
