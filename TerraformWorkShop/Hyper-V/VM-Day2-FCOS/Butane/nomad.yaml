@@ -53,7 +53,7 @@ storage:
 
           consul {
             address = "127.0.0.1:8501"
-            ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+            ca_file = "/etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem"
             ssl = true
             token = "${nomad_consul_acl_token}"
           }

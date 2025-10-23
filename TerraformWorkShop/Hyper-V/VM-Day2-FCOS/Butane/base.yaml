@@ -27,8 +27,13 @@ storage:
       overwrite: true
       mode: 0644
       contents:
+        source: ${root_ca_url}
+    - path: /etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem
+      overwrite: true
+      mode: 0644
+      contents:
         inline: |
-          ${indent(10, ca_content)}
+          ${indent(10, consul_ca_content)}
   links:
     - path: /etc/localtime
       target: ../usr/share/zoneinfo/${timezone}

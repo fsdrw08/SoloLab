@@ -13,7 +13,7 @@ prov_vault = {
 }
 
 vm = {
-  count     = 2
+  count     = 1
   base_name = "Day2-FCOS"
   vhd = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
@@ -73,6 +73,7 @@ butane = {
       "ssh_authorized_keys_1000" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
       "password_hash_1001"       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
       "ssh_authorized_keys_1001" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+      "root_ca_url"              = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
       # nomad client
       "fcos_image_mirror"                   = "zot.day0.sololab/fedora/fedora-coreos"
       "fcos_rebase_mirror"                  = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
@@ -92,22 +93,22 @@ butane = {
     local = [
       {
         # "ip"                                 = "192.168.255.30"
-        "vm_name" = "day2-1"
+        "vm_name" = "day2"
       },
-      {
-        # "ip"                                 = "192.168.255.30"
-        "vm_name" = "day2-2"
-      }
+      # {
+      #   # "ip"                                 = "192.168.255.30"
+      #   "vm_name" = "day2-2"
+      # }
     ]
     secrets = [
       {
         vault_kvv2 = {
           mount = "kvv2-certs"
-          name  = "root"
+          name  = "consul_root"
         }
         value_sets = [
           {
-            name          = "ca_content"
+            name          = "consul_ca_content"
             value_ref_key = "ca"
           }
         ]
