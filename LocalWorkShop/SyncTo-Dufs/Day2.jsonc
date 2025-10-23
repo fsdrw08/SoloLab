@@ -10,11 +10,11 @@
     {
         "type": "vault-kvv2",
         "publicRegistry": "https://vault.day1.sololab",
-        "publicRepo": "/v1/kvv2-certs/data/root",
+        "publicRepo": "/v1/kvv2-certs/data/sololab_root",
         "data": ".data.data.ca",
-        "archive": "root.crt",
-        "privateRepo": "public/certs/root.crt",
-        "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2-certs/kv/client.global.nomad/paths",
+        "archive": "sololab_root.crt",
+        "privateRepo": "public/certs/sololab_root.crt",
+        "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2-certs/kv/sololab_root/paths",
     },
     {
         "type": "vault-kvv2",

@@ -25,24 +25,11 @@ vault_certs = [
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "consul.service.consul"
+    common_name = "consul.day1.sololab"
     alt_names = [
-      "consul.day1.sololab",
+      "consul.service.consul",
       "server.dc1.consul",
       "localhost"
-    ]
-  },
-  # day1 and consul service wild card cert hosting in reverse proxy
-  {
-    root_ca_backend = "pki-sololab_root"
-    secret_engine = {
-      backend   = "pki-sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
-    }
-    ttl_years   = 3
-    common_name = "*.service.consul"
-    alt_names = [
-      "*.day1.sololab"
     ]
   },
   # nomad server
@@ -57,6 +44,26 @@ vault_certs = [
     alt_names = [
       "nomad.service.consul",
     ]
+  },
+  # day1 wild card cert hosting in reverse proxy
+  {
+    root_ca_backend = "pki-sololab_root"
+    secret_engine = {
+      backend   = "pki-sololab_day1"
+      role_name = "IntCA-Day1-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "*.day1.sololab"
+  },
+  # consul service wild card cert hosting in reverse proxy
+  {
+    root_ca_backend = "pki-consul_root"
+    secret_engine = {
+      backend   = "pki-consul_root"
+      role_name = "RootCA-Consul-v1-role-default"
+    }
+    ttl_years   = 3
+    common_name = "*.service.consul"
   },
   # nomad client
   # https://developer.hashicorp.com/nomad/tutorials/archive/security-enable-tls#agent-certificates

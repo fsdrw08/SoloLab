@@ -27,7 +27,7 @@ storage:
             tls = true
           }
           bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
-          client_addr = "0.0.0.0"
+          client_addr = "127.0.0.1"
           data_dir = "/var/lib/consul"
           encrypt = "${consul_encrypt_key}"
           ports {

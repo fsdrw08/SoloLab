@@ -63,6 +63,7 @@ consul:
       #         - value.node_name == "${node}"
       addresses:
         dns: '{{ GetInterfaceIP "eth0" }}'
+      # https://developer.hashicorp.com/consul/docs/secure/encryption/tls/enable/existing/vm
       auto_encrypt:
         allow_tls: true
       bind_addr: '{{ GetInterfaceIP "eth0" }}'

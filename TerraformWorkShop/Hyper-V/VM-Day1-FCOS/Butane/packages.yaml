@@ -112,6 +112,10 @@ systemd:
     # zincati service use cincinnati protocol to fetch latest system image information from remote server
     # zincati service in fcos almost meaning tie the registry endpoint of system upgrade to the external container registry, e.g. quay.io/fedora/fedora-coreos
     # in order to use private container registry to upgrade system image, we have to disable zincati service
+    # to upgrade system image:
+    # 1. Push the latest os image to private registry
+    # 2. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
+    # 3. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
     # ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
     - name: zincati.service
       enabled: false
