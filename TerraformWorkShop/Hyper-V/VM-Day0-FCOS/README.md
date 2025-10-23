@@ -39,3 +39,10 @@ restore:
 cd /var/home/core
 sudo xfsrestore -f podmgr_2.xfsdump /var/home/podmgr
 ```
+
+### Upgrade system image from private container registry:
+1. Disable zincati service
+2. Push the latest os image to private registry
+3. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
+4. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
+ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
