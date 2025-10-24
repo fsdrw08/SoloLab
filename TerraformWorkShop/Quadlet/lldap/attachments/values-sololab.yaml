@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.vyos.sololab
 lldap:
   podLabels:
     traefik.enable: true

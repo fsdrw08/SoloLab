@@ -24,7 +24,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "zot.tls.contents.ca\\.crt"
+              name          = "zot.secret.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             # {

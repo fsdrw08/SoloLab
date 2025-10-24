@@ -27,6 +27,7 @@ users = [
       "lldap_admin",
       "sso_allow", # "02999e39" 
       # "app-sftpgo-prim-ignition", # c4bf67c5
+      "app-zot-admin",          # "f8fddd0f"
       "app-vault-user",         # "9d1dbb70" 
       "app-vault-admin",        # "751b1e41" 
       "app-minio-user",         # "94a5e552" 
@@ -72,6 +73,10 @@ groups = [
   #   iac_id       = "c4bf67c5"
   #   display_name = "app-sftpgo-prim-ignition"
   # },
+  {
+    iac_id       = "f8fddd0f"
+    display_name = "app-zot-admin"
+  },
   {
     iac_id       = "9d1dbb70"
     display_name = "app-vault-user"
