@@ -8,7 +8,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "lldap-https-check"
       name            = "lldap-https-check"
-      http            = "http://localhost:17170/login"
+      http            = "http://localhost:17170/health"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
