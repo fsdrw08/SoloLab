@@ -84,10 +84,10 @@ zot:
       gc: true
     log:
       level: "info"
-  # htpasswd: |
-  #   admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa
   secret:
     contents:
+      # htpasswd: |
+      #   admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa
       ldap-credentials.json: |
         {
           "bindDN":"cn=readonly,ou=people,dc=root,dc=sololab",
