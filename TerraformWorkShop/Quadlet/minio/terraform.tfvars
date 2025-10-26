@@ -1,11 +1,5 @@
-prov_vault = {
-  address         = "https://vault.day1.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
-}
-
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -19,19 +13,16 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
-          vault_kvv2 = {
-            mount = "kvv2-certs"
-            name  = "root"
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "root"
           }
           value_sets = [
-            # {
-            #   name          = "minio.tls.contents.public\\.crt"
-            #   value_ref_key = "cert"
-            # },
-            # {
-            #   name          = "minio.tls.contents.private\\.key"
-            #   value_ref_key = "private_key"
-            # },
             {
               name          = "minio.tls.contents.CAs.sololab\\.crt"
               value_ref_key = "ca"
@@ -69,7 +60,7 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab/v1/identity/oidc/.well-known/openid-configuration"
+            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://lldap.day0.sololab/health"
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run minio-server\""
             Restart       = "on-failure"
           }

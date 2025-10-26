@@ -63,7 +63,18 @@ dns_records = [
     }
   },
   {
-    hostname = "sftpgo.day0.sololab"
+    hostname = "minio-api.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "minio-console.day0.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"

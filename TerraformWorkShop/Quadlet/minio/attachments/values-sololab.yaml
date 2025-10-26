@@ -12,12 +12,12 @@ minio:
   podLabels:
     traefik.enable: true
     traefik.http.routers.minio-api-redirect.entrypoints: web
-    traefik.http.routers.minio-api-redirect.rule: Host(`minio-api.day1.sololab`)
+    traefik.http.routers.minio-api-redirect.rule: Host(`minio-api.day0.sololab`)
     traefik.http.routers.minio-api-redirect.middlewares: toHttps@file
     traefik.http.routers.minio-api-redirect.service: minio-api
 
     traefik.http.routers.minio-api.entrypoints: webSecure
-    traefik.http.routers.minio-api.rule: Host(`minio-api.day1.sololab`)
+    traefik.http.routers.minio-api.rule: Host(`minio-api.day0.sololab`)
     traefik.http.routers.minio-api.tls: true
     traefik.http.routers.minio-api.service: minio-api
 
@@ -26,12 +26,12 @@ minio:
     traefik.http.services.minio-api.loadbalancer.server.port: 9000
 
     traefik.http.routers.minio-console-redirect.entrypoints: web
-    traefik.http.routers.minio-console-redirect.rule: Host(`minio-console.day1.sololab`)
+    traefik.http.routers.minio-console-redirect.rule: Host(`minio-console.day0.sololab`)
     traefik.http.routers.minio-console-redirect.service: minio-console
     traefik.http.routers.minio-console-redirect.middlewares: toHttps@file
 
     traefik.http.routers.minio-console.entrypoints: webSecure
-    traefik.http.routers.minio-console.rule: Host(`minio-console.day1.sololab`)
+    traefik.http.routers.minio-console.rule: Host(`minio-console.day0.sololab`)
     traefik.http.routers.minio-console.tls: true
     traefik.http.routers.minio-console.service: minio-console
 
@@ -53,13 +53,13 @@ minio:
     # traefik.http.services.minio-console.loadbalancer.server.port: 9001
 
     # traefik.tcp.routers.minio-api.entrypoints: webSecure
-    # traefik.tcp.routers.minio-api.rule: HostSNI(`minio-api.day1.sololab`)
+    # traefik.tcp.routers.minio-api.rule: HostSNI(`minio-api.day0.sololab`)
     # traefik.tcp.routers.minio-api.tls.passthrough: true
     # traefik.tcp.routers.minio-api.service: minio-api
     # traefik.tcp.services.minio-api.loadbalancer.server.port: 9000
 
     # traefik.tcp.routers.minio-console.entrypoints: webSecure
-    # traefik.tcp.routers.minio-console.rule: HostSNI(`minio-console.day1.sololab`)
+    # traefik.tcp.routers.minio-console.rule: HostSNI(`minio-console.day0.sololab`)
     # traefik.tcp.routers.minio-console.tls.passthrough: true
     # traefik.tcp.routers.minio-console.service: minio-console
     # traefik.tcp.services.minio-console.loadbalancer.server.port: 9001
@@ -68,14 +68,20 @@ minio:
       --address=127.0.0.1:9000
       --console-address=127.0.0.1:9001
       --certs-dir=/etc/minio/certs
-    MINIO_IDENTITY_OPENID_CONFIG_URL: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_CLIENT_ID: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_CLIENT_SECRET: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_DISPLAY_NAME: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_CLAIM_NAME: # get from vault, by terraform
-    MINIO_SERVER_URL: https://minio-api.day1.sololab
+    MINIO_IDENTITY_LDAP_SERVER_ADDR: lldap.day0.sololab:636
+    MINIO_IDENTITY_LDAP_LOOKUP_BIND_DN: cn=readonly,ou=people,dc=root,dc=sololab
+    MINIO_IDENTITY_LDAP_LOOKUP_BIND_PASSWORD: readonly
+    MINIO_IDENTITY_LDAP_USER_DN_ATTRIBUTES: uid
+    MINIO_IDENTITY_LDAP_USER_DN_SEARCH_BASE_DN: ou=people,dc=root,dc=sololab
+    MINIO_IDENTITY_LDAP_USER_DN_SEARCH_FILTER: (&(uid=%s)(objectclass=posixAccount))
+    # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/ldap/#env-minio-identity-ldap-group-search-filter
+    MINIO_IDENTITY_LDAP_GROUP_SEARCH_FILTER: (&(objectClass=groupOfUniqueNames)(member=%d))
+    MINIO_IDENTITY_LDAP_GROUP_SEARCH_BASE_DN: ou=groups,dc=root,dc=sololab
+    MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: off
+
+    MINIO_SERVER_URL: https://minio-api.day0.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869
-    MINIO_BROWSER_REDIRECT_URL: https://minio-console.day1.sololab
+    MINIO_BROWSER_REDIRECT_URL: https://minio-console.day0.sololab
     # https://docs.min.io/community/minio-object-store/operations/monitoring/collect-minio-metrics-using-prometheus.html?_gl=1*18d2nvn*_gcl_au*MTEwOTU2NjM0NS4xNzU4MzcyNjA5*_ga*NjcwMTcwNzIyLjE3NDQ1NTMxNTM.*_ga_SY0M3KFH50*czE3NTgzNzI2MDEkbzckZzEkdDE3NTgzNzQ5MzckajU0JGwwJGgxNDE0ODk1Nzgz#configure-prometheus-to-collect-and-alert-using-minio-metrics
     # https://docs.min.io/community/minio-object-store/reference/minio-server/settings/metrics-and-logging.html#envvar.MINIO_PROMETHEUS_AUTH_TYPE
     MINIO_PROMETHEUS_AUTH_TYPE: public

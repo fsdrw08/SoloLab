@@ -1,11 +1,3 @@
-data "vault_identity_oidc_openid_config" "config" {
-  name = "sololab"
-}
-
-data "vault_identity_oidc_client_creds" "creds" {
-  name = "minio"
-}
-
 # load secret from vault kvv2 or load cert from tfstate
 locals {
   secrets_vault_kvv2 = flatten([
@@ -29,13 +21,13 @@ locals {
 }
 
 # load secret from vault
-data "vault_kv_secret_v2" "secrets" {
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
-  }
-  mount = each.value.mount
-  name  = each.value.name
-}
+# data "vault_kv_secret_v2" "secrets" {
+#   for_each = local.secrets_vault_kvv2 == null ? null : {
+#     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+#   }
+#   mount = each.value.mount
+#   name  = each.value.name
+# }
 
 # load cert from terraform state
 data "terraform_remote_state" "tfstate" {
@@ -86,43 +78,12 @@ data "helm_template" "podman_kubes" {
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
-          name = value_set.name
-          # value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
-          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          name  = value_set.name
+          value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          # value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
-    ],
-    flatten([
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL"
-        value = "${data.vault_identity_oidc_openid_config.config.issuer}/.well-known/openid-configuration"
-      },
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_CLIENT_ID"
-        value = data.vault_identity_oidc_client_creds.creds.client_id
-      },
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_CLIENT_SECRET"
-        value = data.vault_identity_oidc_client_creds.creds.client_secret
-      },
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_DISPLAY_NAME"
-        value = "login with vault"
-      },
-      {
-        # https://min.io/docs/minio/linux/reference/minio-server/settings/iam/openid.html#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
-        name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_NAME"
-        value = "policy"
-      },
-      # {
-      #   name  = "minio.config.MINIO_IDENTITY_OPENID_CLAIM_PREFIX"
-      #   value = "minio"
-      # },
-      {
-        name  = "minio.config.MINIO_IDENTITY_OPENID_SCOPES"
-        value = "openid\\,minio_scope"
-      }
-    ])
+    ]
   ])
 }
 

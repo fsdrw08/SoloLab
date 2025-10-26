@@ -146,6 +146,22 @@ zones = [
         ]
       },
       {
+        fqdn = "minio-api.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "minio-console.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
         fqdn = "prometheus-podman-exporter.day0.sololab."
         type = "A"
         ttl  = 60

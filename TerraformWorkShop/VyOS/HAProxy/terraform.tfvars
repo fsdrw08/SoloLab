@@ -70,6 +70,22 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
+  day0_frontend_minio_api = {
+    path = "load-balancing haproxy service tcp443 rule 160"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "minio-api.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
+  day0_frontend_minio_console = {
+    path = "load-balancing haproxy service tcp443 rule 165"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "minio-console.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
   # day0_frontend_sftpgo = {
   #   path = "load-balancing haproxy service tcp443 rule 160"
   #   configs = {
