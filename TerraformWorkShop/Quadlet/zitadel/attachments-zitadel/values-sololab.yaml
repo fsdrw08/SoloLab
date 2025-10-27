@@ -1,0 +1,48 @@
+zitadel:
+  image:
+    registry: zot.vyos.sololab
+    repository: zitadel/zitadel
+  resourcesPreset: medium
+  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
+  configFiles:
+    config:
+      Port: 8081
+      ExternalPort: 443
+  secret:
+    tls:
+      contents:
+        ca.crt: # set by terraform data
+    others:
+      contents:
+        database: |-
+          postgres:
+            User:
+              Username: 'zitadel'
+              Password: 'zitadel'
+            Admin:
+              Username: 'postgres'
+              Password: 'P@ssw0rd'
+  args:
+    - start-from-init
+    - --config
+    - /config/zitadel-config.yaml
+    - --config
+    - /secret/database.yaml
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.zitadel-redirect.entrypoints: web
+    traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
+    traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
+    traefik.http.routers.zitadel-redirect.service: zitadel
+
+    traefik.http.routers.zitadel.entrypoints: webSecure
+    traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
+    traefik.http.routers.zitadel.tls: true
+    traefik.http.routers.zitadel.service: zitadel
+
+    traefik.http.services.zitadel.loadbalancer.server.port: 8080
+    traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
+
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai

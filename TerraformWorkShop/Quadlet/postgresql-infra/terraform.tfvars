@@ -67,7 +67,7 @@ podman_quadlet = {
             yaml          = "tfbackend-pg-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = "podman-default-kube-network"
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run tfbackend-pg-postgresql\""

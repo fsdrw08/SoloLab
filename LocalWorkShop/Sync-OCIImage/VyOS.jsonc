@@ -28,6 +28,13 @@
         "description": "https://hub.docker.com/r/powerdns/pdns-auth-50",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "zitadel/zitadel:v4.4.0",
+        "archive": "ghcr.io_zitadel_zitadel_v4.4.0.tar",
+        "privateRepo": "zitadel/zitadel:v4.4.0",
+        "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "sclorg/postgresql-16-c10s:20250912",
         "archive": "quay.io_sclorg_postgresql-16-c10s_20250912.tar",
