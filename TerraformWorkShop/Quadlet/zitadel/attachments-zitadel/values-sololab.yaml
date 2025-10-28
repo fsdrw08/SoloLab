@@ -1,33 +1,4 @@
 zitadel:
-  image:
-    registry: zot.vyos.sololab
-    repository: zitadel/zitadel
-  resourcesPreset: medium
-  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
-  configFiles:
-    config:
-      Port: 8081
-      ExternalPort: 443
-  secret:
-    tls:
-      contents:
-        ca.crt: # set by terraform data
-    others:
-      contents:
-        database: |-
-          postgres:
-            User:
-              Username: 'zitadel'
-              Password: 'zitadel'
-            Admin:
-              Username: 'postgres'
-              Password: 'P@ssw0rd'
-  args:
-    - start-from-init
-    - --config
-    - /config/zitadel-config.yaml
-    - --config
-    - /secret/database.yaml
   podLabels:
     traefik.enable: true
     traefik.http.routers.zitadel-redirect.entrypoints: web
@@ -43,6 +14,37 @@ zitadel:
     traefik.http.services.zitadel.loadbalancer.server.port: 8080
     traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
 
+  image:
+    registry: zot.vyos.sololab
+    repository: zitadel/zitadel
+  resourcesPreset: medium
+  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
+  configFiles:
+    config:
+      Port: 8081
+      ExternalPort: 443
+  secret:
+    # tls:
+    #   contents:
+    #     ca.crt: # set by terraform data
+    others:
+      contents:
+        database.yaml: |-
+          postgres:
+            User:
+              Username: zitadel
+              Password: zitadel
+            Admin:
+              Username: postgres
+              Password: P@ssw0rd
+  args:
+    - start-from-init
+    - --config
+    - /config/zitadel-config.yaml
+    - --masterkeyFile
+    - /secret/masterkey
+    - --config
+    - /secret/database.yaml
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

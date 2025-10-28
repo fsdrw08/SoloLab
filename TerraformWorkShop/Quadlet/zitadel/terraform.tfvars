@@ -11,33 +11,33 @@ podman_kubes = [
       name       = "zitadel"
       chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel"
       value_file = "./attachments-zitadel/values-sololab.yaml"
-      secrets = [
-        {
-          tfstate = {
-            backend = {
-              type = "local"
-              config = {
-                path = "../../TLS/RootCA/terraform.tfstate"
-              }
-            }
-            cert_name = "root"
-          }
-          value_sets = [
-            {
-              name          = "zitadel.secret.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-            # {
-            #   name          = "zitadel.tls.contents.server\\.crt"
-            #   value_ref_key = "cert_pem_chain"
-            # },
-            # {
-            #   name          = "zitadel.tls.contents.server\\.key"
-            #   value_ref_key = "key_pem"
-            # }
-          ]
-        }
-      ]
+      # secrets = [
+      #   {
+      #     tfstate = {
+      #       backend = {
+      #         type = "local"
+      #         config = {
+      #           path = "../../TLS/RootCA/terraform.tfstate"
+      #         }
+      #       }
+      #       cert_name = "root"
+      #     }
+      #     value_sets = [
+      #       {
+      #         name          = "zitadel.secret.contents.ca\\.crt"
+      #         value_ref_key = "ca"
+      #       },
+      #       # {
+      #       #   name          = "zitadel.tls.contents.server\\.crt"
+      #       #   value_ref_key = "cert_pem_chain"
+      #       # },
+      #       # {
+      #       #   name          = "zitadel.tls.contents.server\\.key"
+      #       #   value_ref_key = "key_pem"
+      #       # }
+      #     ]
+      #   }
+      # ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-aio.yaml"
   },
@@ -49,11 +49,11 @@ podman_kubes = [
       value_sets = [
         {
           name         = "fullnameOverride"
-          value_string = "tfbackend-pg"
+          value_string = "zitadel-pg"
         }
       ]
     }
-    manifest_dest_path = "/home/podmgr/.config/containers/systemd/tfbackend-pg-aio.yaml"
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-pg-aio.yaml"
   }
 ]
 
@@ -80,7 +80,7 @@ podman_quadlet = {
             KubeDownForce = "false"
             Network       = "host"
             # service
-            ExecStartPre  = ""
+            ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
             ExecStartPost = ""
             Restart       = "on-failure"
           }
@@ -88,6 +88,37 @@ podman_quadlet = {
       ]
       service = {
         name   = "zitadel"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Zitadel PostgreSQL backend"
+            Documentation         = "https://zitadel.com/docs/self-hosting/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "zitadel-pg-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = ""
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "zitadel-pg"
         status = "start"
       }
     },

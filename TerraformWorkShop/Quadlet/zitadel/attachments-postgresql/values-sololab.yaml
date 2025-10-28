@@ -1,6 +1,12 @@
 global:
   imageRegistry: zot.vyos.sololab
 postgresql:
+  containerPorts:
+    - name: postgresql
+      containerPort: 5432
+      hostPort: 5432
+      hostIP: 127.0.0.1
+      protocol: TCP
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
