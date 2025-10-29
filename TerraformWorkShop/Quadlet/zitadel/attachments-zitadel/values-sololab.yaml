@@ -1,42 +1,52 @@
 zitadel:
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.zitadel-redirect.entrypoints: web
-    traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
-    traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
-    traefik.http.routers.zitadel-redirect.service: zitadel
+  hostNetwork: false
+  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.zitadel-redirect.entrypoints: web
+  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.zitadel-redirect.service: zitadel
 
-    traefik.http.routers.zitadel.entrypoints: webSecure
-    traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
-    traefik.http.routers.zitadel.tls: true
-    traefik.http.routers.zitadel.service: zitadel
+  #   traefik.http.routers.zitadel.entrypoints: webSecure
+  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel.tls: true
+  #   traefik.http.routers.zitadel.service: zitadel
 
-    traefik.http.services.zitadel.loadbalancer.server.port: 8080
-    traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
+  #   traefik.http.services.zitadel.loadbalancer.server.port: 8080
+  #   traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
 
   image:
     registry: zot.vyos.sololab
     repository: zitadel/zitadel
+  containerPorts:
+    - name: http
+      containerPort: 8080
+      hostPort: 8081
+      hostIP: 127.0.0.1
+      protocol: TCP
   resourcesPreset: medium
-  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
   configFiles:
     config:
-      Port: 8081
       ExternalPort: 443
+      ExternalDomain: zitadel.day0.sololab
+      Database:
+        postgres:
+          host: zitadel-pg
   secret:
     # tls:
     #   contents:
     #     ca.crt: # set by terraform data
     others:
       contents:
+        # https://github.com/zitadel/zitadel/blob/v4.5.0/cmd/defaults.yaml#L115C1-L115C10
         database.yaml: |-
-          postgres:
-            User:
-              Username: zitadel
-              Password: zitadel
-            Admin:
-              Username: postgres
-              Password: P@ssw0rd
+          Database:
+            postgres:
+              User:
+                Password: zitadel
+              Admin:
+                Password: P@ssw0rd
   args:
     - start-from-init
     - --config

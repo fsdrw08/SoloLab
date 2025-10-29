@@ -158,3 +158,15 @@ resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
 }
+
+resource "remote_file" "traefik_file_provider" {
+  depends_on = [
+    module.podman_quadlet
+  ]
+  for_each = toset([
+    "./attachments-zitadel/zitadel.traefik.yaml",
+  ])
+  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
+  content = file("${each.key}")
+}
+

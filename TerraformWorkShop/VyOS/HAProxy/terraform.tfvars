@@ -62,6 +62,14 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
+  day0_frontend_zitadel = {
+    path = "load-balancing haproxy service tcp443 rule 145"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "zitadel.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
   day0_frontend_dufs = {
     path = "load-balancing haproxy service tcp443 rule 150"
     configs = {

@@ -1,0 +1,19 @@
+# https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
+http:
+  routers:
+    zitadel-redirect:
+      entrypoints: web
+      rule: Host(`zitadel.day0.sololab`)
+      middlewares: toHttps@file
+      service: zitadel
+    zitadel:
+      entrypoints: webSecure
+      rule: Host(`zitadel.day0.sololab`)
+      tls: {}
+      service: zitadel
+  services:
+    zitadel:
+      loadbalancer:
+        passHostHeader: true
+        servers:
+          - url: "h2c://127.0.0.1:8081"

@@ -71,8 +71,18 @@ zones = [
           "192.168.255.2"
         ]
       },
+      # {
+      #   fqdn = "_etcd-server-ssl._tcp.day0.sololab."
+      #   type = "SRV"
+      #   ttl  = 3
+      #   results = [
+      #     "0 10 2380 etcd-0.day0.sololab.",
+      #     # "0 10 2380 etcd-1.day0.sololab.",
+      #     # "0 10 2380 etcd-2.day0.sololab.",
+      #   ]
+      # },
       {
-        fqdn = "zot.day0.sololab."
+        fqdn = "etcd-0.day0.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -88,23 +98,37 @@ zones = [
         ]
       },
       {
-        fqdn = "etcd-0.day0.sololab."
+        fqdn = "traefik.day0.sololab."
         type = "A"
         ttl  = 60
         results = [
           "192.168.255.2"
         ]
       },
-      # {
-      #   fqdn = "_etcd-server-ssl._tcp.day0.sololab."
-      #   type = "SRV"
-      #   ttl  = 3
-      #   results = [
-      #     "0 10 2380 etcd-0.day0.sololab.",
-      #     # "0 10 2380 etcd-1.day0.sololab.",
-      #     # "0 10 2380 etcd-2.day0.sololab.",
-      #   ]
-      # },
+      {
+        fqdn = "lldap.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "zitadel.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "zot.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
       {
         fqdn = "tfbackend-pg.day0.sololab."
         type = "A"
@@ -114,23 +138,7 @@ zones = [
         ]
       },
       {
-        fqdn = "traefik.day0.sololab."
-        type = "A"
-        ttl  = 60
-        results = [
-          "192.168.255.2"
-        ]
-      },
-      {
         fqdn = "cockpit.day0.sololab."
-        type = "A"
-        ttl  = 60
-        results = [
-          "192.168.255.2"
-        ]
-      },
-      {
-        fqdn = "lldap.day0.sololab."
         type = "A"
         ttl  = 60
         results = [

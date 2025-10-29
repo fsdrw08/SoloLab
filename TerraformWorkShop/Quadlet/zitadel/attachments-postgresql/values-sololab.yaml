@@ -16,12 +16,14 @@ postgresql:
     ## @param postgresql.config.POSTGRESQL_USER User name for PostgreSQL account to be created
     ##
     POSTGRESQL_USER: zitadel
-    ## @param postgresql.config.POSTGRESQL_PASSWORD Password for the user account
-    ##
-    POSTGRESQL_PASSWORD: zitadel
     ## @param postgresql.config.POSTGRESQL_DATABASE Database name
     ##
     POSTGRESQL_DATABASE: zitadel
-    ## @param postgresql.config.POSTGRESQL_ADMIN_PASSWORD Password for the postgres admin account (optional)
-    ##
-    POSTGRESQL_ADMIN_PASSWORD: P@ssw0rd
+  secret:
+    envVars:
+      ## @param postgresql.config.POSTGRESQL_PASSWORD Password for the user account
+      ##
+      POSTGRESQL_PASSWORD: zitadel
+      ## @param postgresql.config.POSTGRESQL_ADMIN_PASSWORD Password for the postgres admin account (optional)
+      ##
+      POSTGRESQL_ADMIN_PASSWORD: P@ssw0rd

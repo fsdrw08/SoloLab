@@ -8,17 +8,6 @@ prov_etcd = {
 # https://coredns.io/plugins/etcd/
 dns_records = [
   {
-    hostname = "tfbackend-pg.day0.sololab"
-    value = {
-      string_map = {
-        host = "192.168.255.10"
-      }
-      number_map = {
-        ttl = 60
-      }
-    }
-  },
-  {
     hostname = "traefik.day0.sololab"
     value = {
       string_map = {
@@ -30,7 +19,7 @@ dns_records = [
     }
   },
   {
-    hostname = "cockpit.day0.sololab"
+    hostname = "lldap.day0.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -41,7 +30,29 @@ dns_records = [
     }
   },
   {
-    hostname = "lldap.day0.sololab"
+    hostname = "zitadel.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "tfbackend-pg.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "cockpit.day0.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
