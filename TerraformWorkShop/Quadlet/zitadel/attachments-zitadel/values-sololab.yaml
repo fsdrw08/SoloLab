@@ -26,13 +26,12 @@ zitadel:
       hostIP: 127.0.0.1
       protocol: TCP
   resourcesPreset: medium
-  configFiles:
-    config:
-      ExternalPort: 443
-      ExternalDomain: zitadel.day0.sololab
-      Database:
-        postgres:
-          host: zitadel-pg
+  config:
+    ExternalPort: 443
+    ExternalDomain: zitadel.day0.sololab
+    Database:
+      postgres:
+        host: zitadel-pg
   secret:
     # tls:
     #   contents:
@@ -52,7 +51,7 @@ zitadel:
     - --config
     - /config/zitadel-config.yaml
     - --masterkeyFile
-    - /secret/masterkey
+    - /secret/masterKey
     - --config
     - /secret/database.yaml
   extraEnvVars:
