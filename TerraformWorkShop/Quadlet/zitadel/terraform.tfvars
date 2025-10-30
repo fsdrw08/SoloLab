@@ -9,7 +9,7 @@ podman_kubes = [
   {
     helm = {
       name       = "zitadel"
-      chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel-backend"
       value_file = "./attachments-zitadel/values-sololab.yaml"
       # secrets = [
       #   {

@@ -39,8 +39,8 @@ zitadel:
     #     ca.crt: # set by terraform data
     others:
       contents:
-        # https://github.com/zitadel/zitadel/blob/v4.5.0/cmd/defaults.yaml#L115C1-L115C10
-        database.yaml: |-
+        # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/defaults.yaml#L115C1-L115C10
+        database.yaml:
           Database:
             postgres:
               User:
