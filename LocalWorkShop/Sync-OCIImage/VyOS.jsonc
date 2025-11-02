@@ -28,10 +28,24 @@
         "description": "https://hub.docker.com/r/powerdns/pdns-auth-50",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "wait4x/wait4x:3.6.0",
+        "archive": "docker.io_wait4x_wait4x_3.6.0.tar",
+        "privateRepo": "wait4x/wait4x:3.6.0",
+        "description": "https://hub.docker.com/r/wait4x/wait4x",
+    },
+    {
         "publicRegistry": "ghcr.io",
         "publicRepo": "zitadel/zitadel:v4.6.1",
         "archive": "ghcr.io_zitadel_zitadel_v4.6.1.tar",
         "privateRepo": "zitadel/zitadel:v4.6.1",
+        "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
+    },
+    {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "zitadel/zitadel-login:v4.6.1",
+        "archive": "ghcr.io_zitadel_zitadel-login_v4.6.1.tar",
+        "privateRepo": "zitadel/zitadel-login:v4.6.1",
         "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
     },
     {

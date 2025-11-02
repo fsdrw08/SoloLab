@@ -19,7 +19,7 @@ Restart=${Restart}
 ContainerName=whoami
 
 Image=zot.day0.sololab/traefik/whoami:v1.10
-Exec="--port=8081"
+Exec="--port=8082"
 
 Label="traefik.enable=true"
 
@@ -33,7 +33,7 @@ Label="traefik.http.routers.whoami.rule=Host(`whoami.day0.sololab`)"
 Label="traefik.http.routers.whoami.tls=true"
 Label="traefik.http.routers.whoami.service=whoami"
 
-Label="traefik.http.services.whoami.loadbalancer.server.port=8081"
+Label="traefik.http.services.whoami.loadbalancer.server.port=8082"
 
 PodmanArgs=${PodmanArgs}
 Network=${Network}
