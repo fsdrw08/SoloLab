@@ -40,15 +40,16 @@ zitadelLogin:
       hostIP: 127.0.0.1
       protocol: TCP
   config:
-    ZITADEL_API_URL: http://zitadel-backend:8080
+    CUSTOM_REQUEST_HEADERS: Host:zitadel.day0.sololab
     NEXT_PUBLIC_BASE_PATH: /ui/v2/login
-    ZITADEL_SERVICE_USER_TOKEN_FILE: /login-client/pat
+    ZITADEL_API_URL: http://zitadel-backend:8080
+    ZITADEL_SERVICE_USER_TOKEN_FILE: /data/login-client.pat
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
   extraVolumeMounts:
     - name: data
-      mountPath: /login-client
+      mountPath: /data
   extraVolumes:
     - name: data
       persistentVolumeClaim:

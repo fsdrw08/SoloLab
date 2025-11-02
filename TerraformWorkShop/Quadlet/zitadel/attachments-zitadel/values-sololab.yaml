@@ -46,9 +46,20 @@ zitadel:
       # https://zitadel.com/docs/self-hosting/deploy/compose
       # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/setup/steps.yaml
       FirstInstance:
-        LoginClientPatPath: /login-client/pat
+        # https://questions.zitadel.com/m/1397337190165643284
+        MachineKeyPath: /data/zitadel-admin-sa.json
+        LoginClientPatPath: /data/login-client.pat
         Org:
+          Name: ZITADEL
           Human:
+            # ref: https://zitadel.com/docs/self-hosting/deploy/compose#next-steps
+            # ref: https://github.com/zitadel/zitadel/blob/v4.6.2/docs/docs/self-hosting/deploy/docker-compose.yaml
+            # login name = <FirstInstance.Org.Human.UserName>@<FirstInstance.Org.Name>.<ExternalDomain>
+            # in this case:
+            # login name = admin@zitadel.zitadel.day0.sololab
+            #
+            UserName: admin
+            Password: P@ssw0rd
             PasswordChangeRequired: false
           LoginClient:
             Machine:
@@ -56,6 +67,16 @@ zitadel:
               Username: login-client
             Pat:
               ExpirationDate: "2100-01-01T00:00:00Z"
+          # create machine credential for terraform
+          # https://registry.terraform.io/providers/zitadel/zitadel/latest/docs
+          # https://questions.zitadel.com/m/1397337190165643284
+          # https://zitadel.com/docs/self-hosting/manage/custom-domain
+          Machine:
+            Machine:
+              UserName: zitadel-admin-sa
+              Name: admin
+            MachineKey:
+              Type: 1
   secret:
     # tls:
     #   contents:
@@ -86,4 +107,4 @@ zitadel:
 
 persistence:
   enabled: true
-  mountPath: /login-client
+  mountPath: /data
