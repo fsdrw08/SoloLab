@@ -1,0 +1,55 @@
+global:
+  imageRegistry: "zot.vyos.sololab"
+zitadelLogin:
+  hostNetwork: false
+  # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.zitadel-redirect.entrypoints: web
+  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.zitadel-redirect.service: zitadel
+
+  #   traefik.http.routers.zitadel.entrypoints: webSecure
+  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel.tls: true
+  #   traefik.http.routers.zitadel.service: zitadel
+
+  #   traefik.http.services.zitadel.loadbalancer.server.port: 8080
+  #   traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
+  initContainers:
+    - name: wait-for-backend
+      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+      command:
+        - wait4x
+        - http
+        - "{{ .Values.zitadelLogin.config.ZITADEL_API_URL }}/debug/ready"
+        - --insecure-skip-tls-verify
+        - --h2c
+        - --no-redirect
+        - --expect-status-code
+        - "200"
+        - --timeout
+        - "5m"
+        - --interval
+        - "5s"
+  containerPorts:
+    - name: http
+      containerPort: 3000
+      hostPort: 3000
+      hostIP: 127.0.0.1
+      protocol: TCP
+  config:
+    ZITADEL_API_URL: http://zitadel-backend:8080
+    NEXT_PUBLIC_BASE_PATH: /ui/v2/login
+    ZITADEL_SERVICE_USER_TOKEN_FILE: /login-client/pat
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  extraVolumeMounts:
+    - name: data
+      mountPath: /login-client
+  extraVolumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: zitadel-backend-pvc

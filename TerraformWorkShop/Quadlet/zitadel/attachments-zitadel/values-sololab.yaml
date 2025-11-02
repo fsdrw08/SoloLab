@@ -1,3 +1,5 @@
+global:
+  imageRegistry: "zot.vyos.sololab"
 zitadel:
   hostNetwork: false
   # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
@@ -15,10 +17,17 @@ zitadel:
 
   #   traefik.http.services.zitadel.loadbalancer.server.port: 8080
   #   traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
-
-  image:
-    registry: zot.vyos.sololab
-    repository: zitadel/zitadel
+  initContainers:
+    - name: wait-for-postgres
+      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+      command:
+        - wait4x
+        - tcp
+        - '{{ default "localhost" .Values.zitadel.configFiles.config.Database.postgres.Host }}:{{ default 5432 .Values.zitadel.configFiles.config.Database.postgres.Post }}'
+        - --timeout
+        - 5m
+        - --interval
+        - 5s
   containerPorts:
     - name: http
       containerPort: 8080
@@ -26,12 +35,27 @@ zitadel:
       hostIP: 127.0.0.1
       protocol: TCP
   resourcesPreset: medium
-  config:
-    ExternalPort: 443
-    ExternalDomain: zitadel.day0.sololab
-    Database:
-      postgres:
-        host: zitadel-pg
+  configFiles:
+    config:
+      Database:
+        postgres:
+          Host: zitadel-database
+      ExternalPort: 443
+      ExternalDomain: zitadel.day0.sololab
+    step:
+      # https://zitadel.com/docs/self-hosting/deploy/compose
+      # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/setup/steps.yaml
+      FirstInstance:
+        LoginClientPatPath: /login-client/pat
+        Org:
+          Human:
+            PasswordChangeRequired: false
+          LoginClient:
+            Machine:
+              Name: Automatically Initialized IAM_LOGIN_CLIENT
+              Username: login-client
+            Pat:
+              ExpirationDate: "2100-01-01T00:00:00Z"
   secret:
     # tls:
     #   contents:
@@ -39,7 +63,7 @@ zitadel:
     others:
       contents:
         # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/defaults.yaml#L115C1-L115C10
-        database.yaml:
+        database.yaml: |-
           Database:
             postgres:
               User:
@@ -50,6 +74,8 @@ zitadel:
     - start-from-init
     - --config
     - /config/zitadel-config.yaml
+    - --steps
+    - /config/zitadel-step.yaml
     - --masterkeyFile
     - /secret/masterKey
     - --config
@@ -57,3 +83,7 @@ zitadel:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
+
+persistence:
+  enabled: true
+  mountPath: /login-client

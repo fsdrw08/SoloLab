@@ -8,7 +8,7 @@ prov_remote = {
 podman_kubes = [
   {
     helm = {
-      name       = "zitadel"
+      name       = "zitadel-backend"
       chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel-backend"
       value_file = "./attachments-zitadel/values-sololab.yaml"
       # secrets = [
@@ -39,21 +39,29 @@ podman_kubes = [
       #   }
       # ]
     }
-    manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-aio.yaml"
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-backend-aio.yaml"
   },
   {
     helm = {
-      name       = "zitadel-pg"
+      name       = "zitadel-database"
       chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
       value_file = "./attachments-postgresql/values-sololab.yaml"
       value_sets = [
         {
           name         = "fullnameOverride"
-          value_string = "zitadel-pg"
+          value_string = "zitadel-database"
         }
       ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-pg-aio.yaml"
+  },
+  {
+    helm = {
+      name       = "zitadel-frontend"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel-frontend"
+      value_file = "./attachments-zitadel-login/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-frontend-aio.yaml"
   }
 ]
 
@@ -75,19 +83,20 @@ podman_quadlet = {
             Before                = "umount.target"
             Conflicts             = "umount.target"
             # kube
-            yaml          = "zitadel-aio.yaml"
+            yaml          = "zitadel-backend-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
             Network       = ""
             # service
-            ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
+            # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
+            ExecStartPre  = ""
             ExecStartPost = ""
             Restart       = "on-failure"
           }
         }
       ]
       service = {
-        name   = "zitadel"
+        name   = "zitadel-backend"
         status = "start"
       }
     },
@@ -113,12 +122,44 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
-            Restart       = "on-failure"
+            Restart       = "no"
           }
         }
       ]
       service = {
-        name   = "zitadel-pg"
+        name   = "zitadel-database"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "ZITADEL Hosted Login Version 2"
+            Documentation         = "https://zitadel.com/docs/self-hosting/"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "zitadel-frontend-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = ""
+            # service
+            # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "no"
+          }
+        }
+      ]
+      service = {
+        name   = "zitadel-frontend"
         status = "start"
       }
     },
