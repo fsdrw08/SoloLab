@@ -34,17 +34,16 @@ zitadel:
       hostPort: 8081
       hostIP: 127.0.0.1
       protocol: TCP
-  resourcesPreset: medium
   configFiles:
     config:
       Database:
         postgres:
-          Host: zitadel-database
+          Host: # set in terraform zitadel-database
       ExternalPort: 443
       ExternalDomain: zitadel.day0.sololab
     step:
       # https://zitadel.com/docs/self-hosting/deploy/compose
-      # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/setup/steps.yaml
+      # https://github.com/zitadel/zitadel/blob/v4.6.2/cmd/setup/steps.yaml
       FirstInstance:
         # https://questions.zitadel.com/m/1397337190165643284
         MachineKeyPath: /data/zitadel-admin-sa.json
@@ -83,7 +82,7 @@ zitadel:
     #     ca.crt: # set by terraform data
     others:
       contents:
-        # https://github.com/zitadel/zitadel/blob/v4.6.1/cmd/defaults.yaml#L115C1-L115C10
+        # https://github.com/zitadel/zitadel/blob/v4.6.2/cmd/defaults.yaml#L115C1-L115C10
         database.yaml: |-
           Database:
             postgres:

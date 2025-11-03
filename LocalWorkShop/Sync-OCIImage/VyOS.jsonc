@@ -36,16 +36,16 @@
     },
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "zitadel/zitadel:v4.6.1",
-        "archive": "ghcr.io_zitadel_zitadel_v4.6.1.tar",
-        "privateRepo": "zitadel/zitadel:v4.6.1",
+        "publicRepo": "zitadel/zitadel:v4.6.2",
+        "archive": "ghcr.io_zitadel_zitadel_v4.6.2.tar",
+        "privateRepo": "zitadel/zitadel:v4.6.2",
         "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
     },
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "zitadel/zitadel-login:v4.6.1",
-        "archive": "ghcr.io_zitadel_zitadel-login_v4.6.1.tar",
-        "privateRepo": "zitadel/zitadel-login:v4.6.1",
+        "publicRepo": "zitadel/zitadel-login:v4.6.2",
+        "archive": "ghcr.io_zitadel_zitadel-login_v4.6.2.tar",
+        "privateRepo": "zitadel/zitadel-login:v4.6.2",
         "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
     },
     {

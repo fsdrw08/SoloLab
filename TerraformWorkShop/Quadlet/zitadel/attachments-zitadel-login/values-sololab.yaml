@@ -42,7 +42,7 @@ zitadelLogin:
   config:
     CUSTOM_REQUEST_HEADERS: Host:zitadel.day0.sololab
     NEXT_PUBLIC_BASE_PATH: /ui/v2/login
-    ZITADEL_API_URL: http://zitadel-backend:8080
+    ZITADEL_API_URL: # set by terraform variable http://zitadel-backend:8080
     ZITADEL_SERVICE_USER_TOKEN_FILE: /data/login-client.pat
   extraEnvVars:
     - name: TZ

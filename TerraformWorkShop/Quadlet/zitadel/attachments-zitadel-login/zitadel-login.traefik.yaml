@@ -5,7 +5,7 @@ http:
       entrypoints: web
       rule: Host(`zitadel.day0.sololab`) && PathPrefix(`/ui/v2/login`)
       middlewares: toHttps@file
-      service: zitadel
+      service: zitadel-login
     zitadel-login:
       entrypoints: webSecure
       rule: Host(`zitadel.day0.sololab`) && PathPrefix(`/ui/v2/login`)

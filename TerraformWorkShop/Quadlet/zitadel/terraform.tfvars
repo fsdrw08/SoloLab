@@ -25,33 +25,12 @@ podman_kubes = [
       name       = "zitadel-backend"
       chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel-backend"
       value_file = "./attachments-zitadel/values-sololab.yaml"
-      # secrets = [
-      #   {
-      #     tfstate = {
-      #       backend = {
-      #         type = "local"
-      #         config = {
-      #           path = "../../TLS/RootCA/terraform.tfstate"
-      #         }
-      #       }
-      #       cert_name = "root"
-      #     }
-      #     value_sets = [
-      #       {
-      #         name          = "zitadel.secret.contents.ca\\.crt"
-      #         value_ref_key = "ca"
-      #       },
-      #       # {
-      #       #   name          = "zitadel.tls.contents.server\\.crt"
-      #       #   value_ref_key = "cert_pem_chain"
-      #       # },
-      #       # {
-      #       #   name          = "zitadel.tls.contents.server\\.key"
-      #       #   value_ref_key = "key_pem"
-      #       # }
-      #     ]
-      #   }
-      # ]
+      value_sets = [
+        {
+          name         = "zitadel.configFiles.config.Database.postgres.Host"
+          value_string = "zitadel-database"
+        }
+      ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-backend-aio.yaml"
   },
@@ -60,6 +39,12 @@ podman_kubes = [
       name       = "zitadel-frontend"
       chart      = "../../../HelmWorkShop/helm-charts/charts/zitadel-frontend"
       value_file = "./attachments-zitadel-login/values-sololab.yaml"
+      value_sets = [
+        {
+          name         = "zitadelLogin.config.ZITADEL_API_URL"
+          value_string = "http://zitadel-backend:8080"
+        }
+      ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/zitadel-frontend-aio.yaml"
   }
@@ -121,7 +106,7 @@ podman_quadlet = {
             # service
             # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
             ExecStartPre  = ""
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-20 -n 1) && podman healthcheck run zitadel-backend-api\""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-15 -n 1) && podman healthcheck run zitadel-backend-api\""
             Restart       = "no"
           }
         }
@@ -153,7 +138,7 @@ podman_quadlet = {
             # service
             # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
             ExecStartPre  = ""
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-25 -n 1) && podman healthcheck run zitadel-frontend-login\""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run zitadel-frontend-login\""
             Restart       = "no"
           }
         }
