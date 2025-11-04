@@ -56,6 +56,10 @@ terraform {
       source  = "tasansga/lldap"
       version = ">= 0.3.0"
     }
+    zitadel = {
+      source  = "zitadel/zitadel"
+      version = ">= 2.2.0"
+    }
     sftpgo = {
       source  = "drakkan/sftpgo"
       version = ">= 0.0.18"
