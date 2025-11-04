@@ -2,6 +2,10 @@ global:
   imageRegistry: "zot.vyos.sololab"
 zitadel:
   hostNetwork: false
+  hostAliases:
+    - ip: host-gateway
+      hostnames:
+        - lldap.day0.sololab
   # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
   # podLabels:
   #   traefik.enable: true

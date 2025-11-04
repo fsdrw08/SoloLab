@@ -75,7 +75,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run zitadel-database-postgresql\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         }
       ]
@@ -107,7 +107,7 @@ podman_quadlet = {
             # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-15 -n 1) && podman healthcheck run zitadel-backend-api\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         }
       ]
@@ -139,7 +139,7 @@ podman_quadlet = {
             # ExecStartPre  = "/usr/bin/bash -c \"while ! exec 3<>/dev/tcp/127.0.0.1/5432; do sleep 5 ; done\""
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run zitadel-frontend-login\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         }
       ]
