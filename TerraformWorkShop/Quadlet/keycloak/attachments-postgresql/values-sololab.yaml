@@ -1,0 +1,26 @@
+global:
+  imageRegistry: zot.vyos.sololab
+postgresql:
+  containerPorts:
+    - name: postgresql
+      containerPort: 5432
+      hostPort: 5432
+      hostIP: 127.0.0.1
+      protocol: TCP
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  # %%OTHER_PARAMETERS_RELATED_TO_THIS_CONTAINER/POD%%
+  ## @param postgresql.config environment variable config for postgresql
+  config:
+    ## @param postgresql.config.POSTGRESQL_USER User name for PostgreSQL account to be created
+    ##
+    POSTGRESQL_USER: keycloak
+    ## @param postgresql.config.POSTGRESQL_DATABASE Database name
+    ##
+    POSTGRESQL_DATABASE: keycloak
+  secret:
+    envVars:
+      ## @param postgresql.config.POSTGRESQL_PASSWORD Password for the user account
+      ##
+      POSTGRESQL_PASSWORD: password

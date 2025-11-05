@@ -70,20 +70,6 @@
         "description": "https://hub.docker.com/r/swaggerapi/swagger-ui/tags",
     },
     {
-        "publicRegistry": "docker.io",
-        "publicRepo": "leg100/otfd:0.4.1",
-        "archive": "docker.io_leg100_oftd_0.4.1.tar",
-        "privateRepo": "leg100/otfd:0.4.1",
-        "description": "https://hub.docker.com/r/leg100/otfd?tab=tags",
-    },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "clivern/lynx:0.12.9",
-        "archive": "docker.io_clivern_lynx_0.12.9.tar",
-        "privateRepo": "clivern/lynx:0.12.9",
-        "description": "https://hub.docker.com/r/clivern/lynx?tab=tags",
-    },
-    {
         "publicRegistry": "quay.io",
         "publicRepo": "minio/minio:RELEASE.2025-09-07T16-13-09Z",
         "archive": "quay.io_minio_minio_RELEASE.2025-09-07T16-13-09Z.tar",
@@ -110,6 +96,13 @@
         "archive": "docker.io_lldap_lldap_v0.6.2-alpine-rootless.tar",
         "privateRepo": "lldap/lldap:v0.6.2-alpine-rootless",
         "description": "https://hub.docker.com/r/lldap/lldap/tags",
+    },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "keycloak/keycloak:26.4.2",
+        "archive": "quay.io_keycloak_keycloak_26.4.2.tar",
+        "privateRepo": "keycloak/keycloak:26.4.2",
+        "description": "https://quay.io/repository/keycloak/keycloak?tab=tags",
     },
     {
         "publicRegistry": "docker.io", // "quay.io",

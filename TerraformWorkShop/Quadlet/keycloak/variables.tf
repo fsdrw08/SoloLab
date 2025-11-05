@@ -7,72 +7,71 @@ variable "prov_remote" {
   })
 }
 
-variable "certs_ref" {
-  type = object({
-    tfstate = optional(
-      object({
-        backend = string
-        config  = map(string)
-        entity  = string
-      }), null
-    )
-    config_node = object({
-      cert = string
-      key  = string
-    })
-
-  })
-}
-
-variable "podman_kube" {
-  type = object({
+variable "podman_kubes" {
+  type = list(object({
     helm = object({
       name       = string
       chart      = string
       value_file = string
       value_sets = optional(
+        list(
+          object({
+            name                = string
+            value_string        = optional(string, null)
+            value_template_path = optional(string, null)
+            value_template_vars = optional(map(string), null)
+          })
+        ), null
+      )
+      secrets = optional(
         list(object({
-          name                = string
-          value_string        = optional(string, null)
-          value_template_path = optional(string, null)
-          value_template_vars = optional(map(string), null)
-      })), null)
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
+          )
+          vault_kvv2 = optional(
+            object({
+              mount = string
+              name  = string
+            }),
+            null
+          )
+          tfstate = optional(
+            object({
+              backend = object({
+                type   = string
+                config = map(string)
+              })
+              cert_name = string
+            }),
+            null
+          )
+        })),
+        null
+      )
     })
     manifest_dest_path = string
-  })
+  }))
 }
 
 variable "podman_quadlet" {
   type = object({
-    service = object({
-      name   = string
-      status = string
-    })
-    quadlet = object({
-      file_contents = list(object({
-        file_source = string
-        # https://stackoverflow.com/questions/63180277/terraform-map-with-string-and-map-elements-possible
-        vars = map(string)
+    dir = string
+    units = list(object({
+      files = list(object({
+        template = string
+        vars     = map(string)
       }))
-      file_path_dir = string
-    })
+      service = optional(
+        object({
+          name   = string
+          status = string
+        }),
+        null
+      )
+    }))
   })
 }
 
-variable "prov_pdns" {
-  type = object({
-    api_key        = string
-    server_url     = string
-    insecure_https = optional(bool, null)
-  })
-}
-
-variable "dns_record" {
-  type = object({
-    zone    = string
-    name    = string
-    type    = string
-    ttl     = number
-    records = list(string)
-  })
-}
