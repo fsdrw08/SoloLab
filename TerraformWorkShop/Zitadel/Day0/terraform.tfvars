@@ -29,6 +29,6 @@ ldap = {
   user_filters        = ["uid", "objectClass=person", "memberOf=cn=sso_allow,ou=groups,dc=root,dc=sololab"]
   is_linking_allowed  = false
   is_creation_allowed = true
-  is_auto_creation    = false
+  is_auto_creation    = true
   is_auto_update      = true
 }
