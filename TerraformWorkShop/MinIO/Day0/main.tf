@@ -21,9 +21,10 @@ resource "minio_accesskey" "users" {
   for_each = {
     for user in var.users : user.name => user
   }
-  user       = minio_iam_user.users[each.value.name].name
-  access_key = each.value.access_key
-  secret_key = each.value.secret_key
+  user               = minio_iam_user.users[each.value.name].name
+  access_key         = each.value.access_key
+  secret_key         = each.value.secret_key
+  secret_key_version = each.value.secret_key_version
 }
 
 resource "minio_iam_policy" "policies" {
