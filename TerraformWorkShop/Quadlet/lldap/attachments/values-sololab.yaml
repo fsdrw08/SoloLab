@@ -11,7 +11,6 @@ lldap:
     traefik.http.routers.lldap-web.tls: true
     traefik.http.routers.lldap-web.service: lldap-web
     traefik.http.services.lldap-web.loadbalancer.server.port: 17170
-    # traefik.http.services.lldap-web.loadbalancer.server.url: http://127.0.0.1:17170
   containerSecurityContext:
     sysctls:
       - name: net.ipv4.ip_unprivileged_port_start
@@ -23,13 +22,20 @@ lldap:
     # health check function only support localhost
     http_host: 127.0.0.1
     # http_port: 17170
-    jwt_secret: REPLACE_WITH_RANDOM
     ldap_base_dn: dc=root,dc=sololab
     ldap_user_dn: admin
-    ldap_user_pass: P@ssw0rd
     database_url: sqlite:///data/persistence/users.db?mode=rwc
     ldaps_options:
       enabled: true
       # port: 636
-      cert_file: /data/certs/cert.pem
-      key_file: /data/certs/key.pem
+      cert_file: /data/secret/certs/cert.pem
+      key_file: /data/secret/certs/key.pem
+  secret:
+    envVars:
+      LLDAP_KEY_SEED: "RanD0m STR1ng"
+      LLDAP_JWT_SECRET_FILE: /data/secret/others/lldap-jwt-secret
+      LLDAP_LDAP_USER_PASS_FILE: /data/secret/others/lldap-ldap-user-pass
+    others:
+      contents:
+        lldap-jwt-secret: REPLACE_WITH_RANDOM
+        lldap-ldap-user-pass: P@ssw0rd

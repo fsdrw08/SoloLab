@@ -42,11 +42,11 @@ podman_kubes = [
         {
           value_sets = [
             {
-              name          = "lldap.ssl.contents.cert\\.pem"
+              name          = "lldap.secret.ssl.contents.cert\\.pem"
               value_ref_key = "cert_pem_chain"
             },
             {
-              name          = "lldap.ssl.contents.key\\.pem"
+              name          = "lldap.secret.ssl.contents.key\\.pem"
               value_ref_key = "key_pem"
             }
           ]
@@ -87,7 +87,7 @@ podman_quadlet = {
             yaml          = "lldap-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run lldap-server\""
