@@ -15,9 +15,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.8",
-        "archive": "quay.io_giantswarm_zot-v2.1.8.tar",
-        "privateRepo": "giantswarm/zot:v2.1.8",
+        "publicRepo": "giantswarm/zot:v2.1.10",
+        "archive": "quay.io_giantswarm_zot-v2.1.10.tar",
+        "privateRepo": "giantswarm/zot:v2.1.10",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
     },
     {
@@ -33,20 +33,6 @@
         "archive": "docker.io_wait4x_wait4x_3.6.0.tar",
         "privateRepo": "wait4x/wait4x:3.6.0",
         "description": "https://hub.docker.com/r/wait4x/wait4x",
-    },
-    {
-        "publicRegistry": "ghcr.io",
-        "publicRepo": "zitadel/zitadel:v4.6.2",
-        "archive": "ghcr.io_zitadel_zitadel_v4.6.2.tar",
-        "privateRepo": "zitadel/zitadel:v4.6.2",
-        "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
-    },
-    {
-        "publicRegistry": "ghcr.io",
-        "publicRepo": "zitadel/zitadel-login:v4.6.2",
-        "archive": "ghcr.io_zitadel_zitadel-login_v4.6.2.tar",
-        "privateRepo": "zitadel/zitadel-login:v4.6.2",
-        "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
     },
     {
         "publicRegistry": "quay.io",
@@ -103,6 +89,13 @@
         "archive": "quay.io_keycloak_keycloak_26.4.2.tar",
         "privateRepo": "keycloak/keycloak:26.4.2",
         "description": "https://quay.io/repository/keycloak/keycloak?tab=tags",
+    },
+    {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "dexidp/dex:v2.44.0-alpine",
+        "archive": "ghcr.io_dexidp_dex_v2.44.0-alpine.tar",
+        "privateRepo": "dexidp/dex:v2.44.0-alpine",
+        "description": "https://github.com/dexidp/dex/pkgs/container/dex",
     },
     {
         "publicRegistry": "docker.io", // "quay.io",

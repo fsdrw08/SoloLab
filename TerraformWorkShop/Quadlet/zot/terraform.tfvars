@@ -24,7 +24,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "zot.secret.contents.ca\\.crt"
+              name          = "zot.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             # {
@@ -64,7 +64,7 @@ podman_quadlet = {
             yaml          = "zot-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = ""

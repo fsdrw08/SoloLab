@@ -53,20 +53,20 @@ module "config_map" {
   config = {
     create_dir = true
     dir        = "/mnt/data/etc/zot"
-    # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
+    # https://zotregistry.dev/v2.1.10/admin-guide/admin-configuration/#configuration-file
     files = [
       {
         basename = "config.json"
         content  = jsonencode(yamldecode(file("${path.module}/attachments/config-htpasswd.yaml")))
       },
       # for htpasswd auth
-      # https://zotregistry.dev/v2.1.8/articles/authn-authz/#htpasswd
+      # https://zotregistry.dev/v2.1.10/articles/authn-authz/#htpasswd
       {
         basename = "htpasswd"
         content  = "admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa"
       },
       # for ldap auth
-      # https://zotregistry.dev/v2.1.8/articles/authn-authz/#server-side-authentication
+      # https://zotregistry.dev/v2.1.10/articles/authn-authz/#server-side-authentication
       # {
       #   basename = "config-ldap-credentials.json"
       #   content = jsonencode({
@@ -108,9 +108,9 @@ module "vyos_container" {
   workloads = [
     {
       name  = "zot"
-      image = "quay.io/giantswarm/zot-linux-amd64:v2.1.8"
-      # image       = "192.168.255.10:5000/giantswarm/zot:v2.1.8"
-      local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.8.tar"
+      image = "quay.io/giantswarm/zot-linux-amd64:v2.1.10"
+      # image       = "192.168.255.10:5000/giantswarm/zot:v2.1.10"
+      local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.10.tar"
       pull_flag   = "--tls-verify=false"
       others = {
         "uid"                  = var.owner.uid

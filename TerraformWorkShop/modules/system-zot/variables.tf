@@ -27,7 +27,7 @@ variable "install" {
     {
       bin_file_dir    = "/usr/bin"
       bin_file_name   = "zot"
-      bin_file_source = "https://github.com/project-zot/zot/releases/download/v2.1.8/zot-linux-amd64"
+      bin_file_source = "https://github.com/project-zot/zot/releases/download/v2.1.10/zot-linux-amd64"
     }
   ]
 }

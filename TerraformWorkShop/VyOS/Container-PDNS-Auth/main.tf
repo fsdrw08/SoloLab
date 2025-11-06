@@ -38,7 +38,6 @@ module "config_map" {
   config = {
     create_dir = true
     dir        = "/mnt/data/etc/powerdns"
-    # https://zotregistry.dev/v2.1.8/admin-guide/admin-configuration/#configuration-file
     files = [
       {
         basename = "entrypoint.sh"

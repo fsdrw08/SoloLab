@@ -15,9 +15,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.8",
-        "archive": "quay.io_giantswarm_zot-v2.1.8.tar",
-        "privateRepo": "giantswarm/zot:v2.1.8",
+        "publicRepo": "giantswarm/zot:v2.1.10",
+        "archive": "quay.io_giantswarm_zot-v2.1.10.tar",
+        "privateRepo": "giantswarm/zot:v2.1.10",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
     },
     {
