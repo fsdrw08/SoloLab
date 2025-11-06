@@ -1,7 +1,22 @@
 global:
   imageRegistry: zot.day0.sololab
 minio:
-  containerPorts: []
+  initContainers:
+    - name: wait-for-oidc
+      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+      command:
+        - wait4x
+        - http
+        - "{{ .Values.minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL }}"
+        - --insecure-skip-tls-verify
+        - --h2c
+        - --no-redirect
+        - --expect-status-code
+        - "200"
+        - --timeout
+        - "5m"
+        - --interval
+        - "5s"
   livenessProbe:
     exec:
       command:
@@ -68,16 +83,24 @@ minio:
       --address=127.0.0.1:9000
       --console-address=127.0.0.1:9001
       --certs-dir=/etc/minio/certs
-    MINIO_IDENTITY_LDAP_SERVER_ADDR: lldap.day0.sololab:636
-    MINIO_IDENTITY_LDAP_LOOKUP_BIND_DN: cn=readonly,ou=people,dc=root,dc=sololab
-    MINIO_IDENTITY_LDAP_LOOKUP_BIND_PASSWORD: readonly
-    MINIO_IDENTITY_LDAP_USER_DN_ATTRIBUTES: uid
-    MINIO_IDENTITY_LDAP_USER_DN_SEARCH_BASE_DN: ou=people,dc=root,dc=sololab
-    MINIO_IDENTITY_LDAP_USER_DN_SEARCH_FILTER: (&(uid=%s)(objectclass=posixAccount))
-    # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/ldap/#env-minio-identity-ldap-group-search-filter
-    MINIO_IDENTITY_LDAP_GROUP_SEARCH_FILTER: (&(objectClass=groupOfUniqueNames)(member=%d))
-    MINIO_IDENTITY_LDAP_GROUP_SEARCH_BASE_DN: ou=groups,dc=root,dc=sololab
-    MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: off
+    # MINIO_IDENTITY_LDAP_SERVER_ADDR: lldap.day0.sololab:636
+    # MINIO_IDENTITY_LDAP_LOOKUP_BIND_DN: cn=readonly,ou=people,dc=root,dc=sololab
+    # MINIO_IDENTITY_LDAP_LOOKUP_BIND_PASSWORD: readonly
+    # MINIO_IDENTITY_LDAP_USER_DN_ATTRIBUTES: uid
+    # MINIO_IDENTITY_LDAP_USER_DN_SEARCH_BASE_DN: ou=people,dc=root,dc=sololab
+    # MINIO_IDENTITY_LDAP_USER_DN_SEARCH_FILTER: (&(uid=%s)(objectclass=posixAccount))
+    # # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/ldap/#env-minio-identity-ldap-group-search-filter
+    # MINIO_IDENTITY_LDAP_GROUP_SEARCH_FILTER: (&(objectClass=groupOfUniqueNames)(member=%d))
+    # MINIO_IDENTITY_LDAP_GROUP_SEARCH_BASE_DN: ou=groups,dc=root,dc=sololab
+    # MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: off
+
+    MINIO_IDENTITY_OPENID_CONFIG_URL: https://dex.day0.sololab/.well-known/openid-configuration
+    MINIO_IDENTITY_OPENID_CLIENT_ID: minio
+    MINIO_IDENTITY_OPENID_CLIENT_SECRET: ZXhhbXBsZS1hcHAtc2VjcmV0
+    MINIO_IDENTITY_OPENID_DISPLAY_NAME: login via dex
+    # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/openid/#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
+    MINIO_IDENTITY_OPENID_CLAIM_NAME: groups
+    MINIO_IDENTITY_OPENID_SCOPES: openid,groups
 
     MINIO_SERVER_URL: https://minio-api.day0.sololab
     # https://github.com/minio/console/issues/1908#issuecomment-1113587869

@@ -24,7 +24,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "minio.tls.contents.CAs.sololab\\.crt"
+              name          = "minio.secret.tls.contents.CAs.sololab\\.crt"
               value_ref_key = "ca"
             }
           ]
@@ -56,11 +56,11 @@ podman_quadlet = {
             yaml          = "minio-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://lldap.day0.sololab/health"
+            ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run minio-server\""
             Restart       = "on-failure"
           }
