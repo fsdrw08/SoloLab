@@ -114,7 +114,7 @@ zones = [
         ]
       },
       {
-        fqdn = "zitadel.day0.sololab."
+        fqdn = "dex.day0.sololab."
         type = "A"
         ttl  = 60
         results = [

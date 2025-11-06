@@ -1,0 +1,63 @@
+global:
+  imageRegistry: zot.vyos.sololab
+dex:
+  config:
+    issuer: https://dex.day0.sololab/
+    web:
+      http: 127.0.0.1:5556
+    connectors:
+      - type: ldap
+        id: ldap
+        name: LDAP
+        config:
+          host: lldap.day0.sololab:636 # or 6360 if you have ldaps enabled, make sure it does not start with `ldap://`
+          insecureNoSSL: false # or false if you have ldaps enabled
+          insecureSkipVerify: false # or false if you have ldaps enabled
+          rootCA: /etc/ssl/certs/private/sololab.crt
+          bindDN: cn=readonly,ou=people,dc=root,dc=sololab # replace admin with your admin user
+          bindPW: readonly # replace with your admin password
+          userSearch:
+            baseDN: ou=people,dc=root,dc=sololab
+            username: uid
+            idAttr: uid
+            emailAttr: mail
+            nameAttr: displayName
+            preferredUsernameAttr: uid
+          groupSearch:
+            baseDN: ou=groups,dc=root,dc=sololab
+            filter: "(objectClass=groupOfUniqueNames)"
+            userMatchers:
+              - userAttr: DN
+                groupAttr: member
+            nameAttr: cn
+    oauth2:
+      responseTypes:
+        - code
+        - id_token
+        - token
+      skipApprovalScreen: true
+      alwaysShowLoginScreen: false
+    staticClients:
+      - id: minio
+        redirectURIs:
+          - https://minio-console.day0.sololab/oauth_callback
+        name: minio
+        secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      - id: zot
+        redirectURIs:
+          - https://zot.day0.sololab/zot/auth/callback/oidc
+        name: zot
+        secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.dex-http.entrypoints: web
+    traefik.http.routers.dex-http.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex-http.service: dex
+
+    traefik.http.routers.dex.entrypoints: webSecure
+    traefik.http.routers.dex.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex.tls: true
+    traefik.http.routers.dex.service: dex
+
+    traefik.http.services.dex.loadbalancer.server.port: 5556

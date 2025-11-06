@@ -30,7 +30,7 @@ dns_records = [
     }
   },
   {
-    hostname = "zitadel.day0.sololab"
+    hostname = "dex.day0.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
