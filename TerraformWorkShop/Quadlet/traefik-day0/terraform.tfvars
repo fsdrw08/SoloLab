@@ -24,15 +24,15 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "traefik.tls.contents.\"ca\\.crt\""
+              name          = "traefik.secret.tls.contents.\"ca\\.crt\""
               value_ref_key = "ca"
             },
             {
-              name          = "traefik.tls.contents.\"day0\\.crt\""
+              name          = "traefik.secret.tls.contents.\"day0\\.crt\""
               value_ref_key = "cert_pem_chain"
             },
             {
-              name          = "traefik.tls.contents.\"day0\\.key\""
+              name          = "traefik.secret.tls.contents.\"day0\\.key\""
               value_ref_key = "key_pem"
             }
           ]
@@ -64,7 +64,7 @@ podman_quadlet = {
             yaml          = "traefik-aio.yaml"
             PodmanArgs    = "--tls-verify=false --no-hosts"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""

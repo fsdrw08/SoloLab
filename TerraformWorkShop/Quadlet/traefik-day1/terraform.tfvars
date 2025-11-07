@@ -25,15 +25,15 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "traefik.tls.contents.ca\\.crt"
+              name          = "traefik.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             {
-              name          = "traefik.tls.contents.day1\\.crt"
+              name          = "traefik.secret.tls.contents.day1\\.crt"
               value_ref_key = "cert"
             },
             {
-              name          = "traefik.tls.contents.day1\\.key"
+              name          = "traefik.secret.tls.contents.day1\\.key"
               value_ref_key = "private_key"
             }
           ]
@@ -45,7 +45,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "traefik.configFiles.static.providers.consulCatalog.endpoint.token"
+              name          = "traefik.configFiles.install.providers.consulCatalog.endpoint.token"
               value_ref_key = "token"
             }
           ]
