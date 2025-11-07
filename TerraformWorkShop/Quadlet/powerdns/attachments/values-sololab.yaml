@@ -23,7 +23,7 @@ powerdns:
   ## the userns annotation only work podman v4.9+
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ## ref: https://github.com/containers/podman/discussions/22378
-  ## ref: https://github.com/PowerDNS/pdns/blob/auth-5.0.0/Dockerfile-auth#L93
+  ## ref: https://github.com/PowerDNS/pdns/blob/auth-5.0.1/Dockerfile-auth#L93
   ##
   podAnnotations:
     io.podman.annotations.userns: keep-id:uid=953,gid=953
