@@ -16,7 +16,7 @@ In current dir, run:
 ```powershell
 # config http proxy if require
 $proxy="127.0.0.1:7890"
-$env:HTTP_PROXY=$proxy;$env:HTTPS_PROXY=$proxy
+$env:HTTP_PROXY=$proxy;$env:HTTPS_PROXY=$proxy;$env:NO_PROXY="sololab"
 # setup target download folder
 $publicDir=$env:PUBLIC
 # $publicDir="D:\Users\Public\"

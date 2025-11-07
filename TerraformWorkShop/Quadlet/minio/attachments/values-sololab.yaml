@@ -1,29 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 minio:
-  initContainers:
-    - name: wait-for-oidc
-      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
-      command:
-        - wait4x
-        - http
-        - "{{ .Values.minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL }}"
-        - --insecure-skip-tls-verify
-        - --h2c
-        - --no-redirect
-        - --expect-status-code
-        - "200"
-        - --timeout
-        - "5m"
-        - --interval
-        - "5s"
-  livenessProbe:
-    exec:
-      command:
-        - mc
-        - --insecure
-        - ready
-        - sololab
   podLabels:
     traefik.enable: true
     traefik.http.routers.minio-api-redirect.entrypoints: web
@@ -78,6 +55,29 @@ minio:
     # traefik.tcp.routers.minio-console.tls.passthrough: true
     # traefik.tcp.routers.minio-console.service: minio-console
     # traefik.tcp.services.minio-console.loadbalancer.server.port: 9001
+  initContainers:
+    - name: wait-for-oidc
+      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+      command:
+        - wait4x
+        - http
+        - "{{ .Values.minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL }}"
+        - --insecure-skip-tls-verify
+        - --h2c
+        - --no-redirect
+        - --expect-status-code
+        - "200"
+        - --timeout
+        - "5m"
+        - --interval
+        - "5s"
+  livenessProbe:
+    exec:
+      command:
+        - mc
+        - --insecure
+        - ready
+        - sololab
   config:
     MINIO_OPTS: >-
       --address=127.0.0.1:9000

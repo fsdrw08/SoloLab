@@ -82,7 +82,7 @@ terraform {
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.5.1"
+      version = ">= 3.11.3"
     }
     grafana = {
       source  = "grafana/grafana"
