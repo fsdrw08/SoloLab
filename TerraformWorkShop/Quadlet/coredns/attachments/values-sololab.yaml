@@ -1,9 +1,6 @@
 global:
   imageRegistry: zot.vyos.sololab
 coredns:
-  containerPorts: []
-  livenessProbe:
-    enabled: false
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

@@ -24,15 +24,15 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "etcd.tls.contents.ca\\.crt"
+              name          = "etcd.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             {
-              name          = "etcd.tls.contents.server\\.crt"
+              name          = "etcd.secret.tls.contents.server\\.crt"
               value_ref_key = "cert_pem_chain"
             },
             {
-              name          = "etcd.tls.contents.server\\.key"
+              name          = "etcd.secret.tls.contents.server\\.key"
               value_ref_key = "key_pem"
             },
           ]

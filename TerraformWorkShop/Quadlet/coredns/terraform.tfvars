@@ -24,7 +24,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "coredns.tls.contents.ca\\.crt"
+              name          = "coredns.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
           ]
@@ -57,7 +57,7 @@ podman_quadlet = {
             yaml          = "coredns-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "true"
-            Network       = "host"
+            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
