@@ -1,14 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 dufs:
-  config:
-    bind: 127.0.0.1
-    port: 5001
-    auth:
-      - admin:admin@/:rw
-      - user:pass@/private:ro
-      - "@/public"
-
   podLabels:
     traefik.enable: true
     traefik.http.routers.dufs-http.entrypoints: web
@@ -23,3 +15,10 @@ dufs:
     # traefik.http.services.dufs.loadBalancer.serversTransport: dufs@file
     # traefik.http.services.dufs.loadbalancer.server.scheme: https
     traefik.http.services.dufs.loadbalancer.server.port: 5001
+  config:
+    bind: 127.0.0.1
+    port: 5001
+    auth:
+      - admin:admin@/:rw
+      - user:pass@/private:ro
+      - "@/public"
