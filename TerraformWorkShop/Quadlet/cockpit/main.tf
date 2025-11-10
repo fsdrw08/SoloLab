@@ -72,7 +72,10 @@ data "helm_template" "podman_kubes" {
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
-    ],
+    ]
+  ])
+
+  set_sensitive = flatten([
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
@@ -81,7 +84,7 @@ data "helm_template" "podman_kubes" {
           # value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
-    ],
+    ]
   ])
 }
 

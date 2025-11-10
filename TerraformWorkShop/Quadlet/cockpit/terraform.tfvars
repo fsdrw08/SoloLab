@@ -13,20 +13,6 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
-          value_sets = [
-            {
-              name          = "cockpit.tls.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-            {
-              name          = "cockpit.tls.contents.server\\.crt"
-              value_ref_key = "cert_pem_chain"
-            },
-            {
-              name          = "cockpit.tls.contents.server\\.key"
-              value_ref_key = "key_pem"
-            }
-          ]
           tfstate = {
             backend = {
               type = "local"
@@ -36,6 +22,20 @@ podman_kubes = [
             }
             cert_name = "cockpit.day0"
           }
+          value_sets = [
+            {
+              name          = "cockpit.secret.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "cockpit.secret.tls.contents.server\\.crt"
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "cockpit.secret.tls.contents.server\\.key"
+              value_ref_key = "key_pem"
+            }
+          ]
         }
       ]
     }

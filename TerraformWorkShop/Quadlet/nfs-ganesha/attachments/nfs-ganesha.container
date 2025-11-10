@@ -9,7 +9,7 @@ Conflicts=${Conflicts}
 [Container]
 ContainerName=nfs-ganesha
 
-Image=zot.day0.sololab/hectorm/nfs-ganesha:v9
+Image=zot.day0.sololab/hectorm/nfs-ganesha:v10
 
 AddCapability=CHOWN
 AddCapability=DAC_OVERRIDE

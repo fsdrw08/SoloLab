@@ -60,11 +60,12 @@ podman_quadlet = {
             StartLimitBurst       = 3
             Before                = "umount.target"
             Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "zot-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = ""

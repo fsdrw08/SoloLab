@@ -106,16 +106,16 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "navidys/prometheus-podman-exporter:v1.18.1",
-        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.18.1.tar",
-        "privateRepo": "navidys/prometheus-podman-exporter:v1.18.1",
+        "publicRepo": "navidys/prometheus-podman-exporter:v1.19.0",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.19.0.tar",
+        "privateRepo": "navidys/prometheus-podman-exporter:v1.19.0",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hectorm/nfs-ganesha:v9",
-        "archive": "docker.io_hectorm_nfs-ganesha_v9.tar",
-        "privateRepo": "hectorm/nfs-ganesha:v9",
+        "publicRepo": "hectorm/nfs-ganesha:v10",
+        "archive": "docker.io_hectorm_nfs-ganesha_v10.tar",
+        "privateRepo": "hectorm/nfs-ganesha:v10",
         "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
     },
 ]

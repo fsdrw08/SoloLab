@@ -7,14 +7,14 @@ prov_remote = {
 }
 
 podman_kubes = [
-  {
-    helm = {
-      name       = "nfs-ganesha"
-      chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
-      value_file = "./attachments/values-sololab.yaml"
-    }
-    manifest_dest_path = "/etc/containers/systemd/nfs-ganesha-aio.yaml"
-  }
+  # {
+  #   helm = {
+  #     name       = "nfs-ganesha"
+  #     chart      = "../../../HelmWorkShop/helm-charts/charts/nfs-ganesha"
+  #     value_file = "./attachments/values-sololab.yaml"
+  #   }
+  #   manifest_dest_path = "/etc/containers/systemd/nfs-ganesha-aio.yaml"
+  # }
 ]
 
 podman_quadlet = {

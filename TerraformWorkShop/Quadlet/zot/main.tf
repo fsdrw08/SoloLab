@@ -63,27 +63,6 @@ data "helm_template" "podman_kubes" {
     "${file(each.value.helm.value_file)}"
   ]
 
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
-
   # v3 helm provider
   set = flatten([
     each.value.helm.value_sets == null ? [] : [
@@ -93,7 +72,10 @@ data "helm_template" "podman_kubes" {
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
-    ],
+    ]
+  ])
+
+  set_sensitive = flatten([
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
@@ -102,7 +84,7 @@ data "helm_template" "podman_kubes" {
           # value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
-    ],
+    ]
   ])
 }
 

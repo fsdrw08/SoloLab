@@ -60,11 +60,12 @@ podman_quadlet = {
             StartLimitBurst       = 3
             Before                = "umount.target"
             Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false --no-hosts"
+            Network    = ""
             # kube
             yaml          = "traefik-aio.yaml"
-            PodmanArgs    = "--tls-verify=false --no-hosts"
             KubeDownForce = "false"
-            Network       = ""
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
