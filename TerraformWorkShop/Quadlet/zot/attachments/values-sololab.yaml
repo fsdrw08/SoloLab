@@ -79,13 +79,13 @@ zot:
             # https://github.com/project-zot/zot/blob/main/examples/README.md#identity-based-authorization
             anonymousPolicy: ["read"]
         adminPolicy:
+          actions: ["read", "create", "update", "delete"]
           ## for user pass
           # users: ["admin"]
           ## for ldap
           groups: ["cn=app-zot-admin,ou=groups,dc=root,dc=sololab"]
           ## for oidc
           # groups: ["app-zot-admin"]
-          # actions: ["read", "create", "update", "delete"]
 
     # https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
     storage:
