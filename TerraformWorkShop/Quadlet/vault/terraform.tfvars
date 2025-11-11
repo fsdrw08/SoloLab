@@ -13,20 +13,6 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
       secrets = [
         {
-          value_sets = [
-            {
-              name          = "vault.tls.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-            {
-              name          = "vault.tls.contents.tls\\.crt"
-              value_ref_key = "cert_pem_chain"
-            },
-            {
-              name          = "vault.tls.contents.tls\\.key"
-              value_ref_key = "key_pem"
-            }
-          ]
           tfstate = {
             backend = {
               type = "local"
@@ -36,6 +22,20 @@ podman_kubes = [
             }
             cert_name = "vault.day1"
           }
+          value_sets = [
+            {
+              name          = "vault.secret.tls.contents.ca\\.crt"
+              value_ref_key = "ca"
+            },
+            {
+              name          = "vault.secret.tls.contents.tls\\.crt"
+              value_ref_key = "cert_pem_chain"
+            },
+            {
+              name          = "vault.secret.tls.contents.tls\\.key"
+              value_ref_key = "key_pem"
+            }
+          ]
         }
       ]
     }
@@ -59,15 +59,16 @@ podman_quadlet = {
             StartLimitBurst       = 3
             Before                = "umount.target"
             Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "vault-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run vault-server\""
-            Restart       = "on-failure"
+            Restart       = "no" # "on-failure"
           }
         }
       ]

@@ -28,7 +28,7 @@ function wait_ready {
     status=$(curl -s -k -X GET "$VAULT_ADDR/v1/sys/health" | jq -r '. | select(.initialized == true and .sealed == false) | .initialized')
     until [ "$status" = "true" ]
     do
-        if [ $retried -lt 3 ]; then
+        if [ $retried -lt 10 ]; then
             echo "[$retried] Vault not initialized nor unseal "
             ((retried++))
             sleep 5
