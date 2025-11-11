@@ -28,25 +28,11 @@
         "description": "https://hub.docker.com/r/powerdns/pdns-auth-50",
     },
     {
-        "publicRegistry": "ghcr.io",
-        "publicRepo": "zitadel/zitadel:v4.6.2",
-        "archive": "ghcr.io_zitadel_zitadel_v4.6.2.tar",
-        "privateRepo": "zitadel/zitadel:v4.6.2",
-        "description": "https://github.com/zitadel/zitadel/pkgs/container/zitadel/versions?filters%5Bversion_type%5D=tagged",
-    },
-    {
         "publicRegistry": "quay.io",
         "publicRepo": "sclorg/postgresql-16-c10s:20250827",
         "archive": "quay.io_sclorg_postgresql-16-c10s_20250827.tar",
         "privateRepo": "sclorg/postgresql-16-c10s:20250827",
         "description": "https://quay.io/repository/sclorg/postgresql-16-c10s?tab=tags",
-    },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "leg100/otfd:0.4.1",
-        "archive": "docker.io_leg100_oftd_0.4.1.tar",
-        "privateRepo": "leg100/otfd:0.4.1",
-        "description": "https://hub.docker.com/r/leg100/otfd?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
@@ -61,13 +47,6 @@
         "archive": "docker.io_sigoden_dufs_v0.45.0.tar",
         "privateRepo": "sigoden/dufs:v0.45.0",
         "description": "https://hub.docker.com/r/sigoden/dufs/tags",
-    },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "drakkan/sftpgo:v2.6.6-plugins",
-        "archive": "docker.io_drakkan_sftpgo_v2.6.6-plugins.tar",
-        "privateRepo": "drakkan/sftpgo:v2.6.6-plugins",
-        "description": "https://hub.docker.com/r/drakkan/sftpgo/tags",
     },
     {
         "publicRegistry": "docker.io",
@@ -92,9 +71,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.5.4",
-        "archive": "docker.io_library_traefik_v3.5.4.tar",
-        "privateRepo": "library/traefik:v3.5.4",
+        "publicRepo": "library/traefik:v3.6.0",
+        "archive": "docker.io_library_traefik_v3.6.0.tar",
+        "privateRepo": "library/traefik:v3.6.0",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {

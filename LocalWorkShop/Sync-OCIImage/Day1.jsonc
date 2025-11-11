@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/vault:1.20.3",
-        "archive": "docker.io_hashicorp_vault_1.20.3.tar",
-        "privateRepo": "hashicorp/vault:1.20.3",
+        "publicRepo": "hashicorp/vault:1.21.0",
+        "archive": "docker.io_hashicorp_vault_1.21.0.tar",
+        "privateRepo": "hashicorp/vault:1.21.0",
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
@@ -29,16 +29,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul-template:0.41.2",
-        "archive": "docker.io_hashicorp_consul-template_0.41.2.tar",
-        "privateRepo": "hashicorp/consul-template:0.41.2",
+        "publicRepo": "hashicorp/consul-template:0.41.3",
+        "archive": "docker.io_hashicorp_consul-template_0.41.3.tar",
+        "privateRepo": "hashicorp/consul-template:0.41.3",
         "description": "https://hub.docker.com/r/hashicorp/consul-template",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.21.4",
-        "archive": "docker.io_hashicorp_consul_1.21.4.tar",
-        "privateRepo": "hashicorp/consul:1.21.4",
+        "publicRepo": "hashicorp/consul:1.22.0",
+        "archive": "docker.io_hashicorp_consul_1.22.0.tar",
+        "privateRepo": "hashicorp/consul:1.22.0",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
