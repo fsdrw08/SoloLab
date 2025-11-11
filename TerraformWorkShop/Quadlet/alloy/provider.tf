@@ -2,7 +2,7 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.0.0"
+      version = ">= 5.4.0"
     }
     null = {
       source  = "hashicorp/null"
@@ -14,7 +14,7 @@ terraform {
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.1.3"
+      version = ">=0.2.1"
     }
     grafana = {
       source  = "grafana/grafana"
