@@ -25,38 +25,16 @@ oidc_provider = {
       }
       EOT
     },
-    {
-      name     = "minio_scope"
-      template = <<-EOT
-      {
-        "policy": {{identity.entity.groups.names}}
-      }
-      EOT
-    },
   ]
 }
 
 oidc_client = [
-  {
-    name         = "example-app"
-    allow_groups = ["app-vault-user"]
-    redirect_uris = [
-      "http://example-app.day1.sololab/callback",
-    ]
-  },
   {
     name         = "nomad"
     allow_groups = ["app-nomad-user"]
     redirect_uris = [
       "https://nomad.day1.sololab/oidc/callback",
       "https://nomad.day1.sololab/ui/settings/tokens",
-    ]
-  },
-  {
-    name         = "minio"
-    allow_groups = ["app-minio-user"]
-    redirect_uris = [
-      "https://minio-console.day1.sololab/oauth_callback",
     ]
   },
   {

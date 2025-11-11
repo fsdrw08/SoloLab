@@ -7,7 +7,7 @@
 
 data "vault_kv_secret_v2" "root_cert" {
   mount = "kvv2-certs"
-  name  = "root"
+  name  = "sololab_root"
 }
 
 resource "vault_ldap_auth_backend" "ldap" {

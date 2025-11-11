@@ -1,6 +1,6 @@
 data "vault_kv_secret_v2" "ca_cert" {
   mount = "kvv2-certs"
-  name  = "root"
+  name  = "sololab_root"
 }
 
 resource "vault_consul_secret_backend" "backend" {
