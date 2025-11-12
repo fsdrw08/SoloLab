@@ -1,40 +1,31 @@
 global:
   imageRegistry: zot.day0.sololab
 consul:
-  containerPorts: []
-    # - name: server
-    #   containerPort: 8300
-    #   hostPort: 8300
-    #   protocol: TCP
-    # - name: serf_lan-tcp
-    #   containerPort: 8301
-    #   hostPort: 8301
-    #   protocol: TCP
-    # - name: serf_lan-udp
-    #   containerPort: 8301
-    #   hostPort: 8301
-    #   protocol: UDP
-    # - name: http
-    #   containerPort: 8500
-    #   hostPort: 8500
-    #   protocol: TCP
-    # - name: https
-    #   containerPort: 8501
-    #   hostPort: 8501
-    #   protocol: TCP
-    # - name: grpc_tls
-    #   containerPort: 8503
-    #   hostPort: 8503
-    #   protocol: TCP
-    # - name: dns-udp
-    #   containerPort: 8600
-    #   hostPort: 8600
-    #   protocol: UDP
-    # - name: dns-tcp
-    #   containerPort: 8600
-    #   hostPort: 8600
-    #   protocol: TCP
-  ## @param consul.configFiles
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=100,gid=1000
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.consul-redirect.entrypoints: web
+    traefik.http.routers.consul-redirect.rule: Host(`consul-client.day0.sololab`)
+    traefik.http.routers.consul-redirect.middlewares: toHttps@file
+    traefik.http.routers.consul-redirect.service: consul
+
+    traefik.http.routers.consul.entrypoints: webSecure
+    traefik.http.routers.consul.rule: Host(`consul-client.day0.sololab`)
+    traefik.http.routers.consul.tls: true
+    traefik.http.routers.consul.service: consul
+
+    traefik.http.services.consul.loadBalancer.serversTransport: consul@file
+    traefik.http.services.consul.loadbalancer.server.scheme: https
+    traefik.http.services.consul.loadbalancer.server.port: 8501
+
+    # tcp route, deprecated
+    # traefik.tcp.routers.consul-web.entrypoints: webSecure
+    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day0.sololab`)
+    # traefik.tcp.routers.consul-web.tls.passthrough: true
+    # traefik.tcp.routers.consul-web.service: consul-web
+    # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
+
   configFiles:
     main:
       acl:
@@ -64,78 +55,12 @@ consul:
         internal_rpc:
           verify_incoming: true
           verify_server_hostname: true
-  ## @param consul.command Override default container command (useful when using custom images)
-  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
-  ## this command is used to set the advertise ip to host ip when consul start
-  ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
-  ## update: too complicate, hard code advertise ip instead
-  ## before:
-  ## set -- consul agent \
-  ##   -data-dir="$CONSUL_DATA_DIR" \
-  ##   -config-dir="$CONSUL_CONFIG_DIR" \
-  ##   $CONSUL_BIND \
-  ##   $CONSUL_CLIENT \
-  ##   "$@"
-  ##
-  ## after:
-  ## set -- consul agent \
-  ##   -data-dir="$CONSUL_DATA_DIR" \
-  ##   -config-dir="$CONSUL_CONFIG_DIR" \
-  ##   $CONSUL_BIND \
-  ##   -advertise=<host ip> \
-  ##   $CONSUL_CLIENT \
-  ##   "$@"
-  ## why not pass the advertise ip into args?
-  ## args only accept plain text command, not accept variable which come with expression
-  ##
-  # command:
-  #   - "/bin/sh"
-  #   - "-c"
-  #   - |
-  #     sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=192.168.255.20 \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
-  #     chmod +x /tmp/docker-entrypoint.sh
-  #     exec /tmp/docker-entrypoint.sh "$0" "$@"
   ## @param consul.args Override default container args (useful when using custom images)
   ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
   ##
   args:
     - agent
     - -config-dir=/consul/services
-  ## @param consul.podAnnotations Annotations for consul pods
-  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
-  ## the userns annotation only work podman v4.9+
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-  ## ref: https://github.com/containers/podman/discussions/22378
-  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/Dockerfile#L271-L273
-  ## e.g.
-  ## podAnnotations:
-  ##   io.podman.annotations.userns: keep-id:uid=100,gid=1000
-  ##
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=100,gid=1000
-
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.consul-redirect.entrypoints: web
-    traefik.http.routers.consul-redirect.rule: Host(`consul-client.day0.sololab`)
-    traefik.http.routers.consul-redirect.middlewares: toHttps@file
-    traefik.http.routers.consul-redirect.service: consul
-
-    traefik.http.routers.consul.entrypoints: webSecure
-    traefik.http.routers.consul.rule: Host(`consul-client.day0.sololab`)
-    traefik.http.routers.consul.tls: true
-    traefik.http.routers.consul.service: consul
-
-    traefik.http.services.consul.loadBalancer.serversTransport: consul@file
-    traefik.http.services.consul.loadbalancer.server.scheme: https
-    traefik.http.services.consul.loadbalancer.server.port: 8501
-
-    # tcp route, deprecated
-    # traefik.tcp.routers.consul-web.entrypoints: webSecure
-    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day0.sololab`)
-    # traefik.tcp.routers.consul-web.tls.passthrough: true
-    # traefik.tcp.routers.consul-web.service: consul-web
-    # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
 
   extraEnvVars:
     - name: CONSUL_DISABLE_PERM_MGMT

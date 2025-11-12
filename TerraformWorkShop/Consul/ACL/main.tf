@@ -64,7 +64,7 @@ resource "consul_certificate_authority" "connect_ca" {
   config_json = jsonencode({
     Address                  = "https://${data.consul_service.vault.service[0].address}:${data.consul_service.vault.service[0].port}"
     TLSServerName            = "vault.service.consul"
-    CAFile                   = "/consul/config/certs/ca.crt"
+    CAFile                   = "/consul/secret/certs/ca.crt"
     Token                    = data.vault_kv_secret_v2.secret.data["token"]
     RootPkiPath              = "pki-consul_root"
     IntermediatePkiPath      = "pki-consul_int"

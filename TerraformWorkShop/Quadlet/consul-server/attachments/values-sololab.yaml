@@ -1,51 +1,44 @@
 global:
   imageRegistry: zot.day0.sololab
 consul:
-  containerPorts: []
-    # - name: server
-    #   containerPort: 8300
-    #   hostPort: 8300
-    #   protocol: TCP
-    # - name: serf_lan-tcp
-    #   containerPort: 8301
-    #   hostPort: 8301
-    #   protocol: TCP
-    # - name: serf_lan-udp
-    #   containerPort: 8301
-    #   hostPort: 8301
-    #   protocol: UDP
-    # - name: http
-    #   containerPort: 8500
-    #   hostPort: 8500
-    #   protocol: TCP
-    # - name: https
-    #   containerPort: 8501
-    #   hostPort: 8501
-    #   protocol: TCP
-    # - name: grpc_tls
-    #   containerPort: 8503
-    #   hostPort: 8503
-    #   protocol: TCP
-    # - name: dns-udp
-    #   containerPort: 8600
-    #   hostPort: 8600
-    #   protocol: UDP
-    # - name: dns-tcp
-    #   containerPort: 8600
-    #   hostPort: 8600
-    #   protocol: TCP
+  podAnnotations:
+    io.podman.annotations.userns: keep-id:uid=100,gid=1000
+
+  podLabels:
+    # traefik.enable: true
+    # traefik.http.routers.consul-redirect.entrypoints: web
+    # traefik.http.routers.consul-redirect.rule: Host(`consul.day1.sololab`)
+    # traefik.http.routers.consul-redirect.middlewares: toHttps@file
+    # traefik.http.routers.consul-redirect.service: consul
+
+    # traefik.http.routers.consul.entrypoints: webSecure
+    # traefik.http.routers.consul.rule: Host(`consul.day1.sololab`)
+    # traefik.http.routers.consul.tls: true
+    # traefik.http.routers.consul.service: consul
+
+    # traefik.http.services.consul.loadBalancer.serversTransport: consul@file
+    # traefik.http.services.consul.loadbalancer.server.scheme: https
+    # traefik.http.services.consul.loadbalancer.server.port: 8501
+
+    # traefik.tcp.routers.consul-web.entrypoints: webSecure
+    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day1.sololab`)
+    # traefik.tcp.routers.consul-web.tls.passthrough: true
+    # traefik.tcp.routers.consul-web.service: consul-web
+    # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
   ## @param consul.configFiles
+  ##
   configFiles:
     main:
       acl:
         enabled: true
         default_policy: deny
         enable_token_persistence: true
-        tokens:
-          initial_management: e95b599e-166e-7d80-08ad-aee76e7ddf19
-          agent: e95b599e-166e-7d80-08ad-aee76e7ddf19
-          dns: e95b599e-166e-7d80-08ad-aee76e7ddf19
-          config_file_service_registration: e95b599e-166e-7d80-08ad-aee76e7ddf19
+        ## token values config in secret.others.contents
+        # tokens:
+        #   initial_management:
+        #   agent:
+        #   dns:
+        #   config_file_service_registration:
       # auto_config:
       #   authorization:
       #     enabled: true
@@ -70,7 +63,7 @@ consul:
       # log_level: trace
       # https://github.com/hashicorp/learn-consul-docker/blob/110bc9484b0dcd714e64604cd011a360d03b9bc6/datacenter-deploy-auto-config/vault/consul/server2.json#L33
       client_addr: "0.0.0.0"
-      # config in terraform consul provider instead
+      ## config in terraform consul provider instead
       # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/service-mesh
       # connect:
       #   enabled: true
@@ -98,9 +91,9 @@ consul:
       #   allow_tls: true
       tls:
         defaults:
-          ca_file: /consul/config/certs/ca.crt
-          cert_file: /consul/config/certs/server.crt
-          key_file: /consul/config/certs/server.key
+          ca_file: /consul/secret/certs/ca.crt
+          cert_file: /consul/secret/certs/server.crt
+          key_file: /consul/secret/certs/server.key
           verify_incoming: false
           verify_outgoing: true
           verify_server_hostname: true
@@ -109,8 +102,8 @@ consul:
           verify_server_hostname: true
       # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry
       telemetry:
-        prometheus_retention_time: 30s
         disable_hostname: true
+        prometheus_retention_time: 30s
   ## @param consul.command Override default container command (useful when using custom images)
   ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
   ## this command is used to set the advertise ip to host ip when consul start
@@ -148,40 +141,7 @@ consul:
   args:
     - agent
     - -config-dir=/consul/services
-  ## @param consul.podAnnotations Annotations for consul pods
-  ## to keep container user as same permission as host user, set keep-id point to the container user and group id
-  ## the userns annotation only work podman v4.9+
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-  ## ref: https://github.com/containers/podman/discussions/22378
-  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/Dockerfile#L271-L273
-  ## e.g.
-  ## podAnnotations:
-  ##   io.podman.annotations.userns: keep-id:uid=100,gid=1000
-  ##
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=100,gid=1000
-
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.consul-redirect.entrypoints: web
-    # traefik.http.routers.consul-redirect.rule: Host(`consul.day1.sololab`)
-    # traefik.http.routers.consul-redirect.middlewares: toHttps@file
-    # traefik.http.routers.consul-redirect.service: consul
-
-    # traefik.http.routers.consul.entrypoints: webSecure
-    # traefik.http.routers.consul.rule: Host(`consul.day1.sololab`)
-    # traefik.http.routers.consul.tls: true
-    # traefik.http.routers.consul.service: consul
-
-    # traefik.http.services.consul.loadBalancer.serversTransport: consul@file
-    # traefik.http.services.consul.loadbalancer.server.scheme: https
-    # traefik.http.services.consul.loadbalancer.server.port: 8501
-
-    # traefik.tcp.routers.consul-web.entrypoints: webSecure
-    # traefik.tcp.routers.consul-web.rule: HostSNI(`consul.day1.sololab`)
-    # traefik.tcp.routers.consul-web.tls.passthrough: true
-    # traefik.tcp.routers.consul-web.service: consul-web
-    # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
+    - -config-dir=/consul/secret/others
 
   extraEnvVars:
     - name: CONSUL_DISABLE_PERM_MGMT

@@ -30,15 +30,15 @@ podman_kubes = [
             #   value_ref_key = "ca"
             # },
             {
-              name          = "consul.tls.contents.ca\\.crt"
+              name          = "consul.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             {
-              name          = "consul.tls.contents.server\\.crt"
+              name          = "consul.secret.tls.contents.server\\.crt"
               value_ref_key = "cert"
             },
             {
-              name          = "consul.tls.contents.server\\.key"
+              name          = "consul.secret.tls.contents.server\\.key"
               value_ref_key = "private_key"
             },
           ]
@@ -50,19 +50,31 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "consul.configFiles.main.encrypt"
+              name          = "consul.secret.others.contents.encrypt\\.json.encrypt"
               value_ref_key = "key"
             },
           ]
         },
         {
           vault_kvv2 = {
-            mount = "kvv2-vault_token"
-            name  = "consul-ca"
+            mount = "kvv2-consul"
+            name  = "token-init_management"
           }
           value_sets = [
             {
-              name          = "consul.configFiles.main.connect.ca_config.token"
+              name          = "consul.secret.others.contents.acl_token\\.json.acl.tokens.initial_management"
+              value_ref_key = "token"
+            },
+            {
+              name          = "consul.secret.others.contents.acl_token\\.json.acl.tokens.agent"
+              value_ref_key = "token"
+            },
+            {
+              name          = "consul.secret.others.contents.acl_token\\.json.acl.tokens.dns"
+              value_ref_key = "token"
+            },
+            {
+              name          = "consul.secret.others.contents.acl_token\\.json.acl.tokens.config_file_service_registration"
               value_ref_key = "token"
             },
           ]
