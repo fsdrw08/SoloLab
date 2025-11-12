@@ -99,14 +99,14 @@ controller:
       value: "http://192.168.255.1:7890"
     - name: no_proxy
       value: "localhost"
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock"
   extraVolumes:
     - name: docker-socket
       hostPath:
         path: /run/user/1001/podman/podman.sock
         type: Socket
-  extraVolumeMounts:
-    - name: docker-socket
-      mountPath: "/var/run/docker.sock"
   ## @param controller.podLabels Extra labels for jenkins pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##

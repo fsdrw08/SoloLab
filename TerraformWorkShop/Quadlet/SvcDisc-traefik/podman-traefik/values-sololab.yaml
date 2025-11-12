@@ -76,14 +76,14 @@ traefik:
       value: /etc/traefik/tls/ca.crt
     - name: LEGO_CA_SYSTEM_CERT_POOL
       value: "true"
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
   extraVolumes:
     - name: docker-socket
       hostPath:
         path: /run/user/1001/podman/podman.sock
         type: Socket
-  extraVolumeMounts:
-    - name: docker-socket
-      mountPath: /var/run/docker.sock
 persistence:
   enabled: true
   mountPath: /mnt/acmeStorage

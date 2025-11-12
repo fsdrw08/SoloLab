@@ -153,9 +153,17 @@ traefik:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars: 
+  extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
+  ## @param traefik.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the traefik container(s)
+  ## e.g.
+  ## extraVolumeMounts:
+  ##   - name: acmeStorage
+  ##     mountPath: /mnt/traefik
+  extraVolumeMounts:
+    - name: docker-socket
+      mountPath: "/var/run/docker.sock:Z"
   ## @param traefik.extraVolumes Optionally specify extra list of additional volumes for the traefik pod(s)
   ## e.g.
   ## extraVolumes:
@@ -167,14 +175,6 @@ traefik:
       hostPath:
         path: /run/user/1001/podman/podman.sock
         type: Socket
-  ## @param traefik.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the traefik container(s)
-  ## e.g.
-  ## extraVolumeMounts:
-  ##   - name: acmeStorage
-  ##     mountPath: /mnt/traefik
-  extraVolumeMounts:
-    - name: docker-socket
-      mountPath: "/var/run/docker.sock:Z"
 
 ## @section Persistence Parameters
 ##
@@ -202,7 +202,7 @@ persistence:
   storageClass: ""
   ## @param persistence.annotations Persistent Volume Claim annotations
   ##
-  annotations: 
+  annotations:
     volume.podman.io/type: bind
     volume.podman.io/device: /mnt/data/ci-traefik
   ## @param persistence.accessModes Persistent Volume Access Modes
