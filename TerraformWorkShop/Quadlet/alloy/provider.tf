@@ -10,7 +10,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.0.2"
+      version = ">= 3.1.0"
     }
     remote = {
       source  = "tenstad/remote"
@@ -18,7 +18,7 @@ terraform {
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 4.3.0"
+      version = ">= 4.14.0"
     }
   }
   backend "pg" {

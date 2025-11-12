@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tls = {
       source  = "hashicorp/tls"
-      version = ">= 4.0.5"
+      version = ">= 4.1.0"
     }
     hyperv = {
       source  = "taliesins/hyperv"
@@ -14,7 +14,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.2"
+      version = ">= 3.2.4"
     }
     archive = {
       source  = "hashicorp/archive"
@@ -22,7 +22,7 @@ terraform {
     }
     tfe = {
       source  = "hashicorp/tfe"
-      version = ">= 0.69.0"
+      version = ">= 0.70.0"
     }
     lynx = {
       source  = "Clivern/lynx"
@@ -34,15 +34,15 @@ terraform {
     }
     ct = {
       source  = "poseidon/ct"
-      version = ">= 0.13.0"
+      version = ">= 0.14.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = ">= 2.4.1"
+      version = ">= 2.5.3"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.0.2"
+      version = ">= 3.1.0"
     }
     remote = {
       source  = "tenstad/remote"
@@ -58,11 +58,11 @@ terraform {
     }
     zitadel = {
       source  = "zitadel/zitadel"
-      version = ">= 2.2.0"
+      version = ">= 2.3.0"
     }
     sftpgo = {
       source  = "drakkan/sftpgo"
-      version = ">= 0.0.18"
+      version = ">= 0.0.19"
     }
     vault = {
       source  = "hashicorp/vault"
@@ -74,19 +74,19 @@ terraform {
     }
     consul = {
       source  = "hashicorp/consul"
-      version = ">= 2.22.0"
+      version = ">= 2.22.1"
     }
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.0"
+      version = ">= 2.5.1"
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.11.3"
+      version = ">= 3.11.4"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 4.3.0"
+      version = ">= 4.14.0"
     }
     system = {
       source  = "neuspaces/system"
