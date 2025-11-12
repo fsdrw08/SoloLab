@@ -27,14 +27,6 @@ traefik:
       type: spc_t
   configFiles:
     install:
-      # providers:
-      #   consulCatalog:
-      #     endpoint:
-      #       address: consul.day1.sololab:8501
-      #       datacenter: dc1
-      #       scheme: https
-      #       tls:
-      #         ca: /etc/traefik/tls/ca.crt
       serversTransport:
         rootCAs:
           - /etc/traefik/tls/ca.crt
@@ -62,21 +54,6 @@ traefik:
           proxyProtocol:
             trustedIPs:
               - 192.168.255.1
-      # certificatesResolvers:
-      #   external:
-      #     acme:
-      #       caServer: https://acme-v02.api.letsencrypt.org/directory
-      #       certificatesDuration: 2160
-      #       email: ""
-      #       storage: /mnt/acmeStorage/external.json
-      #       tlsChallenge: {}
-      #   internal:
-      #     acme:
-      #       caServer: https://vault.day1.sololab:8200/v1/pki-sololab_day1/acme/directory
-      #       certificatesDuration: 2160
-      #       email: ""
-      #       storage: /mnt/acmeStorage/internal.json
-      #       tlsChallenge: {}
       log:
         level: INFO
       metrics:
@@ -90,6 +67,7 @@ traefik:
           certificates:
             - certFile: /etc/traefik/tls/day0.crt
               keyFile: /etc/traefik/tls/day0.key
+
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

@@ -1,25 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 traefik:
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.dashboard-redirect.entrypoints: web
-    # traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-    # traefik.http.routers.dashboard-redirect.middlewares: toHttps@file
-    # traefik.http.routers.dashboard-redirect.service: api@internal
-
-    # traefik.http.routers.dashboard.entryPoints: webSecure
-    # traefik.http.routers.dashboard.tls: true
-    # traefik.http.routers.dashboard.rule: "Host(`traefik.day1.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-    # traefik.http.routers.dashboard.service: api@internal
-    # traefik.http.routers.dashboard.middlewares: userPass@file
-    # # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
-    # traefik.http.services.dashboard.loadbalancer.server.port: 443
-
-    # traefik.http.routers.metrics.entryPoints: webSecure
-    # traefik.http.routers.metrics.tls: true
-    # traefik.http.routers.metrics.rule: "Host(`traefik.day1.sololab`) && PathPrefix(`/metrics`)"
-    # traefik.http.routers.metrics.service: prometheus@internal
   containerSecurityContext:
     enabled: true
     seLinuxOptions:
@@ -28,14 +9,13 @@ traefik:
     install:
       providers:
         consulCatalog:
-          # constraints: "Tag(`host=day1`)"
           endpoint:
             address: consul.service.consul:8501
             datacenter: dc1
             scheme: https
             tls:
               ca: /etc/traefik/tls/ca.crt
-            token: # set by terraform get value from vault
+            # token: # set by terraform get value from vault
           exposedByDefault: false
       serversTransport:
         rootCAs:

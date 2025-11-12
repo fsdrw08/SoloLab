@@ -21,7 +21,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "*.service.consul"
+            name  = "*.day1.sololab"
           }
           value_sets = [
             {
@@ -45,7 +45,8 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "traefik.configFiles.install.providers.consulCatalog.endpoint.token"
+              # name          = "traefik.configFiles.install.providers.consulCatalog.endpoint.token"
+              name          = "traefik.secret.envVars.TRAEFIK_PROVIDERS_CONSULCATALOG_ENDPOINT_TOKEN"
               value_ref_key = "token"
             }
           ]
@@ -73,18 +74,19 @@ podman_quadlet = {
             StartLimitBurst       = 5
             Before                = "umount.target"
             Conflicts             = "umount.target"
-            # kube
-            yaml          = "traefik-aio.yaml"
-            PodmanArgs    = "--tls-verify=false --no-hosts"
-            KubeDownForce = "false"
-            Network       = "host"
+            # podman
+            PodmanArgs = "--tls-verify=false --no-hosts"
+            Network    = ""
             # Network    = "podman"
             # Network = "pasta:--map-host-loopback=169.254.1.3"
+            # kube
+            yaml          = "traefik-aio.yaml"
+            KubeDownForce = "false"
             # service
             ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
             ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services"
             ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
-            Restart            = "on-failure"
+            Restart            = "no"
           }
         },
       ]
