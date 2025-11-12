@@ -1,10 +1,10 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/nomad:1.10.4",
-        "archive": "docker.io_hashicorp_nomad_1.10.4.tar",
+        "publicRepo": "hashicorp/nomad:1.11.0",
+        "archive": "docker.io_hashicorp_nomad_1.11.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/nomad:1.10.4",
+        "privateRepo": "hashicorp/nomad:1.11.0",
         "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
     },
     {
