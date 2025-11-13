@@ -1,22 +1,39 @@
 global:
   imageRegistry: zot.vyos.sololab
 etcd:
-  extraEnvVars:
-    - name: TZ
-      value: Asia/Shanghai
-  containerPorts: []
-    # - name: client
-    #   containerPort: 2379
-    #   hostPort: 2379
-    #   protocol: TCP
-    # - name: peer
-    #   containerPort: 2380
-    #   hostPort: 2380
-    #   protocol: TCP
-    # - name: health
-    #   containerPort: 2381
-    #   hostPort: 2381
-    #   protocol: TCP
+  ## @param etcd.podLabels Extra labels for etcd pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels:
+    traefik.enable: true
+    # web
+    traefik.http.routers.etcd-redirect.entrypoints: web
+    traefik.http.routers.etcd-redirect.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd-redirect.middlewares: toHttps@file
+    traefik.http.routers.etcd-redirect.service: etcd
+
+    traefik.http.routers.etcd.entrypoints: webSecure
+    traefik.http.routers.etcd.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd.tls: true
+    traefik.http.routers.etcd.service: etcd
+
+    traefik.http.services.etcd.loadBalancer.serversTransport: etcd@file
+    traefik.http.services.etcd.loadbalancer.server.scheme: https
+    traefik.http.services.etcd.loadbalancer.server.port: 2379
+
+    # metric
+    traefik.http.routers.etcd-metrics-redirect.entrypoints: web
+    traefik.http.routers.etcd-metrics-redirect.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics-redirect.middlewares: toHttps@file
+    traefik.http.routers.etcd-metrics-redirect.service: etcd-metrics
+
+    traefik.http.routers.etcd-metrics.entrypoints: webSecure
+    traefik.http.routers.etcd-metrics.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics.tls: true
+    traefik.http.routers.etcd-metrics.service: etcd-metrics
+
+    traefik.http.services.etcd-metrics.loadbalancer.server.port: 2381
+
   ## Configure extra options for etcd containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param etcd.livenessProbe.enabled Enable livenessProbe on etcd containers
@@ -43,6 +60,7 @@ etcd:
         - --user=monitor:monitor
         - endpoint
         - health
+
   configFile:
     ### Member
     ## @param etcd.configFile.name Human-readable name for this member.
@@ -114,35 +132,7 @@ etcd:
     ## @param etcd.configFile.listen-metrics-urls List of URLs to listen on for the metrics and health endpoints.
     ##
     listen-metrics-urls: http://localhost:2381
-  ## @param etcd.podLabels Extra labels for etcd pods
-  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-  ##
-  podLabels:
-    traefik.enable: true
-    # web
-    traefik.http.routers.etcd-redirect.entrypoints: web
-    traefik.http.routers.etcd-redirect.rule: "Host(`etcd-0.day0.sololab`)"
-    traefik.http.routers.etcd-redirect.middlewares: toHttps@file
-    traefik.http.routers.etcd-redirect.service: etcd
 
-    traefik.http.routers.etcd.entrypoints: webSecure
-    traefik.http.routers.etcd.rule: "Host(`etcd-0.day0.sololab`)"
-    traefik.http.routers.etcd.tls: true
-    traefik.http.routers.etcd.service: etcd
-
-    traefik.http.services.etcd.loadBalancer.serversTransport: etcd@file
-    traefik.http.services.etcd.loadbalancer.server.scheme: https
-    traefik.http.services.etcd.loadbalancer.server.port: 2379
-
-    # metric
-    traefik.http.routers.etcd-metrics-redirect.entrypoints: web
-    traefik.http.routers.etcd-metrics-redirect.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
-    traefik.http.routers.etcd-metrics-redirect.middlewares: toHttps@file
-    traefik.http.routers.etcd-metrics-redirect.service: etcd-metrics
-
-    traefik.http.routers.etcd-metrics.entrypoints: webSecure
-    traefik.http.routers.etcd-metrics.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
-    traefik.http.routers.etcd-metrics.tls: true
-    traefik.http.routers.etcd-metrics.service: etcd-metrics
-
-    traefik.http.services.etcd-metrics.loadbalancer.server.port: 2381
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai

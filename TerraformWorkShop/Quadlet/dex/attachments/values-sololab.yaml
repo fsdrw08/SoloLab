@@ -1,6 +1,19 @@
 global:
   imageRegistry: zot.vyos.sololab
 dex:
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.dex-http.entrypoints: web
+    traefik.http.routers.dex-http.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex-http.service: dex
+
+    traefik.http.routers.dex.entrypoints: webSecure
+    traefik.http.routers.dex.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex.tls: true
+    traefik.http.routers.dex.service: dex
+
+    traefik.http.services.dex.loadbalancer.server.port: 5556
+
   config:
     issuer: https://dex.day0.sololab/
     web:
@@ -43,21 +56,3 @@ dex:
           - https://minio-console.day0.sololab/oauth_callback
         name: minio
         secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-      - id: zot
-        redirectURIs:
-          - https://zot.day0.sololab/zot/auth/callback/oidc
-        name: zot
-        secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.dex-http.entrypoints: web
-    traefik.http.routers.dex-http.rule: Host(`dex.day0.sololab`)
-    traefik.http.routers.dex-http.service: dex
-
-    traefik.http.routers.dex.entrypoints: webSecure
-    traefik.http.routers.dex.rule: Host(`dex.day0.sololab`)
-    traefik.http.routers.dex.tls: true
-    traefik.http.routers.dex.service: dex
-
-    traefik.http.services.dex.loadbalancer.server.port: 5556

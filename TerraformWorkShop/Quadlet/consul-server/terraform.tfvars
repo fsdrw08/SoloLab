@@ -25,10 +25,6 @@ podman_kubes = [
             name  = "consul.day1.sololab"
           }
           value_sets = [
-            # {
-            #   name          = "consul.configFiles.main.auto_config.authorization.static.oidc_discovery_ca_cert"
-            #   value_ref_key = "ca"
-            # },
             {
               name          = "consul.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
@@ -106,7 +102,7 @@ podman_quadlet = {
             yaml          = "consul-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502

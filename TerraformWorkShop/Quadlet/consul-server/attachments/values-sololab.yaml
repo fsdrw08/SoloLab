@@ -25,6 +25,7 @@ consul:
     # traefik.tcp.routers.consul-web.tls.passthrough: true
     # traefik.tcp.routers.consul-web.service: consul-web
     # traefik.tcp.services.consul-web.loadbalancer.server.port: 8501
+
   ## @param consul.configFiles
   ##
   configFiles:
@@ -104,37 +105,7 @@ consul:
       telemetry:
         disable_hostname: true
         prometheus_retention_time: 30s
-  ## @param consul.command Override default container command (useful when using custom images)
-  ## ref: https://github.com/hashicorp/consul/blob/v1.20.2/.release/docker/docker-entrypoint.sh#L75
-  ## this command is used to set the advertise ip to host ip when consul start
-  ## in detail, this script insert "-advertise=<host ip>" in the next line of string "$CONSUL_BIND \"
-  ## update: too complicate, hard code advertise ip instead
-  ## before:
-  ## set -- consul agent \
-  ##   -data-dir="$CONSUL_DATA_DIR" \
-  ##   -config-dir="$CONSUL_CONFIG_DIR" \
-  ##   $CONSUL_BIND \
-  ##   $CONSUL_CLIENT \
-  ##   "$@"
-  ##
-  ## after:
-  ## set -- consul agent \
-  ##   -data-dir="$CONSUL_DATA_DIR" \
-  ##   -config-dir="$CONSUL_CONFIG_DIR" \
-  ##   $CONSUL_BIND \
-  ##   -advertise=<host ip> \
-  ##   $CONSUL_CLIENT \
-  ##   "$@"
-  ## why not pass the advertise ip into args?
-  ## args only accept plain text command, not accept variable which come with expression
-  ##
-  # command:
-  #   - "/bin/sh"
-  #   - "-c"
-  #   - |
-  #     sed -e '/$CONSUL_BIND \\/i\' -e '    -advertise=192.168.255.20 \\' /usr/local/bin/docker-entrypoint.sh > /tmp/docker-entrypoint.sh
-  #     chmod +x /tmp/docker-entrypoint.sh
-  #     exec /tmp/docker-entrypoint.sh "$0" "$@"
+
   ## @param consul.args Override default container args (useful when using custom images)
   ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
   ## ref: https://github.com/hashicorp/consul/blob/v1.22.0/.release/docker/docker-entrypoint.sh#L70-L85

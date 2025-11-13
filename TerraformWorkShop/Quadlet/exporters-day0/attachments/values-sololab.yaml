@@ -14,9 +14,11 @@ exporter:
     traefik.http.routers.prometheus-podman-exporter.service: prometheus-podman-exporter
 
     traefik.http.services.prometheus-podman-exporter.loadbalancer.server.port: 9882
+
   flags:
     web:
       listen-address: 127.0.0.1:9882
+
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
