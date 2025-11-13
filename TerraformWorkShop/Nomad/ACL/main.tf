@@ -8,7 +8,7 @@ data "vault_identity_oidc_client_creds" "creds" {
 
 data "vault_kv_secret_v2" "ca" {
   mount = "kvv2-certs"
-  name  = "root"
+  name  = "sololab_root"
 }
 
 # https://developer.hashicorp.com/nomad/api-docs/acl/auth-methods#create-auth-method
