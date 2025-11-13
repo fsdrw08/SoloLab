@@ -1,8 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 consul:
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=100,gid=1000
   podLabels:
     traefik.enable: true
     traefik.http.routers.consul-redirect.entrypoints: web
@@ -28,19 +26,11 @@ consul:
 
   configFiles:
     main:
-      acl:
-        tokens:
-          default: # set by terraform get data from vault secret
-      # auto_config:
-      #   enabled: true
-      #   server_addresses:
-      #     - consul.day0.sololab
       auto_encrypt:
         tls: true
       bind_addr: '{{ GetInterfaceIP "eth0" }}'
       bootstrap_expect: null
       client_addr: "0.0.0.0"
-      encrypt: # set by terraform get data from vault secret
       ports:
         https: 8501
       retry_join:
@@ -48,7 +38,7 @@ consul:
       server: false
       tls:
         defaults:
-          ca_file: /consul/config/certs/ca.crt
+          ca_file: /consul/secret/certs/ca.crt
           verify_incoming: false
           verify_outgoing: true
           verify_server_hostname: true
@@ -61,6 +51,7 @@ consul:
   args:
     - agent
     - -config-dir=/consul/services
+    - -config-dir=/consul/secret/others
 
   extraEnvVars:
     - name: CONSUL_DISABLE_PERM_MGMT

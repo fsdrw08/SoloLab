@@ -22,11 +22,11 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "root"
+            name  = "sololab_root"
           }
           value_sets = [
             {
-              name          = "consul.tls.contents.ca\\.crt"
+              name          = "consul.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
           ]
@@ -38,7 +38,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "consul.configFiles.main.acl.tokens.default"
+              name          = "consul.secret.others.contents.acl_token\\.json.acl.tokens.default"
               value_ref_key = "token"
             },
           ]
@@ -50,7 +50,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "consul.configFiles.main.encrypt"
+              name          = "consul.secret.others.contents.encrypt\\.json.encrypt"
               value_ref_key = "key"
             },
           ]
@@ -82,9 +82,9 @@ podman_quadlet = {
             yaml          = "consul-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            Network       = ""
             # service
-            # wait until vault oidc ready
+            # wait until consul cluster ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
             ExecStartPre = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://consul.service.consul/v1/status/leader\""
             # ExecStartPre  = ""

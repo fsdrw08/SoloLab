@@ -31,7 +31,7 @@ data "vault_kv_secret_v2" "secrets" {
     for secret in [
       {
         mount = "kvv2-certs"
-        name  = "root"
+        name  = "sololab_root"
       },
       {
         mount = "kvv2-consul"
@@ -92,7 +92,7 @@ module "config_map" {
         files = [
           {
             basename = "ca.crt"
-            content  = data.vault_kv_secret_v2.secrets["root"].data["ca"]
+            content  = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
           }
         ]
       }
