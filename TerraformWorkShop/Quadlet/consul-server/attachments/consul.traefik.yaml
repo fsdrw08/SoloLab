@@ -1,6 +1,0 @@
-http:
-  serversTransports:
-    consul:
-      serverName: consul.day1.sololab
-      rootcas:
-        - "/etc/traefik/tls/ca.crt"

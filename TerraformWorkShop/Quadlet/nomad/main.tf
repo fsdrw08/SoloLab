@@ -173,14 +173,6 @@ resource "null_resource" "post_process" {
   }
 }
 
-resource "remote_file" "traefik_file_provider" {
-  for_each = toset([
-    "./attachments/nomad.traefik.yaml"
-  ])
-  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
-  content = file("${each.key}")
-}
-
 resource "remote_file" "consul_service" {
   for_each = toset([
     "./attachments/nomad.consul.hcl",

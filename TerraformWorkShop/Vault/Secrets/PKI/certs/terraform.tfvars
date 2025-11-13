@@ -27,6 +27,7 @@ vault_certs = [
     ttl_years   = 3
     common_name = "consul.day1.sololab"
     alt_names = [
+      "*.day1.sololab",
       "consul.service.consul",
       "server.dc1.consul",
       "localhost"
@@ -42,6 +43,7 @@ vault_certs = [
     ttl_years   = 3
     common_name = "nomad.day1.sololab"
     alt_names = [
+      "*.day1.sololab",
       "nomad.service.consul",
     ]
   },

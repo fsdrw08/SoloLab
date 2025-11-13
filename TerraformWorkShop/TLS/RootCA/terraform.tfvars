@@ -330,7 +330,7 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "vault.day1.sololab",
+        "*.day1.sololab",
         "vault.service.consul",
       ]
       subject = {

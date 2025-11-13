@@ -80,10 +80,14 @@ traefik:
       serversTransports.yaml:
         http:
           serversTransports:
+            sololab-day1:
+              serverName: "*.day1.sololab"
+              rootcas:
+                - "/etc/traefik/tls/ca.crt"
             consul-service:
               serverName: "*.service.consul"
               rootcas:
-                - "/etc/traefik/tls/ca.crt"
+                - "/etc/traefik/tls/consul-root.crt"
 
   extraEnvVars:
     - name: TZ
