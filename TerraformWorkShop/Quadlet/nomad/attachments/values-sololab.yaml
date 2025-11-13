@@ -1,6 +1,22 @@
 global:
   imageRegistry: zot.day0.sololab
 nomad:
+  podLabels:
+    # traefik.enable: true
+    # traefik.http.routers.nomad-redirect.entrypoints: web
+    # traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad-redirect.middlewares: toHttps@file
+    # traefik.http.routers.nomad-redirect.service: nomad
+
+    # traefik.http.routers.nomad.entrypoints: webSecure
+    # traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad.tls: true
+    # traefik.http.routers.nomad.service: nomad
+
+    # traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
+    # traefik.http.services.nomad.loadbalancer.server.scheme: https
+    # traefik.http.services.nomad.loadbalancer.server.port: 4646
+
   image:
     repository: multani/nomad
   # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
@@ -34,8 +50,8 @@ nomad:
         serf: '{{ GetInterfaceIP "eth0" }}'
       # https://developer.hashicorp.com/nomad/docs/configuration/consul
       consul:
-        address: consul.day1.sololab:8501
-        ca_file: /nomad/config/certs/ca.crt
+        address: consul.service.consul:8501
+        ca_file: /nomad/secret/certs/ca.crt
         ssl: true
         token: # set by vault data
         service_identity:
@@ -47,9 +63,9 @@ nomad:
       tls:
         http: true
         rpc: true
-        ca_file: /nomad/config/certs/ca.crt
-        cert_file: /nomad/config/certs/server.crt
-        key_file: /nomad/config/certs/server.key
+        ca_file: /nomad/secret/certs/ca.crt
+        cert_file: /nomad/secret/certs/server.crt
+        key_file: /nomad/secret/certs/server.key
       # https://developer.hashicorp.com/nomad/docs/configuration/vault
       # https://developer.hashicorp.com/nomad/docs/secure/workload-identity/vault#start-the-nomad-agent
       vault:
@@ -57,25 +73,6 @@ nomad:
         default_identity:
           aud: ["vault.io"]
           ttl: 1h
-
-  args:
-    - agent
-
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.nomad-redirect.entrypoints: web
-    # traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
-    # traefik.http.routers.nomad-redirect.middlewares: toHttps@file
-    # traefik.http.routers.nomad-redirect.service: nomad
-
-    # traefik.http.routers.nomad.entrypoints: webSecure
-    # traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
-    # traefik.http.routers.nomad.tls: true
-    # traefik.http.routers.nomad.service: nomad
-
-    # traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
-    # traefik.http.services.nomad.loadbalancer.server.scheme: https
-    # traefik.http.services.nomad.loadbalancer.server.port: 4646
 
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT
@@ -89,4 +86,4 @@ nomad:
     - name: NOMAD_ADDR
       value: https://nomad.day1.sololab:4646
     - name: NOMAD_CACERT
-      value: /nomad/config/certs/ca.crt
+      value: /nomad/secret/certs/ca.crt

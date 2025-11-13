@@ -26,15 +26,15 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "nomad.tls.contents.ca\\.crt"
+              name          = "nomad.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
             },
             {
-              name          = "nomad.tls.contents.server\\.crt"
+              name          = "nomad.secret.tls.contents.server\\.crt"
               value_ref_key = "cert"
             },
             {
-              name          = "nomad.tls.contents.server\\.key"
+              name          = "nomad.secret.tls.contents.server\\.key"
               value_ref_key = "private_key"
             },
           ]
@@ -46,7 +46,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "nomad.configFiles.main.consul.token"
+              name          = "nomad.secret.others.contents.consul_token\\.json.consul.token"
               value_ref_key = "token"
             }
           ]
@@ -75,18 +75,19 @@ podman_quadlet = {
             StartLimitBurst       = 5
             Before                = "umount.target"
             Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "nomad-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
             ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services"
             ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab:8200/v1/identity/oidc/.well-known/openid-configuration"
             ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && [ -f /var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc/_data/server/nomad_token ] && podman healthcheck run nomad-agent || echo done \""
-            Restart            = "on-failure"
+            Restart            = "no" #"on-failure"
           }
         },
       ]

@@ -24,7 +24,7 @@ services {
     "traefik.http.routers.nomad.entrypoints=webSecure",
     "traefik.http.routers.nomad.rule=Host(`nomad.day1.sololab`)||Host(`nomad.service.consul`)",
     "traefik.http.routers.nomad.tls=true",
-    "traefik.http.services.nomad.loadBalancer.serversTransport=nomad@file",
+    "traefik.http.services.nomad.loadBalancer.serversTransport=sololab-day1@file",
     "traefik.http.services.nomad.loadbalancer.server.scheme=https",
   ]
 }
