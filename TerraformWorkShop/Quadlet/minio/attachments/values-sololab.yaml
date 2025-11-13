@@ -55,22 +55,23 @@ minio:
     # traefik.tcp.routers.minio-console.tls.passthrough: true
     # traefik.tcp.routers.minio-console.service: minio-console
     # traefik.tcp.services.minio-console.loadbalancer.server.port: 9001
-  initContainers:
-    - name: wait-for-oidc
-      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
-      command:
-        - wait4x
-        - http
-        - "{{ .Values.minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL }}"
-        - --insecure-skip-tls-verify
-        - --h2c
-        - --no-redirect
-        - --expect-status-code
-        - "200"
-        - --timeout
-        - "5m"
-        - --interval
-        - "5s"
+
+  # initContainers:
+  #   - name: wait-for-oidc
+  #     image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+  #     command:
+  #       - wait4x
+  #       - http
+  #       - "{{ .Values.minio.config.MINIO_IDENTITY_OPENID_CONFIG_URL }}"
+  #       - --insecure-skip-tls-verify
+  #       - --h2c
+  #       - --no-redirect
+  #       - --expect-status-code
+  #       - "200"
+  #       - --timeout
+  #       - "5m"
+  #       - --interval
+  #       - "5s"
   livenessProbe:
     exec:
       command:
@@ -108,6 +109,7 @@ minio:
     # https://docs.min.io/community/minio-object-store/operations/monitoring/collect-minio-metrics-using-prometheus.html?_gl=1*18d2nvn*_gcl_au*MTEwOTU2NjM0NS4xNzU4MzcyNjA5*_ga*NjcwMTcwNzIyLjE3NDQ1NTMxNTM.*_ga_SY0M3KFH50*czE3NTgzNzI2MDEkbzckZzEkdDE3NTgzNzQ5MzckajU0JGwwJGgxNDE0ODk1Nzgz#configure-prometheus-to-collect-and-alert-using-minio-metrics
     # https://docs.min.io/community/minio-object-store/reference/minio-server/settings/metrics-and-logging.html#envvar.MINIO_PROMETHEUS_AUTH_TYPE
     MINIO_PROMETHEUS_AUTH_TYPE: public
+
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
