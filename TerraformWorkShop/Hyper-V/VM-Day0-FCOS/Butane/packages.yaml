@@ -140,9 +140,9 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
+        ExecStartPre=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
         ExecStart=/bin/touch /var/lib/%N.stamp
-        ExecStart=/usr/bin/systemctl --no-block reboot
+        ExecStartPost=/usr/bin/systemctl --no-block reboot
         [Install]
         WantedBy=multi-user.target
 
@@ -164,7 +164,8 @@ systemd:
         RemainAfterExit=yes
         ExecStartPre=/usr/bin/rpm-ostree install -y --allow-inactive $RPMS
         ExecStart=/bin/touch /var/lib/%N.stamp
-        ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
+        ExecStartPost=/bin/bash -c "systemctl --no-block reboot"
+        # ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
 
         [Install]
         WantedBy=multi-user.target
