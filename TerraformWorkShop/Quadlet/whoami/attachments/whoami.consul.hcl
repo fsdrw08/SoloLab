@@ -8,7 +8,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "whoami-http-check"
       name            = "whoami-http-check"
-      http            = "http://localhost:8081/"
+      http            = "http://localhost:8082/"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"

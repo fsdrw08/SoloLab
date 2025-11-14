@@ -8,7 +8,7 @@ services {
     {
       id       = "postgresql-tcp-check"
       name     = "postgresql-tcp-check"
-      tcp      = "localhost:5432"
+      tcp      = "192.168.255.10:5432"
       interval = "300s"
       timeout  = "2s"
       status   = "passing"
