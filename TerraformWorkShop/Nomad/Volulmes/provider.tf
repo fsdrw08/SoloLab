@@ -5,9 +5,24 @@ terraform {
       version = ">= 2.5.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-    schema_name = "Nomad-Volumes"
+  backend "s3" {
+    bucket = "tfstate"       # Name of the S3 bucket
+    key    = "Nomad/Volumes" # Name of the tfstate file
+
+    endpoints = {
+      s3 = "https://minio-api.day0.sololab" # Minio endpoint
+    }
+
+    access_key = "minioadmin" # Access and secret keys
+    secret_key = "minioadmin"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
+    insecure                    = true
   }
 }
 
