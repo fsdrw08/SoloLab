@@ -17,7 +17,7 @@ terraform {
     key    = "Nomad/ACL-OIDC" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
+      s3 = "https://minio-api.day0.sololab" # Minio endpoint
     }
 
     access_key = "minioadmin" # Access and secret keys

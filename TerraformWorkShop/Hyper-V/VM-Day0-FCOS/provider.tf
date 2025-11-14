@@ -25,29 +25,25 @@ terraform {
       version = ">=1.5.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "HyperV-Infra-VM-FCOS"
-  # }
-  # backend "s3" {
-  #   bucket = "tfstate"                 # Name of the S3 bucket
-  #   key    = "Hyper-V/VM-SvcDisc-FCOS" # Name of the tfstate file
+  backend "s3" {
+    bucket = "tfstate"              # Name of the S3 bucket
+    key    = "Hyper-V/Day0-VM-FCOS" # Name of the tfstate file
 
-  #   endpoints = {
-  #     s3 = "https://minio.service.consul" # Minio endpoint
-  #   }
+    endpoints = {
+      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
+    }
 
-  #   access_key = "admin" # Access and secret keys
-  #   secret_key = "P@ssw0rd"
+    access_key = "minioadmin" # Access and secret keys
+    secret_key = "minioadmin"
 
-  #   region                      = "main" # Region validation will be skipped
-  #   skip_credentials_validation = true   # Skip AWS related checks and validations
-  #   skip_metadata_api_check     = true
-  #   skip_region_validation      = true
-  #   use_path_style              = true
-  #   skip_requesting_account_id  = true
-  #   insecure                    = true
-  # }
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
+    insecure                    = true
+  }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
