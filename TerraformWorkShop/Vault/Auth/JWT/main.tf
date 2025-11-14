@@ -8,7 +8,7 @@ locals {
 
 data "vault_kv_secret_v2" "root_cert" {
   mount = "kvv2-certs"
-  name  = "root"
+  name  = "sololab_root"
 }
 
 # vault_jwt_auth_backend.nomad is the JWT auth method used by Nomad tasks to

@@ -1,6 +1,6 @@
 data "vault_kv_secret_v2" "ca_cert" {
   mount = "kvv2-certs"
-  name  = "root"
+  name  = "sololab_root"
 }
 
 resource "consul_acl_auth_method" "jwt" {
