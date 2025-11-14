@@ -21,10 +21,11 @@ variable "buckets" {
 
 variable "users" {
   type = list(object({
-    name       = string
-    policies   = list(string)
-    access_key = optional(string, null)
-    secret_key = optional(string, null)
+    name               = string
+    policies           = list(string)
+    access_key         = optional(string, null)
+    secret_key         = optional(string, null)
+    secret_key_version = optional(string, null)
   }))
   default = []
 }

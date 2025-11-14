@@ -13,10 +13,11 @@ buckets = [
 
 users = [
   {
-    name       = "tfstate"
-    policies   = ["tfstate-readwrite"]
-    access_key = "terraform"
-    secret_key = "terraform"
+    name               = "tfstate"
+    policies           = ["tfstate-readwrite"]
+    access_key         = "terraform"
+    secret_key         = "terraform"
+    secret_key_version = "v1"
   },
 ]
 
