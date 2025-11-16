@@ -1,7 +1,27 @@
 global:
   imageRegistry: zot.day0.sololab
 grafana:
-  containerPorts: []
+  podLabels:
+    # traefik.enable: true
+    # traefik.http.routers.grafana-redirect.entrypoints: web
+    # traefik.http.routers.grafana-redirect.rule: Host(`grafana.day1.sololab`)
+    # traefik.http.routers.grafana-redirect.middlewares: toHttps@file
+    # traefik.http.routers.grafana-redirect.service: grafana
+
+    # traefik.http.routers.grafana.entrypoints: webSecure
+    # traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
+    # traefik.http.routers.grafana.tls: true
+    # traefik.http.routers.grafana.service: grafana
+
+    # traefik.http.services.grafana.loadBalancer.serversTransport: grafana@file
+    # traefik.http.services.grafana.loadbalancer.server.scheme: https
+    # traefik.http.services.grafana.loadbalancer.server.port: 3000
+
+    # traefik.tcp.routers.grafana.entrypoints: webSecure
+    # traefik.tcp.routers.grafana.rule: HostSNI(`grafana.day1.sololab`)
+    # traefik.tcp.routers.grafana.tls.passthrough: true
+    # traefik.tcp.routers.grafana.service: grafana
+    # traefik.tcp.services.grafana.loadbalancer.server.port: 3000
   livenessProbe:
     enabled: true
     initialDelaySeconds: 3
@@ -18,10 +38,9 @@ grafana:
     grafana:
       server:
         domain: grafana.day1.sololab
+        http_addr: 127.0.0.1
         root_url: https://grafana.day1.sololab
-        cert_key: /etc/grafana/certs/grafana.key
-        cert_file: /etc/grafana/certs/grafana.crt
-        protocol: https
+        protocol: http
       auth.generic_oauth:
         enabled: true
         name: vault
@@ -47,27 +66,7 @@ grafana:
         allow_assign_grafana_admin: true
         # ref: https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/#roles-and-permissions
         role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin' || contains(groups[*], 'app-grafana-admin') && 'Admin' || contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.grafana-redirect.entrypoints: web
-    # traefik.http.routers.grafana-redirect.rule: Host(`grafana.day1.sololab`)
-    # traefik.http.routers.grafana-redirect.middlewares: toHttps@file
-    # traefik.http.routers.grafana-redirect.service: grafana
 
-    # traefik.http.routers.grafana.entrypoints: webSecure
-    # traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
-    # traefik.http.routers.grafana.tls: true
-    # traefik.http.routers.grafana.service: grafana
-
-    # traefik.http.services.grafana.loadBalancer.serversTransport: grafana@file
-    # traefik.http.services.grafana.loadbalancer.server.scheme: https
-    # traefik.http.services.grafana.loadbalancer.server.port: 3000
-
-    # traefik.tcp.routers.grafana.entrypoints: webSecure
-    # traefik.tcp.routers.grafana.rule: HostSNI(`grafana.day1.sololab`)
-    # traefik.tcp.routers.grafana.tls.passthrough: true
-    # traefik.tcp.routers.grafana.service: grafana
-    # traefik.tcp.services.grafana.loadbalancer.server.port: 3000
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

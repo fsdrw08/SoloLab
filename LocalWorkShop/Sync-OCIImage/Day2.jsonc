@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/grafana:12.1.1",
-        "archive": "docker.io_grafana_grafana_12.1.1.tar",
-        "privateRepo": "grafana/grafana:12.1.1",
+        "publicRepo": "grafana/grafana:12.2.1",
+        "archive": "docker.io_grafana_grafana_12.2.1.tar",
+        "privateRepo": "grafana/grafana:12.2.1",
         "description": "https://hub.docker.com/r/grafana/grafana/tags, https://quay.io/repository/giantswarm/grafana?tab=tags",
     },
     {
