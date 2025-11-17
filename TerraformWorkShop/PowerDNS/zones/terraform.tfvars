@@ -248,7 +248,7 @@ zones = [
         ]
       },
       {
-        fqdn = "minio-api.day1.sololab."
+        fqdn = "grafana.day1.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -256,7 +256,7 @@ zones = [
         ]
       },
       {
-        fqdn = "minio-console.day1.sololab."
+        fqdn = "loki.day1.sololab."
         type = "A"
         ttl  = 60
         results = [

@@ -175,19 +175,27 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day1_frontend_grafana = {
+    path = "load-balancing haproxy service tcp443 rule 240"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "grafana.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
+  day1_frontend_loki = {
+    path = "load-balancing haproxy service tcp443 rule 250"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "loki.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
   day2_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 300"
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "traefik.day2.sololab"
-      "set backend" = "day1"
-    }
-  }
-  day2_frontend_grafana = {
-    path = "load-balancing haproxy service tcp443 rule 310"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "grafana.day2.sololab"
       "set backend" = "day1"
     }
   }
