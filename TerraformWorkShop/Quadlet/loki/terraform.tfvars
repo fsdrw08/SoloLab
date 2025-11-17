@@ -26,20 +26,12 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "loki.day1.sololab"
+            name  = "sololab_root"
           }
           value_sets = [
             {
-              name          = "loki.tls.contents.ca\\.crt"
+              name          = "loki.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
-            },
-            {
-              name          = "loki.tls.contents.loki\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "loki.tls.contents.loki\\.key"
-              value_ref_key = "private_key"
             },
           ]
         }
@@ -64,16 +56,18 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 5
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # podman
+            Network    = ""
+            PodmanArgs = "--tls-verify=false"
             # kube
-            yaml          = "loki-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "podman"
+            yaml          = "loki-aio.yaml"
             # service
-            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
+            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day0.sololab/minio/health/live"
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-            # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 80-90 -n 1) && podman healthcheck run loki-server \"" # || sleep $(shuf -i 30-35 -n 1) && podman healthcheck run loki-server \""
-            ExecStartPost = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 80-90 -n 1) && podman healthcheck run loki-server \"" # || sleep $(shuf -i 30-35 -n 1) && podman healthcheck run loki-server \""
             Restart       = "on-failure"
           }
         },

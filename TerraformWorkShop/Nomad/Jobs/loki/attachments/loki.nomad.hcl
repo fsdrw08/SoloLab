@@ -59,7 +59,7 @@ job "loki" {
       driver = "podman"
 
       config {
-        image = "zot.day0.sololab/grafana/loki:3.5.3"
+        image = "zot.day0.sololab/grafana/loki:3.5.8"
         labels = {
           "traefik.enable"                                 = "true"
           "traefik.http.routers.loki-redirect.entrypoints" = "web"

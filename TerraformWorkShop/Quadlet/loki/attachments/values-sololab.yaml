@@ -1,8 +1,21 @@
 global:
   imageRegistry: zot.day0.sololab
 loki:
-  # image:
-  #   repository: bitnami/grafana-loki
+  hostNetwork: false
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.loki-redirect.entrypoints: web
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.loki-redirect.service: loki
+
+  #   traefik.http.routers.loki.entrypoints: webSecure
+  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.tls: true
+  #   traefik.http.routers.loki.service: loki
+
+  #   traefik.http.services.loki.loadbalancer.server.port: 3100
+
   containerPorts:
     - name: http
       containerPort: 3100
@@ -14,15 +27,8 @@ loki:
       hostPort: 9095
       hostIP: 127.0.0.1
       protocol: TCP
-  livenessProbe:
-    enabled: false
-    # exec:
-    #   command:
-    #     - sh
-    #     - -c
-    #     - |
-    #       curl -s -k http://localhost:3100/ready
-  resourcesPreset: "medium"
+  resourcesPreset: "small"
+
   config:
     # https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
     limits_config:
@@ -49,18 +55,18 @@ loki:
     ## reason: failed to run local healthcheck with wget if tls configed
     ## error message: tls: invalid ClientKeyExchange message
     # server:
-    #   # http_listen_address: 127.0.0.1
-    #   # grpc_listen_address: 127.0.0.1
-    #   http_tls_config:
-    #     # https://pkg.go.dev/crypto/tls#ClientAuthType
-    #     # client_auth_type: VerifyClientCertIfGiven
-    #     # client_ca_file: /etc/loki/certs/ca.crt
-    #     cert_file: /etc/loki/certs/loki.crt
-    #     key_file: /etc/loki/certs/loki.key
+    #   http_listen_address: 127.0.0.1
+    #   grpc_listen_address: 127.0.0.1
+    #   # http_tls_config:
+    #   #   # https://pkg.go.dev/crypto/tls#ClientAuthType
+    #   #   client_auth_type: VerifyClientCertIfGiven
+    #   #   client_ca_file: /etc/loki/certs/ca.crt
+    #   #   cert_file: /etc/loki/certs/loki.crt
+    #   #   key_file: /etc/loki/certs/loki.key
 
     ## @param loki.config.storage_config config storage backend for storing chunks of log data
-    ## ref: https://grafana.com/docs/loki/latest/configure/#storage_config
-    ## ref: https://grafana.com/docs/loki/latest/operations/storage/tsdb/#single-store-tsdb-tsdb
+    ## ref: https://grafana.com/docs/loki/v3.5.x/configure/#storage_config
+    ## ref: https://grafana.com/docs/loki/v3.5.x/operations/storage/tsdb/#single-store-tsdb-tsdb
     ##
     storage_config:
       tsdb_shipper:
@@ -68,10 +74,10 @@ loki:
         cache_location: /var/loki/tsdb-cache
       use_thanos_objstore: true
       object_store:
-        # https://grafana.com/docs/loki/latest/configure/#thanos_object_store_config
+        # https://grafana.com/docs/loki/v3.5.x/configure/#thanos_object_store_config
         s3:
           # https://github.com/cloudlena/s3manager/issues/7
-          endpoint: minio-api.day1.sololab
+          endpoint: minio-api.day0.sololab
           bucket_name: loki
           access_key_id: # set from terraform data
           secret_access_key: # set from terraform data
@@ -82,43 +88,9 @@ loki:
       enabled: true
       node_name: day1
 
-  # tls:
-  #   mountPath: /etc/loki/certs
-  #   contents:
-  #     loki.crt: # set from terraform data
-  #     loki.key: # set from terraform data
   args:
     - -config.file=/etc/loki/local-config.yaml
-  hostAliases:
-    - ip: host-gateway
-      hostnames:
-        - minio-api.day1.sololab
-  # podLabels:
-  #   traefik.enable: true
-  #   traefik.http.routers.loki-redirect.entrypoints: web
-  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
-  #   traefik.http.routers.loki-redirect.service: loki
 
-  #   traefik.http.routers.loki.entrypoints: webSecure
-  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki.tls: true
-  #   traefik.http.routers.loki.service: loki
-
-  #   traefik.http.services.loki.loadBalancer.serversTransport: loki@file
-  #   traefik.http.services.loki.loadbalancer.server.scheme: https
-  #   traefik.http.services.loki.loadbalancer.server.port: 3100
-
-  #   traefik.http.routers.loki-redirect.entrypoints: web
-  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
-  #   traefik.http.routers.loki.entryPoints: webSecure
-  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki.tls.certresolver: internal
-  #   traefik.http.services.loki.loadbalancer.server.port: 3100
-  # https://github.com/bitnami/containers/blob/main/bitnami/grafana-loki/3/debian-12/Dockerfile#L54
-  podAnnotations:
-    io.podman.annotations.userns: keep-id:uid=10001,gid=10001
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

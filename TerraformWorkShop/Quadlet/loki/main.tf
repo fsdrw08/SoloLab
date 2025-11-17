@@ -70,27 +70,6 @@ data "helm_template" "podman_kubes" {
     "${file(each.value.helm.value_file)}"
   ]
 
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
-
   # v3 helm provider
   set = flatten([
     each.value.helm.value_sets == null ? [] : [
@@ -101,6 +80,9 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
+  ])
+
+  set_sensitive = flatten([
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
@@ -110,6 +92,8 @@ data "helm_template" "podman_kubes" {
         }
       ]
     ],
+    # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
+    # https://grafana.com/docs/grafana/v3.5.x/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
     flatten([
       {
         name  = "loki.config.storage_config.object_store.s3.access_key_id"
@@ -190,7 +174,7 @@ resource "grafana_data_source" "data_source" {
   url  = "https://${trimsuffix(var.dns_records.0.name, ".")}"
 
   secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.secrets["loki.day1.sololab"].data["ca"]
+    tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
   })
 
   json_data_encoded = jsonencode({
