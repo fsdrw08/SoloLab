@@ -80,6 +80,10 @@ terraform {
       source  = "hashicorp/nomad"
       version = ">= 2.5.1"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.7.2"
+    }
     minio = {
       source  = "aminueza/minio"
       version = ">= 3.11.4"
