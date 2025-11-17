@@ -83,6 +83,9 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
+  ])
+
+  set_sensitive = flatten([
     each.value.helm.secrets == null ? [] : [
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
@@ -96,23 +99,23 @@ data "helm_template" "podman_kubes" {
     # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
     flatten([
       {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.client_id"
+        name  = "grafana.secret.others.contents.oauth_client_id"
         value = data.vault_identity_oidc_client_creds.creds.client_id
       },
       {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.client_secret"
+        name  = "grafana.secret.others.contents.oauth_client_secret"
         value = data.vault_identity_oidc_client_creds.creds.client_secret
       },
       {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.auth_url"
+        name  = "grafana.secret.others.contents.oauth_auth_url"
         value = "${data.vault_identity_oidc_openid_config.config.authorization_endpoint}?with=ldap"
       },
       {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.api_url"
+        name  = "grafana.secret.others.contents.oauth_api_url"
         value = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
       },
       {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.token_url"
+        name  = "grafana.secret.others.contents.oauth_token_url"
         value = data.vault_identity_oidc_openid_config.config.token_endpoint
       },
     ])
@@ -161,14 +164,6 @@ module "podman_quadlet" {
       }
     ]
   }
-}
-
-resource "remote_file" "traefik_file_provider" {
-  for_each = toset([
-    "./attachments/grafana.traefik.yaml"
-  ])
-  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
-  content = file("${each.key}")
 }
 
 resource "remote_file" "consul_service" {

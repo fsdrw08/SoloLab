@@ -2,38 +2,19 @@ global:
   imageRegistry: zot.day0.sololab
 grafana:
   podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.grafana-redirect.entrypoints: web
-    # traefik.http.routers.grafana-redirect.rule: Host(`grafana.day1.sololab`)
-    # traefik.http.routers.grafana-redirect.middlewares: toHttps@file
-    # traefik.http.routers.grafana-redirect.service: grafana
+    traefik.enable: true
+    traefik.http.routers.grafana-redirect.entrypoints: web
+    traefik.http.routers.grafana-redirect.rule: Host(`grafana.day1.sololab`)
+    traefik.http.routers.grafana-redirect.middlewares: toHttps@file
+    traefik.http.routers.grafana-redirect.service: grafana
 
-    # traefik.http.routers.grafana.entrypoints: webSecure
-    # traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
-    # traefik.http.routers.grafana.tls: true
-    # traefik.http.routers.grafana.service: grafana
+    traefik.http.routers.grafana.entrypoints: webSecure
+    traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
+    traefik.http.routers.grafana.tls: true
+    traefik.http.routers.grafana.service: grafana
 
-    # traefik.http.services.grafana.loadBalancer.serversTransport: grafana@file
-    # traefik.http.services.grafana.loadbalancer.server.scheme: https
-    # traefik.http.services.grafana.loadbalancer.server.port: 3000
+    traefik.http.services.grafana.loadbalancer.server.port: 3000
 
-    # traefik.tcp.routers.grafana.entrypoints: webSecure
-    # traefik.tcp.routers.grafana.rule: HostSNI(`grafana.day1.sololab`)
-    # traefik.tcp.routers.grafana.tls.passthrough: true
-    # traefik.tcp.routers.grafana.service: grafana
-    # traefik.tcp.services.grafana.loadbalancer.server.port: 3000
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 3
-    periodSeconds: 600
-    timeoutSeconds: 5
-    failureThreshold: 3
-    successThreshold: 1
-    exec:
-      command:
-        - curl
-        - -kf
-        - https://localhost:3000/api/health
   configFiles:
     grafana:
       server:
@@ -44,11 +25,11 @@ grafana:
       auth.generic_oauth:
         enabled: true
         name: vault
-        client_id: # set from terraform data
-        client_secret: # set from terraform data
-        auth_url: # set from terraform data
-        api_url: # set from terraform data
-        token_url: # set from terraform data
+        client_id: $__file{/etc/grafana/secret/oauth_client_id} # set from terraform data
+        client_secret: $__file{/etc/grafana/secret/oauth_client_secret} # set from terraform data
+        auth_url: $__file{/etc/grafana/secret/oauth_auth_url} # set from terraform data
+        api_url: $__file{/etc/grafana/secret/oauth_api_url} # set from terraform data
+        token_url: $__file{/etc/grafana/secret/oauth_token_url} # set from terraform data
         scopes: openid groups user
         email_attribute_path: email
         empty_scopes: false
@@ -66,7 +47,15 @@ grafana:
         allow_assign_grafana_admin: true
         # ref: https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/#roles-and-permissions
         role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin' || contains(groups[*], 'app-grafana-admin') && 'Admin' || contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
-
+  secret:
+    others:
+      # mountPath: /etc/grafana/secret
+      contents: {}
+        # oauth_client_id: xxx
+        # oauth_client_secret: xxx
+        # oauth_auth_url: xxx
+        # oauth_api_url: xxx
+        # oauth_token_url: xxx
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai

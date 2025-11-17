@@ -21,20 +21,12 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "grafana.day1.sololab"
+            name  = "sololab_root"
           }
           value_sets = [
             {
-              name          = "grafana.tls.contents.ca\\.crt"
+              name          = "grafana.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
-            },
-            {
-              name          = "grafana.tls.contents.grafana\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "grafana.tls.contents.grafana\\.key"
-              value_ref_key = "private_key"
             },
           ]
         }
@@ -59,11 +51,14 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 5
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # podman
+            Network    = ""
+            PodmanArgs = "--tls-verify=false"
             # kube
-            yaml          = "grafana-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
+            yaml          = "grafana-aio.yaml"
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
