@@ -83,6 +83,20 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
+    flatten([
+      {
+        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.auth_url"
+        value = "${data.vault_identity_oidc_openid_config.config.authorization_endpoint}?with=ldap"
+      },
+      {
+        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.api_url"
+        value = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
+      },
+      {
+        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.token_url"
+        value = data.vault_identity_oidc_openid_config.config.token_endpoint
+      },
+    ])
   ])
 
   set_sensitive = flatten([
@@ -105,18 +119,6 @@ data "helm_template" "podman_kubes" {
       {
         name  = "grafana.secret.others.contents.oauth_client_secret"
         value = data.vault_identity_oidc_client_creds.creds.client_secret
-      },
-      {
-        name  = "grafana.secret.others.contents.oauth_auth_url"
-        value = "${data.vault_identity_oidc_openid_config.config.authorization_endpoint}?with=ldap"
-      },
-      {
-        name  = "grafana.secret.others.contents.oauth_api_url"
-        value = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
-      },
-      {
-        name  = "grafana.secret.others.contents.oauth_token_url"
-        value = data.vault_identity_oidc_openid_config.config.token_endpoint
       },
     ])
   ])

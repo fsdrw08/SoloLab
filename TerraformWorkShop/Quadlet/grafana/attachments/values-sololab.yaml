@@ -25,11 +25,11 @@ grafana:
       auth.generic_oauth:
         enabled: true
         name: vault
-        client_id: $__file{/etc/grafana/secret/oauth_client_id} # set from terraform data
-        client_secret: $__file{/etc/grafana/secret/oauth_client_secret} # set from terraform data
-        auth_url: $__file{/etc/grafana/secret/oauth_auth_url} # set from terraform data
-        api_url: $__file{/etc/grafana/secret/oauth_api_url} # set from terraform data
-        token_url: $__file{/etc/grafana/secret/oauth_token_url} # set from terraform data
+        client_id: $__file{/etc/grafana/secret/oauth_client_id}
+        client_secret: $__file{/etc/grafana/secret/oauth_client_secret}
+        # auth_url: # set from terraform data
+        # api_url: # set from terraform data
+        # token_url: # set from terraform data
         scopes: openid groups user
         email_attribute_path: email
         empty_scopes: false
@@ -51,11 +51,8 @@ grafana:
     others:
       # mountPath: /etc/grafana/secret
       contents: {}
-        # oauth_client_id: xxx
-        # oauth_client_secret: xxx
-        # oauth_auth_url: xxx
-        # oauth_api_url: xxx
-        # oauth_token_url: xxx
+        # oauth_client_id: xxx # set from terraform data
+        # oauth_client_secret: xxx # set from terraform data
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
