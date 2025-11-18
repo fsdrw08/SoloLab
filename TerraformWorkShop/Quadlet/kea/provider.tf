@@ -13,10 +13,6 @@ terraform {
       version = ">=0.2.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "System-Infra-Quadlet-Kea"
-  # }
   backend "local" {
 
   }

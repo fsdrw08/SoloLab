@@ -13,10 +13,6 @@ terraform {
       version = ">= 0.2.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "System-Day0-Quadlet-etcd"
-  # }
   backend "s3" {
     bucket = "tfstate"                  # Name of the S3 bucket
     key    = "System/Day0-Quadlet-etcd" # Name of the tfstate file

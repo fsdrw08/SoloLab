@@ -32,10 +32,6 @@ terraform {
     skip_requesting_account_id  = true
     insecure                    = true
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-  #   schema_name = "System-Day0-Quadlet-dufs"
-  # }
 }
 
 provider "remote" {

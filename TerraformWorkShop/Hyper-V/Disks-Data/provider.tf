@@ -5,10 +5,6 @@ terraform {
       version = ">=1.2.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-  #   schema_name = "HyperV-Infra-Disk-FCOS"
-  # }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs

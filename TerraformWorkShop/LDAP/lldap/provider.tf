@@ -5,10 +5,6 @@ terraform {
       version = ">= 0.3.0"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-  #   schema_name = "LDAP-LLDAP-Day0"
-  # }
   backend "s3" {
     bucket = "tfstate"         # Name of the S3 bucket
     key    = "LDAP/LLDAP-Day0" # Name of the tfstate file

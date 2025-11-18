@@ -13,10 +13,6 @@ terraform {
       version = ">= 0.2.0"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-  #   schema_name = "System-Day0-Quadlet-Exporters"
-  # }
   backend "s3" {
     bucket = "tfstate"                       # Name of the S3 bucket
     key    = "System/Day0-Quadlet-Exporters" # Name of the tfstate file

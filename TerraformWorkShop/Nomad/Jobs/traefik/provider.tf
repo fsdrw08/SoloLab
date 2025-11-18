@@ -5,10 +5,6 @@ terraform {
       version = ">= 2.5.1"
     }
   }
-  # backend "pg" {
-  #   conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-  #   schema_name = "Nomad-Job-Traefik"
-  # }
   backend "s3" {
     bucket = "tfstate"           # Name of the S3 bucket
     key    = "Nomad/Job-Traefik" # Name of the tfstate file
