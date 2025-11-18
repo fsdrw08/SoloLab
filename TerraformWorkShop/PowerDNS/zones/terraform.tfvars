@@ -178,6 +178,14 @@ zones = [
         ]
       },
       {
+        fqdn = "alloy.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
         fqdn = "whoami.day0.sololab."
         type = "A"
         ttl  = 60

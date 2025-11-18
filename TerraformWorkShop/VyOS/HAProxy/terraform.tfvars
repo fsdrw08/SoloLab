@@ -126,6 +126,14 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
+  day0_frontend_alloy = {
+    path = "load-balancing haproxy service tcp443 rule 191"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "alloy.day0.sololab"
+      "set backend" = "day0"
+    }
+  }
   day1_frontend_vault = {
     path = "load-balancing haproxy service tcp443 rule 200"
     configs = {

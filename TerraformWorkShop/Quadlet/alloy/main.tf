@@ -127,36 +127,27 @@ module "podman_quadlet" {
   }
 }
 
-resource "remote_file" "traefik_file_provider" {
-  for_each = toset([
-    "./attachments-alloy/alloy.traefik.yaml"
-  ])
-  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
-  content = file("${each.key}")
-}
-
 resource "remote_file" "consul_service" {
   for_each = toset([
-    "./attachments-alloy/alloy.consul.hcl",
-    "./attachments-podman-exporter/podman-exporter.consul.hcl"
+    "./attachments/alloy.consul.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
 }
 
-data "grafana_data_source" "data_source" {
-  name = "prometheus"
-}
+# data "grafana_data_source" "data_source" {
+#   name = "prometheus"
+# }
 
-resource "grafana_dashboard" "dashboards" {
-  for_each = toset([
-    # "./attachments-alloy/podman-exporter-dashboard.json",
-    "./attachments-alloy/Node-Exporter-Full.json",
-  ])
-  config_json = templatefile(
-    each.key,
-    {
-      DS_PROMETHEUS = data.grafana_data_source.data_source.uid
-    }
-  )
-}
+# resource "grafana_dashboard" "dashboards" {
+#   for_each = toset([
+#     # "./attachments-alloy/podman-exporter-dashboard.json",
+#     "./attachments-alloy/Node-Exporter-Full.json",
+#   ])
+#   config_json = templatefile(
+#     each.key,
+#     {
+#       DS_PROMETHEUS = data.grafana_data_source.data_source.uid
+#     }
+#   )
+# }

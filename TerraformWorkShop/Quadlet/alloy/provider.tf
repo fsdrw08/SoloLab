@@ -1,9 +1,5 @@
 terraform {
   required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = ">= 5.4.0"
-    }
     null = {
       source  = "hashicorp/null"
       version = ">= 3.2.2"
@@ -16,21 +12,26 @@ terraform {
       source  = "tenstad/remote"
       version = ">=0.2.1"
     }
-    grafana = {
-      source  = "grafana/grafana"
-      version = ">= 4.14.0"
-    }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-    schema_name = "System-Day1-Quadlet-Alloy"
-  }
-}
+  backend "s3" {
+    bucket = "tfstate"                   # Name of the S3 bucket
+    key    = "System/Day0-Quadlet-Alloy" # Name of the tfstate file
 
-provider "vault" {
-  address         = var.prov_vault.address
-  token           = var.prov_vault.token
-  skip_tls_verify = var.prov_vault.skip_tls_verify
+    endpoints = {
+      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
+    }
+
+    access_key = "terraform" # Access and secret keys
+    secret_key = "terraform"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
+    insecure                    = true
+  }
 }
 
 provider "remote" {
@@ -40,9 +41,4 @@ provider "remote" {
     user     = var.prov_remote.user
     password = var.prov_remote.password
   }
-}
-
-provider "grafana" {
-  url  = var.prov_grafana.url
-  auth = var.prov_grafana.auth
 }

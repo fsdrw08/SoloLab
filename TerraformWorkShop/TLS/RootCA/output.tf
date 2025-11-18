@@ -44,7 +44,7 @@ output "signed_certs" {
     [
       {
         name = "root"
-        ca   = tls_locally_signed_cert.int_ca.cert_pem
+        ca   = tls_self_signed_cert.root.cert_pem
       }
     ],
     [

@@ -71,9 +71,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/alloy:v1.10.2",
-        "archive": "docker.io_grafana_alloy_v1.10.2.tar",
-        "privateRepo": "grafana/alloy:v1.10.2",
+        "publicRepo": "grafana/alloy:v1.11.3",
+        "archive": "docker.io_grafana_alloy_v1.11.3.tar",
+        "privateRepo": "grafana/alloy:v1.11.3",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
     {
