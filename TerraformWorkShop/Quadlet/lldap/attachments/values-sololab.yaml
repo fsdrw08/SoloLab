@@ -1,16 +1,6 @@
 global:
   imageRegistry: zot.vyos.sololab
 lldap:
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.lldap-web-redirect.entrypoints: web
-    traefik.http.routers.lldap-web-redirect.rule: "Host(`lldap.day0.sololab`)"
-    traefik.http.routers.lldap-web-redirect.middlewares: toHttps@file
-    traefik.http.routers.lldap-web.entryPoints: webSecure
-    traefik.http.routers.lldap-web.rule: "Host(`lldap.day0.sololab`)"
-    traefik.http.routers.lldap-web.tls: true
-    traefik.http.routers.lldap-web.service: lldap-web
-    traefik.http.services.lldap-web.loadbalancer.server.port: 17170
   containerSecurityContext:
     sysctls:
       - name: net.ipv4.ip_unprivileged_port_start
@@ -39,3 +29,14 @@ lldap:
       contents:
         lldap-jwt-secret: REPLACE_WITH_RANDOM
         lldap-ldap-user-pass: P@ssw0rd
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.lldap-web-redirect.entrypoints: web
+    traefik.http.routers.lldap-web-redirect.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web-redirect.middlewares: toHttps@file
+    traefik.http.routers.lldap-web.entryPoints: webSecure
+    traefik.http.routers.lldap-web.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web.tls: true
+    traefik.http.routers.lldap-web.service: lldap-web
+    traefik.http.services.lldap-web.loadbalancer.server.port: 17170

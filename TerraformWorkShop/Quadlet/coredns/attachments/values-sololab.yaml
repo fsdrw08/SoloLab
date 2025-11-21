@@ -1,34 +1,6 @@
 global:
   imageRegistry: zot.vyos.sololab
 coredns:
-  podLabels:
-    traefik.enable: true
-    # health
-    traefik.http.routers.coredns-health-redirect.entrypoints: web
-    traefik.http.routers.coredns-health-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
-    traefik.http.routers.coredns-health-redirect.middlewares: toHttps@file
-    traefik.http.routers.coredns-health-redirect.service: coredns-health
-
-    traefik.http.routers.coredns-health.entrypoints: webSecure
-    traefik.http.routers.coredns-health.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
-    traefik.http.routers.coredns-health.tls: true
-    traefik.http.routers.coredns-health.service: coredns-health
-
-    traefik.http.services.coredns-health.loadbalancer.server.port: 5380
-
-    # metric
-    traefik.http.routers.coredns-metrics-redirect.entrypoints: web
-    traefik.http.routers.coredns-metrics-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
-    traefik.http.routers.coredns-metrics-redirect.middlewares: toHttps@file
-    traefik.http.routers.coredns-metrics-redirect.service: coredns-metrics
-
-    traefik.http.routers.coredns-metrics.entrypoints: webSecure
-    traefik.http.routers.coredns-metrics.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
-    traefik.http.routers.coredns-metrics.tls: true
-    traefik.http.routers.coredns-metrics.service: coredns-metrics
-
-    traefik.http.services.coredns-metrics.loadbalancer.server.port: 9153
-
   hostIP: 192.168.255.10
   servers:
     - zones:
@@ -131,6 +103,34 @@ coredns:
   #       zot       IN  A   {{ .Values.coredns.hostIP }}
   #       coredns   IN  A   {{ .Values.coredns.hostIP }}
   #       etcd-0    IN  A   {{ .Values.coredns.hostIP }}
+
+  podLabels:
+    traefik.enable: true
+    # health
+    traefik.http.routers.coredns-health-redirect.entrypoints: web
+    traefik.http.routers.coredns-health-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health-redirect.middlewares: toHttps@file
+    traefik.http.routers.coredns-health-redirect.service: coredns-health
+
+    traefik.http.routers.coredns-health.entrypoints: webSecure
+    traefik.http.routers.coredns-health.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health.tls: true
+    traefik.http.routers.coredns-health.service: coredns-health
+
+    traefik.http.services.coredns-health.loadbalancer.server.port: 5380
+
+    # metric
+    traefik.http.routers.coredns-metrics-redirect.entrypoints: web
+    traefik.http.routers.coredns-metrics-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics-redirect.middlewares: toHttps@file
+    traefik.http.routers.coredns-metrics-redirect.service: coredns-metrics
+
+    traefik.http.routers.coredns-metrics.entrypoints: webSecure
+    traefik.http.routers.coredns-metrics.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics.tls: true
+    traefik.http.routers.coredns-metrics.service: coredns-metrics
+
+    traefik.http.services.coredns-metrics.loadbalancer.server.port: 9153
 
   extraEnvVars:
     - name: TZ
