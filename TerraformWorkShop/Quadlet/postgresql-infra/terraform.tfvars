@@ -19,6 +19,15 @@ podman_kubes = [
       ]
       secrets = [
         {
+          tfstate = {
+            backend = {
+              type = "local"
+              config = {
+                path = "../../TLS/RootCA/terraform.tfstate"
+              }
+            }
+            cert_name = "tfbackend-pg"
+          }
           value_sets = [
             {
               name          = "postgresql.secret.ssl.contents.tls\\.crt"
@@ -29,15 +38,6 @@ podman_kubes = [
               value_ref_key = "key_pem"
             }
           ]
-          tfstate = {
-            backend = {
-              type = "local"
-              config = {
-                path = "../../TLS/RootCA/terraform.tfstate"
-              }
-            }
-            cert_name = "tfbackend-pg"
-          }
         }
       ]
     }
@@ -63,11 +63,12 @@ podman_quadlet = {
             StartLimitBurst       = 3
             Before                = "umount.target"
             Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = "podman-default-kube-network"
             # kube
             yaml          = "tfbackend-pg-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "podman-default-kube-network"
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 6-10 -n 1) && podman healthcheck run tfbackend-pg-postgresql\""
