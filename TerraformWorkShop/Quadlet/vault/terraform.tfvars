@@ -67,7 +67,7 @@ podman_quadlet = {
             KubeDownForce = "false"
             # service
             ExecStartPre  = ""
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 15-20 -n 1) && podman healthcheck run vault-server\""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-30 -n 1) && podman healthcheck run vault-server\""
             Restart       = "no" # "on-failure"
           }
         }
