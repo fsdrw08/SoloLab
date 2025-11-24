@@ -1,27 +1,4 @@
 zot:
-  podLabels:
-    traefik.enable: true
-    traefik.http.routers.zot-redirect.entrypoints: web
-    traefik.http.routers.zot-redirect.rule: Host(`zot.day0.sololab`)
-    traefik.http.routers.zot-redirect.middlewares: toHttps@file
-    traefik.http.routers.zot-redirect.service: zot
-
-    traefik.http.routers.zot.entrypoints: webSecure
-    traefik.http.routers.zot.rule: Host(`zot.day0.sololab`)
-    traefik.http.routers.zot.tls: true
-    traefik.http.routers.zot.service: zot
-
-    # traefik.http.services.zot.loadBalancer.serversTransport: zot@file
-    # traefik.http.services.zot.loadbalancer.server.scheme: https
-    traefik.http.services.zot.loadbalancer.server.port: 5000
-    traefik.http.services.zot.loadbalancer.healthCheck.path: /v2/
-
-    # traefik.tcp.routers.zot-web.entrypoints: webSecure
-    # traefik.tcp.routers.zot-web.rule: HostSNI(`zot.day0.sololab`)
-    # traefik.tcp.routers.zot-web.tls.passthrough: true
-    # traefik.tcp.routers.zot-web.service: zot-web
-    # traefik.tcp.services.zot-web.loadbalancer.server.port: 5000
-
   image:
     registry: zot.vyos.sololab
     repository: giantswarm/zot
@@ -133,6 +110,29 @@ zot:
         ldap-credentials.json:
           bindDN: cn=readonly,ou=people,dc=root,dc=sololab
           bindPassword: readonly
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.zot-redirect.entrypoints: web
+    traefik.http.routers.zot-redirect.rule: Host(`zot.day0.sololab`)
+    traefik.http.routers.zot-redirect.middlewares: toHttps@file
+    traefik.http.routers.zot-redirect.service: zot
+
+    traefik.http.routers.zot.entrypoints: webSecure
+    traefik.http.routers.zot.rule: Host(`zot.day0.sololab`)
+    traefik.http.routers.zot.tls: true
+    traefik.http.routers.zot.service: zot
+
+    # traefik.http.services.zot.loadBalancer.serversTransport: zot@file
+    # traefik.http.services.zot.loadbalancer.server.scheme: https
+    traefik.http.services.zot.loadbalancer.server.port: 5000
+    traefik.http.services.zot.loadbalancer.healthCheck.path: /v2/
+
+    # traefik.tcp.routers.zot-web.entrypoints: webSecure
+    # traefik.tcp.routers.zot-web.rule: HostSNI(`zot.day0.sololab`)
+    # traefik.tcp.routers.zot-web.tls.passthrough: true
+    # traefik.tcp.routers.zot-web.service: zot-web
+    # traefik.tcp.services.zot-web.loadbalancer.server.port: 5000
 
   extraEnvVars:
     - name: TZ

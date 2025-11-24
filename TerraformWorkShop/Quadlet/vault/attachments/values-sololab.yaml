@@ -86,10 +86,3 @@ vault:
         value: 5
       - name: SECRET_THRESHOLD
         value: 3
-
-volumePermissions:
-  enabled: true
-  image:
-    registry: zot.day0.sololab
-    repository: hashicorp/vault
-    tag: 1.21.0

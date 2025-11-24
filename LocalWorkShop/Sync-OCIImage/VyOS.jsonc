@@ -64,9 +64,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:346",
-        "archive": "quay.io_cockpit_ws_346.tar",
-        "privateRepo": "cockpit/ws:346",
+        "publicRepo": "cockpit/ws:350",
+        "archive": "quay.io_cockpit_ws_350.tar",
+        "privateRepo": "cockpit/ws:350",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
