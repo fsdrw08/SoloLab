@@ -2,20 +2,6 @@ global:
   imageRegistry: zot.day0.sololab
 loki:
   hostNetwork: false
-  # podLabels:
-  #   traefik.enable: true
-  #   traefik.http.routers.loki-redirect.entrypoints: web
-  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
-  #   traefik.http.routers.loki-redirect.service: loki
-
-  #   traefik.http.routers.loki.entrypoints: webSecure
-  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
-  #   traefik.http.routers.loki.tls: true
-  #   traefik.http.routers.loki.service: loki
-
-  #   traefik.http.services.loki.loadbalancer.server.port: 3100
-
   containerPorts:
     - name: http
       containerPort: 3100
@@ -90,6 +76,20 @@ loki:
 
   args:
     - -config.file=/etc/loki/local-config.yaml
+
+  # podLabels:
+  #   traefik.enable: true
+  #   traefik.http.routers.loki-redirect.entrypoints: web
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
+  #   traefik.http.routers.loki-redirect.service: loki
+
+  #   traefik.http.routers.loki.entrypoints: webSecure
+  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.tls: true
+  #   traefik.http.routers.loki.service: loki
+
+  #   traefik.http.services.loki.loadbalancer.server.port: 3100
 
   extraEnvVars:
     - name: TZ

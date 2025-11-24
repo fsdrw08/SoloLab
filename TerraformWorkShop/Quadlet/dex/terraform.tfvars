@@ -61,7 +61,7 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run dex-idp\""
-            Restart       = "no"
+            Restart       = "on-failure"
           }
         },
       ]

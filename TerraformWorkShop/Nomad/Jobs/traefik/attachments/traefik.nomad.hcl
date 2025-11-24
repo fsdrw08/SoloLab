@@ -85,7 +85,7 @@ job "traefik" {
       driver = "podman"
 
       config {
-        image = "zot.day0.sololab/library/traefik:v3.6.0"
+        image = "zot.day0.sololab/library/traefik:v3.6.2"
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
