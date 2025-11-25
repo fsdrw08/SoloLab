@@ -1,7 +1,7 @@
 services {
   name = "prometheus-podman-exporter-day0"
   id   = "prometheus-podman-exporter-workload"
-  port = 9882
+  port = 443
 
   checks = [
     {
@@ -20,7 +20,7 @@ services {
     "exporter",
   ]
   meta = {
-    scheme            = "http"
+    scheme            = "https"
     address           = "prometheus-podman-exporter.day0.sololab"
     health_check_path = "metrics"
     metrics_path      = "metrics"

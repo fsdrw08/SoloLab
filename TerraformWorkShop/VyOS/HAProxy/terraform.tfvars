@@ -199,6 +199,22 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day1_frontend_prometheus = {
+    path = "load-balancing haproxy service tcp443 rule 260"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "prometheus.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
+  day1_frontend_prometheus_blackbox_exporter = {
+    path = "load-balancing haproxy service tcp443 rule 261"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "prometheus-blackbox-exporter.day1.sololab"
+      "set backend" = "day1"
+    }
+  }
   day2_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 300"
     configs = {

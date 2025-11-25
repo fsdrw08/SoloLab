@@ -271,6 +271,22 @@ zones = [
           "192.168.255.2"
         ]
       },
+      {
+        fqdn = "prometheus.day1.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "prometheus-blackbox-exporter.day1.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
     ]
   },
   {

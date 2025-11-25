@@ -194,17 +194,28 @@ dns_records = [
       }
     }
   },
-  # {
-  #   hostname = "grafana.day2.sololab"
-  #   value = {
-  #     string_map = {
-  #       host = "192.168.255.20"
-  #     }
-  #     number_map = {
-  #       ttl = 60
-  #     }
-  #   }
-  # },
+  {
+    hostname = "prometheus.day1.sololab"
+    value = {
+      string_map = {
+        host = "prometheus.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "prometheus-blackbox-exporter.day1.sololab"
+    value = {
+      string_map = {
+        host = "prometheus-blackbox-exporter.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
   {
     hostname = "traefik.day2.sololab"
     value = {

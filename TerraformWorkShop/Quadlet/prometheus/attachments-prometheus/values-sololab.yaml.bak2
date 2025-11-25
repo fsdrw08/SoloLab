@@ -1,10 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 prometheus:
-  # hostAliases:
-  #   - ip: host-gateway
-  #     hostnames:
-  #       - day1.node.consul
   podLabels:
     # traefik.enable: true
     # traefik.http.routers.prometheus-redirect.entrypoints: web

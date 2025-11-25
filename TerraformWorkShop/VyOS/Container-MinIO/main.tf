@@ -47,6 +47,7 @@ module "config_map" {
           MINIO_ROOT_PASSWORD=minioadmin
           MINIO_UPDATE=off
           MINIO_VOLUMES=/data
+          MINIO_PROMETHEUS_AUTH_TYPE=public
         EOT
         mode    = 644
       }

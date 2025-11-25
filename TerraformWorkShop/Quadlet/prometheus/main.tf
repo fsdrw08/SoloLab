@@ -6,12 +6,21 @@ locals {
         mount = secret.vault_kvv2.mount
         name  = secret.vault_kvv2.name
       }
+      if secret.vault_kvv2 != null
+    ]
+  ])
+  tls_tfstate = flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
+        backend = secret.tfstate.backend
+        name    = secret.tfstate.cert_name
+      }
+      if secret.tfstate != null
     ]
   ])
 }
 
 data "vault_kv_secret_v2" "secrets" {
-  # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
   for_each = local.secrets_vault_kvv2 == null ? null : {
     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
   }
@@ -19,19 +28,29 @@ data "vault_kv_secret_v2" "secrets" {
   name  = each.value.name
 }
 
-# load cert from local tls
-# data "terraform_remote_state" "root_ca" {
-#   count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
-#   backend = var.podman_kube.helm.secrets.tfstate.backend.type
-#   config  = var.podman_kube.helm.secrets.tfstate.backend.config
-# }
+data "terraform_remote_state" "tfstate" {
+  # count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
+  for_each = local.tls_tfstate == null ? null : {
+    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
 
-# locals {
-#   cert = var.podman_kube.helm.secrets.tfstate == null ? null : [
-#     for cert in data.terraform_remote_state.root_ca[0].outputs.signed_certs : cert
-#     if cert.name == var.podman_kube.helm.secrets.tfstate.cert_name
-#   ]
-# }
+locals {
+  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for podman_kube in var.podman_kubes : [
+      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : [
+        for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
+        if cert.name == secret.tfstate.cert_name
+      ]
+      if secret.tfstate != null
+    ]
+  ])
+  certs = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.cert_list : cert.name => cert
+  }
+}
 
 data "helm_template" "podman_kubes" {
   for_each = {
@@ -43,27 +62,6 @@ data "helm_template" "podman_kubes" {
   values = [
     "${file(each.value.helm.value_file)}"
   ]
-
-  # v2 helm provider
-  # normal values
-  # set = local.helm_value_sets
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.value_sets == null ? [] : flatten([var.podman_kube.helm.value_sets])
-  #   content {
-  #     name = set.value.name
-  #     value = set.value.value_string != null ? set.value.value_string : templatefile(
-  #       "${set.value.value_template_path}", "${set.value.value_template_vars}"
-  #     )
-  #   }
-  # }
-  # # tls
-  # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
-  #   content {
-  #     name  = set.value.name
-  #     value = local.cert[0][set.value.value_ref_key]
-  #   }
-  # }
 
   # v3 helm provider
   set = flatten([
@@ -79,8 +77,8 @@ data "helm_template" "podman_kubes" {
       for secret in each.value.helm.secrets : [
         for value_set in secret.value_sets : {
           name = value_set.name
-          # value = local.cert[0][value_set.value_ref_key]
-          value = data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key]
+          # value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],
@@ -128,17 +126,10 @@ module "podman_quadlet" {
   }
 }
 
-resource "remote_file" "traefik_file_provider" {
-  for_each = toset([
-    "./attachments/prometheus.traefik.yaml"
-  ])
-  path    = "/var/home/podmgr/traefik-file-provider/${basename(each.key)}"
-  content = file("${each.key}")
-}
-
 resource "remote_file" "consul_service" {
   for_each = toset([
-    "./attachments/prometheus.consul.hcl",
+    "./attachments-prometheus/prometheus.consul.hcl",
+    "./attachments-blackbox-exporter/blackbox-exporter.consul.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
@@ -148,10 +139,10 @@ resource "grafana_data_source" "data_source" {
   depends_on = [module.podman_quadlet]
   type       = "prometheus"
   name       = "prometheus"
-  url        = "https://${trimsuffix(var.dns_records.0.name, ".")}"
+  url        = "https://prometheus.day1.sololab"
 
   secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.secrets["${trimsuffix(var.dns_records.0.name, ".")}"].data["ca"]
+    tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
   })
 
   json_data_encoded = jsonencode({
@@ -161,14 +152,13 @@ resource "grafana_data_source" "data_source" {
 
 resource "grafana_dashboard" "dashboards" {
   for_each = toset([
-    "./attachments/podman-exporter-dashboard.json",
-    "./attachments/Blackbox-Exporter-Full.json",
-    "./attachments/traefik-dashboard.json",
-    "./attachments/vault-dashboard.json",
-    "./attachments/consul-dashboard.json",
-    "./attachments/minio-dashboard.json",
-    "./attachments/zot-dashboard.json",
-    "./attachments/loki-dashboard.json",
+    "./attachments-prometheus/podman-exporter-dashboard.json",
+    "./attachments-prometheus/Blackbox-Exporter-Full.json",
+    "./attachments-prometheus/traefik-dashboard.json",
+    "./attachments-prometheus/vault-dashboard.json",
+    "./attachments-prometheus/consul-dashboard.json",
+    "./attachments-prometheus/minio-dashboard.json",
+    "./attachments-prometheus/zot-dashboard.json",
   ])
   config_json = templatefile(
     each.key,

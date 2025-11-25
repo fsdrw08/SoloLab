@@ -32,7 +32,7 @@ services {
   ]
   meta = {
     scheme            = "https"
-    address           = "minio-api.day1.sololab"
+    address           = "minio-api.day0.sololab"
     health_check_path = "minio/health/live"
     metrics_path      = "minio/v2/metrics/cluster"
   }

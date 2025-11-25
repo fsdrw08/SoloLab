@@ -18,10 +18,12 @@ policies = [
     name        = "consul_dns"
     description = "Policy for traefik proxy consul catalog provoider to read service"
     rules       = <<-EOT
+      agent_prefix "" {
+        policy = "read"
+      }
       node_prefix "" {
         policy = "read"
       }
-
       service_prefix "" {
         policy = "read"
       }

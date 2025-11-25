@@ -21,25 +21,17 @@ podman_kubes = [
     helm = {
       name       = "prometheus"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
-      value_file = "./attachments/values-sololab.yaml"
+      value_file = "./attachments-prometheus/values-sololab.yaml"
       secrets = [
         {
           vault_kvv2 = {
             mount = "kvv2-certs"
-            name  = "prometheus.day1.sololab"
+            name  = "sololab_root"
           }
           value_sets = [
             {
-              name          = "prometheus.containers.server.tls.contents.ca\\.crt"
+              name          = "prometheus.secret.tls.contents.ca\\.crt"
               value_ref_key = "ca"
-            },
-            {
-              name          = "prometheus.containers.server.tls.contents.prometheus\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "prometheus.containers.server.tls.contents.prometheus\\.key"
-              value_ref_key = "private_key"
             },
           ]
         },
@@ -50,7 +42,7 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "prometheus.containers.server.tls.contents.vault-token"
+              name          = "prometheus.secret.others.contents.vault-token"
               value_ref_key = "token"
             },
           ]
@@ -62,34 +54,22 @@ podman_kubes = [
           }
           value_sets = [
             {
-              name          = "prometheus.containers.server.tls.contents.consul-token"
+              name          = "prometheus.secret.others.contents.consul-token"
               value_ref_key = "token"
             },
           ]
         },
-        # {
-        #   value_sets = [
-        #     # {
-        #     #   name          = "prometheus.containers.blackboxExporter.tls.contents.ca\\.crt"
-        #     #   value_ref_key = "ca"
-        #     # },
-        #     {
-        #       name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.crt"
-        #       value_ref_key = "cert"
-        #     },
-        #     {
-        #       name          = "prometheus.containers.blackboxExporter.tls.contents.blackboxExporter\\.key"
-        #       value_ref_key = "private_key"
-        #     },
-        #   ]
-        #   vault_kvv2 = {
-        #     mount = "kvv2-certs"
-        #     name  = "prometheus-blackbox-exporter.day1.sololab"
-        #   }
-        # }
       ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-aio.yaml"
+  },
+  {
+    helm = {
+      name       = "prometheus-blackbox-exporter"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-blackbox-exporter"
+      value_file = "./attachments-blackbox-exporter/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-blackbox-exporter-aio.yaml"
   }
 ]
 
@@ -108,6 +88,8 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
             # kube
             yaml          = "prometheus-aio.yaml"
             PodmanArgs    = "--tls-verify=false"
@@ -116,8 +98,8 @@ podman_quadlet = {
             # service
             ExecStartPre = ""
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-            # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run prometheus-server\""
-            ExecStartPost = ""
+            # ExecStartPost = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-15 -n 1) && podman healthcheck run prometheus-server\""
             Restart       = "on-failure"
           }
         },
@@ -127,26 +109,38 @@ podman_quadlet = {
         status = "start"
       }
     },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "The blackbox exporter allows blackbox probing of endpoints over HTTP, HTTPS, DNS, TCP, ICMP and gRPC"
+            Documentation         = "https://github.com/prometheus/blackbox_exporter/tree/master"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "prometheus-blackbox-exporter-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre = ""
+            ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
+            # ExecStartPost = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-15 -n 1) && podman healthcheck run prometheus-blackbox-exporter-workload\""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "prometheus-blackbox-exporter"
+        status = "start"
+      }
+    },
   ]
 }
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "prometheus.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "prometheus-day1.service.consul."
-    ]
-  },
-  {
-    zone = "day1.sololab."
-    name = "prometheus-blackbox-exporter.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "prometheus-blackbox-exporter-day1.service.consul."
-    ]
-  },
-]
