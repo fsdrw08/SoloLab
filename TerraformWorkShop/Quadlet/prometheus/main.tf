@@ -134,36 +134,3 @@ resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
 }
-
-resource "grafana_data_source" "data_source" {
-  depends_on = [module.podman_quadlet]
-  type       = "prometheus"
-  name       = "prometheus"
-  url        = "https://prometheus.day1.sololab"
-
-  secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
-  })
-
-  json_data_encoded = jsonencode({
-    tlsAuthWithCACert = true
-  })
-}
-
-resource "grafana_dashboard" "dashboards" {
-  for_each = toset([
-    "./attachments-prometheus/podman-exporter-dashboard.json",
-    "./attachments-prometheus/Blackbox-Exporter-Full.json",
-    "./attachments-prometheus/traefik-dashboard.json",
-    "./attachments-prometheus/vault-dashboard.json",
-    "./attachments-prometheus/consul-dashboard.json",
-    "./attachments-prometheus/minio-dashboard.json",
-    "./attachments-prometheus/zot-dashboard.json",
-  ])
-  config_json = templatefile(
-    each.key,
-    {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
-    }
-  )
-}

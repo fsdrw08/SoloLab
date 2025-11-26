@@ -11,11 +11,6 @@ prov_remote = {
   password = "podmgr"
 }
 
-prov_grafana = {
-  url  = "https://grafana.day1.sololab"
-  auth = "admin:admin"
-}
-
 podman_kubes = [
   {
     helm = {

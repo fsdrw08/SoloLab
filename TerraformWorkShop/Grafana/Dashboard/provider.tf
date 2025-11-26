@@ -1,25 +1,13 @@
 terraform {
   required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = ">= 5.4.0"
-    }
-    null = {
-      source  = "hashicorp/null"
-      version = ">= 3.2.2"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = ">= 3.1.0"
-    }
-    remote = {
-      source  = "tenstad/remote"
-      version = ">= 0.2.1"
+    grafana = {
+      source  = "grafana/grafana"
+      version = ">= 4.14.0"
     }
   }
   backend "s3" {
-    bucket = "tfstate"                        # Name of the S3 bucket
-    key    = "System/Day1-Quadlet-Prometheus" # Name of the tfstate file
+    bucket = "tfstate"           # Name of the S3 bucket
+    key    = "Grafana/Dashboard" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio-api.day0.sololab" # Minio endpoint
@@ -44,11 +32,7 @@ provider "vault" {
   skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
-provider "remote" {
-  conn {
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = var.prov_remote.password
-  }
+provider "grafana" {
+  url  = var.prov_grafana.url
+  auth = var.prov_grafana.auth
 }
