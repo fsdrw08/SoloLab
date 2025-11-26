@@ -17,15 +17,17 @@ prometheus:
           metrics_path: /probe
           tls_config:
             ca_file: /etc/prometheus/secrets/certs/ca.crt
-            server_name: prometheus.day1.sololab
           params:
             module: [http_2xx]
           consul_sd_configs:
-            - server: consul-client.day0.sololab
+            - server: consul.service.consul:8501
               datacenter: dc1
               scheme: https
               tls_config:
                 ca_file: /etc/prometheus/secrets/certs/ca.crt
+              # https://inuits.eu/blog/prometheus-consul-vault-228/
+              authorization:
+                credentials_file: /etc/prometheus/secrets/others/consul-token
           # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
           relabel_configs:
             - source_labels: ["__meta_consul_service_metadata_address"]
@@ -57,11 +59,13 @@ prometheus:
           tls_config:
             insecure_skip_verify: true
           consul_sd_configs:
-            - server: consul-client.day0.sololab
+            - server: consul.service.consul:8501
               datacenter: dc1
               scheme: https
               tls_config:
                 ca_file: /etc/prometheus/secrets/certs/ca.crt
+              authorization:
+                credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
               regex: .*,exporter,.*
@@ -86,13 +90,13 @@ prometheus:
           authorization:
             credentials_file: /etc/prometheus/secrets/others/vault-token
           consul_sd_configs:
-            - server: consul-client.day0.sololab
+            - server: consul.service.consul:8501
               datacenter: dc1
               scheme: https
               tls_config:
                 ca_file: /etc/prometheus/secrets/certs/ca.crt
-              # services:
-              #   - vault
+              authorization:
+                credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
               regex: .*vault-exporter.*
@@ -118,13 +122,13 @@ prometheus:
               files:
                 - /etc/prometheus/secrets/others/consul-token
           consul_sd_configs:
-            - server: consul-client.day0.sololab
+            - server: consul.service.consul:8501
               datacenter: dc1
               scheme: https
               tls_config:
                 ca_file: /etc/prometheus/secrets/certs/ca.crt
-              services:
-                - consul
+              authorization:
+                credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
               regex: .*consul-exporter.*
