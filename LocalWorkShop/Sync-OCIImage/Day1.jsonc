@@ -97,4 +97,18 @@
         "privateRepo": "prometheus/blackbox-exporter:v0.27.0",
         "description": "https://quay.io/repository/prometheus/blackbox-exporter?tab=tags, https://quay.io/repository/prometheus/blackbox-exporter?tab=tags",
     },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "prometheus/node-exporter:v1.10.2",
+        "archive": "quay.io_prometheus_node-exporter_v1.10.2.tar",
+        "privateRepo": "prometheus/node-exporter:v1.10.2",
+        "description": "https://quay.io/repository/prometheus/node-exporter?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "navidys/prometheus-podman-exporter:v1.19.0",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.19.0.tar",
+        "privateRepo": "navidys/prometheus-podman-exporter:v1.19.0",
+        "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
+    },
 ]

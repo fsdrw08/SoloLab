@@ -13,6 +13,14 @@ podman_kubes = [
       value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-podman-exporter-aio.yaml"
+  },
+  {
+    helm = {
+      name       = "prometheus-node-exporter"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-node-exporter"
+      value_file = "./attachments/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-node-exporter-aio.yaml"
   }
 ]
 
@@ -29,8 +37,8 @@ podman_quadlet = {
             # unit
             Description           = "Prometheus podman exporter"
             Documentation         = "https://github.com/containers/prometheus-podman-exporter"
-            After                 = ""
-            Wants                 = ""
+            After                 = "podman.socket"
+            Wants                 = "podman.socket"
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
             Before                = "umount.target"
@@ -44,12 +52,45 @@ podman_quadlet = {
             # service
             ExecStartPre  = ""
             ExecStartPost = ""
-            Restart       = "no"
+            Restart       = "on-failure" # "no"
           }
         },
       ]
       service = {
         name   = "prometheus-podman-exporter"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          # template = "./attachments/prometheus-podman-exporter.container"
+          vars = {
+            # unit
+            Description           = "Prometheus node exporter"
+            Documentation         = "https://github.com/prometheus/node_exporter"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
+            # kube
+            yaml          = "prometheus-node-exporter-aio.yaml"
+            KubeDownForce = "false"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure" # "no"
+          }
+        },
+      ]
+      service = {
+        name   = "prometheus-node-exporter"
         status = "start"
       }
     },
