@@ -1,7 +1,7 @@
 services {
   name = "zot"
   id   = "zot-registry"
-  port = 5000
+  port = 443
 
   checks = [
     {
@@ -17,10 +17,9 @@ services {
   ]
 
   # https://github.com/project-zot/zot/issues/2149
-  # not able to scrape metric as http 401
-  # tags = [
-  #   "exporter",
-  # ]
+  tags = [
+    "exporter",
+  ]
 
   meta = {
     scheme            = "https"

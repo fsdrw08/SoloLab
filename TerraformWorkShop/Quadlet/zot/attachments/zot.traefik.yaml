@@ -1,6 +1,0 @@
-http:
-  serversTransports:
-    zot:
-      serverName: zot.day0.sololab
-      rootcas:
-        - "/etc/traefik/tls/ca.crt"
