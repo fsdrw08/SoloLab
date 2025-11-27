@@ -84,7 +84,8 @@ prometheus:
             - action: labelmap
               regex: __meta_consul_service_metadata_metrics_path_param_(.+)
               replacement: __param_$1
-        - job_name: vault_exporter
+        # job name have to match with grafana vault dashboard's query name
+        - job_name: vault
           tls_config:
             ca_file: /etc/prometheus/secrets/certs/ca.crt
           authorization:
