@@ -13,8 +13,8 @@ resource "vault_pki_secret_backend_cert" "cert" {
 data "vault_pki_secret_backend_issuers" "issuers" {
   for_each = {
     for backend in [
-      "pki-sololab_root",
-      "pki-consul_root",
+      "pki_sololab_root",
+      "pki_consul_root",
     ] : backend => backend
   }
   backend = each.key
@@ -23,8 +23,8 @@ data "vault_pki_secret_backend_issuers" "issuers" {
 data "vault_pki_secret_backend_issuer" "issuer" {
   for_each = {
     for backend in [
-      "pki-sololab_root",
-      "pki-consul_root",
+      "pki_sololab_root",
+      "pki_consul_root",
     ] : backend => backend
   }
   backend    = each.key
@@ -34,12 +34,12 @@ data "vault_pki_secret_backend_issuer" "issuer" {
 resource "vault_kv_secret_v2" "root_cert" {
   for_each = {
     for backend in [
-      "pki-sololab_root",
-      "pki-consul_root",
+      "pki_sololab_root",
+      "pki_consul_root",
     ] : backend => backend
   }
   mount = var.vault_kvv2.secret_engine.path
-  name  = element(split("-", each.key), 1)
+  name  = element(split("pki_", each.key), 1)
   data_json = jsonencode({
     "ca" = data.vault_pki_secret_backend_issuer.issuer[each.key].certificate
   })

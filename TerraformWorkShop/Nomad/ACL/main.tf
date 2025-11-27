@@ -7,7 +7,7 @@ data "vault_identity_oidc_client_creds" "creds" {
 }
 
 data "vault_kv_secret_v2" "ca" {
-  mount = "kvv2-certs"
+  mount = "kvv2_certs"
   name  = "sololab_root"
 }
 

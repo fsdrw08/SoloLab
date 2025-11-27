@@ -25,16 +25,16 @@ resource "null_resource" "traefik_init" {
 }
 
 # data "vault_pki_secret_backend_issuers" "root" {
-#   backend = "pki-sololab_root"
+#   backend = "pki_sololab_root"
 # }
 
 # data "vault_pki_secret_backend_issuer" "root" {
-#   backend    = "pki-sololab_root"
+#   backend    = "pki_sololab_root"
 #   issuer_ref = keys(jsondecode(data.vault_pki_secret_backend_issuers.root.key_info_json))[0]
 # }
 
 data "vault_generic_secret" "rootca" {
-  path = "pki-sololab_root/cert/ca"
+  path = "pki_sololab_root/cert/ca"
 }
 
 module "traefik" {

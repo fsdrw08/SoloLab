@@ -7,7 +7,7 @@ prov_vault = {
 
 vault_pki = {
   secret_engine = {
-    path                    = "pki-sololab_root"
+    path                    = "pki_sololab_root"
     description             = "PKI engine hosting root CA v1 for sololab"
     default_lease_ttl_years = 5
     max_lease_ttl_years     = 5
@@ -37,7 +37,7 @@ vault_pki = {
 root_cas = [
   {
     secret_engine = {
-      path                    = "pki-sololab_root"
+      path                    = "pki_sololab_root"
       description             = "PKI engine hosting root CA v1 for sololab"
       default_lease_ttl_years = 5
       max_lease_ttl_years     = 5
@@ -67,7 +67,7 @@ root_cas = [
   },
   {
     secret_engine = {
-      path                    = "pki-consul_root"
+      path                    = "pki_consul_root"
       description             = "PKI engine hosting root CA for Consul"
       default_lease_ttl_years = 5
       max_lease_ttl_years     = 5

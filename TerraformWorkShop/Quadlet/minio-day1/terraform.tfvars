@@ -20,7 +20,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2-certs"
+            mount = "kvv2_certs"
             name  = "root"
           }
           value_sets = [

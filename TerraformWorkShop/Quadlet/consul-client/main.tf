@@ -19,7 +19,7 @@ resource "null_resource" "init" {
 }
 
 # data "vault_kv_secret_v2" "jwt" {
-#   mount = "kvv2-consul"
+#   mount = "kvv2_consul"
 #   name  = "jwt"
 # }
 

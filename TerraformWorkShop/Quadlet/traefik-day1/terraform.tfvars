@@ -20,7 +20,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2-certs"
+            mount = "kvv2_certs"
             name  = "*.day1.sololab"
           }
           value_sets = [
@@ -40,7 +40,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2-certs"
+            mount = "kvv2_certs"
             name  = "*.service.consul"
           }
           value_sets = [
@@ -52,7 +52,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2-consul"
+            mount = "kvv2_consul"
             name  = "token-consul_dns"
           }
           value_sets = [

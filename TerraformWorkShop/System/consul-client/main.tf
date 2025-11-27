@@ -1,15 +1,15 @@
 data "vault_kv_secret_v2" "cert" {
-  mount = "kvv2-certs"
+  mount = "kvv2_certs"
   name  = "root"
 }
 
 data "vault_kv_secret_v2" "encrypt" {
-  mount = "kvv2-consul"
+  mount = "kvv2_consul"
   name  = "key-gossip_encryption"
 }
 
 data "vault_kv_secret_v2" "token" {
-  mount = "kvv2-consul"
+  mount = "kvv2_consul"
   name  = "token-consul_client"
 }
 

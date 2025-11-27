@@ -141,15 +141,15 @@ policy_bindings = [
       path "identity/entity/id/{{identity.entity.id}}" {
         capabilities = ["read"]
       }
-      path "kvv2-certs/data/*" {
+      path "kvv2_certs/data/*" {
         capabilities = ["read"]
       }
 
-      path "kvv2-certs/data/" {
+      path "kvv2_certs/data/" {
         capabilities = ["read"]
       }
 
-      path "kvv2-certs/metadata/*" {
+      path "kvv2_certs/metadata/*" {
         capabilities = ["list"]
       }
 
@@ -178,30 +178,30 @@ policy_bindings = [
       no_parent    = true
     }
   },
-  # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca
+  # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki_consul-connect-ca
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
   {
     policy_name    = "consul-ca"
     policy_content = <<-EOT
       # Allow Consul to read both PKI mounts and to manage the intermediate PKI mount configuration:
-      path "/sys/mounts/pki-consul_root" {
+      path "/sys/mounts/pki_consul_root" {
         capabilities = [ "read" ]
       }
-      path "/sys/mounts/pki-consul_int" {
+      path "/sys/mounts/pki_consul_int" {
         capabilities = [ "read" ]
       }
-      path "/sys/mounts/pki-consul_int/tune" {
+      path "/sys/mounts/pki_consul_int/tune" {
         capabilities = [ "update" ]
       }
       
       # Allow Consul read-only access to the root PKI engine, to automatically rotate intermediate CAs as needed, and full use of the intermediate PKI engine:
-      path "/pki-consul_root/" {
+      path "/pki_consul_root/" {
         capabilities = [ "read" ]
       }
-      path "/pki-consul_root/root/sign-intermediate" {
+      path "/pki_consul_root/root/sign-intermediate" {
         capabilities = [ "update" ]
       }
-      path "/pki-consul_int/*" {
+      path "/pki_consul_int/*" {
         capabilities = [ "create", "read", "update", "delete", "list" ]
       }
       
@@ -222,15 +222,15 @@ policy_bindings = [
   {
     policy_name    = "cert-read"
     policy_content = <<-EOT
-      path "kvv2-certs/data/*" {
+      path "kvv2_certs/data/*" {
         capabilities = ["read"]
       }
 
-      path "kvv2-certs/data/" {
+      path "kvv2_certs/data/" {
         capabilities = ["read"]
       }
 
-      path "kvv2-certs/metadata/*" {
+      path "kvv2_certs/metadata/*" {
         capabilities = ["list"]
       }
     EOT

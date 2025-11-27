@@ -31,15 +31,15 @@ data "vault_kv_secret_v2" "secret" {
   for_each = {
     for secret in [
       {
-        mount = "kvv2-certs"
+        mount = "kvv2_certs"
         name  = "client.global.nomad"
       },
       {
-        mount = "kvv2-consul"
+        mount = "kvv2_consul"
         name  = "token-nomad_client"
       },
       {
-        mount = "kvv2-nomad"
+        mount = "kvv2_nomad"
         name  = "token-node_write"
       },
     ] : secret.name => secret

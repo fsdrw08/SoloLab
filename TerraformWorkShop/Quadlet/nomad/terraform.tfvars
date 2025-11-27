@@ -21,7 +21,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2-certs"
+            mount = "kvv2_certs"
             name  = "nomad.day1.sololab"
           }
           value_sets = [
@@ -41,7 +41,7 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2-consul"
+            mount = "kvv2_consul"
             name  = "token-nomad_server"
           }
           value_sets = [

@@ -105,7 +105,7 @@ job "loki" {
 
       template {
         data        = <<-EOF
-          {{ with secret "kvv2-certs/data/root" }}{{ .Data.data.ca }}{{ end }}
+          {{ with secret "kvv2_certs/data/root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/ca.crt"
         change_mode = "restart"

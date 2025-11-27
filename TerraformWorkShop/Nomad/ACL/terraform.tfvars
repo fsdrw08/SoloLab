@@ -62,7 +62,7 @@ roles = [
     token = {
       type = "management"
       store = {
-        vault_kvv2_path = "kvv2-nomad"
+        vault_kvv2_path = "kvv2_nomad"
       }
     }
   },
@@ -78,7 +78,7 @@ roles = [
     policy_names = ["node-write"]
     token = {
       store = {
-        vault_kvv2_path = "kvv2-nomad"
+        vault_kvv2_path = "kvv2_nomad"
       }
     }
   },

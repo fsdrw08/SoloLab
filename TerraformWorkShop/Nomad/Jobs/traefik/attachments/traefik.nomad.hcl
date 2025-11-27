@@ -160,7 +160,7 @@ job "traefik" {
 
       template {
         data        = <<-EOF
-          {{ with secret "kvv2-certs/data/*.service.consul" }}{{ .Data.data.ca }}{{ end }}
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/ca.crt"
         change_mode = "restart"
@@ -168,7 +168,7 @@ job "traefik" {
 
       template {
         data        = <<-EOF
-          {{ with secret "kvv2-certs/data/*.service.consul" }}{{ .Data.data.cert }}{{ end }}
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.cert }}{{ end }}
         EOF
         destination = "secrets/consul.crt"
         change_mode = "restart"
@@ -176,7 +176,7 @@ job "traefik" {
 
       template {
         data        = <<-EOF
-          {{ with secret "kvv2-certs/data/*.service.consul" }}{{ .Data.data.private_key }}{{ end }}
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.private_key }}{{ end }}
         EOF
         destination = "secrets/consul.key"
         change_mode = "restart"

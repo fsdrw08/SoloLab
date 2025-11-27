@@ -30,23 +30,23 @@ data "vault_kv_secret_v2" "secrets" {
   for_each = {
     for secret in [
       {
-        mount = "kvv2-certs"
+        mount = "kvv2_certs"
         name  = "sololab_root"
       },
       {
-        mount = "kvv2-consul"
+        mount = "kvv2_consul"
         name  = "token-init_management"
       },
       {
-        mount = "kvv2-consul"
+        mount = "kvv2_consul"
         name  = "token-consul_dns"
       },
       {
-        mount = "kvv2-consul"
+        mount = "kvv2_consul"
         name  = "token-consul_client"
       },
       {
-        mount = "kvv2-consul"
+        mount = "kvv2_consul"
         name  = "key-gossip_encryption"
       },
     ] : secret.name => secret

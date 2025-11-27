@@ -1,5 +1,5 @@
 data "vault_kv_secret_v2" "ca_cert" {
-  mount = "kvv2-certs"
+  mount = "kvv2_certs"
   name  = "sololab_root"
 }
 
@@ -53,7 +53,7 @@ resource "vault_kv_secret_v2" "secret" {
       }
     }
   }
-  mount = "kvv2-consul"
+  mount = "kvv2_consul"
   name  = each.key
   data_json = jsonencode(
     each.value.data

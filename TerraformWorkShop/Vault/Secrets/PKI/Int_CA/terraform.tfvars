@@ -9,14 +9,14 @@ intermediate_cas = [
   # day1
   {
     secret_engine = {
-      path                    = "pki-sololab_day1"
+      path                    = "pki_sololab_day1"
       description             = "PKI engine hosting intermediate CA day1 v1 for sololab"
       default_lease_ttl_years = 3
       max_lease_ttl_years     = 3
     }
     enable_backend_config = true
     csr = {
-      root_ca_backend = "pki-sololab_root"
+      root_ca_backend = "pki_sololab_root"
       common_name     = "Sololab Intermediate CA Day1"
       ttl_years       = 5
     }
@@ -47,14 +47,14 @@ intermediate_cas = [
   # day2
   {
     secret_engine = {
-      path                    = "pki-sololab_day2"
+      path                    = "pki_sololab_day2"
       description             = "PKI engine hosting intermediate CA day2+ v1 for sololab"
       default_lease_ttl_years = 3
       max_lease_ttl_years     = 3
     }
     enable_backend_config = true
     csr = {
-      root_ca_backend = "pki-sololab_root"
+      root_ca_backend = "pki_sololab_root"
       common_name     = "Sololab Intermediate CA Day2"
       ttl_years       = 5
     }
@@ -82,7 +82,7 @@ intermediate_cas = [
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
   {
     secret_engine = {
-      path                    = "pki-consul_int"
+      path                    = "pki_consul_int"
       description             = "PKI engine hosting intermediate CA for consul connect"
       default_lease_ttl_years = 3
       max_lease_ttl_years     = 3

@@ -8,7 +8,7 @@ resource "vault_kv_secret_v2" "secret" {
   for_each = {
     for token in module.policy_bindings.tokens : token.name => token
   }
-  mount               = "kvv2-vault_token"
+  mount               = "kvv2_vault_token"
   name                = each.value.name
   delete_all_versions = true
   data_json = jsonencode(

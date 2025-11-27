@@ -20,7 +20,7 @@ podman_kube = {
     tls_value_sets = {
       value_ref = {
         vault_kvv2 = {
-          mount = "kvv2-certs"
+          mount = "kvv2_certs"
           name  = "traefik.day1.sololab"
         }
       }

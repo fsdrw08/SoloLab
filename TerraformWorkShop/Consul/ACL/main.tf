@@ -50,7 +50,7 @@ resource "vault_kv_secret_v2" "secret" {
 }
 
 data "vault_kv_secret_v2" "secret" {
-  mount = "kvv2-vault_token"
+  mount = "kvv2_vault_token"
   name  = "consul-ca"
 }
 
@@ -66,8 +66,8 @@ resource "consul_certificate_authority" "connect_ca" {
     TLSServerName            = "vault.service.consul"
     CAFile                   = "/consul/secret/certs/ca.crt"
     Token                    = data.vault_kv_secret_v2.secret.data["token"]
-    RootPkiPath              = "pki-consul_root"
-    IntermediatePkiPath      = "pki-consul_int"
+    RootPkiPath              = "pki_consul_root"
+    IntermediatePkiPath      = "pki_consul_int"
     LeafCertTTL              = "72h"
     RotationPeriod           = "2160h"
     IntermediateCertTTL      = "8760h"

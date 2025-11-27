@@ -7,7 +7,7 @@ prov_vault = {
 
 vault_kvv2 = {
   secret_engine = {
-    path = "kvv2-certs"
+    path = "kvv2_certs"
   }
   data_key_name = {
     ca          = "ca"
@@ -19,9 +19,9 @@ vault_kvv2 = {
 vault_certs = [
   # consul server cert
   {
-    root_ca_backend = "pki-sololab_root"
+    root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki-sololab_day1"
+      backend   = "pki_sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -35,9 +35,9 @@ vault_certs = [
   },
   # nomad server
   {
-    root_ca_backend = "pki-sololab_root"
+    root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki-sololab_day1"
+      backend   = "pki_sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -49,9 +49,9 @@ vault_certs = [
   },
   # day1 wild card cert hosting in reverse proxy
   {
-    root_ca_backend = "pki-sololab_root"
+    root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki-sololab_day1"
+      backend   = "pki_sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -59,9 +59,9 @@ vault_certs = [
   },
   # consul service wild card cert hosting in reverse proxy
   {
-    root_ca_backend = "pki-consul_root"
+    root_ca_backend = "pki_consul_root"
     secret_engine = {
-      backend   = "pki-consul_root"
+      backend   = "pki_consul_root"
       role_name = "RootCA-Consul-v1-role-default"
     }
     ttl_years   = 3
@@ -69,12 +69,12 @@ vault_certs = [
   },
   # nomad client
   # https://developer.hashicorp.com/nomad/tutorials/archive/security-enable-tls#agent-certificates
-  # https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad#create-and-populate-the-templates-directory
+  # https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki_nomad#create-and-populate-the-templates-directory
   # https://github.com/livioribeiro/nomad-lxd-terraform/blob/0c792716c9824c4c59de349d27b6aa1d1c16b09d/certs.tf#L197
   {
-    root_ca_backend = "pki-sololab_root"
+    root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki-sololab_day1"
+      backend   = "pki_sololab_day1"
       role_name = "IntCA-Day1-v1-role-default"
     }
     ttl_years   = 3
@@ -87,7 +87,7 @@ vault_certs = [
   },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
@@ -98,7 +98,7 @@ vault_certs = [
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
@@ -106,7 +106,7 @@ vault_certs = [
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
@@ -114,7 +114,7 @@ vault_certs = [
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
@@ -125,7 +125,7 @@ vault_certs = [
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3
@@ -133,7 +133,7 @@ vault_certs = [
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki-sololab_day1"
+  #     backend   = "pki_sololab_day1"
   #     role_name = "IntCA-Day1-v1-role-default"
   #   }
   #   ttl_years   = 3

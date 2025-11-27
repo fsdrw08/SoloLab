@@ -58,12 +58,12 @@ policy_bindings = [
         capabilities = ["read", "update"]
       }
       
-      # 允许对 kvv2-consul 下的所有 secret 的数据进行增删改查
-      path "kvv2-consul/data/*" {
+      # 允许对 kvv2_consul 下的所有 secret 的数据进行增删改查
+      path "kvv2_consul/data/*" {
         capabilities = ["list", "read", "create", "update", "delete"]
       }
-      # 允许列出 kvv2-consul 下的所有 secret 的元数据，这对于获取 secret 的列表很有用。
-      path "kvv2-consul/metadata/*" {
+      # 允许列出 kvv2_consul 下的所有 secret 的元数据，这对于获取 secret 的列表很有用。
+      path "kvv2_consul/metadata/*" {
         capabilities = ["list", "read"]
       }
       EOT

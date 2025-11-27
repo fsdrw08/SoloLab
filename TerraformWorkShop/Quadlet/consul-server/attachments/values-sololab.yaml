@@ -73,8 +73,8 @@ consul:
       #     address: https://vault.day1.sololab:8200
       #     ca_file: /consul/config/certs/ca.crt
       #     token: # set by terraform get data from vault secret
-      #     root_pki_path: pki-consul_root
-      #     intermediate_pki_path: pki-consul_int
+      #     root_pki_path: pki_consul_root
+      #     intermediate_pki_path: pki_consul_int
       #     leaf_cert_ttl: 72h
       #     rotation_period: 2160h
       #     intermediate_cert_ttl: 8760h

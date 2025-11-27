@@ -1,5 +1,5 @@
 data "vault_kv_secret_v2" "ca_cert" {
-  mount = "kvv2-certs"
+  mount = "kvv2_certs"
   name  = "sololab_root"
 }
 
