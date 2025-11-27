@@ -16,10 +16,6 @@ terraform {
       source  = "tenstad/remote"
       version = ">= 0.2.1"
     }
-    grafana = {
-      source  = "grafana/grafana"
-      version = ">= 4.14.0"
-    }
   }
   backend "s3" {
     bucket = "tfstate"                  # Name of the S3 bucket
@@ -55,9 +51,4 @@ provider "remote" {
     user     = var.prov_remote.user
     password = var.prov_remote.password
   }
-}
-
-provider "grafana" {
-  url  = var.prov_grafana.url
-  auth = var.prov_grafana.auth
 }

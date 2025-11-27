@@ -15,14 +15,6 @@ variable "prov_remote" {
   })
 }
 
-variable "prov_grafana" {
-  type = object({
-    url                  = string
-    auth                 = string
-    insecure_skip_verify = optional(bool, true)
-  })
-}
-
 variable "podman_kubes" {
   type = list(object({
     helm = object({
@@ -89,15 +81,4 @@ variable "podman_quadlet" {
       )
     }))
   })
-}
-
-variable "dns_records" {
-  type = list(object({
-    zone    = string
-    name    = string
-    type    = string
-    ttl     = number
-    records = list(string)
-  }))
-  default = []
 }

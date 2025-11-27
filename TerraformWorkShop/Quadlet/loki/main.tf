@@ -1,6 +1,6 @@
 # get minio access id and secret id from vault
 data "vault_kv_secret_v2" "minio" {
-  mount = "kvv2-minio"
+  mount = "kvv2_minio"
   name  = "loki"
 }
 
@@ -166,18 +166,4 @@ resource "remote_file" "consul_service" {
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
-}
-
-resource "grafana_data_source" "data_source" {
-  type = "loki"
-  name = "loki"
-  url  = "https://${trimsuffix(var.dns_records.0.name, ".")}"
-
-  secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
-  })
-
-  json_data_encoded = jsonencode({
-    tlsAuthWithCACert = true
-  })
 }

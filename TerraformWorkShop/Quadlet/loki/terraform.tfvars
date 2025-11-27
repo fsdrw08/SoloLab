@@ -11,11 +11,6 @@ prov_remote = {
   password = "podmgr"
 }
 
-prov_grafana = {
-  url  = "https://grafana.day1.sololab"
-  auth = "admin:admin"
-}
-
 podman_kubes = [
   {
     helm = {
@@ -25,7 +20,7 @@ podman_kubes = [
       secrets = [
         {
           vault_kvv2 = {
-            mount = "kvv2-certs"
+            mount = "kvv2_certs"
             name  = "sololab_root"
           }
           value_sets = [
@@ -80,15 +75,3 @@ podman_quadlet = {
     },
   ]
 }
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "loki.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "loki-day1.service.consul."
-    ]
-  }
-]

@@ -13,3 +13,21 @@ variable "prov_grafana" {
     insecure_skip_verify = optional(bool, true)
   })
 }
+
+variable "data_sources" {
+  type = list(object({
+    iac_id = string
+    name   = string
+    type   = string
+    url    = string
+  }))
+}
+
+variable "dashboards" {
+  type = list(object({
+    template = string
+    vars = object({
+      data_source = string
+    })
+  }))
+}

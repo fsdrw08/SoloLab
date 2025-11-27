@@ -1,7 +1,7 @@
 data "vault_kv_secret_v2" "secrets" {
   for_each = {
     sololab_root = {
-      mount = "kvv2-certs"
+      mount = "kvv2_certs"
       name  = "sololab_root"
     }
   }
@@ -9,10 +9,13 @@ data "vault_kv_secret_v2" "secrets" {
   name  = each.value.name
 }
 
-resource "grafana_data_source" "data_source" {
-  type = "prometheus"
-  name = "prometheus"
-  url  = "https://prometheus.day1.sololab"
+resource "grafana_data_source" "data_sources" {
+  for_each = {
+    for ds in var.data_sources : ds.iac_id => ds
+  }
+  type = each.value.type
+  name = each.value.name
+  url  = each.value.url
 
   secure_json_data_encoded = jsonencode({
     tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
@@ -23,22 +26,30 @@ resource "grafana_data_source" "data_source" {
   })
 }
 
-
 resource "grafana_dashboard" "dashboards" {
-  for_each = toset([
-    "./attachments/podman-exporter-dashboard.json",
-    "./attachments/Blackbox-Exporter-Full.json",
-    "./attachments/traefik-dashboard.json",
-    "./attachments/vault-dashboard.json",
-    "./attachments/consul-dashboard.json",
-    "./attachments/minio-dashboard.json",
-    "./attachments/zot-dashboard.json",
-    "./attachments/coredns-dashboard.json",
-  ])
+  # for_each = toset([
+  #   "./attachments/podman-exporter-dashboard.json",
+  #   "./attachments/Blackbox-Exporter-Full.json",
+  #   "./attachments/traefik-dashboard.json",
+  #   "./attachments/vault-dashboard.json",
+  #   "./attachments/consul-dashboard.json",
+  #   "./attachments/minio-dashboard.json",
+  #   "./attachments/zot-dashboard.json",
+  #   "./attachments/coredns-dashboard.json",
+  # ])
+  # config_json = templatefile(
+  #   each.key,
+  #   {
+  #     DS_PROMETHEUS = grafana_data_source.data_source.uid
+  #   }
+  # )
+  for_each = {
+    for dashboard in var.dashboards : dashboard.template => dashboard
+  }
   config_json = templatefile(
-    each.key,
+    each.value.template,
     {
-      DS_PROMETHEUS = grafana_data_source.data_source.uid
+      DS_PROMETHEUS = grafana_data_source.data_sources[each.value.vars.data_source].uid
     }
   )
 }
