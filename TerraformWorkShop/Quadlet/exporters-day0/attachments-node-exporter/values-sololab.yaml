@@ -1,0 +1,24 @@
+global:
+  imageRegistry: zot.vyos.sololab
+exporter:
+  flags:
+    web:
+      listen-address: 127.0.0.1:9100
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.prometheus-node-exporter-redirect.entrypoints: web
+    traefik.http.routers.prometheus-node-exporter-redirect.rule: Host(`prometheus-node-exporter.day0.sololab`)
+    traefik.http.routers.prometheus-node-exporter-redirect.middlewares: toHttps@file
+    traefik.http.routers.prometheus-node-exporter-redirect.service: prometheus-node-exporter
+
+    traefik.http.routers.prometheus-node-exporter.entrypoints: webSecure
+    traefik.http.routers.prometheus-node-exporter.rule: Host(`prometheus-node-exporter.day0.sololab`)
+    traefik.http.routers.prometheus-node-exporter.tls: true
+    traefik.http.routers.prometheus-node-exporter.service: prometheus-node-exporter
+
+    traefik.http.services.prometheus-node-exporter.loadbalancer.server.port: 9100
+
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
