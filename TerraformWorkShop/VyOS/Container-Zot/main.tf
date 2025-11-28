@@ -154,19 +154,20 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l4_backend = {
       path = "load-balancing haproxy backend vyos_zot_ssl"
       configs = {
-        "mode"                = "tcp"
-        "server vyos address" = "127.0.0.1"
-        "server vyos port"    = "5000"
+        "mode"                      = "tcp"
+        "server vyos address"       = "127.0.0.1"
+        "server vyos port"          = "5000"
+        "server vyos send-proxy-v2" = ""
       }
     }
     l7_frontend = {
       path = "load-balancing haproxy service vyos_zot_ssl"
       configs = {
-        "listen-address"  = "127.0.0.1"
-        "port"            = "5000"
-        "mode"            = "tcp"
-        "backend"         = "vyos_zot"
-        "ssl certificate" = "vyos"
+        "listen-address 127.0.0.1 accept-proxy" = ""
+        "port"                                  = "5000"
+        "mode"                                  = "tcp"
+        "backend"                               = "vyos_zot"
+        "ssl certificate"                       = "vyos"
       }
     }
     l7_backend = {
