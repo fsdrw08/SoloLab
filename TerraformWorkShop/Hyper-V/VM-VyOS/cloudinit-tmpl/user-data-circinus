@@ -78,11 +78,11 @@ vyos_config_commands:
   # reverse proxy rule for vyos api
   - set load-balancing haproxy service tcp443 rule 10 ssl 'req-ssl-sni'
   - set load-balancing haproxy service tcp443 rule 10 domain-name '${dns_api_fqdn}'
-  - set load-balancing haproxy service tcp443 rule 10 set backend 'api_vyos'
-  - set load-balancing haproxy backend api_vyos balance 'round-robin'
-  - set load-balancing haproxy backend api_vyos mode 'tcp'
-  - set load-balancing haproxy backend api_vyos server vyos address '${api_listen_addr}'
-  - set load-balancing haproxy backend api_vyos server vyos port '${api_listen_port}'
+  - set load-balancing haproxy service tcp443 rule 10 set backend 'vyos_api'
+  - set load-balancing haproxy backend vyos_api balance 'round-robin'
+  - set load-balancing haproxy backend vyos_api mode 'tcp'
+  - set load-balancing haproxy backend vyos_api server vyos address '${api_listen_addr}'
+  - set load-balancing haproxy backend vyos_api server vyos port '${api_listen_port}'
   # System
   # hostname
   - set system host-name '${local_hostname}'
