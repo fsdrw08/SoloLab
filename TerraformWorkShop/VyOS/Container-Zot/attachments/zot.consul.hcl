@@ -8,7 +8,7 @@ services {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
       id              = "zot-http-check"
       name            = "zot-http-check"
-      http            = "https://localhost:5000/v2/"
+      http            = "https://zot.vyos.sololab/v2/"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
