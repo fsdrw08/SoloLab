@@ -26,6 +26,12 @@ data_sources = [
 
 dashboards = [
   {
+    template = "./attachments/Node-Exporter-Full.json"
+    vars = {
+      data_source = "517bb05c"
+    }
+  },
+  {
     template = "./attachments/podman-exporter-dashboard.json"
     vars = {
       data_source = "517bb05c"

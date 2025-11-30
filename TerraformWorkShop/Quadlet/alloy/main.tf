@@ -134,20 +134,3 @@ resource "remote_file" "consul_service" {
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")
 }
-
-# data "grafana_data_source" "data_source" {
-#   name = "prometheus"
-# }
-
-# resource "grafana_dashboard" "dashboards" {
-#   for_each = toset([
-#     # "./attachments-alloy/podman-exporter-dashboard.json",
-#     "./attachments-alloy/Node-Exporter-Full.json",
-#   ])
-#   config_json = templatefile(
-#     each.key,
-#     {
-#       DS_PROMETHEUS = data.grafana_data_source.data_source.uid
-#     }
-#   )
-# }
