@@ -6,28 +6,6 @@ global:
   imageRegistry: "zot.day0.sololab"
 
 vault:
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.vault-redirect.entrypoints: web
-    # traefik.http.routers.vault-redirect.rule: Host(`vault.day1.sololab`)
-    # traefik.http.routers.vault-redirect.middlewares: toHttps@file
-    # traefik.http.routers.vault-redirect.service: vault
-
-    # traefik.http.routers.vault.entrypoints: webSecure
-    # traefik.http.routers.vault.rule: Host(`vault.day1.sololab`)
-    # traefik.http.routers.vault.tls: true
-    # traefik.http.routers.vault.service: vault
-
-    # traefik.http.services.vault.loadBalancer.serversTransport: vault@file
-    # traefik.http.services.vault.loadbalancer.server.scheme: https
-    # traefik.http.services.vault.loadbalancer.server.port: 8200
-
-    # traefik.tcp.routers.vault-web.entrypoints: webSecure
-    # traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)
-    # traefik.tcp.routers.vault-web.tls.passthrough: true
-    # traefik.tcp.routers.vault-web.service: vault-web
-    # traefik.tcp.services.vault-web.loadbalancer.server.port: 8200
-
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
   ## You can add whatever sub items under this block
   ## ref: https://developer.hashicorp.com/vault/docs/configuration
@@ -50,6 +28,7 @@ vault:
             proxy_protocol_behavior: allow_authorized
             proxy_protocol_authorized_addrs:
               - 192.168.255.1
+              - 192.168.255.2
               - 192.168.255.20
             # https://github.com/hashicorp/vault/blob/2718994242f94df3dc90215b2ecbc5d4198d9e3c/website/content/docs/platform/k8s/helm/examples/standalone-tls.mdx#L191
             tls_cert_file: /vault/userconfig/vault-server-tls/tls.crt
@@ -62,6 +41,28 @@ vault:
       telemetry:
         disable_hostname: true
         enable_hostname_label: true
+
+  podLabels:
+    # traefik.enable: true
+    # traefik.http.routers.vault-redirect.entrypoints: web
+    # traefik.http.routers.vault-redirect.rule: Host(`vault.day1.sololab`)
+    # traefik.http.routers.vault-redirect.middlewares: toHttps@file
+    # traefik.http.routers.vault-redirect.service: vault
+
+    # traefik.http.routers.vault.entrypoints: webSecure
+    # traefik.http.routers.vault.rule: Host(`vault.day1.sololab`)
+    # traefik.http.routers.vault.tls: true
+    # traefik.http.routers.vault.service: vault
+
+    # traefik.http.services.vault.loadBalancer.serversTransport: vault@file
+    # traefik.http.services.vault.loadbalancer.server.scheme: https
+    # traefik.http.services.vault.loadbalancer.server.port: 8200
+
+    # traefik.tcp.routers.vault-web.entrypoints: webSecure
+    # traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)
+    # traefik.tcp.routers.vault-web.tls.passthrough: true
+    # traefik.tcp.routers.vault-web.service: vault-web
+    # traefik.tcp.services.vault-web.loadbalancer.server.port: 8200
 
   extraEnvVars:
     - name: TZ
