@@ -126,10 +126,10 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l4_backend = {
       path = "load-balancing haproxy backend vyos_coredns"
       configs = {
-        "mode"                      = "tcp"
-        "server vyos address"       = "127.0.0.1"
-        "server vyos port"          = "44353"
-        "server vyos send-proxy-v2" = ""
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "44353"
+        # "server vyos send-proxy-v2" = ""
       }
     }
     l4_frontend_metrics = {
@@ -143,10 +143,10 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l4_backend_metrics = {
       path = "load-balancing haproxy backend vyos_coredns_metrics_ssl"
       configs = {
-        "mode"                      = "tcp"
-        "server vyos address"       = "127.0.0.1"
-        "server vyos port"          = "19153"
-        "server vyos send-proxy-v2" = ""
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "19153"
+        # "server vyos send-proxy-v2" = ""
       }
     }
     l7_frontend_metrics = {
@@ -162,10 +162,10 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l7_backend_metrics = {
       path = "load-balancing haproxy backend vyos_coredns_metrics"
       configs = {
-        "mode"                      = "http"
-        "server vyos address"       = "127.0.0.1"
-        "server vyos port"          = "9153"
-        "server vyos send-proxy-v2" = ""
+        "mode"                = "http"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "9153"
+        # "server vyos send-proxy-v2" = ""
       }
     }
   }
