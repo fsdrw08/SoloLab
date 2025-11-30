@@ -74,7 +74,7 @@ module "vyos_container" {
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
-        "arguments"                               = "server --address=:9000 --console-address=:9001"
+        "arguments"                               = "server --address=172.16.70.10:9000 --console-address=172.16.70.10:9001"
         "environment TZ value"                    = "Asia/Shanghai"
         "environment MINIO_CONFIG_ENV_FILE value" = "/etc/config.env"
         "network minio address"                   = "172.16.70.10"
@@ -104,20 +104,21 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l4_backend_api = {
       path = "load-balancing haproxy backend vyos_minio_ssl"
       configs = {
-        "mode"                      = "tcp"
-        "server vyos address"       = "127.0.0.1"
-        "server vyos port"          = "9000"
-        "server vyos send-proxy-v2" = ""
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "9000"
+        # "server vyos send-proxy-v2" = ""
       }
     }
     l7_frontend_api = {
       path = "load-balancing haproxy service vyos_minio_ssl"
       configs = {
-        "listen-address 127.0.0.1 accept-proxy" = ""
-        "port"                                  = "9000"
-        "mode"                                  = "tcp"
-        "backend"                               = "vyos_minio"
-        "ssl certificate"                       = "vyos"
+        # "listen-address 127.0.0.1 accept-proxy" = ""
+        "listen-address 127.0.0.1" = ""
+        "port"                     = "9000"
+        "mode"                     = "tcp"
+        "backend"                  = "vyos_minio"
+        "ssl certificate"          = "vyos"
       }
     }
     l7_backend_api = {
@@ -139,20 +140,21 @@ resource "vyos_config_block_tree" "reverse_proxy" {
     l4_backend_console = {
       path = "load-balancing haproxy backend vyos_mc_ssl"
       configs = {
-        "mode"                      = "tcp"
-        "server vyos address"       = "127.0.0.1"
-        "server vyos port"          = "9001"
-        "server vyos send-proxy-v2" = ""
+        "mode"                = "tcp"
+        "server vyos address" = "127.0.0.1"
+        "server vyos port"    = "9001"
+        # "server vyos send-proxy-v2" = ""
       }
     }
     l7_frontend_console = {
       path = "load-balancing haproxy service vyos_mc_ssl"
       configs = {
-        "listen-address 127.0.0.1 accept-proxy" = ""
-        "port"                                  = "9001"
-        "mode"                                  = "tcp"
-        "backend"                               = "vyos_mc"
-        "ssl certificate"                       = "vyos"
+        # "listen-address 127.0.0.1 accept-proxy" = ""
+        "listen-address 127.0.0.1" = ""
+        "port"                     = "9001"
+        "mode"                     = "tcp"
+        "backend"                  = "vyos_mc"
+        "ssl certificate"          = "vyos"
       }
     }
     l7_backend_console = {
