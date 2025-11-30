@@ -34,6 +34,14 @@ zones = [
         ]
       },
       {
+        fqdn = "prometheus-node-exporter.vyos.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
         fqdn = "postgrest.vyos.sololab."
         type = "A"
         ttl  = 60

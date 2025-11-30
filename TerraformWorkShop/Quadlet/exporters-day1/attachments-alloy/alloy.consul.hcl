@@ -1,0 +1,18 @@
+services {
+  name = "alloy-day1"
+  id   = "alloy-web"
+  port = 12345
+
+  checks = [
+    {
+      # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
+      id              = "alloy-http-check"
+      name            = "alloy-http-check"
+      http            = "http://localhost:12345/-/healthy"
+      tls_skip_verify = true
+      interval        = "300s"
+      timeout         = "2s"
+      status          = "passing"
+    }
+  ]
+}

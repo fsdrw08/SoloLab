@@ -137,6 +137,7 @@ resource "remote_file" "consul_service" {
   for_each = toset([
     "./attachments-podman-exporter/podman-exporter.consul.hcl",
     "./attachments-node-exporter/node-exporter.consul.hcl",
+    "./attachments-alloy/alloy.consul.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")

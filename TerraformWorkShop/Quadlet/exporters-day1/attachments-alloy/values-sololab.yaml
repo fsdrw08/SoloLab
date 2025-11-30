@@ -1,0 +1,165 @@
+global:
+  imageRegistry: zot.day0.sololab
+alloy:
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.alloy-redirect.entrypoints: web
+    traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day1.sololab`)
+    traefik.http.routers.alloy-redirect.middlewares: toHttps@file
+    traefik.http.routers.alloy-redirect.service: alloy
+
+    traefik.http.routers.alloy.entryPoints: webSecure
+    traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day1.sololab`)
+    traefik.http.routers.alloy.tls: true
+    traefik.http.routers.alloy.service: alloy
+
+    traefik.http.services.alloy.loadbalancer.server.port: 12345
+
+  containerSecurityContext:
+    enabled: true
+    privileged: true
+    seLinuxOptions:
+      type: spc_t
+  config:
+    fromYAML:
+      # https://grafana.com/docs/alloy/latest/reference/config-blocks/http/
+      - component: http
+      # - component: local.file_match
+      #   label: local_files
+      #   attributes:
+      #     path_targets:
+      #       - '"__path__"': '"/var/log/*.log"'
+      #     sync_period: '"5s"'
+      # - component: loki.source.file
+      #   label: log_scrape
+      #   attributes:
+      #     targets: local.file_match.local_files.targets
+      #     forward_to:
+      #       - loki.process.filter_logs.receiver
+      #     tail_from_end: true
+      # - component: loki.process
+      #   label: filter_logs
+      #   attributes:
+      #     stage.drop.0:
+      #       source: '""'
+      #       expression: '".*Connection closed by authenticating user root"'
+      #       drop_counter_reason: '"noisy"'
+      #     forward_to:
+      #       - loki.write.loki.receiver
+      - component: loki.source.journal
+        label: journal
+        attributes:
+          relabel_rules: loki.relabel.journal.rules
+          forward_to:
+            - loki.write.loki.receiver
+          labels:
+            component: '"loki.source.journal"'
+          # need to explicitly set the path value for the loki.source.journal component when running within a container
+          # https://community.grafana.com/t/scrape-journald-log-with-alloy-docker-container/119896/2
+          path: '"/var/log/journal"'
+          format_as_json: false
+      - component: loki.relabel
+        label: journal
+        attributes:
+          forward_to: []
+          rule.0:
+            source_labels:
+              - '"__journal__systemd_unit"'
+            target_label: '"systemd_unit"'
+          rule.1:
+            source_labels:
+              - '"__journal__systemd_user_unit"'
+            target_label: '"systemd_user_unit"'
+          rule.2:
+            source_labels:
+              - '"__journal__hostname"'
+            target_label: '"systemd_hostname"'
+          rule.3:
+            source_labels:
+              - '"__journal__transport"'
+            target_label: '"systemd_transport"'
+      - component: loki.write
+        label: loki
+        attributes:
+          endpoint.0:
+            url: '"https://loki.day1.sololab/loki/api/v1/push"'
+            tls_config.0:
+              ca_file: '"/etc/alloy/certs/ca.crt"'
+      # - component: prometheus.exporter.process
+      #   label: process
+      #   attributes:
+      #     procfs_path: '"/host/proc"'
+      #     matcher.0:
+      #       name: '"{{.ExeFull}}"'
+      #       cmdline: [".+"]
+      # - component: prometheus.exporter.unix
+      #   label: node
+      #   attributes:
+      #     rootfs_path: '"/host/root"'
+      #     procfs_path: '"/host/proc"'
+      #     sysfs_path: '"/host/sys"'
+      #     udev_data_path: '"/host/udev"'
+      #     netdev.0:
+      #       device_include: '"^(enp.*|eth.*|br[0-9]+|lo$)"'
+      #     netclass.0:
+      #       ignored_devices: '"^lxc.*"'
+      #     filesystem.0:
+      #       fs_types_exclude: '"^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|tmpfs)$"'
+      # - component: prometheus.scrape
+      #   label: node
+      #   attributes:
+      #     scrape_interval: '"30s"'
+      #     targets: prometheus.exporter.unix.node.targets
+      #     forward_to: [prometheus.remote_write.prometheus.receiver]
+      # - component: discovery.relabel
+      #   label: node
+      #   attributes:
+      #     targets: prometheus.exporter.unix.node.targets
+      #     rule.1:
+      #       target_label: '"job"'
+      #       replacement: '"integrations/node_exporter"'
+      # - component: prometheus.remote_write
+      #   label: prometheus
+      #   attributes:
+      #     endpoint.0:
+      #       url: '"https://prometheus.day1.sololab/api/v1/write"'
+      #       tls_config.0:
+      #         ca_file: '"/etc/alloy/certs/ca.crt"'
+  flags:
+    server:
+      http:
+        listen-addr: 127.0.0.1:12345
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+  extraVolumeMounts:
+    - name: journald
+      mountPath: /var/log/journal
+    # - name: root
+    #   mountPath: /host/root
+    #   readOnly: true
+    # - name: proc
+    #   mountPath: /host/proc
+    #   readOnly: true
+    # - name: sys
+    #   mountPath: /host/sys
+    #   readOnly: true
+    # - name: udev
+    #   mountPath: /host/udev
+    #   readOnly: true
+  extraVolumes:
+    - name: journald
+      hostPath:
+        path: /var/log/journal
+    # - name: root
+    #   hostPath:
+    #     path: /
+    # - name: proc
+    #   hostPath:
+    #     path: /proc
+    # - name: sys
+    #   hostPath:
+    #     path: /sys
+    # - name: udev
+    #   hostPath:
+    #     path: /run/udev/data

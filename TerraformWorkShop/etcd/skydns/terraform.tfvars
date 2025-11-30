@@ -107,6 +107,17 @@ dns_records = [
     }
   },
   {
+    hostname = "prometheus-node-exporter.day0.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "consul-client.day0.sololab"
     value = {
       string_map = {
@@ -210,6 +221,28 @@ dns_records = [
     value = {
       string_map = {
         host = "prometheus-blackbox-exporter.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "prometheus-podman-exporter.day1.sololab"
+    value = {
+      string_map = {
+        host = "prometheus-podman-exporter-day1.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "prometheus-node-exporter.day1.sololab"
+    value = {
+      string_map = {
+        host = "prometheus-node-exporter-day1.service.consul"
       }
       number_map = {
         ttl = 60
