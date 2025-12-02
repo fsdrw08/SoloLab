@@ -29,7 +29,6 @@ minio:
       --address=127.0.0.1:9000
       --console-address=127.0.0.1:9001
       --certs-dir=/etc/minio/certs
-    # LDAP auth
     # MINIO_IDENTITY_LDAP_SERVER_ADDR: lldap.day0.sololab:636
     # MINIO_IDENTITY_LDAP_LOOKUP_BIND_DN: cn=readonly,ou=people,dc=root,dc=sololab
     # MINIO_IDENTITY_LDAP_LOOKUP_BIND_PASSWORD: readonly
@@ -41,21 +40,11 @@ minio:
     # MINIO_IDENTITY_LDAP_GROUP_SEARCH_BASE_DN: ou=groups,dc=root,dc=sololab
     # MINIO_IDENTITY_LDAP_TLS_SKIP_VERIFY: off
 
-    # OIDC auth dex
-    # MINIO_IDENTITY_OPENID_CONFIG_URL: https://dex.day0.sololab/.well-known/openid-configuration
-    # MINIO_IDENTITY_OPENID_CLIENT_ID: minio
-    # MINIO_IDENTITY_OPENID_CLIENT_SECRET: ZXhhbXBsZS1hcHAtc2VjcmV0
-    # MINIO_IDENTITY_OPENID_DISPLAY_NAME: login via dex
-    # # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/openid/#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
-    # MINIO_IDENTITY_OPENID_CLAIM_NAME: groups
-    # MINIO_IDENTITY_OPENID_SCOPES: openid,groups
-
-    # OIDC auth vault
-    MINIO_IDENTITY_OPENID_CONFIG_URL: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_CLIENT_ID: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_CLIENT_SECRET: # get from vault, by terraform
-    MINIO_IDENTITY_OPENID_DISPLAY_NAME: login with vault
-    # https://min.io/docs/minio/linux/reference/minio-server/settings/iam/openid.html#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
+    MINIO_IDENTITY_OPENID_CONFIG_URL: https://dex.day0.sololab/.well-known/openid-configuration
+    MINIO_IDENTITY_OPENID_CLIENT_ID: minio
+    MINIO_IDENTITY_OPENID_CLIENT_SECRET: ZXhhbXBsZS1hcHAtc2VjcmV0
+    MINIO_IDENTITY_OPENID_DISPLAY_NAME: login via dex
+    # https://docs.min.io/enterprise/aistor-object-store/reference/aistor-server/settings/iam/openid/#envvar.MINIO_IDENTITY_OPENID_CLAIM_NAME
     MINIO_IDENTITY_OPENID_CLAIM_NAME: groups
     MINIO_IDENTITY_OPENID_SCOPES: openid,groups
 

@@ -1,9 +1,3 @@
-# get minio access id and secret id from vault
-data "vault_kv_secret_v2" "minio" {
-  mount = "kvv2_minio"
-  name  = "loki"
-}
-
 # load cert from vault
 locals {
   secrets_vault_kvv2 = flatten([
@@ -92,18 +86,6 @@ data "helm_template" "podman_kubes" {
         }
       ]
     ],
-    # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
-    # https://grafana.com/docs/grafana/v3.5.x/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
-    flatten([
-      {
-        name  = "loki.config.storage_config.object_store.s3.access_key_id"
-        value = data.vault_kv_secret_v2.minio.data["access_key"]
-      },
-      {
-        name  = "loki.config.storage_config.object_store.s3.secret_access_key"
-        value = data.vault_kv_secret_v2.minio.data["secret_key"]
-      },
-    ])
   ])
 }
 

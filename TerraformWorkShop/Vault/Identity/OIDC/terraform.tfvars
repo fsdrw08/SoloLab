@@ -31,6 +31,13 @@ oidc_provider = {
 
 oidc_client = [
   {
+    name         = "minio"
+    allow_groups = ["app-minio-user"]
+    redirect_uris = [
+      "https://minio-console.day0.sololab/oauth_callback",
+    ]
+  },
+  {
     name         = "nomad"
     allow_groups = ["app-nomad-user"]
     redirect_uris = [
@@ -46,3 +53,5 @@ oidc_client = [
     ]
   },
 ]
+
+vault_secret_backend = "kvv2_vault"

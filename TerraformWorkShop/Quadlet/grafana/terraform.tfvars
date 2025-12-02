@@ -29,6 +29,44 @@ podman_kubes = [
               value_ref_key = "ca"
             },
           ]
+        },
+        {
+          vault_kvv2 = {
+            mount = "kvv2_vault"
+            name  = "oidc-provider_sololab"
+          }
+          value_sets = [
+            {
+              name          = "grafana.configFiles.grafana.auth\\.generic_oauth.auth_url"
+              value_ref_key = "authorization_endpoint"
+            },
+            {
+              name          = "grafana.configFiles.grafana.auth\\.generic_oauth.api_url"
+              value_ref_key = "userinfo_endpoint"
+            },
+            {
+              name          = "grafana.configFiles.grafana.auth\\.generic_oauth.token_url"
+              value_ref_key = "token_endpoint"
+            },
+          ]
+        },
+        {
+          vault_kvv2 = {
+            mount = "kvv2_vault"
+            name  = "oidc-client_grafana"
+          }
+          value_sets = [
+            # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
+            # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
+            {
+              name          = "grafana.secret.others.contents.oauth_client_id"
+              value_ref_key = "client_id"
+            },
+            {
+              name          = "grafana.secret.others.contents.oauth_client_secret"
+              value_ref_key = "client_secret"
+            },
+          ]
         }
       ]
     }
@@ -62,7 +100,7 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab/v1/identity/oidc/.well-known/openid-configuration"
+            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-30 -n 1) && podman healthcheck run grafana-server\""
             Restart       = "on-failure"
           }

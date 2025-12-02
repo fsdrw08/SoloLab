@@ -6,6 +6,10 @@ variable "prov_vault" {
   })
 }
 
+variable "vault_secret_backend" {
+  type = string
+}
+
 variable "policy_bindings" {
   type = list(object({
     policy_name    = string

@@ -50,20 +50,16 @@ resource "vault_kv_secret_v2" "secret" {
 }
 
 data "vault_kv_secret_v2" "secret" {
-  mount = "kvv2_vault_token"
-  name  = "consul-ca"
-}
-
-data "consul_service" "vault" {
-  name = "vault"
+  mount = "kvv2_vault"
+  name  = "token-consul_ca"
 }
 
 resource "consul_certificate_authority" "connect_ca" {
   connect_provider = "vault"
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault?page=connect&page=ca&page=vault#enable-vault-as-the-ca
   config_json = jsonencode({
-    Address                  = "https://${data.consul_service.vault.service[0].address}:${data.consul_service.vault.service[0].port}"
-    TLSServerName            = "vault.service.consul"
+    Address                  = var.prov_vault.address
+    TLSServerName            = split("//", var.prov_vault.address)[1]
     CAFile                   = "/consul/secret/certs/ca.crt"
     Token                    = data.vault_kv_secret_v2.secret.data["token"]
     RootPkiPath              = "pki_consul_root"

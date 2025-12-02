@@ -18,8 +18,8 @@ kvv2 = [
     description = "kvv2 secret backend for minio"
   },
   {
-    mount_path  = "kvv2_vault_token"
-    description = "kvv2 secret backend for vault token"
+    mount_path  = "kvv2_vault"
+    description = "kvv2 secret backend for vault"
   },
   {
     mount_path  = "kvv2_nomad"

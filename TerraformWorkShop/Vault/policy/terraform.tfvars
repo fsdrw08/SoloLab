@@ -4,6 +4,8 @@ prov_vault = {
   skip_tls_verify = true
 }
 
+vault_secret_backend = "kvv2_vault"
+
 policy_bindings = [
   # vault-admin
   {

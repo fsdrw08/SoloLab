@@ -1,11 +1,3 @@
-data "vault_identity_oidc_openid_config" "config" {
-  name = "sololab"
-}
-
-data "vault_identity_oidc_client_creds" "creds" {
-  name = "grafana"
-}
-
 # load secret from vault kvv2 or load cert from tfstate
 locals {
   secrets_vault_kvv2 = flatten([
@@ -83,20 +75,11 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
-    flatten([
-      {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.auth_url"
-        value = "${data.vault_identity_oidc_openid_config.config.authorization_endpoint}?with=ldap"
-      },
-      {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.api_url"
-        value = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
-      },
-      {
-        name  = "grafana.configFiles.grafana.auth\\.generic_oauth.token_url"
-        value = data.vault_identity_oidc_openid_config.config.token_endpoint
-      },
-    ])
+    # flatten([
+    #   {
+    #     name  = "grafana.configFiles.grafana.auth\\.generic_oauth.auth_url"
+    #     value = "${data.vault_identity_oidc_openid_config.config.authorization_endpoint}?with=ldap"
+    #   },
   ])
 
   set_sensitive = flatten([
@@ -109,18 +92,6 @@ data "helm_template" "podman_kubes" {
         }
       ]
     ],
-    # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
-    # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
-    flatten([
-      {
-        name  = "grafana.secret.others.contents.oauth_client_id"
-        value = data.vault_identity_oidc_client_creds.creds.client_id
-      },
-      {
-        name  = "grafana.secret.others.contents.oauth_client_secret"
-        value = data.vault_identity_oidc_client_creds.creds.client_secret
-      },
-    ])
   ])
 }
 

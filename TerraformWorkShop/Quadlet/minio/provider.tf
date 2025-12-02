@@ -1,5 +1,10 @@
 terraform {
   required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.4.0"
+    }
+
     null = {
       source  = "hashicorp/null"
       version = ">= 3.2.2"
@@ -32,6 +37,12 @@ terraform {
     skip_requesting_account_id  = true
     insecure                    = true
   }
+}
+
+provider "vault" {
+  address         = var.prov_vault.address
+  token           = var.prov_vault.token
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
 provider "remote" {

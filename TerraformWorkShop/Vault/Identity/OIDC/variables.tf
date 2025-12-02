@@ -8,6 +8,7 @@ variable "prov_vault" {
 
 variable "oidc_provider" {
   type = object({
+    name        = string
     issuer_host = string
     scopes = optional(
       list(
@@ -30,4 +31,8 @@ variable "oidc_client" {
       access_token_ttl = optional(number, 7200)
     })
   )
+}
+
+variable "vault_secret_backend" {
+  type = string
 }

@@ -32,8 +32,8 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
-            mount = "kvv2_vault_token"
-            name  = "prometheus-metrics"
+            mount = "kvv2_vault"
+            name  = "token-prometheus_metrics"
           }
           value_sets = [
             {

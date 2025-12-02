@@ -24,7 +24,7 @@ resource "vault_identity_oidc_provider" "provider" {
   # depends_on = [
   #   vault_identity_oidc_scope.scopes,
   # ]
-  name          = "sololab"
+  name          = var.oidc_provider.name
   https_enabled = true
   issuer_host   = var.oidc_provider.issuer_host
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
@@ -93,4 +93,39 @@ resource "vault_identity_oidc_key_allowed_client_id" "allow" {
   }
   key_name          = vault_identity_oidc_key.key.name
   allowed_client_id = vault_identity_oidc_client.client[each.key].client_id
+}
+
+data "vault_identity_oidc_openid_config" "config" {
+  depends_on = [vault_identity_oidc_provider.provider]
+  name       = var.oidc_provider.name
+}
+
+resource "vault_kv_secret_v2" "oidc_provider" {
+  mount = var.vault_secret_backend
+  name  = "oidc-provider_${var.oidc_provider.name}"
+  data_json = jsonencode(
+    {
+      issuer                 = data.vault_identity_oidc_openid_config.config.issuer
+      config_url             = "${data.vault_identity_oidc_openid_config.config.issuer}/.well-known/openid-configuration"
+      jwks_uri               = data.vault_identity_oidc_openid_config.config.jwks_uri
+      authorization_endpoint = data.vault_identity_oidc_openid_config.config.authorization_endpoint
+      token_endpoint         = data.vault_identity_oidc_openid_config.config.token_endpoint
+      userinfo_endpoint      = data.vault_identity_oidc_openid_config.config.userinfo_endpoint
+    }
+  )
+}
+
+resource "vault_kv_secret_v2" "secret" {
+  for_each = {
+    for client in var.oidc_client : client.name => client
+  }
+  mount               = var.vault_secret_backend
+  name                = "oidc-client_${each.value.name}"
+  delete_all_versions = true
+  data_json = jsonencode(
+    {
+      client_id     = vault_identity_oidc_client.client[each.key].client_id
+      client_secret = vault_identity_oidc_client.client[each.key].client_secret
+    }
+  )
 }
