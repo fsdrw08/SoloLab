@@ -20,6 +20,7 @@ resource "minio_iam_user" "users" {
 resource "random_password" "secret_key" {
   for_each = {
     for user in var.users : user.name => user
+    if !user.hardcoded_credential
   }
   length = 10
 }
@@ -31,8 +32,8 @@ resource "minio_accesskey" "users" {
   }
   user               = minio_iam_user.users[each.value.name].name
   access_key         = each.value.access_key
-  secret_key         = random_password.secret_key[each.value.name].result
-  secret_key_version = sha256(random_password.secret_key[each.value.name].result)
+  secret_key         = each.value.hardcoded_credential ? each.value.secret_key : random_password.secret_key[each.value.name].result
+  secret_key_version = each.value.hardcoded_credential ? each.value.secret_key_version : sha256(random_password.secret_key[each.value.name].result)
 }
 
 resource "minio_iam_policy" "policies" {
@@ -69,8 +70,7 @@ resource "vault_kv_secret_v2" "secret" {
   data_json = jsonencode(
     {
       access_key = minio_accesskey.users[each.value.name].access_key,
-      # secret_key = minio_accesskey.users[each.value.name].secret_key
-      secret_key = random_password.secret_key[each.value.name].result
+      secret_key = each.value.hardcoded_credential ? each.value.secret_key : random_password.secret_key[each.value.name].result
     }
   )
 }
