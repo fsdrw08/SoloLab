@@ -4,6 +4,8 @@ prometheus:
   resourcesPreset: "small"
   configFiles:
     prometheus:
+      global:
+        scrape_interval: 60s
       scrape_configs:
         # the blackbox exporter implements the multi-target exporter pattern, this config tell prometheus to:
         # 1. get target data from consul service definition's metadata, only keep the data which the service has `address` metadata
@@ -12,7 +14,7 @@ prometheus:
         # finally, prometheus will send http request to: `scheme`://`address`/`probe?module=http_2xx&target=${instance}`
         # ref: https://prometheus.io/docs/guides/multi-target-exporter/#querying-multi-target-exporters-with-prometheus:~:text=To%20fix%20this%2C%20we%20will%20use%20relabeling.
         - job_name: blackbox_exporter
-          scrape_interval: 15s
+          scrape_interval: 600s
           scrape_timeout: 5s
           metrics_path: /probe
           tls_config:
@@ -56,6 +58,8 @@ prometheus:
         # `scheme`://`address`:`port`/`metrics_path`?`metrics_path_param_<key>=metrics_path_param_<value>`
         # finally, prometheus send request to the url above
         - job_name: general_exporter_consul_sd
+          scrape_interval: 30s
+          scrape_timeout: 10s
           tls_config:
             insecure_skip_verify: true
           consul_sd_configs:
@@ -86,6 +90,8 @@ prometheus:
               replacement: __param_$1
         # job name have to match with grafana vault dashboard's query name
         - job_name: vault
+          scrape_interval: 3600s
+          scrape_timeout: 10s
           tls_config:
             ca_file: /etc/prometheus/secrets/certs/ca.crt
           authorization:

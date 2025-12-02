@@ -1,0 +1,24 @@
+global:
+  imageRegistry: zot.day0.sololab
+exporter:
+  flags:
+    web:
+      listen-address: 127.0.0.1:9107
+
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.prometheus-consul-exporter-redirect.entrypoints: web
+    traefik.http.routers.prometheus-consul-exporter-redirect.rule: Host(`prometheus-consul-exporter.day1.sololab`)
+    traefik.http.routers.prometheus-consul-exporter-redirect.middlewares: toHttps@file
+    traefik.http.routers.prometheus-consul-exporter-redirect.service: prometheus-consul-exporter
+
+    traefik.http.routers.prometheus-consul-exporter.entryPoints: webSecure
+    traefik.http.routers.prometheus-consul-exporter.rule: Host(`prometheus-consul-exporter.day1.sololab`)
+    traefik.http.routers.prometheus-consul-exporter.tls: true
+    traefik.http.routers.prometheus-consul-exporter.service: prometheus-consul-exporter
+
+    traefik.http.services.prometheus-consul-exporter.loadbalancer.server.port: 9107
+
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
