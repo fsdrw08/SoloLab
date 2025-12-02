@@ -50,6 +50,20 @@ traefik:
           certificates:
             - certFile: /etc/traefik/tls/day0.crt
               keyFile: /etc/traefik/tls/day0.key
+      httpBasicAuth.yaml:
+        http:
+          middlewares:
+            userPass:
+              basicAuth:
+                users:
+                  - admin:$apr1$/F5ai.wT$7nFJWh4F7ZA0qoY.JZ69l1
+      serversTransports.yaml:
+        http:
+          serversTransports:
+            sololab-day0:
+              serverName: "*.day0.sololab"
+              rootcas:
+                - "/etc/traefik/tls/ca.crt"
 
   podLabels:
     traefik.enable: true
