@@ -31,6 +31,7 @@ variable "vm" {
     }))
     enable_secure_boot = optional(string, "On")
     power_state        = optional(string, "Off")
+    processor_count    = number
     memory = object({
       static        = optional(bool, null)
       dynamic       = optional(bool, null)

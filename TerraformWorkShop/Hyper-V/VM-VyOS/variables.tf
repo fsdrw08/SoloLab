@@ -32,6 +32,7 @@ variable "vm" {
     enable_secure_boot = optional(string, "On")
     power_state        = optional(string, "Off")
     checkpoint_type    = optional(string, "Disabled")
+    processor_count    = optional(number, 2)
     memory = object({
       static        = optional(bool, null)
       dynamic       = optional(bool, null)

@@ -31,6 +31,7 @@ vm = {
   ]
   enable_secure_boot = "On"
   power_state        = "Off"
+  processor_count    = 4
   memory = {
     dynamic       = true
     startup_bytes = 2046820352

@@ -160,7 +160,7 @@ module "hyperv_machine_instance" {
     memory_minimum_bytes = var.vm.memory.minimum_bytes
     memory_startup_bytes = var.vm.memory.startup_bytes
     notes                = "This VM instance is managed by terraform"
-    processor_count      = 4
+    processor_count      = var.vm.processor_count
     state                = var.vm.power_state
 
     vm_firmware = {
