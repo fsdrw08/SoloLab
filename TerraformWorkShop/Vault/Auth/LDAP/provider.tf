@@ -18,7 +18,7 @@ terraform {
     key    = "Vault/Auth-LDAP" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.day0.sololab" # Minio endpoint
+      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
     }
 
     access_key = "terraform" # Access and secret keys

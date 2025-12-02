@@ -1,11 +1,12 @@
 prov_vault = {
-  address         = "https://vault.day1.sololab:8200"
+  address         = "https://vault.day0.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
 oidc_provider = {
-  issuer_host = "vault.day1.sololab"
+  name        = "sololab"
+  issuer_host = "vault.day0.sololab"
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {

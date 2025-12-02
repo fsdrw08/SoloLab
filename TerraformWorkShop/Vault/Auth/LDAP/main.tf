@@ -1,14 +1,14 @@
-# data "terraform_remote_state" "root_ca" {
-#   backend = "local"
-#   config = {
-#     path = "../../TLS/RootCA/terraform.tfstate"
-#   }
-# }
-
-data "vault_kv_secret_v2" "root_cert" {
-  mount = "kvv2_certs"
-  name  = "sololab_root"
+data "terraform_remote_state" "tfstate" {
+  backend = "local"
+  config = {
+    path = "../../../TLS/RootCA/terraform.tfstate"
+  }
 }
+
+# data "vault_kv_secret_v2" "root_cert" {
+#   mount = "kvv2_certs"
+#   name  = "sololab_root"
+# }
 
 resource "vault_ldap_auth_backend" "ldap" {
   path                 = var.vault_ldap_auth_backend.path
@@ -18,7 +18,7 @@ resource "vault_ldap_auth_backend" "ldap" {
   tls_min_version      = var.vault_ldap_auth_backend.tls_min_version
   tls_max_version      = var.vault_ldap_auth_backend.tls_max_version
   insecure_tls         = var.vault_ldap_auth_backend.insecure_tls
-  certificate          = data.vault_kv_secret_v2.root_cert.data["ca"]
+  certificate          = data.terraform_remote_state.tfstate.outputs.root_cert_pem
   binddn               = var.vault_ldap_auth_backend.binddn
   bindpass             = var.vault_ldap_auth_backend.bindpass
   userdn               = var.vault_ldap_auth_backend.userdn

@@ -7,7 +7,7 @@ prov_hyperv = {
 
 prov_vault = {
   schema          = "https"
-  address         = "vault.day1.sololab:8200"
+  address         = "vault.day0.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -88,7 +88,7 @@ butane = {
       "nomad_client_cert_download_url"      = "http://dufs.day0.sololab/private/certs/client.global.nomad.crt"
       "nomad_client_cert_key_download_url"  = "http://dufs.day0.sololab/private/certs/client.global.nomad.key"
       "nomad_client_cert_download_url_cred" = "YWRtaW46YWRtaW4="
-      "vault_server_address"                = "https://vault.day1.sololab:8200"
+      "vault_server_address"                = "https://vault.day0.sololab"
     }
     local = [
       {

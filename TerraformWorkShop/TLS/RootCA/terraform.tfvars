@@ -320,7 +320,7 @@ certs = [
   },
   # vault
   {
-    name = "vault.day1"
+    name = "vault.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
@@ -330,11 +330,11 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "*.day1.sololab",
+        "*.day0.sololab",
         "vault.service.consul",
       ]
       subject = {
-        common_name  = "vault.day1.sololab"
+        common_name  = "vault.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800

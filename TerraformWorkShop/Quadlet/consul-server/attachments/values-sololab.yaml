@@ -44,9 +44,9 @@ consul:
       #   authorization:
       #     enabled: true
       #     static:
-      #       oidc_discovery_url: https://vault.day1.sololab:8200/v1/identity/oidc
+      #       oidc_discovery_url: https://vault.day0.sololab/v1/identity/oidc
       #       oidc_discovery_ca_cert: ## set via helm value
-      #       bound_issuer: https://vault.day1.sololab:8200/v1/identity/oidc
+      #       bound_issuer: https://vault.day0.sololab/v1/identity/oidc
       #       # The value for matching the aud field of the JSON web token (JWT).
       #       # The audience aud claim in a JWT is meant to refer to the authorization servers that should accept the token.
       #       bound_audiences:
@@ -70,7 +70,7 @@ consul:
       #   enabled: true
       #   ca_provider: vault
       #   ca_config:
-      #     address: https://vault.day1.sololab:8200
+      #     address: https://vault.day0.sololab
       #     ca_file: /consul/config/certs/ca.crt
       #     token: # set by terraform get data from vault secret
       #     root_pki_path: pki_consul_root

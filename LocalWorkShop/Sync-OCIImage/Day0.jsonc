@@ -70,6 +70,13 @@
         "description": "https://hub.docker.com/r/wait4x/wait4x",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hashicorp/vault:1.21.1",
+        "archive": "docker.io_hashicorp_vault_1.21.1.tar",
+        "privateRepo": "hashicorp/vault:1.21.1",
+        "description": "https://hub.docker.com/r/hashicorp/vault/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "minio/minio:RELEASE.2025-04-22T22-12-26Z",
         "archive": "quay.io_minio_minio_RELEASE.2025-04-22T22-12-26Z.tar",

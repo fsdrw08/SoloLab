@@ -134,31 +134,23 @@ reverse_proxy = {
       "set backend" = "day0"
     }
   }
-  day1_frontend_vault = {
+  day0_frontend_vault = {
     path = "load-balancing haproxy service tcp443 rule 200"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "vault.day1.sololab"
-      "set backend" = "day1_vault"
+      "domain-name" = "vault.day0.sololab"
+      "set backend" = "vault"
     }
   }
-  day1_backend_vault = {
-    path = "load-balancing haproxy backend day1_vault"
+  day0_backend_vault = {
+    path = "load-balancing haproxy backend vault"
     configs = {
       "mode"                       = "tcp"
-      "server vault address"       = "192.168.255.20"
+      "server vault address"       = "192.168.255.10"
       "server vault port"          = "8200"
       "server vault send-proxy-v2" = ""
     }
   }
-  # day1_frontend_vault = {
-  #   path = "load-balancing haproxy service tcp443 rule 200"
-  #   configs = {
-  #     "ssl"         = "req-ssl-sni"
-  #     "domain-name" = "vault.day1.sololab"
-  #     "set backend" = "day1"
-  #   }
-  # }
   day1_frontend_consul = {
     path = "load-balancing haproxy service tcp443 rule 210"
     configs = {

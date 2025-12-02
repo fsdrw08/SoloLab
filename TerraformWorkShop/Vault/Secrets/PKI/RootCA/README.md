@@ -64,14 +64,14 @@ terraform show -json | ConvertFrom-Json | Select-Object -ExpandProperty values |
 ### have a check with the cert chain
 have a check
 ```powershell
-$VAULT_ADDR="https://vault.day1.sololab"
+$VAULT_ADDR="https://vault.day0.sololab"
 curl -k --request LIST $VAULT_ADDR/pki/issuers
 Invoke-RestMethod -URI $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/pem | step certificate inspect
 Invoke-RestMethod -URI $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca_chain | step certificate inspect
 ```
 run in linux
 ```shell
-VAULT_ADDR="http://vault.day1.sololab:8200" 
+VAULT_ADDR="https://vault.day0.sololab" 
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica1/v1/ca/ca_chain | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
 curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile  /dev/stdin  | openssl pkcs7 -print_certs -noout
@@ -83,14 +83,14 @@ curl -s $VAULT_ADDR/v1/sololab-pki/v1/ica2/v1/ca_chain | openssl crl2pkcs7 -nocr
 have a check
 ref: https://developer.hashicorp.com/vault/docs/commands#vault_cacert
 ```powershell
-$env:VAULT_ADDR="https://vault.day1.sololab"
+$env:VAULT_ADDR="https://vault.day0.sololab"
 $env:VAULT_TOKEN="hvs.pqibSbWZDHGmY2ZBlT0IHKXG"
 $env:VAULT_CACERT=join-path (git rev-parse --show-toplevel) -ChildPath "KubeWorkShop\Traefik\conf\root_ca.crt"
 vault login
 vault auth list
 
 # https://developer.hashicorp.com/vault/docs/secrets/pki/considerations#role-based-access
-$env:VAULT_ADDR="https://vault.day1.sololab"
+$env:VAULT_ADDR="https://vault.day0.sololab"
 $env:VAULT_TOKEN="hvs.pqibSbWZDHGmY2ZBlT0IHKXG"
 $ca1="sololab-pki/v1/ica1/v1"
 $ca2="sololab-pki/v1/ica2/v1"

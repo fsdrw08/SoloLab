@@ -130,6 +130,14 @@ zones = [
         ]
       },
       {
+        fqdn = "vault.day0.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
         fqdn = "zot.day0.sololab."
         type = "A"
         ttl  = 60
@@ -225,14 +233,6 @@ zones = [
       },
       {
         fqdn = "ns1.day1.sololab."
-        type = "A"
-        ttl  = 60
-        results = [
-          "192.168.255.2"
-        ]
-      },
-      {
-        fqdn = "vault.day1.sololab."
         type = "A"
         ttl  = 60
         results = [

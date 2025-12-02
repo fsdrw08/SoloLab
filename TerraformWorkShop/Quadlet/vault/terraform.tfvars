@@ -1,5 +1,5 @@
 prov_remote = {
-  host     = "192.168.255.20"
+  host     = "192.168.255.10"
   port     = 22
   user     = "podmgr"
   password = "podmgr"
@@ -20,7 +20,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "vault.day1"
+            cert_name = "vault.day0"
           }
           value_sets = [
             {
@@ -66,10 +66,10 @@ podman_quadlet = {
             yaml          = "vault-aio.yaml"
             KubeDownForce = "false"
             # service
-            ExecStartPre = ""
-            # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-30 -n 1) && podman healthcheck run vault-server\""
-            ExecStartPost = ""
-            Restart       = "on-failure"
+            ExecStartPre  = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-30 -n 1) && podman healthcheck run vault-server\""
+            # ExecStartPost = ""
+            Restart = "on-failure"
           }
         }
       ]

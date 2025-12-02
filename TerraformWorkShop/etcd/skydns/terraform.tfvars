@@ -140,10 +140,10 @@ dns_records = [
     }
   },
   {
-    hostname = "vault.day1.sololab"
+    hostname = "vault.day0.sololab"
     value = {
       string_map = {
-        host = "192.168.255.20"
+        host = "192.168.255.10"
       }
       number_map = {
         ttl = 60

@@ -20,20 +20,20 @@ services {
   tags = [
     "vault-exporter",
 
-    "traefik.enable=true",
-    "traefik.http.routers.vault-redirect.entrypoints=web",
-    "traefik.http.routers.vault-redirect.rule=Host(`vault.day1.sololab`) || Host(`vault.service.consul`)",
-    "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
-    "traefik.http.routers.vault.entrypoints=webSecure",
-    "traefik.http.routers.vault.rule=Host(`vault.day1.sololab`) || Host(`vault.service.consul`)",
-    "traefik.http.routers.vault.tls=true",
-    "traefik.http.services.vault.loadBalancer.serversTransport=sololab-day1@file",
-    "traefik.http.services.vault.loadbalancer.server.scheme=https",
+    # "traefik.enable=true",
+    # "traefik.http.routers.vault-redirect.entrypoints=web",
+    # "traefik.http.routers.vault-redirect.rule=Host(`vault.day0.sololab`) || Host(`vault.service.consul`)",
+    # "traefik.http.routers.vault-redirect.middlewares=toHttps@file",
+    # "traefik.http.routers.vault.entrypoints=webSecure",
+    # "traefik.http.routers.vault.rule=Host(`vault.day0.sololab`) || Host(`vault.service.consul`)",
+    # "traefik.http.routers.vault.tls=true",
+    # "traefik.http.services.vault.loadBalancer.serversTransport=sololab-day0@file",
+    # "traefik.http.services.vault.loadbalancer.server.scheme=https",
   ]
 
   meta = {
     scheme                    = "https"
-    address                   = "vault.day1.sololab"
+    address                   = "vault.day0.sololab"
     health_check_path         = "v1/sys/health"
     metrics_path              = "v1/sys/metrics"
     metrics_path_param_format = "prometheus"

@@ -15,10 +15,10 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate"                   # Name of the S3 bucket
-    key    = "System/Day1-Quadlet-Vault" # Name of the tfstate file
+    key    = "System/Day0-Quadlet-Vault" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.day0.sololab" # Minio endpoint
+      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
     }
 
     access_key = "terraform" # Access and secret keys
