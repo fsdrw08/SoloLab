@@ -114,7 +114,7 @@ if ($Download) {
                     if ($VaultToken -ne "") {
                         Write-Host "From $fullUri Fetch `"$data`" Save to $localPath"
                         $content = $(curl.exe `
-                            -s `
+                            -k -s `
                             -H "X-Vault-Token: $VaultToken" `
                             -X GET `
                             $fullUri | jq.exe "$data")
