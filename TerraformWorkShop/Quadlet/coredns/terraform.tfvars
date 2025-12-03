@@ -59,7 +59,8 @@ podman_quadlet = {
             KubeDownForce = "true"
             Network       = ""
             # service
-            ExecStartPre  = ""
+            # start after etcd is ready
+            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://192.168.255.10:2379/health"
             ExecStartPost = ""
             Restart       = "on-failure"
           }
