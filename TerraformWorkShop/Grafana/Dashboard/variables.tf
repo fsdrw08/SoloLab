@@ -26,8 +26,6 @@ variable "data_sources" {
 variable "dashboards" {
   type = list(object({
     template = string
-    vars = object({
-      data_source_id = string
-    })
+    vars     = map(string)
   }))
 }

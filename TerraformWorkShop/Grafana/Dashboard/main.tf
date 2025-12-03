@@ -49,7 +49,8 @@ resource "grafana_dashboard" "dashboards" {
   config_json = templatefile(
     each.value.template,
     {
-      DS_PROMETHEUS = grafana_data_source.data_sources[each.value.vars.data_source_id].uid
+      DS_PROMETHEUS = lookup(each.value.vars, "DS_PROMETHEUS", null) == null ? null : grafana_data_source.data_sources[lookup(each.value.vars, "DS_PROMETHEUS")].uid
+      DS_LOKI       = lookup(each.value.vars, "DS_LOKI", null) == null ? null : grafana_data_source.data_sources[lookup(each.value.vars, "DS_LOKI")].uid
     }
   )
 }

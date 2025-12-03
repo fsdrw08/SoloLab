@@ -28,61 +28,67 @@ dashboards = [
   {
     template = "./attachments/Node-Exporter-Full.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/podman-exporter-dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/Blackbox-Exporter-Full.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/Consul-Exporter-Dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/traefik-dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
-    }
-  },
-  {
-    template = "./attachments/vault-dashboard.json"
-    vars = {
-      data_source_id = "517bb05c"
-    }
-  },
-  {
-    template = "./attachments/consul-dashboard.json"
-    vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/minio-dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/zot-dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
   },
   {
     template = "./attachments/coredns-dashboard.json"
     vars = {
-      data_source_id = "517bb05c"
+      DS_PROMETHEUS = "517bb05c"
     }
-  }
+  },
+  {
+    template = "./attachments/vault-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
+  {
+    template = "./attachments/consul-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
+  {
+    template = "./attachments/nomad-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
 ]
