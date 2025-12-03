@@ -65,6 +65,28 @@ podman_kubes = [
       value_file = "./attachments-blackbox-exporter/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-blackbox-exporter-aio.yaml"
+  },
+  {
+    helm = {
+      name       = "prometheus-consul-exporter"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-consul-exporter"
+      value_file = "./attachments-consul-exporter/values-sololab.yaml"
+      secrets = [
+        {
+          vault_kvv2 = {
+            mount = "kvv2_consul"
+            name  = "token-consul_dns"
+          }
+          value_sets = [
+            {
+              name          = "exporter.secret.envVars.CONSUL_HTTP_TOKEN"
+              value_ref_key = "token"
+            },
+          ]
+        },
+      ]
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/prometheus-consul-exporter-aio.yaml"
   }
 ]
 
@@ -134,6 +156,37 @@ podman_quadlet = {
       ]
       service = {
         name   = "prometheus-blackbox-exporter"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Exporter for Consul metrics"
+            Documentation         = "https://github.com/prometheus/consul_exporter/tree/master"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "prometheus-consul-exporter-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = ""
+            Restart       = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "prometheus-consul-exporter"
         status = "start"
       }
     },

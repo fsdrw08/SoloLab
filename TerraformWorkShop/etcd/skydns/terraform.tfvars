@@ -228,6 +228,17 @@ dns_records = [
     }
   },
   {
+    hostname = "prometheus-consul-exporter.day1.sololab"
+    value = {
+      string_map = {
+        host = "prometheus-consul-exporter.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "prometheus-podman-exporter.day1.sololab"
     value = {
       string_map = {

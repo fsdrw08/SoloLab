@@ -44,6 +44,12 @@ dashboards = [
     }
   },
   {
+    template = "./attachments/Consul-Exporter-Dashboard.json"
+    vars = {
+      data_source_id = "517bb05c"
+    }
+  },
+  {
     template = "./attachments/traefik-dashboard.json"
     vars = {
       data_source = "517bb05c"

@@ -92,6 +92,13 @@
     },
     {
         "publicRegistry": "quay.io",
+        "publicRepo": "prometheus/consul-exporter:v0.13.0",
+        "archive": "quay.io_prometheus_consul-exporter_v0.13.0.tar",
+        "privateRepo": "prometheus/consul-exporter:v0.13.0",
+        "description": "https://quay.io/repository/prometheus/consul-exporter?tab=tags",
+    },
+    {
+        "publicRegistry": "quay.io",
         "publicRepo": "prometheus/node-exporter:v1.10.2",
         "archive": "quay.io_prometheus_node-exporter_v1.10.2.tar",
         "privateRepo": "prometheus/node-exporter:v1.10.2",
