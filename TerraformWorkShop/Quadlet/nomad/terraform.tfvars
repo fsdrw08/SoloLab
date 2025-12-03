@@ -87,7 +87,7 @@ podman_quadlet = {
             ExecStartPreConsul = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services"
             ExecStartPreVault  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration"
             ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && [ -f /var/home/podmgr/.local/share/containers/storage/volumes/nomad-pvc/_data/server/nomad_token ] && podman healthcheck run nomad-agent || echo done \""
-            Restart            = "no" #"on-failure"
+            Restart            = "on-failure" #"on-failure" "no"
           }
         },
       ]

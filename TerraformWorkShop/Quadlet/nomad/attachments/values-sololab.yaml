@@ -1,22 +1,6 @@
 global:
   imageRegistry: zot.day0.sololab
 nomad:
-  podLabels:
-    # traefik.enable: true
-    # traefik.http.routers.nomad-redirect.entrypoints: web
-    # traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
-    # traefik.http.routers.nomad-redirect.middlewares: toHttps@file
-    # traefik.http.routers.nomad-redirect.service: nomad
-
-    # traefik.http.routers.nomad.entrypoints: webSecure
-    # traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
-    # traefik.http.routers.nomad.tls: true
-    # traefik.http.routers.nomad.service: nomad
-
-    # traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
-    # traefik.http.services.nomad.loadbalancer.server.scheme: https
-    # traefik.http.services.nomad.loadbalancer.server.port: 4646
-
   image:
     repository: multani/nomad
   # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
@@ -73,6 +57,30 @@ nomad:
         default_identity:
           aud: ["vault.io"]
           ttl: 1h
+      telemetry:
+        # common
+        collection_interval: "1s"
+        disable_hostname: false
+        publish_allocation_metrics: true
+        publish_node_metrics: true
+        # prometheus metrics
+        prometheus_metrics: true
+
+  podLabels:
+    # traefik.enable: true
+    # traefik.http.routers.nomad-redirect.entrypoints: web
+    # traefik.http.routers.nomad-redirect.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad-redirect.middlewares: toHttps@file
+    # traefik.http.routers.nomad-redirect.service: nomad
+
+    # traefik.http.routers.nomad.entrypoints: webSecure
+    # traefik.http.routers.nomad.rule: Host(`nomad.day1.sololab`)
+    # traefik.http.routers.nomad.tls: true
+    # traefik.http.routers.nomad.service: nomad
+
+    # traefik.http.services.nomad.loadBalancer.serversTransport: nomad@file
+    # traefik.http.services.nomad.loadbalancer.server.scheme: https
+    # traefik.http.services.nomad.loadbalancer.server.port: 4646
 
   extraEnvVars:
     - name: NOMAD_DISABLE_PERM_MGMT

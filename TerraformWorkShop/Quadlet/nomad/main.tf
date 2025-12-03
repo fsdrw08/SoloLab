@@ -21,7 +21,6 @@ locals {
 }
 
 data "vault_kv_secret_v2" "secrets" {
-  # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
   for_each = local.secrets_vault_kvv2 == null ? null : {
     for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
   }
