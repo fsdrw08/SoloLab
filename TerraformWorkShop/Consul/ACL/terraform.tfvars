@@ -121,6 +121,19 @@ policies = [
       }
     EOT
   },
+  {
+    name        = "tf_backend"
+    description = "Policy for Terraform to read and write state"
+    rules       = <<-EOT
+      key_prefix "tfstate/" {
+        policy = "write"
+      }
+      
+      session_prefix "" {
+        policy = "write"
+      }
+    EOT
+  },
 ]
 
 roles = [
@@ -175,6 +188,14 @@ roles = [
     name         = "prometheus"
     description  = "Role of Prometheus"
     policy_names = ["prometheus"]
+    token_store = {
+      vault_kvv2_path = "kvv2_consul"
+    }
+  },
+  {
+    name         = "tf_backend"
+    description  = "Role of Terraform"
+    policy_names = ["tf_backend"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
