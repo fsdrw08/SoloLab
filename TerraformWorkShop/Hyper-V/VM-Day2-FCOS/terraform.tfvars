@@ -19,14 +19,14 @@ vm = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
-    # data_disk_tfstate = {
-    #   backend = {
-    #     type = "local"
-    #     config = {
-    #       path = "../Disks-Data/terraform.tfstate"
-    #     }
-    #   }
-    # }
+    data_disk_tfstate = {
+      backend = {
+        type = "local"
+        config = {
+          path = "../Disks-Data/terraform.tfstate"
+        }
+      }
+    }
   }
   nic = [
     {
@@ -52,7 +52,7 @@ butane = {
     others = [
       # "./Butane/network.yaml",
       "./Butane/packages.yaml",
-      # "./Butane/storage.yaml",
+      "./Butane/storage.yaml",
       "./Butane/user-1000.yaml",
       "./Butane/user-1001.yaml",
       "./Butane/consul.yaml",

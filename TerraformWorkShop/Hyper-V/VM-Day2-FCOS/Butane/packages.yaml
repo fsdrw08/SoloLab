@@ -112,6 +112,10 @@ systemd:
     # zincati service use cincinnati protocol to fetch latest system image information from remote server
     # zincati service in fcos almost meaning tie the registry endpoint of system upgrade to the external container registry, e.g. quay.io/fedora/fedora-coreos
     # in order to use private container registry to upgrade system image, we have to disable zincati service
+    # to upgrade system image:
+    # 1. Push the latest os image to private registry
+    # 2. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
+    # 3. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
     # ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
     - name: zincati.service
       enabled: false
@@ -135,9 +139,9 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
+        ExecStartPre=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
         ExecStart=/bin/touch /var/lib/%N.stamp
-        ExecStart=/usr/bin/systemctl --no-block reboot
+        ExecStartPost=/usr/bin/systemctl --no-block reboot
         [Install]
         WantedBy=multi-user.target
 
@@ -162,9 +166,10 @@ systemd:
         # if the package is already installed. This is useful if the package is
         # added to the root image in a future Fedora CoreOS release as it will
         # prevent the service from failing.
-        ExecStartPre=/usr/bin/rpm-ostree install -y --allow-inactive $RPMS
+        ExecStartPre=/usr/bin/rpm-ostree install -y --idempotent --allow-inactive $RPMS
         ExecStart=/bin/touch /var/lib/%N.stamp
-        ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
+        ExecStartPost=/bin/bash -c "systemctl --no-block reboot"
+        # ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
 
         [Install]
         WantedBy=multi-user.target
