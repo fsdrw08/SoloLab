@@ -49,7 +49,7 @@ resource "grafana_dashboard" "dashboards" {
   config_json = templatefile(
     each.value.template,
     {
-      DS_PROMETHEUS = grafana_data_source.data_sources[each.value.vars.data_source].uid
+      DS_PROMETHEUS = grafana_data_source.data_sources[each.value.vars.data_source_id].uid
     }
   )
 }

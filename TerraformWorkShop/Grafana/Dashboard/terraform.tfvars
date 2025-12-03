@@ -28,19 +28,19 @@ dashboards = [
   {
     template = "./attachments/Node-Exporter-Full.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/podman-exporter-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/Blackbox-Exporter-Full.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
@@ -52,37 +52,37 @@ dashboards = [
   {
     template = "./attachments/traefik-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/vault-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/consul-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/minio-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/zot-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   },
   {
     template = "./attachments/coredns-dashboard.json"
     vars = {
-      data_source = "517bb05c"
+      data_source_id = "517bb05c"
     }
   }
 ]
