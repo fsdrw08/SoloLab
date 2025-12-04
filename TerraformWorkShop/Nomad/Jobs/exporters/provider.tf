@@ -4,10 +4,10 @@ terraform {
       source  = "hashicorp/nomad"
       version = ">= 2.5.1"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = ">= 5.4.0"
-    }
+    # vault = {
+    #   source  = "hashicorp/vault"
+    #   version = ">= 5.4.0"
+    # }
   }
   backend "consul" {
     address = "consul.day1.sololab"
