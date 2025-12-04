@@ -42,6 +42,14 @@ prometheus:
                 - __meta_consul_service_metadata_address
                 - __meta_consul_service_port
                 - __meta_consul_service_metadata_health_check_path
+              regex: (.+);(.+);0;(.*)
+              replacement: ${1}://${2}/${4}
+              target_label: __param_target
+            - source_labels:
+                - __meta_consul_service_metadata_scheme
+                - __meta_consul_service_metadata_address
+                - __meta_consul_service_port
+                - __meta_consul_service_metadata_health_check_path
               regex: (.+);(.+);(.+);(.*)
               replacement: ${1}://${2}:${3}/${4}
               target_label: __param_target
@@ -79,7 +87,13 @@ prometheus:
             - source_labels:
                 - __meta_consul_service_metadata_address
                 - __meta_consul_service_port
-              regex: (.+);(.+)
+              regex: (.+);0
+              replacement: ${1}
+              target_label: __address__
+            - source_labels:
+                - __meta_consul_service_metadata_address
+                - __meta_consul_service_port
+              regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
             - source_labels: ["__meta_consul_service_metadata_metrics_path"]
@@ -113,7 +127,13 @@ prometheus:
             - source_labels:
                 - __meta_consul_service_metadata_address
                 - __meta_consul_service_port
-              regex: (.+);(.+)
+              regex: (.+);0
+              replacement: ${1}
+              target_label: __address__
+            - source_labels:
+                - __meta_consul_service_metadata_address
+                - __meta_consul_service_port
+              regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
             - source_labels: ["__meta_consul_service_metadata_metrics_path"]
@@ -145,7 +165,13 @@ prometheus:
             - source_labels:
                 - __meta_consul_service_metadata_address
                 - __meta_consul_service_port
-              regex: (.+);(.+)
+              regex: (.+);0
+              replacement: ${1}
+              target_label: __address__
+            - source_labels:
+                - __meta_consul_service_metadata_address
+                - __meta_consul_service_port
+              regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
             - source_labels: ["__meta_consul_service_metadata_metrics_path"]
