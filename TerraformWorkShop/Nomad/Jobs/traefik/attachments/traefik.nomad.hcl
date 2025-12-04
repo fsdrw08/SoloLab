@@ -57,17 +57,17 @@ job "traefik" {
         "exporter",
 
         "traefik.enable=true",
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard-redirect.entryPoints=web",
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard-redirect.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard-redirect.middlewares=toHttps@file",
+        "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.entryPoints=web",
+        "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
+        "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
 
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.entryPoints=webSecure",
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
-        "traefik.http.routers.traefik-${attr.unique.hostname}-dashboard.tls.certresolver=internal",
+        "traefik.http.routers.traefik-${attr.unique.hostname}.entryPoints=webSecure",
+        "traefik.http.routers.traefik-${attr.unique.hostname}.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
+        "traefik.http.routers.traefik-${attr.unique.hostname}.tls.certresolver=internal",
 
-        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.scheme=https",
-        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadbalancer.server.port=443",
-        "traefik.http.services.traefik-${attr.unique.hostname}-dashboard.loadBalancer.serversTransport=consul-service@file",
+        "traefik.http.services.traefik-${attr.unique.hostname}.loadbalancer.server.scheme=https",
+        "traefik.http.services.traefik-${attr.unique.hostname}.loadbalancer.server.port=443",
+        "traefik.http.services.traefik-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
       ]
 
     }
@@ -89,13 +89,13 @@ job "traefik" {
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
-          "traefik.http.routers.dashboard-redirect.rule"        = "Host(`traefik.${attr.unique.hostname}.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard-redirect.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.dashboard-redirect.service"     = "api@internal"
 
           "traefik.http.routers.dashboard.entryPoints" = "webSecure"
           "traefik.http.routers.dashboard.tls"         = "true"
-          "traefik.http.routers.dashboard.rule"        = "Host(`traefik.${attr.unique.hostname}.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard.service"     = "api@internal"
           "traefik.http.routers.dashboard.middlewares" = "userPass@file"
 
@@ -104,7 +104,7 @@ job "traefik" {
 
           "traefik.http.routers.metrics.entryPoints" = "webSecure"
           "traefik.http.routers.metrics.tls"         = "true"
-          "traefik.http.routers.metrics.rule"        = "Host(`traefik-${attr.unique.hostname}.sololab`) && PathPrefix(`/metrics`)"
+          "traefik.http.routers.metrics.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && PathPrefix(`/metrics`)"
           "traefik.http.routers.metrics.service"     = "prometheus@internal"
         }
         network_mode = "host"
