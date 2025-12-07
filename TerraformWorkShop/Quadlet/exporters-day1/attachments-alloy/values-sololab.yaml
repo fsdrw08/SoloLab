@@ -65,19 +65,15 @@ alloy:
           rule.0:
             source_labels:
               - '"__journal__systemd_unit"'
-            target_label: '"systemd_unit"'
+            target_label: '"service_name"'
           rule.1:
             source_labels:
               - '"__journal__systemd_user_unit"'
-            target_label: '"systemd_user_unit"'
+            target_label: '"service_name"'
           rule.2:
             source_labels:
               - '"__journal__hostname"'
-            target_label: '"systemd_hostname"'
-          rule.3:
-            source_labels:
-              - '"__journal__transport"'
-            target_label: '"systemd_transport"'
+            target_label: '"host"'
       - component: loki.write
         label: loki
         attributes:

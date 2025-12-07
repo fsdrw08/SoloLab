@@ -55,6 +55,7 @@ job "traefik" {
 
       tags = [
         "exporter",
+        "log",
 
         "traefik.enable=true",
         "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.entryPoints=web",
