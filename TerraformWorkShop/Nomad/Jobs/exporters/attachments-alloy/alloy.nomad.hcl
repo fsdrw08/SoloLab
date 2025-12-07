@@ -17,7 +17,6 @@ job "alloy" {
   }
 
   group "alloy" {
-
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "alloy" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
@@ -38,16 +37,16 @@ job "alloy" {
         }
 
         tags = [
-          "exporter",
+          "log",
 
           "traefik.enable=true",
           "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.entryPoints=web",
-          "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.rule=Host(`alloy.day2.sololab`)",
+          "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))",
           "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.alloy-${attr.unique.hostname}.entryPoints=webSecure",
-          "traefik.http.routers.alloy-${attr.unique.hostname}.rule=Host(`alloy.day2.sololab`)",
-          "traefik.http.routers.alloy-${attr.unique.hostname}.tls.certresolver=internal",
+          "traefik.http.routers.alloy-${attr.unique.hostname}.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.alloy-${attr.unique.hostname}.tls=true",
 
           "traefik.http.services.alloy-${attr.unique.hostname}.loadbalancer.server.scheme=https",
           "traefik.http.services.alloy-${attr.unique.hostname}.loadbalancer.server.port=443",
@@ -55,15 +54,16 @@ job "alloy" {
         ]
       }
 
-      driver = "podman"
+      user = "root"
 
-      user = "473:473"
+      driver = "podman"
       config {
+        network_mode = "host"
         image = "zot.day0.sololab/grafana/alloy:v1.11.3"
         args = [
           "run",
           "/etc/alloy/config.alloy",
-          "--server.http.listen-addr=0.0.0.0:12345",
+          "--server.http.listen-addr=127.0.0.1:12345",
           "--storage.path=${NOMAD_ALLOC_DIR}/data",
         ]
         labels = {
@@ -88,6 +88,7 @@ job "alloy" {
         volumes = [
           "local/config.alloy:/etc/alloy/config.alloy",
           "/var/lib/nomad/alloc:/var/lib/nomad/alloc:ro",
+          "/:/host:ro,rslave",
         ]
 
       }

@@ -45,12 +45,12 @@ job "prometheus-podman-exporter" {
 
           "traefik.enable=true",
           "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}-redirect.entryPoints=web",
-          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}-redirect.rule=Host(`prometheus-podman-exporter.day2.sololab`)",
+          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}-redirect.rule=(Host(`prometheus-podman-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-podman-exporter-${attr.unique.hostname}.service.consul`))",
           "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}.entryPoints=webSecure",
-          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}.rule=Host(`prometheus-podman-exporter.day2.sololab`)",
-          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}.tls.certresolver=internal",
+          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}.rule=(Host(`prometheus-podman-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-podman-exporter-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.prometheus-podman-exporter-${attr.unique.hostname}.tls=true",
 
           "traefik.http.services.prometheus-podman-exporter-${attr.unique.hostname}.loadbalancer.server.scheme=https",
           "traefik.http.services.prometheus-podman-exporter-${attr.unique.hostname}.loadbalancer.server.port=443",
