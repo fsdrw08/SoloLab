@@ -112,6 +112,12 @@ storage:
             }
           }
 
+          plugin "raw_exec" {
+            config {
+              enabled = true
+            }
+          }
+
           plugin_dir = "/opt/bin"
 
           vault {

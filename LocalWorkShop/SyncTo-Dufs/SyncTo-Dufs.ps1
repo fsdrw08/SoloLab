@@ -108,7 +108,7 @@ if ($Download) {
             switch ($_.type) {
                 "general" { 
                     Write-Host "Download $fullUri to $localPath"
-                    curl.exe --output $localPath $fullUri
+                    curl.exe --output $localPath --location $fullUri
                 }
                 "vault-kvv2" {
                     if ($VaultToken -ne "") {

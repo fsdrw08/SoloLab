@@ -94,8 +94,8 @@ podman_quadlet = {
             yaml          = "traefik-aio.yaml"
             KubeDownForce = "false"
             # service
-            ExecStartPreVault  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration\""
-            ExecStartPreConsul = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services\""
+            ExecStartPreVault  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://vault.day0.sololab/v1/identity/oidc/.well-known/openid-configuration\""
+            ExecStartPreConsul = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://consul.service.consul:8501/v1/catalog/services\""
             ExecStartPost      = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
             Restart            = "no"
           }
