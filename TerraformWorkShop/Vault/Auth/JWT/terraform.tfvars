@@ -8,4 +8,5 @@ jwt_auth_path  = "jwt-nomad"
 nomad_jwks_url = "https://nomad.day1.sololab/.well-known/jwks.json"
 policy_names = [
   "cert-read",
+  "pgsql-read",
 ]

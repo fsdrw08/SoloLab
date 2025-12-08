@@ -35,6 +35,13 @@
         "description": "https://quay.io/repository/enterprisedb/pgbouncer?tab=tags",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "cloudnative-pg/pgbouncer:1.25.1",
+        "archive": "ghcr.io_cloudnative-pg_pgbouncer_1.25.1.tar",
+        "privateRepo": "cloudnative-pg/pgbouncer:1.25.1",
+        "description": "https://github.com/cloudnative-pg/pgbouncer-containers/pkgs/container/pgbouncer",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "fedora/postgresql-16:20251203",
         "archive": "quay.io_fedora_postgresql-16_20251203.tar",

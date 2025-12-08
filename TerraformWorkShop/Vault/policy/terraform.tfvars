@@ -240,5 +240,25 @@ policy_bindings = [
       display_name = "cert-read"
       no_parent    = true
     }
+  },
+  {
+    policy_name    = "pgsql-read"
+    policy_content = <<-EOT
+      path "kvv2_pgsql/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_pgsql/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_pgsql/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
+    token_binding = {
+      display_name = "pgsql-read"
+      no_parent    = true
+    }
   }
 ]
