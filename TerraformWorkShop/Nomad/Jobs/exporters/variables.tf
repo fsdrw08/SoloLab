@@ -5,14 +5,6 @@ variable "prov_nomad" {
   })
 }
 
-# variable "prov_vault" {
-#   type = object({
-#     address         = string
-#     token           = string
-#     skip_tls_verify = bool
-#   })
-# }
-
 variable "jobs" {
   type = list(object({
     path = string

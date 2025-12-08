@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/nomad"
       version = ">= 2.5.1"
     }
-    # vault = {
-    #   source  = "hashicorp/vault"
-    #   version = ">= 5.4.0"
-    # }
   }
   backend "consul" {
     address = "consul.day1.sololab"
@@ -21,10 +17,4 @@ provider "nomad" {
   skip_verify = var.prov_nomad.skip_verify
   # secret_id   = var.NOMAD_TOKEN
   # $env:NOMAD_TOKEN="xxxx"
-}
-
-provider "vault" {
-  address         = var.prov_vault.address
-  token           = var.prov_vault.token
-  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
