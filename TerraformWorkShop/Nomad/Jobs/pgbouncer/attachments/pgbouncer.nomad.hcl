@@ -12,8 +12,8 @@ job "pgbouncer" {
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    operator  = "!="
-    value     = "day1"
+    operator  = "="
+    value     = "day2"
   }
 
   group "pgbouncer" {
@@ -41,6 +41,12 @@ job "pgbouncer" {
         tags = [
           "log",
         ]
+
+        # meta {
+        #   # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
+        #   "NOMAD_JOB_NAME" = "${NOMAD_JOB_NAME}"
+        #   "NOMAD_ALLOC_ID" = "${NOMAD_ALLOC_ID}"
+        # }
       }
 
       user = "996:996"
@@ -49,7 +55,9 @@ job "pgbouncer" {
       config {
         image = "zot.day0.sololab/cloudnative-pg/pgbouncer:1.25.1"
 
-        hostname = "${attr.unique.hostname}"
+        ports = [
+          "pgbouncer",
+        ]
 
         volumes = [
           "local/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini",
@@ -71,8 +79,10 @@ job "pgbouncer" {
       }
 
       template {
-        data        = var.pgbouncer_config
-        destination = "local/pgbouncer.ini"
+        data          = var.pgbouncer_config
+        destination   = "local/pgbouncer.ini"
+        change_mode   = "signal"
+        change_signal = "SIGHUP"
       }
 
       template {

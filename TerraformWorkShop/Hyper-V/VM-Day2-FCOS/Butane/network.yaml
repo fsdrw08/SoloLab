@@ -1,7 +1,33 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
-# variant: fcos
-# version: 1.5.0
-# storage:
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    # enable dns resolution for podman default network
+    # ref: https://github.com/containers/podman/blob/main/docs/tutorials/basic_networking.md#default-network
+    - path: /etc/containers/networks/podman.json
+      mode: 0600
+      contents:
+        inline: |
+          {
+            "name": "podman",
+            "id": "2f259bab93aaaaa2542ba43ef33eb990d0999ee1b9924b557b7be53c0b7a1bb9",
+            "driver": "bridge",
+            "network_interface": "podman0",
+            "subnets": [
+              {
+                "subnet": "10.88.0.0/16",
+                "gateway": "10.88.0.1"
+              }
+            ],
+            "ipv6_enabled": false,
+            "internal": false,
+            "dns_enabled": true,
+            "ipam_options": {
+              "driver": "host-local"
+            }
+          }
+
 #   directories:
 #     - path: /etc/systemd/resolved.conf.d
 #   files:
