@@ -2,9 +2,26 @@
     {
         "type": "general",
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "consul/1.22.0/consul_1.22.0_linux_amd64.zip",
-        "archive": "consul_1.22.0_linux_amd64.zip",
-        "privateRepo": "public/binaries/consul_1.22.0_linux_amd64.zip",
+        "publicRepo": "nomad/1.11.1/nomad_1.11.1_linux_amd64.zip",
+        "archive": "nomad_1.11.1_linux_amd64.zip",
+        "privateRepo": "public/binaries/nomad_1.11.1_linux_amd64.zip",
+        "description": "https://releases.hashicorp.com/nomad",
+    },
+    {
+        // https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
+        "type": "general",
+        "publicRegistry": "https://releases.hashicorp.com",
+        "publicRepo": "nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip",
+        "archive": "nomad-driver-podman_0.6.3_linux_amd64.zip",
+        "privateRepo": "public/binaries/nomad-driver-podman_0.6.3_linux_amd64.zip",
+        "description": "https://releases.hashicorp.com/nomad-driver-podman/",
+    },
+    {
+        "type": "general",
+        "publicRegistry": "https://releases.hashicorp.com",
+        "publicRepo": "consul/1.22.1/consul_1.22.1_linux_amd64.zip",
+        "archive": "consul_1.22.1_linux_amd64.zip",
+        "privateRepo": "public/binaries/consul_1.22.1_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/consul",
     },
     {

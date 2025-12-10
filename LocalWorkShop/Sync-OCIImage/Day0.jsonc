@@ -77,6 +77,13 @@
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "apteno/alpine-jq:2025-11-23",
+        "archive": "docker.io_apteno_alpine-jq_2025-11-23.tar",
+        "privateRepo": "apteno/alpine-jq:latest",
+        "description": "https://hub.docker.com/r/apteno/alpine-jq/tags",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "minio/minio:RELEASE.2025-04-22T22-12-26Z",
         "archive": "quay.io_minio_minio_RELEASE.2025-04-22T22-12-26Z.tar",

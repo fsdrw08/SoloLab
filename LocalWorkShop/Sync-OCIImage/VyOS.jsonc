@@ -1,10 +1,10 @@
 [
     {
-        "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.10",
-        "archive": "quay.io_giantswarm_zot-v2.1.10.tar",
-        "privateRepo": "giantswarm/zot:v2.1.10",
-        "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "project-zot/zot-linux-amd64:v2.1.11",
+        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.11.tar",
+        "privateRepo": "project-zot/zot-linux-amd64:v2.1.11",
+        "description": "https://quay.io/repository/giantswarm/zot?tab=tags, https://github.com/project-zot/zot/pkgs/container/zot-linux-amd64",
     },
     {
         "publicRegistry": "docker.io",
@@ -43,9 +43,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.22.0",
-        "archive": "docker.io_hashicorp_consul_1.22.0.tar",
-        "privateRepo": "hashicorp/consul:1.22.0",
+        "publicRepo": "hashicorp/consul:1.22.1",
+        "archive": "docker.io_hashicorp_consul_1.22.1.tar",
+        "privateRepo": "hashicorp/consul:1.22.1",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
 ]

@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.22.0",
-        "archive": "docker.io_hashicorp_consul_1.22.0.tar",
-        "privateRepo": "hashicorp/consul:1.22.0",
+        "publicRepo": "hashicorp/consul:1.22.1",
+        "archive": "docker.io_hashicorp_consul_1.22.1.tar",
+        "privateRepo": "hashicorp/consul:1.22.1",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
@@ -36,9 +36,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "multani/nomad:1.11.0",
-        "archive": "docker.io_multani_nomad_1.11.0.tar",
-        "privateRepo": "multani/nomad:1.11.0",
+        "publicRepo": "multani/nomad:1.11.1",
+        "archive": "docker.io_multani_nomad_1.11.1.tar",
+        "privateRepo": "multani/nomad:1.11.1",
         "description": "https://hub.docker.com/r/multani/nomad/tags",
     },
     {

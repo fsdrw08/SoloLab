@@ -108,9 +108,9 @@ module "vyos_container" {
   workloads = [
     {
       name  = "zot"
-      image = "quay.io/giantswarm/zot-linux-amd64:v2.1.10"
+      image = "ghcr.io/project-zot/zot-linux-amd64:v2.1.11"
       # image       = "192.168.255.10:5000/giantswarm/zot:v2.1.10"
-      local_image = "/mnt/data/offline/images/quay.io_giantswarm_zot-linux-amd64_v2.1.10.tar"
+      local_image = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.1.11.tar"
       pull_flag   = "--tls-verify=false"
       others = {
         "uid"                  = var.owner.uid

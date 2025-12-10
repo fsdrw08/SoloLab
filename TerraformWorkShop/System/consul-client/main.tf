@@ -75,7 +75,7 @@ module "config_map" {
 #     {
 #       # https://releases.hashicorp.com/consul/
 #       zip_file_source = "http://sws.infra.sololab:4080/releases/consul%5F1.18.0%5Flinux%5Famd64.zip"
-#       zip_file_path   = "/var/home/podmgr/nomad_1.11.0_linux_amd64.zip"
+#       zip_file_path   = "/var/home/podmgr/nomad_1.11.1_linux_amd64.zip"
 #       bin_file_name   = "consul"
 #       bin_file_dir    = "${var.bin_dir}"
 #     }

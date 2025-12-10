@@ -108,7 +108,7 @@ consul:
 
   ## @param consul.args Override default container args (useful when using custom images)
   ## ref: https://blog.christophersmart.com/2021/01/31/podman-volumes-and-selinux/
-  ## ref: https://github.com/hashicorp/consul/blob/v1.22.0/.release/docker/docker-entrypoint.sh#L70-L85
+  ## ref: https://github.com/hashicorp/consul/blob/v1.22.1/.release/docker/docker-entrypoint.sh#L70-L85
   args:
     - agent
     - -config-dir=/consul/services

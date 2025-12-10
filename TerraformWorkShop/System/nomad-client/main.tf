@@ -61,8 +61,8 @@ module "nomad" {
   }
   install = [
     {
-      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad_1.11.0_linux_amd64.zip"
-      zip_file_path   = "/var/home/core/nomad_1.11.0_linux_amd64.zip"
+      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad_1.11.1_linux_amd64.zip"
+      zip_file_path   = "/var/home/core/nomad_1.11.1_linux_amd64.zip"
       bin_file_name   = "nomad"
       bin_file_dir    = "/var/home/core/.local/bin"
     },
