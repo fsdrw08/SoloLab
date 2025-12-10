@@ -17,6 +17,14 @@ resource "minio_iam_user" "users" {
   name = each.value.name
 }
 
+resource "random_password" "access_key" {
+  for_each = {
+    for user in var.users : user.name => user
+    if !user.hardcoded_credential
+  }
+  length = 10
+}
+
 resource "random_password" "secret_key" {
   for_each = {
     for user in var.users : user.name => user
@@ -31,7 +39,7 @@ resource "minio_accesskey" "users" {
     for user in var.users : user.name => user
   }
   user               = minio_iam_user.users[each.value.name].name
-  access_key         = each.value.access_key
+  access_key         = each.value.hardcoded_credential ? each.value.access_key : random_password.access_key[each.value.name].result
   secret_key         = each.value.hardcoded_credential ? each.value.secret_key : random_password.secret_key[each.value.name].result
   secret_key_version = each.value.hardcoded_credential ? each.value.secret_key_version : sha256(random_password.secret_key[each.value.name].result)
 }
