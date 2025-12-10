@@ -81,10 +81,10 @@ coredns:
           parameters: node.consul 192.168.255.20
         - name: forward
           parameters: service.consul 192.168.255.20
-        - name: forward
-          parameters: consul 192.168.255.20
-        - name: forward
-          parameters: . 192.168.255.20
+        # - name: forward
+        #   parameters: consul 192.168.255.20
+        # - name: forward
+        #   parameters: . 192.168.255.20
   # zoneFiles:
   #   - filename: day0.sololab.db
   #     domain: day0.sololab
