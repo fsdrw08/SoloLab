@@ -1,7 +1,6 @@
+global:
+  imageRegistry: zot.vyos.sololab
 zot:
-  image:
-    registry: zot.vyos.sololab
-    repository: giantswarm/zot
   resourcesPreset: small
   config:
     # https://zotregistry.dev/v2.1.10/admin-guide/admin-configuration/#extensions
