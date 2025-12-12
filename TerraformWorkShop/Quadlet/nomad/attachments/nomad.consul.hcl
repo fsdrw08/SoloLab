@@ -10,7 +10,7 @@ services {
       name            = "nomad-https-check"
       http            = "https://localhost:4646/v1/status/leader"
       tls_skip_verify = true
-      interval        = "300s"
+      interval        = "30s"
       timeout         = "2s"
       status          = "passing"
     }
