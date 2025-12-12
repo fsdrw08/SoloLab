@@ -86,13 +86,16 @@ job "pgbouncer" {
       }
 
       template {
+        # https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#secrets
         data          = <<-EOF
-          "pgbounder" \"{{ "P@ssw0rd" | md5sum }}\"
-          {{- range secrets "kvv2_pgsql/metadata/" -}}
-          {{- with secret (printf "kvv2_pgsql/data/%s" .) -}}
+          "pgbounder" "{{ "P@ssw0rd" | md5sum }}"
+          {{- range secrets "kvv2_pgsql/" }}
+          {{- with secret (printf "kvv2_pgsql/%s" .) }}
+          {{- if and .Data.data.username .Data.data.password }}
           "{{ .Data.data.username }}" "{{ .Data.data.password | md5sum }}"
-          {{- end -}}
-          {{- end -}}
+          {{- end }}
+          {{- end }}
+          {{- end }}
         EOF
         destination   = "secrets/userlist.txt"
         change_mode   = "signal"
