@@ -74,12 +74,14 @@ butane = {
       "password_hash_1001"       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
       "ssh_authorized_keys_1001" = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
       "root_ca_url"              = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
+      "fcos_image_mirror"        = "zot.day0.sololab/fedora/fedora-coreos"
+      "fcos_rebase_mirror"       = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
+      # consul client
+      "consul_download_url" = "http://dufs.day0.sololab/public/binaries/consul_1.22.1_linux_amd64.zip"
+      "consul_version"      = "1.22.1"
+      "consul_server_fqdn"  = "consul.service.consul"
+      "consul_data_dir"     = "/var/mnt/data/consul"
       # nomad client
-      "fcos_image_mirror"                   = "zot.day0.sololab/fedora/fedora-coreos"
-      "fcos_rebase_mirror"                  = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
-      "consul_download_url"                 = "http://dufs.day0.sololab/public/binaries/consul_1.22.1_linux_amd64.zip"
-      "consul_version"                      = "1.22.1"
-      "consul_server_fqdn"                  = "consul.service.consul"
       "nomad_download_url"                  = "http://dufs.day0.sololab/public/binaries/nomad_1.11.1_linux_amd64.zip"
       "nomad_version"                       = "1.11.1"
       "nomad_server_fqdn"                   = "nomad.service.consul"
@@ -88,6 +90,7 @@ butane = {
       "nomad_client_cert_download_url"      = "http://dufs.day0.sololab/private/certs/client.global.nomad.crt"
       "nomad_client_cert_key_download_url"  = "http://dufs.day0.sololab/private/certs/client.global.nomad.key"
       "nomad_client_cert_download_url_cred" = "YWRtaW46YWRtaW4="
+      "nomad_data_dir"                      = "/var/mnt/data/nomad"
       "vault_server_address"                = "https://vault.day0.sololab"
     }
     local = [
