@@ -8,6 +8,14 @@ variable "prov_nomad" {
 variable "dynamic_host_volumes" {
   type = list(object({
     name = string
+    constraint = optional(
+      list(object({
+        attribute = string
+        operator  = string
+        value     = string
+      })),
+      null
+    )
     capability = object({
       access_mode = optional(string, "single-node-writer")
     })

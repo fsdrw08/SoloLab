@@ -3,38 +3,58 @@ prov_nomad = {
   skip_verify = true
 }
 
-# dynamic_host_volumes = [
-#   {
-#     name = "traefik"
-#     capability = {
-#       access_mode = "single-node-writer"
-#     }
-#   }
-# ]
-
-csi_volumes = [
+dynamic_host_volumes = [
   {
-    name      = "nomad-grafana-data"
-    plugin_id = "nfs"
-    volume_id = "grafana-data"
-    capabilities = [
+    name = "test"
+    constraint = [
       {
-        access_mode     = "multi-node-multi-writer"
-        attachment_mode = "file-system"
-      },
-      {
-        access_mode     = "single-node-writer"
-        attachment_mode = "file-system"
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day2"
       }
     ]
-    parameters = {
-      server           = "192.168.255.10"
-      share            = "/"
-      mountPermissions = "777"
+    capability = {
+      access_mode = "single-node-writer"
     }
-    mount_options = {
-      fs_type = "nfs"
+  },
+  {
+    name = "gitea-db"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day2"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
     }
   }
 ]
+
+# csi_volumes = [
+#   {
+#     name      = "nomad-grafana-data"
+#     plugin_id = "nfs"
+#     volume_id = "grafana-data"
+#     capabilities = [
+#       {
+#         access_mode     = "multi-node-multi-writer"
+#         attachment_mode = "file-system"
+#       },
+#       {
+#         access_mode     = "single-node-writer"
+#         attachment_mode = "file-system"
+#       }
+#     ]
+#     parameters = {
+#       server           = "192.168.255.10"
+#       share            = "/"
+#       mountPermissions = "777"
+#     }
+#     mount_options = {
+#       fs_type = "nfs"
+#     }
+#   }
+# ]
 

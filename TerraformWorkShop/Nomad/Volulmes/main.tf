@@ -6,6 +6,15 @@ resource "nomad_dynamic_host_volume" "volumes" {
   name      = each.value.name
   plugin_id = "mkdir"
 
+  dynamic "constraint" {
+    for_each = each.value.constraint == null ? [] : flatten([each.value.constraint])
+    content {
+      attribute = constraint.value.attribute
+      operator  = constraint.value.operator
+      value     = constraint.value.value
+    }
+  }
+
   # https://developer.hashicorp.com/nomad/docs/other-specifications/volume/capability#parameters
   capability {
     access_mode     = each.value.capability.access_mode

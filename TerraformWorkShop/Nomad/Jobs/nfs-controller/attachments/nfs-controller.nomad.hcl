@@ -6,11 +6,20 @@ job "nfs-controller" {
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value     = "day1"
+    operator  = "="
+    value     = "day2"
   }
 
   group "nfs-controller" {
     task "plugin" {
+      service {
+        provider     = "consul"
+        name         = "nfs-controller"
+        tags = [
+          "log",
+        ]
+      }
+      
       driver = "podman"
 
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
