@@ -79,8 +79,8 @@ podman_quadlet = {
             # unit
             Description           = "Traefik Proxy"
             Documentation         = "https://docs.traefik.io"
-            After                 = ""
-            Wants                 = ""
+            After                 = "podman.socket"
+            Wants                 = "podman.socket"
             StartLimitIntervalSec = 120
             StartLimitBurst       = 5
             Before                = "umount.target"
