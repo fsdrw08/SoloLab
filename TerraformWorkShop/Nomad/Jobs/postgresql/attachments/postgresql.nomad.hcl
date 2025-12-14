@@ -53,11 +53,24 @@ job "postgresql" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        POSTGRESQL_USER = "test"
-        POSTGRESQL_PASSWORD = "test"
         POSTGRESQL_DATABASE = "test"
         POSTGRESQL_ADMIN_PASSWORD = "P@ssw0rd"
       }
+
+      template {
+        data = <<-EOH
+        # Lines starting with a # are ignored
+
+        # Empty lines are also ignored
+        POSTGRESQL_USER="{{with secret "kvv2_pgsql/data/test"}}"{{.Data.data.username}}"{{end}}
+        POSTGRESQL_PASSWORD="{{with secret "kvv2_pgsql/data/test"}}"{{.Data.data.password}}"{{end}}
+        POSTGRESQL_ADMIN_PASSWORD="{{secret "service/postgresql/admin-password"}}"
+        EOH
+
+        destination = "secrets/file.env"
+        env         = true
+      }
+
 
       resources {
         # Specifies the CPU required to run this task in MHz

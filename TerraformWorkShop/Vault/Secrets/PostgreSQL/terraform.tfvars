@@ -8,7 +8,8 @@ mount = "kvv2_pgsql"
 
 databases = [
   {
-    "name"     = "test"
-    "username" = "test"
-  }
+    name           = "test"
+    user_name      = "test"
+    secret_version = 1
+  },
 ]

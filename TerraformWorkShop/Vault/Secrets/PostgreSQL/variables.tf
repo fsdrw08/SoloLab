@@ -12,7 +12,8 @@ variable "mount" {
 
 variable "databases" {
   type = list(object({
-    name     = string
-    username = string
+    name           = string
+    user_name      = string
+    secret_version = number
   }))
 }

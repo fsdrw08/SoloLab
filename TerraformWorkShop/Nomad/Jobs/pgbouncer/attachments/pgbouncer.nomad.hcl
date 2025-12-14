@@ -91,8 +91,8 @@ job "pgbouncer" {
           "pgbounder" "{{ "P@ssw0rd" | md5sum }}"
           {{- range secrets "kvv2_pgsql/" }}
           {{- with secret (printf "kvv2_pgsql/%s" .) }}
-          {{- if and .Data.data.username .Data.data.password }}
-          "{{ .Data.data.username }}" "{{ .Data.data.password | md5sum }}"
+          {{- if and .Data.data.user_name .Data.data.user_password }}
+          "{{ .Data.data.user_name }}" "{{ .Data.data.user_password | md5sum }}"
           {{- end }}
           {{- end }}
           {{- end }}
