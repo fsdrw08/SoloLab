@@ -49,11 +49,11 @@
         "description": "https://hub.docker.com/r/lldap/lldap/tags",
     },
     {
-        "publicRegistry": "quay.io",
-        "publicRepo": "giantswarm/zot:v2.1.10",
-        "archive": "quay.io_giantswarm_zot-v2.1.10.tar",
-        "privateRepo": "giantswarm/zot:v2.1.10",
-        "description": "https://quay.io/repository/giantswarm/zot?tab=tags",
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "project-zot/zot-linux-amd64:v2.1.11",
+        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.11.tar",
+        "privateRepo": "project-zot/zot-linux-amd64:v2.1.11",
+        "description": "https://github.com/project-zot/zot/pkgs/container/zot-linux-amd64, https://quay.io/repository/giantswarm/zot-linux-amd64?tab=tags",
     },
     {
         "publicRegistry": "ghcr.io",
