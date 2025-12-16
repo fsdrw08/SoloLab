@@ -129,6 +129,7 @@ storage:
 
 systemd:
   units:
+    # https://github.com/containers/podman/blob/03bb9aa2e851d58d1fc0aec808bcffc2b95848be/docs/tutorials/basic_networking.md#default-network
     - name: enable-podname-network-dns.service
       enabled: true
       contents: |
