@@ -129,6 +129,17 @@ storage:
 
 systemd:
   units:
+    - name: enable-podname-network-dns.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable Podman to use CoreDNS for container DNS resolution
+        After=network-online.target
+        Wants=network-online.target
+        Before=nomad.service
+
+        [Service]
+        ExecStart=/bin/bash -c "/usr/bin/podman network inspect podman | jq '.[] | del(.containers) | .dns_enabled = true' > /etc/containers/networks/podman.json"
     - name: prepare-nomad-binary.service
       enabled: true
       contents: |
