@@ -16,6 +16,11 @@ dynamic_host_volumes = [
     capability = {
       access_mode = "single-node-writer"
     }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 26
+      gid = 26
+    }
   },
   {
     name = "gitea-db"
@@ -28,6 +33,11 @@ dynamic_host_volumes = [
     ]
     capability = {
       access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 26
+      gid = 26
     }
   }
 ]

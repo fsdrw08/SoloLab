@@ -19,6 +19,8 @@ variable "dynamic_host_volumes" {
     capability = object({
       access_mode = optional(string, "single-node-writer")
     })
+    plugin_id  = optional(string, "mkdir")
+    parameters = optional(map(string), null)
   }))
   default = []
 }

@@ -3,8 +3,9 @@ resource "nomad_dynamic_host_volume" "volumes" {
     for volume in var.dynamic_host_volumes : volume.name => volume
     if var.dynamic_host_volumes != []
   }
-  name      = each.value.name
-  plugin_id = "mkdir"
+  name       = each.value.name
+  plugin_id  = each.value.plugin_id
+  parameters = each.value.parameters
 
   dynamic "constraint" {
     for_each = each.value.constraint == null ? [] : flatten([each.value.constraint])
