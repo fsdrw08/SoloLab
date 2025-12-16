@@ -37,8 +37,8 @@ job "postgresql" {
 
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
-          "dbName" = "test"
-          "dbConfig" = "host=${NOMAD_ALLOC_ID}-${NOMAD_ALLOC_ID} user=test"
+          dbName   = "test"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test"
         }
       }
 
@@ -46,15 +46,12 @@ job "postgresql" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/sclorg/postgresql-16-c10s:20250912"
-
-        userns = "keep-id:uid=26,gid=26"
+        image = "zot.day0.sololab/fedora/postgresql-16:20251203"
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
         POSTGRESQL_DATABASE = "test"
-        POSTGRESQL_ADMIN_PASSWORD = "P@ssw0rd"
       }
 
       template {
@@ -62,15 +59,15 @@ job "postgresql" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER="{{with secret "kvv2_pgsql/data/test"}}"{{.Data.data.username}}"{{end}}
-        POSTGRESQL_PASSWORD="{{with secret "kvv2_pgsql/data/test"}}"{{.Data.data.password}}"{{end}}
-        POSTGRESQL_ADMIN_PASSWORD="{{secret "service/postgresql/admin-password"}}"
+        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"
         env         = true
       }
-
+      vault {}
 
       resources {
         # Specifies the CPU required to run this task in MHz
@@ -81,8 +78,9 @@ job "postgresql" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
-        volume      = "test"
-        destination = "/var/lib/pgsql/data"
+        volume        = "test"
+        destination   = "/var/lib/pgsql/data"
+        selinux_label = "Z"
       }
     }
     volume "test" {
