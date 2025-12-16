@@ -134,9 +134,9 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Enable Podman to use CoreDNS for container DNS resolution
-        After=network-online.target
-        Wants=network-online.target
+        Description=Enable Podman default network DNS resolution
+        After=podman.service
+        Wants=podman.service
         Before=nomad.service
 
         [Service]
