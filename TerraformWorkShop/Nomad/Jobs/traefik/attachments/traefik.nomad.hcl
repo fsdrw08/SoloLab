@@ -114,13 +114,21 @@ job "traefik" {
           "label=type:spc_t",
         ]
 
+        # https://github.com/traefik/traefik/blob/v3.6.2/Dockerfile
+        # https://doc.traefik.io/traefik/reference/install-configuration/boot-environment/#configuration-file
+        command = "--configFile=/local/install/install.traefik.yaml"
+
+        # in order to make template file content able to refresh in container environment,
+        # use dir path which provide by nomad (/local, /secrets)
+        # workload can only access templates rendered into the NOMAD_ALLOC_DIR, NOMAD_TASK_DIR, or NOMAD_SECRETS_DIR.
+        # https://developer.hashicorp.com/nomad/docs/job-specification/template#template-destinations
         volumes = [
           "local/hosts:/etc/hosts",
-          "local/install.traefik.yaml:/etc/traefik/traefik.yml",
-          "local/routing.traefik.yaml:/etc/traefik/dynamic/routing.yml",
-          "secrets/ca.crt:/etc/traefik/tls/ca.crt",
-          "secrets/consul.crt:/etc/traefik/tls/consul.crt",
-          "secrets/consul.key:/etc/traefik/tls/consul.key",
+          # "local/install.traefik.yaml:/etc/traefik/traefik.yml",
+          # "local/routing.traefik.yaml:/etc/traefik/dynamic/routing.yml",
+          # "secrets/ca.crt:/etc/traefik/tls/ca.crt",
+          # "secrets/consul.crt:/etc/traefik/tls/consul.crt",
+          # "secrets/consul.key:/etc/traefik/tls/consul.key",
           "/run/podman/podman.sock:/var/run/docker.sock"
         ]
       }
@@ -129,7 +137,8 @@ job "traefik" {
       env {
         TZ = "Asia/Shanghai"
         # https://doc.traefik.io/traefik/https/acme/#casystemcertpool
-        LEGO_CA_CERTIFICATES     = "/etc/traefik/tls/ca.crt"
+        # LEGO_CA_CERTIFICATES     = "/etc/traefik/tls/ca.crt"
+        LEGO_CA_CERTIFICATES     = "/secrets/tls/ca.crt"
         LEGO_CA_SYSTEM_CERT_POOL = "true"
       }
 
@@ -143,12 +152,12 @@ job "traefik" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
         data        = var.install_config
-        destination = "local/install.traefik.yaml"
+        destination = "local/install/install.traefik.yaml"
       }
 
       template {
         data        = var.routing_config
-        destination = "local/routing.traefik.yaml"
+        destination = "local/routing/routing.traefik.yaml"
       }
 
       template {
@@ -163,7 +172,7 @@ job "traefik" {
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.ca }}{{ end }}
         EOF
-        destination = "secrets/ca.crt"
+        destination = "secrets/tls/ca.crt"
         change_mode = "restart"
       }
 
@@ -171,7 +180,7 @@ job "traefik" {
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.cert }}{{ end }}
         EOF
-        destination = "secrets/consul.crt"
+        destination = "secrets/tls/consul.crt"
         change_mode = "restart"
       }
 
@@ -179,7 +188,7 @@ job "traefik" {
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.private_key }}{{ end }}
         EOF
-        destination = "secrets/consul.key"
+        destination = "secrets/tls/consul.key"
         change_mode = "restart"
       }
 

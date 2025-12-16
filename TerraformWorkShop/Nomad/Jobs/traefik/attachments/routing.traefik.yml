@@ -11,5 +11,5 @@ http:
 
 tls:
   certificates:
-    - certFile: /etc/traefik/tls/consul.crt
-      keyFile: /etc/traefik/tls/consul.key
+    - certFile: /secrets/tls/consul.crt
+      keyFile: /secrets/tls/consul.key

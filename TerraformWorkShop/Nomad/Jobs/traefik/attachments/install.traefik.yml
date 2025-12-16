@@ -47,9 +47,9 @@ providers:
     exposedByDefault: false
     useBindPortIP: false
   file:
-    directory: /etc/traefik/dynamic
+    directory: /local/routing
     watch: true
 serversTransport:
   insecureSkipVerify: false
   rootCAs:
-    - /etc/traefik/tls/ca.crt
+    - /secrets/tls/ca.crt
