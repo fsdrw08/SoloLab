@@ -53,16 +53,15 @@ job "pgbouncer" {
 
       driver = "podman"
       config {
+        # https://github.com/cloudnative-pg/pgbouncer-containers/blob/main/entrypoint.sh
         image = "zot.day0.sololab/cloudnative-pg/pgbouncer:1.25.1"
 
         ports = [
           "pgbouncer",
         ]
 
-        volumes = [
-          "local/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini",
-          "secrets/userlist.txt:/etc/pgbouncer/userlist.txt",
-        ]
+        entrypoint = "/usr/bin/pgbouncer"
+        command    = "/local/pgbouncer.ini"
 
       }
 
@@ -87,12 +86,16 @@ job "pgbouncer" {
 
       template {
         # https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#secrets
+        # https://www.pgbouncer.org/config.html#authentication-file-format
+        # PostgreSQL MD5-hashed password format:
+        # "md5" + md5(password + username)
+        # So user admin with password 1234 will have MD5-hashed password md545f2603610af569b6155c45067268c6b.
         data          = <<-EOF
-          "pgbounder" "{{ "P@ssw0rd" | md5sum }}"
+          "pgbounder" "md5{{ "P@ssw0rdpgbounder" | md5sum }}"
           {{- range secrets "kvv2_pgsql/" }}
           {{- with secret (printf "kvv2_pgsql/%s" .) }}
           {{- if and .Data.data.user_name .Data.data.user_password }}
-          "{{ .Data.data.user_name }}" "{{ .Data.data.user_password | md5sum }}"
+          "{{ .Data.data.user_name }}" "md5{{ printf "%s%s" .Data.data.user_password .Data.data.user_name | md5sum }}"
           {{- end }}
           {{- end }}
           {{- end }}
