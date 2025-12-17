@@ -91,7 +91,7 @@ job "pgbouncer" {
         # "md5" + md5(password + username)
         # So user admin with password 1234 will have MD5-hashed password md545f2603610af569b6155c45067268c6b.
         data          = <<-EOF
-          "pgbounder" "md5{{ "P@ssw0rdpgbounder" | md5sum }}"
+          "pgbounder" "md5{{ "pgbounderpgbounder" | md5sum }}"
           {{- range secrets "kvv2_pgsql/" }}
           {{- with secret (printf "kvv2_pgsql/%s" .) }}
           {{- if and .Data.data.user_name .Data.data.user_password }}

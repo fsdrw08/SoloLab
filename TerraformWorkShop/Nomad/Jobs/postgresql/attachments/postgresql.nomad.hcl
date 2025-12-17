@@ -38,7 +38,7 @@ job "postgresql" {
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
           dbName   = "test"
-          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
         }
       }
 
@@ -47,11 +47,48 @@ job "postgresql" {
       driver = "podman"
       config {
         image = "zot.day0.sololab/fedora/postgresql-16:20251203"
+        volumes = [
+          "local/init-hba.sh:/opt/app-root/src/postgresql-init/init-hba.sh",
+          "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
+        ]
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
         POSTGRESQL_DATABASE = "test"
+      }
+
+      template {
+        # https://github.com/sclorg/postgresql-container/blob/b2645eaceed24be95676cfeb2fe24df3c5e45468/16/root/usr/share/container-scripts/postgresql/common.sh#L212
+        data = <<-EOH
+        #!/bin/bash
+        set -e
+        cat >> "/var/lib/pgsql/data/userdata/pg_hba.conf" <<EOF
+        host all pgbouncer all trust
+        EOF
+        EOH
+
+        destination = "local/init-hba.sh"
+      }
+
+      template {
+        # https://www.enterprisedb.com/postgres-tutorials/pgbouncer-authquery-and-authuser-pro-tips
+        data = <<-EOH
+        #!/bin/bash
+        set -e
+        psql -v ON_ERROR_STOP=1 <<-EOSQL
+        DROP ROLE IF EXISTS pgbouncer;
+        CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
+        \\c test;
+        CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
+        \$\$
+          SELECT usename, passwd FROM pg_shadow WHERE usename=\$1;
+        \$\$
+        LANGUAGE sql SECURITY DEFINER;
+        EOSQL
+        EOH
+
+        destination = "local/init-db.sh"
       }
 
       template {
