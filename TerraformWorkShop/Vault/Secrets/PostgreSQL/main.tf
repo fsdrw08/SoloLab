@@ -2,14 +2,16 @@ ephemeral "random_password" "admin_password" {
   for_each = {
     for database in var.databases : database.name => database
   }
-  length = 10
+  length  = 10
+  special = false
 }
 
 ephemeral "random_password" "user_password" {
   for_each = {
     for database in var.databases : database.name => database
   }
-  length = 10
+  length  = 10
+  special = false
 }
 
 resource "vault_kv_secret_v2" "secret" {
