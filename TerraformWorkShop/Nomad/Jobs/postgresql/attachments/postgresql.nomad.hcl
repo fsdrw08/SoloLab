@@ -48,7 +48,7 @@ job "postgresql" {
       config {
         image = "zot.day0.sololab/fedora/postgresql-16:20251203"
         volumes = [
-          "local/init-hba.sh:/opt/app-root/src/postgresql-init/init-hba.sh",
+          "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
         ]
       }
@@ -61,18 +61,33 @@ job "postgresql" {
       template {
         # https://github.com/sclorg/postgresql-container/blob/b2645eaceed24be95676cfeb2fe24df3c5e45468/16/root/usr/share/container-scripts/postgresql/common.sh#L212
         data = <<-EOH
-        #!/bin/bash
-        set -e
-        cat >> "/var/lib/pgsql/data/userdata/pg_hba.conf" <<EOF
-        host all pgbouncer all trust
-        EOF
+        hba_file = '/local/pg_hba.conf'
         EOH
 
-        destination = "local/init-hba.sh"
+        destination = "local/postgresql_hba.conf"
+      }
+
+      template {
+        data = <<-EOH
+        local  all          all                      trust
+        host   all          all        127.0.0.1/32  trust
+        host   all          all        ::1/128       trust
+        local  replication  all                      trust
+        host   replication  all        127.0.0.1/32  trust
+        host   replication  all        ::1/128       trust
+
+        host  all           pgbouncer  10.88.0.0/16  trust
+        host  all           test       all           scram-sha-256
+        EOH
+        destination = "local/pg_hba.conf"
+        change_mode   = "signal"
+        change_signal = "SIGHUP"
       }
 
       template {
         # https://www.enterprisedb.com/postgres-tutorials/pgbouncer-authquery-and-authuser-pro-tips
+        # https://readmedium.com/unlocking-advanced-authentication-in-pgbouncer-a-guide-to-auth-query-and-auth-user-configuration-6189e0fd0562
+        # auth function need to create in target database
         data = <<-EOH
         #!/bin/bash
         set -e
@@ -89,6 +104,7 @@ job "postgresql" {
         EOH
 
         destination = "local/init-db.sh"
+        change_mode = "restart"
       }
 
       template {
