@@ -87,23 +87,29 @@ job "pgbouncer" {
       template {
         # https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#secrets
         # https://www.pgbouncer.org/config.html#authentication-file-format
+        # https://www.percona.com/blog/configuring-pgbouncer-auth_type-with-trust-and-hba-examples-and-known-issues/#:~:text=%3D6s)-,auth_query%20method,-If%20you%20do
         # PostgreSQL MD5-hashed password format:
         # "md5" + md5(password + username)
         # So user admin with password 1234 will have MD5-hashed password md545f2603610af569b6155c45067268c6b.
         data          = <<-EOF
           "pgbounder" "md5{{ "pgbounderpgbounder" | md5sum }}"
-          {{- range secrets "kvv2_pgsql/" }}
-          {{- with secret (printf "kvv2_pgsql/%s" .) }}
-          {{- if and .Data.data.user_name .Data.data.user_password }}
-          "{{ .Data.data.user_name }}" "md5{{ printf "%s%s" .Data.data.user_password .Data.data.user_name | md5sum }}"
-          {{- end }}
-          {{- end }}
-          {{- end }}
         EOF
         destination   = "secrets/userlist.txt"
         change_mode   = "signal"
         change_signal = "SIGHUP"
       }
+
+      # template {
+      #   # https://www.percona.com/blog/configuring-pgbouncer-auth_type-with-trust-and-hba-examples-and-known-issues/#:~:text=%3D6s)-,auth_query%20method,-If%20you%20do
+      #   data = <<-EOH
+      #   host all pgbounder all md5
+      #   host all all all scram-sha-256
+      #   EOH
+
+      #   destination = "local/pg_hba.conf"
+      #   change_mode   = "signal"
+      #   change_signal = "SIGHUP"
+      # }
       vault {}
     }
   }
