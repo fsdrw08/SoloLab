@@ -264,7 +264,18 @@ dns_records = [
     hostname = "traefik.day2.sololab"
     value = {
       string_map = {
-        host = "192.168.255.20"
+        host = "day1.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "pgweb.day2.sololab"
+    value = {
+      string_map = {
+        host = "day1.node.consul"
       }
       number_map = {
         ttl = 60

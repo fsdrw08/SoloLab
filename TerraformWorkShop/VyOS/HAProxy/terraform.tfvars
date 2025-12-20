@@ -215,4 +215,12 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day2_frontend_pgweb = {
+    path = "load-balancing haproxy service tcp443 rule 310"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "pgweb.day2.sololab"
+      "set backend" = "day1"
+    }
+  }
 }

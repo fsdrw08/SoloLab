@@ -326,7 +326,7 @@ zones = [
         ]
       },
       {
-        fqdn = "grafana.day2.sololab."
+        fqdn = "pgweb.day2.sololab."
         type = "A"
         ttl  = 60
         results = [

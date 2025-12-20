@@ -49,6 +49,13 @@
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "sosedoff/pgweb:0.17.0",
+        "archive": "ghcr.io_sosedoff_pgweb_0.17.0.tar",
+        "privateRepo": "sosedoff/pgweb:0.17.0",
+        "description": "https://github.com/sosedoff/pgweb/pkgs/container/pgweb",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "library/redis:8.4.0",
         "archive": "docker.io_library_redis_8.4.0.tar",
