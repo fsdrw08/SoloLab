@@ -66,7 +66,7 @@ job "grafana" {
       driver = "podman"
 
       config {
-        image = "zot.day0.sololab/grafana/grafana:12.3.0"
+        image = "zot.day0.sololab/grafana/grafana:12.3.1"
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.grafana-redirect.entrypoints" = "web"

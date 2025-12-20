@@ -1,11 +1,11 @@
 1. EntryPoint command
-According to below commands in [Dockerfile-auth](https://github.com/PowerDNS/pdns/blob/auth-5.0.1/Dockerfile-auth):
+According to below commands in [Dockerfile-auth](https://github.com/PowerDNS/pdns/blob/auth-5.0.2/Dockerfile-auth):
 ```dockerfile
 COPY dockerdata/startup.py /usr/local/sbin/pdns_server-startup
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/sbin/pdns_server-startup"]
 ```
-and [startup.py](https://github.com/PowerDNS/pdns/blob/auth-5.0.1/dockerdata/startup.py)
+and [startup.py](https://github.com/PowerDNS/pdns/blob/auth-5.0.2/dockerdata/startup.py)
 ```python
 program = sys.argv[0].split('-')[0]
 product = os.path.basename(program)
@@ -22,7 +22,7 @@ Regarding to [config-dir](https://doc.powerdns.com/authoritative/settings.html#c
 Location of configuration directory (the directory containing pdns.conf). Usually /etc/powerdns, but this depends on SYSCONFDIR during compile-time.
 ```
 
-and according to below commands in [Dockerfile-auth](https://github.com/PowerDNS/pdns/blob/auth-5.0.1/Dockerfile-auth):
+and according to below commands in [Dockerfile-auth](https://github.com/PowerDNS/pdns/blob/auth-5.0.2/Dockerfile-auth):
 ```dockerfile
 COPY dockerdata/pdns.conf /etc/powerdns/
 RUN mkdir -p /etc/powerdns/pdns.d /var/run/pdns /var/lib/powerdns /etc/powerdns/templates.d

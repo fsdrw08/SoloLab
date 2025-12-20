@@ -51,8 +51,8 @@ loki:
     #   #   key_file: /etc/loki/certs/loki.key
 
     ## @param loki.config.storage_config config storage backend for storing chunks of log data
-    ## ref: https://grafana.com/docs/loki/v3.5.x/configure/#storage_config
-    ## ref: https://grafana.com/docs/loki/v3.5.x/operations/storage/tsdb/#single-store-tsdb-tsdb
+    ## ref: https://grafana.com/docs/loki/v3.6.x/configure/#storage_config
+    ## ref: https://grafana.com/docs/loki/v3.6.x/operations/storage/tsdb/#single-store-tsdb-tsdb
     ##
     storage_config:
       tsdb_shipper:
@@ -60,7 +60,7 @@ loki:
         cache_location: /var/loki/tsdb-cache
       use_thanos_objstore: true
       object_store:
-        # https://grafana.com/docs/loki/v3.5.x/configure/#thanos_object_store_config
+        # https://grafana.com/docs/loki/v3.6.x/configure/#thanos_object_store_config
         s3:
           # https://github.com/cloudlena/s3manager/issues/7
           endpoint: minio-api.day0.sololab
@@ -72,7 +72,6 @@ loki:
             tls_ca_path: /etc/loki/certs/ca.crt
     ui:
       enabled: true
-      node_name: day1
 
   args:
     - -config.file=/etc/loki/local-config.yaml

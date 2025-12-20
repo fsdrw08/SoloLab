@@ -9,10 +9,10 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "bitnami/grafana-loki:3.5.8",
-        "archive": "docker.io_bitnami_grafana-loki_3.5.8.tar",
+        "publicRepo": "bitnami/grafana-loki:3.6.3",
+        "archive": "docker.io_bitnami_grafana-loki_3.6.3.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "bitnami/grafana-loki:3.5.8",
+        "privateRepo": "bitnami/grafana-loki:3.6.3",
         "description": "https://hub.docker.com/r/bitnami/grafana-loki/tags",
     },
     {

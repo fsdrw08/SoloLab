@@ -24,7 +24,7 @@ podman_kubes = [
             name  = "loki"
           }
           # https://github.com/ordiri/ordiri/blob/e18120c4c00fa45f771ea01a39092d6790f16de8/manifests/platform/monitoring/base/kustomization.yaml#L132
-          # https://grafana.com/docs/grafana/v3.5.x/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
+          # https://grafana.com/docs/grafana/v3.6.x/setup-grafana/configure-security/configure-authentication/generic-oauth/#steps
           value_sets = [
             {
               name          = "loki.config.storage_config.object_store.s3.access_key_id"
@@ -64,7 +64,7 @@ podman_quadlet = {
           vars = {
             # unit
             Description           = "Loki service"
-            Documentation         = "https://grafana.com/docs/loki/v3.5.x/"
+            Documentation         = "https://grafana.com/docs/loki/v3.6.x/"
             After                 = ""
             Wants                 = ""
             StartLimitIntervalSec = 120

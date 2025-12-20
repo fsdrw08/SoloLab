@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "consul/1.22.1/consul_1.22.1_linux_amd64.zip",
-        "archive": "consul_1.22.1_linux_amd64.zip",
-        "privateRepo": "/ignition/binaries/consul_1.22.1_linux_amd64.zip",
+        "publicRepo": "consul/1.22.2/consul_1.22.2_linux_amd64.zip",
+        "archive": "consul_1.22.2_linux_amd64.zip",
+        "privateRepo": "/ignition/binaries/consul_1.22.2_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/consul",
     },
     {

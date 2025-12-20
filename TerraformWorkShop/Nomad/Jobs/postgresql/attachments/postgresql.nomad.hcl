@@ -46,7 +46,7 @@ job "postgresql" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/fedora/postgresql-16:20251203"
+        image = "zot.day0.sololab/fedora/postgresql-16:20251217"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",

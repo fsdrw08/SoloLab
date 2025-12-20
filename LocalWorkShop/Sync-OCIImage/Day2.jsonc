@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.2",
-        "archive": "docker.io_library_traefik_v3.6.2.tar",
-        "privateRepo": "library/traefik:v3.6.2",
+        "publicRepo": "library/traefik:v3.6.5",
+        "archive": "docker.io_library_traefik_v3.6.5.tar",
+        "privateRepo": "library/traefik:v3.6.5",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -43,16 +43,16 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20251203",
-        "archive": "quay.io_fedora_postgresql-16_20251203.tar",
-        "privateRepo": "fedora/postgresql-16:20251203",
+        "publicRepo": "fedora/postgresql-16:20251217",
+        "archive": "quay.io_fedora_postgresql-16_20251217.tar",
+        "privateRepo": "fedora/postgresql-16:20251217",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/redis:8.4.0-alpine",
-        "archive": "docker.io_library_redis_8.4.0-alpine.tar",
-        "privateRepo": "library/redis:8.4.0-alpine",
+        "publicRepo": "library/redis:8.4.0",
+        "archive": "docker.io_library_redis_8.4.0.tar",
+        "privateRepo": "library/redis:8.4.0",
         "description": "https://hub.docker.com/_/redis",
     },
     {
