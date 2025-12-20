@@ -110,6 +110,30 @@ job "pgbouncer" {
       #   change_mode   = "signal"
       #   change_signal = "SIGHUP"
       # }
+
+      template {
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.ca }}{{ end }}
+        EOF
+        destination = "secrets/tls/ca.crt"
+        change_mode = "restart"
+      }
+
+      template {
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.cert }}{{ end }}
+        EOF
+        destination = "secrets/tls/consul.crt"
+        change_mode = "restart"
+      }
+
+      template {
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/*.service.consul" }}{{ .Data.data.private_key }}{{ end }}
+        EOF
+        destination = "secrets/tls/consul.key"
+        change_mode = "restart"
+      }
       vault {}
     }
   }
