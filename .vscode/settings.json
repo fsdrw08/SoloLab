@@ -37,7 +37,7 @@
     "editor.defaultFormatter": "DotJoshJohnson.xml"
   },
   "[hcl]": {
-    "editor.defaultFormatter": "twiking.vscode-hcl-format"
+    "editor.defaultFormatter": "fredwangwang.vscode-hcl-format"
   },
   "[markdown]": {
     "editor.defaultFormatter": "yzhang.markdown-all-in-one"

@@ -53,6 +53,9 @@ job "traefik" {
         metrics_path      = "metrics"
       }
 
+      # traffic path: haproxy.vyos -(tcp route)-> 
+      #   traefik.day1 -[http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: traefik-day2.service.consul)]-> 
+      #   traefik.day2 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
         "exporter",
         "log",
