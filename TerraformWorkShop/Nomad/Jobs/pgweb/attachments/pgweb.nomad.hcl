@@ -50,6 +50,13 @@ job "pgweb" {
           initial_status = "passing"
         }
 
+        meta {
+          scheme            = "https"
+          address           = "pgweb.service.consul"
+          health_check_path = ""
+          # metrics_path      = "metrics"
+        }
+
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(pgweb.day2.sololab) & re-encrypt(server transport(pgweb.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
@@ -91,6 +98,7 @@ job "pgweb" {
         }
         args = [
           "--bookmarks-dir=/local/bookmark.d",
+          # "--metrics",
         ]
       }
 
