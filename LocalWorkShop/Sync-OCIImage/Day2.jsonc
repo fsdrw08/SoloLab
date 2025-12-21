@@ -56,6 +56,13 @@
         "description": "https://github.com/sosedoff/pgweb/pkgs/container/pgweb",
     },
     {
+        "publicRegistry": "quay.io",
+        "publicRepo": "prometheuscommunity/postgres-exporter:v0.18.1",
+        "archive": "quay.io_prometheuscommunity_postgres-exporter_v0.18.1.tar",
+        "privateRepo": "prometheuscommunity/postgres-exporter:v0.18.1",
+        "description": "https://quay.io/repository/prometheuscommunity/postgres-exporter?tab=tags",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "library/redis:8.4.0",
         "archive": "docker.io_library_redis_8.4.0.tar",
