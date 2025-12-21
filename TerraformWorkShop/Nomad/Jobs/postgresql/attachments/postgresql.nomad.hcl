@@ -57,7 +57,8 @@ job "postgresql" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        POSTGRESQL_DATABASE = "test"
+        POSTGRESQL_DATABASE        = "test"
+        POSTGRESQL_LOG_DESTINATION = "/dev/stderr"
       }
 
       template {
@@ -96,6 +97,13 @@ job "postgresql" {
         psql -v ON_ERROR_STOP=1 <<-EOSQL
         DROP ROLE IF EXISTS pgbouncer;
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
+        
+        DROP ROLE IF EXISTS postgres_exporter;
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/exporter"}}{{.Data.data.user_password}}{{end}}';
+        GRANT pg_monitor TO postgres_exporter;
+        GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
+        GRANT CONNECT ON DATABASE test TO postgres_exporter;
+
         \\c test;
         CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
         \$\$
