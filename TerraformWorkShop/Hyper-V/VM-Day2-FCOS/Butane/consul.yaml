@@ -73,23 +73,25 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-          Description="HashiCorp Consul - A service mesh solution"
-          Documentation=https://developer.hashicorp.com/
-          After=network-online.target prepare-consul-binary.service
-          Wants=network-online.target
-          Requires=prepare-consul-binary.service
-          ConditionFileNotEmpty=/opt/bin/consul
-          ConditionFileNotEmpty=/etc/consul.d/consul.hcl
-          ConditionPathIsDirectory=${consul_data_dir}
+        Description="HashiCorp Consul - A service mesh solution"
+        Documentation=https://developer.hashicorp.com/
+        After=network-online.target prepare-consul-binary.service
+        Wants=network-online.target
+        Requires=prepare-consul-binary.service
+        ConditionFileNotEmpty=/opt/bin/consul
+        ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+        ConditionPathIsDirectory=${consul_data_dir}
+        Before=umount.target
+        Conflicts=umount.target
 
-          [Service]
-          ExecStart=/opt/bin/consul agent \
-            -config-dir=/etc/consul.d
-          ExecReload=/bin/kill --signal HUP $MAINPID
-          KillMode=process
-          KillSignal=SIGTERM
-          Restart=on-failure
-          LimitNOFILE=65536
+        [Service]
+        ExecStart=/opt/bin/consul agent \
+          -config-dir=/etc/consul.d
+        ExecReload=/bin/kill --signal HUP $MAINPID
+        KillMode=process
+        KillSignal=SIGTERM
+        Restart=on-failure
+        LimitNOFILE=65536
 
-          [Install]
-          WantedBy=multi-user.target
+        [Install]
+        WantedBy=multi-user.target

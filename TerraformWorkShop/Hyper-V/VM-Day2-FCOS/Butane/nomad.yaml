@@ -185,6 +185,8 @@ systemd:
         Requires=prepare-nomad-binary.service
         Wants=consul.service
         After=consul.service
+        Before=umount.target
+        Conflicts=umount.target
 
         ConditionFileNotEmpty=/opt/bin/nomad
         ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
