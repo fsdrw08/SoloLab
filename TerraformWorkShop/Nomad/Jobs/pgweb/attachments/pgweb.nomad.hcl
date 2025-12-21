@@ -1,3 +1,22 @@
+locals {
+  bookmarks = <<-EOH
+  {{- range services }}
+  {{- range service .Name }}
+  {{- if (contains "behind_pgbouncer" .Tags) }}
+  host = "{{ index .ServiceMeta "pgBouncerHost" }}"
+  port = 6432
+  sslmode = "require"
+  database = "{{ index .ServiceMeta "dbName" }}"
+  user = "{{ index .ServiceMeta "dbUser" }}"
+  {{- $dbName := index .ServiceMeta "dbName" }}
+  password = "{{ with secret (printf "kvv2_pgsql/data/%s" $dbName) }}{{ .Data.data.user_password }}{{ end }}"
+  {{ printf "\n\n" }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  EOH
+}
+
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
 job "pgweb" {
@@ -70,6 +89,9 @@ job "pgweb" {
 
           "traefik.http.services.pgweb.loadbalancer.server.port" = "8081"
         }
+        args = [
+          "--bookmarks-dir=/local/bookmark.d",
+        ]
       }
 
       resources {
@@ -78,6 +100,23 @@ job "pgweb" {
         # Specifies the memory required in MB
         memory = 128
       }
+
+      dynamic "template" {
+        for_each = split("\n\n", local.bookmarks)
+
+        content {
+          data        = template.value
+          destination = "local/bookmark.d/${template.key}.toml"
+        }
+      }
+
+      template {
+        data = local.bookmarks
+
+        destination = "local/test.txt"
+      }
+
+      vault {}
 
     }
   }

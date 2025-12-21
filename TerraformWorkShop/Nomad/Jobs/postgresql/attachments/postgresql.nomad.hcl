@@ -37,8 +37,10 @@ job "postgresql" {
 
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
-          dbName   = "test"
-          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
+          dbName        = "test"
+          dbConfig      = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
+          dbUser        = "test"
+          pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
         }
       }
 
@@ -68,7 +70,7 @@ job "postgresql" {
       }
 
       template {
-        data = <<-EOH
+        data          = <<-EOH
         local  all          all                      trust
         host   all          all        127.0.0.1/32  trust
         host   all          all        ::1/128       trust
@@ -77,9 +79,9 @@ job "postgresql" {
         host   replication  all        ::1/128       trust
 
         host  all           pgbouncer  10.88.0.0/16  trust
-        host  all           test       all           scram-sha-256
+        host  all           {{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
-        destination = "local/pg_hba.conf"
+        destination   = "local/pg_hba.conf"
         change_mode   = "signal"
         change_signal = "SIGHUP"
       }
