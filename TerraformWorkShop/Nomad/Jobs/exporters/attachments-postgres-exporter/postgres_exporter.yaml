@@ -1,0 +1,9 @@
+auth_modules:
+  postgres_exporter: # Set this to any name you want
+    type: userpass
+    userpass:
+      username: "{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_name}}{{end}}"
+      password: "{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}"
+    options:
+      # options become key=value parameters of the DSN
+      sslmode: require

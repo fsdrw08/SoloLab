@@ -91,4 +91,10 @@ dashboards = [
       DS_PROMETHEUS = "517bb05c"
     }
   },
+  {
+    template = "./attachments/postgres-exporter-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
 ]

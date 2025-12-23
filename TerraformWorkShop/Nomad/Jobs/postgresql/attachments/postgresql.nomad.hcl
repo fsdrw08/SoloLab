@@ -41,6 +41,12 @@ job "postgresql" {
           dbConfig      = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
           dbUser        = "test"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
+          # for exporter
+          scheme  = "https"
+          address = "prometheus-postgres-exporter.service.consul"
+          # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
+          metrics_path              = "probe"
+          metrics_path_param_target = "prometheus"
         }
       }
 
@@ -99,10 +105,10 @@ job "postgresql" {
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
         
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
-        GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
-        GRANT CONNECT ON DATABASE test TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE test TO postgres_exporter;
 
         \\c test;
         CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as

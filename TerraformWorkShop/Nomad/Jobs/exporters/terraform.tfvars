@@ -19,4 +19,13 @@ jobs = [
   {
     path = "./attachments-podman-exporter/podman-exporter.nomad.hcl"
   },
+  {
+    path = "./attachments-postgres-exporter/postgres-exporter.nomad.hcl"
+    var_sets = [
+      {
+        name                = "postgresql_exporter_config"
+        value_template_path = "./attachments-postgres-exporter/postgres_exporter.yaml"
+      }
+    ]
+  },
 ]

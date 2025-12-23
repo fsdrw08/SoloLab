@@ -1,9 +1,0 @@
-auth_modules:
-  foo1: # Set this to any name you want
-    type: userpass
-    userpass:
-      username: first
-      password: firstpass
-    options:
-      # options become key=value parameters of the DSN
-      sslmode: require

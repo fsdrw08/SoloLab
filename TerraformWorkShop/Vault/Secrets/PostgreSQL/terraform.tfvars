@@ -8,8 +8,8 @@ mount = "kvv2_pgsql"
 
 databases = [
   {
-    name           = "exporter"
-    user_name      = "exporter"
+    name           = "postgres_exporter"
+    user_name      = "postgres_exporter"
     secret_version = 1
   },
   {
