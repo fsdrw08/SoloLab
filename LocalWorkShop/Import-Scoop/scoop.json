@@ -1,60 +1,74 @@
 {
-    "apps": [
-        {
-            "Version": "25.01",
-            "Name": "7zip",
-            "Info": "",
-            "Source": "main",
-            "Updated": "2025-08-09T12:17:54.7824524+08:00"
-        },
-        {
-            "Version": "1.6.1",
-            "Name": "clash-nyanpasu",
-            "Info": "",
-            "Source": "extras",
-            "Updated": "2025-08-09T11:36:39.6029563+08:00"
-        },
-        {
-            "Version": "1.2.3",
-            "Name": "oras",
-            "Info": "",
-            "Source": "extras",
-            "Updated": "2025-08-09T11:51:22.206329+08:00"
-        },
-        {
-            "Version": "2.56",
-            "Name": "oscdimg",
-            "Info": "",
-            "Source": "main",
-            "Updated": "2025-08-09T12:17:56.3044602+08:00"
-        },
-        {
-            "Version": "1.14.1",
-            "Name": "packer",
-            "Info": "",
-            "Source": "main",
-            "Updated": "2025-08-09T11:52:50.269005+08:00"
-        },
-        {
-            "Version": "1.12.2",
-            "Name": "terraform",
-            "Info": "",
-            "Source": "main",
-            "Updated": "2025-08-09T11:52:57.6710421+08:00"
-        }
-    ],
     "buckets": [
         {
             "Name": "main",
-            "Source": "https://github.com/ScoopInstaller/Main",
-            "Updated": "2025-08-09T08:42:14+08:00",
-            "Manifests": 1398
+            "Source": "https://github.com/ScoopInstaller/Main.git",
+            "Updated": "2025-12-27T16:31:11+08:00",
+            "Manifests": 1412
         },
         {
             "Name": "extras",
             "Source": "https://github.com/ScoopInstaller/Extras",
-            "Updated": "2025-08-09T08:40:32+08:00",
-            "Manifests": 2177
+            "Updated": "2025-12-27T16:49:09+08:00",
+            "Manifests": 2238
+        }
+    ],
+    "apps": [
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "25.01",
+            "Updated": "2025-12-26T17:15:10.0188512+08:00",
+            "Name": "7zip"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Version": "2.4.4",
+            "Updated": "2025-12-26T17:16:13.5251478+08:00",
+            "Name": "clash-verge-rev"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "4.0.4",
+            "Updated": "2025-12-27T19:35:37.2052782+08:00",
+            "Name": "helm"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "1.8.1",
+            "Updated": "2025-12-27T19:44:26.3169057+08:00",
+            "Name": "jq"
+        },
+        {
+            "Info": "",
+            "Source": "extras",
+            "Version": "1.3.0",
+            "Updated": "2025-12-27T13:42:04.6045022+08:00",
+            "Name": "oras"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "2.56",
+            "Updated": "2025-12-27T13:42:05.6116414+08:00",
+            "Name": "oscdimg"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "1.14.3",
+            "Updated": "2025-12-27T13:34:06.4051887+08:00",
+            "Name": "packer"
+        },
+        {
+            "Info": "",
+            "Source": "main",
+            "Version": "1.14.3",
+            "Updated": "2025-12-27T13:29:12.8924655+08:00",
+            "Name": "terraform"
         }
     ]
 }
