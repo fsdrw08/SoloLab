@@ -12,6 +12,9 @@
 				},
 				{
 					"PackageIdentifier": "Microsoft.VisualStudioCode"
+				},
+				{
+					"PackageIdentifier": "Microsoft.PowerShell"
 				}
 			],
 			"SourceDetails": {

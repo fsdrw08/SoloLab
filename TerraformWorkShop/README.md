@@ -8,7 +8,10 @@ This guile is used to download all providers this project need, set up terraform
 ### Setup terraform.rc
 Should run by powershell 7+, in current dir, run:
 ```powershell
-. .\Set-TFCLIConfigFile.ps1
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop"
+Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
+pwsh -File ".\Set-TFCLIConfigFile.ps1"
 ```
 
 ### Download terraform providers
