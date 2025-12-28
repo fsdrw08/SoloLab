@@ -7,6 +7,34 @@ prometheus:
       global:
         scrape_interval: 60s
       scrape_configs:
+        # - job_name: multi_target
+        #   scrape_interval: 300s
+        #   scrape_timeout: 5s
+        #   metrics_path: /probe
+        #   tls_config:
+        #     ca_file: /etc/prometheus/secrets/certs/ca.crt
+        #   consul_sd_configs:
+        #     - server: consul.service.consul:8501
+        #       datacenter: dc1
+        #       scheme: https
+        #       tls_config:
+        #         ca_file: /etc/prometheus/secrets/certs/ca.crt
+        #       # https://inuits.eu/blog/prometheus-consul-vault-228/
+        #       authorization:
+        #         credentials_file: /etc/prometheus/secrets/others/consul-token
+        #   relabel_configs:
+        #     - source_labels: ["__meta_consul_tags"]
+        #       regex: .*multi-targe-exporter.*
+        #       action: keep
+        #     - source_labels:
+        #         - __meta_consul_service_metadata_multi_target_exporter_address
+        #       target_label: __address__
+        #     - source_labels:
+        #         - __meta_consul_service_metadata_multi_target_exporter_metrics_path
+        #       target_label: __metrics_path__
+        #     - source_labels:
+        #         - __meta_consul_service_metadata_multi_target_exporter_instance
+        #       target_label: instance
         # the blackbox exporter implements the multi-target exporter pattern, this config tell prometheus to:
         # 1. get target data from consul service definition's metadata, only keep the data which the service has `address` metadata
         # 2. assemble the metadata to an url, pass the url info to the `instance` label
