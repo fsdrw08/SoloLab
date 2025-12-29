@@ -17,7 +17,8 @@ services {
   ]
 
   tags = [
-    "consul-exporter",
+    "blackbox-exporter",
+    "metrics-exposing-consul",
 
     "traefik.enable=true",
     "traefik.http.routers.consul-redirect.entrypoints=web",

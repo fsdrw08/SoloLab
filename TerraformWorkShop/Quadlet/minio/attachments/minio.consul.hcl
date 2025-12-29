@@ -18,7 +18,8 @@ services {
   ]
 
   tags = [
-    "exporter",
+    "blackbox-exporter",
+    "metrics-exposing-general",
 
     # "traefik.enable=true",
     # "traefik.http.routers.minio-api-redirect.entrypoints=web",

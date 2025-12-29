@@ -23,7 +23,8 @@ services = [{
     timeout         = "2s"
     tls_skip_verify = true
   }]
-  tags = ["exporter"]
+  tags = ["blackbox-exporter",
+  "metrics-exposing"]
   meta = {
     scheme            = "https"
     address           = "prometheus-podman-exporter.day0.sololab"

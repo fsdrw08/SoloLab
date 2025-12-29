@@ -46,7 +46,8 @@ job "grafana" {
         }
 
         tags = [
-          "exporter",
+          "blackbox-exporter",
+          "metrics-exposing",
 
           "traefik.enable=true",
           "traefik.http.routers.grafana-redirect.entryPoints=web",

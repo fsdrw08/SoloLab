@@ -37,15 +37,8 @@ job "prometheus-postgres-exporter" {
           initial_status = "passing"
         }
 
-        meta {
-          scheme            = "https"
-          address           = "prometheus-postgres-exporter.service.consul"
-          health_check_path = "metrics"
-          metrics_path      = "metrics"
-        }
-
         tags = [
-          "exporter",
+          "log",
 
           "traefik.enable=true",
           "traefik.http.routers.prometheus-postgres-exporter-redirect.entryPoints=web",

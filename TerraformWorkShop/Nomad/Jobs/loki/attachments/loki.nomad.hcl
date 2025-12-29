@@ -46,7 +46,8 @@ job "loki" {
         }
 
         tags = [
-          "exporter",
+          "blackbox-exporter",
+          "metrics-exposing",
 
           "traefik.enable=true",
           "traefik.tcp.routers.loki.entryPoints=webSecure",

@@ -1,7 +1,7 @@
 services {
   name = "alloy-day0"
   id   = "alloy-web"
-  port = 12345
+  port = 443 # 12345
 
   checks = [
     {
@@ -15,4 +15,12 @@ services {
       status          = "passing"
     }
   ]
+  tags = [
+    "blackbox-exporter",
+  ]
+  meta = {
+    scheme            = "https"
+    address           = "alloy.day0.sololab"
+    health_check_path = "-/healthy"
+  }
 }

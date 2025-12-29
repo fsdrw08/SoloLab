@@ -46,18 +46,12 @@ job "traefik" {
         initial_status = "passing"
       }
 
-      meta {
-        scheme            = "https"
-        address           = "traefik-${attr.unique.hostname}.service.consul"
-        health_check_path = "metrics"
-        metrics_path      = "metrics"
-      }
-
       # traffic path: haproxy.vyos -(tcp route)-> 
       #   traefik.day1 -[http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: traefik-day2.service.consul)]-> 
       #   traefik.day2 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
-        "exporter",
+        "blackbox-exporter",
+        "metrics-exposing-general",
         "log",
 
         "traefik.enable=true",
@@ -74,6 +68,12 @@ job "traefik" {
         "traefik.http.services.traefik-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
       ]
 
+      meta {
+        scheme            = "https"
+        address           = "traefik-${attr.unique.hostname}.service.consul"
+        health_check_path = "metrics"
+        metrics_path      = "metrics"
+      }
     }
 
     # volume "certs" {

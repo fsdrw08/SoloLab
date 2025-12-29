@@ -17,7 +17,8 @@ services {
   ]
 
   tags = [
-    "exporter",
+    "blackbox-exporter",
+    "metrics-exposing-general",
 
     # "traefik.enable=true",
     # "traefik.http.routers.prometheus-consul-exporter-redirect.entrypoints=web",

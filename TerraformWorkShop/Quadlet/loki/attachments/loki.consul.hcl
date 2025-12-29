@@ -17,12 +17,13 @@ services {
   ]
 
   tags = [
-    "exporter",
+    "blackbox-exporter",
+    "metrics-exposing-general",
   ]
   meta = {
     scheme            = "https"
     address           = "loki.day1.sololab"
-    health_check_path = "metrics"
+    health_check_path = "ready"
     metrics_path      = "metrics"
   }
 }

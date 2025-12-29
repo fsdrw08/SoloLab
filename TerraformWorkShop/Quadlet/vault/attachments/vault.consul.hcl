@@ -18,7 +18,8 @@ services {
   ]
 
   tags = [
-    "vault-exporter",
+    "blackbox-exporter",
+    "metrics-exposing-vault",
 
     # "traefik.enable=true",
     # "traefik.http.routers.vault-redirect.entrypoints=web",

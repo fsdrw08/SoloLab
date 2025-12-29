@@ -15,5 +15,13 @@ services {
     }
   ]
 
+  tags = [
+    "blackbox-exporter",
+  ]
 
+  meta = {
+    scheme            = "https"
+    address           = "dufs.day0.sololab"
+    health_check_path = "__dufs__/health"
+  }
 }

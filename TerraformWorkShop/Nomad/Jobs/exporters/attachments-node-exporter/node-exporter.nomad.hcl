@@ -33,15 +33,9 @@ job "prometheus-node-exporter" {
           initial_status = "passing"
         }
 
-        meta {
-          scheme            = "https"
-          address           = "prometheus-node-exporter-${attr.unique.hostname}.service.consul"
-          health_check_path = "metrics"
-          metrics_path      = "metrics"
-        }
-
         tags = [
-          "exporter",
+          "log",
+          "metrics-exposing-general",
 
           "traefik.enable=true",
           "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}-redirect.entryPoints=web",
@@ -56,6 +50,11 @@ job "prometheus-node-exporter" {
           "traefik.http.services.prometheus-node-exporter-${attr.unique.hostname}.loadbalancer.server.port=443",
           "traefik.http.services.prometheus-node-exporter-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
         ]
+        meta {
+          scheme       = "https"
+          address      = "prometheus-node-exporter-${attr.unique.hostname}.service.consul"
+          metrics_path = "metrics"
+        }
       }
 
       driver = "podman"

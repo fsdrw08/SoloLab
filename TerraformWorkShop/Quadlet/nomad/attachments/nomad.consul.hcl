@@ -17,7 +17,9 @@ services {
   ]
 
   tags = [
-    "exporter",
+    "blackbox-exporter",
+    "metrics-exposing-general",
+
     "traefik.enable=true",
     "traefik.http.routers.nomad-redirect.entrypoints=web",
     "traefik.http.routers.nomad-redirect.rule=Host(`nomad.day1.sololab`)||Host(`nomad.service.consul`)",
@@ -29,10 +31,10 @@ services {
     "traefik.http.services.nomad.loadbalancer.server.scheme=https",
   ]
   meta = {
-    scheme            = "https"
-    address           = "nomad.day1.sololab"
-    health_check_path = "v1/status/leader"
-    metrics_path      = "v1/metrics"
+    scheme                    = "https"
+    address                   = "nomad.day1.sololab"
+    health_check_path         = "v1/status/leader"
+    metrics_path              = "v1/metrics"
     metrics_path_param_format = "prometheus"
   }
 }

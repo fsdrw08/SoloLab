@@ -27,14 +27,18 @@ prometheus:
         #       regex: .*multi-targe-exporter.*
         #       action: keep
         #     - source_labels:
-        #         - __meta_consul_service_metadata_multi_target_exporter_address
+        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_scheme
+        #       target_label: __scheme__
+        #     - source_labels:
+        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_address
         #       target_label: __address__
         #     - source_labels:
-        #         - __meta_consul_service_metadata_multi_target_exporter_metrics_path
+        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_metrics_path
         #       target_label: __metrics_path__
-        #     - source_labels:
-        #         - __meta_consul_service_metadata_multi_target_exporter_instance
-        #       target_label: instance
+        #     - action: labelmap
+        #       regex: __meta_consul_service_metadata_prometheus_multi_target_exporter_param_(.+)
+        #       replacement: __param_$1
+
         # the blackbox exporter implements the multi-target exporter pattern, this config tell prometheus to:
         # 1. get target data from consul service definition's metadata, only keep the data which the service has `address` metadata
         # 2. assemble the metadata to an url, pass the url info to the `instance` label
@@ -44,9 +48,9 @@ prometheus:
         - job_name: blackbox_exporter
           scrape_interval: 600s
           scrape_timeout: 5s
-          metrics_path: /probe
           tls_config:
             ca_file: /etc/prometheus/secrets/certs/ca.crt
+          metrics_path: /probe
           params:
             module: [http_2xx]
           consul_sd_configs:
@@ -60,8 +64,8 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
           relabel_configs:
-            - source_labels: ["__meta_consul_service_metadata_address"]
-              regex: ".+"
+            - source_labels: ["__meta_consul_tags"]
+              regex: .*,blackbox-exporter,.*
               action: keep
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
             # https://github.com/spirkaa/infra/blob/fa0fcce1e2e764d911f58c621cb81c9065e1ad41/cluster/observability/kube-prometheus-stack/kps/values.yaml#L163
@@ -88,11 +92,50 @@ prometheus:
               replacement: https
             - target_label: __address__
               replacement: prometheus-blackbox-exporter.day1.sololab
-        # this config tell prometheus to:
+        - job_name: postgres_exporter
+          scrape_interval: 300s
+          scrape_timeout: 10s
+          tls_config:
+            insecure_skip_verify: true
+          metrics_path: /probe
+          params:
+            auth_module: [postgres_exporter]
+          consul_sd_configs:
+            - server: consul.service.consul:8501
+              datacenter: dc1
+              scheme: https
+              tls_config:
+                ca_file: /etc/prometheus/secrets/certs/ca.crt
+              authorization:
+                credentials_file: /etc/prometheus/secrets/others/consul-token
+          relabel_configs:
+            - source_labels: ["__meta_consul_tags"]
+              regex: .*,postgres-exporter,.*
+              action: keep
+            - source_labels:
+                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_port
+                - __meta_consul_service_metadata_dbName
+              regex: (.+);(.+);(.+)
+              replacement: ${1}:${2}/${3}
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+            - action: labelmap
+              regex: __meta_consul_service_metadata_param_(.+)
+              replacement: __param_$1
+            # postgres exporter config
+            - target_label: __scheme__
+              replacement: https
+            - target_label: __address__
+              replacement: prometheus-postgres-exporter.service.consul
+
+        # below config tell prometheus to:
         # 1. get target data from consul service definition's metadata, only keep the data which the service has `exporter` tag
         # 2. assemble the service's metadata to an url, format:
         # `scheme`://`address`:`port`/`metrics_path`?`metrics_path_param_<key>=metrics_path_param_<value>`
         # finally, prometheus send request to the url above
+        # ref: https://training.promlabs.com/training/relabeling/introduction-to-relabeling/hidden-labels-and-metadata/
         - job_name: general_exporter_consul_sd
           scrape_interval: 30s
           scrape_timeout: 10s
@@ -108,7 +151,7 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*,exporter,.*
+              regex: .*,metrics-exposing-general,.*
               action: keep
             - source_labels: ["__meta_consul_service_metadata_scheme"]
               target_label: __scheme__
@@ -130,6 +173,7 @@ prometheus:
             - action: labelmap
               regex: __meta_consul_service_metadata_metrics_path_param_(.+)
               replacement: __param_$1
+
         # job name have to match with grafana vault dashboard's query name
         - job_name: vault
           scrape_interval: 3600s
@@ -148,7 +192,7 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*vault-exporter.*
+              regex: .*metrics-exposing-vault.*
               action: keep
             - source_labels: ["__meta_consul_service_metadata_scheme"]
               target_label: __scheme__
@@ -186,7 +230,7 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*consul-exporter.*
+              regex: .*metrics-exposing-consul.*
               action: keep
             - source_labels: ["__meta_consul_service_metadata_scheme"]
               target_label: __scheme__

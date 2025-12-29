@@ -31,6 +31,7 @@ job "postgresql" {
         }
 
         tags = [
+          "postgres-exporter",
           "log",
           "behind_pgbouncer",
         ]
@@ -41,12 +42,10 @@ job "postgresql" {
           dbConfig      = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
           dbUser        = "test"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
-          # for exporter
-          scheme  = "https"
-          address = "prometheus-postgres-exporter.service.consul"
-          # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
-          metrics_path              = "probe"
-          metrics_path_param_target = "prometheus"
+          # for postgres exporter
+          address = "pgbouncer-${node.unique.name}.service.consul"
+          port    = 6432
+          # param_auth_module = "postgres_exporter"
         }
       }
 
@@ -78,14 +77,15 @@ job "postgresql" {
 
       template {
         data          = <<-EOH
-        local  all          all                      trust
-        host   all          all        127.0.0.1/32  trust
-        host   all          all        ::1/128       trust
+        local  all          all                              trust
+        host   all          all                127.0.0.1/32  trust
+        host   all          all                ::1/128       trust
         local  replication  all                      trust
-        host   replication  all        127.0.0.1/32  trust
-        host   replication  all        ::1/128       trust
+        host   replication  all                127.0.0.1/32  trust
+        host   replication  all                ::1/128       trust
 
-        host  all           pgbouncer  10.88.0.0/16  trust
+        host  all           pgbouncer          10.88.0.0/16  trust
+        host  all           postgres_exporter  10.88.0.0/16  trust
         host  all           {{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
