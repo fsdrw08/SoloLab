@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.5",
-        "archive": "docker.io_library_traefik_v3.6.5.tar",
-        "privateRepo": "library/traefik:v3.6.5",
+        "publicRepo": "library/traefik:v3.6.6",
+        "archive": "docker.io_library_traefik_v3.6.6.tar",
+        "privateRepo": "library/traefik:v3.6.6",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {

@@ -67,7 +67,7 @@ podman_quadlet = {
             yaml          = "traefik-aio.yaml"
             KubeDownForce = "false"
             # service
-            ExecStartPre  = "sleep 3"
+            ExecStartPre  = "sleep 5"
             ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run traefik-proxy\""
             Restart       = "on-failure"
           }
