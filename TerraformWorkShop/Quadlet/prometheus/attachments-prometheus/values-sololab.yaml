@@ -65,7 +65,7 @@ prometheus:
           # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*,blackbox-exporter,.*
+              regex: .*,metrics-exposing-blackbox,.*
               action: keep
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
             # https://github.com/spirkaa/infra/blob/fa0fcce1e2e764d911f58c621cb81c9065e1ad41/cluster/observability/kube-prometheus-stack/kps/values.yaml#L163

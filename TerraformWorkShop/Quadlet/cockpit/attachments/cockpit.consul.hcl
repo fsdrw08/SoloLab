@@ -18,7 +18,7 @@ services {
   ]
 
   tags = [
-    "blackbox-exporter",
+    "metrics-exposing-blackbox",
 
     # "traefik.enable=true",
     # "traefik.tcp.routers.cockpit-web.entrypoints=webSecure",

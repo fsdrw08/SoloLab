@@ -18,7 +18,7 @@ services {
 
   # https://github.com/project-zot/zot/issues/2149
   tags = [
-    "blackbox-exporter",
+    "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]
 

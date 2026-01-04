@@ -19,7 +19,7 @@ services {
   # https://github.com/project-zot/zot/issues/2149
   # not able to scrape metric as http 401
   # tags = [
-  #   "blackbox-exporter",
+  #   "metrics-exposing-blackbox",
   #   "metrics-exposing-general",
   # ]
 

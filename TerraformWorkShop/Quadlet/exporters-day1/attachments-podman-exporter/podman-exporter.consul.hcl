@@ -17,8 +17,8 @@ services {
   ]
 
   tags = [
-    "blackbox-exporter",
-    "metrics-exposing",
+    "metrics-exposing-blackbox",
+    "metrics-exposing-general",
   ]
   meta = {
     scheme            = "https"

@@ -50,7 +50,7 @@ job "traefik" {
       #   traefik.day1 -[http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: traefik-day2.service.consul)]-> 
       #   traefik.day2 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
-        "blackbox-exporter",
+        "metrics-exposing-blackbox",
         "metrics-exposing-general",
         "log",
 

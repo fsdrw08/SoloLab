@@ -18,7 +18,7 @@ services {
   ]
 
   tags = [
-    "blackbox-exporter",
+    "metrics-exposing-blackbox",
 
     # "traefik.enable=true",
     # "traefik.http.routers.grafana-redirect.entrypoints=web",

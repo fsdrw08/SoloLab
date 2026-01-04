@@ -17,7 +17,7 @@ services {
   ]
 
   tags = [
-    "blackbox-exporter",
+    "metrics-exposing-blackbox",
 
     # "traefik.enable=true",
     # "traefik.tcp.routers.lldap-web.entrypoints=webSecure",

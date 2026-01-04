@@ -17,7 +17,7 @@ services {
   ]
 
   tags = [
-    "blackbox-exporter",
+    "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]
   meta = {
