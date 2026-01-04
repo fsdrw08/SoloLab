@@ -1,52 +1,49 @@
 global:
   imageRegistry: zot.day0.sololab
 redis:
-  containers:
+  livenessProbe:
+    exec:
+      command:
+        - redis-cli
+        - --user
+        - admin
+        - ping
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
+    - name: REDISCLI_AUTH
+      value: P@ssw0rd
+  configFiles:
     server:
-      containerPorts: []
-      livenessProbe:
-        exec:
-          command:
-            - redis-cli
-            - --user
-            - admin
-            - ping
-      extraEnvVars:
-        - name: TZ
-          value: Asia/Shanghai
-        - name: REDISCLI_AUTH
-          value: P@ssw0rd
-      configFiles:
-        server:
-          include:
-            - /etc/redis/acl.conf
-        acl:
-          user:
-            - default off
-            - admin on ~* +@all >P@ssw0rd
-            - gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
-    sentinel:
-      enabled: true
-      containerPorts: []
-      livenessProbe:
-        exec:
-          command:
-            - redis-cli
-            - -p
-            - "26379"
-            - --user
-            - admin
-            - ping
-      extraEnvVars:
-        - name: TZ
-          value: Asia/Shanghai
-        - name: REDISCLI_AUTH
-          value: P@ssw0rd
-      configFiles:
-        sentinel:
-          include:
-            - /etc/redis/sentinel-acl.conf
-        sentinel-acl:
-          user:
-            - default off
-            - admin on ~* +@all >P@ssw0rd
+      include:
+        - /etc/redis/acl.conf
+    acl:
+      user:
+        - default off
+        - admin on ~* +@all >P@ssw0rd
+        - gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
+    # sentinel:
+    #   enabled: true
+    #   containerPorts: []
+    #   livenessProbe:
+    #     exec:
+    #       command:
+    #         - redis-cli
+    #         - -p
+    #         - "26379"
+    #         - --user
+    #         - admin
+    #         - ping
+    #   extraEnvVars:
+    #     - name: TZ
+    #       value: Asia/Shanghai
+    #     - name: REDISCLI_AUTH
+    #       value: P@ssw0rd
+    #   configFiles:
+    #     sentinel:
+    #       include:
+    #         - /etc/redis/sentinel-acl.conf
+    #     sentinel-acl:
+    #       user:
+    #         - default off
+    #         - admin on ~* +@all >P@ssw0rd

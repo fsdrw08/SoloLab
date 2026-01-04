@@ -31,4 +31,11 @@
         "privateRepo": "bitnami/blackbox-exporter:0.26.0",
         "description": "https://hub.docker.com/r/bitnami/blackbox-exporter/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "library/redis:8.4.0",
+        "archive": "docker.io_library_redis_8.4.0.tar",
+        "privateRepo": "library/redis:8.4.0",
+        "description": "https://hub.docker.com/_/redis",
+    },
 ]

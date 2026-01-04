@@ -16,7 +16,7 @@ podman_kubes = [
     helm = {
       name       = "gitea-redis"
       chart      = "../../../HelmWorkShop/helm-charts/charts/redis"
-      value_file = "./attachments/values-sololab.yaml"
+      value_file = "./attachments-redis/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/gitea-redis-aio.yaml"
   },
@@ -37,6 +37,8 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
             # kube
             yaml          = "gitea-redis-aio.yaml"
             KubeDownForce = "false"
@@ -45,7 +47,7 @@ podman_quadlet = {
             # service
             ExecStartPre = ""
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-12 -n 1) && podman healthcheck run gitea-redis-server\""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 12-20 -n 1) && podman healthcheck run gitea-redis-server\""
             Restart       = "on-failure"
           }
         },
@@ -57,20 +59,3 @@ podman_quadlet = {
     },
   ]
 }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "gitea-redis.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "gitea-redis.service.consul."
-    ]
-  },
-]
