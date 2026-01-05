@@ -178,9 +178,10 @@ policy_bindings = [
     token_binding = {
       display_name = "prometheus-metrics"
       no_parent    = true
+      renewable    = true
     }
   },
-  # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki_consul-connect-ca
+  # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
   {
     policy_name    = "consul-ca"
@@ -219,6 +220,7 @@ policy_bindings = [
     token_binding = {
       display_name = "consul-ca"
       no_parent    = true
+      renewable    = true
     }
   },
   {
@@ -236,10 +238,6 @@ policy_bindings = [
         capabilities = ["list"]
       }
     EOT
-    token_binding = {
-      display_name = "cert-read"
-      no_parent    = true
-    }
   },
   {
     policy_name    = "pgsql-read"
@@ -256,9 +254,5 @@ policy_bindings = [
         capabilities = ["list"]
       }
     EOT
-    token_binding = {
-      display_name = "pgsql-read"
-      no_parent    = true
-    }
   }
 ]
