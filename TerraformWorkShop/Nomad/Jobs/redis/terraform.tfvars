@@ -6,11 +6,11 @@ prov_nomad = {
 jobs = [
   {
     path = "./attachments/redis.nomad.hcl"
-    # var_sets = [
-    #   {
-    #     name                = "postgresql_config"
-    #     value_template_path = "./attachments/postgresql.ini"
-    #   }
-    # ]
+    var_sets = [
+      {
+        name                = "config"
+        value_template_path = "./attachments/server.conf"
+      }
+    ]
   },
 ]

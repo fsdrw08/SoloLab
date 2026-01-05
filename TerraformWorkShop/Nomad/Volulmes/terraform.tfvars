@@ -5,6 +5,24 @@ prov_nomad = {
 
 dynamic_host_volumes = [
   {
+    name = "redis"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day2"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 999
+      gid = 1000
+    }
+  },
+  {
     name = "test"
     constraint = [
       {

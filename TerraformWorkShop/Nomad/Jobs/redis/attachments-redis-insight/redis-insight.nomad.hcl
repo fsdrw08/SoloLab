@@ -1,10 +1,6 @@
-variable "config" {
-  type = string
-}
-
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
-job "redis" {
+job "redis-insight" {
   datacenters = ["dc1"]
   region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
@@ -15,14 +11,13 @@ job "redis" {
     operator  = "="
     value     = "day2"
   }
-
-  group "redis" {
+  group "redis-insight" {
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
-    task "redis" {
+    task "redis-insight" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
-        name     = "redis-${attr.unique.hostname}"
+        name     = "redis-insight-${attr.unique.hostname}"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
@@ -44,18 +39,22 @@ job "redis" {
       driver = "podman"
       config {
         image = "zot.day0.sololab/library/redis:8.4.0"
+        args = [
+          "redis-server",
+          "/local/server.conf",
+        ]
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        TZ        = "Asia/Shanghai"
+        TZ            = "Asia/Shanghai"
         REDISCLI_AUTH = "P@ssw0rd"
       }
 
       template {
-        data          = var.config
-        destination   = "local/server.conf"
-        change_mode   = "restart"
+        data        = var.config
+        destination = "local/server.conf"
+        change_mode = "restart"
       }
 
       template {
@@ -67,7 +66,7 @@ job "redis" {
 
         destination = "secrets/acl.conf"
       }
-      vault {}
+      # vault {}
 
       resources {
         # Specifies the CPU required to run this task in MHz
