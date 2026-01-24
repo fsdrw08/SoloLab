@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "loki"
       chart      = "../../../HelmWorkShop/helm-charts/charts/loki"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_minio"

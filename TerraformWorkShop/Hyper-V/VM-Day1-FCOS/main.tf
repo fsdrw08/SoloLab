@@ -1,37 +1,37 @@
 # load secret from vault
 locals {
   secrets_vault_kvv2 = flatten([
-    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : {
-      mount = secret.vault_kvv2.mount
-      name  = secret.vault_kvv2.name
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
+      mount = value_refer.vault_kvv2.mount
+      name  = value_refer.vault_kvv2.name
     }
-    if secret.vault_kvv2 != null
+    if value_refer.vault_kvv2 != null
   ])
   secret_var_keys = flatten([
-    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
-      for value_set in secret.value_sets : [
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
         value_set.name
       ]
     ]
-    # if secret.vault_kvv2 != null
-    if secret.tfstate != null
+    # if value_refer.vault_kvv2 != null
+    if value_refer.tfstate != null
   ])
   secret_var_values = flatten([
-    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
-      for value_set in secret.value_sets : [
-        # data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key]
-        local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
+        # data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
+        local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
       ]
     ]
-    # if secret.vault_kvv2 != null
-    if secret.tfstate != null
+    # if value_refer.vault_kvv2 != null
+    if value_refer.tfstate != null
   ])
   tls_tfstate = flatten([
-    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : {
-      backend = secret.tfstate.backend
-      name    = secret.tfstate.cert_name
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
+      backend = value_refer.tfstate.backend
+      name    = value_refer.tfstate.cert_name
     }
-    if secret.tfstate != null
+    if value_refer.tfstate != null
   ])
 }
 
@@ -46,11 +46,11 @@ data "terraform_remote_state" "tfstate" {
 
 locals {
   cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
-    for secret in var.butane.vars.secrets == null ? [] : var.butane.vars.secrets : [
-      for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
-      if cert.name == secret.tfstate.cert_name
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
+      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.signed_certs : cert
+      if cert.name == value_refer.tfstate.cert_name
     ]
-    if secret.tfstate != null
+    if value_refer.tfstate != null
   ])
   certs = data.terraform_remote_state.tfstate == null ? null : {
     for cert in local.cert_list : cert.name => cert

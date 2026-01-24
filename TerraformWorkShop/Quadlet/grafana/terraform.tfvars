@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "grafana"
       chart      = "../../../HelmWorkShop/helm-charts/charts/grafana"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"

@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "traefik"
       chart      = "../../../HelmWorkShop/helm-charts/charts/traefik"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"

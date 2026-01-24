@@ -103,7 +103,7 @@ butane = {
       #   "vm_name" = "day2-2"
       # }
     ]
-    secrets = [
+    value_refers = [
       {
         vault_kvv2 = {
           mount = "kvv2_certs"

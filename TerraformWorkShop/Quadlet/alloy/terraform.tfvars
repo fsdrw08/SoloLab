@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "alloy"
       chart      = "../../../HelmWorkShop/helm-charts/charts/alloy"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           tfstate = {
             backend = {

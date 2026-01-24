@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "minio"
       chart      = "../../../HelmWorkShop/helm-charts/charts/minio"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           tfstate = {
             backend = {

@@ -60,14 +60,8 @@ variable "butane" {
     vars = object({
       global = map(string)
       local  = optional(list(map(string)), null)
-      secrets = optional(
+      value_refers = optional(
         list(object({
-          value_sets = list(
-            object({
-              name          = string
-              value_ref_key = string
-            })
-          )
           vault_kvv2 = optional(
             object({
               mount = string
@@ -84,6 +78,12 @@ variable "butane" {
               cert_name = string
             }),
             null
+          )
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
           )
         })),
         null

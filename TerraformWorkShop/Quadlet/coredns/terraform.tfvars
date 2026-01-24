@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "coredns"
       chart      = "../../../HelmWorkShop/helm-charts/charts/coredns"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           tfstate = {
             backend = {

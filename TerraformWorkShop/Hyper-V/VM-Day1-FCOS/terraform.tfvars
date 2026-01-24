@@ -74,7 +74,7 @@ butane = {
         "fcos_rebase_mirror" = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
       }
     ]
-    secrets = [
+    value_refers = [
       {
         tfstate = {
           backend = {

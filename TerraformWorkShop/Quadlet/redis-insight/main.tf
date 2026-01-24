@@ -2,35 +2,35 @@
 locals {
   secrets_vault_kvv2 = flatten([
     for podman_kube in var.podman_kubes : [
-      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
-        mount = secret.vault_kvv2.mount
-        name  = secret.vault_kvv2.name
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
+        mount = value_refer.vault_kvv2.mount
+        name  = value_refer.vault_kvv2.name
       }
       if secret.vault_kvv2 != null
     ]
   ])
   tls_tfstate = flatten([
     for podman_kube in var.podman_kubes : [
-      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : {
-        backend = secret.tfstate.backend
-        name    = secret.tfstate.cert_name
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
+        backend = value_refer.tfstate.backend
+        name    = value_refer.tfstate.cert_name
       }
       if secret.tfstate != null
     ]
   ])
 }
 
-data "vault_kv_secret_v2" "secrets" {
-  # count = var.podman_kube.helm.secrets == null ? 0 : var.podman_kube.helm.secrets.vault_kvv2 == null ? 0 : 1
+data "vault_kv_secret_v2" "secret" {
+  # count = var.podman_kube.helm.value_refers == null ? 0 : var.podman_kube.helm.value_refers.vault_kvv2 == null ? 0 : 1
   for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+    for secret_vault_kvv2 in local.secrets_vault_kvv2 : secret_vault_kvv2.name => secret_vault_kvv2
   }
   mount = each.value.mount
   name  = each.value.name
 }
 
 data "terraform_remote_state" "tfstate" {
-  # count   = var.podman_kube.helm.secrets.tfstate == null ? 0 : 1
+  # count   = var.podman_kube.helm.value_refers.tfstate == null ? 0 : 1
   for_each = local.tls_tfstate == null ? null : {
     for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
   }
@@ -41,9 +41,9 @@ data "terraform_remote_state" "tfstate" {
 locals {
   cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
     for podman_kube in var.podman_kubes : [
-      for secret in podman_kube.helm.secrets == null ? [] : podman_kube.helm.secrets : [
-        for cert in data.terraform_remote_state.tfstate[secret.tfstate.cert_name].outputs.signed_certs : cert
-        if cert.name == secret.tfstate.cert_name
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : [
+        for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.signed_certs : cert
+        if cert.name == value_refer.tfstate.cert_name
       ]
       if secret.tfstate != null
     ]
@@ -78,7 +78,7 @@ data "helm_template" "podman_kubes" {
   # }
   # # tls
   # dynamic "set" {
-  #   for_each = var.podman_kube.helm.secrets == null ? [] : flatten([var.podman_kube.helm.secrets.value_sets])
+  #   for_each = var.podman_kube.helm.value_refers == null ? [] : flatten([var.podman_kube.helm.value_refers.value_sets])
   #   content {
   #     name  = set.value.name
   #     value = local.cert[0][set.value.value_ref_key]
@@ -95,12 +95,12 @@ data "helm_template" "podman_kubes" {
         )
       }
     ],
-    each.value.helm.secrets == null ? [] : [
-      for secret in each.value.helm.secrets : [
-        for value_set in secret.value_sets : {
+    each.value.helm.value_refers == null ? [] : [
+      for value_refer in each.value.helm.value_refers : [
+        for value_set in value_refer.value_sets : {
           name = value_set.name
-          # value = secret.tfstate == null ? null : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
-          value = secret.tfstate == null ? data.vault_kv_secret_v2.secrets[secret.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[secret.tfstate.cert_name][value_set.value_ref_key]
+          # value = secret.tfstate == null ? null : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+          value = secret.tfstate == null ? data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],

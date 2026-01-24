@@ -17,7 +17,7 @@ podman_kubes = [
       name       = "prometheus"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus"
       value_file = "./attachments-prometheus/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"
@@ -71,7 +71,7 @@ podman_kubes = [
       name       = "prometheus-consul-exporter"
       chart      = "../../../HelmWorkShop/helm-charts/charts/prometheus-consul-exporter"
       value_file = "./attachments-consul-exporter/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_consul"

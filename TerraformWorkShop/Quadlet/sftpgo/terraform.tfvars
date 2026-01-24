@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "sftpgo"
       chart      = "../../../HelmWorkShop/helm-charts/charts/sftpgo"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           tfstate = {
             backend = {

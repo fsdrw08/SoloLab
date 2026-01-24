@@ -26,7 +26,7 @@ resource "null_resource" "init" {
   }
 }
 
-data "vault_kv_secret_v2" "secrets" {
+data "vault_kv_secret_v2" "secret" {
   for_each = {
     for secret in [
       {
@@ -76,10 +76,10 @@ module "config_map" {
       {
         basename = "client.hcl"
         content = templatefile("./attachments/client.hcl", {
-          # consul_token_init    = data.vault_kv_secret_v2.secrets["token-init_management"].data["token"]
-          consul_token_default = data.vault_kv_secret_v2.secrets["token-consul_dns"].data["token"]
-          consul_token_client  = data.vault_kv_secret_v2.secrets["token-consul_client"].data["token"]
-          consul_encrypt_key   = data.vault_kv_secret_v2.secrets["key-gossip_encryption"].data["key"]
+          # consul_token_init    = data.vault_kv_secret_v2.secret["token-init_management"].data["token"]
+          consul_token_default = data.vault_kv_secret_v2.secret["token-consul_dns"].data["token"]
+          consul_token_client  = data.vault_kv_secret_v2.secret["token-consul_client"].data["token"]
+          consul_encrypt_key   = data.vault_kv_secret_v2.secret["key-gossip_encryption"].data["key"]
           tls_ca_file          = "/consul/config/certs/ca.crt"
           # tls_cert_file        = "/consul/config/certs/server.crt"
           # tls_key_file         = "/consul/config/certs/server.key"
@@ -92,7 +92,7 @@ module "config_map" {
         files = [
           {
             basename = "ca.crt"
-            content  = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
+            content  = data.vault_kv_secret_v2.secret["sololab_root"].data["ca"]
           }
         ]
       }

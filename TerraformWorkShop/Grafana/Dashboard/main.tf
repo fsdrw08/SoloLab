@@ -1,4 +1,4 @@
-data "vault_kv_secret_v2" "secrets" {
+data "vault_kv_secret_v2" "secret" {
   for_each = {
     sololab_root = {
       mount = "kvv2_certs"
@@ -18,7 +18,7 @@ resource "grafana_data_source" "data_sources" {
   url  = each.value.url
 
   secure_json_data_encoded = jsonencode({
-    tlsCACert = data.vault_kv_secret_v2.secrets["sololab_root"].data["ca"]
+    tlsCACert = data.vault_kv_secret_v2.secret["sololab_root"].data["ca"]
   })
 
   json_data_encoded = jsonencode({

@@ -23,14 +23,8 @@ variable "podman_kubes" {
           })
         ), null
       )
-      secrets = optional(
+      value_refers = optional(
         list(object({
-          value_sets = list(
-            object({
-              name          = string
-              value_ref_key = string
-            })
-          )
           vault_kvv2 = optional(
             object({
               mount = string
@@ -47,6 +41,12 @@ variable "podman_kubes" {
               cert_name = string
             }),
             null
+          )
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
           )
         })),
         null

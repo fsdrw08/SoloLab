@@ -18,7 +18,7 @@ podman_kubes = [
       name       = "consul"
       chart      = "../../../HelmWorkShop/helm-charts/charts/consul"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"

@@ -18,7 +18,7 @@ podman_kubes = [
       name       = "redis-insight"
       chart      = "../../../HelmWorkShop/helm-charts/charts/redis-insight"
       value_file = "./podman-redis-insight/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"

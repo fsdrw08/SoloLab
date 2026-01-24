@@ -11,7 +11,7 @@ podman_kubes = [
       name       = "etcd"
       chart      = "../../../HelmWorkShop/helm-charts/charts/etcd"
       value_file = "./attachments/values-sololab.yaml"
-      secrets = [
+      value_refers = [
         {
           tfstate = {
             backend = {
