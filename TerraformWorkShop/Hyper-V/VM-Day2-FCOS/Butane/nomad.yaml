@@ -24,7 +24,7 @@ storage:
       mode: 0644
       contents:
         source: ${nomad_podman_driver_download_url}
-        # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.3/nomad-driver-podman_0.6.3_linux_amd64.zip
+        # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
     - path: /etc/nomad.d/client.pem
       mode: 0600
       contents:

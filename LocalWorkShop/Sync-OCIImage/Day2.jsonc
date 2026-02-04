@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.6",
-        "archive": "docker.io_library_traefik_v3.6.6.tar",
-        "privateRepo": "library/traefik:v3.6.6",
+        "publicRepo": "library/traefik:v3.6.7",
+        "archive": "docker.io_library_traefik_v3.6.7.tar",
+        "privateRepo": "library/traefik:v3.6.7",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -22,17 +22,10 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "navidys/prometheus-podman-exporter:v1.19.0",
-        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.19.0.tar",
-        "privateRepo": "navidys/prometheus-podman-exporter:v1.19.0",
+        "publicRepo": "navidys/prometheus-podman-exporter:v1.20.0",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.20.0.tar",
+        "privateRepo": "navidys/prometheus-podman-exporter:v1.20.0",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
-    },
-    {
-        "publicRegistry": "quay.io",
-        "publicRepo": "enterprisedb/pgbouncer:1.24.1",
-        "archive": "quay.io_enterprisedb_pgbouncer_1.24.1.tar",
-        "privateRepo": "enterprisedb/pgbouncer:1.24.1",
-        "description": "https://quay.io/repository/enterprisedb/pgbouncer?tab=tags",
     },
     {
         "publicRegistry": "ghcr.io",
@@ -43,9 +36,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20251217",
-        "archive": "quay.io_fedora_postgresql-16_20251217.tar",
-        "privateRepo": "fedora/postgresql-16:20251217",
+        "publicRepo": "fedora/postgresql-16:20260203",
+        "archive": "quay.io_fedora_postgresql-16_20260203.tar",
+        "privateRepo": "fedora/postgresql-16:20260203",
         "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
     },
     {
@@ -71,9 +64,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "redis/redisinsight:2.70.1",
-        "archive": "docker.io_redis_redisinsight_2.70.1.tar",
-        "privateRepo": "redis/redisinsight:2.70.1",
+        "publicRepo": "redis/redisinsight:3.0.2",
+        "archive": "docker.io_redis_redisinsight_3.0.2.tar",
+        "privateRepo": "redis/redisinsight:3.0.2",
         "description": "https://hub.docker.com/r/redis/redisinsight/tags",
     },
 ]

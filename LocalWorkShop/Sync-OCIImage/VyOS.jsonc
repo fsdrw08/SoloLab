@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "project-zot/zot-linux-amd64:v2.1.11",
-        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.11.tar",
-        "privateRepo": "project-zot/zot-linux-amd64:v2.1.11",
+        "publicRepo": "project-zot/zot-linux-amd64:v2.1.14",
+        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.14.tar",
+        "privateRepo": "project-zot/zot-linux-amd64:v2.1.14",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags, https://github.com/project-zot/zot/pkgs/container/zot-linux-amd64",
     },
     {
@@ -29,23 +29,23 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:351",
-        "archive": "quay.io_cockpit_ws_351.tar",
-        "privateRepo": "cockpit/ws:351",
+        "publicRepo": "cockpit/ws:354",
+        "archive": "quay.io_cockpit_ws_354.tar",
+        "privateRepo": "cockpit/ws:354",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
         "publicRegistry": "docker.io", // "quay.io",
-        "publicRepo": "coredns/coredns:1.13.2", // "giantswarm/coredns:1.13.2",
-        "archive": "docker.io_coredns_coredns_1.13.2.tar",
-        "privateRepo": "coredns/coredns:1.13.2",
+        "publicRepo": "coredns/coredns:1.14.1", // "giantswarm/coredns:1.14.1",
+        "archive": "docker.io_coredns_coredns_1.14.1.tar",
+        "privateRepo": "coredns/coredns:1.14.1",
         "description": "https://hub.docker.com/r/coredns/coredns/tags, https://quay.io/repository/giantswarm/coredns?tab=tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.22.2",
-        "archive": "docker.io_hashicorp_consul_1.22.2.tar",
-        "privateRepo": "hashicorp/consul:1.22.2",
+        "publicRepo": "hashicorp/consul:1.22.3",
+        "archive": "docker.io_hashicorp_consul_1.22.3.tar",
+        "privateRepo": "hashicorp/consul:1.22.3",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
 ]

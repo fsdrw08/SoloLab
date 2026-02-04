@@ -88,7 +88,7 @@ traefik:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
-    # https://github.com/traefik/traefik/blob/v3.6.6/docs/content/https/acme.md#cacertificates
+    # https://github.com/traefik/traefik/blob/v3.6.7/docs/content/https/acme.md#cacertificates
     - name: LEGO_CA_CERTIFICATES
       value: /etc/traefik/tls/ca.crt
     - name: LEGO_CA_SYSTEM_CERT_POOL

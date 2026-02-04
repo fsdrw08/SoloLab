@@ -22,7 +22,7 @@ job "nfs-nodes" {
     task "plugin" {
       driver = "podman"
       config {
-        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.11.0"
+        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.12.1"
         args = [
           "--drivername=nfs.csi.k8s.io",
           "--endpoint=unix:///csi/csi.sock",
