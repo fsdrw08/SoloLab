@@ -13,18 +13,18 @@ job "nfs-controller" {
   group "nfs-controller" {
     task "plugin" {
       service {
-        provider     = "consul"
-        name         = "nfs-controller"
+        provider = "consul"
+        name     = "nfs-controller"
         tags = [
           "log",
         ]
       }
-      
+
       driver = "podman"
 
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
       config {
-        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.11.0"
+        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.12.1"
         args = [
           "--drivername=nfs.csi.k8s.io",
           "--endpoint=unix://csi/csi.sock",
