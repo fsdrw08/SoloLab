@@ -46,3 +46,4 @@ sudo xfsrestore -f podmgr_2.xfsdump /var/home/podmgr
 3. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
 4. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
 ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
+5. Run `sudo rpm-ostree cleanup -r` to clean up the old ostree deployments and free up space on Fedora CoreOS
