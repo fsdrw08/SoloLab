@@ -29,13 +29,12 @@ job "redis" {
       service {
         provider = "consul"
         name     = "redis-${attr.unique.hostname}"
-        port     = 6379
+        port     = "redis"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
-          address_mode   = "driver"
           type           = "tcp"
-          port           = 6379
+          port           = "redis"
           interval       = "180s"
           timeout        = "2s"
           initial_status = "passing"

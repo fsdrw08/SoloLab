@@ -5,11 +5,11 @@ prov_nomad = {
 
 jobs = [
   {
-    path = "./attachments/redis.nomad.hcl"
+    path = "./attachments-redis/redis.nomad.hcl"
     var_sets = [
       {
         name                = "config"
-        value_template_path = "./attachments/server.conf"
+        value_template_path = "./attachments-redis/server.conf"
       }
     ]
   },
