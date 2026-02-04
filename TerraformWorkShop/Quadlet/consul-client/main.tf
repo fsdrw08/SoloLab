@@ -31,7 +31,7 @@ locals {
         mount = value_refer.vault_kvv2.mount
         name  = value_refer.vault_kvv2.name
       }
-      if secret.vault_kvv2 != null
+      if value_refer.vault_kvv2 != null
     ]
   ])
   tls_tfstate = flatten([
@@ -40,7 +40,7 @@ locals {
         backend = value_refer.tfstate.backend
         name    = value_refer.tfstate.cert_name
       }
-      if secret.tfstate != null
+      if value_refer.tfstate != null
     ]
   ])
 }
@@ -69,7 +69,7 @@ locals {
         for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.signed_certs : cert
         if cert.name == value_refer.tfstate.cert_name
       ]
-      if secret.tfstate != null
+      if value_refer.tfstate != null
     ]
   ])
   certs = data.terraform_remote_state.tfstate == null ? null : {
@@ -102,8 +102,8 @@ data "helm_template" "podman_kubes" {
       for value_refer in each.value.helm.value_refers : [
         for value_set in value_refer.value_sets : {
           name = value_set.name
-          # value = secret.tfstate == null ? null : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
-          value = secret.tfstate == null ? data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+          # value = value_refer.tfstate == null ? null : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+          value = value_refer.tfstate == null ? data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
         }
       ]
     ],
