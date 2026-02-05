@@ -17,29 +17,7 @@ podman_kubes = [
     helm = {
       name       = "redis-insight"
       chart      = "../../../HelmWorkShop/helm-charts/charts/redis-insight"
-      value_file = "./podman-redis-insight/values-sololab.yaml"
-      value_refers = [
-        {
-          vault_kvv2 = {
-            mount = "kvv2_certs"
-            name  = "redis-insight.day1.sololab"
-          }
-          value_sets = [
-            {
-              name          = "redisInsight.tls.contents.ca\\.crt"
-              value_ref_key = "ca"
-            },
-            {
-              name          = "redisInsight.tls.contents.server\\.crt"
-              value_ref_key = "cert"
-            },
-            {
-              name          = "redisInsight.tls.contents.server\\.key"
-              value_ref_key = "private_key"
-            },
-          ]
-        }
-      ]
+      value_file = "./attachments/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/redis-insight-aio.yaml"
   },
@@ -61,16 +39,17 @@ podman_quadlet = {
             Wants                 = ""
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # podman
+            PodmanArgs = "--tls-verify=false"
+            Network    = ""
             # kube
             yaml          = "redis-insight-aio.yaml"
-            PodmanArgs    = "--tls-verify=false"
             KubeDownForce = "false"
-            Network       = "host"
             # service
-            # wait until vault oidc ready
-            # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
             ExecStartPre  = ""
-            ExecStartPost = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 50-60 -n 1) && podman healthcheck run redis-insight-server\""
             Restart       = "on-failure"
           }
         },
@@ -82,20 +61,3 @@ podman_quadlet = {
     },
   ]
 }
-
-prov_pdns = {
-  api_key    = "powerdns"
-  server_url = "https://pdns-auth.day0.sololab"
-}
-
-dns_records = [
-  {
-    zone = "day1.sololab."
-    name = "redis-insight.day1.sololab."
-    type = "CNAME"
-    ttl  = 86400
-    records = [
-      "redis-insight.service.consul."
-    ]
-  }
-]

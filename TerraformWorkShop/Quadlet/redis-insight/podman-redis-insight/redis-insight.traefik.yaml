@@ -1,6 +1,0 @@
-http:
-  serversTransports:
-    redis-insight:
-      serverName: redis-insight.day1.sololab
-      rootcas:
-        - "/etc/traefik/tls/ca.crt"
