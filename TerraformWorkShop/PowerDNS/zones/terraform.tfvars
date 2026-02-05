@@ -295,14 +295,6 @@ zones = [
           "192.168.255.2"
         ]
       },
-      {
-        fqdn = "redis-insight.day2.sololab."
-        type = "A"
-        ttl  = 60
-        results = [
-          "192.168.255.2"
-        ]
-      },
     ]
   },
   {
@@ -335,6 +327,14 @@ zones = [
       },
       {
         fqdn = "pgweb.day2.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "redis-insight.day2.sololab."
         type = "A"
         ttl  = 60
         results = [
