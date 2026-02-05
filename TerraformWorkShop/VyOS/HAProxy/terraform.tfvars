@@ -207,6 +207,14 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day2_frontend_redis_insight = {
+    path = "load-balancing haproxy service tcp443 rule 270"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "redis-insight.day2.sololab"
+      "set backend" = "day1"
+    }
+  }
   day2_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 300"
     configs = {

@@ -16,57 +16,74 @@ job "redis-insight" {
     task "redis-insight" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
-        provider = "consul"
-        name     = "redis-insight-${attr.unique.hostname}"
+        provider     = "consul"
+        name         = "redis-insight"
+        address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
           address_mode   = "driver"
           type           = "tcp"
-          port           = 6379
+          port           = 5540
           interval       = "180s"
           timeout        = "2s"
           initial_status = "passing"
         }
 
+        meta {
+          scheme            = "https"
+          address           = "redis-insight.service.consul"
+          health_check_path = "/api/health"
+          # metrics_path      = "metrics"
+        }
+
+        # traffic path: haproxy.vyos -(tcp route)-> 
+        #   traefik.day1 -[http route: decrypt(redis-insight.day2.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
+        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "log",
+
+          "traefik.enable=true",
+          "traefik.http.routers.redis-insight-redirect.entryPoints=web",
+          "traefik.http.routers.redis-insight-redirect.rule=Host(`redis-insight.day2.sololab`)",
+          "traefik.http.routers.redis-insight-redirect.middlewares=toHttps@file",
+
+          "traefik.http.routers.redis-insight.entryPoints=webSecure",
+          "traefik.http.routers.redis-insight.rule=Host(`redis-insight.day2.sololab`)",
+          "traefik.http.routers.redis-insight.tls.certresolver=internal",
+
+          "traefik.http.services.redis-insight.loadbalancer.server.scheme=https",
+          "traefik.http.services.redis-insight.loadbalancer.server.port=443",
+          "traefik.http.services.redis-insight.loadBalancer.serversTransport=consul-service@file",
         ]
       }
 
-      user = "999:1000"
+      user = "1000:1000"
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/library/redis:8.4.0"
-        args = [
-          "redis-server",
-          "/local/server.conf",
-        ]
+        image = "zot.day0.sololab/redis/redisinsight:3.0.2"
+        labels = {
+          "traefik.enable"                                          = "true"
+          "traefik.http.routers.redis-insight-redirect.entrypoints" = "web"
+          "traefik.http.routers.redis-insight-redirect.rule"        = "Host(`redis-insight.day2.sololab`)"
+          "traefik.http.routers.redis-insight-redirect.middlewares" = "toHttps@file"
+          "traefik.http.routers.redis-insight.service"              = "redis-insight"
+
+          "traefik.http.routers.redis-insight.entryPoints" = "webSecure"
+          "traefik.http.routers.redis-insight.rule"        = "Host(`redis-insight.day2.sololab`)"
+          "traefik.http.routers.redis-insight.tls"         = "true"
+          "traefik.http.routers.redis-insight.service"     = "redis-insight"
+
+          "traefik.http.services.redis-insight.loadbalancer.server.port" = "5540"
+        }
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        TZ            = "Asia/Shanghai"
-        REDISCLI_AUTH = "P@ssw0rd"
+        TZ                = "Asia/Shanghai"
+        RI_ENCRYPTION_KEY = "somepassword"
       }
-
-      template {
-        data        = var.config
-        destination = "local/server.conf"
-        change_mode = "restart"
-      }
-
-      template {
-        data = <<-EOH
-        user default off
-        user admin on ~* +@all >P@ssw0rd
-        user gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
-        EOH
-
-        destination = "secrets/acl.conf"
-      }
-      # vault {}
 
       resources {
         # Specifies the CPU required to run this task in MHz
@@ -77,14 +94,15 @@ job "redis-insight" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
-        volume        = "redis"
+        volume = "redis-insight"
+        # https://github.com/redis/RedisInsight/blob/3.0.2/Dockerfile#L55
         destination   = "/data"
         selinux_label = "Z"
       }
     }
-    volume "redis" {
+    volume "redis-insight" {
       type            = "host"
-      source          = "redis"
+      source          = "redis-insight"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

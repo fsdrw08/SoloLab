@@ -217,6 +217,17 @@ dns_records = [
     }
   },
   {
+    hostname = "redis-insight.day2.sololab"
+    value = {
+      string_map = {
+        host = "redis-insight.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "prometheus-blackbox-exporter.day1.sololab"
     value = {
       string_map = {

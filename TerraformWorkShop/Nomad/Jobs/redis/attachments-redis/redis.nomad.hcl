@@ -29,7 +29,6 @@ job "redis" {
       service {
         provider = "consul"
         name     = "redis-${attr.unique.hostname}"
-        port     = "redis"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
@@ -50,6 +49,11 @@ job "redis" {
       driver = "podman"
       config {
         image = "zot.day0.sololab/library/redis:8.4.0"
+
+        ports = [
+          "redis",
+        ]
+
         args = [
           "redis-server",
           "/local/server.conf",

@@ -13,4 +13,7 @@ jobs = [
       }
     ]
   },
+  {
+    path = "./attachments-redis-insight/redis-insight.nomad.hcl"
+  },
 ]
