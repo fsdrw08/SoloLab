@@ -47,6 +47,16 @@ grafana:
         allow_assign_grafana_admin: true
         # ref: https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/#roles-and-permissions
         role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin' || contains(groups[*], 'app-grafana-admin') && 'Admin' || contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
+      plugins:
+        # Comma separated list of plugin ids to install as part of the startup process.
+        # https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-using-grafana-configuration
+        # https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        # https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
+        preinstall:
+          - grafana-lokiexplore-app@1.0.35@http://dufs.day0.sololab/public/binaries/grafana-lokiexplore-app-1.0.35.zip
+          - grafana-pyroscope-app@1.16.0@http://dufs.day0.sololab/public/binaries/grafana-pyroscope-app-1.16.0.zip
+          - grafana-exploretraces-app@1.3.2@http://dufs.day0.sololab/public/binaries/grafana-exploretraces-app-1.3.2.zip
+          - grafana-metricsdrilldown-app@1.0.29@http://dufs.day0.sololab/public/binaries/grafana-metricsdrilldown-app-1.0.29.zip
   secret:
     others:
       # mountPath: /etc/grafana/secret

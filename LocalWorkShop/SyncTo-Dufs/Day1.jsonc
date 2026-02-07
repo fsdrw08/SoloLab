@@ -1,20 +1,46 @@
 [
     {
-        // https://releases.hashicorp.com/nomad/1.11.1/nomad_1.11.1_linux_amd64.zip
+        // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
+        // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
+        // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
         "type": "general",
-        "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad/1.11.1/nomad_1.11.1_linux_amd64.zip",
-        "archive": "nomad_1.11.1_linux_amd64.zip",
-        "privateRepo": "public/binaries/nomad_1.11.1_linux_amd64.zip",
-        "description": "https://releases.hashicorp.com/nomad",
+        "publicRegistry": "https://storage.googleapis.com",
+        "publicRepo": "grafana-plugins-catalog/grafana-lokiexplore-app/release/1.0.35/grafana-lokiexplore-app-1.0.35.zip",
+        "archive": "grafana-lokiexplore-app-1.0.35.zip",
+        "privateRepo": "public/binaries/grafana-lokiexplore-app-1.0.35.zip",
+        "description": "https://grafana.com/grafana/plugins/grafana-lokiexplore-app/",
     },
     {
-        // https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
+        // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
+        // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
+        // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
         "type": "general",
-        "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "archive": "nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "privateRepo": "public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "description": "https://releases.hashicorp.com/nomad-driver-podman/",
+        "publicRegistry": "https://storage.googleapis.com",
+        "publicRepo": "grafana-plugins-catalog/grafana-pyroscope-app/release/1.16.0/grafana-pyroscope-app-1.16.0.zip",
+        "archive": "grafana-pyroscope-app-1.16.0.zip",
+        "privateRepo": "public/binaries/grafana-pyroscope-app-1.16.0.zip",
+        "description": "https://grafana.com/grafana/plugins/grafana-pyroscope-app/?tab=changelog",
+    },
+    {
+        // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
+        // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
+        // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        "type": "general",
+        "publicRegistry": "https://storage.googleapis.com",
+        "publicRepo": "grafana-plugins-catalog/grafana-exploretraces-app/release/1.3.2/grafana-exploretraces-app-1.3.2.zip",
+        "archive": "grafana-exploretraces-app-1.3.2.zip",
+        "privateRepo": "public/binaries/grafana-exploretraces-app-1.3.2.zip",
+        "description": "https://grafana.com/grafana/plugins/grafana-exploretraces-app/?tab=changelog",
+    },
+    {
+        // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
+        // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
+        // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        "type": "general",
+        "publicRegistry": "https://storage.googleapis.com",
+        "publicRepo": "grafana-plugins-catalog/grafana-metricsdrilldown-app/release/1.0.29/grafana-metricsdrilldown-app-1.0.29.zip",
+        "archive": "grafana-metricsdrilldown-app-1.0.29.zip",
+        "privateRepo": "public/binaries/grafana-metricsdrilldown-app-1.0.29.zip",
+        "description": "https://grafana.com/grafana/plugins/grafana-metricsdrilldown-app/",
     },
 ]
