@@ -87,7 +87,7 @@ job "redis-insight" {
 
       resources {
         # Specifies the CPU required to run this task in MHz
-        cpu = 200
+        cpu = 400
         # Specifies the memory required in MB
         memory = 128
       }
