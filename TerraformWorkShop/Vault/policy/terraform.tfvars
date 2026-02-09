@@ -217,11 +217,6 @@ policy_bindings = [
         capabilities = [ "read" ]
       }
     EOT
-    token_binding = {
-      display_name = "consul-ca"
-      no_parent    = true
-      renewable    = true
-    }
   },
   {
     policy_name    = "cert-read"

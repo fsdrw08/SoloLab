@@ -51,17 +51,25 @@ resource "vault_kv_secret_v2" "secret" {
 
 data "vault_kv_secret_v2" "secret" {
   mount = "kvv2_vault"
-  name  = "token-consul_ca"
+  name  = "approle-consul_ca"
 }
 
 resource "consul_certificate_authority" "connect_ca" {
   connect_provider = "vault"
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault?page=connect&page=ca&page=vault#enable-vault-as-the-ca
   config_json = jsonencode({
-    Address                  = var.prov_vault.address
-    TLSServerName            = split("//", var.prov_vault.address)[1]
-    CAFile                   = "/consul/secret/certs/ca.crt"
-    Token                    = data.vault_kv_secret_v2.secret.data["token"]
+    Address       = var.prov_vault.address
+    TLSServerName = split("//", var.prov_vault.address)[1]
+    CAFile        = "/consul/secret/certs/ca.crt"
+    # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault#configuration-reference
+    # https://github.com/Mastercard/mangos/blob/f5d5530f43c82a959fe631811a862546c80fb366/mkosi.images/terraform/share/terraform/consul-connect.tf#L163
+    # Token                    = data.vault_kv_secret_v2.secret.data["token"]
+    Type = "approle"
+    Params = {
+      role_id   = data.vault_kv_secret_v2.secret.data["role_id"]
+      secret_id = data.vault_kv_secret_v2.secret.data["secret_id"]
+    }
+
     RootPkiPath              = "pki_consul_root"
     IntermediatePkiPath      = "pki_consul_int"
     LeafCertTTL              = "72h"

@@ -66,7 +66,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.7.0"
     }
     ldap = {
       source  = "l-with/ldap"
