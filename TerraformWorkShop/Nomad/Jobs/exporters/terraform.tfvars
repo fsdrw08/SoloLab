@@ -28,4 +28,7 @@ jobs = [
       }
     ]
   },
+  {
+    path = "./attachments-redis-exporter/redis-exporter.nomad.hcl"
+  },
 ]

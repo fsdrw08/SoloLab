@@ -69,4 +69,11 @@
         "privateRepo": "redis/redisinsight:3.0.2",
         "description": "https://hub.docker.com/r/redis/redisinsight/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "oliver006/redis_exporter:v1.80.2-alpine",
+        "archive": "docker.io_oliver006_redis_exporter_v1.80.2-alpine.tar",
+        "privateRepo": "oliver006/redis_exporter:v1.80.2-alpine",
+        "description": "https://hub.docker.com/r/oliver006/redis_exporter/tags",
+    },
 ]

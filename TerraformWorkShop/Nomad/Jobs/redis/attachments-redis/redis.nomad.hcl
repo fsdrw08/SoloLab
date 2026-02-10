@@ -41,7 +41,14 @@ job "redis" {
 
         tags = [
           "log",
+          "metrics-exposing-general",
         ]
+        meta {
+          scheme            = "https"
+          address           = "prometheus-redis-exporter-${attr.unique.hostname}.service.consul"
+          health_check_path = "scrape"
+          metrics_path      = "scrape"
+        }
       }
 
       user = "999:1000"
@@ -75,6 +82,7 @@ job "redis" {
       template {
         data = <<-EOH
         user default off
+        user exporter +client +ping +info +config|get +cluster|info +slowlog +latency +memory +select +get +scan +xinfo +type +pfcount +strlen +llen +scard +zcard +hlen +xlen on >exporter
         user admin on ~* +@all >P@ssw0rd
         user gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
         EOH
