@@ -44,6 +44,12 @@ dashboards = [
     }
   },
   {
+    template = "./attachments/Etcd-Cluster-Dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
+  {
     template = "./attachments/Consul-Exporter-Dashboard.json"
     vars = {
       DS_PROMETHEUS = "517bb05c"
