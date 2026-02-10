@@ -51,7 +51,7 @@ resource "vault_kv_secret_v2" "secret" {
 
 data "vault_kv_secret_v2" "secret" {
   mount = "kvv2_vault"
-  name  = "approle-consul_ca"
+  name  = "approle-consul_connect_pki"
 }
 
 resource "consul_certificate_authority" "connect_ca" {
@@ -64,10 +64,12 @@ resource "consul_certificate_authority" "connect_ca" {
     # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault#configuration-reference
     # https://github.com/Mastercard/mangos/blob/f5d5530f43c82a959fe631811a862546c80fb366/mkosi.images/terraform/share/terraform/consul-connect.tf#L163
     # Token                    = data.vault_kv_secret_v2.secret.data["token"]
-    Type = "approle"
-    Params = {
-      role_id   = data.vault_kv_secret_v2.secret.data["role_id"]
-      secret_id = data.vault_kv_secret_v2.secret.data["secret_id"]
+    AuthMethod = {
+      Type = "approle"
+      Params = {
+        role_id   = data.vault_kv_secret_v2.secret.data["role_id"]
+        secret_id = data.vault_kv_secret_v2.secret.data["secret_id"]
+      }
     }
 
     RootPkiPath              = "pki_consul_root"
