@@ -44,14 +44,11 @@ resource "vault_kv_secret_v2" "secret" {
   mount               = var.vault_secret_backend
   name                = "approle-${replace(each.value.role_name, "-", "_")}"
   delete_all_versions = true
-  data_json = jsonencode(
-    {
-      role_id = vault_approle_auth_backend_role.role[each.key].role_id
-    }
-  )
   data_json_wo = jsonencode(
     {
+      role_id   = vault_approle_auth_backend_role.role[each.key].role_id
       secret_id = ephemeral.vault_approle_auth_backend_role_secret_id.secret_id[each.key].secret_id
     }
   )
+  data_json_wo_version = each.value.secret_version
 }

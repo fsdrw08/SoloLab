@@ -9,6 +9,7 @@ approles = [
     role_name      = "consul-connect-pki"
     role_id        = "consul-connect-pki"
     token_policies = ["consul-ca"]
+    secret_version = 1
   }
 ]
 

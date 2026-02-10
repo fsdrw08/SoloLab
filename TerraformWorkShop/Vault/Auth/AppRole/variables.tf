@@ -26,6 +26,8 @@ variable "approles" {
       token_num_uses          = optional(number, null)
       token_type              = optional(string, null)
       alias_metadata          = optional(map(string), null)
+
+      secret_version = optional(number, 1)
     })
   )
 }
