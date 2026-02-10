@@ -98,7 +98,7 @@ job "prometheus-podman-exporter" {
         # Specifies the CPU required to run this task in MHz
         cpu = 200
         # Specifies the memory required in MB
-        memory = 128
+        memory = 64
       }
 
     }

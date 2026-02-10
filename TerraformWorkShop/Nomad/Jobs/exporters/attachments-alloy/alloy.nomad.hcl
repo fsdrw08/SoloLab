@@ -102,7 +102,7 @@ job "alloy" {
         # Specifies the CPU required to run this task in MHz
         cpu = 200
         # Specifies the memory required in MB
-        memory = 384
+        memory = 256
       }
 
       template {
