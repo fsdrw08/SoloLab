@@ -51,9 +51,9 @@ job "prometheus-node-exporter" {
           "traefik.http.services.prometheus-node-exporter-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
         ]
         meta {
-          scheme       = "https"
-          address      = "prometheus-node-exporter-${attr.unique.hostname}.service.consul"
-          metrics_path = "metrics"
+          exporter_scheme       = "https"
+          exporter_address      = "prometheus-node-exporter-${attr.unique.hostname}.service.consul"
+          exporter_metrics_path = "metrics"
         }
       }
 

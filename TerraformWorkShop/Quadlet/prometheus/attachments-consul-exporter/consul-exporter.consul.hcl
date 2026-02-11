@@ -29,9 +29,9 @@ services {
     # "traefik.http.routers.prometheus-consul-exporter.tls=true",
   ]
   meta = {
-    scheme            = "https"
-    address           = "prometheus-consul-exporter.day1.sololab"
-    health_check_path = "metrics"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "prometheus-consul-exporter.day1.sololab"
+    health_check_path     = "metrics"
+    exporter_metrics_path = "metrics"
   }
 }

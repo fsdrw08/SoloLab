@@ -32,9 +32,9 @@ services {
     # "traefik.http.services.prometheus.loadbalancer.server.scheme=https",
   ]
   meta = {
-    scheme            = "https"
-    address           = "prometheus.day1.sololab"
-    health_check_path = "metrics"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "prometheus.day1.sololab"
+    health_check_path     = "metrics"
+    exporter_metrics_path = "metrics"
   }
 }

@@ -29,9 +29,9 @@ services {
     # "traefik.http.routers.prometheus-blackbox-exporter.tls=true",
   ]
   meta = {
-    scheme            = "https"
-    address           = "prometheus-blackbox-exporter.day1.sololab"
-    health_check_path = "metrics"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "prometheus-blackbox-exporter.day1.sololab"
+    health_check_path     = "metrics"
+    exporter_metrics_path = "metrics"
   }
 }

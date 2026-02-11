@@ -35,9 +35,9 @@ services {
     "traefik.http.routers.metrics.service=prometheus@internal",
   ]
   meta = {
-    scheme            = "https"
-    address           = "traefik-day1.service.consul"
-    health_check_path = "metrics"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "traefik-day1.service.consul"
+    health_check_path     = "metrics"
+    exporter_metrics_path = "metrics"
   }
 }

@@ -32,11 +32,11 @@ services {
   ]
 
   meta = {
-    scheme            = "https"
-    address           = "consul.service.consul"
+    exporter_scheme   = "https"
+    exporter_address  = "consul.service.consul"
     health_check_path = "v1/status/leader"
     # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
-    metrics_path              = "v1/agent/metrics"
-    metrics_path_param_format = "prometheus"
+    exporter_metrics_path              = "v1/agent/metrics"
+    exporter_metrics_path_param_format = "prometheus"
   }
 }

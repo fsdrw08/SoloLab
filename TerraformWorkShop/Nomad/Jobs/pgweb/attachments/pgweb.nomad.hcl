@@ -51,10 +51,10 @@ job "pgweb" {
         }
 
         meta {
-          scheme            = "https"
-          address           = "pgweb.service.consul"
+          exporter_scheme   = "https"
+          exporter_address  = "pgweb.service.consul"
           health_check_path = ""
-          # metrics_path      = "metrics"
+          # exporter_metrics_path      = "metrics"
         }
 
         # traffic path: haproxy.vyos -(tcp route)-> 

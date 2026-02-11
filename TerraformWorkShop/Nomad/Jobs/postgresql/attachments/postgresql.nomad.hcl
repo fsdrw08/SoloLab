@@ -31,21 +31,28 @@ job "postgresql" {
         }
 
         tags = [
-          "postgres-exporter",
-          "log",
           "behind_pgbouncer",
+          "log",
+          "metrics-exposing-general",
         ]
 
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
-          dbName        = "test"
-          dbConfig      = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
+          # meta data to render pgbouncer config with consul template
+          dbName   = "test"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
+          # meta data to render pgweb config with consul template
           dbUser        = "test"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
-          # for postgres exporter
-          address = "pgbouncer-${node.unique.name}.service.consul"
-          port    = 6432
-          # param_auth_module = "postgres_exporter"
+          # meta data for Prometheus consul_sd_config:
+          # this postgresql server hosting behind pgbouncer, so we need to tell 
+          # prometheus to scrap metrics from postgres exporter with multi target pattern:
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Ftest
+          exporter_scheme                         = "https"
+          exporter_address                        = "prometheus-postgres-exporter.service.consul"
+          exporter_metrics_path                   = "probe"
+          exporter_metrics_path_param_auth_module = "postgres_exporter"
+          exporter_metrics_path_param_target      = "postgresql-${attr.unique.hostname}.service.consul:5432/test"
         }
       }
 

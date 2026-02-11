@@ -18,7 +18,7 @@ job "prometheus-redis-exporter" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider     = "consul"
-        name         = "prometheus-redis-exporter-${attr.unique.hostname}"
+        name         = "prometheus-redis-exporter"
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -43,12 +43,12 @@ job "prometheus-redis-exporter" {
         labels = {
           "traefik.enable"                                                      = "true"
           "traefik.http.routers.prometheus-redis-exporter-redirect.entrypoints" = "web"
-          "traefik.http.routers.prometheus-redis-exporter-redirect.rule"        = "Host(`prometheus-redis-exporter-${attr.unique.hostname}.service.consul`)"
+          "traefik.http.routers.prometheus-redis-exporter-redirect.rule"        = "Host(`prometheus-redis-exporter.service.consul`)"
           "traefik.http.routers.prometheus-redis-exporter-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.prometheus-redis-exporter.service"              = "prometheus-redis-exporter"
 
           "traefik.http.routers.prometheus-redis-exporter.entrypoints" = "webSecure"
-          "traefik.http.routers.prometheus-redis-exporter.rule"        = "Host(`prometheus-redis-exporter-${attr.unique.hostname}.service.consul`)"
+          "traefik.http.routers.prometheus-redis-exporter.rule"        = "Host(`prometheus-redis-exporter.service.consul`)"
           "traefik.http.routers.prometheus-redis-exporter.tls"         = "true"
           "traefik.http.routers.prometheus-redis-exporter.service"     = "prometheus-redis-exporter"
 

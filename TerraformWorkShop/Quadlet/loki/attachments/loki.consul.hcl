@@ -21,9 +21,9 @@ services {
     "metrics-exposing-general",
   ]
   meta = {
-    scheme            = "https"
-    address           = "loki.day1.sololab"
-    health_check_path = "ready"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "loki.day1.sololab"
+    health_check_path     = "ready"
+    exporter_metrics_path = "metrics"
   }
 }

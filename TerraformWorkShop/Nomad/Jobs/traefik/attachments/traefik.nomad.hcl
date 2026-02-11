@@ -69,10 +69,10 @@ job "traefik" {
       ]
 
       meta {
-        scheme            = "https"
-        address           = "traefik-${attr.unique.hostname}.service.consul"
-        health_check_path = "metrics"
-        metrics_path      = "metrics"
+        exporter_scheme       = "https"
+        exporter_address      = "traefik-${attr.unique.hostname}.service.consul"
+        health_check_path     = "metrics"
+        exporter_metrics_path = "metrics"
       }
     }
 

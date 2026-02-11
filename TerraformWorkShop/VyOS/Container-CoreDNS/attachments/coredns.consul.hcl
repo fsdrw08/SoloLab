@@ -21,9 +21,9 @@ services {
   ]
 
   meta = {
-    scheme            = "https"
-    address           = "coredns.vyos.sololab"
-    health_check_path = "health"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "coredns.vyos.sololab"
+    health_check_path     = "health"
+    exporter_metrics_path = "metrics"
   }
 }

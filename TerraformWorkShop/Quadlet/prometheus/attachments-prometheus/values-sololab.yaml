@@ -92,46 +92,46 @@ prometheus:
               replacement: https
             - target_label: __address__
               replacement: prometheus-blackbox-exporter.day1.sololab
-        - job_name: postgres_exporter
-          scrape_interval: 300s
-          scrape_timeout: 10s
-          tls_config:
-            insecure_skip_verify: true
-          metrics_path: /probe
-          params:
-            auth_module: [postgres_exporter]
-          consul_sd_configs:
-            - server: consul.service.consul:8501
-              datacenter: dc1
-              scheme: https
-              tls_config:
-                ca_file: /etc/prometheus/secrets/certs/ca.crt
-              authorization:
-                credentials_file: /etc/prometheus/secrets/others/consul-token
-          relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
-              regex: .*,postgres-exporter,.*
-              action: keep
-            - source_labels:
-                - __meta_consul_service_metadata_address
-                - __meta_consul_service_metadata_port
-                - __meta_consul_service_metadata_dbName
-              regex: (.+);(.+);(.+)
-              replacement: ${1}:${2}/${3}
-              target_label: __param_target
-            - source_labels: [__param_target]
-              target_label: instance
-            - action: labelmap
-              regex: __meta_consul_service_metadata_param_(.+)
-              replacement: __param_$1
-            # postgres exporter config
-            - target_label: __scheme__
-              replacement: https
-            - target_label: __address__
-              replacement: prometheus-postgres-exporter.service.consul
+        # - job_name: postgres_exporter
+        #   scrape_interval: 300s
+        #   scrape_timeout: 10s
+        #   tls_config:
+        #     insecure_skip_verify: true
+        #   metrics_path: /probe
+        #   params:
+        #     auth_module: [postgres_exporter]
+        #   consul_sd_configs:
+        #     - server: consul.service.consul:8501
+        #       datacenter: dc1
+        #       scheme: https
+        #       tls_config:
+        #         ca_file: /etc/prometheus/secrets/certs/ca.crt
+        #       authorization:
+        #         credentials_file: /etc/prometheus/secrets/others/consul-token
+        #   relabel_configs:
+        #     - source_labels: ["__meta_consul_tags"]
+        #       regex: .*,postgres-exporter,.*
+        #       action: keep
+        #     - source_labels:
+        #         - __meta_consul_service_metadata_address
+        #         - __meta_consul_service_metadata_port
+        #         - __meta_consul_service_metadata_dbName
+        #       regex: (.+);(.+);(.+)
+        #       replacement: ${1}:${2}/${3}
+        #       target_label: __param_target
+        #     - source_labels: [__param_target]
+        #       target_label: instance
+        #     - action: labelmap
+        #       regex: __meta_consul_service_metadata_param_(.+)
+        #       replacement: __param_$1
+        #     # postgres exporter config
+        #     - target_label: __scheme__
+        #       replacement: https
+        #     - target_label: __address__
+        #       replacement: prometheus-postgres-exporter.service.consul
 
         # below config tell prometheus to:
-        # 1. get target data from consul service definition's metadata, only keep the data which the service has `exporter` tag
+        # 1. get target data from consul service definition's metadata, only keep the data which the service has `metrics-exposing-general` tag
         # 2. assemble the service's metadata to an url, format:
         # `scheme`://`address`:`port`/`metrics_path`?`metrics_path_param_<key>=metrics_path_param_<value>`
         # finally, prometheus send request to the url above
@@ -153,21 +153,22 @@ prometheus:
             - source_labels: ["__meta_consul_tags"]
               regex: .*,metrics-exposing-general,.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_scheme"]
+            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
-            - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+            - source_labels:
+                - "__meta_consul_service_metadata_exporter_metrics_path"
               target_label: __metrics_path__
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config
             - action: labelmap
@@ -194,16 +195,16 @@ prometheus:
             - source_labels: ["__meta_consul_tags"]
               regex: .*metrics-exposing-vault.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_scheme"]
+            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
@@ -211,7 +212,7 @@ prometheus:
             - source_labels: ["__meta_consul_service_metadata_metrics_path"]
               target_label: __metrics_path__
             - action: labelmap
-              regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+              regex: __meta_consul_service_metadata_exporter_metrics_path_param_(.+)
               replacement: __param_$1
         - job_name: consul_exporter
           tls_config:
@@ -232,24 +233,25 @@ prometheus:
             - source_labels: ["__meta_consul_tags"]
               regex: .*metrics-exposing-consul.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_scheme"]
+            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_exporter_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
-            - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+            - source_labels:
+                - "__meta_consul_service_metadata_exporter_metrics_path"
               target_label: __metrics_path__
             - action: labelmap
-              regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+              regex: __meta_consul_service_metadata_exporter_metrics_path_param_(.+)
               replacement: __param_$1
   # https://prometheus.io/docs/prometheus/3.4/command-line/prometheus/
   flags:

@@ -33,10 +33,10 @@ services {
   ]
 
   meta = {
-    scheme                    = "https"
-    address                   = "vault.day0.sololab"
-    health_check_path         = "v1/sys/health"
-    metrics_path              = "v1/sys/metrics"
-    metrics_path_param_format = "prometheus"
+    exporter_scheme                    = "https"
+    exporter_address                   = "vault.day0.sololab"
+    health_check_path                  = "v1/sys/health"
+    exporter_metrics_path              = "v1/sys/metrics"
+    exporter_metrics_path_param_format = "prometheus"
   }
 }

@@ -44,10 +44,10 @@ job "redis" {
           "metrics-exposing-general",
         ]
         meta {
-          scheme            = "https"
-          address           = "prometheus-redis-exporter-${attr.unique.hostname}.service.consul"
-          health_check_path = "scrape"
-          metrics_path      = "scrape"
+          exporter_scheme                    = "https"
+          exporter_address                   = "prometheus-redis-exporter.service.consul"
+          exporter_metrics_path              = "scrape"
+          exporter_metrics_path_param_target = "redis-${attr.unique.hostname}.service.consul:6379"
         }
       }
 

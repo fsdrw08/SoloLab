@@ -31,10 +31,10 @@ services {
     "traefik.http.services.nomad.loadbalancer.server.scheme=https",
   ]
   meta = {
-    scheme                    = "https"
-    address                   = "nomad.day1.sololab"
-    health_check_path         = "v1/status/leader"
-    metrics_path              = "v1/metrics"
-    metrics_path_param_format = "prometheus"
+    exporter_scheme                    = "https"
+    exporter_address                   = "nomad.day1.sololab"
+    health_check_path                  = "v1/status/leader"
+    exporter_metrics_path              = "v1/metrics"
+    exporter_metrics_path_param_format = "prometheus"
   }
 }

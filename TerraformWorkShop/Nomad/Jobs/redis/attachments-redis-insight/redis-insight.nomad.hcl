@@ -34,7 +34,7 @@ job "redis-insight" {
           scheme            = "https"
           address           = "redis-insight.service.consul"
           health_check_path = "/api/health"
-          # metrics_path      = "metrics"
+          # exporter_metrics_path      = "metrics"
         }
 
         # traffic path: haproxy.vyos -(tcp route)-> 

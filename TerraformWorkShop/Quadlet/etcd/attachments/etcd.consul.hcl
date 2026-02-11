@@ -24,9 +24,9 @@ services {
   ]
 
   meta = {
-    scheme            = "https"
-    address           = "etcd-0.day0.sololab"
-    health_check_path = "health"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "etcd-0.day0.sololab"
+    health_check_path     = "health"
+    exporter_metrics_path = "metrics"
   }
 }

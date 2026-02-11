@@ -24,9 +24,9 @@ services {
   # ]
 
   meta = {
-    scheme            = "https"
-    address           = "zot.day0.sololab"
-    health_check_path = "v2/"
-    metrics_path      = "metrics"
+    exporter_scheme       = "https"
+    exporter_address      = "zot.day0.sololab"
+    health_check_path     = "v2/"
+    exporter_metrics_path = "metrics"
   }
 }
