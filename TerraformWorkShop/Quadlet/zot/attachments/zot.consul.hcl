@@ -23,9 +23,12 @@ services {
   ]
 
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "zot.day0.sololab"
-    health_check_path     = "v2/"
-    exporter_metrics_path = "metrics"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "zot.day0.sololab"
+    prom_blackbox_health_check_path = "v2/"
+
+    prom_target_scheme       = "https"
+    prom_target_address      = "zot.day0.sololab"
+    prom_target_metrics_path = "metrics"
   }
 }

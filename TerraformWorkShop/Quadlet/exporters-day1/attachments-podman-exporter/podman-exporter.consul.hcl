@@ -21,9 +21,12 @@ services {
     "metrics-exposing-general",
   ]
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "prometheus-podman-exporter.day1.sololab"
-    health_check_path     = "metrics"
-    exporter_metrics_path = "metrics"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "prometheus-podman-exporter.day1.sololab"
+    prom_blackbox_health_check_path = "metrics"
+
+    prom_target_scheme       = "https"
+    prom_target_address      = "prometheus-podman-exporter.day1.sololab"
+    prom_target_metrics_path = "metrics"
   }
 }

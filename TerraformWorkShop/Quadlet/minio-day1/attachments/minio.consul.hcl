@@ -32,10 +32,10 @@ services {
     # "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
   ]
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "minio-api.day1.sololab"
-    health_check_path     = "minio/health/live"
-    exporter_metrics_path = "minio/v2/metrics/cluster"
+    prom_target_scheme       = "https"
+    prom_target_address      = "minio-api.day1.sololab"
+    health_check_path        = "minio/health/live"
+    prom_target_metrics_path = "minio/v2/metrics/cluster"
   }
 }
 

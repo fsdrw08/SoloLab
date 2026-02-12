@@ -19,18 +19,10 @@ services {
 
   tags = [
     "metrics-exposing-blackbox",
-
-    # "traefik.enable=true",
-    # "traefik.http.routers.grafana-redirect.entrypoints=web",
-    # "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day1.sololab`)",
-    # "traefik.http.routers.grafana-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.grafana.entrypoints=webSecure",
-    # "traefik.http.routers.grafana.rule=Host(`grafana.day1.sololab`)",
-    # "traefik.http.routers.grafana.tls=true",
   ]
   meta = {
-    scheme            = "https"
-    address           = "grafana.day1.sololab"
-    health_check_path = "api/health"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "grafana.day1.sololab"
+    prom_blackbox_health_check_path = "api/health"
   }
 }

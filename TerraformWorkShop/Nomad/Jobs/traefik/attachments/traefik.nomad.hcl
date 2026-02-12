@@ -69,10 +69,14 @@ job "traefik" {
       ]
 
       meta {
-        exporter_scheme       = "https"
-        exporter_address      = "traefik-${attr.unique.hostname}.service.consul"
-        health_check_path     = "metrics"
-        exporter_metrics_path = "metrics"
+        prom_blackbox_scheme            = "https"
+        prom_blackbox_address           = "traefik-${attr.unique.hostname}.service.consul"
+        prom_blackbox_health_check_path = "metrics"
+
+        prom_target_scheme            = "https"
+        prom_target_address           = "traefik-${attr.unique.hostname}.service.consul"
+        prom_target_health_check_path = "metrics"
+        prom_target_metrics_path      = "metrics"
       }
     }
 

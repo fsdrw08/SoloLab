@@ -30,17 +30,11 @@ job "redis-insight" {
           initial_status = "passing"
         }
 
-        meta {
-          scheme            = "https"
-          address           = "redis-insight.service.consul"
-          health_check_path = "/api/health"
-          # exporter_metrics_path      = "metrics"
-        }
-
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(redis-insight.day2.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
+          "metrics-exposing-blackbox",
           "log",
 
           "traefik.enable=true",
@@ -56,6 +50,11 @@ job "redis-insight" {
           "traefik.http.services.redis-insight.loadbalancer.server.port=443",
           "traefik.http.services.redis-insight.loadBalancer.serversTransport=consul-service@file",
         ]
+
+        meta {
+          prom_blackbox_scheme  = "https"
+          prom_blackbox_address = "redis-insight.${attr.unique.hostname}.sololab"
+        }
       }
 
       user = "1000:1000"

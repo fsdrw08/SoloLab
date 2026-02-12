@@ -1,7 +1,7 @@
 services {
   name = "cockpit-vyos"
   id   = "cockpit-web"
-  port = 9090
+  port = 443 # 9090
 
   checks = [
     # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
@@ -17,17 +17,13 @@ services {
     }
   ]
 
-  # tags = [
-  #   "traefik.enable=true",
-  #   "traefik.tcp.routers.cockpit-web.entrypoints=webSecure",
-  #   "traefik.tcp.routers.cockpit-web.rule=HostSNI(`cockpit.day1.sololab`)",
-  #   "traefik.tcp.routers.cockpit-web.tls.passthrough=true",
-  #   # "traefik.http.routers.cockpit-web-redirect.entrypoints=web",
-  #   # "traefik.http.routers.cockpit-web-redirect.rule=Host(`cockpit.day1.sololab`)",
-  #   # "traefik.http.routers.cockpit-web-redirect.middlewares=toHttps@file",
-  #   # "traefik.http.routers.cockpit-web.entrypoints=websecure",
-  #   # "traefik.http.routers.cockpit-web.rule=Host(`cockpit.day1.sololab`)",
-  #   # "traefik.http.routers.cockpit-web.tls=true",
-  #   # "traefik.http.services.cockpit-web.loadbalancer.server.scheme=https",
-  # ]
+  tags = [
+    "metrics-exposing-blackbox",
+  ]
+  meta = {
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "cockpit.vyos.sololab"
+    prom_blackbox_health_check_path = "ping"
+
+  }
 }

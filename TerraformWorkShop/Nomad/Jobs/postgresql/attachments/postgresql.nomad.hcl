@@ -48,11 +48,11 @@ job "postgresql" {
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
           # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Ftest
-          exporter_scheme                         = "https"
-          exporter_address                        = "prometheus-postgres-exporter.service.consul"
-          exporter_metrics_path                   = "probe"
-          exporter_metrics_path_param_auth_module = "postgres_exporter"
-          exporter_metrics_path_param_target      = "postgresql-${attr.unique.hostname}.service.consul:5432/test"
+          prom_target_scheme                         = "https"
+          prom_target_address                        = "prometheus-postgres-exporter.service.consul"
+          prom_target_metrics_path                   = "probe"
+          prom_target_metrics_path_param_auth_module = "postgres_exporter"
+          prom_target_metrics_path_param_target      = "postgresql-${attr.unique.hostname}.service.consul:5432/test"
         }
       }
 

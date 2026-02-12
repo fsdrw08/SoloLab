@@ -16,17 +16,21 @@ services {
     }
   ]
 
-  # https://github.com/project-zot/zot/issues/2149
-  # not able to scrape metric as http 401
-  # tags = [
-  #   "metrics-exposing-blackbox",
-  #   "metrics-exposing-general",
-  # ]
+  tags = [
+    "metrics-exposing-blackbox",
+    # https://github.com/project-zot/zot/issues/2149
+    # not able to scrape metric as http 401
+    # "metrics-exposing-general",
+  ]
 
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "zot.vyos.sololab"
-    health_check_path     = "v2/"
-    exporter_metrics_path = "metrics"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "zot.vyos.sololab"
+    prom_blackbox_health_check_path = "v2/"
+
+    # prom_target_scheme       = "https"
+    # prom_target_address      = "zot.vyos.sololab"
+    # prom_target_metrics_path = "metrics"
+    # health_check_path        = "v2/"
   }
 }

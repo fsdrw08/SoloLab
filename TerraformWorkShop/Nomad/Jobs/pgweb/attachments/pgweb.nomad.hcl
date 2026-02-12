@@ -36,8 +36,9 @@ job "pgweb" {
     task "pgweb" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
-        provider     = "consul"
-        name         = "pgweb"
+        provider = "consul"
+        name     = "pgweb"
+        # need to set address_mode to "host" to use day1 traefik's server transport
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -49,18 +50,11 @@ job "pgweb" {
           timeout        = "2s"
           initial_status = "passing"
         }
-
-        meta {
-          exporter_scheme   = "https"
-          exporter_address  = "pgweb.service.consul"
-          health_check_path = ""
-          # exporter_metrics_path      = "metrics"
-        }
-
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(pgweb.day2.sololab) & re-encrypt(server transport(pgweb.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
+          "metrics-exposing-blackbox",
           "log",
 
           "traefik.enable=true",
@@ -77,6 +71,11 @@ job "pgweb" {
           "traefik.http.services.pgweb.loadBalancer.serversTransport=consul-service@file",
         ]
 
+        meta {
+          prom_blackbox_scheme            = "https"
+          prom_blackbox_address           = "pgweb.day2.sololab"
+          prom_blackbox_health_check_path = ""
+        }
       }
 
       driver = "podman"

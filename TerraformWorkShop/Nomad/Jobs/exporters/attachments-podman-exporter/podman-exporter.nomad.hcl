@@ -51,10 +51,9 @@ job "prometheus-podman-exporter" {
           "traefik.http.services.prometheus-podman-exporter-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
         ]
         meta {
-          exporter_scheme       = "https"
-          exporter_address      = "prometheus-podman-exporter-${attr.unique.hostname}.service.consul"
-          health_check_path     = "metrics"
-          exporter_metrics_path = "metrics"
+          prom_target_scheme       = "https"
+          prom_target_address      = "prometheus-podman-exporter-${attr.unique.hostname}.service.consul"
+          prom_target_metrics_path = "metrics"
         }
       }
 

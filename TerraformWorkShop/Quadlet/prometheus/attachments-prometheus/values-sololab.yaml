@@ -27,13 +27,13 @@ prometheus:
         #       regex: .*multi-targe-exporter.*
         #       action: keep
         #     - source_labels:
-        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_scheme
+        #         - __meta_consul_service_metadata_prometheus_multi_target_prom_target_scheme
         #       target_label: __scheme__
         #     - source_labels:
-        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_address
+        #         - __meta_consul_service_metadata_prometheus_multi_target_prom_target_address
         #       target_label: __address__
         #     - source_labels:
-        #         - __meta_consul_service_metadata_prometheus_multi_target_exporter_metrics_path
+        #         - __meta_consul_service_metadata_prometheus_multi_target_prom_target_metrics_path
         #       target_label: __metrics_path__
         #     - action: labelmap
         #       regex: __meta_consul_service_metadata_prometheus_multi_target_exporter_param_(.+)
@@ -70,19 +70,19 @@ prometheus:
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
             # https://github.com/spirkaa/infra/blob/fa0fcce1e2e764d911f58c621cb81c9065e1ad41/cluster/observability/kube-prometheus-stack/kps/values.yaml#L163
             - source_labels:
-                - __meta_consul_service_metadata_scheme
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_prom_blackbox_scheme
+                - __meta_consul_service_metadata_prom_blackbox_address
                 - __meta_consul_service_port
-                - __meta_consul_service_metadata_health_check_path
+                - __meta_consul_service_metadata_prom_blackbox_health_check_path
               regex: (.+);(.+);0;(.*)
               replacement: ${1}://${2}/${4}
               target_label: __param_target
             - source_labels:
-                - __meta_consul_service_metadata_scheme
-                - __meta_consul_service_metadata_address
+                - __meta_consul_service_metadata_prom_blackbox_scheme
+                - __meta_consul_service_metadata_prom_blackbox_address
                 - __meta_consul_service_port
-                - __meta_consul_service_metadata_health_check_path
-              regex: (.+);(.+);(.+);(.*)
+                - __meta_consul_service_metadata_prom_blackbox_health_check_path
+              regex: (.+);(.+);([1-9][0-9]*);(.*)
               replacement: ${1}://${2}:${3}/${4}
               target_label: __param_target
             - source_labels: [__param_target]
@@ -153,26 +153,27 @@ prometheus:
             - source_labels: ["__meta_consul_tags"]
               regex: .*,metrics-exposing-general,.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
+            - source_labels:
+                ["__meta_consul_service_metadata_prom_target_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
             - source_labels:
-                - "__meta_consul_service_metadata_exporter_metrics_path"
+                - "__meta_consul_service_metadata_prom_target_metrics_path"
               target_label: __metrics_path__
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config
             - action: labelmap
-              regex: __meta_consul_service_metadata_metrics_path_param_(.+)
+              regex: __meta_consul_service_metadata_prom_target_metrics_path_param_(.+)
               replacement: __param_$1
 
         # job name have to match with grafana vault dashboard's query name
@@ -193,26 +194,28 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*metrics-exposing-vault.*
+              regex: .*,metrics-exposing-vault,.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
+            - source_labels:
+                ["__meta_consul_service_metadata_prom_target_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
-            - source_labels: ["__meta_consul_service_metadata_metrics_path"]
+            - source_labels:
+                - "__meta_consul_service_metadata_prom_target_metrics_path"
               target_label: __metrics_path__
             - action: labelmap
-              regex: __meta_consul_service_metadata_exporter_metrics_path_param_(.+)
+              regex: __meta_consul_service_metadata_prom_target_metrics_path_param_(.+)
               replacement: __param_$1
         - job_name: consul_exporter
           tls_config:
@@ -231,27 +234,28 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
             - source_labels: ["__meta_consul_tags"]
-              regex: .*metrics-exposing-consul.*
+              regex: .*,metrics-exposing-consul,.*
               action: keep
-            - source_labels: ["__meta_consul_service_metadata_exporter_scheme"]
+            - source_labels:
+                ["__meta_consul_service_metadata_prom_target_scheme"]
               target_label: __scheme__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);0
               replacement: ${1}
               target_label: __address__
             - source_labels:
-                - __meta_consul_service_metadata_exporter_address
+                - __meta_consul_service_metadata_prom_target_address
                 - __meta_consul_service_port
               regex: (.+);([1-9][0-9]*)
               replacement: ${1}:${2}
               target_label: __address__
             - source_labels:
-                - "__meta_consul_service_metadata_exporter_metrics_path"
+                - "__meta_consul_service_metadata_prom_target_metrics_path"
               target_label: __metrics_path__
             - action: labelmap
-              regex: __meta_consul_service_metadata_exporter_metrics_path_param_(.+)
+              regex: __meta_consul_service_metadata_prom_target_metrics_path_param_(.+)
               replacement: __param_$1
   # https://prometheus.io/docs/prometheus/3.4/command-line/prometheus/
   flags:

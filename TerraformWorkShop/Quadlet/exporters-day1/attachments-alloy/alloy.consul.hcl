@@ -1,7 +1,7 @@
 services {
   name = "alloy-day1"
   id   = "alloy-web"
-  port = 12345
+  port = 443 # 12345
 
   checks = [
     {
@@ -15,4 +15,12 @@ services {
       status          = "passing"
     }
   ]
+  tags = [
+    "metrics-exposing-blackbox",
+  ]
+  meta = {
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "alloy.day1.sololab"
+    prom_blackbox_health_check_path = "-/healthy"
+  }
 }

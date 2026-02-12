@@ -20,22 +20,15 @@ services {
   tags = [
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
-
-    # "traefik.enable=true",
-    # "traefik.http.routers.minio-api-redirect.entrypoints=web",
-    # "traefik.http.routers.minio-api-redirect.rule=Host(`minio-api.day1.sololab`)",
-    # "traefik.http.routers.minio-api-redirect.middlewares=toHttps@file",
-    # "traefik.http.routers.minio-api.entrypoints=webSecure",
-    # "traefik.http.routers.minio-api.rule=Host(`minio-api.day1.sololab`)",
-    # "traefik.http.routers.minio-api.tls=true",
-    # "traefik.http.services.minio-api.loadBalancer.serversTransport=minio-api@file",
-    # "traefik.http.services.minio-api.loadbalancer.server.scheme=https",
   ]
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "minio-api.day0.sololab"
-    health_check_path     = "minio/health/live"
-    exporter_metrics_path = "minio/v2/metrics/cluster"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "minio-api.day0.sololab"
+    prom_blackbox_health_check_path = "minio/health/live"
+
+    prom_target_scheme       = "https"
+    prom_target_address      = "minio-api.day0.sololab"
+    prom_target_metrics_path = "minio/v2/metrics/cluster"
   }
 }
 

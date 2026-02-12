@@ -32,11 +32,14 @@ services {
   ]
 
   meta = {
-    exporter_scheme   = "https"
-    exporter_address  = "consul.service.consul"
-    health_check_path = "v1/status/leader"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "consul.service.consul"
+    prom_blackbox_health_check_path = "v1/status/leader"
+
+    prom_target_scheme  = "https"
+    prom_target_address = "consul.service.consul"
     # https://developer.hashicorp.com/consul/docs/reference/agent/configuration-file/telemetry#telemetry-prometheus_retention_time
-    exporter_metrics_path              = "v1/agent/metrics"
-    exporter_metrics_path_param_format = "prometheus"
+    prom_target_metrics_path              = "v1/agent/metrics"
+    prom_target_metrics_path_param_format = "prometheus"
   }
 }

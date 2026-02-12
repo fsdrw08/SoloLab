@@ -21,9 +21,12 @@ services {
     "metrics-exposing-general",
   ]
   meta = {
-    exporter_scheme       = "https"
-    exporter_address      = "loki.day1.sololab"
-    health_check_path     = "ready"
-    exporter_metrics_path = "metrics"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "loki.day1.sololab"
+    prom_blackbox_health_check_path = "ready"
+
+    prom_target_scheme       = "https"
+    prom_target_address      = "loki.day1.sololab"
+    prom_target_metrics_path = "metrics"
   }
 }

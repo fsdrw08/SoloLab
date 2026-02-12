@@ -18,8 +18,8 @@ services {
   ]
 
   tags = [
-    "metrics-exposing-blackbox",
     "metrics-exposing-vault",
+    "metrics-exposing-blackbox",
 
     # "traefik.enable=true",
     # "traefik.http.routers.vault-redirect.entrypoints=web",
@@ -33,10 +33,13 @@ services {
   ]
 
   meta = {
-    exporter_scheme                    = "https"
-    exporter_address                   = "vault.day0.sololab"
-    health_check_path                  = "v1/sys/health"
-    exporter_metrics_path              = "v1/sys/metrics"
-    exporter_metrics_path_param_format = "prometheus"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "vault.day0.sololab"
+    prom_blackbox_health_check_path = "v1/sys/health"
+
+    prom_target_scheme                    = "https"
+    prom_target_address                   = "vault.day0.sololab"
+    prom_target_metrics_path              = "v1/sys/metrics"
+    prom_target_metrics_path_param_format = "prometheus"
   }
 }

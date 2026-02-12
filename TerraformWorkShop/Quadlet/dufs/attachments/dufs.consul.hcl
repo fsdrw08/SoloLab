@@ -1,7 +1,7 @@
 services {
   name = "dufs"
   id   = "dufs-server"
-  port = 5001
+  port = 443 # 5001
 
   checks = [
     {
@@ -20,8 +20,8 @@ services {
   ]
 
   meta = {
-    scheme            = "https"
-    address           = "dufs.day0.sololab"
-    health_check_path = "__dufs__/health"
+    prom_blackbox_scheme            = "https"
+    prom_blackbox_address           = "dufs.day0.sololab"
+    prom_blackbox_health_check_path = "__dufs__/health"
   }
 }
