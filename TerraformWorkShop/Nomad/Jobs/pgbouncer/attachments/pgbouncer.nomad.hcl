@@ -26,8 +26,9 @@ job "pgbouncer" {
     task "pgbouncer" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
-        provider = "consul"
-        name     = "pgbouncer-${attr.unique.hostname}"
+        provider     = "consul"
+        name         = "pgbouncer-${attr.unique.hostname}"
+        address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
