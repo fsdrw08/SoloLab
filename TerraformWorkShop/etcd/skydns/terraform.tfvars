@@ -151,6 +151,17 @@ dns_records = [
     }
   },
   {
+    hostname = "alloy.day1.sololab"
+    value = {
+      string_map = {
+        host = "alloy-day1.service.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "consul.day1.sololab"
     value = {
       string_map = {
