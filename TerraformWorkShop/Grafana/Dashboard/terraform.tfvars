@@ -11,6 +11,10 @@ prov_grafana = {
 
 data_sources = [
   {
+    # iac_id is used to link the data source with the dashboard variables in terraform side
+    # get generate by:
+    # powershell: new-guid
+    # bash: uuidgen
     iac_id = "1364b682"
     type   = "loki"
     name   = "loki"
@@ -99,6 +103,18 @@ dashboards = [
   },
   {
     template = "./attachments/postgres-exporter-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
+  {
+    template = "./attachments/redis-dashboard.json"
+    vars = {
+      DS_PROMETHEUS = "517bb05c"
+    }
+  },
+  {
+    template = "./attachments/meilisearch-dashboard.json"
     vars = {
       DS_PROMETHEUS = "517bb05c"
     }
