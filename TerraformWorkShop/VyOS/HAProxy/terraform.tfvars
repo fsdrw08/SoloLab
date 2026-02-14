@@ -231,4 +231,12 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day2_frontend_meilisearch = {
+    path = "load-balancing haproxy service tcp443 rule 320"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "meilisearch.day2.sololab"
+      "set backend" = "day1"
+    }
+  }
 }

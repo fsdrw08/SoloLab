@@ -75,6 +75,24 @@ dynamic_host_volumes = [
       uid = 26
       gid = 26
     }
+  },
+  {
+    name = "meilisearch"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day2"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 0
+      gid = 0
+    }
   }
 ]
 

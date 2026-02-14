@@ -304,4 +304,15 @@ dns_records = [
       }
     }
   },
+  {
+    hostname = "meilisearch.day2.sololab"
+    value = {
+      string_map = {
+        host = "day1.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
 ]

@@ -76,4 +76,11 @@
         "privateRepo": "oliver006/redis_exporter:v1.80.2-alpine",
         "description": "https://hub.docker.com/r/oliver006/redis_exporter/tags",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "getmeili/meilisearch:v1.35.0",
+        "archive": "docker.io_getmeili_meilisearch_v1.35.0.tar",
+        "privateRepo": "getmeili/meilisearch:v1.35.0",
+        "description": "https://hub.docker.com/r/getmeili/meilisearch/tags",
+    },
 ]
