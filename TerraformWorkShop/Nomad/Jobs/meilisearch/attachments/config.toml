@@ -13,3 +13,6 @@ master_key = "${master_key}"
 # Meilisearch currently supports six log levels, listed in order of increasing verbosity:  `OFF`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`
 # https://www.meilisearch.com/docs/learn/configuration/instance_options#log-level
 log_level = "INFO"
+# Experimental metrics feature. For more information, see: <https://github.com/meilisearch/meilisearch/discussions/3518>
+# Enables the Prometheus metrics on the `GET /metrics` endpoint.
+experimental_enable_metrics = true

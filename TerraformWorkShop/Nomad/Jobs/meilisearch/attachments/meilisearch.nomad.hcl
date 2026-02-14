@@ -2,6 +2,10 @@ variable "config" {
   type = string
 }
 
+variable "master_key" {
+  type = string
+}
+
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
 job "meilisearch" {
@@ -40,6 +44,7 @@ job "meilisearch" {
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
+          "metrics-exposing-general",
           "log",
 
           "traefik.enable=true",
@@ -60,6 +65,10 @@ job "meilisearch" {
           prom_blackbox_scheme            = "https"
           prom_blackbox_address           = "meilisearch-${attr.unique.hostname}.service.consul"
           prom_blackbox_health_check_path = "/health"
+
+          prom_target_scheme       = "https"
+          prom_target_address      = "meilisearch-${attr.unique.hostname}.service.consul"
+          prom_target_metrics_path = "metrics"
         }
       }
 
@@ -77,6 +86,13 @@ job "meilisearch" {
           "traefik.http.routers.meilisearch.rule"        = "(Host(`meilisearch.${attr.unique.hostname}.sololab`)||Host(`meilisearch-${attr.unique.hostname}.service.consul`))"
           "traefik.http.routers.meilisearch.tls"         = "true"
           "traefik.http.routers.meilisearch.service"     = "meilisearch"
+
+          "traefik.http.middlewares.meilisearch-metrics-AuthHeader.headers.customRequestHeaders.Authorization" = "Bearer ${var.master_key}"
+          "traefik.http.routers.meilisearch-metrics.entryPoints"                                               = "webSecure"
+          "traefik.http.routers.meilisearch-metrics.rule"                                                      = "(Host(`meilisearch.${attr.unique.hostname}.sololab`)||Host(`meilisearch-${attr.unique.hostname}.service.consul`)) && Path(`/metrics`)"
+          "traefik.http.routers.meilisearch-metrics.middlewares"                                               = "meilisearch-metrics-AuthHeader@docker"
+          "traefik.http.routers.meilisearch-metrics.tls"                                                       = "true"
+          "traefik.http.routers.meilisearch-metrics.service"                                                   = "meilisearch"
 
           "traefik.http.services.meilisearch.loadbalancer.server.port" = "7700"
         }

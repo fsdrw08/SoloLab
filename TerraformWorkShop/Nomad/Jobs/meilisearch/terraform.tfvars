@@ -14,6 +14,10 @@ jobs = [
           "master_key" = "sBAYWAE2iVmK4UFYuNxryoK-GyIPe7swAUN2nCcnSqY"
         }
       },
+      {
+        name         = "master_key"
+        value_string = "sBAYWAE2iVmK4UFYuNxryoK-GyIPe7swAUN2nCcnSqY"
+      },
     ]
   },
 ]
