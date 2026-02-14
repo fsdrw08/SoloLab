@@ -108,6 +108,8 @@ zot:
     others:
       contents:
         # htpasswd -bBn <username> <password>
+        # htpasswd -bBn admin P@ssw0rd
+        # htpasswd -bBn metric P@ssw0rd
         htpasswd: |
           admin:$2y$05$S94dvsnxtN2tTONk8eTGEuABGfzDAcXXqkWbIg62mHyOe71PWRRGa
           metric:$2y$05$aI.hrUK8PRqDnxG6ptitFO6Orzbn.ZbiVxYNuJPrJyMnVUCZLmrT.
@@ -129,6 +131,7 @@ zot:
     traefik.http.routers.zot.service: zot
 
     # add a basic auth header middleware to make metric request without authentication from prometheus
+    # bWV0cmljOlBAc3N3MHJk is the base64 encoding of "metric:P@ssw0rd"
     traefik.http.middlewares.metricBasicAuthHeader.headers.customRequestHeaders.Authorization: "Basic bWV0cmljOlBAc3N3MHJk"
     traefik.http.routers.zot-metric.entrypoints: webSecure
     traefik.http.routers.zot-metric.rule: "Host(`zot.day0.sololab`) && Path(`/metrics`)"
