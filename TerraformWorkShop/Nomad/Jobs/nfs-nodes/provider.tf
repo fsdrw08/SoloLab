@@ -5,9 +5,10 @@ terraform {
       version = ">= 2.5.1"
     }
   }
-  backend "pg" {
-    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-    schema_name = "Nomad-Job-NFS-Nodes"
+  backend "consul" {
+    address = "consul.day1.sololab"
+    scheme  = "https"
+    path    = "tfstate/Nomad/Job-NFS-Nodes"
   }
 }
 

@@ -7,7 +7,7 @@ job "nfs-nodes" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "!="
-    value     = "day1"
+    value     = "day2"
   }
 
   group "nfs-nodes" {
