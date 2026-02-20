@@ -18,6 +18,9 @@ buckets = [
   {
     bucket = "loki"
   },
+  {
+    bucket = "gitea"
+  },
 ]
 
 users = [
@@ -27,11 +30,17 @@ users = [
     hardcoded_credential = true
     access_key           = "terraform"
     secret_key           = "terraform"
-    secret_key_version   = "v1"
+    secret_key_version   = "1"
   },
   {
-    name     = "loki"
-    policies = ["loki-readwrite"]
+    name               = "loki"
+    policies           = ["loki-readwrite"]
+    secret_key_version = "1"
+  },
+  {
+    name               = "gitea"
+    policies           = ["gitea-readwrite"]
+    secret_key_version = "1"
   },
 ]
 
@@ -118,6 +127,25 @@ policies = [
                 ],
                 "Resource": [
                     "arn:aws:s3:::loki/*"
+                ]
+            }
+        ]
+    }
+    EOF
+  },
+  {
+    name   = "gitea-readwrite"
+    policy = <<-EOF
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gitea/*"
                 ]
             }
         ]
