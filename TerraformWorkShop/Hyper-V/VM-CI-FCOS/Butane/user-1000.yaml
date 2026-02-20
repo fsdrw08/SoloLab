@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+# config users
+passwd:
+  users:
+    # set core user password and ssh key
+    - name: core
+      uid: 1000
+      groups:
+        - wheel
+        - sudo
+      # to gen password hash
+      # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
+      password_hash: ${password_hash_1000}
+      ssh_authorized_keys:
+        - "${ssh_authorized_keys_1000}"
+storage:
+  files:
+    # core
+    # enable lingering to make user level service able to auto start on boot
+    - path: /var/lib/systemd/linger/core
+    # source bash auto completion
+    - path: /var/home/core/.bashrc
+      overwrite: true
+      user:
+        id: 1000
+      group:
+        id: 1000
+      contents:
+        inline: |
+          source /etc/profile.d/bash_completion.sh
+  # set rootless user home dir to external disk
+  directories:
+    - path: /var/home/core
+      mode: 0700
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.config
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # config podman quadlet
+    # https://www.redhat.com/sysadmin/multi-container-application-podman-quadlet
+    - path: /var/home/core/.config/containers
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.config/containers/systemd
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # config user level systemd
+    - path: /var/home/core/.config/systemd
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    - path: /var/home/core/.config/systemd/user
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level default.target.wants dir for service auto start
+    # https://docs.fedoraproject.org/en-US/fedora-coreos/tutorial-user-systemd-unit-on-boot/
+    - path: /var/home/core/.config/systemd/user/default.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level sockets.target.wants dir for service auto run during this phase
+    # then link the socket in this dir for socket auto start when user login
+    # https://github.com/coreos/fedora-coreos-pipeline/blob/0a519b24de4e779a3e44eaaf1784993a3468b9b6/multi-arch-builders/builder-common.bu#L113
+    - path: /var/home/core/.config/systemd/user/sockets.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level halt.target.wants dir for service auto run during this phase
+    - path: /var/home/core/.config/systemd/user/halt.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level poweroff.target.wants dir for service auto run during this phase
+    - path: /var/home/core/.config/systemd/user/poweroff.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level shutdown.target.wants dir for service auto run during this phase
+    - path: /var/home/core/.config/systemd/user/shutdown.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+    # create user level reboot.target.wants dir for service auto run during this phase
+    - path: /var/home/core/.config/systemd/user/reboot.target.wants
+      mode: 0755
+      user:
+        id: 1000
+      group:
+        id: 1000
+  links:
+    # link the socket in this dir for socket auto start when user login
+    - path: /var/home/core/.config/systemd/user/sockets.target.wants/podman.socket
+      target: /usr/lib/systemd/user/podman.socket
+      overwrite: true
+      user:
+        id: 1000
+      group:
+        id: 1000

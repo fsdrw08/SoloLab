@@ -1,0 +1,175 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    # mirror system image
+    # https://bootc-dev.github.io/bootc/registries-and-offline.html#pulling-updates-from-a-local-mirror
+    # https://github.com/chenzhiwei/linux/blob/8cdb9aa837747b12ea6efb240e7ebab89ec7a767/podman/README.md#setup-mirrors
+    - path: /etc/containers/registries.conf.d/local-registry.conf
+      contents:
+        inline: |
+          [[registry]]
+          prefix=""
+          location="quay.io/fedora/fedora-coreos"
+          mirror-by-digest-only=false
+          [[registry.mirror]]
+            location="${fcos_image_mirror}"
+    # mirror_fedora_repo
+    # https://mirrors.tuna.tsinghua.edu.cn/help/fedora/
+    # https://mirrors.ustc.edu.cn/help/fedora.html
+    - path: /etc/yum.repos.d/fedora.repo
+      overwrite: true
+      contents:
+        inline: |
+          [fedora]
+          name=Fedora $releasever - $basearch
+          failovermethod=priority
+          baseurl=https://mirrors.ustc.edu.cn/fedora/releases/$releasever/Everything/$basearch/os/
+          enabled=1
+          metadata_expire=7d
+          repo_gpgcheck=0
+          type=rpm
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=False
+    - path: /etc/yum.repos.d/fedora-updates.repo
+      overwrite: true
+      contents:
+        inline: |
+          [updates]
+          name=Fedora $releasever - $basearch - Updates
+          failovermethod=priority
+          baseurl=https://mirrors.ustc.edu.cn/fedora/updates/$releasever/Everything/$basearch/
+          enabled=1
+          repo_gpgcheck=0
+          type=rpm
+          gpgcheck=1
+          metadata_expire=6h
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=False
+    - path: /etc/yum.repos.d/fedora-updates-archive.repo
+      overwrite: true
+      contents:
+        inline: |
+          [updates-archive]
+          name=Fedora $releasever - $basearch - Updates Archive
+          baseurl=https://fedoraproject-updates-archive.fedoraproject.org/fedora/$releasever/$basearch/
+          enabled=0
+          metadata_expire=6h
+          repo_gpgcheck=0
+          type=rpm
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=True
+          cost=10000 # default is 1000
+    - path: /etc/yum.repos.d/fedora-cisco-openh264.repo
+      overwrite: true
+      contents:
+        inline: |
+          [fedora-cisco-openh264]
+          name=Fedora $releasever openh264 (From Cisco) - $basearch
+          metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-$releasever&arch=$basearch
+          type=rpm
+          enabled=0
+          metadata_expire=14d
+          repo_gpgcheck=0
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=True
+
+          [fedora-cisco-openh264-debuginfo]
+          name=Fedora $releasever openh264 (From Cisco) - $basearch - Debug
+          metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-debug-$releasever&arch=$basearch
+          type=rpm
+          enabled=0
+          metadata_expire=14d
+          repo_gpgcheck=0
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=True
+
+          [fedora-cisco-openh264-source]
+          name=Fedora $releasever openh264 (From Cisco) - $basearch - Source
+          metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-source-$releasever&arch=$basearch
+          type=rpm
+          enabled=0
+          metadata_expire=14d
+          repo_gpgcheck=0
+          gpgcheck=1
+          gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
+          skip_if_unavailable=True
+    # install packages during ignition process
+    # https://cockpit-project.org/running.html#coreos
+    # https://github.com/coreos/fedora-coreos-tracker/issues/681
+    - path: /etc/systemd/system/rpm-ostree-install.service.d/rpms.conf
+      contents:
+        inline: |
+          [Service]
+          Environment=RPMS="${packages}"
+systemd:
+  units:
+    # zincati service use cincinnati protocol to fetch latest system image information from remote server
+    # zincati service in fcos almost meaning tie the registry endpoint of system upgrade to the external container registry, e.g. quay.io/fedora/fedora-coreos
+    # in order to use private container registry to upgrade system image, we have to disable zincati service
+    # to upgrade system image:
+    # 1. Push the latest os image to private registry
+    # 2. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
+    # 3. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
+    # ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
+    - name: zincati.service
+      enabled: false
+    - name: rpm-ostreed-automatic.timer
+      enabled: true
+    # ref: https://github.com/krestomatio/terraform-ct-butane-snippets/blob/9c077717430e19175e27a14d65a11f535dcc8bd0/modules/common/butane.tf#L453
+    # https://github.com/coreos/rpm-ostree/blob/main/docs/container.md#rebasing-a-client-system
+    - name: rpm-ostree-rebase.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Rebase rpm-ostree
+        Wants=network-online.target
+        After=network-online.target
+        After=systemd-machine-id-commit.service
+        # We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+        Before=zincati.service
+        Before=shutdown.target
+        Before=rpm-ostree-install.service
+        ConditionPathExists=!/var/lib/%N.stamp
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStartPre=/usr/bin/rpm-ostree rebase ${fcos_rebase_mirror}
+        ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStartPost=/usr/bin/systemctl --no-block reboot
+        [Install]
+        WantedBy=multi-user.target
+
+    # install packages during ignition process
+    # https://docs.fedoraproject.org/en-US/fedora-coreos/os-extensions/
+    # https://github.com/coreos/fedora-coreos-tracker/issues/681#issuecomment-974301872
+    - name: rpm-ostree-install.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Layer additional rpms
+        Wants=network-online.target
+        After=network-online.target
+        # We run before `zincati.service` to avoid conflicting rpm-ostree transactions.
+        Before=zincati.service
+        ConditionPathExists=/var/lib/rpm-ostree-rebase.stamp
+        ConditionPathExists=!/var/lib/%N.stamp
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        # `--allow-inactive` ensures that rpm-ostree does not return an error
+        # if the package is already installed. This is useful if the package is
+        # added to the root image in a future Fedora CoreOS release as it will
+        # prevent the service from failing.
+        ExecStartPre=/usr/bin/rpm-ostree install -y --idempotent --allow-inactive $RPMS
+        ExecStart=/bin/touch /var/lib/%N.stamp
+        ExecStartPost=/bin/bash -c "systemctl --no-block reboot"
+        # ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
+
+        [Install]
+        WantedBy=multi-user.target

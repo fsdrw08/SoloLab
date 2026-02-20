@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    # enable dns resolution for podman default network
+    # ref: https://github.com/containers/podman/blob/main/docs/tutorials/basic_networking.md#default-network
+    - path: /etc/containers/networks/podman.json
+      mode: 0600
+      contents:
+        inline: |
+          {
+            "name": "podman",
+            "id": "2f259bab93aaaaa2542ba43ef33eb990d0999ee1b9924b557b7be53c0b7a1bb9",
+            "driver": "bridge",
+            "network_interface": "podman0",
+            "subnets": [
+              {
+                "subnet": "10.88.0.0/16",
+                "gateway": "10.88.0.1"
+              }
+            ],
+            "ipv6_enabled": false,
+            "internal": false,
+            "dns_enabled": true,
+            "ipam_options": {
+              "driver": "host-local"
+            }
+          }
+
+#   directories:
+#     - path: /etc/systemd/resolved.conf.d
+#   files:
+#     # config static ip
+#     # https://docs.fedoraproject.org/en-US/fedora-coreos/sysconfig-network-configuration/#_disabling_automatic_configuration_of_ethernet_devices
+#     # - path: /etc/NetworkManager/conf.d/noauto.conf
+#     #   mode: 0600
+#     #   contents:
+#     #     inline: |
+#     #       [main]
+#     #       # Do not do automatic (DHCP/SLAAC) configuration on ethernet devices
+#     #       # with no other matching connections.
+#     #       no-auto-default=*
+#     # https://networkmanager.dev/docs/api/latest/settings-connection.html
+#     - path: /etc/NetworkManager/system-connections/${interface}.nmconnection
+#       mode: 0600
+#       contents:
+#         inline: |
+#           [connection]
+#           id=${interface}
+#           type=ethernet
+#           interface-name=${interface}
+
+#           [ethernet]
+
+#           [ipv4]
+#           address1=${ip}/${prefix},${gateway}
+#           dns=${general_dns};
+#           may-fail=false
+#           method=manual
+#     # https://wiki.archlinux.org/title/Systemd-resolved#Automatically
+#     - path: /etc/systemd/resolved.conf.d/custom.conf
+#       contents:
+#         inline: |
+#           [Resolve]
+#           DNS=${domain_dns}
+#           Domains=${domain}

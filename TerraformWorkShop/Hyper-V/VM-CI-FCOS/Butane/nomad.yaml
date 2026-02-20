@@ -1,0 +1,219 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+
+# https://github.com/lancehampton/nomad-on-coreos/blob/main/coreos/ignition/nomad.yaml
+storage:
+  directories:
+    # nomad config dir
+    - path: /etc/nomad.d
+    # nomad data dir
+    - path: "${nomad_data_dir}"
+  # # dont use symlink for data_dir， but need a fixed path for log correction tools
+  # # https://discuss.hashicorp.com/t/cant-read-allocation-logs-path-escapes-the-alloc-directory/72841/2
+  # links:
+  #   - path: /var/lib/nomad
+  #     target: "${nomad_data_dir}"
+  files:
+    - path: /opt/bin/nomad_${nomad_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: ${nomad_download_url}
+    # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#installation
+    - path: /opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: ${nomad_podman_driver_download_url}
+        # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
+    - path: /etc/nomad.d/client.pem
+      mode: 0600
+      contents:
+        source: ${nomad_client_cert_download_url}
+        http_headers:
+          - name: Authorization
+            value: Basic ${nomad_client_cert_download_url_cred}
+    - path: /etc/nomad.d/client-key.pem
+      mode: 0600
+      contents:
+        source: ${nomad_client_cert_key_download_url}
+        http_headers:
+          - name: Authorization
+            value: Basic ${nomad_client_cert_download_url_cred}
+    - path: /etc/nomad.d/nomad.hcl
+      contents:
+        inline: |
+          client {
+            enabled = true
+            servers = ["${nomad_server_fqdn}"]
+            drain_on_shutdown {
+              deadline           = "20s"
+              ignore_system_jobs = true
+            }
+          }
+
+          consul {
+            address = "127.0.0.1:8501"
+            ca_file = "/etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem"
+            ssl = true
+            token = "${nomad_consul_acl_token}"
+          }
+
+          data_dir           = "${nomad_data_dir}"
+          leave_on_interrupt = true
+          leave_on_terminate = true
+
+          ports {
+            http = 4646
+            rpc  = 4647
+            serf = 4648
+          }
+
+          tls {
+            http = true
+            rpc  = true
+
+            ca_file   = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+            cert_file = "/etc/nomad.d/client.pem"
+            key_file  = "/etc/nomad.d/client-key.pem"
+
+            # verify_server_hostname = true
+            verify_https_client = true
+          }
+
+          plugin "docker" {
+            config {
+              endpoint = "unix:///disable/docker.sock"
+            }
+          }
+
+          # plugin "docker" {
+          #   config {
+          #     allow_privileged = true
+          #     infra_image = "zot.day0.sololab/pause-amd64:3.3"
+          #     volumes {
+          #       enabled      = true
+          #       selinuxlabel = "z"
+          #     }
+          #   }
+          # }
+
+          # Podman driver plugin configuration
+          # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
+          plugin "nomad-driver-podman" {
+            config {
+              socket { 
+                name        = "default"
+                socket_path = "unix://run/podman/podman.sock"
+              }
+              volumes {
+                enabled = true
+                selinuxlabel = "z"
+              }
+            }
+          }
+
+          plugin "raw_exec" {
+            config {
+              enabled = true
+            }
+          }
+
+          plugin_dir = "/opt/bin"
+
+          vault {
+            enabled = true
+            address = "${vault_server_address}"
+            ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+            jwt_auth_backend_path = "jwt-nomad"
+          }
+
+systemd:
+  units:
+    # https://github.com/containers/podman/blob/03bb9aa2e851d58d1fc0aec808bcffc2b95848be/docs/tutorials/basic_networking.md#default-network
+    - name: enable-podname-network-dns.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Enable Podman default network DNS resolution
+        After=podman.service
+        Wants=podman.service
+        Before=nomad.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/bin/bash -c "/usr/bin/podman network inspect podman | jq '.[] | del(.containers) | .dns_enabled = true' > /etc/containers/networks/podman.json"
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: prepare-nomad-binary.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Unpack Nomad binary and Podman driver to /opt/bin
+        ConditionPathExists=!/opt/bin/nomad
+
+        [Service]
+        Type=oneshot
+        Restart=on-failure
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_${nomad_version}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad_${nomad_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /opt/bin/nomad 
+        # Fix ownership to root:root for proper permissions
+        ExecStart=/usr/bin/chown root:root /opt/bin/nomad 
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad
+
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /var/mnt/data/nomad/plugins/nomad-driver-podman
+        # Fix ownership to root:root for proper permissions
+        ExecStart=/usr/bin/chown root:root /opt/bin/nomad-driver-podman
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad-driver-podman
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: nomad.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description="Nomad Client Agent"
+        Documentation=https://developer.hashicorp.com/
+        After=network-online.target prepare-nomad-binary.service podman.service
+        Wants=network-online.target
+        Requires=prepare-nomad-binary.service
+        Wants=consul.service
+        After=consul.service
+        Before=umount.target
+        Conflicts=umount.target
+
+        ConditionFileNotEmpty=/opt/bin/nomad
+        ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
+        ConditionPathIsDirectory=${nomad_data_dir}
+
+        [Service]
+        # https://developer.hashicorp.com/nomad/commands#environment-variables
+        Environment="NOMAD_ADDR=https://127.0.0.1:4646"
+        Environment="NOMAD_CACERT=/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+        Environment="NOMAD_CLIENT_CERT=/etc/nomad.d/client.pem"
+        Environment="NOMAD_CLIENT_KEY=/etc/nomad.d/client-key.pem"
+        Environment="NOMAD_TOKEN=${nomad_acl_token}" 
+
+        ExecReload=/bin/kill -HUP $MAINPID
+        ExecStart=/opt/bin/nomad agent \
+          -config /etc/nomad.d/nomad.hcl
+        # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
+        ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
+        ExecStop=/opt/bin/nomad node drain -enable -self
+        KillMode=process
+        KillSignal=SIGINT
+        LimitNOFILE=65536
+        LimitNPROC=infinity
+        TasksMax=infinity
+        Restart=on-failure
+        RestartSec=2
+        OOMScoreAdjust=-999
+
+        [Install]
+        WantedBy=multi-user.target

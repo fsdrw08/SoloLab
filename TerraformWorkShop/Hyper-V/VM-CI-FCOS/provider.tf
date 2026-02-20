@@ -2,50 +2,44 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.1.0"
+      version = ">= 1.2.1"
     }
     null = {
       source  = "hashicorp/null"
-      version = ">=3.2.2"
+      version = ">= 3.2.2"
     }
-    ignition = {
-      source  = "community-terraform-providers/ignition"
-      version = ">=2.3.2"
+    # ignition = {
+    #   source  = "community-terraform-providers/ignition"
+    #   version = ">=2.3.5"
+    # }
+    ct = {
+      source  = "poseidon/ct"
+      version = ">= 0.13.0"
+    }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.4.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = ">=2.5.3"
+      version = ">= 2.5.1"
     }
   }
 
   # https://ruben-rodriguez.github.io/posts/minio-s3-terraform-backend/
-  backend "s3" {
-    bucket = "tfstate"            # Name of the S3 bucket
-    key    = "Hyper-V/CI-FCOS-VM" # Name of the tfstate file
-
-    endpoints = {
-      s3 = "https://minio.service.consul" # Minio endpoint
-    }
-
-    access_key = "admin" # Access and secret keys
-    secret_key = "P@ssw0rd"
-
-    region                      = "main" # Region validation will be skipped
-    skip_credentials_validation = true   # Skip AWS related checks and validations
-    skip_metadata_api_check     = true
-    skip_region_validation      = true
-    use_path_style              = true
-    skip_requesting_account_id  = true
-    insecure                    = true
+  backend "consul" {
+    address = "consul.day1.sololab"
+    scheme  = "https"
+    path    = "tfstate/Hyper-V/VM-CI-FCOS"
   }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.hyperv_user
-  password = var.hyperv_password
-  host     = var.hyperv_host
-  port     = var.hyperv_port
+  user     = var.prov_hyperv.user
+  password = var.prov_hyperv.password
+  host     = var.prov_hyperv.host
+  port     = var.prov_hyperv.port
   https    = true
   insecure = true
   use_ntlm = true
@@ -55,4 +49,11 @@ provider "hyperv" {
   # key_path        = ""
   script_path = "C:/Temp/terraform_%RAND%.cmd"
   timeout     = "30s"
+}
+
+provider "vault" {
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
