@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
-job "postgresql" {
+job "gitea-db" {
   datacenters = ["dc1"]
   region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
@@ -12,13 +12,13 @@ job "postgresql" {
     value     = "day2"
   }
 
-  group "postgresql" {
+  group "gitea-db" {
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
-    task "postgresql" {
+    task "gitea-db" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
-        name     = "postgresql-${attr.unique.hostname}"
+        name     = "gitea-db-${attr.unique.hostname}"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
@@ -39,20 +39,20 @@ job "postgresql" {
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
           # meta data to render pgbouncer config with consul template
-          dbName   = "test"
-          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=test auth_user=pgbouncer"
+          dbName   = "gitea"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=gitea auth_user=pgbouncer"
           # meta data to render pgweb config with consul template
-          dbUser        = "test"
+          dbUser        = "gitea"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
-          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Ftest
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Fgitea
           prom_target_scheme                         = "https"
           prom_target_address                        = "prometheus-postgres-exporter.service.consul"
           prom_target_metrics_path                   = "probe"
           prom_target_metrics_path_param_auth_module = "postgres_exporter"
-          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/test"
+          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/gitea"
         }
       }
 
@@ -69,7 +69,7 @@ job "postgresql" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        POSTGRESQL_DATABASE        = "test"
+        POSTGRESQL_DATABASE        = "gitea"
         POSTGRESQL_LOG_DESTINATION = "/dev/stderr"
       }
 
@@ -93,7 +93,7 @@ job "postgresql" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
@@ -115,9 +115,9 @@ job "postgresql" {
         CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
-        ---GRANT CONNECT ON DATABASE test TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE gitea TO postgres_exporter;
 
-        \\c test;
+        \\c gitea;
         CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
         \$\$
           SELECT usename, passwd FROM pg_shadow WHERE usename=\$1;
@@ -135,9 +135,9 @@ job "postgresql" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/test"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"
@@ -154,14 +154,14 @@ job "postgresql" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
-        volume        = "test"
+        volume        = "gitea-db"
         destination   = "/var/lib/pgsql/data"
         selinux_label = "Z"
       }
     }
-    volume "test" {
+    volume "gitea-db" {
       type            = "host"
-      source          = "test"
+      source          = "gitea-db"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

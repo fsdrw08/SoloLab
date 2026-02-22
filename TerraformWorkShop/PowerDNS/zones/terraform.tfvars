@@ -350,6 +350,36 @@ zones = [
         ]
       },
     ]
+  },
+  {
+    name        = "ci.sololab."
+    nameservers = ["ns1.ci.sololab."]
+    records = [
+      {
+        fqdn = "ci.sololab."
+        type = "SOA"
+        ttl  = 60
+        results = [
+          "ns1.ci.sololab. ci.sololab. 2025081301 3600 600 1814400 7200"
+        ]
+      },
+      {
+        fqdn = "traefik.ci.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "gitea.ci.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+    ]
   }
 ]
 

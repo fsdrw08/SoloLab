@@ -249,5 +249,21 @@ policy_bindings = [
         capabilities = ["list"]
       }
     EOT
-  }
+  },
+  {
+    policy_name    = "minio-read"
+    policy_content = <<-EOT
+      path "kvv2_minio/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_minio/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_minio/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
+  },
 ]

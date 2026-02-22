@@ -7,18 +7,20 @@ reverse_proxy = {
   day0_backend = {
     path = "load-balancing haproxy backend day0"
     configs = {
-      "mode"                      = "tcp"
-      "server day0 address"       = "192.168.255.10"
-      "server day0 port"          = "443"
+      "mode"                = "tcp"
+      "server day0 address" = "192.168.255.10"
+      "server day0 port"    = "443"
+      # Send the PROXY protocol
       "server day0 send-proxy-v2" = ""
     }
   }
   day1_backend = {
     path = "load-balancing haproxy backend day1"
     configs = {
-      "mode"                      = "tcp"
-      "server day1 address"       = "192.168.255.20"
-      "server day1 port"          = "443"
+      "mode"                = "tcp"
+      "server day1 address" = "192.168.255.20"
+      "server day1 port"    = "443"
+      # Send the PROXY protocol
       "server day1 send-proxy-v2" = ""
     }
   }
@@ -236,6 +238,22 @@ reverse_proxy = {
     configs = {
       "ssl"         = "req-ssl-sni"
       "domain-name" = "meilisearch.day2.sololab"
+      "set backend" = "day1"
+    }
+  }
+  ci_frontend_traefik = {
+    path = "load-balancing haproxy service tcp443 rule 400"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "traefik.ci.sololab"
+      "set backend" = "day1"
+    }
+  }
+  ci_frontend_gogs = {
+    path = "load-balancing haproxy service tcp443 rule 410"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "gitea.ci.sololab"
       "set backend" = "day1"
     }
   }

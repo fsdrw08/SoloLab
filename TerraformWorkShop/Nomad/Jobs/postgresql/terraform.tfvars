@@ -4,13 +4,10 @@ prov_nomad = {
 }
 
 jobs = [
+  # {
+  #   path = "./attachments/test-db.nomad.hcl"
+  # },
   {
-    path = "./attachments/postgresql.nomad.hcl"
-    # var_sets = [
-    #   {
-    #     name                = "postgresql_config"
-    #     value_template_path = "./attachments/postgresql.ini"
-    #   }
-    # ]
+    path = "./attachments/gitea-db.nomad.hcl"
   },
 ]

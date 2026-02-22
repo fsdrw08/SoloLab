@@ -1,0 +1,9 @@
+[
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "gitea/gitea:1.25.4-rootless",
+        "archive": "docker.io_gitea-gitea_1.25.4-rootless.tar",
+        "privateRepo": "gitea/gitea:1.25.4-rootless",
+        "description": "https://hub.docker.com/r/gitea/gitea",
+    },
+]

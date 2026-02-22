@@ -17,4 +17,9 @@ databases = [
     user_name      = "test"
     secret_version = 1
   },
+  {
+    name           = "gitea"
+    user_name      = "gitea"
+    secret_version = 1
+  },
 ]

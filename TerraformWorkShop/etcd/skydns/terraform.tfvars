@@ -315,4 +315,26 @@ dns_records = [
       }
     }
   },
+  {
+    hostname = "traefik.ci.sololab"
+    value = {
+      string_map = {
+        host = "day1.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "gitea.ci.sololab"
+    value = {
+      string_map = {
+        host = "day1.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
 ]
