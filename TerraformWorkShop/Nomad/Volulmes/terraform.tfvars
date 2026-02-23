@@ -58,24 +58,24 @@ dynamic_host_volumes = [
       gid = 26
     }
   },
-  {
-    name = "gitea-db"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day2"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      uid = 26
-      gid = 26
-    }
-  },
+  # {
+  #   name = "gitea-db"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day2"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 26
+  #     gid = 26
+  #   }
+  # },
   {
     name = "meilisearch"
     constraint = [
@@ -98,9 +98,9 @@ dynamic_host_volumes = [
 
 csi_volumes = [
   {
-    name      = "nomad-gitea-config"
+    name      = "nomad-gitblit-config"
     plugin_id = "nfs"
-    volume_id = "gitea-config"
+    volume_id = "gitblit-config"
     capabilities = [
       {
         access_mode     = "multi-node-multi-writer"
@@ -121,9 +121,9 @@ csi_volumes = [
     }
   },
   {
-    name      = "nomad-gitea-data"
+    name      = "nomad-gitblit-data"
     plugin_id = "nfs"
-    volume_id = "gitea-data"
+    volume_id = "gitblit-data"
     capabilities = [
       {
         access_mode     = "multi-node-multi-writer"

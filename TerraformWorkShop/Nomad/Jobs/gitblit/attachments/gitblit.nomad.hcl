@@ -42,11 +42,10 @@ job "gitblit" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(meilisearch.day2.sololab) & re-encrypt(server transport(meilisearch-day2.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(gitblit.ci.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
-          "metrics-exposing-general",
           "log",
 
           "traefik.enable=true",
@@ -63,21 +62,17 @@ job "gitblit" {
           "traefik.http.services.gitblit.loadBalancer.serversTransport=consul-service@file",
         ]
 
-        # meta {
-        #   prom_blackbox_scheme            = "https"
-        #   prom_blackbox_address           = "gitblit.service.consul"
-        #   prom_blackbox_health_check_path = "/health"
-
-        #   prom_target_scheme       = "https"
-        #   prom_target_address      = "gitblit.service.consul"
-        #   prom_target_metrics_path = "metrics"
-        # }
+        meta {
+          prom_blackbox_scheme            = "https"
+          prom_blackbox_address           = "gitblit.service.consul"
+          prom_blackbox_health_check_path = "/"
+        }
       }
 
       driver = "podman"
       config {
-        # https://github.com/go-gitblit/gitblit/blob/v1.25.4/Dockerfile.rootless
-        image = "zot.day0.sololab/gitblit/gitblit:1.25.4-rootless"
+        # https://github.com/gitblit-org/gitblit-docker/blob/v1.10.0-1/Dockerfile
+        image = "zot.day0.sololab/gitblit/gitblit:1.10.0-rpc"
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.gitblit-redirect.entrypoints" = "web"
@@ -85,8 +80,14 @@ job "gitblit" {
           "traefik.http.routers.gitblit-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.gitblit-redirect.service"     = "gitblit"
 
+          # https://github.com/gitblit-org/gitblit/issues/900
+          "traefik.http.middlewares.gitblit-HSTSHeader.headers.stsPreload"           = "true"
+          "traefik.http.middlewares.gitblit-HSTSHeader.headers.stsSeconds"           = "15768000"
+          "traefik.http.middlewares.gitblit-HSTSHeader.headers.stsIncludeSubdomains" = "true"
+
           "traefik.http.routers.gitblit.entryPoints" = "webSecure"
           "traefik.http.routers.gitblit.rule"        = "(Host(`gitblit.ci.sololab`)||Host(`gitblit.service.consul`))"
+          "traefik.http.routers.gitblit.middlewares" = "gitblit-HSTSHeader@docker"
           "traefik.http.routers.gitblit.tls"         = "true"
           "traefik.http.routers.gitblit.service"     = "gitblit"
           # https://github.com/gitblit-org/gitblit-docker/blob/v1.10.0-1/Dockerfile.alpine#L86
@@ -99,13 +100,22 @@ job "gitblit" {
           # Customization files should be placed in /var/opt/gitblit/etc/gitblit.properties
           "local/gitblit.properties:/var/opt/gitblit/etc/gitblit.properties",
         ]
+        tmpfs = [
+          # https://hub.docker.com/r/gitblit/gitblit#temporary-webapp-data
+          "/var/opt/gitblit/temp:rw,size=102400k"
+        ]
+
+        userns = "keep-id:uid=8117,gid=8117"
+      }
+      env {
+        TZ = "Asia/Shanghai"
       }
 
       resources {
         # Specifies the CPU required to run this task in MHz
         cpu = 300
         # Specifies the memory required in MB
-        memory = 300
+        memory = 500
       }
 
       template {

@@ -327,7 +327,7 @@ dns_records = [
     }
   },
   {
-    hostname = "gitea.ci.sololab"
+    hostname = "gitblit.ci.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"

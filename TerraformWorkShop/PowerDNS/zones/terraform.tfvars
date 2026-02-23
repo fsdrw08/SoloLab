@@ -372,7 +372,7 @@ zones = [
         ]
       },
       {
-        fqdn = "gitea.ci.sololab."
+        fqdn = "gitblit.ci.sololab."
         type = "A"
         ttl  = 60
         results = [

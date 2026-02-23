@@ -39,6 +39,8 @@ users = [
       "app-nomad-admin",        # "ca4dde60" 
       "app-grafana-user",       # "a4019ca3" 
       "app-grafana-root",       # "a3d0b5af" 
+      "app-gitblit-user",       # "0d243b52" 
+      "app-gitblit-admin",      # "ba1fd3a9" 
     ]
   },
   {
@@ -136,6 +138,14 @@ groups = [
   {
     iac_id       = "9114292a"
     display_name = "app-grafana-editor"
+  },
+  {
+    iac_id       = "0d243b52"
+    display_name = "app-gitblit-user"
+  },
+  {
+    iac_id       = "ba1fd3a9"
+    display_name = "app-gitblit-admin"
   },
 ]
 

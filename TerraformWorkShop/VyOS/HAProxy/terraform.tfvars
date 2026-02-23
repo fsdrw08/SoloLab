@@ -249,11 +249,11 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  ci_frontend_gogs = {
+  ci_frontend_gitblit = {
     path = "load-balancing haproxy service tcp443 rule 410"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "gitea.ci.sololab"
+      "domain-name" = "gitblit.ci.sololab"
       "set backend" = "day1"
     }
   }
