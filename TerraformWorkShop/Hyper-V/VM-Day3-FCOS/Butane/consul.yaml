@@ -1,0 +1,97 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+
+# https://github.com/lancehampton/nomad-on-coreos/blob/main/coreos/ignition/consul.yaml
+storage:
+  directories:
+    # consul config dir
+    - path: /etc/consul.d
+    # consul data dir
+    - path: "${consul_data_dir}"
+  files:
+    - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
+      mode: 0644
+      contents:
+        source: ${consul_download_url}
+    - path: /etc/consul.d/consul.hcl
+      contents:
+        inline: |
+          acl {
+            enabled = true
+            tokens {
+              default = "${consul_acl_token}"
+            }
+          }
+          auto_encrypt {
+            tls = true
+          }
+          bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
+          client_addr = "127.0.0.1"
+          data_dir = "${consul_data_dir}"
+          encrypt = "${consul_encrypt_key}"
+          ports {
+            https = 8501
+          }
+          retry_join = ["${consul_server_fqdn}"]
+          server = false
+          tls {
+            defaults {
+              ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+              verify_incoming = false
+              verify_outgoing = true
+              verify_server_hostname = true
+            }
+            internal_rpc {
+              verify_server_hostname = true
+            }
+          }
+systemd:
+  units:
+    - name: prepare-consul-binary.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Unpack Consul binary to /opt/bin
+        ConditionPathExists=!/opt/bin/consul
+
+        [Service]
+        Type=oneshot
+        Restart=on-failure
+        RemainAfterExit=yes
+        Environment=consul_version=${consul_version}
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/consul_${consul_version}_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/consul_${consul_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x /opt/bin/consul
+        # Fix SELinux contexts for systemd execution
+        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/consul
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: consul.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description="HashiCorp Consul - A service mesh solution"
+        Documentation=https://developer.hashicorp.com/
+        After=network-online.target prepare-consul-binary.service
+        Wants=network-online.target
+        Requires=prepare-consul-binary.service
+        ConditionFileNotEmpty=/opt/bin/consul
+        ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+        ConditionPathIsDirectory=${consul_data_dir}
+        Before=umount.target
+        Conflicts=umount.target
+
+        [Service]
+        ExecStart=/opt/bin/consul agent \
+          -config-dir=/etc/consul.d
+        ExecReload=/bin/kill --signal HUP $MAINPID
+        KillMode=process
+        KillSignal=SIGTERM
+        Restart=on-failure
+        LimitNOFILE=65536
+
+        [Install]
+        WantedBy=multi-user.target

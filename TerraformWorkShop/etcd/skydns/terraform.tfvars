@@ -316,7 +316,7 @@ dns_records = [
     }
   },
   {
-    hostname = "traefik.ci.sololab"
+    hostname = "traefik.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -327,7 +327,7 @@ dns_records = [
     }
   },
   {
-    hostname = "gitblit.ci.sololab"
+    hostname = "gitblit.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"

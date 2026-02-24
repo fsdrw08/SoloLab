@@ -241,19 +241,19 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  ci_frontend_traefik = {
+  day3_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 400"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "traefik.ci.sololab"
+      "domain-name" = "traefik.day3.sololab"
       "set backend" = "day1"
     }
   }
-  ci_frontend_gitblit = {
+  day3_frontend_gitblit = {
     path = "load-balancing haproxy service tcp443 rule 410"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "gitblit.ci.sololab"
+      "domain-name" = "gitblit.day3.sololab"
       "set backend" = "day1"
     }
   }

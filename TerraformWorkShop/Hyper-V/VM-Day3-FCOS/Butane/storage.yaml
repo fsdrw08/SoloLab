@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Relativ-IT/Butane-Schemas/Release/Butane-Schema.json
+variant: fcos
+version: 1.5.0
+storage:
+  # data disk
+  disks:
+    - device: /dev/sdb
+      wipe_table: false
+      partitions:
+        - label: "1000"
+          number: 1
+          size_mib: 40959
+        - label: "1001"
+          number: 2
+          size_mib: 40959
+        - label: data
+          number: 3
+          size_mib: 40959
+  directories:
+    - path: /var/mnt/data
+  filesystems:
+    - device: /dev/disk/by-partlabel/1000
+      format: xfs
+      path: /var/home/core
+      wipe_filesystem: false
+      label: "1000"
+      with_mount_unit: true
+    - device: /dev/disk/by-partlabel/1001
+      format: xfs
+      path: /var/home/podmgr
+      wipe_filesystem: false
+      label: "1001"
+      with_mount_unit: true
+    - device: /dev/disk/by-partlabel/data
+      format: xfs
+      path: /var/mnt/data
+      wipe_filesystem: false
+      label: data
+      with_mount_unit: true

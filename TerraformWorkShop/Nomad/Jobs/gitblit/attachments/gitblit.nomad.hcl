@@ -13,7 +13,7 @@ job "gitblit" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "ci"
+    value     = "day3"
   }
 
   group "gitblit" {
@@ -42,7 +42,7 @@ job "gitblit" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(gitblit.ci.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(gitblit.day3.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
@@ -76,7 +76,7 @@ job "gitblit" {
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.gitblit-redirect.entrypoints" = "web"
-          "traefik.http.routers.gitblit-redirect.rule"        = "(Host(`gitblit.ci.sololab`)||Host(`gitblit.service.consul`))"
+          "traefik.http.routers.gitblit-redirect.rule"        = "(Host(`gitblit.day3.sololab`)||Host(`gitblit.service.consul`))"
           "traefik.http.routers.gitblit-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.gitblit-redirect.service"     = "gitblit"
 
@@ -86,7 +86,7 @@ job "gitblit" {
           "traefik.http.middlewares.gitblit-HSTSHeader.headers.stsIncludeSubdomains" = "true"
 
           "traefik.http.routers.gitblit.entryPoints" = "webSecure"
-          "traefik.http.routers.gitblit.rule"        = "(Host(`gitblit.ci.sololab`)||Host(`gitblit.service.consul`))"
+          "traefik.http.routers.gitblit.rule"        = "(Host(`gitblit.day3.sololab`)||Host(`gitblit.service.consul`))"
           "traefik.http.routers.gitblit.middlewares" = "gitblit-HSTSHeader@docker"
           "traefik.http.routers.gitblit.tls"         = "true"
           "traefik.http.routers.gitblit.service"     = "gitblit"
@@ -100,12 +100,11 @@ job "gitblit" {
           # Customization files should be placed in /var/opt/gitblit/etc/gitblit.properties
           "local/gitblit.properties:/var/opt/gitblit/etc/gitblit.properties",
         ]
-        tmpfs = [
-          # https://hub.docker.com/r/gitblit/gitblit#temporary-webapp-data
-          "/var/opt/gitblit/temp:rw,size=102400k"
-        ]
+        # tmpfs = [
+        #   # https://hub.docker.com/r/gitblit/gitblit#temporary-webapp-data
+        #   "/var/opt/gitblit/temp:rw,size=102400k"
+        # ]
 
-        userns = "keep-id:uid=8117,gid=8117"
       }
       env {
         TZ = "Asia/Shanghai"
@@ -126,29 +125,42 @@ job "gitblit" {
 
       # https://github.com/gitblit-org/gitblit-docker/tree/v1.10.0-1?tab=readme-ov-file#data-persistence
       volume_mount {
-        volume        = "gitblit-config"
-        destination   = "/var/opt/gitblit/etc" # baseFolder = /var/opt/gitblit/etc
+        volume        = "gitblit"
+        destination   = "/var/opt/gitblit/"
         selinux_label = "Z"
       }
-      volume_mount {
-        volume        = "gitblit-data"
-        destination   = "/var/opt/gitblit/srv"
-        selinux_label = "Z"
-      }
+      # volume_mount {
+      #   volume        = "gitblit-config"
+      # # https://github.com/gitblit-org/gitblit-docker/blob/v1.10.0-1/docker-entrypoint.sh#L155C72-L155C83
+      #   destination   = "/var/opt/gitblit/etc" # baseFolder: /var/opt/gitblit/etc
+      #   selinux_label = "Z"
+      # }
+      # volume_mount {
+      #   volume        = "gitblit-data"
+      #   destination   = "/var/opt/gitblit/srv"
+      #   selinux_label = "Z"
+      # }
     }
-    volume "gitblit-config" {
-      type            = "csi"
-      source          = "gitblit-config"
+    volume "gitblit" {
+      type            = "host"
+      source          = "gitblit"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
     }
-    volume "gitblit-data" {
-      type            = "csi"
-      source          = "gitblit-data"
-      read_only       = false
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
-    }
+    # volume "gitblit-config" {
+    #   type            = "csi"
+    #   source          = "gitblit-config"
+    #   read_only       = false
+    #   attachment_mode = "file-system"
+    #   access_mode     = "single-node-writer"
+    # }
+    # volume "gitblit-data" {
+    #   type            = "csi"
+    #   source          = "gitblit-data"
+    #   read_only       = false
+    #   attachment_mode = "file-system"
+    #   access_mode     = "single-node-writer"
+    # }
   }
 }

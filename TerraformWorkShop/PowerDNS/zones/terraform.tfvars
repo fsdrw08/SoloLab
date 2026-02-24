@@ -352,19 +352,19 @@ zones = [
     ]
   },
   {
-    name        = "ci.sololab."
-    nameservers = ["ns1.ci.sololab."]
+    name        = "day3.sololab."
+    nameservers = ["ns1.day3.sololab."]
     records = [
       {
-        fqdn = "ci.sololab."
+        fqdn = "day3.sololab."
         type = "SOA"
         ttl  = 60
         results = [
-          "ns1.ci.sololab. ci.sololab. 2025081301 3600 600 1814400 7200"
+          "ns1.day3.sololab. day3.sololab. 2025081301 3600 600 1814400 7200"
         ]
       },
       {
-        fqdn = "traefik.ci.sololab."
+        fqdn = "traefik.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -372,7 +372,7 @@ zones = [
         ]
       },
       {
-        fqdn = "gitblit.ci.sololab."
+        fqdn = "gitblit.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
