@@ -36,10 +36,10 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-16:20260203",
-        "archive": "quay.io_fedora_postgresql-16_20260203.tar",
-        "privateRepo": "fedora/postgresql-16:20260203",
-        "description": "https://quay.io/repository/fedora/postgresql-16?tab=tags",
+        "publicRepo": "fedora/postgresql-18:20260218",
+        "archive": "quay.io_fedora_postgresql-18_20260218.tar",
+        "privateRepo": "fedora/postgresql-18:20260218",
+        "description": "https://quay.io/repository/fedora/postgresql-18?tab=tags",
     },
     {
         "publicRegistry": "ghcr.io",

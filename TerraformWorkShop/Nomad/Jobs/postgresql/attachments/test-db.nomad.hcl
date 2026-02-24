@@ -60,7 +60,7 @@ job "test-db" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/fedora/postgresql-16:20260203"
+        image = "zot.day0.sololab/fedora/postgresql-18:20260218"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",

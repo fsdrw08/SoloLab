@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
-job "gitea-db" {
+job "nexus3-db" {
   datacenters = ["dc1"]
   region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
@@ -12,13 +12,13 @@ job "gitea-db" {
     value     = "day2"
   }
 
-  group "gitea-db" {
+  group "nexus3-db" {
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
-    task "gitea-db" {
+    task "nexus3-db" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
-        name     = "gitea-db-${attr.unique.hostname}"
+        name     = "nexus3-db-${attr.unique.hostname}"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
@@ -39,20 +39,20 @@ job "gitea-db" {
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
           # meta data to render pgbouncer config with consul template
-          dbName   = "gitea"
-          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=gitea auth_user=pgbouncer"
+          dbName   = "nexus3"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=nexus3 auth_user=pgbouncer"
           # meta data to render pgweb config with consul template
-          dbUser        = "gitea"
+          dbUser        = "nexus3"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
-          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Fgitea
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Fnexus3
           prom_target_scheme                         = "https"
           prom_target_address                        = "prometheus-postgres-exporter.service.consul"
           prom_target_metrics_path                   = "probe"
           prom_target_metrics_path_param_auth_module = "postgres_exporter"
-          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/gitea"
+          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/nexus3"
         }
       }
 
@@ -63,13 +63,18 @@ job "gitea-db" {
         image = "zot.day0.sololab/fedora/postgresql-18:20260218"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
+          # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
+          # postgresql-init/: This directory should contain shell scripts (*.sh) that are sourced when the database is freshly initialized (after a successful initdb run, which makes the data directory non-empty).
+          # At the time of sourcing these scripts, the local PostgreSQL server is running. For re-deployment scenarios with a persistent data directory, the scripts are not sourced (no-op).
+          "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
+          # postgresql-start/: This directory has the same semantics as postgresql-init/, except that these scripts are always sourced (after postgresql-init/ scripts, if they exist).
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
         ]
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        POSTGRESQL_DATABASE        = "gitea"
+        POSTGRESQL_DATABASE        = "nexus3"
         POSTGRESQL_LOG_DESTINATION = "/dev/stderr"
       }
 
@@ -93,11 +98,27 @@ job "gitea-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
         change_signal = "SIGHUP"
+      }
+
+      template {
+        # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
+        # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html#create-a-postgresql-database
+        data        = <<-EOH
+        #!/bin/bash
+        set -e
+        psql -v ON_ERROR_STOP=1 <<-EOSQL
+        \\c nexus3;
+        CREATE SCHEMA IF NOT EXISTS nexus;
+        CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA nexus;
+        EOSQL
+        EOH
+        destination = "local/init-schema.sh"
+        change_mode = "restart"
       }
 
       template {
@@ -115,9 +136,9 @@ job "gitea-db" {
         CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
-        ---GRANT CONNECT ON DATABASE gitea TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE nexus3 TO postgres_exporter;
 
-        \\c gitea;
+        \\c nexus3;
         CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
         \$\$
           SELECT usename, passwd FROM pg_shadow WHERE usename=\$1;
@@ -135,9 +156,9 @@ job "gitea-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"
@@ -154,14 +175,14 @@ job "gitea-db" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
-        volume        = "gitea-db"
+        volume        = "nexus3-db"
         destination   = "/var/lib/pgsql/data"
         selinux_label = "Z"
       }
     }
-    volume "gitea-db" {
+    volume "nexus3-db" {
       type            = "host"
-      source          = "gitea-db"
+      source          = "nexus3-db"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
