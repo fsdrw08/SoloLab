@@ -1,3 +1,10 @@
+data "terraform_remote_state" "tfstate" {
+  backend = "local"
+  config = {
+    path = "../../../TLS/RootCA/terraform.tfstate"
+  }
+}
+
 resource "zitadel_idp_ldap" "idp_ldap" {
   name      = var.ldap.name
   servers   = var.ldap.servers
@@ -16,6 +23,7 @@ resource "zitadel_idp_ldap" "idp_ldap" {
   user_base           = var.ldap.user_base
   user_object_classes = var.ldap.user_object_classes
   user_filters        = var.ldap.user_filters
+  root_ca             = data.terraform_remote_state.tfstate.outputs.root_cert_pem
 }
 
 resource "zitadel_org" "org" {
