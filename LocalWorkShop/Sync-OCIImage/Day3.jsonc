@@ -1,0 +1,23 @@
+[
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "gitea/gitea:1.25.4-rootless",
+        "archive": "docker.io_gitea-gitea_1.25.4-rootless.tar",
+        "privateRepo": "gitea/gitea:1.25.4-rootless",
+        "description": "https://hub.docker.com/r/gitea/gitea",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "gitblit/gitblit:1.10.0-rpc",
+        "archive": "docker.io_gitblit-gitblit_1.10.0-rpc.tar",
+        "privateRepo": "gitblit/gitblit:1.10.0-rpc",
+        "description": "https://hub.docker.com/r/gitblit/gitblit",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "sonatype/nexus3:3.89.1-alpine",
+        "archive": "docker.io_sonatype-nexus3_3.89.1-alpine.tar",
+        "privateRepo": "sonatype/nexus3:3.89.1-alpine",
+        "description": "https://hub.docker.com/r/sonatype/nexus3",
+    },
+]

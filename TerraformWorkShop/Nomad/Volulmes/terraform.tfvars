@@ -41,7 +41,7 @@ dynamic_host_volumes = [
     }
   },
   {
-    name = "test-db"
+    name = "nexus3-db"
     constraint = [
       {
         attribute = "$${attr.unique.hostname}"
@@ -76,13 +76,31 @@ dynamic_host_volumes = [
   #     gid = 26
   #   }
   # },
+  # {
+  #   name = "meilisearch"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day2"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 0
+  #     gid = 0
+  #   }
+  # }
   {
-    name = "meilisearch"
+    name = "gitblit"
     constraint = [
       {
         attribute = "$${attr.unique.hostname}"
         operator  = "=="
-        value     = "day2"
+        value     = "day3"
       }
     ]
     capability = {
@@ -90,58 +108,58 @@ dynamic_host_volumes = [
     }
     plugin_id = "mkdir"
     parameters = {
-      uid = 0
-      gid = 0
+      uid = 8117
+      gid = 8117
     }
   }
 ]
 
 csi_volumes = [
-  {
-    name      = "nomad-gitblit-config"
-    plugin_id = "nfs"
-    volume_id = "gitblit-config"
-    capabilities = [
-      {
-        access_mode     = "multi-node-multi-writer"
-        attachment_mode = "file-system"
-      },
-      {
-        access_mode     = "single-node-writer"
-        attachment_mode = "file-system"
-      }
-    ]
-    parameters = {
-      server           = "192.168.255.10"
-      share            = "/"
-      mountPermissions = "777"
-    }
-    mount_options = {
-      fs_type = "nfs"
-    }
-  },
-  {
-    name      = "nomad-gitblit-data"
-    plugin_id = "nfs"
-    volume_id = "gitblit-data"
-    capabilities = [
-      {
-        access_mode     = "multi-node-multi-writer"
-        attachment_mode = "file-system"
-      },
-      {
-        access_mode     = "single-node-writer"
-        attachment_mode = "file-system"
-      }
-    ]
-    parameters = {
-      server           = "192.168.255.10"
-      share            = "/"
-      mountPermissions = "777"
-    }
-    mount_options = {
-      fs_type = "nfs"
-    }
-  }
+  # {
+  #   name      = "nomad-gitblit-config"
+  #   plugin_id = "nfs"
+  #   volume_id = "gitblit-config"
+  #   capabilities = [
+  #     {
+  #       access_mode     = "multi-node-multi-writer"
+  #       attachment_mode = "file-system"
+  #     },
+  #     {
+  #       access_mode     = "single-node-writer"
+  #       attachment_mode = "file-system"
+  #     }
+  #   ]
+  #   parameters = {
+  #     server           = "192.168.255.10"
+  #     share            = "/"
+  #     mountPermissions = "777"
+  #   }
+  #   mount_options = {
+  #     fs_type = "nfs"
+  #   }
+  # },
+  # {
+  #   name      = "nomad-gitblit-data"
+  #   plugin_id = "nfs"
+  #   volume_id = "gitblit-data"
+  #   capabilities = [
+  #     {
+  #       access_mode     = "multi-node-multi-writer"
+  #       attachment_mode = "file-system"
+  #     },
+  #     {
+  #       access_mode     = "single-node-writer"
+  #       attachment_mode = "file-system"
+  #     }
+  #   ]
+  #   parameters = {
+  #     server           = "192.168.255.10"
+  #     share            = "/"
+  #     mountPermissions = "777"
+  #   }
+  #   mount_options = {
+  #     fs_type = "nfs"
+  #   }
+  # }
 ]
 
