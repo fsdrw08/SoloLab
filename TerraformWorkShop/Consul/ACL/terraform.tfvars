@@ -6,7 +6,7 @@ prov_vault = {
 
 prov_consul = {
   scheme         = "https"
-  address        = "consul.day1.sololab:8501"
+  address        = "consul.day1.sololab"
   datacenter     = "dc1"
   token          = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
   insecure_https = true
