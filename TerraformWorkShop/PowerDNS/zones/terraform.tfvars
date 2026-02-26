@@ -379,6 +379,14 @@ zones = [
           "192.168.255.2"
         ]
       },
+      {
+        fqdn = "nexus3.day3.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
     ]
   }
 ]

@@ -8,6 +8,6 @@ jobs = [
   #   path = "./attachments/test-db.nomad.hcl"
   # },
   {
-    path = "./attachments/gitea-db.nomad.hcl"
+    path = "./attachments/nexus-db.nomad.hcl"
   },
 ]

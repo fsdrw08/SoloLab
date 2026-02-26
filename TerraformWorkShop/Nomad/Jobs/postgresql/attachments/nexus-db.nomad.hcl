@@ -1,6 +1,6 @@
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
-job "nexus3-db" {
+job "nexus-db" {
   datacenters = ["dc1"]
   region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
@@ -12,13 +12,13 @@ job "nexus3-db" {
     value     = "day2"
   }
 
-  group "nexus3-db" {
+  group "nexus-db" {
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
-    task "nexus3-db" {
+    task "nexus-db" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
-        name     = "nexus3-db-${attr.unique.hostname}"
+        name     = "nexus-db-${attr.unique.hostname}"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
@@ -39,10 +39,10 @@ job "nexus3-db" {
         meta {
           # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
           # meta data to render pgbouncer config with consul template
-          dbName   = "nexus3"
-          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=nexus3 auth_user=pgbouncer"
+          dbName   = "nexus"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=nexus auth_user=pgbouncer"
           # meta data to render pgweb config with consul template
-          dbUser        = "nexus3"
+          dbUser        = "nexus"
           pgBouncerHost = "pgbouncer-${node.unique.name}.service.consul"
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
@@ -52,7 +52,7 @@ job "nexus3-db" {
           prom_target_address                        = "prometheus-postgres-exporter.service.consul"
           prom_target_metrics_path                   = "probe"
           prom_target_metrics_path_param_auth_module = "postgres_exporter"
-          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/nexus3"
+          prom_target_metrics_path_param_target      = "pgbouncer-${attr.unique.hostname}.service.consul:6432/nexus"
         }
       }
 
@@ -66,15 +66,17 @@ job "nexus3-db" {
           # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
           # postgresql-init/: This directory should contain shell scripts (*.sh) that are sourced when the database is freshly initialized (after a successful initdb run, which makes the data directory non-empty).
           # At the time of sourcing these scripts, the local PostgreSQL server is running. For re-deployment scenarios with a persistent data directory, the scripts are not sourced (no-op).
-          "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
+          # "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
+
           # postgresql-start/: This directory has the same semantics as postgresql-init/, except that these scripts are always sourced (after postgresql-init/ scripts, if they exist).
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
+          "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
         ]
       }
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
-        POSTGRESQL_DATABASE        = "nexus3"
+        POSTGRESQL_DATABASE        = "nexus"
         POSTGRESQL_LOG_DESTINATION = "/dev/stderr"
       }
 
@@ -98,7 +100,7 @@ job "nexus3-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
@@ -112,8 +114,10 @@ job "nexus3-db" {
         #!/bin/bash
         set -e
         psql -v ON_ERROR_STOP=1 <<-EOSQL
-        \\c nexus3;
+        \\c nexus;
         CREATE SCHEMA IF NOT EXISTS nexus;
+        GRANT ALL PRIVILEGES ON DATABASE nexus TO {{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}};
+        GRANT ALL PRIVILEGES ON SCHEMA nexus TO {{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}};
         CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA nexus;
         EOSQL
         EOH
@@ -136,9 +140,9 @@ job "nexus3-db" {
         CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
-        ---GRANT CONNECT ON DATABASE nexus3 TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE nexus TO postgres_exporter;
 
-        \\c nexus3;
+        \\c nexus;
         CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
         \$\$
           SELECT usename, passwd FROM pg_shadow WHERE usename=\$1;
@@ -156,9 +160,9 @@ job "nexus3-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"
@@ -175,14 +179,14 @@ job "nexus3-db" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
-        volume        = "nexus3-db"
+        volume        = "nexus-db"
         destination   = "/var/lib/pgsql/data"
         selinux_label = "Z"
       }
     }
-    volume "nexus3-db" {
+    volume "nexus-db" {
       type            = "host"
-      source          = "nexus3-db"
+      source          = "nexus-db"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

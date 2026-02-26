@@ -1,7 +1,3 @@
-variable "config" {
-  type = string
-}
-
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
 job "nexus3" {
@@ -81,19 +77,17 @@ job "nexus3" {
 
           "traefik.http.services.nexus3.loadbalancer.server.port" = "8081"
         }
-        ports = [
-          "nexus3-ssh",
-        ]
       }
       env {
-        TZ = "Asia/Shanghai"
+        TZ                      = "Asia/Shanghai"
+        INSTALL4J_ADD_VM_PARAMS = "-Xms300m -Xmx700m -XX:MaxDirectMemorySize=700m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
       }
 
       resources {
         # Specifies the CPU required to run this task in MHz
-        cpu = 300
+        cpu = 1000
         # Specifies the memory required in MB
-        memory = 500
+        memory = 800
       }
 
       template {
@@ -102,9 +96,9 @@ job "nexus3" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc\:postgresql\://pgbouncer-day2.service.consul\:6432/nexus3
-        NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_name}}{{end}}
-        NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_pgsql/data/nexus3"}}{{.Data.data.user_password}}{{end}}
+        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://pgbouncer-day2.service.consul:6432/nexus??useSSL=true&sslMode=require
+        NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}
+        NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
@@ -114,14 +108,14 @@ job "nexus3" {
 
       # https://github.com/nexus3-org/nexus3-docker/tree/v1.10.0-1?tab=readme-ov-file#data-persistence
       volume_mount {
-        volume        = "nexus3"
+        volume        = "nexus"
         destination   = "/nexus-data"
         selinux_label = "Z"
       }
     }
-    volume "nexus3" {
+    volume "nexus" {
       type            = "host"
-      source          = "nexus3"
+      source          = "nexus"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

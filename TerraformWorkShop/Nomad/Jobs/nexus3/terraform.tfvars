@@ -6,11 +6,5 @@ prov_nomad = {
 jobs = [
   {
     path = "./attachments/nexus3.nomad.hcl"
-    var_sets = [
-      {
-        name                = "config"
-        value_template_path = "./attachments/nexus3.properties"
-      },
-    ]
   },
 ]
