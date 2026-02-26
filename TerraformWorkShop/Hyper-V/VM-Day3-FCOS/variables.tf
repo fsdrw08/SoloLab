@@ -40,6 +40,7 @@ variable "vm" {
     }))
     enable_secure_boot = optional(string, "On")
     power_state        = optional(string, "Off")
+    cpu_core           = optional(number, 2)
     memory = object({
       static        = optional(bool, null)
       dynamic       = optional(bool, null)

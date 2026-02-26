@@ -161,7 +161,7 @@ module "hyperv_machine_instance" {
       expose_virtualization_extensions                  = false
       hw_thread_count_per_core                          = 0
       maximum                                           = 100
-      maximum_count_per_numa_node                       = 4
+      maximum_count_per_numa_node                       = var.vm.cpu_core
       maximum_count_per_numa_socket                     = 1
       relative_weight                                   = 100
       reserve                                           = 0
