@@ -107,14 +107,15 @@ job "gitblit" {
 
       }
       env {
-        TZ = "Asia/Shanghai"
+        TZ        = "Asia/Shanghai"
+        JAVA_OPTS = "-Xmx300m"
       }
 
       resources {
         # Specifies the CPU required to run this task in MHz
         cpu = 300
         # Specifies the memory required in MB
-        memory = 500
+        memory = 350
       }
 
       template {
