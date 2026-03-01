@@ -41,6 +41,8 @@ users = [
       "app-grafana-root",       # "a3d0b5af" 
       "app-gitblit-user",       # "0d243b52" 
       "app-gitblit-admin",      # "ba1fd3a9" 
+      "app-nexus-user",         # "90ebdcb1" 
+      "app-nexus-admin",        # "044af468" 
     ]
   },
   {
@@ -59,6 +61,7 @@ users = [
       "app-consul-readonly",    # "542b0c36" 
       "app-nomad-user",         # "091a24fe" 
       "app-grafana-user",       # "a4019ca3" 
+      "app-nexus-user",         # "90ebdcb1" 
     ]
   }
 ]
@@ -146,6 +149,14 @@ groups = [
   {
     iac_id       = "ba1fd3a9"
     display_name = "app-gitblit-admin"
+  },
+  {
+    iac_id       = "044af468"
+    display_name = "app-nexus-admin"
+  },
+  {
+    iac_id       = "90ebdcb1"
+    display_name = "app-nexus-user"
   },
 ]
 

@@ -96,5 +96,9 @@ terraform {
       source  = "neuspaces/system"
       version = ">= 0.5.0"
     }
+    nexus = {
+      source  = "datadrivers/nexus"
+      version = ">= 2.7.0"
+    }
   }
 }
