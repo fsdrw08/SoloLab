@@ -19,7 +19,7 @@ buckets = [
     bucket = "loki"
   },
   {
-    bucket = "gitea"
+    bucket = "nexus3"
   },
 ]
 
@@ -38,8 +38,8 @@ users = [
     secret_key_version = "1"
   },
   {
-    name               = "gitea"
-    policies           = ["gitea-readwrite"]
+    name               = "nexus3"
+    policies           = ["nexus3-readwrite"]
     secret_key_version = "1"
   },
 ]
@@ -134,7 +134,7 @@ policies = [
     EOF
   },
   {
-    name   = "gitea-readwrite"
+    name   = "nexus3-readwrite"
     policy = <<-EOF
     {
         "Version": "2012-10-17",
@@ -145,7 +145,7 @@ policies = [
                     "s3:*"
                 ],
                 "Resource": [
-                    "arn:aws:s3:::gitea/*"
+                    "arn:aws:s3:::nexus3/*"
                 ]
             }
         ]
