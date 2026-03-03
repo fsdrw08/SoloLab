@@ -10,7 +10,7 @@ vm = {
   base_name = "VyOS"
   vhd = {
     dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
-    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos15s\\Virtual Hard Disks\\packer-vyos15s.vhdx"
+    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-vyos_stream\\Virtual Hard Disks\\packer-vyos_stream.vhdx"
     data_disk_tfstate = {
       backend = {
         type = "local"
@@ -55,7 +55,7 @@ cloudinit_nocloud = [
   {
     content_source = "./cloudinit-tmpl/meta-data"
     content_vars = {
-      instance_id    = "iid-VyOS_202507"
+      instance_id    = "iid-VyOS_202603"
       local_hostname = "VyOS"
     }
     filename = "meta-data"

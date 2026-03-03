@@ -8,7 +8,9 @@ param (
     '14x-cloudinit', 
     '14x-cloudinit-vagrant', 
     '15x-cloudinit',
-    '15s-cloudinit')]
+    '15s-cloudinit',
+    'Stream-cloudinit'
+    )]
   [string]
   $VyOSVersion,
 
@@ -38,8 +40,8 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $var_file = "$PSScriptRoot\vars-VyOS$VyOSVersion.pkrvars.hcl"
-  $machine = "VyOS$VyOSVersion-g2"
+  $var_file = "$PSScriptRoot\vars-VyOS_$VyOSVersion.pkrvars.hcl"
+  $machine = "VyOS_$VyOSVersion-g2"
   $packer_log = 0
   
   if (Test-Path -Path "$var_file") {
