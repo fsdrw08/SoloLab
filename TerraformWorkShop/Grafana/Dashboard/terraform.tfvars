@@ -114,7 +114,7 @@ dashboards = [
     }
   },
   {
-    template = "./attachments/meilisearch-dashboard.json"
+    template = "./attachments/nexus3-dashboard.json"
     vars = {
       DS_PROMETHEUS = "517bb05c"
     }

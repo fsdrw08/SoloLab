@@ -57,3 +57,16 @@ variable "roles" {
     privileges = list(string)
   }))
 }
+
+variable "local_users" {
+  type = list(object({
+    userid           = string
+    firstname        = string
+    lastname         = string
+    email            = string
+    password         = string
+    password_version = number
+    roles            = list(string)
+    status           = string
+  }))
+}

@@ -112,6 +112,25 @@ dynamic_host_volumes = [
       gid = 200
     }
   },
+  {
+    name = "nexus-cacerts"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day3"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      mode = "0755"
+      uid  = 0
+      gid  = 0
+    }
+  },
 ]
 
 csi_volumes = [

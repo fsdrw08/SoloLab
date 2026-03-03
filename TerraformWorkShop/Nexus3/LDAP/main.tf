@@ -1,13 +1,13 @@
-# Retrieve Cert via Nexus
-data "nexus_security_ssl" "ssl" {
-  host = var.ldap.host
-  port = var.ldap.port
-}
+# # Retrieve Cert via Nexus
+# data "nexus_security_ssl" "ssl" {
+#   host = var.ldap.host
+#   port = var.ldap.port
+# }
 
-# Import Cert into Nexus
-resource "nexus_security_ssl_truststore" "ssl_truststore" {
-  pem = data.nexus_security_ssl.ssl.pem
-}
+# # Import Cert into Nexus
+# resource "nexus_security_ssl_truststore" "ssl_truststore" {
+#   pem = data.nexus_security_ssl.ssl.pem
+# }
 
 resource "nexus_security_ldap" "ldap" {
   auth_password                  = var.ldap.auth_password
@@ -50,4 +50,21 @@ resource "nexus_security_role" "role" {
   name        = each.value.name
   description = "Role for ${each.value.name}"
   privileges  = each.value.privileges
+}
+
+resource "nexus_security_user" "user" {
+  depends_on = [
+    nexus_security_role.role
+  ]
+  for_each = {
+    for user in var.local_users : user.userid => user
+  }
+  userid              = each.value.userid
+  firstname           = each.value.firstname
+  lastname            = each.value.lastname
+  email               = each.value.email
+  password_wo         = each.value.password
+  password_wo_version = each.value.password_version
+  roles               = each.value.roles
+  status              = each.value.status
 }

@@ -45,4 +45,23 @@ roles = [
     roleid     = "app-nexus-admin"
     privileges = ["nx-all"]
   },
+  {
+    name       = "metrics"
+    roleid     = "metrics"
+    privileges = ["nx-metrics-all"]
+  },
+]
+
+local_users = [
+  {
+    # https://help.sonatype.com/en/prometheus.html
+    userid           = "metrics"
+    firstname        = "metrics"
+    lastname         = "prometheus"
+    email            = "nexus-metrics@mail.sololab"
+    password         = "P@ssw0rd"
+    password_version = 20260303
+    roles            = ["metrics"]
+    status           = "active"
+  },
 ]
