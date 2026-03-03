@@ -12,7 +12,7 @@ terraform {
   backend "consul" {
     address = "consul.day1.sololab"
     scheme  = "https"
-    path    = "tfstate/Nexus3/LDAP"
+    path    = "tfstate/Nexus3/BlobStore"
     # access_token = ""
   }
 }

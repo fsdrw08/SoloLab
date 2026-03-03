@@ -19,11 +19,34 @@ variable "blob_store_s3" {
   type = object({
     name = string
     bucket = object({
-      name              = string
-      region            = string
-      access_key_id     = string
-      secret_access_key = string
+      name       = string
+      region     = string
+      expiration = number
     })
+    advanced_bucket_connection = optional(
+      object({
+        endpoint                 = string
+        force_path_style         = bool
+        max_connection_pool_size = optional(number, null)
+        signer_type              = optional(string, null)
+      }),
+      null
+    )
+    bucket_security_value_refers = list(object({
+      value_sets = list(
+        object({
+          name          = string
+          value_ref_key = string
+        })
+      )
+      vault_kvv2 = optional(
+        object({
+          mount = string
+          name  = string
+        }),
+        null
+      )
+    }))
     soft_quota = optional(object({
       limit = number
       type  = string
@@ -31,10 +54,3 @@ variable "blob_store_s3" {
   })
 }
 
-variable "roles" {
-  type = list(object({
-    name       = string
-    roleid     = string
-    privileges = list(string)
-  }))
-}
