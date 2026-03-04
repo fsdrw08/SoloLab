@@ -100,5 +100,9 @@ terraform {
       source  = "datadrivers/nexus"
       version = ">= 2.7.0"
     }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.62.1"
+    }
   }
 }
