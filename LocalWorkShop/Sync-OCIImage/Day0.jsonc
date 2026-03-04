@@ -15,9 +15,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "coreos/etcd:v3.6.7",
-        "archive": "quay.io_coreos_etcd_v3.6.7.tar",
-        "privateRepo": "coreos/etcd:v3.6.7",
+        "publicRepo": "coreos/etcd:v3.6.9",
+        "archive": "quay.io_coreos_etcd_v3.6.9.tar",
+        "privateRepo": "coreos/etcd:v3.6.9",
         "description": "https://quay.io/repository/coreos/etcd?tab=tags",
     },
     {
@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.7",
-        "archive": "docker.io_library_traefik_v3.6.7.tar",
-        "privateRepo": "library/traefik:v3.6.7",
+        "publicRepo": "library/traefik:v3.6.9",
+        "archive": "docker.io_library_traefik_v3.6.9.tar",
+        "privateRepo": "library/traefik:v3.6.9",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -120,9 +120,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/alloy:v1.12.2",
-        "archive": "docker.io_grafana_alloy_v1.12.2.tar",
-        "privateRepo": "grafana/alloy:v1.12.2",
+        "publicRepo": "grafana/alloy:v1.13.2",
+        "archive": "docker.io_grafana_alloy_v1.13.2.tar",
+        "privateRepo": "grafana/alloy:v1.13.2",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
     {
