@@ -29,4 +29,8 @@ kvv2 = [
     mount_path  = "kvv2_pgsql"
     description = "kvv2 secret backend for pgsql"
   },
+  {
+    mount_path  = "kvv2_others"
+    description = "kvv2 secret backend for others"
+  },
 ]
