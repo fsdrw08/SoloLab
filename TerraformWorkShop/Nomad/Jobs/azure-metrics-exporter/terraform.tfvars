@@ -3,32 +3,36 @@ prov_nomad = {
   skip_verify = true
 }
 
+dynamic_host_volumes = [
+  {
+    name = "azure-metrics-forwarder"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day2"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      mode = "0755"
+      uid  = 65534
+      gid  = 65534
+    }
+  },
+]
+
 jobs = [
   {
-    path = "./attachments-alloy/alloy.nomad.hcl"
+    path = "./attachments/azure-metrics-exporter.nomad.hcl"
     var_sets = [
       {
-        name                = "alloy_config"
-        value_template_path = "./attachments-alloy/config.alloy.hcl"
+        name                = "prometheus_config"
+        value_template_path = "./attachments/prometheus.yml"
       }
     ]
-  },
-  {
-    path = "./attachments-node-exporter/node-exporter.nomad.hcl"
-  },
-  {
-    path = "./attachments-podman-exporter/podman-exporter.nomad.hcl"
-  },
-  {
-    path = "./attachments-postgres-exporter/postgres-exporter.nomad.hcl"
-    var_sets = [
-      {
-        name                = "postgresql_exporter_config"
-        value_template_path = "./attachments-postgres-exporter/postgres_exporter.yaml"
-      }
-    ]
-  },
-  {
-    path = "./attachments-redis-exporter/redis-exporter.nomad.hcl"
   },
 ]

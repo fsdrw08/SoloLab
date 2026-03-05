@@ -83,4 +83,11 @@
         "privateRepo": "getmeili/meilisearch:v1.35.0",
         "description": "https://hub.docker.com/r/getmeili/meilisearch/tags",
     },
+    {
+        "publicRegistry": "quay.io",
+        "publicRepo": "webdevops/azure-metrics-exporter:25.12.0",
+        "archive": "quay.io_webdevops_azure-metrics-exporter_25.12.0.tar",
+        "privateRepo": "webdevops/azure-metrics-exporter:25.12.0",
+        "description": "https://quay.io/repository/webdevops/azure-metrics-exporter?tab=tags",
+    },
 ]

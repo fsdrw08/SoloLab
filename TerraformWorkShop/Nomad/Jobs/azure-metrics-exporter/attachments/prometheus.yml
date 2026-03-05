@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+# https://github.com/webdevops/azure-metrics-exporter?tab=readme-ov-file#prometheus-configuration-examples
+# https://github.com/Wojciech512/NebulaOps-Observability-Platform-Master-s-thesis/blob/b6dd46df5f1245990b47d3153cc34d42a28a0b4f/prometheus.yml
+scrape_configs:
+  - job_name: azure_mssql_low
+    scrape_interval: 60s
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets:
+          - azure-metrics-exporter.service.consul
+    metrics_path: /probe/metrics/list
+    params:
+      subscription:
+        - 95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      target:
+        - /subscriptions/95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<band1><region>mid-prd-001/providers/Microsoft.Sql/servers/sql-<band1>ordermodule-prd-001/databases/sqldb-<band1>ordermodule-prd-001
+      resourceType:
+        - microsoft.sql/servers/databases
+      metric:
+        # https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-sql-servers-databases-metrics
+        - dtu_used # DTU used ~ dtu_used
+      interval: ["PT1M"]
+      timespan: ["PT10M"]
+      aggregation: ["Average", "Total"]
