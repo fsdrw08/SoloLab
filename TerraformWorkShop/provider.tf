@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tls = {
       source  = "hashicorp/tls"
-      version = ">= 4.1.0"
+      version = ">= 4.2.1"
     }
     hyperv = {
       source  = "taliesins/hyperv"
@@ -42,7 +42,7 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.1.0"
+      version = ">= 3.1.1"
     }
     remote = {
       source  = "tenstad/remote"
@@ -54,7 +54,7 @@ terraform {
     }
     lldap = {
       source  = "tasansga/lldap"
-      version = ">= 0.3.0"
+      version = ">= 0.4.1"
     }
     zitadel = {
       source  = "zitadel/zitadel"
@@ -74,11 +74,11 @@ terraform {
     }
     consul = {
       source  = "hashicorp/consul"
-      version = ">= 2.22.1"
+      version = ">= 2.23.0"
     }
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.1"
+      version = ">= 2.5.2"
     }
     random = {
       source  = "hashicorp/random"
@@ -86,7 +86,7 @@ terraform {
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.21.0"
+      version = ">= 3.24.0"
     }
     grafana = {
       source  = "grafana/grafana"
