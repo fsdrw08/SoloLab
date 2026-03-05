@@ -10,4 +10,5 @@ policy_names = [
   "cert-read",
   "pgsql-read",
   "minio-read",
+  "others-read",
 ]

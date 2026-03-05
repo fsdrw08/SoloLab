@@ -266,4 +266,20 @@ policy_bindings = [
       }
     EOT
   },
+  {
+    policy_name    = "others-read"
+    policy_content = <<-EOT
+      path "kvv2_others/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_others/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_others/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
+  },
 ]
