@@ -105,7 +105,7 @@ job "azure-metrics-exporter" {
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "local/prometheus.yml"
       }
-      # vault {}
+      vault {}
 
       volume_mount {
         volume        = "azure-metrics-forwarder"

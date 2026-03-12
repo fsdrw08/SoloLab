@@ -13,12 +13,14 @@ scrape_configs:
     static_configs:
       - targets:
           - azure-metrics-exporter.service.consul
-    metrics_path: /probe/metrics/list
+    metrics_path: /probe/metrics/list # probe/metrics/resource
     params:
       subscription:
         - 95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        - 8f2f3943-xxxx-xxxx-xxxx-xxxxxxxxxxxx
       target:
         - /subscriptions/95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<band1><region>mid-prd-001/providers/Microsoft.Sql/servers/sql-<band1>ordermodule-prd-001/databases/sqldb-<band1>ordermodule-prd-001
+        - /subscriptions/8f2f3943-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<>band3><region>mid-prd-001/providers/Microsoft.Sql/servers/sqlsvr-<band3>middleware-prd-001/databases/sqldb-<band3>middleware-prd-001
       resourceType:
         - microsoft.sql/servers/databases
       metric:
@@ -26,4 +28,16 @@ scrape_configs:
         - dtu_used # DTU used ~ dtu_used
       interval: ["PT1M"]
       timespan: ["PT10M"]
-      aggregation: ["Average", "Total"]
+      aggregation: ["Average"]
+
+remote_write:
+  # https://github.com/Daramfon10/AzGrafanaHPC/blob/3157c92c36437c06e45d60a25cf0d1e481befa71/scripts/prometheus.yml#L56
+  - url: https://amw-<corp><region>dts-prd-001-bvso.eastasia-1.metrics.ingest.monitor.azure.com/dataCollectionRules/dcr-8ebc1e0c59494990b1eba85644dc92e2/streams/Microsoft-PrometheusMetrics/api/v1/write?api-version=2023-04-24
+    tls_config:
+      insecure_skip_verify: true
+    azuread:
+      cloud: AzurePublic
+      oauth:
+        tenant_id: {{with secret "kvv2_others/data/azure-sp-cred_exporter"}}{{.Data.data.tenant_id}}{{end}}
+        client_id: {{with secret "kvv2_others/data/azure-sp-cred_exporter"}}{{.Data.data.client_id}}{{end}}
+        client_secret: {{with secret "kvv2_others/data/azure-sp-cred_exporter"}}{{.Data.data.client_secret}}{{end}}
