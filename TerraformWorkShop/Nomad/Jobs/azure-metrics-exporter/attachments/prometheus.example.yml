@@ -1,33 +1,53 @@
 global:
-  scrape_interval: 60s
+  scrape_interval: 600s
   evaluation_interval: 60s
 
 # https://github.com/webdevops/azure-metrics-exporter?tab=readme-ov-file#prometheus-configuration-examples
 # https://github.com/Wojciech512/NebulaOps-Observability-Platform-Master-s-thesis/blob/b6dd46df5f1245990b47d3153cc34d42a28a0b4f/prometheus.yml
 scrape_configs:
-  - job_name: azure_mssql_low
-    scrape_interval: 60s
+  - job_name: sqldb-<band1>ordermodule-prd-001
+    scrape_interval: 300s
     scheme: https
     tls_config:
       insecure_skip_verify: true
     static_configs:
       - targets:
           - azure-metrics-exporter.service.consul
-    metrics_path: /probe/metrics/list # probe/metrics/resource
+    metrics_path: /probe/metrics/resource # probe/metrics/list
     params:
+      name: 
+        - sqldb-<band1>ordermodule-prd-001
       subscription:
         - 95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        - 8f2f3943-xxxx-xxxx-xxxx-xxxxxxxxxxxx
       target:
         - /subscriptions/95bfe753-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<band1><region>mid-prd-001/providers/Microsoft.Sql/servers/sql-<band1>ordermodule-prd-001/databases/sqldb-<band1>ordermodule-prd-001
-        - /subscriptions/8f2f3943-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<>band3><region>mid-prd-001/providers/Microsoft.Sql/servers/sqlsvr-<band3>middleware-prd-001/databases/sqldb-<band3>middleware-prd-001
-      resourceType:
-        - microsoft.sql/servers/databases
       metric:
         # https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-sql-servers-databases-metrics
         - dtu_used # DTU used ~ dtu_used
-      interval: ["PT1M"]
-      timespan: ["PT10M"]
+      interval: ["PT5M"]
+      timespan: ["PT5M"]
+      aggregation: ["Average"]
+  - job_name: sqldb-<band2>middlware-prd-001
+    scrape_interval: 300s
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets:
+          - azure-metrics-exporter.service.consul
+    metrics_path: /probe/metrics/resource
+    params:
+      name: 
+        - sqldb-<band2>middlware-prd-001
+      subscription:
+        - 7822fcf9-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      target:
+        - /subscriptions/7822fcf9-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-<band2><region>mid-prd-001/providers/Microsoft.Sql/servers/sqlsvr-<band2>middleware-prd-001/databases/sqldb-<band2>middlware-prd-001
+      metric:
+        # https://learn.microsoft.com/en-us/azure/azure-monitor/reference/supported-metrics/microsoft-sql-servers-databases-metrics
+        - dtu_used # DTU used ~ dtu_used
+      interval: ["PT5M"]
+      timespan: ["PT5M"]
       aggregation: ["Average"]
 
 remote_write:
