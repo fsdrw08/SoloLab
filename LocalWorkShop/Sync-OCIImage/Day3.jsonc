@@ -20,4 +20,11 @@
         "privateRepo": "sonatype/nexus3:3.89.1-alpine",
         "description": "https://hub.docker.com/r/sonatype/nexus3",
     },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "jenkins/jenkins:2.541.3-lts",
+        "archive": "docker.io_jenkins_jenkins_2.541.3-lts.tar",
+        "privateRepo": "jenkins/jenkins:2.541.3-lts",
+        "description": "https://hub.docker.com/r/jenkins/jenkins, https://www.jenkins.io/doc/upgrade-guide/",
+    },
 ]

@@ -131,6 +131,25 @@ dynamic_host_volumes = [
       gid  = 0
     }
   },
+  # {
+  #   name = "jenkins"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day3"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     mode = "0755"
+  #     uid  = 1000
+  #     gid  = 1000
+  #   }
+  # },
 ]
 
 csi_volumes = [

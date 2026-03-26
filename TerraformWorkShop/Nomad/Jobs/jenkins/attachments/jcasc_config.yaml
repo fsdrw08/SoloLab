@@ -1,0 +1,27 @@
+jenkins:
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+        - id: admin
+          name: Jenkins Admin
+          password: P@ssw0rd
+unclassified:
+  location:
+    adminAddress: null
+    url: "https://jenkins.day3.sololab"
+
+jobs:
+  - script: >
+      job('jobdsl_test') {
+        steps {
+            shell('whoami')
+        }
+      }

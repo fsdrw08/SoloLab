@@ -265,4 +265,12 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
+  day3_frontend_jenkins = {
+    path = "load-balancing haproxy service tcp443 rule 430"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "jenkins.day3.sololab"
+      "set backend" = "day1"
+    }
+  }
 }
