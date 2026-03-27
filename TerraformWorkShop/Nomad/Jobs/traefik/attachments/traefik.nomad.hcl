@@ -92,7 +92,7 @@ job "traefik" {
       driver = "podman"
 
       config {
-        image = "zot.day0.sololab/library/traefik:v3.6.9"
+        image = "zot.day0.sololab/library/traefik:v3.6.12"
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
@@ -120,7 +120,7 @@ job "traefik" {
           "label=type:spc_t",
         ]
 
-        # https://github.com/traefik/traefik/blob/v3.6.9/Dockerfile
+        # https://github.com/traefik/traefik/blob/v3.6.12/Dockerfile
         # https://doc.traefik.io/traefik/reference/install-configuration/boot-environment/#configuration-file
         command = "--configFile=/local/install/install.traefik.yaml"
 

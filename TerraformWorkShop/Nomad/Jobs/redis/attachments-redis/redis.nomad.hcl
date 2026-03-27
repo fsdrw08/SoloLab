@@ -55,7 +55,7 @@ job "redis" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/library/redis:8.4.0"
+        image = "zot.day0.sololab/library/redis:8.6.2"
 
         ports = [
           "redis",

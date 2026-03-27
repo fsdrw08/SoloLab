@@ -61,7 +61,7 @@ job "redis-insight" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/redis/redisinsight:3.0.2"
+        image = "zot.day0.sololab/redis/redisinsight:3.2.0"
         labels = {
           "traefik.enable"                                          = "true"
           "traefik.http.routers.redis-insight-redirect.entrypoints" = "web"
@@ -94,7 +94,7 @@ job "redis-insight" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
       volume_mount {
         volume = "redis-insight"
-        # https://github.com/redis/RedisInsight/blob/3.0.2/Dockerfile#L55
+        # https://github.com/redis/RedisInsight/blob/3.2.0/Dockerfile#L55
         destination   = "/data"
         selinux_label = "Z"
       }

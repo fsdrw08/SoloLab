@@ -1,18 +1,18 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/nomad:1.11.1",
-        "archive": "docker.io_hashicorp_nomad_1.11.1.tar",
+        "publicRepo": "hashicorp/nomad:1.11.3",
+        "archive": "docker.io_hashicorp_nomad_1.11.3.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "hashicorp/nomad:1.11.1",
+        "privateRepo": "hashicorp/nomad:1.11.3",
         "description": "https://hub.docker.com/r/hashicorp/nomad/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "bitnami/grafana-loki:3.6.7",
-        "archive": "docker.io_bitnami_grafana-loki_3.6.7.tar",
+        "publicRepo": "bitnami/grafana-loki:3.7.0",
+        "archive": "docker.io_bitnami_grafana-loki_3.7.0.tar",
         "privateRegistry": "192.168.255.10:5000",
-        "privateRepo": "bitnami/grafana-loki:3.6.7",
+        "privateRepo": "bitnami/grafana-loki:3.7.0",
         "description": "https://hub.docker.com/r/bitnami/grafana-loki/tags",
     },
     {
@@ -33,9 +33,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/redis:8.4.0",
-        "archive": "docker.io_library_redis_8.4.0.tar",
-        "privateRepo": "library/redis:8.4.0",
+        "publicRepo": "library/redis:8.6.2",
+        "archive": "docker.io_library_redis_8.6.2.tar",
+        "privateRepo": "library/redis:8.6.2",
         "description": "https://hub.docker.com/_/redis",
     },
 ]

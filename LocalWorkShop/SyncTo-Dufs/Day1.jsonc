@@ -3,44 +3,48 @@
         // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
         // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-lokiexplore-app/release/2.0.0/grafana-lokiexplore-app-2.0.0.zip
         "type": "general",
         "publicRegistry": "https://storage.googleapis.com",
-        "publicRepo": "grafana-plugins-catalog/grafana-lokiexplore-app/release/1.0.38/grafana-lokiexplore-app-1.0.38.zip",
-        "archive": "grafana-lokiexplore-app-1.0.38.zip",
-        "privateRepo": "public/binaries/grafana-lokiexplore-app-1.0.38.zip",
+        "publicRepo": "grafana-plugins-catalog/grafana-lokiexplore-app/release/2.0.0/grafana-lokiexplore-app-2.0.0.zip",
+        "archive": "grafana-lokiexplore-app-2.0.0.zip",
+        "privateRepo": "public/binaries/grafana-lokiexplore-app-2.0.0.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=changelog",
     },
     {
         // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
         // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-pyroscope-app/release/2.0.1/grafana-pyroscope-app-2.0.1.zip
         "type": "general",
         "publicRegistry": "https://storage.googleapis.com",
-        "publicRepo": "grafana-plugins-catalog/grafana-pyroscope-app/release/1.17.0/grafana-pyroscope-app-1.17.0.zip",
-        "archive": "grafana-pyroscope-app-1.17.0.zip",
-        "privateRepo": "public/binaries/grafana-pyroscope-app-1.17.0.zip",
+        "publicRepo": "grafana-plugins-catalog/grafana-pyroscope-app/release/2.0.1/grafana-pyroscope-app-2.0.1.zip",
+        "archive": "grafana-pyroscope-app-2.0.1.zip",
+        "privateRepo": "public/binaries/grafana-pyroscope-app-2.0.1.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-pyroscope-app/?tab=changelog",
     },
     {
         // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
         // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-exploretraces-app/release/2.0.0/grafana-exploretraces-app-2.0.0.zip
         "type": "general",
         "publicRegistry": "https://storage.googleapis.com",
-        "publicRepo": "grafana-plugins-catalog/grafana-exploretraces-app/release/1.3.2/grafana-exploretraces-app-1.3.2.zip",
-        "archive": "grafana-exploretraces-app-1.3.2.zip",
-        "privateRepo": "public/binaries/grafana-exploretraces-app-1.3.2.zip",
+        "publicRepo": "grafana-plugins-catalog/grafana-exploretraces-app/release/2.0.0/grafana-exploretraces-app-2.0.0.zip",
+        "archive": "grafana-exploretraces-app-2.0.0.zip",
+        "privateRepo": "public/binaries/grafana-exploretraces-app-2.0.0.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-exploretraces-app/?tab=changelog",
     },
     {
         // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
         // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
+        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-metricsdrilldown-app/release/2.0.0/grafana-metricsdrilldown-app-2.0.0.zip
         "type": "general",
         "publicRegistry": "https://storage.googleapis.com",
-        "publicRepo": "grafana-plugins-catalog/grafana-metricsdrilldown-app/release/1.0.32/grafana-metricsdrilldown-app-1.0.32.zip",
-        "archive": "grafana-metricsdrilldown-app-1.0.32.zip",
-        "privateRepo": "public/binaries/grafana-metricsdrilldown-app-1.0.32.zip",
+        "publicRepo": "grafana-plugins-catalog/grafana-metricsdrilldown-app/release/2.0.0/grafana-metricsdrilldown-app-2.0.0.zip",
+        "archive": "grafana-metricsdrilldown-app-2.0.0.zip",
+        "privateRepo": "public/binaries/grafana-metricsdrilldown-app-2.0.0.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-metricsdrilldown-app/?tab=changelog",
     },
 ]

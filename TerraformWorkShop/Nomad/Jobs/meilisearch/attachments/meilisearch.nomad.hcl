@@ -74,7 +74,7 @@ job "meilisearch" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/getmeili/meilisearch:v1.35.0"
+        image = "zot.day0.sololab/getmeili/meilisearch:v1.40.0"
         labels = {
           "traefik.enable"                                        = "true"
           "traefik.http.routers.meilisearch-redirect.entrypoints" = "web"
@@ -117,7 +117,7 @@ job "meilisearch" {
       }
       vault {}
 
-      # https://github.com/meilisearch/meilisearch/blob/v1.35.0/Dockerfile#L40
+      # https://github.com/meilisearch/meilisearch/blob/v1.40.0/Dockerfile#L40
       volume_mount {
         volume        = "meilisearch"
         destination   = "/meili_data"

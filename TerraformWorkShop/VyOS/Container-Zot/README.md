@@ -137,8 +137,8 @@ $archive="traefik_whoami_v1.10.2.tar"
 $privateRegistry="zot.day0.sololab"
 
 $publicRegistry="docker.io"
-$image="coredns/coredns:1.11.1"
-$archive="coredns_coredns_1.11.1tar"
+$image="coredns/coredns:1.14.2"
+$archive="coredns_coredns_1.14.2.tar"
 $privateRegistry="zot.day0.sololab"
 
 $publicRegistry="quay.io"

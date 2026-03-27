@@ -70,7 +70,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "minio"
-      image     = "zot.vyos.sololab/minio/minio:RELEASE.2025-09-07T16-13-09Z"
+      image     = "zot.vyos.sololab/pgsty/minio:RELEASE.2026-03-25T00-00-00Z"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {

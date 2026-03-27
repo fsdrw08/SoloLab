@@ -61,7 +61,7 @@ job "prometheus-podman-exporter" {
 
       user = "root"
       config {
-        image = "zot.day0.sololab/navidys/prometheus-podman-exporter:v1.20.0"
+        image = "zot.day0.sololab/navidys/prometheus-podman-exporter:v1.21.0"
         args = [
           "--web.listen-address=:9882",
         ]

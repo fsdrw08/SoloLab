@@ -39,7 +39,7 @@ job "prometheus-redis-exporter" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/oliver006/redis_exporter:v1.80.2-alpine"
+        image = "zot.day0.sololab/oliver006/redis_exporter:v1.82.0-alpine"
         labels = {
           "traefik.enable"                                                      = "true"
           "traefik.http.routers.prometheus-redis-exporter-redirect.entrypoints" = "web"

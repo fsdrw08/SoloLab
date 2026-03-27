@@ -24,7 +24,7 @@ job "nfs-controller" {
 
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
       config {
-        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.12.1"
+        image = "zot.day0.sololab/sig-storage/nfsplugin:v4.13.1"
         args = [
           "--drivername=nfs.csi.k8s.io",
           "--endpoint=unix://csi/csi.sock",

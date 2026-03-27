@@ -60,7 +60,7 @@ job "nexus-db" {
 
       driver = "podman"
       config {
-        image = "zot.day0.sololab/fedora/postgresql-18:20260218"
+        image = "zot.day0.sololab/fedora/postgresql-18:20260325"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
