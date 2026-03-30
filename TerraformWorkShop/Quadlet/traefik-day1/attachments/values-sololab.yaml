@@ -1,6 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 traefik:
+  resourcesPreset: "micro"
   containerSecurityContext:
     enabled: true
     seLinuxOptions:
