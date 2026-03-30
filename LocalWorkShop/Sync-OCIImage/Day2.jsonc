@@ -8,6 +8,13 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "hectorm/nfs-ganesha:v10",
+        "archive": "docker.io_hectorm_nfs-ganesha_v10.tar",
+        "privateRepo": "hectorm/nfs-ganesha:v10",
+        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "library/traefik:v3.6.12",
         "archive": "docker.io_library_traefik_v3.6.12.tar",
         "privateRepo": "library/traefik:v3.6.12",

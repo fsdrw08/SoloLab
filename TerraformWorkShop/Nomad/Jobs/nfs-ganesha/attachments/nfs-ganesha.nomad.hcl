@@ -12,7 +12,7 @@ job "nfs-ganesha" {
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value     = "day1"
+    value     = "day2"
   }
 
   group "nfs-ganesha" {
@@ -33,6 +33,9 @@ job "nfs-ganesha" {
         interval = "600s"
         timeout  = "2s"
       }
+      tags = [
+        "log"
+      ]
 
     }
 
@@ -42,7 +45,12 @@ job "nfs-ganesha" {
       driver = "podman"
 
       config {
-        image = "zot.day0.sololab/hectorm/nfs-ganesha:v9"
+        image        = "zot.day0.sololab/hectorm/nfs-ganesha:v10"
+        network_mode = "host"
+        security_opt = [
+          "label=type:spc_t",
+        ]
+
         cap_add = [
           "CHOWN",
           "DAC_OVERRIDE",
@@ -56,12 +64,8 @@ job "nfs-ganesha" {
         cap_drop = [
           "ALL"
         ]
-        network_mode = "host"
-        # ports        = ["web", "webSecure", "whoami"]
+
         readonly_rootfs = true
-        security_opt = [
-          "label=type:spc_t",
-        ]
         tmpfs = [
           "/run/",
           "/tmp/",
@@ -79,6 +83,13 @@ job "nfs-ganesha" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
         TZ = "Asia/Shanghai"
+      }
+
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 200
+        # Specifies the memory required in MB
+        memory = 128
       }
 
       template {

@@ -57,6 +57,7 @@ butane = {
       "./Butane/user-1001.yaml",
       "./Butane/consul.yaml",
       "./Butane/nomad.yaml",
+      "./Butane/nfs.yaml",
     ]
   }
   vars = {
