@@ -1,6 +1,7 @@
 global:
   imageRegistry: zot.day0.sololab
 grafana:
+  resourcesPreset: "small"
   podLabels:
     traefik.enable: true
     traefik.http.routers.grafana-redirect.entrypoints: web
