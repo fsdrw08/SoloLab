@@ -4,10 +4,10 @@ prov_nomad = {
 }
 
 jobs = [
-  # {
-  #   path = "./attachments/test-db.nomad.hcl"
-  # },
   {
-    path = "./attachments/nexus-db.nomad.hcl"
+    path = "./attachments/test-db.nomad.hcl"
   },
+  # {
+  #   path = "./attachments/nexus-db.nomad.hcl"
+  # },
 ]

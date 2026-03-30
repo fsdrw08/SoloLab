@@ -142,13 +142,13 @@ job "gitblit" {
       #   selinux_label = "Z"
       # }
     }
-    volume "gitblit" {
-      type            = "host"
-      source          = "gitblit"
-      read_only       = false
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
-    }
+    # volume "gitblit" {
+    #   type            = "host"
+    #   source          = "gitblit"
+    #   read_only       = false
+    #   attachment_mode = "file-system"
+    #   access_mode     = "single-node-writer"
+    # }
     # volume "gitblit-config" {
     #   type            = "csi"
     #   source          = "gitblit-config"
@@ -156,12 +156,12 @@ job "gitblit" {
     #   attachment_mode = "file-system"
     #   access_mode     = "single-node-writer"
     # }
-    # volume "gitblit-data" {
-    #   type            = "csi"
-    #   source          = "gitblit-data"
-    #   read_only       = false
-    #   attachment_mode = "file-system"
-    #   access_mode     = "single-node-writer"
-    # }
+    volume "gitblit" {
+      type            = "csi"
+      source          = "gitblit"
+      read_only       = false
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
+    }
   }
 }

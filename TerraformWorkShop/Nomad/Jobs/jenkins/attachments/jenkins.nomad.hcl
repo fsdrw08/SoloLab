@@ -172,7 +172,7 @@ job "jenkins" {
       }
     }
     volume "jenkins" {
-      type            = "host"
+      type            = "csi"
       source          = "jenkins"
       read_only       = false
       attachment_mode = "file-system"

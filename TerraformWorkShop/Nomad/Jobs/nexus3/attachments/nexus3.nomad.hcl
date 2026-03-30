@@ -242,14 +242,14 @@ job "nexus3" {
       }
     }
     volume "nexus-cacerts" {
-      type            = "host"
+      type            = "csi"
       source          = "nexus-cacerts"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
     }
     volume "nexus" {
-      type            = "host"
+      type            = "csi"
       source          = "nexus"
       read_only       = false
       attachment_mode = "file-system"

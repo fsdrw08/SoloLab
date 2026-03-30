@@ -3,26 +3,26 @@ prov_nomad = {
   skip_verify = true
 }
 
-dynamic_host_volumes = [
+csi_volumes = [
   {
-    name = "jenkins"
-    constraint = [
+    name      = "jenkins"
+    plugin_id = "nfs"
+    volume_id = "jenkins"
+    capabilities = [
       {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day3"
+        access_mode     = "single-node-writer"
+        attachment_mode = "file-system"
       }
     ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
     parameters = {
-      mode = "0755"
-      uid  = 1000
-      gid  = 1000
+      server           = "day2.node.consul"
+      share            = "/"
+      mountPermissions = "777"
     }
-  },
+    mount_options = {
+      fs_type = "nfs"
+    }
+  }
 ]
 
 jobs = [

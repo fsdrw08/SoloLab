@@ -5,43 +5,7 @@ prov_nomad = {
 
 dynamic_host_volumes = [
   {
-    name = "redis"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day2"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      uid = 999
-      gid = 1000
-    }
-  },
-  {
-    name = "redis-insight"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day2"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      uid = 1000
-      gid = 1000
-    }
-  },
-  {
-    name = "nexus-db"
+    name = "test-db"
     constraint = [
       {
         attribute = "$${attr.unique.hostname}"
@@ -58,6 +22,60 @@ dynamic_host_volumes = [
       gid = 26
     }
   },
+  # {
+  #   name = "redis"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day2"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 999
+  #     gid = 1000
+  #   }
+  # },
+  # {
+  #   name = "redis-insight"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day2"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 1000
+  #     gid = 1000
+  #   }
+  # },
+  # {
+  #   name = "nexus-db"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day2"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 26
+  #     gid = 26
+  #   }
+  # },
   # {
   #   name = "meilisearch"
   #   constraint = [
@@ -76,61 +94,61 @@ dynamic_host_volumes = [
   #     gid = 0
   #   }
   # }
-  {
-    name = "gitblit"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day3"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      uid = 8117
-      gid = 8117
-    }
-  },
-  {
-    name = "nexus"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day3"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      uid = 200
-      gid = 200
-    }
-  },
-  {
-    name = "nexus-cacerts"
-    constraint = [
-      {
-        attribute = "$${attr.unique.hostname}"
-        operator  = "=="
-        value     = "day3"
-      }
-    ]
-    capability = {
-      access_mode = "single-node-writer"
-    }
-    plugin_id = "mkdir"
-    parameters = {
-      mode = "0755"
-      uid  = 0
-      gid  = 0
-    }
-  },
+  # {
+  #   name = "gitblit"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day3"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 8117
+  #     gid = 8117
+  #   }
+  # },
+  # {
+  #   name = "nexus"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day3"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     uid = 200
+  #     gid = 200
+  #   }
+  # },
+  # {
+  #   name = "nexus-cacerts"
+  #   constraint = [
+  #     {
+  #       attribute = "$${attr.unique.hostname}"
+  #       operator  = "=="
+  #       value     = "day3"
+  #     }
+  #   ]
+  #   capability = {
+  #     access_mode = "single-node-writer"
+  #   }
+  #   plugin_id = "mkdir"
+  #   parameters = {
+  #     mode = "0755"
+  #     uid  = 0
+  #     gid  = 0
+  #   }
+  # },
   # {
   #   name = "jenkins"
   #   constraint = [
