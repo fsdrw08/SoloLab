@@ -282,4 +282,20 @@ policy_bindings = [
       }
     EOT
   },
+  {
+    policy_name    = "vault-read"
+    policy_content = <<-EOT
+      path "kvv2_vault/data/*" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_vault/data/" {
+        capabilities = ["read"]
+      }
+
+      path "kvv2_vault/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
+  }
 ]

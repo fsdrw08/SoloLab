@@ -11,4 +11,5 @@ policy_names = [
   "pgsql-read",
   "minio-read",
   "others-read",
+  "vault-read",
 ]

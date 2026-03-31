@@ -43,6 +43,8 @@ users = [
       "app-gitblit-admin",      # "ba1fd3a9" 
       "app-nexus-user",         # "90ebdcb1" 
       "app-nexus-admin",        # "044af468" 
+      "app-jenkins-user",       # "8a5d9ae7"
+      "app-jenkins-admin",      # "d5a64bfb"
     ]
   },
   {
@@ -62,6 +64,7 @@ users = [
       "app-nomad-user",         # "091a24fe" 
       "app-grafana-user",       # "a4019ca3" 
       "app-nexus-user",         # "90ebdcb1" 
+      "app-jenkins-user",       # "8a5d9ae7"
     ]
   }
 ]
@@ -157,6 +160,14 @@ groups = [
   {
     iac_id       = "90ebdcb1"
     display_name = "app-nexus-user"
+  },
+  {
+    iac_id       = "8a5d9ae7"
+    display_name = "app-jenkins-user"
+  },
+  {
+    iac_id       = "d5a64bfb"
+    display_name = "app-jenkins-admin"
   },
 ]
 

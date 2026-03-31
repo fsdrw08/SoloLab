@@ -51,8 +51,8 @@ job "jenkins" {
         JAVA_OPTS = "-Xmx600m"
         # https://cloud.tencent.com/developer/article/2040515
         # https://jenkins-update.davidz.cn/
-        JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
-        JENKINS_UC_DOWNLOAD = "https://mirrors.huaweicloud.com/jenkins"
+        # JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
+        # JENKINS_UC_DOWNLOAD = "https://mirrors.huaweicloud.com/jenkins"
       }
 
       template {
@@ -146,7 +146,11 @@ job "jenkins" {
         TZ = "Asia/Shanghai"
         # https://cloud.tencent.com/developer/article/2040515
         # https://jenkins-update.davidz.cn/
-        JAVA_OPTS           = "-Xmx600m -Dhudson.model.DownloadService.noSignatureCheck=true -Djenkins.install.runSetupWizard=false"
+        JAVA_OPTS           = <<-EOF
+          -Xmx600m 
+          -Dhudson.model.DownloadService.noSignatureCheck=true 
+          -Djenkins.install.runSetupWizard=false
+        EOF
         JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
         JENKINS_UC_DOWNLOAD = "https://mirrors.huaweicloud.com/jenkins"
       }
@@ -163,6 +167,7 @@ job "jenkins" {
         change_mode = "noop"
         destination = "local/jcasc.yaml"
       }
+      vault {}
 
       # https://github.com/jenkins-org/jenkins-docker/tree/v1.10.0-1?tab=readme-ov-file#data-persistence
       volume_mount {

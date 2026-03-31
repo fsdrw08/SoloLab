@@ -1,22 +1,74 @@
 jenkins:
   authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
+    # loggedInUsersCanDoAnything:
+    #   allowAnonymousRead: false
+    # for role-strategy plugin, work together with oic plugin for role based access control
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            permissions:
+              - "Overall/Administer"
+            entries:
+              - group: "app-jenkins-user"
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: true
   securityRealm:
-    local:
-      allowsSignup: false
-      enableCaptcha: false
-      users:
-        - id: admin
-          name: Jenkins Admin
-          password: P@ssw0rd
+    # local:
+    #   allowsSignup: false
+    #   enableCaptcha: false
+    #   users:
+    #     - id: admin
+    #       name: Jenkins Admin
+    #       password: P@ssw0rd
+    # https://github.com/jenkinsci/oic-auth-plugin/blob/master/docs/configuration/README.md
+    # for oic-auth plugin
+    oic:
+      # Automatic config of endpoint
+      serverConfiguration:
+        wellKnown:
+          wellKnownOpenIDConfigurationUrl: '{{with secret "kvv2_vault/data/oidc-provider_sololab"}}{{.Data.data.config_url}}{{end}}'
+          scopesOverride: openid groups user
+      # Credentials
+      clientId: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_id}}{{end}}'
+      clientSecret: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_secret}}{{end}}'
+      # claims
+      userNameField: email
+      fullNameFieldName: email
+      groupsFieldName: groups
+      emailFieldName: email
+      userIdStrategy: caseSensitive
+      groupIdStrategy: caseSensitive
+      # Security
+      disableSslVerification: true
+      properties:
+        - escapeHatch:
+            username: admin
+            secret: P@ssw0rd
+            group: app-jenkins-user
+
+appearance:
+  # for dark theme plugin
+  themeManager:
+    disableUserThemes: true
+    theme: "darkSystem"
+
+security:
+  # for csp plugin
+  contentSecurityPolicy:
+    enforce: true
+
 unclassified:
   location:
     adminAddress: null
     url: "https://jenkins.day3.sololab"
+  # https://www.jenkins.io/doc/book/security/user-content/#resource-root-url
+  # https://www.jenkins.io/doc/book/security/configuring-content-security-policy/
+  # https://www.jenkins.io/doc/book/security/csp/
+  # in order to allow jenkins web origin site script run(for oidc login), we need to set resourceRoot to jenkins url
+  resourceRoot:
+    url: "https://jenkins.day3.sololab/"
 
 jobs:
   - script: >

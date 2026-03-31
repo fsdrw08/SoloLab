@@ -52,6 +52,13 @@ oidc_client = [
       "https://grafana.day1.sololab/login/generic_oauth",
     ]
   },
+  {
+    name         = "jenkins"
+    allow_groups = ["app-jenkins-user"]
+    redirect_uris = [
+      "https://jenkins.day3.sololab/securityRealm/finishLogin",
+    ]
+  },
 ]
 
 vault_secret_backend = "kvv2_vault"

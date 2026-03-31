@@ -24,7 +24,7 @@ resource "nomad_csi_volume" "volumes" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
