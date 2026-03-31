@@ -28,10 +28,11 @@ job "nfs-ganesha" {
       port     = "nfs"
 
       check {
-        type     = "tcp"
-        port     = "nfs"
-        interval = "600s"
-        timeout  = "2s"
+        type           = "tcp"
+        port           = "nfs"
+        interval       = "180s"
+        timeout        = "2s"
+        initial_status = "passing"
       }
       tags = [
         "log"
