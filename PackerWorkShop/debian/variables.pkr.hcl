@@ -1,5 +1,5 @@
 variable "boot_command" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "configuration_version" {
@@ -38,7 +38,7 @@ variable "iso_url" {
 }
 
 variable "cd_files" {
-  type    = list(string)
+  type = list(string)
 }
 
 variable "cd_label" {
@@ -56,14 +56,14 @@ variable "provision_script_options" {
   default = ""
 }
 
-// variable "output_vagrant" {
-//   type    = string
-//   default = ""
-// }
-
-variable "ssh_password" {
+variable "output_vagrant" {
   type    = string
   default = ""
+}
+
+variable "ssh_password" {
+  type      = string
+  default   = ""
   sensitive = true
 }
 
@@ -72,10 +72,10 @@ variable "switch_name" {
   default = ""
 }
 
-// variable "vagrantfile_template" {
-//   type    = string
-//   default = ""
-// }
+variable "vagrantfile_template" {
+  type    = string
+  default = ""
+}
 
 variable "vlan_id" {
   type    = string

@@ -1,15 +1,22 @@
 [CmdletBinding()]
 param (
-    [Parameter()]
-    [ValidateSet('1130','1150','1160','1240')]
-    [int16]
-    $DebianVersion
+  [Parameter()]
+  [ValidateSet('1130','1150','1160','1240','1340')]
+  [string]
+  $OSVersion,
+
+  [Parameter()]
+  [ValidateSet(
+    'vagrant'
+  )]
+  [string]
+  $except=$null
 )
 
 #Verify the pre-request
-$Ready = $true
 @"
 packer
+oscdimg
 "@ -split "`r`n" | ForEach-Object {
   if (-not (Get-Command $_)) {
     [bool]$Ready = $false
@@ -19,17 +26,17 @@ packer
 
 # Build images
 if ($Ready -ne $false) {
+
   # Get Start Time
   $startDTM = (Get-Date)
   
   # Variables
-  $template_file="$PSScriptRoot\tmpl-hv_g2-debian.pkr.hcl"
-  $var_file="$PSScriptRoot\vars_debian$DebianVersion.pkrvars.hcl"
-  $machine="Debian $DebianVersion"
-  $packer_log=0
+  $var_file = "$PSScriptRoot\vars_debian$OSVersion.pkrvars.hcl"
+  $machine = "Debian $OSVersion-g2"
+  $packer_log = 0
   
-  if ((Test-Path -Path "$template_file") -and (Test-Path -Path "$var_file")) {
-    Write-Output "Template and var file found"
+  if (Test-Path -Path "$var_file") {
+    Write-Output "var file found"
     Write-Output "Building: $machine"
     $currentLocation = (Get-Location).Path
     Set-Location $PSScriptRoot
@@ -55,9 +62,11 @@ if ($Ready -ne $false) {
       
       $env:PACKER_LOG = $packer_log
       packer version
-      packer build --force `
-        -var-file="$var_file" `
-        .
+      if ($null -ne $except) {
+        packer build --force -var-file="$var_file" --except=$except .
+      } else {
+        packer build --force -var-file="$var_file" .
+      }
     }
     catch {
       Write-Output "Packer build failed, exiting."
@@ -69,6 +78,9 @@ if ($Ready -ne $false) {
     Write-Output "Template or var file not found - exiting"
     exit (-1)
   }
+}
+else {
+  "seems packer is not ready"
 }
 
 $endDTM = (Get-Date)
