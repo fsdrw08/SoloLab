@@ -10,6 +10,23 @@ jenkins:
             permissions:
               - "Overall/Administer"
             entries:
+              - group: "app-jenkins-admin"
+          - name: "agent"
+            permissions:
+              - "Overall/Read"
+              - "Agent/Build"
+              - "Agent/Configure"
+              - "Agent/Connect"
+              - "Agent/Create"
+              - "Agent/Delete"
+              - "Agent/Disconnect"
+              - "Agent/Provision"
+            entries:
+              - group: "app-jenkins-agent"
+          - name: "read"
+            permissions:
+              - "View/Read"
+            entries:
               - group: "app-jenkins-user"
   crumbIssuer:
     standard:
@@ -46,7 +63,7 @@ jenkins:
         - escapeHatch:
             username: admin
             secret: P@ssw0rd
-            group: app-jenkins-user
+            group: app-jenkins-admin
 
 appearance:
   # for dark theme plugin

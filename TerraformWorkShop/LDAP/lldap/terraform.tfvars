@@ -19,6 +19,18 @@ users = [
     ]
   },
   {
+    user_id = "svc-jenkins-agent"
+    email   = "svc-jenkins-agent@mail.sololab"
+    # uncomment below filed when apply this resource in first time
+    password     = "P@ssw0rd"
+    display_name = "svc-jenkins-agent"
+    member_of = [
+      "sso_allow",         # "02999e39" 
+      "app-jenkins-agent", # 9640fa2d
+      "app-jenkins-user",  # 8a5d9ae7
+    ]
+  },
+  {
     user_id      = "000"
     email        = "root@mail.sololab"
     password     = "P@ssw0rd"
@@ -168,6 +180,10 @@ groups = [
   {
     iac_id       = "d5a64bfb"
     display_name = "app-jenkins-admin"
+  },
+  {
+    iac_id       = "9640fa2d"
+    display_name = "app-jenkins-agent"
   },
 ]
 
