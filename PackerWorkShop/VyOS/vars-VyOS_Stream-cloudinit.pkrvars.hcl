@@ -1,8 +1,8 @@
-#iso_url=https://community-downloads.vyos.dev/stream/2026.02/vyos-2026.02-generic-amd64.iso
-# iso_url               = "D:/Users/Public/Downloads/ISO/vyos-2026.02-generic-amd64.iso"
-iso_url               = "C:/Users/Public/Downloads/ISO/vyos-2026.02-generic-amd64.iso"
+#iso_url=https://community-downloads.vyos.dev/stream/2026.03/vyos-2026.03-generic-amd64.iso
+# iso_url               = "D:/Users/Public/Downloads/ISO/vyos-2026.03-generic-amd64.iso"
+iso_url               = "C:/Users/Public/Downloads/ISO/vyos-2026.03-generic-amd64.iso"
+iso_checksum          = "56151A536E4A70C1A3F9202D8E6E59E7DD308CC84E2C50B633884A1376A39010"
 iso_checksum_type     = "sha256"
-iso_checksum          = "CE74A4A795CCC9DA76686BFB32CC3543B415EECE4448F246FF4B7F29960A1AC7"
 vm_name               = "packer-vyos_stream"
 configuration_version = "12.0"
 disk_size             = "128000"
@@ -10,7 +10,7 @@ disk_size             = "128000"
 // https://www.packer.io/plugins/builders/hyperv/iso#cd_files
 cd_files             = [".\\http\\*"]
 switch_name          = "Default Switch"
-output_directory     = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-vyos_stream/"
+output_directory     = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-hyperv_g2-vyos_stream/"
 output_vagrant       = "C:/Users/Public/Downloads/vbox/packer-vyos_stream-hv-g2.box"
 vlan_id              = ""
 vagrantfile_template = "./vagrant-VyOS_Stream.rb"
