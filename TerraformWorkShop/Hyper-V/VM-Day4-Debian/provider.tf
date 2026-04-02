@@ -2,21 +2,26 @@ terraform {
   required_providers {
     hyperv = {
       source  = "taliesins/hyperv"
-      version = ">=1.0.4"
+      version = ">= 1.2.1"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = ">=3.2.1"
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.7.1"
     }
+  }
+  backend "consul" {
+    address = "consul.day1.sololab"
+    scheme  = "https"
+    path    = "tfstate/Hyper-V/VM-Day4-Debian"
   }
 }
 
 # https://registry.terraform.io/providers/taliesins/hyperv/latest/docs
 provider "hyperv" {
-  user     = var.user
-  password = var.password
-  host     = var.host
-  port     = 5986
+  host     = var.prov_hyperv.host
+  port     = var.prov_hyperv.port
+  user     = var.prov_hyperv.user
+  password = var.prov_hyperv.password
   https    = true
   insecure = true
   use_ntlm = true

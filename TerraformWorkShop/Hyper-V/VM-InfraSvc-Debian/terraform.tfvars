@@ -1,6 +1,0 @@
-host        = "127.0.0.1"
-user        = "root"
-password    = "P@ssw0rd"
-vm_name     = "InfraSvc-Debian"
-source_disk = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\Virtual Hard Disks\\packer-debian1240-g2.vhdx"
-# data_disk_ref = "../Disk-InfraSvc-CentOS-Data/terraform.tfstate"
