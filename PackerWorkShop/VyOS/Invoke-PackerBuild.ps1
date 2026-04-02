@@ -12,7 +12,7 @@ param (
     'Stream-cloudinit'
     )]
   [string]
-  $VyOSVersion,
+  $OSVersion,
 
   [Parameter()]
   [ValidateSet(
@@ -40,8 +40,8 @@ if ($Ready -ne $false) {
   $startDTM = (Get-Date)
   
   # Variables
-  $var_file = "$PSScriptRoot\vars-VyOS_$VyOSVersion.pkrvars.hcl"
-  $machine = "VyOS_$VyOSVersion-g2"
+  $var_file = "$PSScriptRoot\vars-VyOS_$OSVersion.pkrvars.hcl"
+  $machine = "VyOS_$OSVersion-g2"
   $packer_log = 0
   
   if (Test-Path -Path "$var_file") {
@@ -78,8 +78,8 @@ if ($Ready -ne $false) {
   }
 }
 else {
-  "seems package is not ready"
+  "seems packer is not ready"
 }
 
 $endDTM = (Get-Date)
-Write-Host "[INFO]  - Elapsed Time: $(($endDTM-$startDTM).totalseconds) seconds" -ForegroundColor Yellow
+Write-Host "[INFO]  - Elapsed Time: $(($endDTM - $startDTM).TotalSeconds) seconds" -ForegroundColor Yellow

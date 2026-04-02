@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
   [Parameter()]
-  [ValidateSet('1130','1150','1160','1240','1340')]
+  [ValidateSet('11','12','13')]
   [string]
   $OSVersion,
 

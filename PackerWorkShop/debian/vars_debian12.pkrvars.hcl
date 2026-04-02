@@ -1,21 +1,21 @@
 // https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/
 // https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.4.0-amd64-netinst.iso
-iso_url="C:/Users/Public/Downloads/ISO/debian-12.4.0-amd64-netinst.iso"
-iso_checksum_type="sha256"
+iso_url           = "C:/Users/Public/Downloads/ISO/debian-12.4.0-amd64-netinst.iso"
+iso_checksum_type = "sha256"
 // https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/SHA256SUMS
-iso_checksum="64d727dd5785ae5fcfd3ae8ffbede5f40cca96f1580aaa2820e8b99dae989d94"
-vm_name="packer-debian1240-g2"
-configuration_version="11.0"
-disk_size="70000"
-cd_files=[".\\http\\*"]
-cd_label="cidata"
-switch_name="Internal Switch"
-output_directory="C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images"
+iso_checksum          = "64d727dd5785ae5fcfd3ae8ffbede5f40cca96f1580aaa2820e8b99dae989d94"
+vm_name               = "packer-debian1240-g2"
+configuration_version = "11.0"
+disk_size             = "70000"
+cd_files              = [".\\http\\*"]
+cd_label              = "cidata"
+switch_name           = "Internal Switch"
+output_directory      = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images"
 // output_vagrant="../vbox/packer-debian1240-hv_g2.box"
-vlan_id=""
+vlan_id = ""
 // vagrantfile_template="./vagrant-debian1240.rb"
 // https://github.com/vmware-samples/packer-examples-for-vsphere/blob/develop/builds/linux/debian/12/linux-debian.pkr.hcl
-boot_command=[
+boot_command = [
   // This waits for 3 seconds, sends the "c" key, and then waits for another 3 seconds. In the GRUB boot loader, this is used to enter command line mode.
   "<wait3s>c<wait3s>",
   // This types a command to load the Linux kernel from the specified path.
