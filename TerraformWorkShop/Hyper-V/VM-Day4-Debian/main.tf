@@ -1,17 +1,65 @@
-data "terraform_remote_state" "root_ca" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
+# load secret from vault
+locals {
+  secrets_vault_kvv2 = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : {
+      mount = value_refer.vault_kvv2.mount
+      name  = value_refer.vault_kvv2.name
+    }
+    if value_refer.vault_kvv2 != null
+  ])
+  secret_var_keys = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
+        value_set.name
+      ]
+    ]
+    if value_refer.vault_kvv2 != null
+  ])
+  secret_var_values = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
+        data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
+      ]
+    ]
+    if value_refer.vault_kvv2 != null
+  ])
+}
+
+data "vault_kv_secret_v2" "secret" {
+  for_each = local.secrets_vault_kvv2 == null ? null : {
+    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
   }
+  mount = each.value.mount
+  name  = each.value.name
+}
+
+module "cloudinit_nocloud_iso" {
+  source   = "../../modules/hyperv-cloudinit-nocloud"
+  count    = var.vm.count == null ? 0 : var.vm.count
+  iso_name = "cloud-init-${local.vm_names[count.index]}"
+  files = [
+    for file in var.cloudinit.files : {
+      content = templatefile(
+        file,
+        merge(
+          var.cloudinit.vars.global,
+          var.cloudinit.vars.local[count.index],
+          zipmap(local.secret_var_keys, local.secret_var_values)
+        )
+      )
+      filename = file
+    }
+  ]
+  destination_iso_file_path = join("\\", [
+    var.vm.vhd.dir,
+    "${local.vm_names[count.index]}\\cloudinit.iso"
+    ]
+  )
 }
 
 locals {
   vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
     for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
-  ]
-  cert = [
-    for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
-    if cert.name == "wildcard.vyos"
   ]
   data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
     for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
@@ -23,66 +71,6 @@ locals {
       if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
     ]
   ])
-}
-
-# for debug
-# output "int_ca_pem" {
-#   value = join("",
-#     slice(
-#       split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
-#       1,
-#       length(
-#         split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem)
-#       ) - 2
-#     )
-#   )
-# }
-
-
-# output "vyos_cert" {
-#   value = join("",
-#     slice(
-#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
-#       1,
-#       length(
-#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
-#       ) - 2
-#     )
-#   )
-# }
-
-# output "vyos_key" {
-#   value = join("",
-#     slice(
-#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
-#       1,
-#       length(
-#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
-#       ) - 2
-#     )
-#   )
-#   # value = lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)
-# }
-
-module "cloudinit_nocloud_iso" {
-  source   = "../../modules/hyperv-cloudinit-nocloud"
-  count    = var.vm.count == null ? 0 : var.cloudinit_nocloud == null ? 0 : var.vm.count
-  iso_name = "cloud-init-${local.vm_names[count.index]}"
-  files = [
-    for content in var.cloudinit_nocloud : {
-      content = templatefile(content.content_source, merge(content.content_vars,
-        {
-          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-        }
-      ))
-      filename = content.filename
-    }
-  ]
-  destination_iso_file_path = join("\\", [
-    var.vm.vhd.dir,
-    "${local.vm_names[count.index]}\\cloudinit.iso"
-    ]
-  )
 }
 
 # fetch data disk info

@@ -6,14 +6,14 @@
 iso_url               = "C:/Users/Public/Downloads/ISO/debian-13.4.0-amd64-DVD-1.iso"
 iso_checksum          = "E41EEAFFA4FDD64FBF07FC8B0D18A1B5F15BA9743A72C222008F8FD0B6463355"
 iso_checksum_type     = "sha256"
-vm_name               = "packer-debian13-g2"
+vm_name               = "packer-debian13"
 configuration_version = "12.0"
 disk_size             = "70000"
 cd_files              = [".\\http\\*"]
 cd_label              = "cidata"
 switch_name           = "Internal Switch"
 output_directory      = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/packer-hyperv_g2-debian13/"
-output_vagrant        = "C:/Users/Public/Downloads/vbox/packer-debian_13-hv-g2.box"
+output_vagrant        = "C:/Users/Public/Downloads/vbox/packer-hv-g2-debian13.box"
 vlan_id               = ""
 # vagrantfile_template="./vagrant-debian13.rb"
 # https://github.com/vmware-samples/packer-examples-for-vsphere/blob/develop/builds/linux/debian/13/linux-debian.pkr.hcl

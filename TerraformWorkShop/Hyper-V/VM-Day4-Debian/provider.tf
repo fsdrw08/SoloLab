@@ -4,6 +4,10 @@ terraform {
       source  = "taliesins/hyperv"
       version = ">= 1.2.1"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.4.0"
+    }
     archive = {
       source  = "hashicorp/archive"
       version = ">= 2.7.1"
@@ -31,4 +35,11 @@ provider "hyperv" {
   # key_path        = ""
   script_path = "C:/Temp/terraform_%RAND%.cmd"
   timeout     = "30s"
+}
+
+provider "vault" {
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
 }

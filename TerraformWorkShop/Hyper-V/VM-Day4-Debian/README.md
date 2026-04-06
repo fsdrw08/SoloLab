@@ -17,3 +17,6 @@ run `New-CIDATA.ps1` to generate the ISO
 ```powershell
 . "C:\Program Files\qemu\qemu-img.exe" convert ` "C:\Users\WindomWu\Downloads\vhd\debian-10-genericcloud-amd64.qcow2" -O vhdx -o subformat=dynamic ` "C:\Users\WindomWu\Downloads\vhd\debian-10-genericcloud-amd64.vhdx"
 ```
+
+dont use this resource, the ifupdown is not support dhcpv6， it cause cloudinit fail to bring up eth0
+https://lists.debian.org/debian-devel/2025/10/msg00201.html
