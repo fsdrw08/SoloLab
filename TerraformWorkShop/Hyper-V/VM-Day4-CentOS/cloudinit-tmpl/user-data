@@ -1,0 +1,351 @@
+#cloud-config
+
+# Network configuration
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+
+# https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
+users:
+  - name: admin
+    gecos: admin
+    groups: wheel
+    plain_text_passwd: P@ssw0rd
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+  - name: podmgr
+    uid: 1001
+    gecos: podmgr
+    plain_text_passwd: podmgr
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
+
+#cloud-config
+timezone: ${time_zone}
+
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/configuring_and_managing_cloud-init_for_rhel_8/index#the-default-cloud-cfg-file_red-hat-support-for-cloud-init
+bootcmd:
+  - mkdir -p /etc/consul.d
+  - mkdir -p ${consul_data_dir}
+  - mkdir -p /etc/nomad.d
+  - mkdir -p ${nomad_data_dir}
+
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
+write_files:
+  - path: /opt/bin/consul_linux_amd64.zip
+    permissions: "0644"
+    source:
+      uri: ${consul_download_url}
+  - path: /opt/bin/nomad_linux_amd64.zip
+    permissions: "0644"
+    source:
+      uri: ${nomad_download_url}
+  - path: /opt/bin/nomad-driver-podman_linux_amd64.zip
+    permissions: "0644"
+    source:
+      uri: ${nomad_podman_driver_download_url}
+  - path: /etc/nomad.d/client.pem
+    permissions: "0600"
+    source:
+      uri: ${nomad_client_cert_download_url}
+      headers:
+        Authorization: Basic ${nomad_client_cert_download_url_cred}
+  - path: /etc/nomad.d/client-key.pem
+    permissions: "0600"
+    source:
+      uri: ${nomad_client_cert_key_download_url}
+      headers:
+        Authorization: Basic ${nomad_client_cert_download_url_cred}
+  - path: /usr/local/share/ca-certificates/Consul-Root-CA.pem
+    permissions: "0644"
+    source:
+      uri: ${root_ca_url}
+  - path: /etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem
+    permissions: "0644"
+    content: |
+      ${indent(6, consul_ca_content)}
+  - path: /etc/consul.d/consul.hcl
+    contents: |
+      acl {
+        enabled = true
+        tokens {
+          default = "${consul_acl_token}"
+        }
+      }
+      auto_encrypt {
+        tls = true
+      }
+      bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
+      client_addr = "127.0.0.1"
+      data_dir = "${consul_data_dir}"
+      encrypt = "${consul_encrypt_key}"
+      ports {
+        https = 8501
+      }
+      retry_join = ["${consul_server_fqdn}"]
+      server = false
+      tls {
+        defaults {
+          ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+          verify_incoming = false
+          verify_outgoing = true
+          verify_server_hostname = true
+        }
+        internal_rpc {
+          verify_server_hostname = true
+        }
+      }
+  - path: /etc/systemd/system/consul.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description="HashiCorp Consul - A service mesh solution"
+      Documentation=https://developer.hashicorp.com/
+      After=network-online.target
+      Wants=network-online.target.service
+      ConditionFileNotEmpty=/opt/bin/consul
+      ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+      ConditionPathIsDirectory=${consul_data_dir}
+      Before=umount.target
+      Conflicts=umount.target
+
+      [Service]
+      ExecStart=/opt/bin/consul agent \
+        -config-dir=/etc/consul.d
+      ExecReload=/bin/kill --signal HUP $MAINPID
+      KillMode=process
+      KillSignal=SIGTERM
+      Restart=on-failure
+      LimitNOFILE=65536
+
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/nomad.d/nomad.hcl
+    permissions: "0644"
+    content: |
+      client {
+        enabled = true
+        servers = ["${nomad_server_fqdn}"]
+        drain_on_shutdown {
+          deadline           = "20s"
+          ignore_system_jobs = true
+        }
+      }
+
+      consul {
+        address = "127.0.0.1:8501"
+        ca_file = "/etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem"
+        ssl = true
+        token = "${nomad_consul_acl_token}"
+      }
+
+      data_dir           = "${nomad_data_dir}"
+      leave_on_interrupt = true
+      leave_on_terminate = true
+
+      ports {
+        http = 4646
+        rpc  = 4647
+        serf = 4648
+      }
+
+      tls {
+        http = true
+        rpc  = true
+        ca_file   = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+        cert_file = "/etc/nomad.d/client.pem"
+        key_file  = "/etc/nomad.d/client-key.pem"
+        # verify_server_hostname = true
+        verify_https_client = true
+      }
+
+      plugin "docker" {
+        config {
+          endpoint = "unix:///disable/docker.sock"
+        }
+      }
+
+      # plugin "docker" {
+      #   config {
+      #     allow_privileged = true
+      #     infra_image = "zot.day0.sololab/pause-amd64:3.3"
+      #     volumes {
+      #       enabled      = true
+      #       selinuxlabel = "z"
+      #     }
+      #   }
+      # }
+
+      # Podman driver plugin configuration
+      # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#plugin-options
+      plugin "nomad-driver-podman" {
+        config {
+          socket { 
+            name        = "default"
+            socket_path = "unix://run/podman/podman.sock"
+          }
+          volumes {
+            enabled = true
+            selinuxlabel = "z"
+          }
+        }
+      }
+
+      plugin "raw_exec" {
+        config {
+          enabled = true
+        }
+      }
+
+      plugin_dir = "/opt/bin"
+
+      vault {
+        enabled = true
+        address = "${vault_server_address}"
+        ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+        jwt_auth_backend_path = "jwt-nomad"
+      }
+  - path: /etc/systemd/system/nomad.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description="Nomad Client Agent"
+      Documentation=https://developer.hashicorp.com/
+      After=network-online.target podman.service
+      Wants=network-online.target
+      Wants=consul.service
+      After=consul.service
+      Before=umount.target
+      Conflicts=umount.target
+
+      ConditionFileNotEmpty=/opt/bin/nomad
+      ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
+      ConditionPathIsDirectory=${nomad_data_dir}
+
+      [Service]
+      # https://developer.hashicorp.com/nomad/commands#environment-variables
+      Environment="NOMAD_ADDR=https://127.0.0.1:4646"
+      Environment="NOMAD_CACERT=/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+      Environment="NOMAD_CLIENT_CERT=/etc/nomad.d/client.pem"
+      Environment="NOMAD_CLIENT_KEY=/etc/nomad.d/client-key.pem"
+      Environment="NOMAD_TOKEN=${nomad_acl_token}" 
+
+      ExecReload=/bin/kill -HUP $MAINPID
+      ExecStart=/opt/bin/nomad agent \
+        -config /etc/nomad.d/nomad.hcl
+      # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
+      ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
+      ExecStop=/opt/bin/nomad node drain -enable -self
+      KillMode=process
+      KillSignal=SIGINT
+      LimitNOFILE=65536
+      LimitNPROC=infinity
+      TasksMax=infinity
+      Restart=on-failure
+      RestartSec=2
+      OOMScoreAdjust=-999
+
+      [Install]
+      WantedBy=multi-user.target
+
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#update-apt-database-on-first-boot
+package_update: true
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#run-apt-or-yum-upgrade
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - nfs-utils
+  - bash-completion
+  - git
+  - acl
+  - cockpit
+  - cockpit-podman
+  - cockpit-bridge
+  - podman
+  - java-25-openjdk-devel
+
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+# disk_setup:
+#   /dev/sdb:
+#     table_type: gpt
+#     layout: True
+#     overwrite: False
+
+# fs_setup:
+#   - label: Data
+#     filesystem: 'xfs'
+#     device: '/dev/sdb'
+#     partition: auto
+#     overwrite: false
+
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+# https://zhuanlan.zhihu.com/p/250658106
+# mounts:
+#   - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
+# mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
+# https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+# growpart:
+#   mode: auto
+#   devices:
+#     - "/dev/sda3"
+#   ignore_growroot_disabled: false
+
+resize_rootfs: true
+
+# https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
+runcmd:
+  - update-ca-trust
+
+  - /usr/bin/bsdtar -xf "/opt/bin/consul_linux_amd64.zip" -C /opt/bin
+  - /usr/bin/rm "/opt/bin/consul_linux_amd64.zip"
+  - /usr/bin/chmod +x /opt/bin/consul
+  - /usr/bin/chown root:root /opt/bin/consul
+
+  - /usr/bin/bsdtar -xf "/opt/bin/nomad_linux_amd64.zip" -C /opt/bin
+  - /usr/bin/rm "/opt/bin/nomad_linux_amd64.zip"
+  - /usr/bin/chmod +x /opt/bin/nomad
+  - /usr/bin/chown root:root /opt/bin/nomad
+
+  - /usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_linux_amd64.zip" -C /opt/bin
+  - /usr/bin/rm "/opt/bin/nomad-driver-podman_linux_amd64.zip"
+  - /usr/bin/chmod +x /opt/bin/nomad-driver-podman
+  - /usr/bin/chown root:root /opt/bin/nomad-driver-podman
+
+  - systemctl enable --now consul.service
+  - systemctl enable --now nomad.service
+#   - chown podmgr:podmgr /home/podmgr
+#   # https://access.redhat.com/solutions/4661741
+#   - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+#   - firewall-offline-cmd --set-default-zone=trusted
+#   - firewall-offline-cmd --zone=trusted --add-service=cockpit
+#   - systemctl unmask firewalld
+#   - systemctl enable --now firewalld
+#   - systemctl enable --now cockpit.socket
+
+# ansible:
+#   install_method: distro
+#   package_name: ansible-core
+#   run_user: vagrant
+#   galaxy:
+#     actions:
+#       - ["ansible-galaxy", "collection", "install", "community.general", "ansible.posix"]
+#   setup_controller:
+#     repositories:
+#       - path: /home/vagrant/SoloLab/
+#         source: https://github.com/fsdrw08/SoloLab.git
+#     run_ansible:
+#       - playbook_dir: /home/vagrant/SoloLab/AnsibleWorkShop/runner/project/
+#         playbook_name: Invoke-PodmanRootlessProvision.yml
+#         inventory: /home/vagrant/SoloLab/AnsibleWorkShop/runner/inventory/SoloLab.yml
+#         extra_vars: host_admin=localhost extravars_file=/home/vagrant/SoloLab/AnsibleWorkShop/runner/env/extravars

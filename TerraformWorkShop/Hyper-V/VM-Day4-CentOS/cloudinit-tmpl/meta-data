@@ -1,0 +1,15 @@
+# https://cloudinit.readthedocs.io/en/latest/reference/network-config-format-v2.html#examples
+instance-id: ${instance_id}
+local-hostname: ${local_hostname}
+
+# https://cloudinit.readthedocs.io/en/latest/reference/network-config-format-v1.html#subnet-ip
+# version: 1
+# config:
+#   - type: physical
+#     name: eth0
+#     subnets:
+#       - type: static
+#         address: 192.168.255.12/24
+#         gateway: 192.168.255.1
+#         dns_nameservers:
+#           - 192.168.255.1
