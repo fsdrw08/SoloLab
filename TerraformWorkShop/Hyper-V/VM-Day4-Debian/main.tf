@@ -47,7 +47,7 @@ module "cloudinit_nocloud_iso" {
           zipmap(local.secret_var_keys, local.secret_var_values)
         )
       )
-      filename = file
+      filename = basename(file)
     }
   ]
   destination_iso_file_path = join("\\", [

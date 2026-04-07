@@ -1,3 +1,4 @@
+# https://docs.cloud-init.io/en/latest/reference/datasources/nocloud.html
 version: 2
 ethernets:
   eth0:

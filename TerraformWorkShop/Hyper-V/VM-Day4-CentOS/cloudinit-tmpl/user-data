@@ -1,16 +1,9 @@
 #cloud-config
-
-# Network configuration
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: true
-
 # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
 users:
   - name: admin
+    uid: 1000
     gecos: admin
     groups: wheel
     plain_text_passwd: P@ssw0rd
@@ -64,7 +57,8 @@ write_files:
       uri: ${nomad_client_cert_key_download_url}
       headers:
         Authorization: Basic ${nomad_client_cert_download_url_cred}
-  - path: /usr/local/share/ca-certificates/Consul-Root-CA.pem
+  # redhat family trust custom cert
+  - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
     permissions: "0644"
     source:
       uri: ${root_ca_url}
@@ -73,7 +67,8 @@ write_files:
     content: |
       ${indent(6, consul_ca_content)}
   - path: /etc/consul.d/consul.hcl
-    contents: |
+    permissions: "0644"
+    content: |
       acl {
         enabled = true
         tokens {
@@ -324,6 +319,7 @@ runcmd:
 
   - systemctl enable --now consul.service
   - systemctl enable --now nomad.service
+  - sudo -u admin /bin/bash -c "echo \"source /etc/profile.d/bash_completion.sh\" >> ~/.bashrc"
 #   - chown podmgr:podmgr /home/podmgr
 #   # https://access.redhat.com/solutions/4661741
 #   - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"

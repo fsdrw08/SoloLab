@@ -1,12 +1,4 @@
 #cloud-config
-
-# Network configuration
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: true
-
 # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
 users:
@@ -67,11 +59,12 @@ write_files:
       uri: ${nomad_client_cert_key_download_url}
       headers:
         Authorization: Basic ${nomad_client_cert_download_url_cred}
+  # debian family trust custom cert
   - path: /usr/local/share/ca-certificates/Consul-Root-CA.pem
     permissions: "0644"
     source:
       uri: ${root_ca_url}
-  - path: /etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem
+  - path: /usr/local/share/ca-certificates/Consul-Root-CA.pem
     permissions: "0644"
     content: |
       ${indent(6, consul_ca_content)}

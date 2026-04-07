@@ -40,6 +40,7 @@ vm = {
 cloudinit = {
   files = [
     "./cloudinit-tmpl/meta-data",
+    "./cloudinit-tmpl/network-config",
     "./cloudinit-tmpl/user-data"
   ]
   vars = {
