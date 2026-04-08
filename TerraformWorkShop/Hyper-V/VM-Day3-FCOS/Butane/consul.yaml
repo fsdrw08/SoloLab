@@ -6,15 +6,15 @@ version: 1.5.0
 storage:
   directories:
     # consul config dir
-    - path: /etc/consul.d
+    - path: ${consul_config_dir}
     # consul data dir
     - path: "${consul_data_dir}"
   files:
-    - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
+    - path: ${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip
       mode: 0644
       contents:
         source: ${consul_download_url}
-    - path: /etc/consul.d/consul.hcl
+    - path: ${consul_config_dir}/consul.hcl
       contents:
         inline: |
           acl {
@@ -37,7 +37,7 @@ storage:
           server = false
           tls {
             defaults {
-              ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+              ca_file = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
               verify_incoming = false
               verify_outgoing = true
               verify_server_hostname = true
@@ -52,19 +52,19 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Unpack Consul binary to /opt/bin
-        ConditionPathExists=!/opt/bin/consul
+        Description=Unpack Consul binary to ${custom_bin_dir}
+        ConditionPathExists=!${custom_bin_dir}/consul
 
         [Service]
         Type=oneshot
         Restart=on-failure
         RemainAfterExit=yes
         Environment=consul_version=${consul_version}
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/consul_${consul_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/consul_${consul_version}_linux_amd64.zip"
-        ExecStart=/usr/bin/chmod +x /opt/bin/consul
+        ExecStart=/usr/bin/bsdtar -xf "${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip" -C ${custom_bin_dir}
+        ExecStart=/usr/bin/rm "${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x ${custom_bin_dir}/consul
         # Fix SELinux contexts for systemd execution
-        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/consul
+        ExecStart=/usr/bin/chcon -t bin_t ${custom_bin_dir}/consul
 
         [Install]
         WantedBy=multi-user.target
@@ -78,15 +78,15 @@ systemd:
         After=network-online.target prepare-consul-binary.service
         Wants=network-online.target
         Requires=prepare-consul-binary.service
-        ConditionFileNotEmpty=/opt/bin/consul
-        ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+        ConditionFileNotEmpty=${custom_bin_dir}/consul
+        ConditionFileNotEmpty=${consul_config_dir}/consul.hcl
         ConditionPathIsDirectory=${consul_data_dir}
         Before=umount.target
         Conflicts=umount.target
 
         [Service]
-        ExecStart=/opt/bin/consul agent \
-          -config-dir=/etc/consul.d
+        ExecStart=${custom_bin_dir}/consul agent \
+          -config-dir=${consul_config_dir}
         ExecReload=/bin/kill --signal HUP $MAINPID
         KillMode=process
         KillSignal=SIGTERM

@@ -45,14 +45,17 @@ cloudinit = {
   ]
   vars = {
     global = {
-      instance_id = "iid-Debian_202604"
-      time_zone   = "Asia/Shanghai"
-      root_ca_url = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
+      instance_id         = "iid-Debian_202604"
+      time_zone           = "Asia/Shanghai"
+      custom_root_ca_url  = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
+      custom_root_ca_path = "/usr/local/share/ca-certificates"
+      custom_bin_dir      = "/opt/bin"
       # consul client
       consul_download_url = "http://dufs.day0.sololab/public/binaries/consul_1.22.6_linux_amd64.zip"
       consul_version      = "1.22.6"
       consul_server_fqdn  = "consul.service.consul"
-      consul_data_dir     = "/opt/consul"
+      consul_config_dir   = "/etc/consul.d"
+      consul_data_dir     = "/var/lib/consul"
       # nomad client
       nomad_download_url                  = "http://dufs.day0.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
       nomad_version                       = "1.11.3"
@@ -62,12 +65,13 @@ cloudinit = {
       nomad_client_cert_download_url      = "http://dufs.day0.sololab/private/certs/client.global.nomad.crt"
       nomad_client_cert_key_download_url  = "http://dufs.day0.sololab/private/certs/client.global.nomad.key"
       nomad_client_cert_download_url_cred = "YWRtaW46YWRtaW4="
-      nomad_data_dir                      = "/opt/nomad"
+      nomad_config_dir                    = "/etc/nomad.d"
+      nomad_data_dir                      = "/var/lib/nomad"
       vault_server_address                = "https://vault.day0.sololab"
     }
     local = [
       {
-        local_hostname = "Day4-Debian"
+        local_hostname = "day4-debian"
       }
     ]
     value_refers = [

@@ -6,7 +6,7 @@ version: 1.5.0
 storage:
   directories:
     # nomad config dir
-    - path: /etc/nomad.d
+    - path: ${nomad_config_dir}
     # nomad data dir
     - path: "${nomad_data_dir}"
   # dont use symlink for data_dir， but need a fixed path for log correction tools
@@ -15,31 +15,31 @@ storage:
     - path: /var/lib/nomad
       target: "${nomad_data_dir}"
   files:
-    - path: /opt/bin/nomad_${nomad_version}_linux_amd64.zip
+    - path: ${custom_bin_dir}/nomad_${nomad_version}_linux_amd64.zip
       mode: 0644
       contents:
         source: ${nomad_download_url}
     # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#installation
-    - path: /opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
+    - path: ${custom_bin_dir}/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
       mode: 0644
       contents:
         source: ${nomad_podman_driver_download_url}
         # source: https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
-    - path: /etc/nomad.d/client.pem
+    - path: ${nomad_config_dir}/client.pem
       mode: 0600
       contents:
         source: ${nomad_client_cert_download_url}
         http_headers:
           - name: Authorization
             value: Basic ${nomad_client_cert_download_url_cred}
-    - path: /etc/nomad.d/client-key.pem
+    - path: ${nomad_config_dir}/client-key.pem
       mode: 0600
       contents:
         source: ${nomad_client_cert_key_download_url}
         http_headers:
           - name: Authorization
             value: Basic ${nomad_client_cert_download_url_cred}
-    - path: /etc/nomad.d/nomad.hcl
+    - path: ${nomad_config_dir}/nomad.hcl
       contents:
         inline: |
           client {
@@ -53,7 +53,7 @@ storage:
 
           consul {
             address = "127.0.0.1:8501"
-            ca_file = "/etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem"
+            ca_file = "${custom_root_ca_path}/Consul-Root-CA.pem"
             ssl = true
             token = "${nomad_consul_acl_token}"
           }
@@ -72,9 +72,9 @@ storage:
             http = true
             rpc  = true
 
-            ca_file   = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
-            cert_file = "/etc/nomad.d/client.pem"
-            key_file  = "/etc/nomad.d/client-key.pem"
+            ca_file   = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
+            cert_file = "${nomad_config_dir}/client.pem"
+            key_file  = "${nomad_config_dir}/client-key.pem"
 
             # verify_server_hostname = true
             verify_https_client = true
@@ -118,12 +118,12 @@ storage:
             }
           }
 
-          plugin_dir = "/opt/bin"
+          plugin_dir = "${custom_bin_dir}"
 
           vault {
             enabled = true
             address = "${vault_server_address}"
-            ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+            ca_file = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
             jwt_auth_backend_path = "jwt-nomad"
           }
 
@@ -149,28 +149,28 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Unpack Nomad binary and Podman driver to /opt/bin
-        ConditionPathExists=!/opt/bin/nomad
+        Description=Unpack Nomad binary and Podman driver to ${custom_bin_dir}
+        ConditionPathExists=!${custom_bin_dir}/nomad
 
         [Service]
         Type=oneshot
         Restart=on-failure
         RemainAfterExit=yes
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_${nomad_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/nomad_${nomad_version}_linux_amd64.zip"
-        ExecStart=/usr/bin/chmod +x /opt/bin/nomad 
+        ExecStart=/usr/bin/bsdtar -xf "${custom_bin_dir}/nomad_${nomad_version}_linux_amd64.zip" -C ${custom_bin_dir}
+        ExecStart=/usr/bin/rm "${custom_bin_dir}/nomad_${nomad_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/chmod +x ${custom_bin_dir}/nomad 
         # Fix ownership to root:root for proper permissions
-        ExecStart=/usr/bin/chown root:root /opt/bin/nomad 
+        ExecStart=/usr/bin/chown root:root ${custom_bin_dir}/nomad 
         # Fix SELinux contexts for systemd execution
-        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad
+        ExecStart=/usr/bin/chcon -t bin_t ${custom_bin_dir}/nomad
 
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/bsdtar -xf "${custom_bin_dir}/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C ${custom_bin_dir}
+        ExecStart=/usr/bin/rm "${custom_bin_dir}/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
         ExecStart=/usr/bin/chmod +x /var/mnt/data/nomad/plugins/nomad-driver-podman
         # Fix ownership to root:root for proper permissions
-        ExecStart=/usr/bin/chown root:root /opt/bin/nomad-driver-podman
+        ExecStart=/usr/bin/chown root:root ${custom_bin_dir}/nomad-driver-podman
         # Fix SELinux contexts for systemd execution
-        ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad-driver-podman
+        ExecStart=/usr/bin/chcon -t bin_t ${custom_bin_dir}/nomad-driver-podman
 
         [Install]
         WantedBy=multi-user.target
@@ -188,24 +188,24 @@ systemd:
         Before=umount.target
         Conflicts=umount.target
 
-        ConditionFileNotEmpty=/opt/bin/nomad
-        ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
+        ConditionFileNotEmpty=${custom_bin_dir}/nomad
+        ConditionFileNotEmpty=${nomad_config_dir}/nomad.hcl
         ConditionPathIsDirectory=${nomad_data_dir}
 
         [Service]
         # https://developer.hashicorp.com/nomad/commands#environment-variables
         Environment="NOMAD_ADDR=https://127.0.0.1:4646"
-        Environment="NOMAD_CACERT=/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
-        Environment="NOMAD_CLIENT_CERT=/etc/nomad.d/client.pem"
-        Environment="NOMAD_CLIENT_KEY=/etc/nomad.d/client-key.pem"
+        Environment="NOMAD_CACERT=${custom_root_ca_path}/SoloLab-Root-CA.pem"
+        Environment="NOMAD_CLIENT_CERT=${nomad_config_dir}/client.pem"
+        Environment="NOMAD_CLIENT_KEY=${nomad_config_dir}/client-key.pem"
         Environment="NOMAD_TOKEN=${nomad_acl_token}" 
 
         ExecReload=/bin/kill -HUP $MAINPID
-        ExecStart=/opt/bin/nomad agent \
-          -config /etc/nomad.d/nomad.hcl
+        ExecStart=${custom_bin_dir}/nomad agent \
+          -config ${nomad_config_dir}/nomad.hcl
         # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
-        ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
-        ExecStop=/opt/bin/nomad node drain -enable -self
+        ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && ${custom_bin_dir}/nomad node eligibility -enable -self"
+        ExecStop=${custom_bin_dir}/nomad node drain -enable -self
         KillMode=process
         KillSignal=SIGINT
         LimitNOFILE=65536

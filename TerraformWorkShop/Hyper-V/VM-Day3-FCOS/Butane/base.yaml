@@ -23,12 +23,12 @@ storage:
         inline: |
           net.ipv4.ip_unprivileged_port_start = 53
     # trust custom cert
-    - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
+    - path: ${custom_root_ca_path}/SoloLab-Root-CA.pem
       overwrite: true
       mode: 0644
       contents:
         source: ${root_ca_url}
-    - path: /etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem
+    - path: ${custom_root_ca_path}/Consul-Root-CA.pem
       overwrite: true
       mode: 0644
       contents:

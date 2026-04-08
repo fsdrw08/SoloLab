@@ -1,4 +1,37 @@
 #cloud-config
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
+# disk_setup:
+#   /dev/sdb:
+#     table_type: gpt
+#     layout: True
+#     overwrite: False
+
+# fs_setup:
+#   - label: Data
+#     filesystem: 'xfs'
+#     device: '/dev/sdb'
+#     partition: auto
+#     overwrite: false
+
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
+# https://zhuanlan.zhihu.com/p/250658106
+# mounts:
+#   - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
+# mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
+
+# https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
+# growpart:
+#   mode: auto
+#   devices:
+#     - "/dev/sda3"
+#   ignore_growroot_disabled: false
+
+resize_rootfs: true
+
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#set-passwords
+ssh_pwauth: true
 # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
 users:
@@ -8,8 +41,9 @@ users:
     groups: wheel
     plain_text_passwd: P@ssw0rd
     lock_passwd: false
-    sudo: ALL=(ALL) NOPASSWD:ALL
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
     shell: /bin/bash
+    ssh_import_id: None
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
   - name: podmgr
@@ -18,6 +52,7 @@ users:
     plain_text_passwd: podmgr
     lock_passwd: false
     shell: /bin/bash
+    ssh_import_id: None
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
 
@@ -26,47 +61,47 @@ timezone: ${time_zone}
 
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/configuring_and_managing_cloud-init_for_rhel_8/index#the-default-cloud-cfg-file_red-hat-support-for-cloud-init
 bootcmd:
-  - mkdir -p /etc/consul.d
+  - mkdir -p ${consul_config_dir}
   - mkdir -p ${consul_data_dir}
-  - mkdir -p /etc/nomad.d
+  - mkdir -p ${nomad_config_dir}
   - mkdir -p ${nomad_data_dir}
 
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
 write_files:
-  - path: /opt/bin/consul_linux_amd64.zip
+  - path: ${custom_bin_dir}/consul_linux_amd64.zip
     permissions: "0644"
     source:
       uri: ${consul_download_url}
-  - path: /opt/bin/nomad_linux_amd64.zip
+  - path: ${custom_bin_dir}/nomad_linux_amd64.zip
     permissions: "0644"
     source:
       uri: ${nomad_download_url}
-  - path: /opt/bin/nomad-driver-podman_linux_amd64.zip
+  - path: ${custom_bin_dir}/nomad-driver-podman_linux_amd64.zip
     permissions: "0644"
     source:
       uri: ${nomad_podman_driver_download_url}
-  - path: /etc/nomad.d/client.pem
+  - path: ${nomad_config_dir}/client.pem
     permissions: "0600"
     source:
       uri: ${nomad_client_cert_download_url}
       headers:
         Authorization: Basic ${nomad_client_cert_download_url_cred}
-  - path: /etc/nomad.d/client-key.pem
+  - path: ${nomad_config_dir}/client-key.pem
     permissions: "0600"
     source:
       uri: ${nomad_client_cert_key_download_url}
       headers:
         Authorization: Basic ${nomad_client_cert_download_url_cred}
   # redhat family trust custom cert
-  - path: /etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem
+  - path: ${custom_root_ca_path}/SoloLab-Root-CA.pem
     permissions: "0644"
     source:
-      uri: ${root_ca_url}
-  - path: /etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem
+      uri: ${custom_root_ca_url}
+  - path: ${custom_root_ca_path}/Consul-Root-CA.pem
     permissions: "0644"
     content: |
       ${indent(6, consul_ca_content)}
-  - path: /etc/consul.d/consul.hcl
+  - path: ${consul_config_dir}/consul.hcl
     permissions: "0644"
     content: |
       acl {
@@ -89,7 +124,7 @@ write_files:
       server = false
       tls {
         defaults {
-          ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+          ca_file = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
           verify_incoming = false
           verify_outgoing = true
           verify_server_hostname = true
@@ -106,15 +141,15 @@ write_files:
       Documentation=https://developer.hashicorp.com/
       After=network-online.target
       Wants=network-online.target.service
-      ConditionFileNotEmpty=/opt/bin/consul
-      ConditionFileNotEmpty=/etc/consul.d/consul.hcl
+      ConditionFileNotEmpty=${custom_bin_dir}/consul
+      ConditionFileNotEmpty=${consul_config_dir}/consul.hcl
       ConditionPathIsDirectory=${consul_data_dir}
       Before=umount.target
       Conflicts=umount.target
 
       [Service]
-      ExecStart=/opt/bin/consul agent \
-        -config-dir=/etc/consul.d
+      ExecStart=${custom_bin_dir}/consul agent \
+        -config-dir=${consul_config_dir}
       ExecReload=/bin/kill --signal HUP $MAINPID
       KillMode=process
       KillSignal=SIGTERM
@@ -123,7 +158,7 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
-  - path: /etc/nomad.d/nomad.hcl
+  - path: ${nomad_config_dir}/nomad.hcl
     permissions: "0644"
     content: |
       client {
@@ -137,7 +172,7 @@ write_files:
 
       consul {
         address = "127.0.0.1:8501"
-        ca_file = "/etc/pki/ca-trust/source/anchors/Consul-Root-CA.pem"
+        ca_file = "${custom_root_ca_path}/Consul-Root-CA.pem"
         ssl = true
         token = "${nomad_consul_acl_token}"
       }
@@ -155,9 +190,9 @@ write_files:
       tls {
         http = true
         rpc  = true
-        ca_file   = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
-        cert_file = "/etc/nomad.d/client.pem"
-        key_file  = "/etc/nomad.d/client-key.pem"
+        ca_file   = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
+        cert_file = "${nomad_config_dir}/client.pem"
+        key_file  = "${nomad_config_dir}/client-key.pem"
         # verify_server_hostname = true
         verify_https_client = true
       }
@@ -200,12 +235,12 @@ write_files:
         }
       }
 
-      plugin_dir = "/opt/bin"
+      plugin_dir = "${custom_bin_dir}"
 
       vault {
         enabled = true
         address = "${vault_server_address}"
-        ca_file = "/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
+        ca_file = "${custom_root_ca_path}/SoloLab-Root-CA.pem"
         jwt_auth_backend_path = "jwt-nomad"
       }
   - path: /etc/systemd/system/nomad.service
@@ -221,24 +256,24 @@ write_files:
       Before=umount.target
       Conflicts=umount.target
 
-      ConditionFileNotEmpty=/opt/bin/nomad
-      ConditionFileNotEmpty=/etc/nomad.d/nomad.hcl
+      ConditionFileNotEmpty=${custom_bin_dir}/nomad
+      ConditionFileNotEmpty=${nomad_config_dir}/nomad.hcl
       ConditionPathIsDirectory=${nomad_data_dir}
 
       [Service]
       # https://developer.hashicorp.com/nomad/commands#environment-variables
       Environment="NOMAD_ADDR=https://127.0.0.1:4646"
-      Environment="NOMAD_CACERT=/etc/pki/ca-trust/source/anchors/SoloLab-Root-CA.pem"
-      Environment="NOMAD_CLIENT_CERT=/etc/nomad.d/client.pem"
-      Environment="NOMAD_CLIENT_KEY=/etc/nomad.d/client-key.pem"
+      Environment="NOMAD_CACERT=${custom_root_ca_path}/SoloLab-Root-CA.pem"
+      Environment="NOMAD_CLIENT_CERT=${nomad_config_dir}/client.pem"
+      Environment="NOMAD_CLIENT_KEY=${nomad_config_dir}/client-key.pem"
       Environment="NOMAD_TOKEN=${nomad_acl_token}" 
 
       ExecReload=/bin/kill -HUP $MAINPID
-      ExecStart=/opt/bin/nomad agent \
-        -config /etc/nomad.d/nomad.hcl
+      ExecStart=${custom_bin_dir}/nomad agent \
+        -config ${nomad_config_dir}/nomad.hcl
       # https://discuss.hashicorp.com/t/issue-with-nomad-service-restart-node-not-eligible-after-bash-script-execution/63723
-      ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && /opt/bin/nomad node eligibility -enable -self"
-      ExecStop=/opt/bin/nomad node drain -enable -self
+      ExecStartPost=/bin/bash -c "sleep $(shuf -i 30-40 -n 1) && ${custom_bin_dir}/nomad node eligibility -enable -self"
+      ExecStop=${custom_bin_dir}/nomad node drain -enable -self
       KillMode=process
       KillSignal=SIGINT
       LimitNOFILE=65536
@@ -257,67 +292,33 @@ package_update: true
 package_upgrade: true
 package_reboot_if_required: true
 packages:
-  - nfs-utils
   - bash-completion
   - git
-  - acl
-  - cockpit
-  - cockpit-podman
   - cockpit-bridge
   - podman
   - java-25-openjdk-devel
-
-# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#disk-setup
-# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#disk-setup
-# disk_setup:
-#   /dev/sdb:
-#     table_type: gpt
-#     layout: True
-#     overwrite: False
-
-# fs_setup:
-#   - label: Data
-#     filesystem: 'xfs'
-#     device: '/dev/sdb'
-#     partition: auto
-#     overwrite: false
-
-# https://cloudinit.readthedocs.io/en/latest/reference/examples.html#adjust-mount-points-mounted
-# https://zhuanlan.zhihu.com/p/250658106
-# mounts:
-#   - [ /dev/disk/by-label/Data, /home/podmgr, auto, "nofail,exec", ]
-# mount_default_fields: [ None, None, "auto", "nofail", "0", "2" ]
-
-# https://unix.stackexchange.com/questions/728955/why-is-the-root-filesystem-so-small-on-a-clean-fedora-37-install
-# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#growpart
-# growpart:
-#   mode: auto
-#   devices:
-#     - "/dev/sda3"
-#   ignore_growroot_disabled: false
-
-resize_rootfs: true
 
 # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
 runcmd:
   - update-ca-trust
 
-  - /usr/bin/bsdtar -xf "/opt/bin/consul_linux_amd64.zip" -C /opt/bin
-  - /usr/bin/rm "/opt/bin/consul_linux_amd64.zip"
-  - /usr/bin/chmod +x /opt/bin/consul
-  - /usr/bin/chown root:root /opt/bin/consul
+  - /usr/bin/bsdtar -xf "${custom_bin_dir}/consul_linux_amd64.zip" -C ${custom_bin_dir}
+  - /usr/bin/rm "${custom_bin_dir}/consul_linux_amd64.zip"
+  - /usr/bin/chmod +x ${custom_bin_dir}/consul
+  - /usr/bin/chown root:root ${custom_bin_dir}/consul
 
-  - /usr/bin/bsdtar -xf "/opt/bin/nomad_linux_amd64.zip" -C /opt/bin
-  - /usr/bin/rm "/opt/bin/nomad_linux_amd64.zip"
-  - /usr/bin/chmod +x /opt/bin/nomad
-  - /usr/bin/chown root:root /opt/bin/nomad
+  - /usr/bin/bsdtar -xf "${custom_bin_dir}/nomad_linux_amd64.zip" -C ${custom_bin_dir}
+  - /usr/bin/rm "${custom_bin_dir}/nomad_linux_amd64.zip"
+  - /usr/bin/chmod +x ${custom_bin_dir}/nomad
+  - /usr/bin/chown root:root ${custom_bin_dir}/nomad
 
-  - /usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_linux_amd64.zip" -C /opt/bin
-  - /usr/bin/rm "/opt/bin/nomad-driver-podman_linux_amd64.zip"
-  - /usr/bin/chmod +x /opt/bin/nomad-driver-podman
-  - /usr/bin/chown root:root /opt/bin/nomad-driver-podman
+  - /usr/bin/bsdtar -xf "${custom_bin_dir}/nomad-driver-podman_linux_amd64.zip" -C ${custom_bin_dir}
+  - /usr/bin/rm "${custom_bin_dir}/nomad-driver-podman_linux_amd64.zip"
+  - /usr/bin/chmod +x ${custom_bin_dir}/nomad-driver-podman
+  - /usr/bin/chown root:root ${custom_bin_dir}/nomad-driver-podman
 
   - systemctl enable --now consul.service
+  - systemctl enable --now podman.socket
   - systemctl enable --now nomad.service
   - sudo -u admin /bin/bash -c "echo \"source /etc/profile.d/bash_completion.sh\" >> ~/.bashrc"
 #   - chown podmgr:podmgr /home/podmgr
