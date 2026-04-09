@@ -68,6 +68,27 @@ bootcmd:
 
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
 write_files:
+  # https://mirrors.tuna.tsinghua.edu.cn/help/debian/
+  - path: /etc/apt/sources.list
+    permissions: "0644"
+    content: |
+      deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie main contrib non-free non-free-firmware
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie main contrib non-free non-free-firmware
+
+      deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-updates main contrib non-free non-free-firmware
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-updates main contrib non-free non-free-firmware
+
+      deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-backports main contrib non-free non-free-firmware
+      # deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-backports main contrib non-free non-free-firmware
+
+      deb https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+      # deb-src https://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
+  - path: /home/admin/.bashrc
+    permissions: "0644"
+    owner: admin:admin
+    defer: true
+    content: |
+      source /etc/profile.d/bash_completion.sh
   - path: ${custom_bin_dir}/consul_linux_amd64.zip
     permissions: "0644"
     source:
@@ -294,8 +315,10 @@ package_reboot_if_required: true
 packages:
   - bash-completion
   - git
-  - cockpit-bridge
   - podman
+  - cockpit
+  - cockpit-bridge
+  - cockpit-podman
   - openjdk-25-jdk
 
 # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
