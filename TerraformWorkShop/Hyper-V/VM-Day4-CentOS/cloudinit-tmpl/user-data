@@ -573,8 +573,9 @@ runcmd:
 
   #   # https://access.redhat.com/solutions/4661741
   # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+  - systemctl stop firewalld
   - firewall-offline-cmd --set-default-zone=trusted
-  - firewall-cmd --reload
+  - systemctl enable --now firewalld
 #   - systemctl enable --now cockpit.socket
 
 # ansible:
