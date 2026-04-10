@@ -146,12 +146,12 @@ job "jenkins" {
         TZ = "Asia/Shanghai"
         # https://cloud.tencent.com/developer/article/2040515
         # https://jenkins-update.davidz.cn/
-        JAVA_OPTS           = <<-EOF
+        JAVA_OPTS = <<-EOF
           -Xmx600m 
           -Dhudson.model.DownloadService.noSignatureCheck=true 
           -Djenkins.install.runSetupWizard=false
         EOF
-        JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
+        # JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
         JENKINS_UC_DOWNLOAD = "https://mirrors.huaweicloud.com/jenkins"
       }
 

@@ -12,6 +12,7 @@ display-url-api:latest
 docker-commons:latest
 docker-plugin:latest
 docker-workflow:latest
+git:latest
 instance-identity:latest
 job-dsl:latest
 mailer:latest
