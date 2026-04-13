@@ -1,6 +1,6 @@
 services {
-  name = "alloy-day0"
-  id   = "alloy-web"
+  name = "alloy"
+  id   = "alloy-day0"
   port = 443 # 12345
 
   checks = [

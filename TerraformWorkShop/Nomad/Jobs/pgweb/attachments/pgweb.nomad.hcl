@@ -51,7 +51,7 @@ job "pgweb" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(pgweb.day2.sololab) & re-encrypt(server transport(pgweb.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(pgweb.${attr.unique.hostname}.sololab) & re-encrypt(server transport(pgweb.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
@@ -59,11 +59,11 @@ job "pgweb" {
 
           "traefik.enable=true",
           "traefik.http.routers.pgweb-redirect.entryPoints=web",
-          "traefik.http.routers.pgweb-redirect.rule=Host(`pgweb.day2.sololab`)",
+          "traefik.http.routers.pgweb-redirect.rule=Host(`pgweb.${attr.unique.hostname}.sololab`)",
           "traefik.http.routers.pgweb-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.pgweb.entryPoints=webSecure",
-          "traefik.http.routers.pgweb.rule=Host(`pgweb.day2.sololab`)",
+          "traefik.http.routers.pgweb.rule=Host(`pgweb.${attr.unique.hostname}.sololab`)",
           "traefik.http.routers.pgweb.tls.certresolver=internal",
 
           "traefik.http.services.pgweb.loadbalancer.server.scheme=https",
@@ -73,7 +73,7 @@ job "pgweb" {
 
         meta {
           prom_blackbox_scheme            = "https"
-          prom_blackbox_address           = "pgweb.day2.sololab"
+          prom_blackbox_address           = "pgweb.${attr.unique.hostname}.sololab"
           prom_blackbox_health_check_path = ""
         }
       }
@@ -84,12 +84,12 @@ job "pgweb" {
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.pgweb-redirect.entrypoints" = "web"
-          "traefik.http.routers.pgweb-redirect.rule"        = "(Host(`pgweb.day2.sololab`)||Host(`pgweb.service.consul`))"
+          "traefik.http.routers.pgweb-redirect.rule"        = "(Host(`pgweb.${attr.unique.hostname}.sololab`)||Host(`pgweb.service.consul`))"
           "traefik.http.routers.pgweb-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.pgweb-redirect.service"     = "pgweb"
 
           "traefik.http.routers.pgweb.entryPoints" = "webSecure"
-          "traefik.http.routers.pgweb.rule"        = "(Host(`pgweb.day2.sololab`)||Host(`pgweb.service.consul`))"
+          "traefik.http.routers.pgweb.rule"        = "(Host(`pgweb.${attr.unique.hostname}.sololab`)||Host(`pgweb.service.consul`))"
           "traefik.http.routers.pgweb.tls"         = "true"
           "traefik.http.routers.pgweb.service"     = "pgweb"
 

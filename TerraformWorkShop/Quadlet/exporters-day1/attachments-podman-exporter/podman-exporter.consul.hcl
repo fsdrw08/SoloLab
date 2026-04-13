@@ -1,6 +1,6 @@
 services {
-  name = "prometheus-podman-exporter-day1"
-  id   = "prometheus-podman-exporter-workload"
+  name = "prometheus-podman-exporter"
+  id   = "prometheus-podman-exporter-day1"
   port = 443
 
   checks = [
@@ -17,16 +17,17 @@ services {
   ]
 
   tags = [
+    "day1",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "prometheus-podman-exporter.day1.sololab"
+    prom_blackbox_address           = "day1.prometheus-podman-exporter.service.consul"
     prom_blackbox_health_check_path = "metrics"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "prometheus-podman-exporter.day1.sololab"
+    prom_target_address      = "day1.prometheus-podman-exporter.service.consul"
     prom_target_metrics_path = "metrics"
   }
 }

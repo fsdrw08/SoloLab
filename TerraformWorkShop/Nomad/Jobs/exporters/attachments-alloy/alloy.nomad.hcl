@@ -22,7 +22,7 @@ job "alloy" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider     = "consul"
-        name         = "alloy-${attr.unique.hostname}"
+        name         = "alloy"
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -37,15 +37,16 @@ job "alloy" {
         }
 
         tags = [
+          "${attr.unique.hostname}",
           "log",
 
-          "traefik.enable=true",
+          "traefik.enable=false",
           "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.entryPoints=web",
-          "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.alloy.service.consul`))",
           "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.alloy-${attr.unique.hostname}.entryPoints=webSecure",
-          "traefik.http.routers.alloy-${attr.unique.hostname}.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.alloy-${attr.unique.hostname}.rule=(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.alloy.service.consul`))",
           "traefik.http.routers.alloy-${attr.unique.hostname}.tls=true",
 
           "traefik.http.services.alloy-${attr.unique.hostname}.loadbalancer.server.scheme=https",
@@ -67,14 +68,14 @@ job "alloy" {
           "--storage.path=${NOMAD_ALLOC_DIR}/data",
         ]
         labels = {
-          "traefik.enable"                                                          = "true"
-          "traefik.http.routers.alloy-${attr.unique.hostname}-redirect.entrypoints" = "web"
-          "traefik.http.routers.alloy-redirect.rule"                                = "(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))"
-          "traefik.http.routers.alloy-redirect.middlewares"                         = "toHttps@file"
-          "traefik.http.routers.alloy.service"                                      = "alloy"
+          "traefik.enable"                                  = "true"
+          "traefik.http.routers.alloy-redirect.entrypoints" = "web"
+          "traefik.http.routers.alloy-redirect.rule"        = "(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.alloy.service.consul`))"
+          "traefik.http.routers.alloy-redirect.middlewares" = "toHttps@file"
+          "traefik.http.routers.alloy.service"              = "alloy"
 
           "traefik.http.routers.alloy.entrypoints" = "webSecure"
-          "traefik.http.routers.alloy.rule"        = "(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`alloy-${attr.unique.hostname}.service.consul`))"
+          "traefik.http.routers.alloy.rule"        = "(Host(`alloy.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.alloy.service.consul`))"
           "traefik.http.routers.alloy.tls"         = "true"
           "traefik.http.routers.alloy.service"     = "alloy"
 

@@ -48,6 +48,14 @@ podman_kubes = [
               name          = "traefik.secret.tls.contents.consul-root\\.crt"
               value_ref_key = "ca"
             },
+            {
+              name          = "traefik.secret.tls.contents.consul-cert\\.crt"
+              value_ref_key = "cert"
+            },
+            {
+              name          = "traefik.secret.tls.contents.consul-key\\.key"
+              value_ref_key = "private_key"
+            }
           ]
         },
         {

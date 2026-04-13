@@ -1,6 +1,6 @@
 services {
-  name = "alloy-day1"
-  id   = "alloy-web"
+  name = "alloy"
+  id   = "alloy-day1"
   port = 443 # 12345
 
   checks = [
@@ -16,6 +16,7 @@ services {
     }
   ]
   tags = [
+    "day1",
     "metrics-exposing-blackbox",
   ]
   meta = {

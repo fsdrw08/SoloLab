@@ -1,6 +1,6 @@
 services {
   name = "zot"
-  id   = "zot-registry"
+  id   = "zot-registry-day0"
   port = 443
 
   checks = [

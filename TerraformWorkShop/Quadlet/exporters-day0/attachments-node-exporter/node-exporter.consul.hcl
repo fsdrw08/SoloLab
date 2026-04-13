@@ -1,6 +1,6 @@
 services {
-  name = "prometheus-node-exporter-day0"
-  id   = "prometheus-node-exporter-workload"
+  name = "prometheus-node-exporter"
+  id   = "prometheus-node-exporter-day0"
   port = 443
 
   checks = [
@@ -17,6 +17,7 @@ services {
   ]
 
   tags = [
+    "day0",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]

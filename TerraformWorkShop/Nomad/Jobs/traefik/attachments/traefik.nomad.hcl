@@ -34,7 +34,7 @@ job "traefik" {
 
     service {
       provider = "consul"
-      name     = "traefik-${attr.unique.hostname}"
+      name     = "traefik"
       port     = "webSecure"
 
       check {
@@ -47,14 +47,15 @@ job "traefik" {
       }
 
       # traffic path: haproxy.vyos -(tcp route)-> 
-      #   traefik.day1 -[http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: traefik-day2.service.consul)]-> 
+      #   traefik.day1 -[match http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: dayX.traefik.service.consul)]-> 
       #   traefik.day2 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
+        "${attr.unique.hostname}",
         "metrics-exposing-blackbox",
         "metrics-exposing-general",
         "log",
 
-        "traefik.enable=true",
+        "traefik.enable=false",
         "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.entryPoints=web",
         "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.rule=Host(`traefik.${attr.unique.hostname}.sololab`)",
         "traefik.http.routers.traefik-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
@@ -70,11 +71,11 @@ job "traefik" {
 
       meta {
         prom_blackbox_scheme            = "https"
-        prom_blackbox_address           = "traefik-${attr.unique.hostname}.service.consul"
+        prom_blackbox_address           = "${attr.unique.hostname}.traefik.service.consul"
         prom_blackbox_health_check_path = "metrics"
 
         prom_target_scheme       = "https"
-        prom_target_address      = "traefik-${attr.unique.hostname}.service.consul"
+        prom_target_address      = "${attr.unique.hostname}.traefik.service.consul"
         prom_target_metrics_path = "metrics"
       }
     }
@@ -96,13 +97,13 @@ job "traefik" {
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"
-          "traefik.http.routers.dashboard-redirect.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard-redirect.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.traefik.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.dashboard-redirect.service"     = "api@internal"
 
           "traefik.http.routers.dashboard.entryPoints" = "webSecure"
           "traefik.http.routers.dashboard.tls"         = "true"
-          "traefik.http.routers.dashboard.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+          "traefik.http.routers.dashboard.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.traefik.service.consul`)) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
           "traefik.http.routers.dashboard.service"     = "api@internal"
           "traefik.http.routers.dashboard.middlewares" = "userPass@file"
 
@@ -111,7 +112,7 @@ job "traefik" {
 
           "traefik.http.routers.metrics.entryPoints" = "webSecure"
           "traefik.http.routers.metrics.tls"         = "true"
-          "traefik.http.routers.metrics.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`traefik-${attr.unique.hostname}.service.consul`)) && PathPrefix(`/metrics`)"
+          "traefik.http.routers.metrics.rule"        = "(Host(`traefik.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.traefik.service.consul`)) && PathPrefix(`/metrics`)"
           "traefik.http.routers.metrics.service"     = "prometheus@internal"
         }
         network_mode = "host"

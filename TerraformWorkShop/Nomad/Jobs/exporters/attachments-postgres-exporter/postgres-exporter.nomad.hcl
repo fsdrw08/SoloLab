@@ -38,15 +38,16 @@ job "prometheus-postgres-exporter" {
         }
 
         tags = [
+          "${attr.unique.hostname}",
           "log",
 
-          "traefik.enable=true",
+          "traefik.enable=false",
           "traefik.http.routers.prometheus-postgres-exporter-redirect.entryPoints=web",
-          "traefik.http.routers.prometheus-postgres-exporter-redirect.rule=(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.prometheus-postgres-exporter-redirect.rule=(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter.service.consul`))",
           "traefik.http.routers.prometheus-postgres-exporter-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.prometheus-postgres-exporter.entryPoints=webSecure",
-          "traefik.http.routers.prometheus-postgres-exporter.rule=(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.prometheus-postgres-exporter.rule=(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter.service.consul`))",
           "traefik.http.routers.prometheus-postgres-exporter.tls=true",
 
           "traefik.http.services.prometheus-postgres-exporter.loadbalancer.server.scheme=https",
@@ -61,11 +62,11 @@ job "prometheus-postgres-exporter" {
       config {
         image = "zot.day0.sololab/prometheuscommunity/postgres-exporter:v0.18.1"
         labels = {
-          "traefik.enable"                                                                                 = "true"
-          "traefik.http.routers.prometheus-postgres-exporter-${attr.unique.hostname}-redirect.entrypoints" = "web"
-          "traefik.http.routers.prometheus-postgres-exporter-redirect.rule"                                = "(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter.service.consul`))"
-          "traefik.http.routers.prometheus-postgres-exporter-redirect.middlewares"                         = "toHttps@file"
-          "traefik.http.routers.prometheus-postgres-exporter.service"                                      = "prometheus-postgres-exporter"
+          "traefik.enable"                                                         = "true"
+          "traefik.http.routers.prometheus-postgres-exporter-redirect.entrypoints" = "web"
+          "traefik.http.routers.prometheus-postgres-exporter-redirect.rule"        = "(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter.service.consul`))"
+          "traefik.http.routers.prometheus-postgres-exporter-redirect.middlewares" = "toHttps@file"
+          "traefik.http.routers.prometheus-postgres-exporter.service"              = "prometheus-postgres-exporter"
 
           "traefik.http.routers.prometheus-postgres-exporter.entrypoints" = "webSecure"
           "traefik.http.routers.prometheus-postgres-exporter.rule"        = "(Host(`prometheus-postgres-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-postgres-exporter.service.consul`))"

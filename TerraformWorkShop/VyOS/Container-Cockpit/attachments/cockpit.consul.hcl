@@ -1,6 +1,6 @@
 services {
-  name = "cockpit-vyos"
-  id   = "cockpit-web"
+  name = "cockpit"
+  id   = "cockpit-web-vyos"
   port = 443 # 9090
 
   checks = [

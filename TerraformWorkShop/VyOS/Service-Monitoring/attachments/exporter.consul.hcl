@@ -1,6 +1,6 @@
 services {
-  name = "prometheus-node-exporter-vyos"
-  id   = "prometheus-node-exporter-workload"
+  name = "prometheus-node-exporter"
+  id   = "prometheus-node-exporter-vyos"
   port = 443
 
   checks = [

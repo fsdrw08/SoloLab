@@ -1,6 +1,6 @@
 services {
-  name = "prometheus-podman-exporter-day0"
-  id   = "prometheus-podman-exporter-workload"
+  name = "prometheus-podman-exporter"
+  id   = "prometheus-podman-exporter-day0"
   port = 443
 
   checks = [
@@ -17,6 +17,7 @@ services {
   ]
 
   tags = [
+    "day0",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]

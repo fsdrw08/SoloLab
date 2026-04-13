@@ -1,6 +1,6 @@
 services {
-  name = "traefik-day0"
-  id   = "traefik-proxy"
+  name = "traefik"
+  id   = "traefik-day0"
   port = 443
 
   checks = [
@@ -16,6 +16,7 @@ services {
   ]
 
   tags = [
+    "day0",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]

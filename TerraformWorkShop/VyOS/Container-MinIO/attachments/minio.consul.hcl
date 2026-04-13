@@ -1,7 +1,7 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
-  name = "minio-vyos"
-  id   = "minio-api"
+  name = "minio"
+  id   = "minio-api-vyos"
   port = 443
 
   checks = [
@@ -33,8 +33,8 @@ services {
 }
 
 services {
-  name = "minio-vyos"
-  id   = "minio-console"
+  name = "minio"
+  id   = "minio-console-vyos"
   port = 443
 
   checks = [

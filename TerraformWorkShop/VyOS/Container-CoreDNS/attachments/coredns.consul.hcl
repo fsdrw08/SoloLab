@@ -1,6 +1,6 @@
 services {
-  name = "coredns-vyos"
-  id   = "coredns-server"
+  name = "coredns"
+  id   = "coredns-vyos"
   port = 443
 
   checks = [

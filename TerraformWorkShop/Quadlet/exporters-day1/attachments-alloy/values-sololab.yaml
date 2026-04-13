@@ -4,12 +4,12 @@ alloy:
   podLabels:
     traefik.enable: true
     traefik.http.routers.alloy-redirect.entrypoints: web
-    traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day1.sololab`)
+    traefik.http.routers.alloy-redirect.rule: Host(`alloy.day1.sololab`) || Host(`day1.alloy.service.consul`)
     traefik.http.routers.alloy-redirect.middlewares: toHttps@file
     traefik.http.routers.alloy-redirect.service: alloy
 
     traefik.http.routers.alloy.entryPoints: webSecure
-    traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`) || Host(`alloy.day1.sololab`)
+    traefik.http.routers.alloy.rule: Host(`alloy.day1.sololab`) || Host(`day1.alloy.service.consul`)
     traefik.http.routers.alloy.tls: true
     traefik.http.routers.alloy.service: alloy
 

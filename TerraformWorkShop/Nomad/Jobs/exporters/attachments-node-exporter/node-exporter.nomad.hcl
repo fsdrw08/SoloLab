@@ -19,7 +19,7 @@ job "prometheus-node-exporter" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider     = "consul"
-        name         = "prometheus-node-exporter-${attr.unique.hostname}"
+        name         = "prometheus-node-exporter"
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -34,16 +34,17 @@ job "prometheus-node-exporter" {
         }
 
         tags = [
+          "${attr.unique.hostname}",
           "log",
           "metrics-exposing-general",
 
-          "traefik.enable=true",
+          "traefik.enable=false",
           "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}-redirect.entryPoints=web",
-          "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}-redirect.rule=(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-node-exporter-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}-redirect.rule=(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.prometheus-node-exporter.service.consul`))",
           "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}.entryPoints=webSecure",
-          "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}.rule=(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-node-exporter-${attr.unique.hostname}.service.consul`))",
+          "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}.rule=(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.prometheus-node-exporter.service.consul`))",
           "traefik.http.routers.prometheus-node-exporter-${attr.unique.hostname}.tls=true",
 
           "traefik.http.services.prometheus-node-exporter-${attr.unique.hostname}.loadbalancer.server.scheme=https",
@@ -51,8 +52,11 @@ job "prometheus-node-exporter" {
           "traefik.http.services.prometheus-node-exporter-${attr.unique.hostname}.loadBalancer.serversTransport=consul-service@file",
         ]
         meta {
-          prom_target_scheme       = "https"
-          prom_target_address      = "prometheus-node-exporter-${attr.unique.hostname}.service.consul"
+          prom_target_scheme = "https"
+          # https://developer.hashicorp.com/consul/docs/discover/service/static
+          # [<tag>.]<service>.service[.<datacenter>.dc][.<cluster-peer>.peer][.<sameness-group>.sg].<domain>
+          # ${attr.unique.hostname} as tag name
+          prom_target_address      = "${attr.unique.hostname}.prometheus-node-exporter.service.consul"
           prom_target_metrics_path = "metrics"
         }
       }
@@ -68,12 +72,12 @@ job "prometheus-node-exporter" {
         labels = {
           "traefik.enable"                                                     = "true"
           "traefik.http.routers.prometheus-node-exporter-redirect.entrypoints" = "web"
-          "traefik.http.routers.prometheus-node-exporter-redirect.rule"        = "(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-node-exporter-${attr.unique.hostname}.service.consul`))"
+          "traefik.http.routers.prometheus-node-exporter-redirect.rule"        = "(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.prometheus-node-exporter.service.consul`))"
           "traefik.http.routers.prometheus-node-exporter-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.prometheus-node-exporter.service"              = "prometheus-node-exporter"
 
           "traefik.http.routers.prometheus-node-exporter.entrypoints" = "webSecure"
-          "traefik.http.routers.prometheus-node-exporter.rule"        = "(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`prometheus-node-exporter-${attr.unique.hostname}.service.consul`))"
+          "traefik.http.routers.prometheus-node-exporter.rule"        = "(Host(`prometheus-node-exporter.${attr.unique.hostname}.sololab`)||Host(`${attr.unique.hostname}.prometheus-node-exporter.service.consul`))"
           "traefik.http.routers.prometheus-node-exporter.tls"         = "true"
           "traefik.http.routers.prometheus-node-exporter.service"     = "prometheus-node-exporter"
 
