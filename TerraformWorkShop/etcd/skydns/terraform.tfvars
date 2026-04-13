@@ -338,7 +338,7 @@ dns_records = [
     }
   },
   {
-    hostname = "nexus3.day3.sololab"
+    hostname = "nexus.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"

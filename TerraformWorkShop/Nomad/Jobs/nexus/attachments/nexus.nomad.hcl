@@ -3,7 +3,7 @@ variable "metrics_auth_header" {
 }
 # https://developer.hashicorp.com/nomad/docs/job-specification/job
 # https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
-job "nexus3" {
+job "nexus" {
   datacenters = ["dc1"]
   region      = "global"
   #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
@@ -15,12 +15,12 @@ job "nexus3" {
     value     = "day3"
   }
 
-  group "nexus3" {
+  group "nexus" {
     # Custom ssl certificates not properly handled by aws sdk using s3 blob store
     # ref: https://github.com/sonatype/nexus-public/issues/894
-    # which means nexus3 fail to connect private minio with tls even after update ssl truststore via web api
+    # which means nexus fail to connect private minio with tls even after update ssl truststore via web api
     # work around:
-    # in order to make nexus3 connect private minio with tls, 
+    # in order to make nexus connect private minio with tls, 
     # need to update default truststore (the cacerts) to trust private ca cert by root user, 
     # then copy it to cacerts volume
     #
@@ -80,7 +80,7 @@ job "nexus3" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        URL=postgres://{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}@pgbouncer-day2.service.consul:6432/nexus?sslmode=require
+        URL=postgres://{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/nexus?sslmode=require
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
@@ -123,11 +123,11 @@ job "nexus3" {
       }
     }
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
-    task "nexus3" {
+    task "nexus" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
-        name     = "nexus3"
+        name     = "nexus"
         # need to set address_mode to "host" to use day1 traefik's server transport
         address_mode = "host"
 
@@ -141,7 +141,7 @@ job "nexus3" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(nexus3.day3.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(nexus.day3.sololab) & re-encrypt(server transport(nexus.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
@@ -149,26 +149,26 @@ job "nexus3" {
           "log",
 
           "traefik.enable=true",
-          "traefik.http.routers.nexus3-redirect.entryPoints=web",
-          "traefik.http.routers.nexus3-redirect.rule=Host(`nexus3.${attr.unique.hostname}.sololab`)",
-          "traefik.http.routers.nexus3-redirect.middlewares=toHttps@file",
+          "traefik.http.routers.nexus-redirect.entryPoints=web",
+          "traefik.http.routers.nexus-redirect.rule=Host(`nexus.${attr.unique.hostname}.sololab`)",
+          "traefik.http.routers.nexus-redirect.middlewares=toHttps@file",
 
-          "traefik.http.routers.nexus3.entryPoints=webSecure",
-          "traefik.http.routers.nexus3.rule=Host(`nexus3.${attr.unique.hostname}.sololab`)",
-          "traefik.http.routers.nexus3.tls.certresolver=internal",
+          "traefik.http.routers.nexus.entryPoints=webSecure",
+          "traefik.http.routers.nexus.rule=Host(`nexus.${attr.unique.hostname}.sololab`)",
+          "traefik.http.routers.nexus.tls.certresolver=internal",
 
-          "traefik.http.services.nexus3.loadbalancer.server.scheme=https",
-          "traefik.http.services.nexus3.loadbalancer.server.port=443",
-          "traefik.http.services.nexus3.loadBalancer.serversTransport=consul-service@file",
+          "traefik.http.services.nexus.loadbalancer.server.scheme=https",
+          "traefik.http.services.nexus.loadbalancer.server.port=443",
+          "traefik.http.services.nexus.loadBalancer.serversTransport=consul-service@file",
         ]
 
         meta {
           prom_blackbox_scheme            = "https"
-          prom_blackbox_address           = "nexus3.service.consul"
+          prom_blackbox_address           = "nexus.service.consul"
           prom_blackbox_health_check_path = "/"
 
           prom_target_scheme       = "https"
-          prom_target_address      = "nexus3.service.consul"
+          prom_target_address      = "nexus.service.consul"
           prom_target_metrics_path = "service/rest/metrics/prometheus"
         }
       }
@@ -178,27 +178,27 @@ job "nexus3" {
         # https://github.com/sonatype/docker-nexus3/blob/b623312ce82a74f877dcaac5b4989b89cd11ecdd/Dockerfile.alpine.java21
         image = "zot.day0.sololab/sonatype/nexus3:3.90.2-alpine"
         labels = {
-          "traefik.enable"                                   = "true"
-          "traefik.http.routers.nexus3-redirect.entrypoints" = "web"
-          "traefik.http.routers.nexus3-redirect.rule"        = "(Host(`nexus3.${attr.unique.hostname}.sololab`)||Host(`nexus3.service.consul`))"
-          "traefik.http.routers.nexus3-redirect.middlewares" = "toHttps@file"
-          "traefik.http.routers.nexus3-redirect.service"     = "nexus3"
+          "traefik.enable"                                  = "true"
+          "traefik.http.routers.nexus-redirect.entrypoints" = "web"
+          "traefik.http.routers.nexus-redirect.rule"        = "(Host(`nexus.${attr.unique.hostname}.sololab`)||Host(`nexus.service.consul`))"
+          "traefik.http.routers.nexus-redirect.middlewares" = "toHttps@file"
+          "traefik.http.routers.nexus-redirect.service"     = "nexus"
 
-          "traefik.http.routers.nexus3.entryPoints" = "webSecure"
-          "traefik.http.routers.nexus3.rule"        = "(Host(`nexus3.${attr.unique.hostname}.sololab`)||Host(`nexus3.service.consul`))"
-          "traefik.http.routers.nexus3.tls"         = "true"
-          "traefik.http.routers.nexus3.service"     = "nexus3"
+          "traefik.http.routers.nexus.entryPoints" = "webSecure"
+          "traefik.http.routers.nexus.rule"        = "(Host(`nexus.${attr.unique.hostname}.sololab`)||Host(`nexus.service.consul`))"
+          "traefik.http.routers.nexus.tls"         = "true"
+          "traefik.http.routers.nexus.service"     = "nexus"
 
           # ref: https://help.sonatype.com/en/prometheus.html
           # add a basic auth header middleware to make metric request without authentication from prometheus
-          "traefik.http.middlewares.nexus3-metric-basicAuthHeader.headers.customRequestHeaders.Authorization" = "${var.metrics_auth_header}"
-          "traefik.http.routers.nexus3-metric.entrypoints"                                                    = "webSecure"
-          "traefik.http.routers.nexus3-metric.rule"                                                           = "Host(`nexus3.service.consul`) && Path(`/service/rest/metrics/prometheus`)"
-          "traefik.http.routers.nexus3-metric.tls"                                                            = "true"
-          "traefik.http.routers.nexus3-metric.middlewares"                                                    = "nexus3-metric-basicAuthHeader@docker"
-          "traefik.http.routers.nexus3-metric.service"                                                        = "nexus3"
+          "traefik.http.middlewares.nexus-metric-basicAuthHeader.headers.customRequestHeaders.Authorization" = "${var.metrics_auth_header}"
+          "traefik.http.routers.nexus-metric.entrypoints"                                                    = "webSecure"
+          "traefik.http.routers.nexus-metric.rule"                                                           = "Host(`nexus.service.consul`) && Path(`/service/rest/metrics/prometheus`)"
+          "traefik.http.routers.nexus-metric.tls"                                                            = "true"
+          "traefik.http.routers.nexus-metric.middlewares"                                                    = "nexus-metric-basicAuthHeader@docker"
+          "traefik.http.routers.nexus-metric.service"                                                        = "nexus"
 
-          "traefik.http.services.nexus3.loadbalancer.server.port" = "8081"
+          "traefik.http.services.nexus.loadbalancer.server.port" = "8081"
         }
       }
       env {
@@ -219,7 +219,7 @@ job "nexus3" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://pgbouncer-day2.service.consul:6432/nexus??useSSL=true&sslMode=require
+        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://pgbouncer.service.consul:6432/nexus??useSSL=true&sslMode=require
         NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}
         NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}
         EOH

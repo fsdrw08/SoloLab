@@ -380,7 +380,7 @@ zones = [
         ]
       },
       {
-        fqdn = "nexus3.day3.sololab."
+        fqdn = "nexus.day3.sololab."
         type = "A"
         ttl  = 60
         results = [

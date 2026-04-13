@@ -70,7 +70,7 @@ jobs = [
     path = "./attachments/nexus-db.nomad.hcl"
   },
   {
-    path = "./attachments/nexus3.nomad.hcl"
+    path = "./attachments/nexus.nomad.hcl"
     var_sets = [
       {
         name = "metrics_auth_header"

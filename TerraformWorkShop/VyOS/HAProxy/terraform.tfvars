@@ -257,11 +257,11 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  day3_frontend_nexus3 = {
+  day3_frontend_nexus = {
     path = "load-balancing haproxy service tcp443 rule 420"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "nexus3.day3.sololab"
+      "domain-name" = "nexus.day3.sololab"
       "set backend" = "day1"
     }
   }
