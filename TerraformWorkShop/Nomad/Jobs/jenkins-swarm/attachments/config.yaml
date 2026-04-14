@@ -1,0 +1,9 @@
+# https://github.com/jenkinsci/swarm-plugin?tab=readme-ov-file#available-options
+url: https://jenkins.day3.sololab
+disableSslVerification: true
+name: day4-centos
+description: Configured from yml
+executors: 2
+username: {{ with secret "kvv2_others/jenkins-credential-swarm" }}{{.Data.data.username}}{{ end }}
+passwordEnvVariable: SWARM_TOKEN
+noCrumb: true

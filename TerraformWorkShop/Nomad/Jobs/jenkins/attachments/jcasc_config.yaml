@@ -51,8 +51,8 @@ jenkins:
       clientId: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_id}}{{end}}'
       clientSecret: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_secret}}{{end}}'
       # claims
-      userNameField: email
-      fullNameFieldName: email
+      userNameField: uid
+      fullNameFieldName: username
       groupsFieldName: groups
       emailFieldName: email
       userIdStrategy: caseSensitive
