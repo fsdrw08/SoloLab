@@ -94,6 +94,7 @@ resource "vault_identity_entity" "user" {
   external_policies = true
   metadata = {
     email = jsondecode(each.value.data_json).mail[0]
+    uid   = jsondecode(each.value.data_json).uid[0]
   }
 
 }

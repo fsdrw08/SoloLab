@@ -10,10 +10,12 @@ oidc_provider = {
   # https://developer.hashicorp.com/vault/docs/concepts/oidc-provider#scopes
   scopes = [
     {
-      name     = "user"
+      name = "user"
+      # metadata config in Vault/Auth/LDAP/main.tf vault_identity_entity.user metadata
       template = <<-EOT
       {
         "username": {{identity.entity.name}},
+        "uid": {{identity.entity.metadata.uid}},
         "email": {{identity.entity.metadata.email}}
       }
       EOT

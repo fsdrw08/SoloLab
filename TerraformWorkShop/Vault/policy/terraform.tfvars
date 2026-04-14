@@ -54,6 +54,12 @@ policy_bindings = [
       path "identity/entity/*" {
         capabilities = ["create", "update", "delete", "read"]
       }
+      path "identity/lookup/entity" {
+        capabilities = ["create", "update"]
+      }
+      path "identity/lookup/group" {
+        capabilities = ["create", "update"]
+      }
       path "identity/entity/name" {
         capabilities = ["list"]
       }
@@ -143,6 +149,12 @@ policy_bindings = [
       path "identity/entity/id/{{identity.entity.id}}" {
         capabilities = ["read"]
       }
+      path "identity/lookup/entity" {
+        capabilities = ["create", "update"]
+      }
+      path "identity/lookup/group" {
+        capabilities = ["create", "update"]
+      }
       path "kvv2_certs/data/*" {
         capabilities = ["read"]
       }
@@ -167,6 +179,7 @@ policy_bindings = [
       external_groups = ["app-vault-user"]
     }
   },
+  # prometheus-metrics
   {
     policy_name    = "prometheus-metrics"
     policy_content = <<-EOT
@@ -181,6 +194,7 @@ policy_bindings = [
       renewable    = true
     }
   },
+  # consul-ca
   # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
   {
@@ -218,84 +232,59 @@ policy_bindings = [
       }
     EOT
   },
+  # nomad-workload-identity
   {
-    policy_name    = "cert-read"
+    policy_name    = "nomad-workload-identity"
     policy_content = <<-EOT
       path "kvv2_certs/data/*" {
         capabilities = ["read"]
       }
-
       path "kvv2_certs/data/" {
         capabilities = ["read"]
       }
-
       path "kvv2_certs/metadata/*" {
         capabilities = ["list"]
       }
-    EOT
-  },
-  {
-    policy_name    = "pgsql-read"
-    policy_content = <<-EOT
+
       path "kvv2_pgsql/data/*" {
         capabilities = ["read"]
       }
-
       path "kvv2_pgsql/data/" {
         capabilities = ["read"]
       }
-
       path "kvv2_pgsql/metadata/*" {
         capabilities = ["list"]
       }
-    EOT
-  },
-  {
-    policy_name    = "minio-read"
-    policy_content = <<-EOT
+
       path "kvv2_minio/data/*" {
         capabilities = ["read"]
       }
-
       path "kvv2_minio/data/" {
         capabilities = ["read"]
       }
-
       path "kvv2_minio/metadata/*" {
         capabilities = ["list"]
       }
-    EOT
-  },
-  {
-    policy_name    = "others-read"
-    policy_content = <<-EOT
+
       path "kvv2_others/data/*" {
         capabilities = ["read"]
       }
-
       path "kvv2_others/data/" {
         capabilities = ["read"]
       }
-
       path "kvv2_others/metadata/*" {
         capabilities = ["list"]
       }
-    EOT
-  },
-  {
-    policy_name    = "vault-read"
-    policy_content = <<-EOT
+
       path "kvv2_vault/data/*" {
         capabilities = ["read"]
       }
-
       path "kvv2_vault/data/" {
         capabilities = ["read"]
       }
-
       path "kvv2_vault/metadata/*" {
         capabilities = ["list"]
       }
     EOT
-  }
+  },
 ]
