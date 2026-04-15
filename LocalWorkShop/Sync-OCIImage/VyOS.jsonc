@@ -15,13 +15,6 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "swaggerapi/swagger-ui:v5.29.0",
-        "archive": "docker.io_swaggerapi_swagger-ui_v5.29.0.tar",
-        "privateRepo": "swaggerapi/swagger-ui:v5.29.0",
-        "description": "https://hub.docker.com/r/swaggerapi/swagger-ui/tags",
-    },
-    {
-        "publicRegistry": "docker.io",
         "publicRepo": "pgsty/minio:RELEASE.2026-03-25T00-00-00Z",
         "archive": "docker.io_pgsty_minio_RELEASE.2026-03-25T00-00-00Z.tar",
         "privateRepo": "pgsty/minio:RELEASE.2026-03-25T00-00-00Z",
@@ -47,5 +40,12 @@
         "archive": "docker.io_hashicorp_consul_1.22.6.tar",
         "privateRepo": "hashicorp/consul:1.22.6",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "juewuy/shellcrash:1.9.4release",
+        "archive": "docker.io_juewuy_shellcrash_1.9.4release.tar",
+        "privateRepo": "juewuy/shellcrash:1.9.4release",
+        "description": "https://hub.docker.com/r/juewuy/shellcrash/tags",
     },
 ]

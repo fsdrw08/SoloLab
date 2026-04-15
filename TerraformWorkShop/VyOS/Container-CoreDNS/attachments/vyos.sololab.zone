@@ -22,3 +22,4 @@ zot             IN  A    192.168.255.1
 pdns-auth       IN  A    192.168.255.1
 minio-api       IN  A    192.168.255.1
 minio-console   IN  A    192.168.255.1
+shellcrash      IN  A    192.168.255.1
