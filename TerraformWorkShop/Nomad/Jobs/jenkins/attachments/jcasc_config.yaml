@@ -51,6 +51,7 @@ jenkins:
       clientId: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_id}}{{end}}'
       clientSecret: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_secret}}{{end}}'
       # claims
+      # uid configured in vault oidc provider, see TerraformWorkShop/Vault/Identity/OIDC/terraform.tfvars
       userNameField: uid
       fullNameFieldName: username
       groupsFieldName: groups
@@ -64,6 +65,7 @@ jenkins:
             username: admin
             secret: P@ssw0rd
             group: app-jenkins-admin
+  slaveAgentPort: 50000
 
 appearance:
   # for dark theme plugin

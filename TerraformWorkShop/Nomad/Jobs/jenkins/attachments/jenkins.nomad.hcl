@@ -68,13 +68,18 @@ job "jenkins" {
       }
     }
 
+    network {
+      port "jnlp" {
+        static = 50000
+      }
+    }
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "jenkins" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider = "consul"
         name     = "jenkins"
-        # need to set address_mode to "host" to use day1 traefik's server transport
+        # need to set address_mode to "host" to let consul know the service can be reached by the host IP
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -124,6 +129,9 @@ job "jenkins" {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
         image = "zot.day0.sololab/jenkins/jenkins:2.541.3-lts"
+        ports = [
+          "jnlp",
+        ]
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.jenkins-redirect.entrypoints" = "web"

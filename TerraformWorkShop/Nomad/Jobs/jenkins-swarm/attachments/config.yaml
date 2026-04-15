@@ -7,3 +7,4 @@ executors: 2
 username: {{ with secret "kvv2_others/jenkins-credential-swarm" }}{{.Data.data.username}}{{ end }}
 passwordEnvVariable: SWARM_TOKEN
 noCrumb: true
+webSocket: true

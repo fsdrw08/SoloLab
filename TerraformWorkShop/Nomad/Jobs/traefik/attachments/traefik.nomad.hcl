@@ -35,7 +35,9 @@ job "traefik" {
     service {
       provider = "consul"
       name     = "traefik"
-      port     = "webSecure"
+      # need to set address_mode to "host" to let consul know the service can be reached by the host IP
+      address_mode = "host"
+      port         = "webSecure"
 
       check {
         type           = "http"
@@ -79,14 +81,6 @@ job "traefik" {
         prom_target_metrics_path = "metrics"
       }
     }
-
-    # volume "certs" {
-    #   type            = "csi"
-    #   source          = "traefik-acme"
-    #   read_only       = false
-    #   attachment_mode = "file-system"
-    #   access_mode     = "multi-node-multi-writer"
-    # }
 
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "traefik" {

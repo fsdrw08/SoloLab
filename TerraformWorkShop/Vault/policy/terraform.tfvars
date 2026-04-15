@@ -287,4 +287,23 @@ policy_bindings = [
       }
     EOT
   },
+  # jenkins-swarm
+  {
+    policy_name    = "jenkins-swarm"
+    policy_content = <<-EOT
+      path "kvv2_others/data/jenkins-credential-swarm" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
+      path "kvv2_others/data/" {
+        capabilities = ["read"]
+      }
+      path "kvv2_others/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
+    group_binding = {
+      policy_group    = "Policy-Jenkins-Swarm"
+      external_groups = ["app-jenkins-agent"]
+    }
+  }
 ]
