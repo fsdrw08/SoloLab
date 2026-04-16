@@ -17,7 +17,7 @@ job "jenkins-swarm" {
     value     = "^day4"
   }
   group "jenkins-swarm" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "jenkins-swarm" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -68,6 +68,9 @@ job "jenkins-swarm" {
         # }
       }
 
+      user = "podmgr"
+
+      # https://developer.hashicorp.com/nomad/docs/job-declare/task-driver/java
       driver = "java"
       config {
         # https://github.com/jenkinsci/swarm-plugin?tab=readme-ov-file#getting-started
