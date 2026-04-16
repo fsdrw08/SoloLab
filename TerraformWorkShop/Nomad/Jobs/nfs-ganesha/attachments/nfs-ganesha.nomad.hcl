@@ -40,11 +40,11 @@ job "nfs-ganesha" {
 
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     # https://github.com/hectorm/docker-nfs-ganesha/blob/master/compose.yaml
     task "nfs-ganesha" {
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-
       config {
         image        = "zot.day0.sololab/hectorm/nfs-ganesha:v10"
         network_mode = "host"

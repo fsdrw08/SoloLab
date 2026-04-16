@@ -18,7 +18,7 @@ job "prometheus-postgres-exporter" {
 
   group "prometheus-postgres-exporter" {
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "prometheus-postgres-exporter" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -56,9 +56,10 @@ job "prometheus-postgres-exporter" {
         ]
       }
 
-      driver = "podman"
-
       user = "root"
+
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+      driver = "podman"
       config {
         image = "zot.day0.sololab/prometheuscommunity/postgres-exporter:v0.18.1"
         labels = {

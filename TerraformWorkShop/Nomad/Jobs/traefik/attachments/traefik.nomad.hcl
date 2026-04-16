@@ -82,10 +82,10 @@ job "traefik" {
       }
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "traefik" {
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-
       config {
         image = "zot.day0.sololab/library/traefik:v3.6.12"
         labels = {

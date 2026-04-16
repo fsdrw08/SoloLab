@@ -23,7 +23,7 @@ job "gitblit" {
       }
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitblit" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -69,6 +69,7 @@ job "gitblit" {
         }
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://github.com/gitblit-org/gitblit-docker/blob/v1.10.0-1/Dockerfile

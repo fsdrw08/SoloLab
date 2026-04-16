@@ -22,7 +22,7 @@ job "pgbouncer" {
         static = 6432
       }
     }
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "pgbouncer" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -52,7 +52,7 @@ job "pgbouncer" {
       }
 
       user = "996:996"
-
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://github.com/cloudnative-pg/pgbouncer-containers/blob/main/entrypoint.sh

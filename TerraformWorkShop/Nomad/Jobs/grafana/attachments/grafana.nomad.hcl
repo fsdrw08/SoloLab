@@ -26,7 +26,7 @@ job "grafana" {
       access_mode     = "multi-node-multi-writer"
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "grafana" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -64,8 +64,8 @@ job "grafana" {
         ]
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-
       config {
         image = "zot.day0.sololab/grafana/grafana:12.4.2"
         labels = {

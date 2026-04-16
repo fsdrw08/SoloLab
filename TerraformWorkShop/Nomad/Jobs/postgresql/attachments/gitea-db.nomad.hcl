@@ -13,7 +13,7 @@ job "gitea-db" {
   }
 
   group "gitea-db" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitea-db" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -57,7 +57,7 @@ job "gitea-db" {
       }
 
       user = "26:26"
-
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/fedora/postgresql-18:20260325"

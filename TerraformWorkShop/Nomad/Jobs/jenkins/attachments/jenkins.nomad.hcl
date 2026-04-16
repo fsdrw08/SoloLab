@@ -19,6 +19,7 @@ job "jenkins" {
     value     = "day3"
   }
   group "jenkins" {
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     # https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
     # https://github.com/hashicorp/nomad-pack-community-registry/blob/2e5e93a5589d4b26c6ea5a39db22f2a80a176f77/packs/jenkins/templates/jenkins.nomad.tpl
     task "install-plugins" {
@@ -34,6 +35,7 @@ job "jenkins" {
         memory = 600
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
@@ -73,7 +75,7 @@ job "jenkins" {
         static = 50000
       }
     }
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "jenkins" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -124,6 +126,7 @@ job "jenkins" {
         }
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://www.jenkins.io/doc/upgrade-guide/

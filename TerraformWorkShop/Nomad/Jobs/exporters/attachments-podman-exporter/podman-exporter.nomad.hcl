@@ -13,8 +13,7 @@ job "prometheus-podman-exporter" {
   }
 
   group "prometheus-podman-exporter" {
-
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "prometheus-podman-exporter" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -61,9 +60,10 @@ job "prometheus-podman-exporter" {
         }
       }
 
-      driver = "podman"
-
       user = "root"
+
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+      driver = "podman"
       config {
         image = "zot.day0.sololab/navidys/prometheus-podman-exporter:v1.21.0"
         args = [

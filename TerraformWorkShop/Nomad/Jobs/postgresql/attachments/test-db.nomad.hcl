@@ -13,7 +13,7 @@ job "test-db" {
   }
 
   group "test-db" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "test-db" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -58,6 +58,7 @@ job "test-db" {
 
       user = "26:26"
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/fedora/postgresql-18:20260325"

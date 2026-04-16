@@ -17,6 +17,7 @@ job "azure-metrics-exporter" {
   }
 
   group "azure-metrics-exporter" {
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "azure-metrics-forwarder" {
       service {
         provider = "consul"
@@ -66,6 +67,7 @@ job "azure-metrics-exporter" {
       }
 
       driver = "podman"
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       config {
         # https://github.com/prometheus/prometheus/blob/v3.10.0/Dockerfile
         image = "zot.day0.sololab/prometheus/prometheus:v3.10.0"

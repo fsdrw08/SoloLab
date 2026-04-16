@@ -18,8 +18,10 @@ job "nfs-nodes" {
 
     shutdown_delay = "10s"
 
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     # https://developer.hashicorp.com/nomad/plugins/drivers/podman#socket
     task "plugin" {
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/sig-storage/nfsplugin:v4.13.1"

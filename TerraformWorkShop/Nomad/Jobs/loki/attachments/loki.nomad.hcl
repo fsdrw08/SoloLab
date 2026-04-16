@@ -25,8 +25,7 @@ job "loki" {
       attachment_mode = "file-system"
       access_mode     = "multi-node-multi-writer"
     }
-
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "loki" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -57,8 +56,8 @@ job "loki" {
         ]
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-
       config {
         image = "zot.day0.sololab/grafana/loki:3.7.0"
         labels = {

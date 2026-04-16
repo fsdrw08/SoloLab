@@ -23,7 +23,7 @@ job "gitea" {
       }
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitea" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -74,6 +74,7 @@ job "gitea" {
         # }
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://github.com/go-gitea/gitea/blob/v1.25.4/Dockerfile.rootless

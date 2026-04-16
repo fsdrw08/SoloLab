@@ -32,7 +32,7 @@ job "pgweb" {
   }
 
   group "pgweb" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "pgweb" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -78,6 +78,7 @@ job "pgweb" {
         }
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/sosedoff/pgweb:0.17.0"

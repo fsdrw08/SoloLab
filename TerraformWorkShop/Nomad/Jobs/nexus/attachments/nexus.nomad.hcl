@@ -24,8 +24,9 @@ job "nexus" {
     # need to update default truststore (the cacerts) to trust private ca cert by root user, 
     # then copy it to cacerts volume
     #
-    # https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "update-truststore" {
+      # https://developer.hashicorp.com/nomad/docs/job-specification/lifecycle
       lifecycle {
         hook    = "prestart"
         sidecar = false
@@ -122,7 +123,6 @@ job "nexus" {
         ]
       }
     }
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
     task "nexus" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -173,6 +173,7 @@ job "nexus" {
         }
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         # https://github.com/sonatype/docker-nexus3/blob/b623312ce82a74f877dcaac5b4989b89cd11ecdd/Dockerfile.alpine.java21

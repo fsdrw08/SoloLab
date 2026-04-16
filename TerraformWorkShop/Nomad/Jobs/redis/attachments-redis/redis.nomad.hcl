@@ -22,8 +22,7 @@ job "redis" {
         static = 6379
       }
     }
-
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "redis" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -52,7 +51,7 @@ job "redis" {
       }
 
       user = "999:1000"
-
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/library/redis:8.6.2"

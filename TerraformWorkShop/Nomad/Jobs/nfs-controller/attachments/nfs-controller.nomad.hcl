@@ -11,6 +11,7 @@ job "nfs-controller" {
   }
 
   group "nfs-controller" {
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "plugin" {
       service {
         provider = "consul"
@@ -20,8 +21,8 @@ job "nfs-controller" {
         ]
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
       config {
         image = "zot.day0.sololab/sig-storage/nfsplugin:v4.13.1"

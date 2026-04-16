@@ -30,7 +30,7 @@ job "whoami" {
 
     }
 
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "whoami" {
       driver = "docker"
 

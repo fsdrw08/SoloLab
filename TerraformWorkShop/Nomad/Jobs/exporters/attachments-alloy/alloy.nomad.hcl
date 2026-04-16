@@ -17,7 +17,7 @@ job "alloy" {
   }
 
   group "alloy" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "alloy" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -57,6 +57,7 @@ job "alloy" {
 
       user = "root"
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         network_mode = "host"

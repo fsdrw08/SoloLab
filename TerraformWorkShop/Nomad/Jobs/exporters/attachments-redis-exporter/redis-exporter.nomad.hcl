@@ -13,7 +13,7 @@ job "prometheus-redis-exporter" {
   }
 
   group "prometheus-redis-exporter" {
-    # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "prometheus-redis-exporter" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
@@ -37,6 +37,7 @@ job "prometheus-redis-exporter" {
         ]
       }
 
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
         image = "zot.day0.sololab/oliver006/redis_exporter:v1.82.0-alpine"
