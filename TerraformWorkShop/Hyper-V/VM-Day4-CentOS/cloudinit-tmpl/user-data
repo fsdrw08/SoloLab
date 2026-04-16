@@ -571,8 +571,10 @@ runcmd:
   - systemctl enable --now podman.socket
   - systemctl enable --now nomad.service
 
-  #   # https://access.redhat.com/solutions/4661741
+  # https://access.redhat.com/solutions/4661741
   # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+  # https://stackoverflow.com/questions/34167257/can-i-control-a-user-systemd-using-systemctl-user-after-sudo-su-myuser
+  - systemctl --user --machine=podmgr@.host enable podman.socket --now
   - systemctl stop firewalld
   - firewall-offline-cmd --set-default-zone=trusted
   - systemctl enable --now firewalld
