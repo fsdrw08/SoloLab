@@ -64,7 +64,7 @@ module "vyos_container" {
   network = {
     create      = true
     name        = "shellcrash"
-    cidr_prefix = "172.16.90.0/24"
+    cidr_prefix = "172.16.50.0/24"
   }
   workloads = [
     {
@@ -75,7 +75,7 @@ module "vyos_container" {
       others = {
         "environment TZ value" = "Asia/Shanghai"
         # "allow-host-networks"  = ""
-        "network shellcrash address"         = "172.16.90.10"
+        "network shellcrash address"         = "172.16.50.10"
         "privileged"                         = ""
         "volume shellcrash_data source"      = "/mnt/data/shellcrash"
         "volume shellcrash_data destination" = "/etc/ShellCrash/configs"
@@ -90,7 +90,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
   ]
   for_each = {
     l4_frontend_console = {
-      path = "load-balancing haproxy service tcp443 rule 90"
+      path = "load-balancing haproxy service tcp443 rule 50"
       configs = {
         "ssl"         = "req-ssl-sni"
         "domain-name" = "shellcrash.vyos.sololab"
@@ -121,7 +121,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy backend vyos_shellcrash"
       configs = {
         "mode"                 = "http"
-        "server minio address" = "172.16.90.10"
+        "server minio address" = "172.16.50.10"
         "server minio port"    = "9999"
       }
     }
@@ -138,7 +138,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy backend shellcrash"
       configs = {
         "mode"                = "tcp"
-        "server vyos address" = "172.16.90.10"
+        "server vyos address" = "172.16.50.10"
         "server vyos port"    = "7890"
         # "server vyos send-proxy-v2" = ""
       }
