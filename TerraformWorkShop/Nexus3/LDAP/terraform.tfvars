@@ -1,6 +1,6 @@
 prov_nexus = {
   insecure = true
-  url      = "https://nexus3.day3.sololab"
+  url      = "https://nexus.day3.sololab"
   username = "admin"
   password = "P@ssw0rd"
 }

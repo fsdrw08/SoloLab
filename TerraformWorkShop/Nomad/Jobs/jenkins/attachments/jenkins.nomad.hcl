@@ -40,7 +40,7 @@ job "jenkins" {
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
-        image   = "zot.day0.sololab/jenkins/jenkins:2.541.3-lts"
+        image   = "zot.day0.sololab/jenkins/jenkins:2.555.1-lts"
         command = "jenkins-plugin-cli"
         args    = ["-f", "/var/jenkins_home/plugins.txt", "--plugin-download-directory", "/var/jenkins_home/plugins/"]
         volumes = [
@@ -50,7 +50,14 @@ job "jenkins" {
 
       env {
         TZ        = "Asia/Shanghai"
-        JAVA_OPTS = "-Xmx600m"
+        JAVA_OPTS = <<-EOF
+          -Xmx600m 
+          -Dhttp.proxyHost=shellcrash.vyos.sololab 
+          -Dhttp.proxyPort=7890 
+          -Dhttps.proxyHost=shellcrash.vyos.sololab 
+          -Dhttps.proxyPort=7890
+          -Dhttp.nonProxyHosts="*.localhost|*.sololab|*.consul"
+        EOF
         # https://cloud.tencent.com/developer/article/2040515
         # https://jenkins-update.davidz.cn/
         # JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
@@ -131,7 +138,7 @@ job "jenkins" {
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
-        image = "zot.day0.sololab/jenkins/jenkins:2.541.3-lts"
+        image = "zot.day0.sololab/jenkins/jenkins:2.555.1-lts"
         ports = [
           "jnlp",
         ]
@@ -161,6 +168,11 @@ job "jenkins" {
           -Xmx600m 
           -Dhudson.model.DownloadService.noSignatureCheck=true 
           -Djenkins.install.runSetupWizard=false
+          -Dhttp.proxyHost=shellcrash.vyos.sololab 
+          -Dhttp.proxyPort=7890 
+          -Dhttps.proxyHost=shellcrash.vyos.sololab 
+          -Dhttps.proxyPort=7890
+          -Dhttp.nonProxyHosts="*.localhost|*.sololab|*.consul"
         EOF
         # JENKINS_UC          = "https://mirrors.huaweicloud.com/jenkins/updates/update-center.json"
         JENKINS_UC_DOWNLOAD = "https://mirrors.huaweicloud.com/jenkins"

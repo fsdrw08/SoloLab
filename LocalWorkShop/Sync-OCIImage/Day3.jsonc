@@ -22,9 +22,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "jenkins/jenkins:2.541.3-lts",
-        "archive": "docker.io_jenkins_jenkins_2.541.3-lts.tar",
-        "privateRepo": "jenkins/jenkins:2.541.3-lts",
+        "publicRepo": "jenkins/jenkins:2.555.1-lts",
+        "archive": "docker.io_jenkins_jenkins_2.555.1-lts.tar",
+        "privateRepo": "jenkins/jenkins:2.555.1-lts",
         "description": "https://hub.docker.com/r/jenkins/jenkins, https://www.jenkins.io/doc/upgrade-guide/",
     },
 ]
