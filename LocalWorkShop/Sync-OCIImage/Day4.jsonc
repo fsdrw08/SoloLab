@@ -1,0 +1,16 @@
+[
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "buildpacksio/pack:0.40.2",
+        "archive": "docker.io_buildpacksio_pack_0.40.2.tar",
+        "privateRepo": "buildpacksio/pack:0.40.2",
+        "description": "https://hub.docker.com/r/buildpacksio/pack",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "buildpacksio/pack:0.40.2",
+        "archive": "docker.io_buildpacksio_pack_0.40.2.tar",
+        "privateRepo": "buildpacksio/pack:latest",
+        "description": "https://hub.docker.com/r/buildpacksio/pack",
+    },
+]
