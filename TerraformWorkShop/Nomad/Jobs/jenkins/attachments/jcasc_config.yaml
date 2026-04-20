@@ -45,6 +45,7 @@ jenkins:
     # https://github.com/jenkinsci/oic-auth-plugin/blob/master/docs/configuration/README.md
     # for oic-auth plugin
     oic:
+      allowTokenAccessWithoutOicSession: true
       # Automatic config of endpoint
       serverConfiguration:
         wellKnown:
@@ -91,6 +92,16 @@ unclassified:
   # in order to allow jenkins web origin site script run(for oidc login), we need to set resourceRoot to jenkins url
   resourceRoot:
     url: "https://jenkins.day3.sololab/"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - VaultAppRoleCredential:
+              description: "Vault Token"
+              id: "vaultToken"
+              scope: GLOBAL
+              token: "${MY_SECRET_TOKEN}"
 
 jobs:
   - script: >

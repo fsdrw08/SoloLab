@@ -10,6 +10,12 @@ approles = [
     role_id        = "consul-connect-pki"
     token_policies = ["consul-ca"]
     secret_version = 1
+  },
+  {
+    role_name      = "jenkins-credential-reader"
+    role_id        = "jenkins-credential-reader"
+    token_policies = ["jenkins"]
+    secret_version = 1
   }
 ]
 

@@ -305,5 +305,19 @@ policy_bindings = [
       policy_group    = "Policy-Jenkins-Swarm"
       external_groups = ["app-jenkins-agent"]
     }
+  },
+  {
+    policy_name    = "jenkins-credential-default"
+    policy_content = <<-EOT
+      path "kvv2_others/data/*" {
+        capabilities = ["read"]
+      }
+      path "kvv2_others/data/" {
+        capabilities = ["read"]
+      }
+      path "kvv2_others/metadata/*" {
+        capabilities = ["list"]
+      }
+    EOT
   }
 ]

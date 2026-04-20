@@ -13,6 +13,7 @@ docker-commons:latest
 docker-plugin:latest
 docker-workflow:latest
 git:latest
+hashicorp-vault-plugin:latest
 instance-identity:latest
 job-dsl:latest
 mailer:latest
