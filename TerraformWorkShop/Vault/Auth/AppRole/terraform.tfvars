@@ -12,9 +12,9 @@ approles = [
     secret_version = 1
   },
   {
-    role_name      = "jenkins-credential-reader"
-    role_id        = "jenkins-credential-reader"
-    token_policies = ["jenkins"]
+    role_name      = "jenkins-secret-reader"
+    role_id        = "jenkins-secret-reader"
+    token_policies = ["jenkins-secret-reader"]
     secret_version = 1
   }
 ]

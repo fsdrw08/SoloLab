@@ -32,6 +32,9 @@ ephemeral "vault_approle_auth_backend_role_secret_id" "secret_id" {
   for_each = {
     for role in var.approles : role.role_name => role
   }
+  depends_on = [
+    vault_approle_auth_backend_role.role
+  ]
   backend   = vault_auth_backend.backend.path
   mount_id  = vault_auth_backend.backend.id
   role_name = vault_approle_auth_backend_role.role[each.key].role_name
@@ -41,6 +44,9 @@ resource "vault_kv_secret_v2" "secret" {
   for_each = {
     for role in var.approles : role.role_name => role
   }
+  depends_on = [
+    vault_approle_auth_backend_role.role
+  ]
   mount               = var.vault_secret_backend
   name                = "approle-${replace(each.value.role_name, "-", "_")}"
   delete_all_versions = true

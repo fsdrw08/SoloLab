@@ -307,7 +307,7 @@ policy_bindings = [
     }
   },
   {
-    policy_name    = "jenkins-credential-default"
+    policy_name    = "jenkins-secret-reader"
     policy_content = <<-EOT
       path "kvv2_others/data/*" {
         capabilities = ["read"]
