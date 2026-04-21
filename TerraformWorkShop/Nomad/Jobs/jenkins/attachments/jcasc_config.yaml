@@ -83,6 +83,11 @@ security:
     enforce: true
 
 unclassified:
+  hashicorpVault:
+    configuration:
+      vaultCredentialId: "vault"
+      vaultUrl: "https://vault.day0.sololab"
+
   location:
     adminAddress: null
     url: "https://jenkins.day3.sololab"
@@ -98,11 +103,18 @@ credentials:
     domainCredentials:
       - credentials:
           - VaultAppRoleCredential:
-              description: "Vault Token"
-              id: "vaultToken"
+              description: "Vault secret reader app role credential"
+              id: "vault"
               scope: GLOBAL
-              token: "${MY_SECRET_TOKEN}"
-
+              roleId: '{{with secret "kvv2_vault/data/approle-jenkins_secret_reader"}}{{.Data.data.role_id}}{{end}}'
+              secretId: '{{with secret "kvv2_vault/data/approle-jenkins_secret_reader"}}{{.Data.data.secret_id}}{{end}}'
+          - vaultUsernamePasswordCredentialImpl:
+              engineVersion: 2
+              id: "git-repo-operator"
+              passwordKey: "password"
+              path: "kvv2_others/git-repo-operator"
+              scope: GLOBAL
+              usernameKey: "username"
 jobs:
   - script: >
       job('jobdsl_test') {

@@ -22,7 +22,26 @@ csi_volumes = [
     mount_options = {
       fs_type = "nfs"
     }
-  }
+  },
+  {
+    name      = "jenkins-cacerts"
+    plugin_id = "nfs"
+    volume_id = "jenkins-cacerts"
+    capabilities = [
+      {
+        access_mode     = "single-node-writer"
+        attachment_mode = "file-system"
+      }
+    ]
+    parameters = {
+      server           = "day2.node.consul"
+      share            = "/"
+      mountPermissions = "777"
+    }
+    mount_options = {
+      fs_type = "nfs"
+    }
+  },
 ]
 
 jobs = [
