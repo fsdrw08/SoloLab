@@ -5,7 +5,7 @@ prov_nomad = {
 
 jobs = [
   {
-    path = "./attachments/jenkins-swarm.nomad.hcl"
+    path = "./attachments/jenkins-swarm-raw_exec.nomad.hcl"
     var_sets = [
       {
         name                = "config"

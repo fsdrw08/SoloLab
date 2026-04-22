@@ -70,33 +70,34 @@ job "jenkins-swarm" {
 
       user = "podmgr"
 
-      # https://developer.hashicorp.com/nomad/docs/job-declare/task-driver/java
-      driver = "java"
-      config {
-        # https://github.com/jenkinsci/swarm-plugin?tab=readme-ov-file#getting-started
-        # https://developer.hashicorp.com/nomad/docs/job-declare/task-driver/java
-        jar_path = "local/swarm-client.jar"
-        args = [
-          "-config",
-          "secret/config.yaml",
-        ]
-        jvm_options = ["-Xmx800m", "-Xms256m"]
-        work_dir    = "/"
-      }
+      # https://developer.hashicorp.com/nomad/docs/job-declare/task-driver/raw_exec
+      driver = "raw_exec"
       artifact {
         source = "https://jenkins.service.consul/swarm/swarm-client.jar"
+      }
+      config {
+        command = "java"
+        args = [
+          "-Xmx800m",
+          "-Xms256m",
+          "-jar",
+          "${NOMAD_TASK_DIR}/swarm-client.jar",
+          "-config",
+          "${NOMAD_TASK_DIR}/config.yaml",
+        ]
+        work_dir = "/home/podmgr"
       }
 
       template {
         data        = var.config
-        destination = "secret/config.yaml"
+        destination = "local/config.yaml"
       }
 
       template {
         data        = <<-EOF
         SWARM_TOKEN={{ with secret "kvv2_others/jenkins-credential-swarm" }}{{.Data.data.token}}{{ end }}
         EOF
-        destination = "secret/file.env"
+        destination = "secrets/file.env"
         env         = true
       }
       vault {}
