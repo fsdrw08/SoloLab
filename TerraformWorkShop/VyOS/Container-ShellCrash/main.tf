@@ -6,7 +6,7 @@ resource "null_resource" "init" {
     password  = var.prov_system.password
     uid       = var.owner.uid
     gid       = var.owner.gid
-    data_dirs = "/mnt/data/shellcrash"
+    data_dirs = "/mnt/data/shellcrash /mnt/data/shellcrash_cron"
   }
   connection {
     type     = "ssh"
@@ -32,32 +32,30 @@ resource "null_resource" "init" {
   # }
 }
 
-# module "config_map" {
-#   source = "../../modules/system-config_files"
-#   owner  = var.owner
-#   config = {
-#     create_dir = true
-#     dir        = "/mnt/data/etc/shellcrash"
-#     files = [
-#       {
-#         basename = "config.env"
-#         # https://docs.min.io/community/minio-object-store/reference/minio-server/settings/console.html#browser-redirect-url
-#         content = <<-EOT
-#           MINIO_ROOT_USER=minioadmin
-#           MINIO_ROOT_PASSWORD=minioadmin
-#           MINIO_UPDATE=off
-#           MINIO_VOLUMES=/data
-#           MINIO_PROMETHEUS_AUTH_TYPE=public
-#         EOT
-#         mode    = 644
-#       }
-#     ]
-#   }
-# }
+module "config_map" {
+  source = "../../modules/system-config_files"
+  owner  = var.owner
+  config = {
+    create_dir = true
+    dir        = "/mnt/data/shellcrash_cron"
+    files = [
+      {
+        basename = "root"
+        content  = <<-EOT
+        EOT
+        #  # do daily/weekly/monthly maintenance
+        #  # min   hour    day     month   weekday command
+        #  * * * * * test -z "$(pidof CrashCore)" && /bin/ash /etc/ShellCrash/starts/start_legacy_wd.sh shellcrash #ShellCrash保守模式守护进程
+        mode = 600
+      }
+    ]
+  }
+}
 
 module "vyos_container" {
   depends_on = [
     null_resource.init,
+    module.config_map.config,
   ]
   source  = "../../modules/vyos-container"
   vm_conn = var.prov_system
@@ -79,6 +77,8 @@ module "vyos_container" {
         "privileged"                         = ""
         "volume shellcrash_data source"      = "/mnt/data/shellcrash"
         "volume shellcrash_data destination" = "/etc/ShellCrash/configs"
+        "volume shellcrash_cron source"      = "/mnt/data/shellcrash_cron"
+        "volume shellcrash_cron destination" = "/etc/crontabs"
       }
     }
   ]
