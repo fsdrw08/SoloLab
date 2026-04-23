@@ -39,7 +39,6 @@ provider "hyperv" {
 
 provider "vault" {
   address = "${var.prov_vault.schema}://${var.prov_vault.address}"
-  token   = var.prov_vault.token
   # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
   skip_tls_verify = var.prov_vault.skip_tls_verify
 }

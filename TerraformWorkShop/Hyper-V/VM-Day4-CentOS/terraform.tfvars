@@ -8,7 +8,6 @@ prov_hyperv = {
 prov_vault = {
   schema          = "https"
   address         = "vault.day0.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
@@ -68,6 +67,9 @@ cloudinit = {
       nomad_config_dir                    = "/etc/nomad.d"
       nomad_data_dir                      = "/var/lib/nomad"
       vault_server_address                = "https://vault.day0.sololab"
+      # mise
+      mise_script_download_url = "http://dufs.day0.sololab/public/binaries/mise-v2026.4.19-install.sh"
+      mise_download_url        = "https://dufs.day0.sololab/public/binaries/mise-v2026.4.19-linux-x64.tar.gz"
     }
     local = [
       {
