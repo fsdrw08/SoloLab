@@ -534,6 +534,10 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
+  - path: /tmp/install-mise.sh
+    permissions: "0755"
+    source:
+      uri: ${mise_script_download_url}
 
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#update-apt-database-on-first-boot
 package_update: true
@@ -578,6 +582,7 @@ runcmd:
   - systemctl stop firewalld
   - firewall-offline-cmd --set-default-zone=trusted
   - systemctl enable --now firewalld
+  - MISE_TARBALL_URL=${mise_download_url} MISE_INSTALL_PATH=/usr/bin/mise /bin/bash "/tmp/install-mise.sh"
 #   - systemctl enable --now cockpit.socket
 
 # ansible:
