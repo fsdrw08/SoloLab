@@ -1,7 +1,7 @@
 global:
   imageRegistry: zot.vyos.sololab
 zot:
-  resourcesPreset: small
+  resourcesPreset: medium
   config:
     # https://zotregistry.dev/v2.1.10/admin-guide/admin-configuration/#extensions
     extensions:
