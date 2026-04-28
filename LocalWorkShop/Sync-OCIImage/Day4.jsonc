@@ -22,6 +22,13 @@
     },
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "cnbs/sample-base-run:noble",
+        "archive": "docker.io_cnbs_sample-base-run_noble.tar",
+        "privateRepo": "cnbs/sample-base-run:noble",
+        "description": "https://hub.docker.com/r/cnbs/sample-base-run",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "paketobuildpacks/ubuntu-noble-builder:0.0.108",
         "archive": "docker.io_paketobuildpacks_ubuntu-noble-builder_0.0.108.tar",
         "privateRepo": "paketobuildpacks/ubuntu-noble-builder:0.0.108",
