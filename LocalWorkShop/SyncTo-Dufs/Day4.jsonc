@@ -2,17 +2,17 @@
     {
         "type": "general",
         "publicRegistry": "https://mise.jdx.dev",
-        "publicRepo": "v2026.4.19/mise-v2026.4.19-linux-x64.tar.gz",
-        "archive": "mise-v2026.4.19-linux-x64.tar.gz",
-        "privateRepo": "public/binaries/mise-v2026.4.19-linux-x64.tar.gz",
+        "publicRepo": "v2026.4.24/mise-v2026.4.24-linux-x64.tar.gz",
+        "archive": "mise-v2026.4.24-linux-x64.tar.gz",
+        "privateRepo": "public/binaries/mise-v2026.4.24-linux-x64.tar.gz",
         "description": "https://github.com/jdx/mise",
     },
     {
         "type": "general",
         "publicRegistry": "https://mise.jdx.dev",
-        "publicRepo": "v2026.4.19/install.sh",
-        "archive": "mise-v2026.4.19-install.sh",
-        "privateRepo": "public/binaries/mise-v2026.4.19-install.sh",
+        "publicRepo": "v2026.4.24/install.sh",
+        "archive": "mise-v2026.4.24-install.sh",
+        "privateRepo": "public/binaries/mise-v2026.4.24-install.sh",
         "description": "https://github.com/jdx/mise",
     },
 ]
