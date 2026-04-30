@@ -87,6 +87,11 @@ job "jenkins-swarm" {
         ]
         work_dir = "/home/podmgr"
       }
+      env {
+        XDG_RUNTIME_DIR = "/run/user/1001"
+        XDG_CONFIG_HOME = "/home/podmgr/.config"
+        XDG_DATA_HOME   = "/home/podmgr/.local/share"
+      }
 
       template {
         data        = var.config

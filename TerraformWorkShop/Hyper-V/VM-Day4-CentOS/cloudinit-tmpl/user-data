@@ -317,6 +317,23 @@ write_files:
     defer: true
     content: |
       source /etc/profile.d/bash_completion.sh
+  - path: /home/podmgr/.bashrc
+    permissions: "0644"
+    owner: podmgr:podmgr
+    defer: true
+    content: |
+      source /etc/profile.d/bash_completion.sh
+  - path: /home/podmgr/.config/containers/storage.conf
+    permissions: "0644"
+    owner: podmgr:podmgr
+    defer: true
+    content: |
+      [storage]
+      # Default storage driver, must be set for proper operation.
+      driver = "overlay"
+
+      # Temporary storage location
+      runroot = "/run/user/1001/containers"
   - path: ${custom_bin_dir}/consul_linux_amd64.zip
     permissions: "0644"
     source:
@@ -577,6 +594,7 @@ runcmd:
 
   # https://access.redhat.com/solutions/4661741
   # - sudo -u podmgr /bin/bash -c "export XDG_RUNTIME_DIR=/run/user/$(id -u podmgr); /usr/bin/systemctl enable --now podman.socket --user"
+  - sudo -u podmgr /bin/bash -c "mkdir -p /home/podmgr/.config/containers"
   # https://stackoverflow.com/questions/34167257/can-i-control-a-user-systemd-using-systemctl-user-after-sudo-su-myuser
   - systemctl --user --machine=podmgr@.host enable podman.socket --now
   - systemctl stop firewalld
