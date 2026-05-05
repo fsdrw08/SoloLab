@@ -56,7 +56,7 @@ job "pgbouncer" {
       driver = "podman"
       config {
         # https://github.com/cloudnative-pg/pgbouncer-containers/blob/main/entrypoint.sh
-        image = "zot.day0.sololab/cloudnative-pg/pgbouncer:1.25.1"
+        image = "zot.day1.sololab/cloudnative-pg/pgbouncer:1.25.1"
 
         ports = [
           "pgbouncer",

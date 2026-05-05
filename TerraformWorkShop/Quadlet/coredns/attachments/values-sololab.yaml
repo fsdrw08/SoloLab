@@ -52,10 +52,10 @@ coredns:
         - name: hosts
           configBlock: |-
             192.168.255.1 api.vyos.sololab
-            {{ .Values.coredns.hostIP }} zot.day0.sololab
-            {{ .Values.coredns.hostIP }} coredns.day0.sololab
-            {{ .Values.coredns.hostIP }} etcd-0.day0.sololab
-            {{ .Values.coredns.hostIP }} tfbackend-pg.day0.sololab
+            {{ .Values.coredns.hostIP }} zot.day1.sololab
+            {{ .Values.coredns.hostIP }} coredns.day1.sololab
+            {{ .Values.coredns.hostIP }} etcd-0.day1.sololab
+            {{ .Values.coredns.hostIP }} tfbackend-pg.day1.sololab
             ttl 60
             fallthrough
         - name: etcd
@@ -85,35 +85,35 @@ coredns:
         #   parameters: consul 192.168.255.20
         # - name: forward
         #   parameters: . 192.168.255.20
-  # zoneFiles:
-  #   - filename: day0.sololab.db
-  #     domain: day0.sololab
-  #     contents: |
-  #       $ORIGIN day0.sololab.
-  #       $TTL 1h
-  #       @         IN SOA  ns.day0.sololab. admin.james.sololab. (
-  #                         2025083001 ; Serial
-  #                         1h         ; Refresh
-  #                         10m        ; Retry
-  #                         1w         ; Expire
-  #                         1h         ; Minimum TTL
-  #                         )
-  #       @         IN  NS  ns.day0.sololab.
-  #       ns        IN  A   {{ .Values.coredns.hostIP }}
-  #       zot       IN  A   {{ .Values.coredns.hostIP }}
-  #       coredns   IN  A   {{ .Values.coredns.hostIP }}
-  #       etcd-0    IN  A   {{ .Values.coredns.hostIP }}
+        # zoneFiles:
+        #   - filename: day1.sololab.db
+        #     domain: day1.sololab
+        #     contents: |
+        #       $ORIGIN day1.sololab.
+        #       $TTL 1h
+        #       @         IN SOA  ns.day1.sololab. admin.james.sololab. (
+        #                         2025083001 ; Serial
+        #                         1h         ; Refresh
+        #                         10m        ; Retry
+        #                         1w         ; Expire
+        #                         1h         ; Minimum TTL
+        #                         )
+        #       @         IN  NS  ns.day1.sololab.
+        #       ns        IN  A   {{ .Values.coredns.hostIP }}
+        #       zot       IN  A   {{ .Values.coredns.hostIP }}
+        #       coredns   IN  A   {{ .Values.coredns.hostIP }}
+        #       etcd-0    IN  A   {{ .Values.coredns.hostIP }}
 
   podLabels:
     traefik.enable: true
     # health
     traefik.http.routers.coredns-health-redirect.entrypoints: web
-    traefik.http.routers.coredns-health-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health-redirect.rule: "Host(`coredns.day1.sololab`) && PathPrefix(`/health`)"
     traefik.http.routers.coredns-health-redirect.middlewares: toHttps@file
     traefik.http.routers.coredns-health-redirect.service: coredns-health
 
     traefik.http.routers.coredns-health.entrypoints: webSecure
-    traefik.http.routers.coredns-health.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/health`)"
+    traefik.http.routers.coredns-health.rule: "Host(`coredns.day1.sololab`) && PathPrefix(`/health`)"
     traefik.http.routers.coredns-health.tls: true
     traefik.http.routers.coredns-health.service: coredns-health
 
@@ -121,12 +121,12 @@ coredns:
 
     # metric
     traefik.http.routers.coredns-metrics-redirect.entrypoints: web
-    traefik.http.routers.coredns-metrics-redirect.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics-redirect.rule: "Host(`coredns.day1.sololab`) && PathPrefix(`/metrics`)"
     traefik.http.routers.coredns-metrics-redirect.middlewares: toHttps@file
     traefik.http.routers.coredns-metrics-redirect.service: coredns-metrics
 
     traefik.http.routers.coredns-metrics.entrypoints: webSecure
-    traefik.http.routers.coredns-metrics.rule: "Host(`coredns.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.coredns-metrics.rule: "Host(`coredns.day1.sololab`) && PathPrefix(`/metrics`)"
     traefik.http.routers.coredns-metrics.tls: true
     traefik.http.routers.coredns-metrics.service: coredns-metrics
 

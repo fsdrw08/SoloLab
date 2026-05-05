@@ -61,13 +61,13 @@ module "nomad" {
   }
   install = [
     {
-      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
+      zip_file_source = "https://dufs.day1.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
       zip_file_path   = "/var/home/core/nomad_1.11.3_linux_amd64.zip"
       bin_file_name   = "nomad"
       bin_file_dir    = "/var/home/core/.local/bin"
     },
     {
-      zip_file_source = "https://dufs.day0.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
+      zip_file_source = "https://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
       zip_file_path   = "/var/home/core/nomad-driver-podman_0.6.4_linux_amd64.zip"
       bin_file_name   = "nomad-driver-podman"
       bin_file_dir    = "/var/home/core/.local/bin"

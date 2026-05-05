@@ -1,12 +1,12 @@
 prov_zitadel = {
-  domain           = "zitadel.day0.sololab"
+  domain           = "zitadel.day1.sololab"
   insecure         = false
   port             = 443
   jwt_profile_file = "../zitadel-admin-sa.json"
 }
 
 prov_etcd = {
-  endpoints = "https://etcd-0.day0.sololab:443"
+  endpoints = "https://etcd-0.day1.sololab:443"
   username  = "root"
   password  = "P@ssw0rd"
   skip_tls  = true
@@ -15,7 +15,7 @@ prov_etcd = {
 # https://github.com/zitadel/terraform-provider-zitadel/issues/30
 ldap = {
   name      = "ldap"
-  servers   = ["ldap://lldap.day0.sololab"]
+  servers   = ["ldap://lldap.day1.sololab"]
   start_tls = false
   timeout   = "10s"
 

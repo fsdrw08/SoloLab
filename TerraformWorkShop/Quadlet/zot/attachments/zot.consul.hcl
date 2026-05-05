@@ -1,6 +1,6 @@
 services {
   name = "zot"
-  id   = "zot-registry-day0"
+  id   = "zot-registry-day1"
   port = 443
 
   checks = [
@@ -24,11 +24,11 @@ services {
 
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "zot.day0.sololab"
+    prom_blackbox_address           = "zot.day1.sololab"
     prom_blackbox_health_check_path = "v2/"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "zot.day0.sololab"
+    prom_target_address      = "zot.day1.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

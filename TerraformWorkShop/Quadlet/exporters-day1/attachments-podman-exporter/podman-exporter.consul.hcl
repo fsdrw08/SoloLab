@@ -1,14 +1,14 @@
 services {
-  name = "prometheus-node-exporter"
-  id   = "prometheus-node-exporter-day0"
+  name = "prometheus-podman-exporter"
+  id   = "prometheus-podman-exporter-day1"
   port = 443
 
   checks = [
     {
       # https://developer.hashicorp.com/consul/docs/services/usage/checks#http-checks
-      id              = "prometheus-node-exporter-http-check"
-      name            = "prometheus-node-exporter-http-check"
-      http            = "http://localhost:9100/"
+      id              = "prometheus-podman-exporter-http-check"
+      name            = "prometheus-podman-exporter-http-check"
+      http            = "http://localhost:9882/"
       tls_skip_verify = true
       interval        = "300s"
       timeout         = "2s"
@@ -17,17 +17,17 @@ services {
   ]
 
   tags = [
-    "day0",
+    "day1",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "prometheus-node-exporter.day0.sololab"
+    prom_blackbox_address           = "prometheus-podman-exporter.day1.sololab"
     prom_blackbox_health_check_path = "metrics"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "prometheus-node-exporter.day0.sololab"
+    prom_target_address      = "prometheus-podman-exporter.day1.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

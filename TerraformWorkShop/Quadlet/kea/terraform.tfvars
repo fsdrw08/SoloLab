@@ -42,8 +42,8 @@ podman_quadlet = {
 #     vars = {
 #       PDNS_HOST        = "http://192.168.255.20:8081"
 #       PDNS_API_KEY     = "kea"
-#       ZONE_NAME        = "day0.sololab."
-#       ZONE_FQDN        = "day0.sololab."
+#       ZONE_NAME        = "day1.sololab."
+#       ZONE_FQDN        = "day1.sololab."
 #       TSIG_KEY_NAME    = "dhcp-key"
 #       TSIG_KEY_CONTENT = "AobsqQd3xT6oYFd51iayOwr/nz883CEndLc7NjCZj8kZ0v6GvWhGPF2etFrGmP7kTaiTBJXBJU5aFHqDycnbFg=="
 #     }

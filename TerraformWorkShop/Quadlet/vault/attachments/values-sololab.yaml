@@ -3,7 +3,7 @@
 ## @param global.storageClass Global StorageClass for Persistent Volume(s)
 ##
 global:
-  imageRegistry: "zot.day0.sololab"
+  imageRegistry: "zot.day1.sololab"
 
 vault:
   ## @param vault.configFiles config file to start vault, the sub config block will convert to json and injected as ConfigMap
@@ -13,8 +13,8 @@ vault:
   ##
   configFiles:
     main:
-      api_addr: "https://vault.day0.sololab:8200"
-      cluster_addr: "https://vault.day0.sololab:8201"
+      api_addr: "https://vault.day1.sololab:8200"
+      cluster_addr: "https://vault.day1.sololab:8201"
       storage:
         raft:
           path: /vault/file
@@ -45,21 +45,20 @@ vault:
   podLabels:
     traefik.enable: true
     traefik.http.routers.vault-redirect.entrypoints: web
-    traefik.http.routers.vault-redirect.rule: Host(`vault.day0.sololab`)
+    traefik.http.routers.vault-redirect.rule: Host(`vault.day1.sololab`)
     traefik.http.routers.vault-redirect.middlewares: toHttps@file
     traefik.http.routers.vault-redirect.service: vault
 
     traefik.http.routers.vault.entrypoints: webSecure
-    traefik.http.routers.vault.rule: Host(`vault.day0.sololab`)
+    traefik.http.routers.vault.rule: Host(`vault.day1.sololab`)
     traefik.http.routers.vault.tls: true
     traefik.http.routers.vault.service: vault
 
-    traefik.http.services.vault.loadBalancer.serversTransport: sololab-day0@file
+    traefik.http.services.vault.loadBalancer.serversTransport: sololab-day1@file
     traefik.http.services.vault.loadbalancer.server.scheme: https
     traefik.http.services.vault.loadbalancer.server.port: 8200
-
     # traefik.tcp.routers.vault-web.entrypoints: webSecure
-    # traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day0.sololab`)
+    # traefik.tcp.routers.vault-web.rule: HostSNI(`vault.day1.sololab`)
     # traefik.tcp.routers.vault-web.tls.passthrough: true
     # traefik.tcp.routers.vault-web.service: vault-web
     # traefik.tcp.services.vault-web.loadbalancer.server.port: 8200

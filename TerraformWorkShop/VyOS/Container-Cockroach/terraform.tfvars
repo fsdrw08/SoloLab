@@ -6,7 +6,7 @@ vm_conn = {
 }
 
 vyos_conn = {
-  url = "https://vyos-api.day0.sololab"
+  url = "https://vyos-api.vyos.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
 
@@ -54,7 +54,7 @@ reverse_proxy = {
     path = "load-balancing haproxy service tcp443 rule 20" # vyos 1.5
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "cockroach.day0.sololab"
+      "domain-name" = "cockroach.day1.sololab"
       "set backend" = "cockroach_5443"
     }
   }
@@ -86,6 +86,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "cockroach.day0.sololab"
+  host = "cockroach.day1.sololab"
   ip   = "192.168.255.1"
 }

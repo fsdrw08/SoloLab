@@ -81,7 +81,7 @@ job "pgweb" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/sosedoff/pgweb:0.17.0"
+        image = "zot.day1.sololab/sosedoff/pgweb:0.17.0"
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.pgweb-redirect.entrypoints" = "web"

@@ -86,7 +86,7 @@ unclassified:
   hashicorpVault:
     configuration:
       vaultCredentialId: "vault"
-      vaultUrl: "https://vault.day0.sololab"
+      vaultUrl: "https://vault.day1.sololab"
 
   location:
     adminAddress: null

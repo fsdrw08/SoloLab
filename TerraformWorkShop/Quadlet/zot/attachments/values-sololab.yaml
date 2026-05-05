@@ -12,8 +12,8 @@ zot:
           updateInterval: "168h"
           # https://github.com/project-zot/zot/issues/2298#issuecomment-1978312708
           trivy:
-            javadbrepository: "zot.day0.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
-            dbrepository: "zot.day0.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
+            javadbrepository: "zot.day1.sololab/aquasecurity/trivy-java-db" # ghcr.io/aquasecurity/trivy-java-db
+            dbrepository: "zot.day1.sololab/aquasecurity/trivy-db" # ghcr.io/aquasecurity/trivy-db
       # Mgmt is enabled when the Search extension is enabled
       mgmt:
         enable: true
@@ -34,7 +34,7 @@ zot:
       # When the zot registry is running behind a proxy or load balancer,
       # you must provide an external URL for OpenID/OAuth2 clients to redirect back to zot.
       # This externalUrl attribute is the URL of the registry
-      # externalUrl: https://zot.day0.sololab
+      # externalUrl: https://zot.day1.sololab
       realm: zot
       # tls:
       #   cert: "/etc/zot/certs/server.crt"
@@ -53,7 +53,7 @@ zot:
         ##
         ldap:
           credentialsFile: /etc/zot/secret/ldap-credentials.json
-          address: lldap.day0.sololab
+          address: lldap.day1.sololab
           port: 636
           startTLS: true
           baseDN: ou=people,dc=root,dc=sololab
@@ -70,30 +70,30 @@ zot:
         #     oidc:
         #       credentialsFile: /etc/zot/secret/oidc-credentials.json
         #       name: dex
-        #       issuer: https://dex.day0.sololab/
+        #       issuer: https://dex.day1.sololab/
         #       keypath:
         #       scopes: ["openid", "profile", "email", "groups"]
 
-      # https://zotregistry.dev/v2.0.4/articles/authn-authz/#example-access-control-configuration
-      # https://github.com/project-zot/zot/issues/2149
+        # https://zotregistry.dev/v2.0.4/articles/authn-authz/#example-access-control-configuration
+        # https://github.com/project-zot/zot/issues/2149
       accessControl:
         metrics:
-          users: ["admin", "metric"]
+          users: [ "admin", "metric" ]
         repositories:
           "**":
-            defaultPolicy: ["read"]
+            defaultPolicy: [ "read" ]
             # https://github.com/project-zot/zot/blob/main/examples/README.md#identity-based-authorization
-            anonymousPolicy: ["read"]
+            anonymousPolicy: [ "read" ]
         adminPolicy:
-          actions: ["read", "create", "update", "delete"]
+          actions: [ "read", "create", "update", "delete" ]
           ## for user pass
-          users: ["admin"]
+          users: [ "admin" ]
           ## for ldap
-          groups: ["cn=app-zot-admin,ou=groups,dc=root,dc=sololab"]
+          groups: [ "cn=app-zot-admin,ou=groups,dc=root,dc=sololab" ]
           ## for oidc
           # groups: ["app-zot-admin"]
 
-    # https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
+          # https://zotregistry.dev/v2.0.4/articles/storage/#configuring-zot-storage
     storage:
       rootDirectory: "/var/lib/registry"
       # https://zotregistry.dev/v2.0.4/articles/storage/#commit
@@ -121,12 +121,12 @@ zot:
   podLabels:
     traefik.enable: true
     traefik.http.routers.zot-redirect.entrypoints: web
-    traefik.http.routers.zot-redirect.rule: Host(`zot.day0.sololab`)
+    traefik.http.routers.zot-redirect.rule: Host(`zot.day1.sololab`)
     traefik.http.routers.zot-redirect.middlewares: toHttps@file
     traefik.http.routers.zot-redirect.service: zot
 
     traefik.http.routers.zot.entrypoints: webSecure
-    traefik.http.routers.zot.rule: Host(`zot.day0.sololab`)
+    traefik.http.routers.zot.rule: Host(`zot.day1.sololab`)
     traefik.http.routers.zot.tls: true
     traefik.http.routers.zot.service: zot
 
@@ -134,16 +134,15 @@ zot:
     # bWV0cmljOlBAc3N3MHJk is the base64 encoding of "metric:P@ssw0rd"
     traefik.http.middlewares.metricBasicAuthHeader.headers.customRequestHeaders.Authorization: "Basic bWV0cmljOlBAc3N3MHJk"
     traefik.http.routers.zot-metric.entrypoints: webSecure
-    traefik.http.routers.zot-metric.rule: "Host(`zot.day0.sololab`) && Path(`/metrics`)"
+    traefik.http.routers.zot-metric.rule: "Host(`zot.day1.sololab`) && Path(`/metrics`)"
     traefik.http.routers.zot-metric.tls: true
     traefik.http.routers.zot-metric.middlewares: metricBasicAuthHeader@docker
     traefik.http.routers.zot-metric.service: zot
 
     traefik.http.services.zot.loadbalancer.server.port: 5000
     traefik.http.services.zot.loadbalancer.healthCheck.path: /v2/
-
     # traefik.tcp.routers.zot-web.entrypoints: webSecure
-    # traefik.tcp.routers.zot-web.rule: HostSNI(`zot.day0.sololab`)
+    # traefik.tcp.routers.zot-web.rule: HostSNI(`zot.day1.sololab`)
     # traefik.tcp.routers.zot-web.tls.passthrough: true
     # traefik.tcp.routers.zot-web.service: zot-web
     # traefik.tcp.services.zot-web.loadbalancer.server.port: 5000

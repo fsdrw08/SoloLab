@@ -61,7 +61,7 @@ job "redis-insight" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/redis/redisinsight:3.2.0"
+        image = "zot.day1.sololab/redis/redisinsight:3.2.0"
         labels = {
           "traefik.enable"                                          = "true"
           "traefik.http.routers.redis-insight-redirect.entrypoints" = "web"

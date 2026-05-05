@@ -1,14 +1,14 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 dufs:
   podLabels:
     traefik.enable: true
     traefik.http.routers.dufs-http.entrypoints: web
-    traefik.http.routers.dufs-http.rule: Host(`dufs.day0.sololab`)
+    traefik.http.routers.dufs-http.rule: Host(`dufs.day1.sololab`)
     traefik.http.routers.dufs-http.service: dufs
 
     traefik.http.routers.dufs.entrypoints: webSecure
-    traefik.http.routers.dufs.rule: Host(`dufs.day0.sololab`)
+    traefik.http.routers.dufs.rule: Host(`dufs.day1.sololab`)
     traefik.http.routers.dufs.tls: true
     traefik.http.routers.dufs.service: dufs
 

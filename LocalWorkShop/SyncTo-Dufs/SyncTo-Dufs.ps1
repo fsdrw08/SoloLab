@@ -46,7 +46,7 @@ param (
 
     [Parameter()]
     [string]
-    $PrivateRegistry = "https://dufs.day0.sololab",
+    $PrivateRegistry = "https://dufs.day1.sololab",
 
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]

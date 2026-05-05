@@ -61,7 +61,7 @@ job "prometheus-postgres-exporter" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/prometheuscommunity/postgres-exporter:v0.18.1"
+        image = "zot.day1.sololab/prometheuscommunity/postgres-exporter:v0.18.1"
         labels = {
           "traefik.enable"                                                         = "true"
           "traefik.http.routers.prometheus-postgres-exporter-redirect.entrypoints" = "web"

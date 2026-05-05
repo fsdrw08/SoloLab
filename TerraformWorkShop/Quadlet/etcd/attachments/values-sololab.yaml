@@ -8,12 +8,12 @@ etcd:
     traefik.enable: true
     # web
     traefik.http.routers.etcd-redirect.entrypoints: web
-    traefik.http.routers.etcd-redirect.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd-redirect.rule: "Host(`etcd-0.day1.sololab`)"
     traefik.http.routers.etcd-redirect.middlewares: toHttps@file
     traefik.http.routers.etcd-redirect.service: etcd
 
     traefik.http.routers.etcd.entrypoints: webSecure
-    traefik.http.routers.etcd.rule: "Host(`etcd-0.day0.sololab`)"
+    traefik.http.routers.etcd.rule: "Host(`etcd-0.day1.sololab`)"
     traefik.http.routers.etcd.tls: true
     traefik.http.routers.etcd.service: etcd
 
@@ -23,12 +23,12 @@ etcd:
 
     # metric
     traefik.http.routers.etcd-metrics-redirect.entrypoints: web
-    traefik.http.routers.etcd-metrics-redirect.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics-redirect.rule: "Host(`etcd-0.day1.sololab`) && PathPrefix(`/metrics`)"
     traefik.http.routers.etcd-metrics-redirect.middlewares: toHttps@file
     traefik.http.routers.etcd-metrics-redirect.service: etcd-metrics
 
     traefik.http.routers.etcd-metrics.entrypoints: webSecure
-    traefik.http.routers.etcd-metrics.rule: "Host(`etcd-0.day0.sololab`) && PathPrefix(`/metrics`)"
+    traefik.http.routers.etcd-metrics.rule: "Host(`etcd-0.day1.sololab`) && PathPrefix(`/metrics`)"
     traefik.http.routers.etcd-metrics.tls: true
     traefik.http.routers.etcd-metrics.service: etcd-metrics
 
@@ -86,14 +86,14 @@ etcd:
     ### Clustering
     ## @param etcd.configFile.initial-advertise-peer-urls List of this member's peer URLs to advertise to the rest of the cluster.
     ##
-    initial-advertise-peer-urls: https://etcd-0.day0.sololab:2380
+    initial-advertise-peer-urls: https://etcd-0.day1.sololab:2380
     ## @param etcd.configFile.initial-cluster-token Initial cluster token for the etcd cluster during bootstrap.
     ## Specifying this can protect you from unintended cross-cluster interaction when running multiple clusters.
     initial-cluster-token: "day2-etcd-cluster"
     ## @param etcd.configFile.advertise-client-urls List of this member's client URLs to advertise to the public.
     ## The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
     ##
-    advertise-client-urls: https://etcd-0.day0.sololab:2379
+    advertise-client-urls: https://etcd-0.day1.sololab:2379
     ## @param etcd.configFile.discovery Discovery URL used to bootstrap the cluster.
     ##
     # discovery: "day2.sololab"

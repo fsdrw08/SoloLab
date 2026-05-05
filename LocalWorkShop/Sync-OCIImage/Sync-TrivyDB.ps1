@@ -32,7 +32,7 @@ param (
     [string]
     [ValidateSet(
         "zot.vyos.sololab.dev",
-        "zot.day0.sololab"
+        "zot.day1.sololab"
     )]
     $PrivateRegistry = "zot.vyos.sololab.dev",
         
@@ -50,7 +50,7 @@ if (!(Get-Command oras.exe)) {
 $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile)
 # $repoDir = git rev-parse --show-toplevel
 # $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\VyOS-Trivy.jsonc")
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day0-Trivy.jsonc")
+# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\Sync-OCIImage\Day1-Trivy.jsonc")
 
 ## validate json
 $referenceObject = @(

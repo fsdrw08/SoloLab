@@ -18,7 +18,7 @@ create_zone() {
     curl -X POST -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
         "name": "'"$ZONE_NAME"'",
         "kind": "Native",
-        "nameservers": ["ns1.day0.sololab."]
+        "nameservers": ["ns1.day1.sololab."]
     }' "$PDNS_HOST/api/v1/servers/localhost/zones"
 }
 

@@ -114,7 +114,7 @@ certs = [
     cert = {
       dns_names = [
         "tf-backend-pg.vyos.sololab",
-        "tf-backend-pg.day0.sololab"
+        "tf-backend-pg.day1.sololab"
       ]
       subject = {
         common_name  = "tfbackend-pg"
@@ -144,7 +144,7 @@ certs = [
   #     ]
   #     dns_names = [
   #       "localhost",
-  #       "cockroach.day0.sololab"
+  #       "cockroach.day1.sololab"
   #     ]
   #     subject = {
   #       common_name  = "node"
@@ -182,16 +182,16 @@ certs = [
   #     ]
   #   }
   # },
-  # day0
+  # day1
   # {
-  #   name = "zot.day0"
+  #   name = "zot.day1"
   #   key = {
   #     algorithm = "RSA"
   #     rsa_bits  = 2048
   #   }
   #   cert = {
   #     dns_names = [
-  #       "zot.day0.sololab"
+  #       "zot.day1.sololab"
   #     ]
   #     subject = {
   #       common_name  = "Zot Registry"
@@ -206,18 +206,18 @@ certs = [
   #   }
   # },
   {
-    name = "etcd-server.day0"
+    name = "etcd-server.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "etcd-0.day0.sololab",
+        "etcd-0.day1.sololab",
         "localhost",
       ]
       subject = {
-        common_name  = "etcd.day0.sololab"
+        common_name  = "etcd.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -251,17 +251,17 @@ certs = [
   # },
   # cockpit
   {
-    name = "cockpit.day0"
+    name = "cockpit.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "cockpit.day0.sololab",
+        "cockpit.day1.sololab",
       ]
       subject = {
-        common_name  = "cockpit.day0.sololab"
+        common_name  = "cockpit.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -272,19 +272,19 @@ certs = [
       ]
     }
   },
-  # day0 wildcard
+  # day1 wildcard
   {
-    name = "wildcard.day0"
+    name = "wildcard.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "*.day0.sololab"
+        "*.day1.sololab"
       ]
       subject = {
-        common_name  = "*.day0.sololab"
+        common_name  = "*.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -297,17 +297,17 @@ certs = [
   },
   # lldap
   {
-    name = "lldap.day0"
+    name = "lldap.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
     }
     cert = {
       dns_names = [
-        "lldap.day0.sololab",
+        "lldap.day1.sololab",
       ]
       subject = {
-        common_name  = "lldap.day0.sololab"
+        common_name  = "lldap.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -320,7 +320,7 @@ certs = [
   },
   # vault
   {
-    name = "vault.day0"
+    name = "vault.day1"
     key = {
       algorithm = "RSA"
       rsa_bits  = 4096
@@ -330,11 +330,11 @@ certs = [
         "127.0.0.1"
       ]
       dns_names = [
-        "*.day0.sololab",
+        "*.day1.sololab",
         "vault.service.consul",
       ]
       subject = {
-        common_name  = "vault.day0.sololab"
+        common_name  = "vault.day1.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -355,7 +355,7 @@ certs = [
   #   }
   #   cert = {
   #     dns_names = [
-  #       "consul.day0.sololab",
+  #       "consul.day1.sololab",
   #       "consul.service.consul",
   #       "server.dc1.consul",
   #       "localhost"
@@ -382,10 +382,10 @@ certs = [
   #   }
   #   cert = {
   #     dns_names = [
-  #       "nomad.day0.sololab",
+  #       "nomad.day1.sololab",
   #     ]
   #     subject = {
-  #       common_name  = "nomad.day0.sololab"
+  #       common_name  = "nomad.day1.sololab"
   #       organization = "Sololab"
   #     }
   #     validity_period_hours = 43800
@@ -405,10 +405,10 @@ certs = [
   #   }
   #   cert = {
   #     dns_names = [
-  #       "opendj.day1.sololab"
+  #       "opendj.day2.sololab"
   #     ]
   #     subject = {
-  #       common_name  = "opendj.day1.sololab"
+  #       common_name  = "opendj.day2.sololab"
   #       organization = "Sololab"
   #     }
   #     validity_period_hours = 43800
@@ -428,10 +428,10 @@ certs = [
   #   }
   #   cert = {
   #     dns_names = [
-  #       "keycloak.day1.sololab"
+  #       "keycloak.day2.sololab"
   #     ]
   #     subject = {
-  #       common_name  = "keycloak.day1.sololab"
+  #       common_name  = "keycloak.day2.sololab"
   #       organization = "Sololab"
   #     }
   #     validity_period_hours = 43800

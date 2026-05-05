@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 sftpgo:
   configFiles:
     # https://github.com/drakkan/sftpgo/blob/v2.6.6/sftpgo.json
@@ -30,7 +30,7 @@ sftpgo:
     sftp-plugin-auth:
       configs:
         - dial_urls:
-            - ldaps://lldap.day0.sololab
+            - ldaps://lldap.day1.sololab
           # List of absolute paths to extra CA certificates to trust
           ca_certificates:
             - /etc/sftpgo/certs/ca.crt
@@ -69,12 +69,12 @@ sftpgo:
   podLabels:
     traefik.enable: true
     traefik.http.routers.sftpgo-redirect.entrypoints: web
-    traefik.http.routers.sftpgo-redirect.rule: Host(`sftpgo.day0.sololab`)
+    traefik.http.routers.sftpgo-redirect.rule: Host(`sftpgo.day1.sololab`)
     traefik.http.routers.sftpgo-redirect.middlewares: toHttps@file
     traefik.http.routers.sftpgo-redirect.service: sftpgo
 
     traefik.http.routers.sftpgo.entrypoints: webSecure
-    traefik.http.routers.sftpgo.rule: Host(`sftpgo.day0.sololab`)
+    traefik.http.routers.sftpgo.rule: Host(`sftpgo.day1.sololab`)
     traefik.http.routers.sftpgo.tls: true
     traefik.http.routers.sftpgo.service: sftpgo
 

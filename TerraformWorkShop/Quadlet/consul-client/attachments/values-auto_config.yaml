@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 consul:
   containerPorts: []
     # - name: server
@@ -44,7 +44,7 @@ consul:
         enabled: true
         intro_token: # set by terraform
         server_addresses:
-          - consul.day0.sololab
+          - consul.day1.sololab
       bind_addr: "{{ GetInterfaceIP \"eth0\" }}"
       bootstrap_expect: null
       client_addr: "0.0.0.0"

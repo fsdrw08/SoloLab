@@ -4,18 +4,18 @@ dex:
   podLabels:
     traefik.enable: true
     traefik.http.routers.dex-http.entrypoints: web
-    traefik.http.routers.dex-http.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex-http.rule: Host(`dex.day1.sololab`)
     traefik.http.routers.dex-http.service: dex
 
     traefik.http.routers.dex.entrypoints: webSecure
-    traefik.http.routers.dex.rule: Host(`dex.day0.sololab`)
+    traefik.http.routers.dex.rule: Host(`dex.day1.sololab`)
     traefik.http.routers.dex.tls: true
     traefik.http.routers.dex.service: dex
 
     traefik.http.services.dex.loadbalancer.server.port: 5556
 
   config:
-    issuer: https://dex.day0.sololab/
+    issuer: https://dex.day1.sololab/
     web:
       http: 127.0.0.1:5556
     connectors:
@@ -23,7 +23,7 @@ dex:
         id: ldap
         name: LDAP
         config:
-          host: lldap.day0.sololab:636 # or 6360 if you have ldaps enabled, make sure it does not start with `ldap://`
+          host: lldap.day1.sololab:636 # or 6360 if you have ldaps enabled, make sure it does not start with `ldap://`
           insecureNoSSL: false # or false if you have ldaps enabled
           insecureSkipVerify: false # or false if you have ldaps enabled
           rootCA: /etc/ssl/certs/private/sololab.crt
@@ -53,6 +53,6 @@ dex:
     staticClients:
       - id: minio
         redirectURIs:
-          - https://minio-console.day0.sololab/oauth_callback
+          - https://minio-console.day1.sololab/oauth_callback
         name: minio
         secret: ZXhhbXBsZS1hcHAtc2VjcmV0

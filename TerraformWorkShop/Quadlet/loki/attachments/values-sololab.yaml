@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 loki:
   hostNetwork: false
   containerPorts:
@@ -63,7 +63,7 @@ loki:
         # https://grafana.com/docs/loki/v3.6.x/configure/#thanos_object_store_config
         s3:
           # https://github.com/cloudlena/s3manager/issues/7
-          endpoint: minio-api.day0.sololab
+          endpoint: minio-api.day1.sololab
           bucket_name: loki
           access_key_id: # set from terraform data
           secret_access_key:

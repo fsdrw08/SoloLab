@@ -7,18 +7,18 @@ prov_consul = {
 }
 
 nodes = [{
-  name    = "Day0-FCOS"
+  name    = "Day1-FCOS"
   address = "192.168.255.10"
 }]
 
 services = [{
-  name = "prometheus-podman-exporter-day0"
-  node = "Day0-FCOS"
+  name = "prometheus-podman-exporter-day1"
+  node = "Day1-FCOS"
   port = 443 # 9882
   check = [{
     check_id        = "prometheus-podman-exporter-http-check"
     name            = "prometheus-podman-exporter-http-check"
-    http            = "https://prometheus-podman-exporter.day0.sololab/"
+    http            = "https://prometheus-podman-exporter.day1.sololab/"
     interval        = "300s"
     timeout         = "2s"
     tls_skip_verify = true
@@ -27,7 +27,7 @@ services = [{
   "metrics-exposing"]
   meta = {
     scheme            = "https"
-    address           = "prometheus-podman-exporter.day0.sololab"
+    address           = "prometheus-podman-exporter.day1.sololab"
     health_check_path = "metrics"
     metrics_path      = "metrics"
   }

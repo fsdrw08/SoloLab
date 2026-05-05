@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 redis:
   livenessProbe:
     exec:

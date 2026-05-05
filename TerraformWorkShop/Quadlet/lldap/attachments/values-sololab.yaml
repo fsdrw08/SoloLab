@@ -33,10 +33,10 @@ lldap:
   podLabels:
     traefik.enable: true
     traefik.http.routers.lldap-web-redirect.entrypoints: web
-    traefik.http.routers.lldap-web-redirect.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web-redirect.rule: "Host(`lldap.day1.sololab`)"
     traefik.http.routers.lldap-web-redirect.middlewares: toHttps@file
     traefik.http.routers.lldap-web.entryPoints: webSecure
-    traefik.http.routers.lldap-web.rule: "Host(`lldap.day0.sololab`)"
+    traefik.http.routers.lldap-web.rule: "Host(`lldap.day1.sololab`)"
     traefik.http.routers.lldap-web.tls: true
     traefik.http.routers.lldap-web.service: lldap-web
     traefik.http.services.lldap-web.loadbalancer.server.port: 17170

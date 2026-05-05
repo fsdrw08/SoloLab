@@ -6,20 +6,20 @@ prov_nexus = {
 }
 
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
 blob_store_s3 = {
-  name = "minio.day0"
+  name = "minio.day1"
   bucket = {
     name       = "nexus3"
     region     = "us-east-1"
     expiration = -1
   }
   advanced_bucket_connection = {
-    endpoint         = "https://minio-api.day0.sololab"
+    endpoint         = "https://minio-api.day1.sololab"
     force_path_style = true
   }
   bucket_security_value_refers = [

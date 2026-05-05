@@ -6,6 +6,6 @@ vm_conn = {
 }
 
 vyos_conn = {
-  url = "https://vyos-api.day0.sololab"
+  url = "https://vyos-api.vyos.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

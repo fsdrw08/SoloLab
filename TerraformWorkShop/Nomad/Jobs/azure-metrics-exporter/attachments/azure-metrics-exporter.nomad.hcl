@@ -70,7 +70,7 @@ job "azure-metrics-exporter" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       config {
         # https://github.com/prometheus/prometheus/blob/v3.10.0/Dockerfile
-        image = "zot.day0.sololab/prometheus/prometheus:v3.10.0"
+        image = "zot.day1.sololab/prometheus/prometheus:v3.10.0"
         labels = {
           "traefik.enable"                                                    = "true"
           "traefik.http.routers.azure-metrics-forwarder-redirect.entrypoints" = "web"
@@ -174,7 +174,7 @@ job "azure-metrics-exporter" {
       driver = "podman"
       config {
         # https://github.com/webdevops/azure-metrics-exporter?tab=readme-ov-file#configuration
-        image = "zot.day0.sololab/webdevops/azure-metrics-exporter:25.12.0"
+        image = "zot.day1.sololab/webdevops/azure-metrics-exporter:25.12.0"
         labels = {
           "traefik.enable"                                                   = "true"
           "traefik.http.routers.azure-metrics-exporter-redirect.entrypoints" = "web"

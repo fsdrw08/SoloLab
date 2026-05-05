@@ -79,7 +79,7 @@ module "config_map" {
       basename = "setup.props"
       content = templatefile("${path.module}/opendj/setup.props", {
         # https://github.com/OpenWIS/open-dj-am-install-scripts/blob/4e08bb61782d7d8621e6e88ba65ec4e8d0f2ace9/deploy-scripts/setup_opendj.properties.orig#L5
-        hostname                      = "opendj.day0.sololab"
+        hostname                      = "opendj.day1.sololab"
         ldapPort                      = 1389
         ldapsPort                     = 1636
         adminConnectorPort            = 4444
@@ -126,7 +126,7 @@ module "config_map" {
     }
     certs = {
       basename = "keystore"
-      # source   = "http://files.day0.sololab/others/opendj.jks"
+      # source   = "http://files.day1.sololab/others/opendj.jks"
       source  = "./keystore"
       sub_dir = "certs"
     }

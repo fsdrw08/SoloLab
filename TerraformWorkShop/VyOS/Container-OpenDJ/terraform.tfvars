@@ -6,7 +6,7 @@ vm_conn = {
 }
 
 vyos_conn = {
-  url = "https://vyos-api.day0.sololab"
+  url = "https://vyos-api.vyos.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }
 
@@ -94,6 +94,6 @@ reverse_proxy = {
 }
 
 dns_record = {
-  host = "opendj.day0.sololab"
+  host = "opendj.day1.sololab"
   ip   = "192.168.255.1"
 }

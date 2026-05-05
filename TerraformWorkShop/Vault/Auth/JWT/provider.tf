@@ -13,7 +13,7 @@ terraform {
     key    = "Vault/Auth-JWT" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.day0.sololab" # Minio endpoint
+      s3 = "https://minio-api.day1.sololab" # Minio endpoint
     }
 
     access_key = "minioadmin" # Access and secret keys

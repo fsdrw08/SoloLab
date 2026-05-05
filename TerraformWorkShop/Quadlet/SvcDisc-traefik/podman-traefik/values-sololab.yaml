@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 workloadKind: ""
 traefik:
   image:
@@ -44,7 +44,7 @@ traefik:
           tlsChallenge: {}
       internal:
         acme:
-          caServer: https://vault.day0.sololab:8200/v1/pki_sololab_day2/acme/directory
+          caServer: https://vault.day1.sololab:8200/v1/pki_sololab_day2/acme/directory
           certificatesDuration: 2160
           email: ""
           storage: /mnt/acmeStorage/internal.json

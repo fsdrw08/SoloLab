@@ -1,5 +1,5 @@
 prov_etcd = {
-  endpoints = "https://etcd-0.day0.sololab:443"
+  endpoints = "https://etcd-0.day1.sololab:443"
   username  = "root"
   password  = "P@ssw0rd"
   skip_tls  = true
@@ -8,7 +8,7 @@ prov_etcd = {
 # https://coredns.io/plugins/etcd/
 dns_records = [
   {
-    hostname = "traefik.day0.sololab"
+    hostname = "traefik.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -19,7 +19,7 @@ dns_records = [
     }
   },
   {
-    hostname = "lldap.day0.sololab"
+    hostname = "lldap.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -30,7 +30,7 @@ dns_records = [
     }
   },
   {
-    hostname = "dex.day0.sololab"
+    hostname = "dex.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -41,7 +41,7 @@ dns_records = [
     }
   },
   {
-    hostname = "tfbackend-pg.day0.sololab"
+    hostname = "tfbackend-pg.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -52,7 +52,7 @@ dns_records = [
     }
   },
   {
-    hostname = "cockpit.day0.sololab"
+    hostname = "cockpit.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -63,7 +63,7 @@ dns_records = [
     }
   },
   {
-    hostname = "dufs.day0.sololab"
+    hostname = "dufs.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -74,7 +74,7 @@ dns_records = [
     }
   },
   {
-    hostname = "minio-api.day0.sololab"
+    hostname = "minio-api.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -85,7 +85,7 @@ dns_records = [
     }
   },
   {
-    hostname = "minio-console.day0.sololab"
+    hostname = "minio-console.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -96,7 +96,7 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-podman-exporter.day0.sololab"
+    hostname = "prometheus-podman-exporter.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -107,7 +107,7 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-node-exporter.day0.sololab"
+    hostname = "prometheus-node-exporter.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -118,7 +118,7 @@ dns_records = [
     }
   },
   {
-    hostname = "consul-client.day0.sololab"
+    hostname = "consul-client.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -129,7 +129,7 @@ dns_records = [
     }
   },
   {
-    hostname = "alloy.day0.sololab"
+    hostname = "alloy.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"
@@ -140,7 +140,7 @@ dns_records = [
     }
   },
   {
-    hostname = "vault.day0.sololab"
+    hostname = "vault.day1.sololab"
     value = {
       string_map = {
         host = "192.168.255.10"

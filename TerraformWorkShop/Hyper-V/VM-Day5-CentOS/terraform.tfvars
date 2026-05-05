@@ -7,7 +7,7 @@ prov_hyperv = {
 
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab"
+  address         = "vault.day1.sololab"
   skip_tls_verify = true
 }
 
@@ -46,30 +46,30 @@ cloudinit = {
     global = {
       instance_id         = "iid-CentOS_202604"
       time_zone           = "Asia/Shanghai"
-      custom_root_ca_url  = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
+      custom_root_ca_url  = "http://dufs.day1.sololab/public/certs/sololab_root.crt"
       custom_root_ca_path = "/etc/pki/ca-trust/source/anchors"
       custom_bin_dir      = "/opt/bin"
       # consul client
-      consul_download_url = "http://dufs.day0.sololab/public/binaries/consul_1.22.6_linux_amd64.zip"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_1.22.6_linux_amd64.zip"
       consul_version      = "1.22.6"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/lib/consul"
       # nomad client
-      nomad_download_url                  = "http://dufs.day0.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
       nomad_version                       = "1.11.3"
       nomad_server_fqdn                   = "nomad.service.consul"
-      nomad_podman_driver_download_url    = "http://dufs.day0.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
+      nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
       nomad_podman_driver_version         = "0.6.4"
-      nomad_client_cert_download_url      = "http://dufs.day0.sololab/private/certs/client.global.nomad.crt"
-      nomad_client_cert_key_download_url  = "http://dufs.day0.sololab/private/certs/client.global.nomad.key"
+      nomad_client_cert_download_url      = "http://dufs.day1.sololab/private/certs/client.global.nomad.crt"
+      nomad_client_cert_key_download_url  = "http://dufs.day1.sololab/private/certs/client.global.nomad.key"
       nomad_client_cert_download_url_cred = "YWRtaW46YWRtaW4="
       nomad_config_dir                    = "/etc/nomad.d"
       nomad_data_dir                      = "/var/lib/nomad"
-      vault_server_address                = "https://vault.day0.sololab"
+      vault_server_address                = "https://vault.day1.sololab"
       # mise
-      mise_script_download_url = "http://dufs.day0.sololab/public/binaries/mise-v2026.4.24-install.sh"
-      mise_download_url        = "https://dufs.day0.sololab/public/binaries/mise-v2026.4.24-linux-x64.tar.gz"
+      mise_script_download_url = "http://dufs.day1.sololab/public/binaries/mise-v2026.4.24-install.sh"
+      mise_download_url        = "https://dufs.day1.sololab/public/binaries/mise-v2026.4.24-linux-x64.tar.gz"
     }
     local = [
       {

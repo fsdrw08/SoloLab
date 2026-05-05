@@ -6,7 +6,7 @@
 # }
 
 prov_nomad = {
-  address     = "https://nomad.day1.sololab"
+  address     = "https://nomad.day2.sololab"
   skip_verify = true
 }
 

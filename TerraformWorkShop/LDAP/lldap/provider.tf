@@ -7,7 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate"         # Name of the S3 bucket
-    key    = "LDAP/LLDAP-Day0" # Name of the tfstate file
+    key    = "LDAP/LLDAP-Day1" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio-api.vyos.sololab" # Minio endpoint

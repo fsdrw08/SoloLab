@@ -1,6 +1,6 @@
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab"
+  address         = "vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -120,7 +120,7 @@ vault_certs = [
   #   ttl_years   = 3
   #   common_name = "alloy.day2.sololab"
   #   alt_names = [
-  #     "alloy.day0.sololab",
+  #     "alloy.day1.sololab",
   #   ]
   # },
   # {

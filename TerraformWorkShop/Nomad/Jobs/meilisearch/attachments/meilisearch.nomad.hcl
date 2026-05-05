@@ -75,7 +75,7 @@ job "meilisearch" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/getmeili/meilisearch:v1.40.0"
+        image = "zot.day1.sololab/getmeili/meilisearch:v1.40.0"
         labels = {
           "traefik.enable"                                        = "true"
           "traefik.http.routers.meilisearch-redirect.entrypoints" = "web"

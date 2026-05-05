@@ -6,12 +6,12 @@ zitadelLogin:
   # podLabels:
   #   traefik.enable: true
   #   traefik.http.routers.zitadel-redirect.entrypoints: web
-  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day1.sololab`)
   #   traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
   #   traefik.http.routers.zitadel-redirect.service: zitadel
 
   #   traefik.http.routers.zitadel.entrypoints: webSecure
-  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day1.sololab`)
   #   traefik.http.routers.zitadel.tls: true
   #   traefik.http.routers.zitadel.service: zitadel
 
@@ -40,7 +40,7 @@ zitadelLogin:
       hostIP: 127.0.0.1
       protocol: TCP
   config:
-    CUSTOM_REQUEST_HEADERS: Host:zitadel.day0.sololab
+    CUSTOM_REQUEST_HEADERS: Host:zitadel.day1.sololab
     NEXT_PUBLIC_BASE_PATH: /ui/v2/login
     ZITADEL_API_URL: # set by terraform variable http://zitadel-backend:8080
     ZITADEL_SERVICE_USER_TOKEN_FILE: /data/login-client.pat

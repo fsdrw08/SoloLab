@@ -9,7 +9,7 @@ ceph:
   ## @param ceph.image.pullSecrets %%MAIN_CONTAINER%% image pull secrets
   ##
   image:
-    registry: zot.day0.sololab
+    registry: zot.day1.sololab
     repository: ceph/daemon
     tag: latest-main
     digest: ""

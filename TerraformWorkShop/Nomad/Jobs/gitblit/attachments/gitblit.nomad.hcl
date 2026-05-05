@@ -73,7 +73,7 @@ job "gitblit" {
       driver = "podman"
       config {
         # https://github.com/gitblit-org/gitblit-docker/blob/v1.10.0-1/Dockerfile
-        image = "zot.day0.sololab/gitblit/gitblit:1.10.0-rpc"
+        image = "zot.day1.sololab/gitblit/gitblit:1.10.0-rpc"
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.gitblit-redirect.entrypoints" = "web"

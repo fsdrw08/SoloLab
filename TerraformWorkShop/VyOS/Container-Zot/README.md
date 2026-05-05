@@ -8,15 +8,15 @@ ref:
 - https://github.com/project-zot/zot/issues/2298 
 - https://github.com/aquasecurity/trivy/issues/4169
 - https://github.com/aquasecurity/trivy/discussions/4194
-1. set config `extensions.search.cve.trivy.dbrepository` to zot itself's oci url, in this case: `zot.day0.sololab/aquasecurity/trivy-db`
+1. set config `extensions.search.cve.trivy.dbrepository` to zot itself's oci url, in this case: `zot.day1.sololab/aquasecurity/trivy-db`
     ```jsonc
     {
         "extensions": {
             "search": {
                 "cve": {
                     "trivy": {
-                        "javadbrepository": "zot.day0.sololab/aquasecurity/trivy-java-db",
-                        "dbrepository": "zot.day0.sololab/aquasecurity/trivy-db",
+                        "javadbrepository": "zot.day1.sololab/aquasecurity/trivy-java-db",
+                        "dbrepository": "zot.day1.sololab/aquasecurity/trivy-db",
                     }
                 }
             }
@@ -49,7 +49,7 @@ ref:
     scoop install oras
 
     # https://github.com/LubinLew/trivy-data-sync/blob/ 80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
-    $privateRegistry = "zot.day0.sololab"
+    $privateRegistry = "zot.day1.sololab"
     $privateRepo = "aquasecurity/trivy-db:2"
     $publicImage = "ghcr.io/aquasecurity/trivy-db:2"
     $localDir = "$env:PUBLIC/Downloads/containers/trivy"
@@ -94,7 +94,7 @@ Sync container image from public to private
 ```powershell
 podman run --rm quay.io/skopeo/stable copy `
     docker://docker.io/hashicorp/consul:1.18.1 `
-    docker://zot.day0.sololab/hashicorp/consul:1.18.1 `
+    docker://zot.day1.sololab/hashicorp/consul:1.18.1 `
     --dest-tls-verify=false `
     --dest-creds=admin:P@ssw0rd
 
@@ -103,7 +103,7 @@ podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os
     --dest-tls-verify=false `
     --dest-creds=admin:P@ssw0rd
     docker://docker.io/hashicorp/consul:1.18.1 `
-    oci-archive://zot.day0.sololab/hashicorp/consul:1.18.1 `
+    oci-archive://zot.day1.sololab/hashicorp/consul:1.18.1 `
 
 ```
 
@@ -114,42 +114,42 @@ podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os
 $publicRegistry="quay.io"
 $image="cockpit/ws:329"
 $archive="quay.io_cockpit_ws_327.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="docker.io"
 $image="hashicorp/vault:1.16.3"
 $archive="hashicorp_vault_1.16.3.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="docker.io"
 $image="hashicorp/consul:1.18.2"
 $archive="hashicorp_consul_1.18.2.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="docker.io"
 $image="library/traefik:v3.0.1"
 $archive="library_traefik_v3.0.1.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="docker.io"
 $image="traefik/whoami:v1.10.2"
 $archive="traefik_whoami_v1.10.2.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="docker.io"
 $image="coredns/coredns:1.14.2"
 $archive="coredns_coredns_1.14.2.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="quay.io"
 $image="ceph/daemon:latest-main"
 $archive="quay.io.ceph_daemon_latest-main.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $publicRegistry="quay.io"
 $image="fedora/postgresql-16:20241127"
 $archive="quay.io_fedora_postgresql-16_20241127.tar"
-$privateRegistry="zot.day0.sololab"
+$privateRegistry="zot.day1.sololab"
 
 $proxy="127.0.0.1:7890"
 $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
@@ -172,7 +172,7 @@ skopeo copy --insecure-policy `
 
 
 # https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
-oras login -u admin zot.day0.sololab
+oras login -u admin zot.day1.sololab
 Set-Location -Path $env:PUBLIC/Downloads/containers/trivy
 # trivy-db
 # Download the trivy-db
@@ -187,15 +187,15 @@ oras manifest fetch `
 oras push `
     --insecure `
     --disable-path-validation `
-    zot.day0.sololab/aquasecurity/trivy-db:2 `
+    zot.day1.sololab/aquasecurity/trivy-db:2 `
     db.tar.gz:application/vnd.aquasec.trivy.db.layer.v1.tar+gzip
 
 oras manifest push `
     --insecure `
-    zot.day0.sololab/aquasecurity/trivy-db:2 `
+    zot.day1.sololab/aquasecurity/trivy-db:2 `
     trivy-db-manifest.json
 
-oras manifest fetch zot.day0.sololab/aquasecurity/trivy-db:2
+oras manifest fetch zot.day1.sololab/aquasecurity/trivy-db:2
 
 # trivy-java-db
 oras pull ghcr.io/aquasecurity/trivy-java-db:1
@@ -206,14 +206,14 @@ oras manifest fetch `
 
 oras push `
     --disable-path-validation `
-    zot.day0.sololab/aquasecurity/trivy-java-db:1 `
+    zot.day1.sololab/aquasecurity/trivy-java-db:1 `
     javadb.tar.gz:application/vnd.aquasec.trivy.javadb.layer.v1.tar+gzip
 
 oras manifest push `
-    zot.day0.sololab/aquasecurity/trivy-java-db:1 `
+    zot.day1.sololab/aquasecurity/trivy-java-db:1 `
     trivy-java-db-manifest.json
 
-oras manifest fetch zot.day0.sololab/aquasecurity/trivy-java-db:1
+oras manifest fetch zot.day1.sololab/aquasecurity/trivy-java-db:1
 
 
 ```

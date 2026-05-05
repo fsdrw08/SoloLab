@@ -1,6 +1,6 @@
 services {
   name = "traefik"
-  id   = "traefik-day0"
+  id   = "traefik-day1"
   port = 443
 
   checks = [
@@ -16,17 +16,17 @@ services {
   ]
 
   tags = [
-    "day0",
+    "day1",
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "traefik.day0.sololab"
+    prom_blackbox_address           = "traefik.day1.sololab"
     prom_blackbox_health_check_path = "metrics"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "traefik.day0.sololab"
+    prom_target_address      = "traefik.day1.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

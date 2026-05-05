@@ -1,5 +1,5 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -29,9 +29,9 @@ jwt_auth_configs = [
   # {
   #   name = "vault-jwt"
   #   config = {
-  #     JWKSURL        = "https://vault.day0.sololab/v1/identity/oidc/.well-known/keys"
+  #     JWKSURL        = "https://vault.day1.sololab/v1/identity/oidc/.well-known/keys"
   #     BoundAudiences = ["consul-jwt-auth"]
-  #     BoundIssuer    = "https://vault.day0.sololab/v1/identity/oidc"
+  #     BoundIssuer    = "https://vault.day1.sololab/v1/identity/oidc"
   #     ClaimMappings = {
   #       username = "username"
   #     }

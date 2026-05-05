@@ -1,11 +1,11 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
 prov_ldap = {
-  host          = "lldap.day0.sololab" # "opendj.day1.sololab"
+  host          = "lldap.day1.sololab" # "opendj.day2.sololab"
   port          = "636"
   tls           = true
   tls_insecure  = true
@@ -19,7 +19,7 @@ vault_ldap_auth_backend = {
   #   certificate  = data.terraform_remote_state.root_ca.outputs.root_cert_pem
 
   # opendj
-  # url         = "ldaps://opendj.day1.sololab"
+  # url         = "ldaps://opendj.day2.sololab"
   # binddn      = "uid=readonly,ou=Services,dc=root,dc=sololab"
   # bindpass    = "P@ssw0rd"
   # userdn      = "ou=People,dc=root,dc=sololab"
@@ -39,7 +39,7 @@ vault_ldap_auth_backend = {
   #   groupattr    = "cn"
 
   ## lldap
-  url      = "ldaps://lldap.day0.sololab"
+  url      = "ldaps://lldap.day1.sololab"
   binddn   = "cn=readonly,ou=people,dc=root,dc=sololab"
   bindpass = "readonly"
   userdn   = "ou=people,dc=root,dc=sololab"

@@ -1,6 +1,6 @@
 postgresql:
   image:
-    registry: zot.day0.sololab
+    registry: zot.day1.sololab
     repository: sclorg/postgresql-16-c10s
     tag: "20250108"
   extraEnvVars:

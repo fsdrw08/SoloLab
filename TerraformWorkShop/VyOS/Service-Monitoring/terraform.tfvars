@@ -23,7 +23,7 @@ service_monitoring = {
   #   path = "service monitoring telegraf loki"
   #   configs = {
   #     "port" = "443"
-  #     "url"  = "https://loki.day1.sololab"
+  #     "url"  = "https://loki.day2.sololab"
   #   }
   # }
 }

@@ -14,13 +14,13 @@ metadata:
     name: example
     traefik.enable: "true"
     traefik.http.routers.example-app.entryPoints: web
-    traefik.http.routers.example-app.rule: Host(`example-app.day0.sololab`)
+    traefik.http.routers.example-app.rule: Host(`example-app.day1.sololab`)
     # traefik.http.routers.whoami.tls.certresolver: internal
     traefik.http.services.example-app.loadbalancer.server.port: "5555"
 spec:
   containers:
     - name: app
-      image: zot.day0.sololab/dexidp/example-app:latest
+      image: zot.day1.sololab/dexidp/example-app:latest
       imagePullPolicy: IfNotPresent
       resources:
         limits:
@@ -40,7 +40,7 @@ spec:
         - --client-secret
         - ${clientSecret}
         - --redirect-uri
-        - http://example-app.day0.sololab/callback
+        - http://example-app.day1.sololab/callback
       volumeMounts:
         - name: ssl
           mountPath: /certs

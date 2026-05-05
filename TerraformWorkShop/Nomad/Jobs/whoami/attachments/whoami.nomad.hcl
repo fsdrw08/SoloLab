@@ -35,7 +35,7 @@ job "whoami" {
       driver = "docker"
 
       config {
-        image = "zot.day0.sololab/traefik/whoami:v1.10"
+        image = "zot.day1.sololab/traefik/whoami:v1.10"
         args = [
           # "--port=8081",
           "--port=${NOMAD_PORT_http}",

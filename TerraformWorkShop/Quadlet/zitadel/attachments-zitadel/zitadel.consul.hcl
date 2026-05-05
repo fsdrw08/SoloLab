@@ -25,7 +25,7 @@ services {
 
   meta = {
     prom_target_scheme       = "https"
-    prom_target_address      = "zot.day0.sololab"
+    prom_target_address      = "zot.day1.sololab"
     health_check_path        = "v2/"
     prom_target_metrics_path = "metrics"
   }

@@ -78,7 +78,7 @@ job "gitea" {
       driver = "podman"
       config {
         # https://github.com/go-gitea/gitea/blob/v1.25.4/Dockerfile.rootless
-        image = "zot.day0.sololab/gitea/gitea:1.25.4-rootless"
+        image = "zot.day1.sololab/gitea/gitea:1.25.4-rootless"
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.gitea-redirect.entrypoints" = "web"

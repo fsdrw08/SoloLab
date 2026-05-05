@@ -8,13 +8,13 @@ powerdns:
     traefik.enable: true
     # pdns-auth
     traefik.http.routers.pdns-auth-web.entrypoints: webSecure
-    traefik.http.routers.pdns-auth-web.rule: Host(`pdns-auth.day0.sololab`)
+    traefik.http.routers.pdns-auth-web.rule: Host(`pdns-auth.day1.sololab`)
     traefik.http.routers.pdns-auth-web.tls: true
     traefik.http.routers.pdns-auth-web.service: pdns-auth-web
     traefik.http.services.pdns-auth-web.loadbalancer.server.port: 8081
     # pdns-recursor
     traefik.http.routers.pdns-recursor-web.entrypoints: webSecure
-    traefik.http.routers.pdns-recursor-web.rule: Host(`pdns-recursor.day0.sololab`)
+    traefik.http.routers.pdns-recursor-web.rule: Host(`pdns-recursor.day1.sololab`)
     traefik.http.routers.pdns-recursor-web.tls: true
     traefik.http.routers.pdns-recursor-web.service: pdns-recursor-web
     traefik.http.services.pdns-recursor-web.loadbalancer.server.port: 8082

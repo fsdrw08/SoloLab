@@ -30,7 +30,7 @@ param (
 
     [Parameter()]
     [string]
-    $PrivateRegistry = "https://sftpgo.day0.sololab",
+    $PrivateRegistry = "https://sftpgo.day1.sololab",
 
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]

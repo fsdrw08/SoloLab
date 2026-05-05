@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
+    conn_str    = "postgres://terraform:terraform@tfbackend-pg.day1.sololab/tfstate?sslmode=require&sslrootcert="
     schema_name = "MinIO-Infra-Buckets"
   }
 }

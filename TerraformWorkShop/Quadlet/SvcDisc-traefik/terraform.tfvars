@@ -7,7 +7,7 @@ prov_remote = {
 
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab"
+  address         = "vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -21,7 +21,7 @@ podman_kube = {
       value_ref = {
         vault_kvv2 = {
           mount = "kvv2_certs"
-          name  = "traefik.day1.sololab"
+          name  = "traefik.day2.sololab"
         }
       }
       value_sets = [
@@ -71,12 +71,12 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "https://pdns.day0.sololab"
+  server_url = "https://pdns.day1.sololab"
 }
 
 dns_record = {
-  zone = "day1.sololab."
-  name = "traefik.day1.sololab."
+  zone = "day2.sololab."
+  name = "traefik.day2.sololab."
   type = "A"
   ttl  = 86400
   records = [

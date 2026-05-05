@@ -13,7 +13,7 @@ vhds = [
     size       = 128849018880
   },
   {
-    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-FCOS.vhdx"
+    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day1-FCOS.vhdx"
     block_size = 0
     type       = "Dynamic"
     size       = 128849018880
@@ -37,13 +37,13 @@ vhds = [
     size       = 128849018880
   },
   # {
-  #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-FCOS01.vhdx"
+  #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day1-FCOS01.vhdx"
   #   block_size = 0
   #   type       = "Dynamic"
   #   size       = 42949672960
   # },
   # {
-  #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-FCOS02.vhdx"
+  #   path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day1-FCOS02.vhdx"
   #   block_size = 0
   #   type       = "Dynamic"
   #   size       = 42949672960

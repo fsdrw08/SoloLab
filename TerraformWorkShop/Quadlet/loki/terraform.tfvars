@@ -1,5 +1,5 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -78,7 +78,7 @@ podman_quadlet = {
             KubeDownForce = "false"
             yaml          = "loki-aio.yaml"
             # service
-            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day0.sololab/minio/health/live"
+            ExecStartPre = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://minio-api.day1.sololab/minio/health/live"
             ## https://community.grafana.com/t/ingester-is-not-ready-automatically-until-a-call-to-ready/100891/4
             # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 80-90 -n 1) && podman healthcheck run loki-server \"" # || sleep $(shuf -i 30-35 -n 1) && podman healthcheck run loki-server \""
             ExecStartPost = ""

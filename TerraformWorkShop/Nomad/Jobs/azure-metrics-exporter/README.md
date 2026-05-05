@@ -5,7 +5,7 @@ Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
 
 $credential = Get-Credential -Message "credential to login vault"
 
-$vaultBaseUri = New-Object System.Uri("https://vault.day0.sololab/")
+$vaultBaseUri = New-Object System.Uri("https://vault.day1.sololab/")
 $vaultLoginEndpoint = "/v1/auth/ldap/login/$($credential.UserName)"
 $vaultLoginUri = New-Object System.Uri($vaultBaseUri, "/v1/auth/ldap/login/$($credential.UserName)")
 $vaultLoginUri.AbsoluteUri

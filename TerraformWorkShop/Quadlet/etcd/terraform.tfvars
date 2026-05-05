@@ -20,7 +20,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "etcd-server.day0"
+            cert_name = "etcd-server.day1"
           }
           value_sets = [
             {

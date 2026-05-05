@@ -40,7 +40,7 @@ job "jenkins" {
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
-        image   = "zot.day0.sololab/jenkins/jenkins:2.555.1-lts"
+        image   = "zot.day1.sololab/jenkins/jenkins:2.555.1-lts"
         command = "jenkins-plugin-cli"
         args    = ["-f", "/var/jenkins_home/plugins.txt", "--plugin-download-directory", "/var/jenkins_home/plugins/"]
         volumes = [
@@ -99,7 +99,7 @@ job "jenkins" {
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
-        image      = "zot.day0.sololab/jenkins/jenkins:2.555.1-lts"
+        image      = "zot.day1.sololab/jenkins/jenkins:2.555.1-lts"
         entrypoint = "/bin/bash"
         args = [
           "-c",
@@ -197,7 +197,7 @@ job "jenkins" {
       config {
         # https://www.jenkins.io/doc/upgrade-guide/
         # https://hub.docker.com/r/jenkins/jenkins
-        image = "zot.day0.sololab/jenkins/jenkins:2.555.1-lts"
+        image = "zot.day1.sololab/jenkins/jenkins:2.555.1-lts"
         ports = [
           "jnlp",
         ]

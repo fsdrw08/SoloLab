@@ -24,14 +24,14 @@ ContainerName=cockpit
 
 Environment=TZ=Asia/Shanghai
 
-Image=zot.day0.sololab/cockpit/ws:346
+Image=zot.day1.sololab/cockpit/ws:346
 
 # Label="traefik.enable=true"
 # Label="traefik.http.routers.cockpit-redirect.entrypoints=web"
-# Label="traefik.http.routers.cockpit-redirect.rule=Host(`cockpit.day0.sololab`)"
+# Label="traefik.http.routers.cockpit-redirect.rule=Host(`cockpit.day1.sololab`)"
 # Label="traefik.http.routers.cockpit-redirect.middlewares=toHttps@file"
 # Label="traefik.http.routers.cockpit.entrypoints=webSecure"
-# Label="traefik.http.routers.cockpit.rule=Host(`cockpit.day0.sololab`)"
+# Label="traefik.http.routers.cockpit.rule=Host(`cockpit.day1.sololab`)"
 # Label="traefik.http.routers.cockpit.tls=true"
 # Label="traefik.http.services.cockpit.loadbalancer.server.port=9090"
 # Label="traefik.http.services.cockpit.loadbalancer.healthCheck.path=/ping"

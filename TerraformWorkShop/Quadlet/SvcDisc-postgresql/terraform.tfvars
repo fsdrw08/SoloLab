@@ -51,12 +51,12 @@ podman_quadlet = {
 
 prov_pdns = {
   api_key    = "powerdns"
-  server_url = "https://pdns.day0.sololab"
+  server_url = "https://pdns.day1.sololab"
 }
 
 dns_record = {
-  zone = "day1.sololab."
-  name = "keycloak-pgsql.day1.sololab."
+  zone = "day2.sololab."
+  name = "keycloak-pgsql.day2.sololab."
   type = "A"
   ttl  = 86400
   records = [

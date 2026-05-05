@@ -3,12 +3,12 @@ http:
   routers:
     zitadel-redirect:
       entrypoints: web
-      rule: Host(`zitadel.day0.sololab`) && !PathPrefix(`/ui/v2/login`)
+      rule: Host(`zitadel.day1.sololab`) && !PathPrefix(`/ui/v2/login`)
       middlewares: toHttps@file
       service: zitadel
     zitadel:
       entrypoints: webSecure
-      rule: Host(`zitadel.day0.sololab`) && !PathPrefix(`/ui/v2/login`)
+      rule: Host(`zitadel.day1.sololab`) && !PathPrefix(`/ui/v2/login`)
       tls: {}
       service: zitadel
   services:

@@ -1,6 +1,6 @@
 services {
   name = "alloy"
-  id   = "alloy-day0"
+  id   = "alloy-day1"
   port = 443 # 12345
 
   checks = [
@@ -20,7 +20,7 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "alloy.day0.sololab"
+    prom_blackbox_address           = "alloy.day1.sololab"
     prom_blackbox_health_check_path = "-/healthy"
   }
 }

@@ -87,7 +87,7 @@ job "traefik" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/library/traefik:v3.6.12"
+        image = "zot.day1.sololab/library/traefik:v3.6.12"
         labels = {
           "traefik.enable"                                      = "true"
           "traefik.http.routers.dashboard-redirect.entrypoints" = "web"

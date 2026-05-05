@@ -1,6 +1,6 @@
 services {
   name = "consul-client"
-  id   = "consul-client-day0"
+  id   = "consul-client-day1"
   port = 8501
 
   checks = [
@@ -17,10 +17,10 @@ services {
   # tags = [
   #   "traefik.enable=true",
   #   "traefik.http.routers.consul-redirect.entrypoints=web",
-  #   "traefik.http.routers.consul-redirect.rule=Host(`consul-client.day0.sololab`)",
+  #   "traefik.http.routers.consul-redirect.rule=Host(`consul-client.day1.sololab`)",
   #   "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
   #   "traefik.http.routers.consul.entrypoints=webSecure",
-  #   "traefik.http.routers.consul.rule=Host(`consul-client.day0.sololab`)",
+  #   "traefik.http.routers.consul.rule=Host(`consul-client.day1.sololab`)",
   #   "traefik.http.routers.consul.tls=true",
   #   "traefik.http.services.consul.loadBalancer.serversTransport=consul@file",
   #   "traefik.http.services.consul.loadbalancer.server.scheme=https",

@@ -1,5 +1,5 @@
 prov_sftpgo = {
-  host     = "https://sftpgo.day0.sololab"
+  host     = "https://sftpgo.day1.sololab"
   username = "admin"
   password = "P@ssw0rd"
 }

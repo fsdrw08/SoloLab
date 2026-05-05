@@ -1,6 +1,6 @@
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab"
+  address         = "vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -42,7 +42,7 @@ intermediate_cas = [
         allow_any_name   = true
       },
     ]
-    public_fqdn = "vault.day0.sololab"
+    public_fqdn = "vault.day1.sololab"
   },
   # day3
   {
@@ -75,7 +75,7 @@ intermediate_cas = [
       },
     ]
     acme_allowed_roles = ["IntCA-Day3Plus-v1-role-acme"]
-    public_fqdn        = "vault.day0.sololab"
+    public_fqdn        = "vault.day1.sololab"
   },
   # consul int
   # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca

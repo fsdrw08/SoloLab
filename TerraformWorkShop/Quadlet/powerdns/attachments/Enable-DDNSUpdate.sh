@@ -18,7 +18,7 @@ create_zone() {
     curl -X POST -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" -d '{
         "name": "'"$ZONE_NAME"'",
         "kind": "Native",
-        "nameservers": ["ns1.day0.sololab."]
+        "nameservers": ["ns1.day1.sololab."]
     }' "$PDNS_HOST/api/v1/servers/localhost/zones"
 }
 
@@ -102,9 +102,9 @@ sleep 5
 # fi
 
 sleep 5
-# create_rrset zot.day0.sololab. A 192.168.255.10
-# create_rrset pdns-auth.day0.sololab. A 192.168.255.10
-# create_rrset pdns-recursor.day0.sololab. A 192.168.255.10
+# create_rrset zot.day1.sololab. A 192.168.255.10
+# create_rrset pdns-auth.day1.sololab. A 192.168.255.10
+# create_rrset pdns-recursor.day1.sololab. A 192.168.255.10
 
 if [ "$(check_tsig_key_exist)" != "200" ]; then
     echo "TSIG key $TSIG_KEY_ID does not exist, creating..."

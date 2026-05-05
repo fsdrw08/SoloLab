@@ -5,17 +5,17 @@ zitadel:
   hostAliases:
     - ip: host-gateway
       hostnames:
-        - lldap.day0.sololab
+        - lldap.day1.sololab
   # https://zitadel.com/docs/self-hosting/manage/reverseproxy/traefik
   # podLabels:
   #   traefik.enable: true
   #   traefik.http.routers.zitadel-redirect.entrypoints: web
-  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel-redirect.rule: Host(`zitadel.day1.sololab`)
   #   traefik.http.routers.zitadel-redirect.middlewares: toHttps@file
   #   traefik.http.routers.zitadel-redirect.service: zitadel
 
   #   traefik.http.routers.zitadel.entrypoints: webSecure
-  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day0.sololab`)
+  #   traefik.http.routers.zitadel.rule: Host(`zitadel.day1.sololab`)
   #   traefik.http.routers.zitadel.tls: true
   #   traefik.http.routers.zitadel.service: zitadel
 
@@ -44,7 +44,7 @@ zitadel:
         postgres:
           Host: # set in terraform zitadel-database
       ExternalPort: 443
-      ExternalDomain: zitadel.day0.sololab
+      ExternalDomain: zitadel.day1.sololab
     step:
       # https://zitadel.com/docs/self-hosting/deploy/compose
       # https://github.com/zitadel/zitadel/blob/v4.6.2/cmd/setup/steps.yaml
@@ -59,7 +59,7 @@ zitadel:
             # ref: https://github.com/zitadel/zitadel/blob/v4.6.2/docs/docs/self-hosting/deploy/docker-compose.yaml
             # login name = <FirstInstance.Org.Human.UserName>@<FirstInstance.Org.Name>.<ExternalDomain>
             # in this case:
-            # login name = admin@zitadel.zitadel.day0.sololab
+            # login name = admin@zitadel.zitadel.day1.sololab
             #
             UserName: admin
             Password: P@ssw0rd

@@ -21,7 +21,7 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "lldap.day0.sololab"
+    prom_blackbox_address           = "lldap.day1.sololab"
     prom_blackbox_health_check_path = "health"
   }
 }

@@ -10,12 +10,12 @@ terraform {
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">= 0.2.1"
+      version = ">= 0.2.0"
     }
   }
   backend "s3" {
-    bucket = "tfstate"                     # Name of the S3 bucket
-    key    = "System/Day0-Quadlet-Traefik" # Name of the tfstate file
+    bucket = "tfstate"                       # Name of the S3 bucket
+    key    = "System/Day1-Quadlet-Exporters" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio-api.vyos.sololab" # Minio endpoint

@@ -12,7 +12,7 @@ resource "nexus_repository_docker_proxy" "docker_proxy" {
   }
 
   storage {
-    blob_store_name                = "minio.day0"
+    blob_store_name                = "minio.day1"
     strict_content_type_validation = true
   }
 

@@ -63,7 +63,7 @@ job "prometheus-node-exporter" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day0.sololab/prometheus/node-exporter:v1.10.2"
+        image = "zot.day1.sololab/prometheus/node-exporter:v1.10.2"
         args = [
           "--path.rootfs=/host",
           "--web.listen-address=:9100",

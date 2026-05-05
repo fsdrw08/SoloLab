@@ -15,7 +15,7 @@ ExecStartPost=${ExecStartPost}
 [Container]
 ContainerName=traefik
 
-Image=zot.day0.sololab/library/traefik:v3.6.12
+Image=zot.day1.sololab/library/traefik:v3.6.12
 
 SecurityLabelType=spc_t
 
@@ -29,7 +29,7 @@ Exec=--accessLog=true \
   --certificatesResolvers.external.acme.certificatesDuration=2160 \
   --certificatesResolvers.external.acme.storage=/etc/traefik/tls/external.json \
   --certificatesResolvers.external.acme.tlsChallenge=true \
-  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab/v1/pki_sololab_day2/acme/directory \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day1.sololab/v1/pki_sololab_day2/acme/directory \
   --certificatesResolvers.internal.acme.certificatesDuration=2160 \
   --certificatesResolvers.internal.acme.storage=/etc/traefik/tls/internal.json \
   --certificatesResolvers.internal.acme.tlsChallenge=true \
@@ -44,7 +44,7 @@ Exec=--accessLog=true \
   --ping=true \
   --ping.entryPoint=traefik \
   --providers.consulCatalog=true \
-  --providers.consulCatalog.endpoint.address=consul.day0.sololab \
+  --providers.consulCatalog.endpoint.address=consul.day1.sololab \
   --providers.consulCatalog.endpoint.dataCenter=dc1 \
   --providers.consulCatalog.endpoint.scheme=https \
   --providers.consulCatalog.endpoint.tls.ca=/etc/traefik/tls/ca.crt \

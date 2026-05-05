@@ -10,7 +10,7 @@ terraform {
     }
   }
   backend "pg" {
-    conn_str    = "postgres://terraform:terraform@cockroach.day0.sololab/tfstate"
+    conn_str    = "postgres://terraform:terraform@cockroach.day1.sololab/tfstate"
     schema_name = "HyperV-Dev-Fedora-VM"
   }
 }

@@ -1,5 +1,5 @@
 prov_vault = {
-  address         = "https://vault.day0.sololab"
+  address         = "https://vault.day1.sololab"
   skip_tls_verify = true
 }
 

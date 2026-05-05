@@ -472,7 +472,7 @@ write_files:
       # plugin "docker" {
       #   config {
       #     allow_privileged = true
-      #     infra_image = "zot.day0.sololab/pause-amd64:3.3"
+      #     infra_image = "zot.day1.sololab/pause-amd64:3.3"
       #     volumes {
       #       enabled      = true
       #       selinuxlabel = "z"

@@ -46,7 +46,7 @@ job "nfs-ganesha" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image        = "zot.day0.sololab/hectorm/nfs-ganesha:v10"
+        image        = "zot.day1.sololab/hectorm/nfs-ganesha:v10"
         network_mode = "host"
         security_opt = [
           "label=type:spc_t",

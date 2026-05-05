@@ -7,7 +7,7 @@ prov_hyperv = {
 
 prov_vault = {
   schema          = "https"
-  address         = "vault.day0.sololab"
+  address         = "vault.day1.sololab"
   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
@@ -74,29 +74,29 @@ butane = {
       ssh_authorized_keys_1000 = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
       password_hash_1001       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
       ssh_authorized_keys_1001 = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
-      root_ca_url              = "http://dufs.day0.sololab/public/certs/sololab_root.crt"
-      fcos_image_mirror        = "zot.day0.sololab/fedora/fedora-coreos"
-      fcos_rebase_mirror       = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
+      root_ca_url              = "http://dufs.day1.sololab/public/certs/sololab_root.crt"
+      fcos_image_mirror        = "zot.day1.sololab/fedora/fedora-coreos"
+      fcos_rebase_mirror       = "ostree-unverified-registry:zot.day1.sololab/fedora/fedora-coreos:stable"
       custom_root_ca_path      = "/etc/pki/ca-trust/source/anchors"
       custom_bin_dir           = "/opt/bin"
       # consul client
-      consul_download_url = "http://dufs.day0.sololab/public/binaries/consul_1.22.6_linux_amd64.zip"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_1.22.6_linux_amd64.zip"
       consul_version      = "1.22.6"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/mnt/data/consul"
       # nomad client
-      nomad_download_url                  = "http://dufs.day0.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_1.11.3_linux_amd64.zip"
       nomad_version                       = "1.11.3"
       nomad_server_fqdn                   = "nomad.service.consul"
-      nomad_podman_driver_download_url    = "http://dufs.day0.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
+      nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
       nomad_podman_driver_version         = "0.6.4"
-      nomad_client_cert_download_url      = "http://dufs.day0.sololab/private/certs/client.global.nomad.crt"
-      nomad_client_cert_key_download_url  = "http://dufs.day0.sololab/private/certs/client.global.nomad.key"
+      nomad_client_cert_download_url      = "http://dufs.day1.sololab/private/certs/client.global.nomad.crt"
+      nomad_client_cert_key_download_url  = "http://dufs.day1.sololab/private/certs/client.global.nomad.key"
       nomad_client_cert_download_url_cred = "YWRtaW46YWRtaW4="
       nomad_config_dir                    = "/etc/nomad.d"
       nomad_data_dir                      = "/var/mnt/data/nomad"
-      vault_server_address                = "https://vault.day0.sololab"
+      vault_server_address                = "https://vault.day1.sololab"
     }
     local = [
       {

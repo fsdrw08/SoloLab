@@ -19,7 +19,7 @@ terraform {
   }
   backend "s3" {
     bucket = "tfstate"                    # Name of the S3 bucket
-    key    = "System/Day0-Quadlet-whoami" # Name of the tfstate file
+    key    = "System/Day1-Quadlet-whoami" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio-api.vyos.sololab" # Minio endpoint

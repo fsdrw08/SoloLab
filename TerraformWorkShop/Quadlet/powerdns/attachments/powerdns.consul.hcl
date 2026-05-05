@@ -1,5 +1,5 @@
 services {
-  name = "powerdns-day0"
+  name = "powerdns-day1"
   id   = "powerdns-auth"
   port = 8081
 
@@ -21,7 +21,7 @@ services {
 }
 
 services {
-  name = "powerdns-day0"
+  name = "powerdns-day1"
   id   = "powerdns-recursor"
   port = 8082
 

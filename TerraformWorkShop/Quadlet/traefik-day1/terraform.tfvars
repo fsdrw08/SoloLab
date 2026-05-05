@@ -20,7 +20,7 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "wildcard.day0"
+            cert_name = "wildcard.day1"
           }
           value_sets = [
             {
@@ -28,11 +28,11 @@ podman_kubes = [
               value_ref_key = "ca"
             },
             {
-              name          = "traefik.secret.tls.contents.\"day0\\.crt\""
+              name          = "traefik.secret.tls.contents.\"day1\\.crt\""
               value_ref_key = "cert_pem_chain"
             },
             {
-              name          = "traefik.secret.tls.contents.\"day0\\.key\""
+              name          = "traefik.secret.tls.contents.\"day1\\.key\""
               value_ref_key = "key_pem"
             }
           ]

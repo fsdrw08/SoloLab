@@ -6,7 +6,7 @@ prov_nexus = {
 }
 
 # prov_vault = {
-#   address         = "https://vault.day0.sololab"
+#   address         = "https://vault.day1.sololab"
 #   token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
 #   skip_tls_verify = true
 # }
@@ -15,7 +15,7 @@ prov_nexus = {
 ldap = {
   name                         = "LLDAP"
   protocol                     = "LDAPS"
-  host                         = "lldap.day0.sololab"
+  host                         = "lldap.day1.sololab"
   port                         = 636
   auth_schema                  = "SIMPLE"
   auth_username                = "cn=readonly,ou=people,dc=root,dc=sololab"

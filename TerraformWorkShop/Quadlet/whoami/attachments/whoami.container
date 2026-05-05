@@ -18,18 +18,18 @@ Restart=${Restart}
 [Container]
 ContainerName=whoami
 
-Image=zot.day0.sololab/traefik/whoami:v1.10
+Image=zot.day1.sololab/traefik/whoami:v1.10
 Exec="--port=8082"
 
 Label="traefik.enable=true"
 
 Label="traefik.http.routers.whoami-redirect.entrypoints=web"
-Label="traefik.http.routers.whoami-redirect.rule=Host(`whoami.day0.sololab`)"
+Label="traefik.http.routers.whoami-redirect.rule=Host(`whoami.day1.sololab`)"
 Label="traefik.http.routers.whoami-redirect.middlewares=toHttps@file"
 Label="traefik.http.routers.whoami-redirect.service=whoami"
 
 Label="traefik.http.routers.whoami.entryPoints=webSecure"
-Label="traefik.http.routers.whoami.rule=Host(`whoami.day0.sololab`)"
+Label="traefik.http.routers.whoami.rule=Host(`whoami.day1.sololab`)"
 Label="traefik.http.routers.whoami.tls=true"
 Label="traefik.http.routers.whoami.service=whoami"
 

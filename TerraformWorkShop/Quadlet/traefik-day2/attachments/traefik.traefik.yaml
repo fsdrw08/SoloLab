@@ -28,5 +28,5 @@ http:
   #       certresolver: internal
   # tls:
   #   certificates:
-  #     - certFile: /etc/traefik/tls/day0.crt
-  #       keyFile: /etc/traefik/tls/day0.key
+  #     - certFile: /etc/traefik/tls/day1.crt
+  #       keyFile: /etc/traefik/tls/day1.key

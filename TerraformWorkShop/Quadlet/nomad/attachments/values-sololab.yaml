@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.day0.sololab
+  imageRegistry: zot.day1.sololab
 nomad:
   image:
     repository: multani/nomad
@@ -7,7 +7,7 @@ nomad:
   # hostAliases:
   #   - ip: "host-gateway"
   #     hostnames:
-  #       - "vault.day0.sololab"
+  #       - "vault.day1.sololab"
   containerPorts: []
   livenessProbe:
     enabled: true
