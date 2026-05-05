@@ -7,6 +7,6 @@ resource "hyperv_vhd" "data" {
   size       = each.value.size
   block_size = each.value.block_size
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = true
   }
 }

@@ -7,7 +7,7 @@ prov_hyperv = {
 
 vhds = [
   {
-    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\VyOS.vhdx"
+    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day0-VyOS.vhdx"
     block_size = 0
     type       = "Dynamic"
     size       = 128849018880
@@ -49,4 +49,3 @@ vhds = [
   #   size       = 42949672960
   # },
 ]
-prevent_destroy = true

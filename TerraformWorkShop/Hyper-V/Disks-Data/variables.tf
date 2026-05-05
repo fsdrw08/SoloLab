@@ -17,8 +17,3 @@ variable "vhds" {
     })
   )
 }
-
-variable "prevent_destroy" {
-  type    = bool
-  default = true
-}
