@@ -336,19 +336,19 @@ zones = [
     ]
   },
   {
-    name        = "day3.sololab."
-    nameservers = ["ns1.day3.sololab."]
+    name        = "day4.sololab."
+    nameservers = ["ns1.day4.sololab."]
     records = [
       {
-        fqdn = "day3.sololab."
+        fqdn = "day4.sololab."
         type = "SOA"
         ttl  = 60
         results = [
-          "ns1.day3.sololab. day3.sololab. 2025081301 3600 600 1814400 7200"
+          "ns1.day4.sololab. day4.sololab. 2025081301 3600 600 1814400 7200"
         ]
       },
       {
-        fqdn = "traefik.day3.sololab."
+        fqdn = "traefik.day4.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -356,7 +356,7 @@ zones = [
         ]
       },
       {
-        fqdn = "gitblit.day3.sololab."
+        fqdn = "gitblit.day4.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -364,7 +364,7 @@ zones = [
         ]
       },
       {
-        fqdn = "nexus.day3.sololab."
+        fqdn = "nexus.day4.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -372,7 +372,7 @@ zones = [
         ]
       },
       {
-        fqdn = "jenkins.day3.sololab."
+        fqdn = "jenkins.day4.sololab."
         type = "A"
         ttl  = 60
         results = [

@@ -58,7 +58,7 @@ oidc_client = [
     name         = "jenkins"
     allow_groups = ["app-jenkins-user"]
     redirect_uris = [
-      "https://jenkins.day3.sololab/securityRealm/finishLogin",
+      "https://jenkins.day4.sololab/securityRealm/finishLogin",
     ]
   },
 ]

@@ -100,7 +100,7 @@ dynamic_host_volumes = [
   #     {
   #       attribute = "$${attr.unique.hostname}"
   #       operator  = "=="
-  #       value     = "day3"
+  #       value     = "day4"
   #     }
   #   ]
   #   capability = {
@@ -118,7 +118,7 @@ dynamic_host_volumes = [
   #     {
   #       attribute = "$${attr.unique.hostname}"
   #       operator  = "=="
-  #       value     = "day3"
+  #       value     = "day4"
   #     }
   #   ]
   #   capability = {
@@ -136,7 +136,7 @@ dynamic_host_volumes = [
   #     {
   #       attribute = "$${attr.unique.hostname}"
   #       operator  = "=="
-  #       value     = "day3"
+  #       value     = "day4"
   #     }
   #   ]
   #   capability = {
@@ -155,7 +155,7 @@ dynamic_host_volumes = [
   #     {
   #       attribute = "$${attr.unique.hostname}"
   #       operator  = "=="
-  #       value     = "day3"
+  #       value     = "day4"
   #     }
   #   ]
   #   capability = {

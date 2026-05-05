@@ -90,13 +90,13 @@ unclassified:
 
   location:
     adminAddress: null
-    url: "https://jenkins.day3.sololab"
+    url: "https://jenkins.day4.sololab"
   # https://www.jenkins.io/doc/book/security/user-content/#resource-root-url
   # https://www.jenkins.io/doc/book/security/configuring-content-security-policy/
   # https://www.jenkins.io/doc/book/security/csp/
   # in order to allow jenkins web origin site script run(for oidc login), we need to set resourceRoot to jenkins url
   resourceRoot:
-    url: "https://jenkins.day3.sololab/"
+    url: "https://jenkins.day4.sololab/"
 
 credentials:
   system:

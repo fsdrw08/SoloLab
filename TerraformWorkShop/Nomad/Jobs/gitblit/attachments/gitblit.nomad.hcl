@@ -13,7 +13,7 @@ job "gitblit" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day3"
+    value     = "day4"
   }
 
   group "gitblit" {
@@ -42,7 +42,7 @@ job "gitblit" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(gitblit.day3.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(gitblit.day4.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
@@ -77,7 +77,7 @@ job "gitblit" {
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.gitblit-redirect.entrypoints" = "web"
-          "traefik.http.routers.gitblit-redirect.rule"        = "(Host(`gitblit.day3.sololab`)||Host(`gitblit.service.consul`))"
+          "traefik.http.routers.gitblit-redirect.rule"        = "(Host(`gitblit.day4.sololab`)||Host(`gitblit.service.consul`))"
           "traefik.http.routers.gitblit-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.gitblit-redirect.service"     = "gitblit"
 
@@ -87,7 +87,7 @@ job "gitblit" {
           "traefik.http.middlewares.gitblit-HSTSHeader.headers.stsIncludeSubdomains" = "true"
 
           "traefik.http.routers.gitblit.entryPoints" = "webSecure"
-          "traefik.http.routers.gitblit.rule"        = "(Host(`gitblit.day3.sololab`)||Host(`gitblit.service.consul`))"
+          "traefik.http.routers.gitblit.rule"        = "(Host(`gitblit.day4.sololab`)||Host(`gitblit.service.consul`))"
           "traefik.http.routers.gitblit.middlewares" = "gitblit-HSTSHeader@docker"
           "traefik.http.routers.gitblit.tls"         = "true"
           "traefik.http.routers.gitblit.service"     = "gitblit"

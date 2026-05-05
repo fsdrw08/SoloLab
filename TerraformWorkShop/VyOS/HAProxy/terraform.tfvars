@@ -241,35 +241,35 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  day3_frontend_traefik = {
+  day4_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 400"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "traefik.day3.sololab"
+      "domain-name" = "traefik.day4.sololab"
       "set backend" = "day1"
     }
   }
-  day3_frontend_gitblit = {
+  day4_frontend_gitblit = {
     path = "load-balancing haproxy service tcp443 rule 410"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "gitblit.day3.sololab"
+      "domain-name" = "gitblit.day4.sololab"
       "set backend" = "day1"
     }
   }
-  day3_frontend_nexus = {
+  day4_frontend_nexus = {
     path = "load-balancing haproxy service tcp443 rule 420"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "nexus.day3.sololab"
+      "domain-name" = "nexus.day4.sololab"
       "set backend" = "day1"
     }
   }
-  day3_frontend_jenkins = {
+  day4_frontend_jenkins = {
     path = "load-balancing haproxy service tcp443 rule 430"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "jenkins.day3.sololab"
+      "domain-name" = "jenkins.day4.sololab"
       "set backend" = "day1"
     }
   }

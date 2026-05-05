@@ -16,7 +16,7 @@ job "jenkins" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day3"
+    value     = "day4"
   }
   group "jenkins" {
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
@@ -160,7 +160,7 @@ job "jenkins" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(jenkins.day3.sololab) & re-encrypt(server transport(jenkins.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(jenkins.day4.sololab) & re-encrypt(server transport(jenkins.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",

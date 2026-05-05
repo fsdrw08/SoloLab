@@ -316,7 +316,7 @@ dns_records = [
     }
   },
   {
-    hostname = "traefik.day3.sololab"
+    hostname = "traefik.day4.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -327,7 +327,7 @@ dns_records = [
     }
   },
   {
-    hostname = "gitblit.day3.sololab"
+    hostname = "gitblit.day4.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -338,7 +338,7 @@ dns_records = [
     }
   },
   {
-    hostname = "nexus.day3.sololab"
+    hostname = "nexus.day4.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -349,7 +349,7 @@ dns_records = [
     }
   },
   {
-    hostname = "jenkins.day3.sololab"
+    hostname = "jenkins.day4.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"

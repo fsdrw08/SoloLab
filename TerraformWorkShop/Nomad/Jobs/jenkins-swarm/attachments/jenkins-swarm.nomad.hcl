@@ -36,7 +36,7 @@ job "jenkins-swarm" {
         #   initial_status = "passing"
         # }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(jenkins.day3.sololab) & re-encrypt(server transport(jenkins.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(jenkins.day4.sololab) & re-encrypt(server transport(jenkins.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         # tags = [
         #   "metrics-exposing-blackbox",

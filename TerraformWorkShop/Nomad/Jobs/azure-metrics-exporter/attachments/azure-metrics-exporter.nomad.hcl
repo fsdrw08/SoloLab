@@ -35,7 +35,7 @@ job "azure-metrics-exporter" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(nexus3.day3.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(nexus3.day4.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "log",
@@ -140,7 +140,7 @@ job "azure-metrics-exporter" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(nexus3.day3.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
+        #   traefik.day1 -[http route: decrypt(nexus3.day4.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
         #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "log",

@@ -1,5 +1,5 @@
 # https://github.com/jenkinsci/swarm-plugin?tab=readme-ov-file#available-options
-url: https://jenkins.day3.sololab
+url: https://jenkins.day4.sololab
 disableSslVerification: true
 name: day5-centos
 description: Configured from yml
