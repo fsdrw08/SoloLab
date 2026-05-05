@@ -13,7 +13,7 @@ prov_vault = {
 
 vm = {
   count     = 1
-  base_name = "Day4-CentOS"
+  base_name = "Day5-CentOS"
   vhd = {
     dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-hyperv_g2-centos-stream-10\\Virtual Hard Disks\\packer-centos-stream-10.vhdx"
@@ -73,7 +73,7 @@ cloudinit = {
     }
     local = [
       {
-        local_hostname = "day4-centos"
+        local_hostname = "day5-centos"
       }
     ]
     value_refers = [

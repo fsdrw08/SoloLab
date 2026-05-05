@@ -16,7 +16,7 @@ terraform {
   backend "consul" {
     address = "consul.day1.sololab"
     scheme  = "https"
-    path    = "tfstate/Hyper-V/VM-Day4-Debian"
+    path    = "tfstate/Hyper-V/VM-Day5-Debian"
   }
 }
 

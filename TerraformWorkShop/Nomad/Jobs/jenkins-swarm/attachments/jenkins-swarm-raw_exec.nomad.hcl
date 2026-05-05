@@ -14,7 +14,7 @@ job "jenkins-swarm" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "regexp"
-    value     = "^day4"
+    value     = "^day5"
   }
   group "jenkins-swarm" {
     # https://developer.hashicorp.com/nomad/docs/job-specification/task

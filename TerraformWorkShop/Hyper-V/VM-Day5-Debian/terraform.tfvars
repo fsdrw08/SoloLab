@@ -14,7 +14,7 @@ prov_vault = {
 
 vm = {
   count     = 1
-  base_name = "Day4-Debian"
+  base_name = "Day5-Debian"
   vhd = {
     dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-hyperv_g2-debian13\\Virtual Hard Disks\\packer-debian13.vhdx"
@@ -71,7 +71,7 @@ cloudinit = {
     }
     local = [
       {
-        local_hostname = "day4-debian"
+        local_hostname = "day5-debian"
       }
     ]
     value_refers = [
