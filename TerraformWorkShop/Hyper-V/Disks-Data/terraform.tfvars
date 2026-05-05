@@ -49,3 +49,4 @@ vhds = [
   #   size       = 42949672960
   # },
 ]
+prevent_destroy = true
