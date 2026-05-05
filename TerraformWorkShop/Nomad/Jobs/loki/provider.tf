@@ -14,7 +14,7 @@ terraform {
     key    = "Nomad/Job-Loki" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.day1.sololab" # Minio endpoint
+      s3 = "https://minio-api.day2.sololab" # Minio endpoint
     }
 
     access_key = "terraform" # Access and secret keys

@@ -22,18 +22,18 @@ services {
 
     # "traefik.enable=true",
     # "traefik.http.routers.prometheus-blackbox-exporter-redirect.entrypoints=web",
-    # "traefik.http.routers.prometheus-blackbox-exporter-redirect.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    # "traefik.http.routers.prometheus-blackbox-exporter-redirect.rule=Host(`prometheus-blackbox-exporter.day2.sololab`)",
     # "traefik.http.routers.prometheus-blackbox-exporter-redirect.middlewares=toHttps@file",
     # "traefik.http.routers.prometheus-blackbox-exporter.entryPoints=webSecure",
-    # "traefik.http.routers.prometheus-blackbox-exporter.rule=Host(`prometheus-blackbox-exporter.day1.sololab`)",
+    # "traefik.http.routers.prometheus-blackbox-exporter.rule=Host(`prometheus-blackbox-exporter.day2.sololab`)",
     # "traefik.http.routers.prometheus-blackbox-exporter.tls=true",
   ]
   meta = {
     prom_blackbox_scheme  = "https"
-    prom_blackbox_address = "prometheus-blackbox-exporter.day1.sololab"
+    prom_blackbox_address = "prometheus-blackbox-exporter.day2.sololab"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "prometheus-blackbox-exporter.day1.sololab"
+    prom_target_address      = "prometheus-blackbox-exporter.day2.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

@@ -52,7 +52,7 @@ prometheus:
             ca_file: /etc/prometheus/secrets/certs/ca.crt
           metrics_path: /probe
           params:
-            module: [http_2xx]
+            module: [ http_2xx ]
           consul_sd_configs:
             - server: consul.service.consul:8501
               datacenter: dc1
@@ -64,7 +64,7 @@ prometheus:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           # https://github.com/unixhot/opsany-paas/blob/ea905341cd02a8562883a8a0dc05f2db812b94aa/install/conf/prometheus/prometheus.yml#L92C7-L97C31
           relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
+            - source_labels: [ "__meta_consul_tags" ]
               regex: .*,metrics-exposing-blackbox,.*
               action: keep
             # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config
@@ -85,13 +85,13 @@ prometheus:
               regex: (.+);(.+);([1-9][0-9]*);(.*)
               replacement: ${1}://${2}:${3}/${4}
               target_label: __param_target
-            - source_labels: [__param_target]
+            - source_labels: [ __param_target ]
               target_label: instance
             # blackbox exporter config
             - target_label: __scheme__
               replacement: https
             - target_label: __address__
-              replacement: prometheus-blackbox-exporter.day1.sololab
+              replacement: prometheus-blackbox-exporter.day2.sololab
         # - job_name: postgres_exporter
         #   scrape_interval: 300s
         #   scrape_timeout: 10s
@@ -150,11 +150,10 @@ prometheus:
               authorization:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
+            - source_labels: [ "__meta_consul_tags" ]
               regex: .*,metrics-exposing-general,.*
               action: keep
-            - source_labels:
-                ["__meta_consul_service_metadata_prom_target_scheme"]
+            - source_labels: [ "__meta_consul_service_metadata_prom_target_scheme" ]
               target_label: __scheme__
             - source_labels:
                 - __meta_consul_service_metadata_prom_target_address
@@ -193,11 +192,10 @@ prometheus:
               authorization:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
+            - source_labels: [ "__meta_consul_tags" ]
               regex: .*,metrics-exposing-vault,.*
               action: keep
-            - source_labels:
-                ["__meta_consul_service_metadata_prom_target_scheme"]
+            - source_labels: [ "__meta_consul_service_metadata_prom_target_scheme" ]
               target_label: __scheme__
             - source_labels:
                 - __meta_consul_service_metadata_prom_target_address
@@ -233,11 +231,10 @@ prometheus:
               authorization:
                 credentials_file: /etc/prometheus/secrets/others/consul-token
           relabel_configs:
-            - source_labels: ["__meta_consul_tags"]
+            - source_labels: [ "__meta_consul_tags" ]
               regex: .*,metrics-exposing-consul,.*
               action: keep
-            - source_labels:
-                ["__meta_consul_service_metadata_prom_target_scheme"]
+            - source_labels: [ "__meta_consul_service_metadata_prom_target_scheme" ]
               target_label: __scheme__
             - source_labels:
                 - __meta_consul_service_metadata_prom_target_address
@@ -266,12 +263,12 @@ prometheus:
   podLabels:
     traefik.enable: true
     traefik.http.routers.prometheus-redirect.entrypoints: web
-    traefik.http.routers.prometheus-redirect.rule: Host(`prometheus.day1.sololab`)
+    traefik.http.routers.prometheus-redirect.rule: Host(`prometheus.day2.sololab`)
     traefik.http.routers.prometheus-redirect.middlewares: toHttps@file
     traefik.http.routers.prometheus-redirect.service: prometheus
 
     traefik.http.routers.prometheus.entryPoints: webSecure
-    traefik.http.routers.prometheus.rule: Host(`prometheus.day1.sololab`)
+    traefik.http.routers.prometheus.rule: Host(`prometheus.day2.sololab`)
     traefik.http.routers.prometheus.tls: true
     traefik.http.routers.prometheus.service: prometheus
 

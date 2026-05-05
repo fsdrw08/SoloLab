@@ -23,21 +23,21 @@ services {
 
     # "traefik.enable=true",
     # "traefik.http.routers.prometheus-redirect.entrypoints=web",
-    # "traefik.http.routers.prometheus-redirect.rule=Host(`prometheus.day1.sololab`)",
+    # "traefik.http.routers.prometheus-redirect.rule=Host(`prometheus.day2.sololab`)",
     # "traefik.http.routers.prometheus-redirect.middlewares=toHttps@file",
     # "traefik.http.routers.prometheus.entryPoints=webSecure",
-    # "traefik.http.routers.prometheus.rule=Host(`prometheus.day1.sololab`)",
+    # "traefik.http.routers.prometheus.rule=Host(`prometheus.day2.sololab`)",
     # "traefik.http.routers.prometheus.tls=true",
     # "traefik.http.services.prometheus.loadBalancer.serversTransport=prometheus@file",
     # "traefik.http.services.prometheus.loadbalancer.server.scheme=https",
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "prometheus.day1.sololab"
+    prom_blackbox_address           = "prometheus.day2.sololab"
     prom_blackbox_health_check_path = "metrics"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "prometheus.day1.sololab"
+    prom_target_address      = "prometheus.day2.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

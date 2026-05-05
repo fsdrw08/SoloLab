@@ -15,18 +15,18 @@ http:
   #     middlewares:
   #       - toHttps@file
   #       - userPass@file
-  #     rule: Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))
+  #     rule: Host(`traefik.day2.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))
   #     service: api@internal
   #   dashboard:
   #     entryPoints:
   #       - webSecure
   #     middlewares:
   #       - userPass@file
-  #     rule: Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))
+  #     rule: Host(`traefik.day2.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))
   #     service: api@internal
   #     tls:
   #       certresolver: internal
-# tls:
-#   certificates:
-#     - certFile: /etc/traefik/tls/day0.crt
-#       keyFile: /etc/traefik/tls/day0.key
+  # tls:
+  #   certificates:
+  #     - certFile: /etc/traefik/tls/day0.crt
+  #       keyFile: /etc/traefik/tls/day0.key

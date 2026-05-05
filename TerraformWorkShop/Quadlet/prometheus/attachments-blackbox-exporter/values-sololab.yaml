@@ -8,7 +8,7 @@ exporter:
           prober: http
           timeout: 5s
           http:
-            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            valid_http_versions: [ "HTTP/1.1", "HTTP/2.0" ]
             follow_redirects: true
             preferred_ip_protocol: "ip4"
             tls_config:
@@ -20,12 +20,12 @@ exporter:
   podLabels:
     traefik.enable: true
     traefik.http.routers.prometheus-blackbox-exporter-redirect.entrypoints: web
-    traefik.http.routers.prometheus-blackbox-exporter-redirect.rule: Host(`prometheus-blackbox-exporter.day1.sololab`)
+    traefik.http.routers.prometheus-blackbox-exporter-redirect.rule: Host(`prometheus-blackbox-exporter.day2.sololab`)
     traefik.http.routers.prometheus-blackbox-exporter-redirect.middlewares: toHttps@file
     traefik.http.routers.prometheus-blackbox-exporter-redirect.service: prometheus-blackbox-exporter
 
     traefik.http.routers.prometheus-blackbox-exporter.entryPoints: webSecure
-    traefik.http.routers.prometheus-blackbox-exporter.rule: Host(`prometheus-blackbox-exporter.day1.sololab`)
+    traefik.http.routers.prometheus-blackbox-exporter.rule: Host(`prometheus-blackbox-exporter.day2.sololab`)
     traefik.http.routers.prometheus-blackbox-exporter.tls: true
     traefik.http.routers.prometheus-blackbox-exporter.service: prometheus-blackbox-exporter
 

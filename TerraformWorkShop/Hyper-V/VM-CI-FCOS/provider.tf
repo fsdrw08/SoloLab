@@ -28,7 +28,7 @@ terraform {
 
   # https://ruben-rodriguez.github.io/posts/minio-s3-terraform-backend/
   backend "consul" {
-    address = "consul.day1.sololab"
+    address = "consul.day2.sololab"
     scheme  = "https"
     path    = "tfstate/Hyper-V/VM-CI-FCOS"
   }

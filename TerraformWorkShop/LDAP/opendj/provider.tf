@@ -7,7 +7,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@postgresql.day0.sololab/tfstate"
-    schema_name = "LDAP-OpenDJ-Day1"
+    schema_name = "LDAP-OpenDJ-Day2"
   }
 }
 

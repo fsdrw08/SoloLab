@@ -21,7 +21,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2_certs"
-            name  = "*.day1.sololab"
+            name  = "*.day2.sololab"
           }
           value_sets = [
             {
@@ -29,11 +29,11 @@ podman_kubes = [
               value_ref_key = "ca"
             },
             {
-              name          = "traefik.secret.tls.contents.day1\\.crt"
+              name          = "traefik.secret.tls.contents.day2\\.crt"
               value_ref_key = "cert"
             },
             {
-              name          = "traefik.secret.tls.contents.day1\\.key"
+              name          = "traefik.secret.tls.contents.day2\\.key"
               value_ref_key = "private_key"
             }
           ]

@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "consul" {
-    address = "consul.day1.sololab"
+    address = "consul.day2.sololab"
     scheme  = "https"
     path    = "tfstate/Nomad/Job-Exporters"
   }

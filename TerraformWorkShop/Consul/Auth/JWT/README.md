@@ -31,7 +31,7 @@ Procedure:
 4. run below command, put jwt token content in to variable `$token`
 
 ```powershell
-$env:CONSUL_HTTP_ADDR="https://consul.day1.sololab:8501"
+$env:CONSUL_HTTP_ADDR="https://consul.day2.sololab:8501"
 
 $token="xxx"
 

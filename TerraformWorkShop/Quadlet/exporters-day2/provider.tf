@@ -1,9 +1,5 @@
 terraform {
   required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = ">= 5.4.0"
-    }
     null = {
       source  = "hashicorp/null"
       version = ">= 3.2.2"
@@ -14,12 +10,12 @@ terraform {
     }
     remote = {
       source  = "tenstad/remote"
-      version = ">=0.2.1"
+      version = ">= 0.2.0"
     }
   }
   backend "s3" {
-    bucket = "tfstate"                     # Name of the S3 bucket
-    key    = "System/Day1-Quadlet-Traefik" # Name of the tfstate file
+    bucket = "tfstate"                       # Name of the S3 bucket
+    key    = "System/Day2-Quadlet-Exporters" # Name of the tfstate file
 
     endpoints = {
       s3 = "https://minio-api.day0.sololab" # Minio endpoint
@@ -36,12 +32,6 @@ terraform {
     skip_requesting_account_id  = true
     insecure                    = true
   }
-}
-
-provider "vault" {
-  address         = var.prov_vault.address
-  token           = var.prov_vault.token
-  skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
 provider "remote" {

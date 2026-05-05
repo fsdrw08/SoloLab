@@ -5,7 +5,7 @@ prov_vault = {
 }
 
 prov_grafana = {
-  url  = "https://grafana.day1.sololab"
+  url  = "https://grafana.day2.sololab"
   auth = "admin:admin"
 }
 
@@ -18,13 +18,13 @@ data_sources = [
     iac_id = "1364b682"
     type   = "loki"
     name   = "loki"
-    url    = "https://loki.day1.sololab"
+    url    = "https://loki.day2.sololab"
   },
   {
     iac_id = "517bb05c"
     type   = "prometheus"
     name   = "prometheus"
-    url    = "https://prometheus.day1.sololab"
+    url    = "https://prometheus.day2.sololab"
   }
 ]
 

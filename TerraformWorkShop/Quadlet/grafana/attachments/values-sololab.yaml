@@ -5,12 +5,12 @@ grafana:
   podLabels:
     traefik.enable: true
     traefik.http.routers.grafana-redirect.entrypoints: web
-    traefik.http.routers.grafana-redirect.rule: Host(`grafana.day1.sololab`)
+    traefik.http.routers.grafana-redirect.rule: Host(`grafana.day2.sololab`)
     traefik.http.routers.grafana-redirect.middlewares: toHttps@file
     traefik.http.routers.grafana-redirect.service: grafana
 
     traefik.http.routers.grafana.entrypoints: webSecure
-    traefik.http.routers.grafana.rule: Host(`grafana.day1.sololab`)
+    traefik.http.routers.grafana.rule: Host(`grafana.day2.sololab`)
     traefik.http.routers.grafana.tls: true
     traefik.http.routers.grafana.service: grafana
 
@@ -19,9 +19,9 @@ grafana:
   configFiles:
     grafana:
       server:
-        domain: grafana.day1.sololab
+        domain: grafana.day2.sololab
         http_addr: 127.0.0.1
-        root_url: https://grafana.day1.sololab
+        root_url: https://grafana.day2.sololab
         protocol: http
       auth.generic_oauth:
         enabled: true
@@ -47,7 +47,9 @@ grafana:
         # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#configuration-options:~:text=mapping%20example.-,allow_assign_grafana_admin,-No
         allow_assign_grafana_admin: true
         # ref: https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/#roles-and-permissions
-        role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin' || contains(groups[*], 'app-grafana-admin') && 'Admin' || contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
+        role_attribute_path: contains(groups[*], 'app-grafana-root') && 'GrafanaAdmin'
+          || contains(groups[*], 'app-grafana-admin') && 'Admin' ||
+          contains(roles[*], 'app-grafana-editor') && 'Editor' || 'Viewer'
       plugins:
         # Comma separated list of plugin ids to install as part of the startup process.
         # https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-using-grafana-configuration

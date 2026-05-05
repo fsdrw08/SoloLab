@@ -53,10 +53,10 @@ alloy:
           forward_to:
             - loki.write.loki.receiver
           labels:
-            component: '"loki.source.journal"'
+            component: "\"loki.source.journal\""
           # need to explicitly set the path value for the loki.source.journal component when running within a container
           # https://community.grafana.com/t/scrape-journald-log-with-alloy-docker-container/119896/2
-          path: '"/var/log/journal"'
+          path: "\"/var/log/journal\""
           format_as_json: false
       - component: loki.relabel
         label: journal
@@ -64,23 +64,23 @@ alloy:
           forward_to: []
           rule.0:
             source_labels:
-              - '"__journal__systemd_unit"'
-            target_label: '"service_name"'
+              - "\"__journal__systemd_unit\""
+            target_label: "\"service_name\""
           rule.1:
             source_labels:
-              - '"__journal__systemd_user_unit"'
-            target_label: '"service_name"'
+              - "\"__journal__systemd_user_unit\""
+            target_label: "\"service_name\""
           rule.2:
             source_labels:
-              - '"__journal__hostname"'
-            target_label: '"host"'
+              - "\"__journal__hostname\""
+            target_label: "\"host\""
       - component: loki.write
         label: loki
         attributes:
           endpoint.0:
-            url: '"https://loki.day1.sololab/loki/api/v1/push"'
+            url: "\"https://loki.day2.sololab/loki/api/v1/push\""
             tls_config.0:
-              ca_file: '"/etc/alloy/certs/ca.crt"'
+              ca_file: "\"/etc/alloy/certs/ca.crt\""
       # - component: prometheus.exporter.process
       #   label: process
       #   attributes:
@@ -118,7 +118,7 @@ alloy:
       #   label: prometheus
       #   attributes:
       #     endpoint.0:
-      #       url: '"https://prometheus.day1.sololab/api/v1/write"'
+      #       url: '"https://prometheus.day2.sololab/api/v1/write"'
       #       tls_config.0:
       #         ca_file: '"/etc/alloy/certs/ca.crt"'
   flags:

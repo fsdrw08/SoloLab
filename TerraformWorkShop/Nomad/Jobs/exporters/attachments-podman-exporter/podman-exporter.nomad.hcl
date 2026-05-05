@@ -9,7 +9,7 @@ job "prometheus-podman-exporter" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "!="
-    value     = "day1"
+    value     = "day2"
   }
 
   group "prometheus-podman-exporter" {

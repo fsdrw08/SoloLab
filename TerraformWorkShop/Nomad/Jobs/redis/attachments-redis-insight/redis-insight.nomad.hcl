@@ -31,7 +31,7 @@ job "redis-insight" {
         }
 
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(redis-insight.day3.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
+        #   traefik.day2 -[http route: decrypt(redis-insight.day3.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
         #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",

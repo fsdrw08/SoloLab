@@ -21,13 +21,13 @@ vault_certs = [
   {
     root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki_sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
+      backend   = "pki_sololab_day2"
+      role_name = "IntCA-Day2-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "consul.day1.sololab"
+    common_name = "consul.day2.sololab"
     alt_names = [
-      "*.day1.sololab",
+      "*.day2.sololab",
       "consul.service.consul",
       "server.dc1.consul",
       "localhost"
@@ -37,25 +37,25 @@ vault_certs = [
   {
     root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki_sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
+      backend   = "pki_sololab_day2"
+      role_name = "IntCA-Day2-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "nomad.day1.sololab"
+    common_name = "nomad.day2.sololab"
     alt_names = [
-      "*.day1.sololab",
+      "*.day2.sololab",
       "nomad.service.consul",
     ]
   },
-  # day1 wild card cert hosting in reverse proxy
+  # day2 wild card cert hosting in reverse proxy
   {
     root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki_sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
+      backend   = "pki_sololab_day2"
+      role_name = "IntCA-Day2-v1-role-default"
     }
     ttl_years   = 3
-    common_name = "*.day1.sololab"
+    common_name = "*.day2.sololab"
   },
   # consul service wild card cert hosting in reverse proxy
   {
@@ -74,8 +74,8 @@ vault_certs = [
   {
     root_ca_backend = "pki_sololab_root"
     secret_engine = {
-      backend   = "pki_sololab_day1"
-      role_name = "IntCA-Day1-v1-role-default"
+      backend   = "pki_sololab_day2"
+      role_name = "IntCA-Day2-v1-role-default"
     }
     ttl_years   = 3
     common_name = "client.global.nomad"
@@ -87,56 +87,56 @@ vault_certs = [
   },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "minio-api.day1.sololab"
+  #   common_name = "minio-api.day2.sololab"
   #   alt_names = [
-  #     "minio-console.day1.sololab",
+  #     "minio-console.day2.sololab",
   #   ]
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "grafana.day1.sololab"
+  #   common_name = "grafana.day2.sololab"
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "loki.day1.sololab"
+  #   common_name = "loki.day2.sololab"
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "alloy.day1.sololab"
+  #   common_name = "alloy.day2.sololab"
   #   alt_names = [
   #     "alloy.day0.sololab",
   #   ]
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "prometheus.day1.sololab"
+  #   common_name = "prometheus.day2.sololab"
   # },
   # {
   #   secret_engine = {
-  #     backend   = "pki_sololab_day1"
-  #     role_name = "IntCA-Day1-v1-role-default"
+  #     backend   = "pki_sololab_day2"
+  #     role_name = "IntCA-Day2-v1-role-default"
   #   }
   #   ttl_years   = 3
-  #   common_name = "redis-insight.day1.sololab"
+  #   common_name = "redis-insight.day2.sololab"
   # },
 ]

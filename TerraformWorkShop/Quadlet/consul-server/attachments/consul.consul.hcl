@@ -1,7 +1,7 @@
 # https://developer.hashicorp.com/consul/docs/reference/service
 services {
   name = "consul-client"
-  id   = "consul-client-day1"
+  id   = "consul-client-day2"
   port = 8501
 
   checks = [
@@ -17,18 +17,18 @@ services {
   ]
 
   tags = [
-    "day1",
+    "day2",
     "metrics-exposing-blackbox",
     "metrics-exposing-consul",
 
     "traefik.enable=true",
     "traefik.http.routers.consul-redirect.entrypoints=web",
-    "traefik.http.routers.consul-redirect.rule=Host(`consul.day1.sololab`) || Host(`consul.service.consul`)",
+    "traefik.http.routers.consul-redirect.rule=Host(`consul.day2.sololab`) || Host(`consul.service.consul`)",
     "traefik.http.routers.consul-redirect.middlewares=toHttps@file",
     "traefik.http.routers.consul.entrypoints=webSecure",
-    "traefik.http.routers.consul.rule=Host(`consul.day1.sololab`) || Host(`consul.service.consul`)",
+    "traefik.http.routers.consul.rule=Host(`consul.day2.sololab`) || Host(`consul.service.consul`)",
     "traefik.http.routers.consul.tls=true",
-    "traefik.http.services.consul.loadBalancer.serversTransport=sololab-day1@file",
+    "traefik.http.services.consul.loadBalancer.serversTransport=sololab-day2@file",
     "traefik.http.services.consul.loadbalancer.server.scheme=https",
   ]
 

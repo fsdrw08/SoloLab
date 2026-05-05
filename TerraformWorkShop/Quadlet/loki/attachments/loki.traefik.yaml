@@ -5,12 +5,12 @@ http:
         - web
       middlewares:
         - toHttps@file
-      rule: Host(`loki.day1.sololab`)
+      rule: Host(`loki.day2.sololab`)
       service: loki
     loki:
       entryPoints:
         - webSecure
-      rule: Host(`loki.day1.sololab`)
+      rule: Host(`loki.day2.sololab`)
       service: loki
       tls: true
   services:

@@ -22,11 +22,11 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "loki.day1.sololab"
+    prom_blackbox_address           = "loki.day2.sololab"
     prom_blackbox_health_check_path = "ready"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "loki.day1.sololab"
+    prom_target_address      = "loki.day2.sololab"
     prom_target_metrics_path = "metrics"
   }
 }

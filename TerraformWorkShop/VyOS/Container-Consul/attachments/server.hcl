@@ -32,7 +32,7 @@ ports {
   https = 8501
 }
 retry_join_wan = [
-  "consul.day1.sololab"
+  "consul.day2.sololab"
 ]
 server = true
 tls {

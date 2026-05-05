@@ -1,5 +1,5 @@
 prov_ldap = {
-  host         = "opendj.day1.sololab"
+  host         = "opendj.day2.sololab"
   port         = "636"
   tls          = true
   tls_insecure = true

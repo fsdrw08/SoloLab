@@ -22,7 +22,7 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "grafana.day1.sololab"
+    prom_blackbox_address           = "grafana.day2.sololab"
     prom_blackbox_health_check_path = "api/health"
   }
 }

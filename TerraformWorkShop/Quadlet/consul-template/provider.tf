@@ -19,7 +19,7 @@ terraform {
   }
   backend "pg" {
     conn_str    = "postgres://terraform:terraform@tfbackend-pg.day0.sololab/tfstate?sslmode=require&sslrootcert="
-    schema_name = "System-Day1-Quadlet-Consul-Template"
+    schema_name = "System-Day2-Quadlet-Consul-Template"
   }
 }
 

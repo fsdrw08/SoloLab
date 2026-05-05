@@ -6,27 +6,27 @@ prov_vault = {
 }
 
 intermediate_cas = [
-  # day1
+  # day2
   {
     secret_engine = {
-      path                    = "pki_sololab_day1"
-      description             = "PKI engine hosting intermediate CA day1 v1 for sololab"
+      path                    = "pki_sololab_day2"
+      description             = "PKI engine hosting intermediate CA day2 v1 for sololab"
       default_lease_ttl_years = 3
       max_lease_ttl_years     = 3
     }
     enable_backend_config = true
     csr = {
       root_ca_backend = "pki_sololab_root"
-      common_name     = "Sololab Intermediate CA Day1"
+      common_name     = "Sololab Intermediate CA Day2"
       ttl_years       = 5
     }
     issuer = {
-      name                           = "IntCA-Day1-v1"
+      name                           = "IntCA-Day2-v1"
       revocation_signature_algorithm = "SHA256WithRSA"
     }
     roles = [
       {
-        name = "IntCA-Day1-v1-role-default"
+        name = "IntCA-Day2-v1-role-default"
         # https://developer.hashicorp.com/vault/api-docs/secret/pki#ext_key_usage
         # https://pkg.go.dev/crypto/x509#ExtKeyUsage
         ext_key_usage = [

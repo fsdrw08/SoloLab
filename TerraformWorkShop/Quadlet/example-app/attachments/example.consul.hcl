@@ -1,7 +1,7 @@
 services {
-  id      = "whoami-web"
-  name    = "whoami"
-  port    = 4646
+  id   = "whoami-web"
+  name = "whoami"
+  port = 4646
 
   checks = [
     {
@@ -16,13 +16,13 @@ services {
   tags = [
     "traefik.enable=true",
     "traefik.tcp.routers.whoami-web.entrypoints=webSecure",
-    "traefik.tcp.routers.whoami-web.rule=HostSNI(`whoami.day1.sololab`)",
+    "traefik.tcp.routers.whoami-web.rule=HostSNI(`whoami.day2.sololab`)",
     "traefik.tcp.routers.whoami-web.tls.passthrough=true",
     # "traefik.http.routers.whoami-web-redirect.entrypoints=web",
-    # "traefik.http.routers.whoami-web-redirect.rule=Host(`whoami.day1.sololab`)",
+    # "traefik.http.routers.whoami-web-redirect.rule=Host(`whoami.day2.sololab`)",
     # "traefik.http.routers.whoami-web-redirect.middlewares=toHttps@file",
     # "traefik.http.routers.whoami-web.entrypoints=websecure",
-    # "traefik.http.routers.whoami-web.rule=Host(`whoami.day1.sololab`)",
+    # "traefik.http.routers.whoami-web.rule=Host(`whoami.day2.sololab`)",
     # "traefik.http.routers.whoami-web.tls=true",
     # "traefik.http.services.whoami-web.loadbalancer.server.scheme=https",
   ]

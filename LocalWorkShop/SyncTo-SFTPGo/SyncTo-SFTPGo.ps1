@@ -40,7 +40,7 @@ param (
 
 $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncProfile)
 # $repoDir = git rev-parse --show-toplevel
-# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day1.jsonc")
+# $syncList = Get-Content -Path (Join-Path -Path $repoDir -ChildPath "LocalWorkShop\SyncTo-Dufs\Day2.jsonc")
 
 ## validate json
 $referenceObject = @(

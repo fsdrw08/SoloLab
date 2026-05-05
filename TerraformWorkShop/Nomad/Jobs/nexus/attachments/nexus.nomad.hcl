@@ -128,7 +128,7 @@ job "nexus" {
       service {
         provider = "consul"
         name     = "nexus"
-        # need to set address_mode to "host" to use day1 traefik's server transport
+        # need to set address_mode to "host" to use day2 traefik's server transport
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -141,7 +141,7 @@ job "nexus" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(nexus.day4.sololab) & re-encrypt(server transport(nexus.service.consul)) & ]-> 
+        #   traefik.day2 -[http route: decrypt(nexus.day4.sololab) & re-encrypt(server transport(nexus.service.consul)) & ]-> 
         #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",

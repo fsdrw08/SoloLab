@@ -151,10 +151,10 @@ dns_records = [
     }
   },
   {
-    hostname = "alloy.day1.sololab"
+    hostname = "alloy.day2.sololab"
     value = {
       string_map = {
-        host = "alloy-day1.service.consul"
+        host = "alloy-day2.service.consul"
       }
       number_map = {
         ttl = 60
@@ -162,7 +162,7 @@ dns_records = [
     }
   },
   {
-    hostname = "consul.day1.sololab"
+    hostname = "consul.day2.sololab"
     value = {
       string_map = {
         host = "consul.service.consul"
@@ -173,10 +173,10 @@ dns_records = [
     }
   },
   {
-    hostname = "traefik.day1.sololab"
+    hostname = "traefik.day2.sololab"
     value = {
       string_map = {
-        host = "traefik-day1.service.consul"
+        host = "traefik-day2.service.consul"
       }
       number_map = {
         ttl = 60
@@ -184,7 +184,7 @@ dns_records = [
     }
   },
   {
-    hostname = "nomad.day1.sololab"
+    hostname = "nomad.day2.sololab"
     value = {
       string_map = {
         host = "nomad.service.consul"
@@ -195,7 +195,7 @@ dns_records = [
     }
   },
   {
-    hostname = "grafana.day1.sololab"
+    hostname = "grafana.day2.sololab"
     value = {
       string_map = {
         host = "grafana.service.consul"
@@ -206,7 +206,7 @@ dns_records = [
     }
   },
   {
-    hostname = "loki.day1.sololab"
+    hostname = "loki.day2.sololab"
     value = {
       string_map = {
         host = "loki.service.consul"
@@ -217,7 +217,7 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus.day1.sololab"
+    hostname = "prometheus.day2.sololab"
     value = {
       string_map = {
         host = "prometheus.service.consul"
@@ -228,7 +228,7 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-blackbox-exporter.day1.sololab"
+    hostname = "prometheus-blackbox-exporter.day2.sololab"
     value = {
       string_map = {
         host = "prometheus-blackbox-exporter.service.consul"
@@ -239,7 +239,7 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-consul-exporter.day1.sololab"
+    hostname = "prometheus-consul-exporter.day2.sololab"
     value = {
       string_map = {
         host = "prometheus-consul-exporter.service.consul"
@@ -250,10 +250,10 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-podman-exporter.day1.sololab"
+    hostname = "prometheus-podman-exporter.day2.sololab"
     value = {
       string_map = {
-        host = "prometheus-podman-exporter-day1.service.consul"
+        host = "prometheus-podman-exporter-day2.service.consul"
       }
       number_map = {
         ttl = 60
@@ -261,10 +261,10 @@ dns_records = [
     }
   },
   {
-    hostname = "prometheus-node-exporter.day1.sololab"
+    hostname = "prometheus-node-exporter.day2.sololab"
     value = {
       string_map = {
-        host = "prometheus-node-exporter-day1.service.consul"
+        host = "prometheus-node-exporter-day2.service.consul"
       }
       number_map = {
         ttl = 60
@@ -275,7 +275,7 @@ dns_records = [
     hostname = "traefik.day3.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -286,7 +286,7 @@ dns_records = [
     hostname = "pgweb.day3.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -297,7 +297,7 @@ dns_records = [
     hostname = "redis-insight.day3.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -308,7 +308,7 @@ dns_records = [
     hostname = "meilisearch.day3.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -319,7 +319,7 @@ dns_records = [
     hostname = "traefik.day4.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -330,7 +330,7 @@ dns_records = [
     hostname = "gitblit.day4.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -341,7 +341,7 @@ dns_records = [
     hostname = "nexus.day4.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60
@@ -352,7 +352,7 @@ dns_records = [
     hostname = "jenkins.day4.sololab"
     value = {
       string_map = {
-        host = "day1.node.consul"
+        host = "day2.node.consul"
       }
       number_map = {
         ttl = 60

@@ -7,7 +7,7 @@ prov_hyperv = {
 
 vm = {
   count     = 1
-  base_name = "Day1-FCOS"
+  base_name = "Day2-FCOS"
   vhd = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
@@ -68,7 +68,7 @@ butane = {
     }
     local = [
       {
-        "vm_name"            = "day1"
+        "vm_name"            = "day2"
         "ip"                 = "192.168.255.20"
         "fcos_image_mirror"  = "zot.day0.sololab/fedora/fedora-coreos"
         "fcos_rebase_mirror" = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"

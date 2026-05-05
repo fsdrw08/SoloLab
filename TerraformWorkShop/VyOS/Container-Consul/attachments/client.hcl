@@ -23,7 +23,7 @@ ports {
   https = 8501
 }
 retry_join = [
-  "consul.day1.sololab"
+  "consul.day2.sololab"
 ]
 server = false
 tls {

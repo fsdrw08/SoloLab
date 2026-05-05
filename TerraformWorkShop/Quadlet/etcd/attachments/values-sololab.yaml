@@ -89,14 +89,14 @@ etcd:
     initial-advertise-peer-urls: https://etcd-0.day0.sololab:2380
     ## @param etcd.configFile.initial-cluster-token Initial cluster token for the etcd cluster during bootstrap.
     ## Specifying this can protect you from unintended cross-cluster interaction when running multiple clusters.
-    initial-cluster-token: "day1-etcd-cluster"
+    initial-cluster-token: "day2-etcd-cluster"
     ## @param etcd.configFile.advertise-client-urls List of this member's client URLs to advertise to the public.
     ## The client URLs advertised should be accessible to machines that talk to etcd cluster. etcd client libraries parse these URLs to connect to the cluster.
     ##
     advertise-client-urls: https://etcd-0.day0.sololab:2379
     ## @param etcd.configFile.discovery Discovery URL used to bootstrap the cluster.
     ##
-    # discovery: "day1.sololab"
+    # discovery: "day2.sololab"
     ### Security
     ## @param etcd.configFile.client-transport-security Block to config the client transport security
     client-transport-security:
@@ -117,7 +117,7 @@ etcd:
       ## aka --trusted-ca-file
       ##
       # trusted-ca-file: /etc/etcd/pki/ca.crt
-    ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
+      ## @param etcd.configFile.peer-transport-security Block to config the peer transport security
     peer-transport-security:
       ## @param etcd.configFile.peer-transport-security.cert-file Path to the peer server TLS cert file.
       ## Certificate used for SSL/TLS connections between peers.

@@ -66,8 +66,10 @@ loki:
           endpoint: minio-api.day0.sololab
           bucket_name: loki
           access_key_id: # set from terraform data
-          secret_access_key: # set from terraform data
-          # s3forcepathstyle: true
+          secret_access_key:
+            # set from terraform data
+            # s3forcepathstyle: true
+
           http:
             tls_ca_path: /etc/loki/certs/ca.crt
     ui:
@@ -79,12 +81,12 @@ loki:
   # podLabels:
   #   traefik.enable: true
   #   traefik.http.routers.loki-redirect.entrypoints: web
-  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki-redirect.rule: Host(`loki.day2.sololab`)
   #   traefik.http.routers.loki-redirect.middlewares: toHttps@file
   #   traefik.http.routers.loki-redirect.service: loki
 
   #   traefik.http.routers.loki.entrypoints: webSecure
-  #   traefik.http.routers.loki.rule: Host(`loki.day1.sololab`)
+  #   traefik.http.routers.loki.rule: Host(`loki.day2.sololab`)
   #   traefik.http.routers.loki.tls: true
   #   traefik.http.routers.loki.service: loki
 

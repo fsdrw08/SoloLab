@@ -10,7 +10,7 @@ terraform {
     }
   }
   backend "consul" {
-    address = "consul.day1.sololab"
+    address = "consul.day2.sololab"
     scheme  = "https"
     path    = "tfstate/Nexus3/BlobStore"
     # access_token = ""

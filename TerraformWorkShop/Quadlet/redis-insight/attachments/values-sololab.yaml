@@ -8,12 +8,12 @@ redisInsight:
   podLabels:
     traefik.enable: true
     traefik.http.routers.redisInsight-redirect.entrypoints: web
-    traefik.http.routers.redisInsight-redirect.rule: Host(`redis-insight.day1.sololab`)
+    traefik.http.routers.redisInsight-redirect.rule: Host(`redis-insight.day2.sololab`)
     traefik.http.routers.redisInsight-redirect.middlewares: toHttps@file
     traefik.http.routers.redisInsight-redirect.service: redisInsight
 
     traefik.http.routers.redisInsight.entrypoints: webSecure
-    traefik.http.routers.redisInsight.rule: Host(`redis-insight.day1.sololab`)
+    traefik.http.routers.redisInsight.rule: Host(`redis-insight.day2.sololab`)
     traefik.http.routers.redisInsight.tls: true
     traefik.http.routers.redisInsight.service: redisInsight
 

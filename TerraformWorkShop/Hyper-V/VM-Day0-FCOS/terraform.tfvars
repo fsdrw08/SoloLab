@@ -104,8 +104,8 @@ butane = {
 # }
 
 # dns_record = {
-#   zone = "day1.sololab."
-#   name = "Infra-FCOS.day1.sololab."
+#   zone = "day2.sololab."
+#   name = "Infra-FCOS.day2.sololab."
 #   type = "A"
 #   ttl  = 86400
 #   records = [

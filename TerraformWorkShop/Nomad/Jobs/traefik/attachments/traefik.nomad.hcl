@@ -16,7 +16,7 @@ job "traefik" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "!="
-    value     = "day1"
+    value     = "day2"
   }
 
   group "traefik" {
@@ -49,7 +49,7 @@ job "traefik" {
       }
 
       # traffic path: haproxy.vyos -(tcp route)-> 
-      #   traefik.day1 -[match http route: decrypt(traefik.day3.sololab) & re-encrypt(server transport: dayX.traefik.service.consul)]-> 
+      #   traefik.day2 -[match http route: decrypt(traefik.day3.sololab) & re-encrypt(server transport: dayX.traefik.service.consul)]-> 
       #   traefik.day3 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
         "${attr.unique.hostname}",

@@ -26,7 +26,7 @@ Exec=--accessLog=true \
   --certificatesResolvers.external.acme.certificatesDuration=2160 \
   --certificatesResolvers.external.acme.storage=/mnt/acmeStorage/external.json \
   --certificatesResolvers.external.acme.tlsChallenge=true \
-  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab:8200/v1/pki_sololab_day1/acme/directory \
+  --certificatesResolvers.internal.acme.caServer=https://vault.day0.sololab:8200/v1/pki_sololab_day2/acme/directory \
   --certificatesResolvers.internal.acme.certificatesDuration=2160 \
   --certificatesResolvers.internal.acme.storage=/mnt/acmeStorage/internal.json \
   --certificatesResolvers.internal.acme.tlsChallenge=true \
@@ -39,7 +39,7 @@ Exec=--accessLog=true \
   --log.level=INFO \
   --ping=true \
   --providers.consulCatalog=true \
-  --providers.consulCatalog.endpoint.address=consul.day1.sololab:8501 \
+  --providers.consulCatalog.endpoint.address=consul.day2.sololab:8501 \
   --providers.consulCatalog.endpoint.dataCenter=dc1 \
   --providers.consulCatalog.endpoint.scheme=https \
   --providers.consulCatalog.endpoint.tls.ca=/etc/traefik/tls/ca.crt \
@@ -67,10 +67,10 @@ Label="traefik.http.middlewares.toHttps.redirectscheme.permanent=true"
 Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
 Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
 Label="traefik.http.routers.dashboard-redirect.middlewares=toHttps@docker"
-Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard-redirect.rule=Host(`traefik.day2.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.entryPoints=webSecure"
 Label="traefik.http.routers.dashboard.middlewares=userPass@docker"
-Label="traefik.http.routers.dashboard.rule=Host(`traefik.day1.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
+Label="traefik.http.routers.dashboard.rule=Host(`traefik.day2.sololab`) && (PathPrefix(`/api`)|| PathPrefix(`/dashboard`))"
 Label="traefik.http.routers.dashboard.service=api@internal"
 Label="traefik.http.routers.dashboard.tls=true"
 

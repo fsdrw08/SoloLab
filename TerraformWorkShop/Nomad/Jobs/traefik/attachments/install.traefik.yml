@@ -36,7 +36,7 @@ ping: {}
 providers:
   # consulCatalog:
   #   endpoint:
-  #     address: consul.day1.sololab:8501
+  #     address: consul.day2.sololab:8501
   #     datacenter: dc1
   #     scheme: https
   #     tls:

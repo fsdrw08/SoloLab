@@ -16,7 +16,6 @@ consul:
     traefik.http.services.consul.loadBalancer.serversTransport: consul@file
     traefik.http.services.consul.loadbalancer.server.scheme: https
     traefik.http.services.consul.loadbalancer.server.port: 8501
-
     # tcp route, deprecated
     # traefik.tcp.routers.consul-web.entrypoints: webSecure
     # traefik.tcp.routers.consul-web.rule: HostSNI(`consul-client.day0.sololab`)
@@ -28,13 +27,13 @@ consul:
     main:
       auto_encrypt:
         tls: true
-      bind_addr: '{{ GetInterfaceIP "eth0" }}'
+      bind_addr: "{{ GetInterfaceIP \"eth0\" }}"
       bootstrap_expect: null
       client_addr: "0.0.0.0"
       ports:
         https: 8501
       retry_join:
-        - consul.day1.sololab
+        - consul.day2.sololab
       server: false
       tls:
         defaults:

@@ -8,7 +8,7 @@ discovery.consulagent "consulagent" {
   server = "127.0.0.1:8501"
   scheme = "https"
   tls_config {
-    insecure_skip_verify  = true
+    insecure_skip_verify = true
   }
 }
 
@@ -64,7 +64,7 @@ loki.source.file "file" {
 
 loki.write "loki" {
   endpoint {
-    url = "https://loki.day1.sololab/loki/api/v1/push"
+    url = "https://loki.day2.sololab/loki/api/v1/push"
     tls_config {
       insecure_skip_verify = true
     }

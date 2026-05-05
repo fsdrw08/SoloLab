@@ -71,8 +71,8 @@ traefik:
       tlsCerts.yaml:
         tls:
           certificates:
-            - certFile: /etc/traefik/tls/day1.crt
-              keyFile: /etc/traefik/tls/day1.key
+            - certFile: /etc/traefik/tls/day2.crt
+              keyFile: /etc/traefik/tls/day2.key
       httpBasicAuth.yaml:
         http:
           middlewares:
@@ -83,8 +83,8 @@ traefik:
       serversTransports.yaml:
         http:
           serversTransports:
-            sololab-day1:
-              serverName: "*.day1.sololab"
+            sololab-day2:
+              serverName: "*.day2.sololab"
               rootcas:
                 - "/etc/traefik/tls/ca.crt"
             consul-service:

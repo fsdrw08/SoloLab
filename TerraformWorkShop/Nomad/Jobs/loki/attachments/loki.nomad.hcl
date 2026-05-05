@@ -13,7 +13,7 @@ job "loki" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "!="
-    value     = "day1"
+    value     = "day2"
   }
 
   group "loki" {

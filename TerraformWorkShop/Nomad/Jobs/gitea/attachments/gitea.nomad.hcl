@@ -29,7 +29,7 @@ job "gitea" {
       service {
         provider = "consul"
         name     = "gitea"
-        # need to set address_mode to "host" to use day1 traefik's server transport
+        # need to set address_mode to "host" to use day2 traefik's server transport
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -42,7 +42,7 @@ job "gitea" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(meilisearch.day3.sololab) & re-encrypt(server transport(meilisearch-day3.service.consul)) & ]-> 
+        #   traefik.day2 -[http route: decrypt(meilisearch.day3.sololab) & re-encrypt(server transport(meilisearch-day3.service.consul)) & ]-> 
         #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
