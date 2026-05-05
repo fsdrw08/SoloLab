@@ -1,42 +1,77 @@
-data "terraform_remote_state" "root_ca" {
-  backend = "local"
-  config = {
-    path = "../../TLS/RootCA/terraform.tfstate"
-  }
-}
+# data "terraform_remote_state" "root_ca" {
+#   backend = "local"
+#   config = {
+#     path = "../../TLS/RootCA/terraform.tfstate"
+#   }
+# }
 
+# load secret from vault
 locals {
-  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
-    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
-  ]
-  cert = [
-    for cert in data.terraform_remote_state.root_ca.outputs.signed_certs : cert
-    if cert.name == "wildcard.vyos"
-  ]
-  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
-    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
-    if regex("^[^.]+", vhd.name) == var.vm.base_name
-    ]) : flatten([
-    for count in range(var.vm.count) : [
-      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
+  secrets_vault_kvv2 = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : {
+      mount = value_refer.vault_kvv2.mount
+      name  = value_refer.vault_kvv2.name
+    }
+    if value_refer.vault_kvv2 != null
+  ])
+  secret_var_keys = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
+        value_set.name
+      ]
     ]
+    # if value_refer.vault_kvv2 != null
+    if value_refer.tfstate != null
+  ])
+  tls_tfstate = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : {
+      backend = value_refer.tfstate.backend
+      name    = value_refer.tfstate.cert_name
+    }
+    if value_refer.tfstate != null
   ])
 }
 
+# load cert from local tls
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tls_tfstate == null ? null : {
+    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
+
+locals {
+  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
+      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.vyos_certs : cert
+      if cert.name == value_refer.tfstate.cert_name
+    ]
+    if value_refer.tfstate != null
+  ])
+  certs = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.cert_list : cert.name => cert
+  }
+  secret_var_values = flatten([
+    for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
+      for value_set in value_refer.value_sets : [
+        # data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
+        local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+      ]
+    ]
+    # if value_refer.vault_kvv2 != null
+    if value_refer.tfstate != null
+  ])
+}
+
+
 # for debug
-# output "int_ca_pem" {
-#   value = join("",
-#     slice(
-#       split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
-#       1,
-#       length(
-#         split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem)
-#       ) - 2
-#     )
-#   )
-# }
+output "local_certs" {
+  value = local.certs
+}
+output "local_secret_var_values" {
+  value = local.secret_var_values
+}
 
 
 # output "vyos_cert" {
@@ -66,48 +101,19 @@ locals {
 
 module "cloudinit_nocloud_iso" {
   source   = "../../modules/hyperv-cloudinit-nocloud"
-  count    = var.vm.count == null ? 0 : var.cloudinit_nocloud == null ? 0 : var.vm.count
+  count    = var.vm.count == null ? 0 : var.vm.count
   iso_name = "cloud-init-${local.vm_names[count.index]}"
   files = [
-    for content in var.cloudinit_nocloud : {
-      content = templatefile(content.content_source, merge(content.content_vars,
-        {
-          # https://docs.vyos.io/en/latest/configuration/pki/index.html#key-usage-cli
-          # When loading the certificate you need to manually strip the -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- tags.
-          # Also, the certificate/key needs to be presented in a single line without line breaks (\n), this can be done using the following shell command:
-          # $ tail -n +2 ca.pem | head -n -1 | tr -d '\n'
-          # https://developer.hashicorp.com/terraform/language/functions/slice
-          ca_cert = join("",
-            slice(
-              split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem),
-              1,
-              length(
-                split("\n", data.terraform_remote_state.root_ca.outputs.int_ca_pem)
-              ) - 2
-            )
-          )
-          vyos_cert = join("",
-            slice(
-              split("\n", local.cert.0["cert_pem"]),
-              1,
-              length(
-                split("\n", local.cert.0["cert_pem"])
-              ) - 2
-            )
-          )
-          vyos_key = join("",
-            slice(
-              split("\n", local.cert.0["key_pkcs8"]),
-              1,
-              length(
-                split("\n", local.cert.0["key_pkcs8"])
-              ) - 2
-            )
-          )
-          root_ca = data.terraform_remote_state.root_ca.outputs.root_cert_pem
-        }
-      ))
-      filename = content.filename
+    for file in var.cloudinit.files : {
+      content = templatefile(
+        file,
+        merge(
+          var.cloudinit.vars.global,
+          var.cloudinit.vars.local[count.index],
+          zipmap(local.secret_var_keys, local.secret_var_values)
+        )
+      )
+      filename = basename(file)
     }
   ]
   destination_iso_file_path = join("\\", [
@@ -115,6 +121,22 @@ module "cloudinit_nocloud_iso" {
     "${local.vm_names[count.index]}\\cloudinit.iso"
     ]
   )
+}
+
+locals {
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
+  ]
+  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
+    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
+    if regex("^[^.]+", vhd.name) == var.vm.base_name
+    ]) : flatten([
+    for count in range(var.vm.count) : [
+      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
+    ]
+  ])
 }
 
 # fetch data disk info

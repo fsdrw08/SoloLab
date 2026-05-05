@@ -60,3 +60,42 @@ output "signed_certs" {
   )
   sensitive = true
 }
+
+output "vyos_certs" {
+  value = concat(
+    [
+      for key in var.certs : {
+        name = key.name
+        ca = join("",
+          slice(
+            split("\n", tls_locally_signed_cert.int_ca.cert_pem),
+            1,
+            length(
+              split("\n", tls_locally_signed_cert.int_ca.cert_pem)
+            ) - 2
+          )
+        )
+        cert_pem = join("",
+          slice(
+            split("\n", tls_locally_signed_cert.cert[key.name].cert_pem),
+            1,
+            length(
+              split("\n", tls_locally_signed_cert.cert[key.name].cert_pem)
+            ) - 2
+          )
+        )
+        key_pkcs8 = join("",
+          slice(
+            split("\n", tls_private_key.key[key.name].private_key_pem_pkcs8),
+            1,
+            length(
+              split("\n", tls_private_key.key[key.name].private_key_pem_pkcs8)
+            ) - 2
+          )
+        )
+      }
+      if key.name == "wildcard.day0"
+    ]
+  )
+  sensitive = true
+}

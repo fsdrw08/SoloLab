@@ -54,20 +54,20 @@ int_ca = {
 }
 
 certs = [
-  # wildcard vyos
+  # wildcard day0
   {
-    name = "wildcard.vyos"
+    name = "wildcard.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
     }
     cert = {
       dns_names = [
-        "*.vyos.sololab",
-        "*.vyos.sololab.dev",
+        "*.day0.sololab",
+        "*.day0.sololab.dev",
       ]
       subject = {
-        common_name  = "*.vyos.sololab"
+        common_name  = "*.day0.sololab"
         organization = "Sololab"
       }
       validity_period_hours = 43800
@@ -80,7 +80,7 @@ certs = [
   },
   # CoreDNS external
   {
-    name = "doh.vyos"
+    name = "doh.day0"
     key = {
       algorithm = "RSA"
       rsa_bits  = 2048
@@ -104,107 +104,6 @@ certs = [
       ]
     }
   },
-  # postgresql for terraform backend
-  {
-    name = "tfbackend-pg"
-    key = {
-      algorithm = "RSA"
-      rsa_bits  = 2048
-    }
-    cert = {
-      dns_names = [
-        "tf-backend-pg.vyos.sololab",
-        "tf-backend-pg.day1.sololab"
-      ]
-      subject = {
-        common_name  = "tfbackend-pg"
-        organization = "Sololab"
-      }
-      validity_period_hours = 43800
-      allowed_uses = [
-        "key_encipherment",
-        "digital_signature",
-        "server_auth",
-      ]
-    }
-  },
-  # cockroach node
-  # # https://github.com/mbookham7/crdb-terraform-azure-aks-single-region/blob/d0113db42803418908d8a6eee332c3266f141115/tls.tf#L201
-  # {
-  #   name = "cockroach_node_1"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     # https://www.cockroachlabs.com/docs/stable/authentication#using-a-custom-ca
-  #     ip_addresses = [
-  #       "192.168.255.1",
-  #       "127.0.0.1"
-  #     ]
-  #     dns_names = [
-  #       "localhost",
-  #       "cockroach.day1.sololab"
-  #     ]
-  #     subject = {
-  #       common_name  = "node"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "digital_signature",
-  #       "key_encipherment",
-  #       "server_auth",
-  #       "client_auth",
-  #     ]
-  #   }
-  # },
-  # cockroach client
-  # {
-  #   name = "cockroach_client_root"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 4096
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "root",
-  #     ]
-  #     subject = {
-  #       common_name  = "root"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "digital_signature",
-  #       "key_encipherment",
-  #       "client_auth",
-  #     ]
-  #   }
-  # },
-  # day1
-  # {
-  #   name = "zot.day1"
-  #   key = {
-  #     algorithm = "RSA"
-  #     rsa_bits  = 2048
-  #   }
-  #   cert = {
-  #     dns_names = [
-  #       "zot.day1.sololab"
-  #     ]
-  #     subject = {
-  #       common_name  = "Zot Registry"
-  #       organization = "Sololab"
-  #     }
-  #     validity_period_hours = 43800
-  #     allowed_uses = [
-  #       "key_encipherment",
-  #       "digital_signature",
-  #       "server_auth",
-  #     ]
-  #   }
-  # },
   {
     name = "etcd-server.day1"
     key = {

@@ -1,4 +1,4 @@
-hyperv = {
+prov_hyperv = {
   host     = "127.0.0.1"
   port     = 5986
   user     = "root"
@@ -7,7 +7,7 @@ hyperv = {
 
 vm = {
   count     = 1
-  base_name = "VyOS"
+  base_name = "Day0-VyOS"
   vhd = {
     dir    = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\packer-hyperv_g2-vyos_stream\\Virtual Hard Disks\\packer-vyos_stream.vhdx"
@@ -51,18 +51,13 @@ vm = {
   }
 }
 
-cloudinit_nocloud = [
-  {
-    content_source = "./cloudinit-tmpl/meta-data"
-    content_vars = {
-      instance_id    = "iid-VyOS_202603"
-      local_hostname = "VyOS"
-    }
-    filename = "meta-data"
-  },
-  {
-    content_source = "./cloudinit-tmpl/user-data-circinus"
-    content_vars = {
+cloudinit = {
+  files = [
+    "./cloudinit-tmpl/meta-data",
+    "./cloudinit-tmpl/user-data-circinus",
+  ]
+  vars = {
+    global = {
       eth1_desc               = "MGMT"
       eth1_cidr               = "192.168.255.1/24"
       eth1_addr               = "192.168.255.1"
@@ -79,7 +74,7 @@ cloudinit_nocloud = [
       dns_forward_allow_from  = "192.168.255.0/24"
       dns_forward_1           = "223.5.5.5"
       dns_forward_2           = "114.114.114.114"
-      dns_api_fqdn            = "api.vyos.sololab"
+      dns_api_fqdn            = "vyos-api.day0.sololab"
       dns_api_ip              = "192.168.255.1"
       haproxy_listen_addr_int = "192.168.255.1"
       haproxy_listen_addr_ext = "192.168.255.1"
@@ -92,6 +87,38 @@ cloudinit_nocloud = [
       ntp_server              = "cn.ntp.org.cn"
       time_zone               = "Asia/Shanghai"
     }
-    filename = "user-data"
+    local = [
+      {
+        instance_id    = "iid-VyOS_202605"
+        local_hostname = "VyOS"
+      }
+    ]
+    value_refers = [
+      {
+        tfstate = {
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
+          }
+          cert_name = "wildcard.day0"
+        }
+        value_sets = [
+          {
+            name          = "ca_cert"
+            value_ref_key = "ca"
+          },
+          {
+            name          = "vyos_cert"
+            value_ref_key = "cert_pem"
+          },
+          {
+            name          = "vyos_key"
+            value_ref_key = "key_pkcs8"
+          },
+        ]
+      }
+    ]
   }
-]
+}

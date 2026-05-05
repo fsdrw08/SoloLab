@@ -1,4 +1,4 @@
-variable "hyperv" {
+variable "prov_hyperv" {
   type = object({
     host     = string
     port     = number
@@ -43,11 +43,40 @@ variable "vm" {
   })
 }
 
-variable "cloudinit_nocloud" {
-  type = list(object({
-    content_source = string
-    content_vars   = map(string)
-    filename       = string
-  }))
-  default = null
+variable "cloudinit" {
+  type = object({
+    files = list(string)
+    vars = object({
+      global = map(string)
+      local  = optional(list(map(string)), null)
+      value_refers = optional(
+        list(object({
+          vault_kvv2 = optional(
+            object({
+              mount = string
+              name  = string
+            }),
+            null
+          )
+          tfstate = optional(
+            object({
+              backend = object({
+                type   = string
+                config = map(string)
+              })
+              cert_name = string
+            }),
+            null
+          )
+          value_sets = list(
+            object({
+              name          = string
+              value_ref_key = string
+            })
+          )
+        })),
+        null
+      )
+    })
+  })
 }
