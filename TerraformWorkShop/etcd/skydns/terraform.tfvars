@@ -272,7 +272,7 @@ dns_records = [
     }
   },
   {
-    hostname = "traefik.day2.sololab"
+    hostname = "traefik.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -283,7 +283,7 @@ dns_records = [
     }
   },
   {
-    hostname = "pgweb.day2.sololab"
+    hostname = "pgweb.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -294,7 +294,7 @@ dns_records = [
     }
   },
   {
-    hostname = "redis-insight.day2.sololab"
+    hostname = "redis-insight.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"
@@ -305,7 +305,7 @@ dns_records = [
     }
   },
   {
-    hostname = "meilisearch.day2.sololab"
+    hostname = "meilisearch.day3.sololab"
     value = {
       string_map = {
         host = "day1.node.consul"

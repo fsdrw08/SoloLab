@@ -161,7 +161,7 @@ job "jenkins" {
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(jenkins.day4.sololab) & re-encrypt(server transport(jenkins.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
           # "metrics-exposing-general",

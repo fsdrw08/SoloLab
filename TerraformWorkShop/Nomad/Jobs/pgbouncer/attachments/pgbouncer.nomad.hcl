@@ -13,7 +13,7 @@ job "pgbouncer" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "pgbouncer" {
@@ -40,7 +40,7 @@ job "pgbouncer" {
         }
 
         tags = [
-          "day2",
+          "day3",
           "log",
         ]
 

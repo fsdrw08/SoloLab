@@ -49,8 +49,8 @@ job "traefik" {
       }
 
       # traffic path: haproxy.vyos -(tcp route)-> 
-      #   traefik.day1 -[match http route: decrypt(traefik.day2.sololab) & re-encrypt(server transport: dayX.traefik.service.consul)]-> 
-      #   traefik.day2 -[http route: decrypt(*.service.sololab)]-> app
+      #   traefik.day1 -[match http route: decrypt(traefik.day3.sololab) & re-encrypt(server transport: dayX.traefik.service.consul)]-> 
+      #   traefik.day3 -[http route: decrypt(*.service.sololab)]-> app
       tags = [
         "${attr.unique.hostname}",
         "metrics-exposing-blackbox",

@@ -43,7 +43,7 @@ job "gitblit" {
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(gitblit.day4.sololab) & re-encrypt(server transport(gitblit.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
           "log",

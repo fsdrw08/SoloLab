@@ -9,7 +9,7 @@ job "gitea-db" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "gitea-db" {
@@ -47,7 +47,7 @@ job "gitea-db" {
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
-          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Fgitea
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day3.service.consul%3A5432%2Fgitea
           prom_target_scheme                         = "https"
           prom_target_address                        = "prometheus-postgres-exporter.service.consul"
           prom_target_metrics_path                   = "probe"

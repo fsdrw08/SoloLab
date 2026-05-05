@@ -17,7 +17,7 @@ job "meilisearch" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "meilisearch" {
@@ -40,8 +40,8 @@ job "meilisearch" {
           initial_status = "passing"
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(meilisearch.day2.sololab) & re-encrypt(server transport(meilisearch-day2.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day1 -[http route: decrypt(meilisearch.day3.sololab) & re-encrypt(server transport(meilisearch-day3.service.consul)) & ]-> 
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
           "metrics-exposing-general",

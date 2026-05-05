@@ -13,7 +13,7 @@ job "redis" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "redis" {

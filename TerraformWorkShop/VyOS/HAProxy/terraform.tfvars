@@ -209,35 +209,35 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  day2_frontend_redis_insight = {
+  day3_frontend_redis_insight = {
     path = "load-balancing haproxy service tcp443 rule 270"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "redis-insight.day2.sololab"
+      "domain-name" = "redis-insight.day3.sololab"
       "set backend" = "day1"
     }
   }
-  day2_frontend_traefik = {
+  day3_frontend_traefik = {
     path = "load-balancing haproxy service tcp443 rule 300"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "traefik.day2.sololab"
+      "domain-name" = "traefik.day3.sololab"
       "set backend" = "day1"
     }
   }
-  day2_frontend_pgweb = {
+  day3_frontend_pgweb = {
     path = "load-balancing haproxy service tcp443 rule 310"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "pgweb.day2.sololab"
+      "domain-name" = "pgweb.day3.sololab"
       "set backend" = "day1"
     }
   }
-  day2_frontend_meilisearch = {
+  day3_frontend_meilisearch = {
     path = "load-balancing haproxy service tcp443 rule 320"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "meilisearch.day2.sololab"
+      "domain-name" = "meilisearch.day3.sololab"
       "set backend" = "day1"
     }
   }

@@ -10,7 +10,7 @@ dynamic_host_volumes = [
       {
         attribute = "$${attr.unique.hostname}"
         operator  = "=="
-        value     = "day2"
+        value     = "day3"
       }
     ]
     capability = {
@@ -36,7 +36,7 @@ csi_volumes = [
       }
     ]
     parameters = {
-      server           = "day2.node.consul"
+      server           = "day3.node.consul"
       share            = "/"
       mountPermissions = "777"
     }
@@ -55,7 +55,7 @@ csi_volumes = [
       }
     ]
     parameters = {
-      server           = "day2.node.consul"
+      server           = "day3.node.consul"
       share            = "/"
       mountPermissions = "777"
     }

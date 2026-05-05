@@ -9,7 +9,7 @@ job "redis-insight" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
   group "redis-insight" {
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
@@ -31,19 +31,19 @@ job "redis-insight" {
         }
 
         # traffic path: haproxy.vyos -(tcp route)-> 
-        #   traefik.day1 -[http route: decrypt(redis-insight.day2.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day1 -[http route: decrypt(redis-insight.day3.sololab) & re-encrypt(server transport(redis-insight.service.consul)) & ]-> 
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
           "log",
 
           "traefik.enable=true",
           "traefik.http.routers.redis-insight-redirect.entryPoints=web",
-          "traefik.http.routers.redis-insight-redirect.rule=Host(`redis-insight.day2.sololab`)",
+          "traefik.http.routers.redis-insight-redirect.rule=Host(`redis-insight.day3.sololab`)",
           "traefik.http.routers.redis-insight-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.redis-insight.entryPoints=webSecure",
-          "traefik.http.routers.redis-insight.rule=Host(`redis-insight.day2.sololab`)",
+          "traefik.http.routers.redis-insight.rule=Host(`redis-insight.day3.sololab`)",
           "traefik.http.routers.redis-insight.tls.certresolver=internal",
 
           "traefik.http.services.redis-insight.loadbalancer.server.scheme=https",
@@ -65,12 +65,12 @@ job "redis-insight" {
         labels = {
           "traefik.enable"                                          = "true"
           "traefik.http.routers.redis-insight-redirect.entrypoints" = "web"
-          "traefik.http.routers.redis-insight-redirect.rule"        = "Host(`redis-insight.day2.sololab`)"
+          "traefik.http.routers.redis-insight-redirect.rule"        = "Host(`redis-insight.day3.sololab`)"
           "traefik.http.routers.redis-insight-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.redis-insight.service"              = "redis-insight"
 
           "traefik.http.routers.redis-insight.entryPoints" = "webSecure"
-          "traefik.http.routers.redis-insight.rule"        = "Host(`redis-insight.day2.sololab`)"
+          "traefik.http.routers.redis-insight.rule"        = "Host(`redis-insight.day3.sololab`)"
           "traefik.http.routers.redis-insight.tls"         = "true"
           "traefik.http.routers.redis-insight.service"     = "redis-insight"
 

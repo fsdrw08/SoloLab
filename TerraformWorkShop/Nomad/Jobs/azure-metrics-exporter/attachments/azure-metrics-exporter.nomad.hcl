@@ -13,7 +13,7 @@ job "azure-metrics-exporter" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "azure-metrics-exporter" {
@@ -36,7 +36,7 @@ job "azure-metrics-exporter" {
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(nexus3.day4.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "log",
 
@@ -141,7 +141,7 @@ job "azure-metrics-exporter" {
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(nexus3.day4.sololab) & re-encrypt(server transport(nexus3.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "log",
 

@@ -13,7 +13,7 @@ job "prometheus-postgres-exporter" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "=="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "prometheus-postgres-exporter" {

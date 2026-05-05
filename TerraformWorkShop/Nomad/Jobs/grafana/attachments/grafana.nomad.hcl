@@ -51,11 +51,11 @@ job "grafana" {
 
           "traefik.enable=true",
           "traefik.http.routers.grafana-redirect.entryPoints=web",
-          "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day2.sololab`)",
+          "traefik.http.routers.grafana-redirect.rule=Host(`grafana.day3.sololab`)",
           "traefik.http.routers.grafana-redirect.middlewares=toHttps@file",
 
           "traefik.http.routers.grafana.entryPoints=webSecure",
-          "traefik.http.routers.grafana.rule=Host(`grafana.day2.sololab`)",
+          "traefik.http.routers.grafana.rule=Host(`grafana.day3.sololab`)",
           "traefik.http.routers.grafana.tls.certresolver=internal",
 
           "traefik.http.services.grafana.loadbalancer.server.scheme=https",
@@ -71,12 +71,12 @@ job "grafana" {
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.grafana-redirect.entrypoints" = "web"
-          "traefik.http.routers.grafana-redirect.rule"        = "Host(`grafana.day2.sololab`)"
+          "traefik.http.routers.grafana-redirect.rule"        = "Host(`grafana.day3.sololab`)"
           "traefik.http.routers.grafana-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.grafana-redirect.service"     = "grafana"
 
           "traefik.http.routers.grafana.entrypoints" = "webSecure"
-          "traefik.http.routers.grafana.rule"        = "Host(`grafana.day2.sololab`)"
+          "traefik.http.routers.grafana.rule"        = "Host(`grafana.day3.sololab`)"
           "traefik.http.routers.grafana.tls"         = "true"
           "traefik.http.routers.grafana.service"     = "grafana"
 
@@ -95,8 +95,8 @@ job "grafana" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
         TZ                 = "Asia/Shanghai"
-        GF_SERVER_DOMAIN   = "grafana.day2.sololab"
-        GF_SERVER_ROOT_URL = "https://grafana.day2.sololab"
+        GF_SERVER_DOMAIN   = "grafana.day3.sololab"
+        GF_SERVER_ROOT_URL = "https://grafana.day3.sololab"
       }
 
       resources {

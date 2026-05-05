@@ -9,7 +9,7 @@ job "nexus-db" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "nexus-db" {
@@ -31,7 +31,7 @@ job "nexus-db" {
         }
 
         tags = [
-          "day2",
+          "day3",
           "behind_pgbouncer",
           "log",
           "metrics-exposing-general",
@@ -48,7 +48,7 @@ job "nexus-db" {
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
-          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day2.service.consul%3A5432%2Fnexus3
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day3.service.consul%3A5432%2Fnexus3
           prom_target_scheme                         = "https"
           prom_target_address                        = "prometheus-postgres-exporter.service.consul"
           prom_target_metrics_path                   = "probe"

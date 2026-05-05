@@ -12,7 +12,7 @@ job "nfs-ganesha" {
 
   constraint {
     attribute = "${attr.unique.hostname}"
-    value     = "day2"
+    value     = "day3"
   }
 
   group "nfs-ganesha" {

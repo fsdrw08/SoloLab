@@ -29,7 +29,7 @@ terraform {
   backend "consul" {
     address = "consul.day1.sololab"
     scheme  = "https"
-    path    = "tfstate/Hyper-V/VM-Day2-FCOS"
+    path    = "tfstate/Hyper-V/VM-Day3-FCOS"
   }
 }
 

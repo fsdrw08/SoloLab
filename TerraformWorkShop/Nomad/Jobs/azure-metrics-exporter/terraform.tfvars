@@ -10,7 +10,7 @@ dynamic_host_volumes = [
       {
         attribute = "$${attr.unique.hostname}"
         operator  = "=="
-        value     = "day2"
+        value     = "day3"
       }
     ]
     capability = {

@@ -55,7 +55,7 @@ traefik:
             tlsChallenge: {}
         internal:
           acme:
-            caServer: https://vault.day0.sololab/v1/pki_sololab_day2/acme/directory
+            caServer: https://vault.day0.sololab/v1/pki_sololab_day3/acme/directory
             certificatesDuration: 2160
             email: ""
             storage: /mnt/acmeStorage/internal.json

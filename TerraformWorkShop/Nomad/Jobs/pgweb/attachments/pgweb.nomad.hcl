@@ -28,7 +28,7 @@ job "pgweb" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "day2"
+    value     = "day3"
   }
 
   group "pgweb" {
@@ -52,7 +52,7 @@ job "pgweb" {
         }
         # traffic path: haproxy.vyos -(tcp route)-> 
         #   traefik.day1 -[http route: decrypt(pgweb.${attr.unique.hostname}.sololab) & re-encrypt(server transport(pgweb.service.consul)) & ]-> 
-        #   traefik.day2 -[http route: decrypt(*.service.consul)]-> app
+        #   traefik.day3 -[http route: decrypt(*.service.consul)]-> app
         tags = [
           "metrics-exposing-blackbox",
           "log",

@@ -282,19 +282,19 @@ zones = [
     ]
   },
   {
-    name        = "day2.sololab."
-    nameservers = ["ns1.day2.sololab."]
+    name        = "day3.sololab."
+    nameservers = ["ns1.day3.sololab."]
     records = [
       {
-        fqdn = "day2.sololab."
+        fqdn = "day3.sololab."
         type = "SOA"
         ttl  = 60
         results = [
-          "ns1.day2.sololab. day2.sololab. 2025081301 3600 600 1814400 7200"
+          "ns1.day3.sololab. day3.sololab. 2025081301 3600 600 1814400 7200"
         ]
       },
       {
-        fqdn = "ns1.day2.sololab."
+        fqdn = "ns1.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -302,7 +302,7 @@ zones = [
         ]
       },
       {
-        fqdn = "traefik.day2.sololab."
+        fqdn = "traefik.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -310,7 +310,7 @@ zones = [
         ]
       },
       {
-        fqdn = "pgweb.day2.sololab."
+        fqdn = "pgweb.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -318,7 +318,7 @@ zones = [
         ]
       },
       {
-        fqdn = "redis-insight.day2.sololab."
+        fqdn = "redis-insight.day3.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -326,7 +326,7 @@ zones = [
         ]
       },
       {
-        fqdn = "meilisearch.day2.sololab."
+        fqdn = "meilisearch.day3.sololab."
         type = "A"
         ttl  = 60
         results = [

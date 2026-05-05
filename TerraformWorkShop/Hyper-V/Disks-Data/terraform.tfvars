@@ -25,7 +25,7 @@ vhds = [
     size       = 128849018880
   },
   {
-    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day2-FCOS.vhdx"
+    path       = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Data_Disk\\Day3-FCOS.vhdx"
     block_size = 0
     type       = "Dynamic"
     size       = 128849018880

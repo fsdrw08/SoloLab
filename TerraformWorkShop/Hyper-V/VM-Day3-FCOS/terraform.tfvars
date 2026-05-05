@@ -14,7 +14,7 @@ prov_vault = {
 
 vm = {
   count     = 1
-  base_name = "Day2-FCOS"
+  base_name = "Day3-FCOS"
   vhd = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
@@ -101,11 +101,11 @@ butane = {
     local = [
       {
         # ip                                 = "192.168.255.30"
-        vm_name = "day2"
+        vm_name = "day3"
       },
       # {
       #   # ip = "192.168.255.30"
-      #   vm_name = "day2-2"
+      #   vm_name = "day3-2"
       # }
     ]
     value_refers = [

@@ -50,7 +50,7 @@ job "loki" {
 
           "traefik.enable=true",
           "traefik.tcp.routers.loki.entryPoints=webSecure",
-          "traefik.tcp.routers.loki.rule=HostSNI(`loki.day2.sololab`)",
+          "traefik.tcp.routers.loki.rule=HostSNI(`loki.day3.sololab`)",
           "traefik.tcp.routers.loki.tls.passthrough=true",
           "traefik.tcp.services.loki.loadbalancer.server.port=443",
         ]
@@ -63,13 +63,13 @@ job "loki" {
         labels = {
           "traefik.enable"                                 = "true"
           "traefik.http.routers.loki-redirect.entrypoints" = "web"
-          "traefik.http.routers.loki-redirect.rule"        = "Host(`loki.day2.sololab`)"
+          "traefik.http.routers.loki-redirect.rule"        = "Host(`loki.day3.sololab`)"
           "traefik.http.routers.loki-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.loki-redirect.service"     = "loki"
 
           "traefik.http.routers.loki.entrypoints"      = "webSecure"
           "traefik.http.routers.loki.tls.certresolver" = "internal"
-          "traefik.http.routers.loki.rule"             = "Host(`loki.day2.sololab`)"
+          "traefik.http.routers.loki.rule"             = "Host(`loki.day3.sololab`)"
 
           "traefik.http.services.loki.loadbalancer.server.port" = "3100"
         }
@@ -86,8 +86,8 @@ job "loki" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/env
       env {
         TZ                 = "Asia/Shanghai"
-        GF_SERVER_DOMAIN   = "loki.day2.sololab"
-        GF_SERVER_ROOT_URL = "https://loki.day2.sololab"
+        GF_SERVER_DOMAIN   = "loki.day3.sololab"
+        GF_SERVER_ROOT_URL = "https://loki.day3.sololab"
       }
 
       resources {

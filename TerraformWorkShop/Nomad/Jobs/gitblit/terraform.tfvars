@@ -15,7 +15,7 @@ csi_volumes = [
       }
     ]
     parameters = {
-      server           = "day2.node.consul"
+      server           = "day3.node.consul"
       share            = "/"
       mountPermissions = "777"
     }
