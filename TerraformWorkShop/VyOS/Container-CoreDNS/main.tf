@@ -8,7 +8,7 @@ data "terraform_remote_state" "cert" {
 locals {
   certs = [
     for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-    if cert.name == "doh.vyos"
+    if cert.name == "doh.day0"
   ]
 }
 
@@ -65,7 +65,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "coredns"
-      image     = "172.16.20.10:5000/coredns/coredns:1.14.2"
+      image     = "172.16.20.10:5000/coredns/coredns:1.14.3"
       pull_flag = "--tls-verify=false"
       others = {
         "allow-host-networks"  = ""

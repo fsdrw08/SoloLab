@@ -8,7 +8,7 @@ data "terraform_remote_state" "cert" {
 locals {
   certs = [
     for cert in data.terraform_remote_state.cert.outputs.signed_certs : cert
-    if cert.name == "wildcard.vyos"
+    if cert.name == "wildcard.day0"
   ]
 }
 
@@ -64,7 +64,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "cockpit"
-      image     = "zot.day0.sololab/cockpit/ws:358"
+      image     = "zot.day0.sololab/cockpit/ws:360.1"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value" = "Asia/Shanghai"
