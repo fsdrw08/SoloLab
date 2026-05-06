@@ -20,10 +20,6 @@ terraform {
       source  = "hashicorp/local"
       version = ">= 2.5.1"
     }
-    powerdns = {
-      source  = "pyama86/powerdns"
-      version = ">= 1.5.1"
-    }
   }
   backend "s3" {
     bucket = "tfstate"              # Name of the S3 bucket
@@ -61,10 +57,4 @@ provider "hyperv" {
   # key_path        = ""
   script_path = "C:/Temp/terraform_%RAND%.cmd"
   timeout     = "30s"
-}
-
-provider "powerdns" {
-  api_key        = var.prov_pdns.api_key
-  server_url     = var.prov_pdns.server_url
-  insecure_https = var.prov_pdns.insecure_https
 }
