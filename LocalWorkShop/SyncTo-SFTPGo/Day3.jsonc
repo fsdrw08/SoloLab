@@ -7,11 +7,11 @@
         "description": "https://releases.hashicorp.com/consul",
     },
     {
-        // https://releases.hashicorp.com/nomad/1.11.3/nomad_1.11.3_linux_amd64.zip
+        // https://releases.hashicorp.com/nomad/2.0.0/nomad_2.0.0_linux_amd64.zip
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad/1.11.3/nomad_1.11.3_linux_amd64.zip",
-        "archive": "nomad_1.11.3_linux_amd64.zip",
-        "privateRepo": "/ignition/binaries/nomad_1.11.3_linux_amd64.zip",
+        "publicRepo": "nomad/2.0.0/nomad_2.0.0_linux_amd64.zip",
+        "archive": "nomad_2.0.0_linux_amd64.zip",
+        "privateRepo": "/ignition/binaries/nomad_2.0.0_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad",
     },
     {

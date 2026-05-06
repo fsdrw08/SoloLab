@@ -33,9 +33,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/redis:8.6.2",
-        "archive": "docker.io_library_redis_8.6.2.tar",
-        "privateRepo": "library/redis:8.6.2",
+        "publicRepo": "library/redis:8.6.3",
+        "archive": "docker.io_library_redis_8.6.3.tar",
+        "privateRepo": "library/redis:8.6.3",
         "description": "https://hub.docker.com/_/redis",
     },
 ]

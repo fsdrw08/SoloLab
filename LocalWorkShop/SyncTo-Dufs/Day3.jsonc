@@ -2,9 +2,9 @@
     {
         "type": "general",
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad/1.11.3/nomad_1.11.3_linux_amd64.zip",
-        "archive": "nomad_1.11.3_linux_amd64.zip",
-        "privateRepo": "public/binaries/nomad_1.11.3_linux_amd64.zip",
+        "publicRepo": "nomad/2.0.0/nomad_2.0.0_linux_amd64.zip",
+        "archive": "nomad_2.0.0_linux_amd64.zip",
+        "privateRepo": "public/binaries/nomad_2.0.0_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad",
     },
     {
