@@ -54,7 +54,7 @@ vm = {
 cloudinit = {
   files = [
     "./cloudinit-tmpl/meta-data",
-    "./cloudinit-tmpl/user-data-circinus",
+    "./cloudinit-tmpl/user-data", # user-data-circinus
   ]
   vars = {
     global = {
@@ -102,7 +102,9 @@ cloudinit = {
               path = "../../TLS/RootCA/terraform.tfstate"
             }
           }
-          cert_name = "wildcard.day0"
+          name      = "RootCA"
+          output    = "vyos_certs"
+          item_name = "wildcard.day0"
         }
         value_sets = [
           {
@@ -116,6 +118,25 @@ cloudinit = {
           {
             name          = "vyos_key"
             value_ref_key = "key_pkcs8"
+          },
+        ]
+      },
+      {
+        tfstate = {
+          backend = {
+            type = "local"
+            config = {
+              path = "../../TLS/RootCA/terraform.tfstate"
+            }
+          }
+          name      = "RootCA"
+          output    = "signed_certs"
+          item_name = "root"
+        }
+        value_sets = [
+          {
+            name          = "root_ca"
+            value_ref_key = "ca"
           },
         ]
       }

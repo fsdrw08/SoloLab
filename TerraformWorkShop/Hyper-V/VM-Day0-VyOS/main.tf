@@ -1,11 +1,4 @@
-# data "terraform_remote_state" "root_ca" {
-#   backend = "local"
-#   config = {
-#     path = "../../TLS/RootCA/terraform.tfstate"
-#   }
-# }
-
-# load secret from vault
+# load secret from vault or tfstate
 locals {
   secrets_vault_kvv2 = flatten([
     for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : {
@@ -25,8 +18,8 @@ locals {
   ])
   tls_tfstate = flatten([
     for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : {
+      name    = value_refer.tfstate.name
       backend = value_refer.tfstate.backend
-      name    = value_refer.tfstate.cert_name
     }
     if value_refer.tfstate != null
   ])
@@ -35,7 +28,7 @@ locals {
 # load cert from local tls
 data "terraform_remote_state" "tfstate" {
   for_each = local.tls_tfstate == null ? null : {
-    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
+    for tls_tfstate in setunion(local.tls_tfstate) : tls_tfstate.name => tls_tfstate
   }
   backend = each.value.backend.type
   config  = each.value.backend.config
@@ -44,8 +37,8 @@ data "terraform_remote_state" "tfstate" {
 locals {
   cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
     for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
-      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.vyos_certs : cert
-      if cert.name == value_refer.tfstate.cert_name
+      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.name].outputs[value_refer.tfstate.output] : cert
+      if cert.name == value_refer.tfstate.item_name
     ]
     if value_refer.tfstate != null
   ])
@@ -56,7 +49,7 @@ locals {
     for value_refer in var.cloudinit.vars.value_refers == null ? [] : var.cloudinit.vars.value_refers : [
       for value_set in value_refer.value_sets : [
         # data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-        local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+        local.certs[value_refer.tfstate.item_name][value_set.value_ref_key]
       ]
     ]
     # if value_refer.vault_kvv2 != null
@@ -66,37 +59,11 @@ locals {
 
 
 # for debug
-output "local_certs" {
-  value = local.certs
-}
-output "local_secret_var_values" {
-  value = local.secret_var_values
-}
-
-
-# output "vyos_cert" {
-#   value = join("",
-#     slice(
-#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null)),
-#       1,
-#       length(
-#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_cert_pem, "vyos", null))
-#       ) - 2
-#     )
-#   )
+# output "local_certs" {
+#   value = local.cert_list
 # }
-
-# output "vyos_key" {
-#   value = join("",
-#     slice(
-#       split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)),
-#       1,
-#       length(
-#         split("\n", lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null))
-#       ) - 2
-#     )
-#   )
-#   # value = lookup(data.terraform_remote_state.root_ca.outputs.signed_key_pkcs8, "vyos", null)
+# output "local_secret_var_values" {
+#   value = local.secret_var_values
 # }
 
 module "cloudinit_nocloud_iso" {

@@ -61,6 +61,11 @@ output "signed_certs" {
   sensitive = true
 }
 
+# https://docs.vyos.io/en/latest/configuration/pki/index.html#key-usage-cli
+# To import cert into vyos via cli, you need to manually strip the -----BEGIN CERTIFICATE----- and -----END CERTIFICATE----- tags in the certificate.
+# Also, the certificate/key needs to be presented in a single line without line breaks (\n), this can be done using the following shell command:
+# $ tail -n +2 ca.pem | head -n -1 | tr -d '\n'
+# with terraform https://developer.hashicorp.com/terraform/language/functions/slice
 output "vyos_certs" {
   value = concat(
     [
