@@ -33,7 +33,7 @@ reverse_proxy = {
     path = "load-balancing haproxy service tcp443 rule 90"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "prometheus-node-exporter.vyos.sololab"
+      "domain-name" = "prometheus-node-exporter.day0.sololab"
       "set backend" = "vyos_node_exporter_ssl"
     }
   }

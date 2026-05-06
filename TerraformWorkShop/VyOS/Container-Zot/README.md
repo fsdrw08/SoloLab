@@ -92,22 +92,6 @@ ref:
 Sync container image from public to private
 ### use skopeo directly 
 ```powershell
-podman run --rm quay.io/skopeo/stable copy `
-    docker://docker.io/hashicorp/consul:1.18.1 `
-    docker://zot.day1.sololab/hashicorp/consul:1.18.1 `
-    --dest-tls-verify=false `
-    --dest-creds=admin:P@ssw0rd
-
-podman run --rm quay.io/skopeo/stable copy –override-arch=amd64 –override-os=linux `
-    --dest-compress-format gzip `
-    --dest-tls-verify=false `
-    --dest-creds=admin:P@ssw0rd
-    docker://docker.io/hashicorp/consul:1.18.1 `
-    oci-archive://zot.day1.sololab/hashicorp/consul:1.18.1 `
-
-```
-
-```powershell
 # https://github.com/passcod/winskopeo
 # https://github.com/containers/skopeo/issues/394
 # https://github.com/containers/skopeo/blob/main/docs/skopeo.1.md#image-names
@@ -115,44 +99,6 @@ $publicRegistry="quay.io"
 $image="cockpit/ws:329"
 $archive="quay.io_cockpit_ws_327.tar"
 $privateRegistry="zot.day1.sololab"
-
-$publicRegistry="docker.io"
-$image="hashicorp/vault:1.16.3"
-$archive="hashicorp_vault_1.16.3.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="docker.io"
-$image="hashicorp/consul:1.18.2"
-$archive="hashicorp_consul_1.18.2.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="docker.io"
-$image="library/traefik:v3.0.1"
-$archive="library_traefik_v3.0.1.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="docker.io"
-$image="traefik/whoami:v1.10.2"
-$archive="traefik_whoami_v1.10.2.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="docker.io"
-$image="coredns/coredns:1.14.2"
-$archive="coredns_coredns_1.14.2.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="quay.io"
-$image="ceph/daemon:latest-main"
-$archive="quay.io.ceph_daemon_latest-main.tar"
-$privateRegistry="zot.day1.sololab"
-
-$publicRegistry="quay.io"
-$image="fedora/postgresql-16:20241127"
-$archive="quay.io_fedora_postgresql-16_20241127.tar"
-$privateRegistry="zot.day1.sololab"
-
-$proxy="127.0.0.1:7890"
-$env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy
 
 skopeo copy --insecure-policy `
     --override-os=linux `
@@ -167,9 +113,6 @@ skopeo copy --insecure-policy `
     --dest-creds=admin:P@ssw0rd `
     oci-archive:$env:PUBLIC/Downloads/containers/$archive `
     docker://$privateRegistry/$image
-
-
-
 
 # https://github.com/LubinLew/trivy-data-sync/blob/80befc585f54769cfd28cd28fc8d9e541ca4fbee/trivy_sync.sh#L112
 oras login -u admin zot.day1.sololab
