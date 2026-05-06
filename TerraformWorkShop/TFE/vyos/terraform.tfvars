@@ -1,5 +1,5 @@
 prov_tfe = {
-  hostname = "otf.vyos.sololab"
+  hostname = "otf.day0.sololab"
   token    = "P@ssw0rd"
 }
 

@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.vyos.sololab
+  imageRegistry: zot.day0.sololab
 coredns:
   hostIP: 192.168.255.10
   servers:
@@ -32,7 +32,7 @@ coredns:
         - name: reload
         - name: log
     - zones:
-        - zone: vyos.sololab
+        - zone: day0.sololab
       port: 53
       plugins:
         - name: bind
@@ -51,7 +51,7 @@ coredns:
         - name: log
         - name: hosts
           configBlock: |-
-            192.168.255.1 api.vyos.sololab
+            192.168.255.1 vyos-api.day0.sololab
             {{ .Values.coredns.hostIP }} zot.day1.sololab
             {{ .Values.coredns.hostIP }} coredns.day1.sololab
             {{ .Values.coredns.hostIP }} etcd-0.day1.sololab

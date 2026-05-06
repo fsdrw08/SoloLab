@@ -15,7 +15,7 @@ terraform {
     key    = "Zitadel/Day1" # Name of the tfstate file
 
     endpoints = {
-      s3 = "https://minio-api.vyos.sololab" # Minio endpoint
+      s3 = "https://minio-api.day0.sololab" # Minio endpoint
     }
 
     access_key = "terraform" # Access and secret keys

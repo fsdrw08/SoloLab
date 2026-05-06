@@ -58,7 +58,7 @@ butane = {
       "prefix"                   = 24
       "gateway"                  = "192.168.255.1"
       "general_dns"              = "192.168.255.1;192.168.255.10"
-      "domain_vyos"              = "vyos.sololab."
+      "domain_vyos"              = "day0.sololab."
       "domain_vyos_dns"          = "192.168.255.1"
       "domain_sololab"           = "sololab."
       "domain_sololab_dns"       = "192.168.255.10"
@@ -72,8 +72,8 @@ butane = {
       {
         "vm_name"            = "day1"
         "ip"                 = "192.168.255.10"
-        "fcos_image_mirror"  = "zot.vyos.sololab/fedora/fedora-coreos"
-        "fcos_rebase_mirror" = "ostree-unverified-registry:zot.vyos.sololab/fedora/fedora-coreos:stable"
+        "fcos_image_mirror"  = "zot.day0.sololab/fedora/fedora-coreos"
+        "fcos_rebase_mirror" = "ostree-unverified-registry:zot.day0.sololab/fedora/fedora-coreos:stable"
       }
     ]
     value_refers = [

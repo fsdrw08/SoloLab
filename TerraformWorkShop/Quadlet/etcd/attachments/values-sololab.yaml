@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.vyos.sololab
+  imageRegistry: zot.day0.sololab
 etcd:
   ## @param etcd.podLabels Extra labels for etcd pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/

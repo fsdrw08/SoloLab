@@ -3,7 +3,7 @@ global:
 minio:
   # initContainers:
   #   - name: wait-for-oidc
-  #     image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+  #     image: zot.day0.sololab/wait4x/wait4x:3.6.0
   #     command:
   #       - wait4x
   #       - http

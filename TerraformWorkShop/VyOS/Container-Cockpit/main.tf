@@ -64,7 +64,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "cockpit"
-      image     = "zot.vyos.sololab/cockpit/ws:358"
+      image     = "zot.day0.sololab/cockpit/ws:358"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value" = "Asia/Shanghai"
@@ -87,7 +87,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 80"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "cockpit.vyos.sololab"
+        "domain-name" = "cockpit.day0.sololab"
         "set backend" = "vyos_cockpit_ssl"
       }
     }

@@ -6,6 +6,6 @@ prov_system = {
 }
 
 prov_vyos = {
-  url = "https://api.vyos.sololab"
+  url = "https://vyos-api.day0.sololab"
   key = "MY-HTTPS-API-PLAINTEXT-KEY"
 }

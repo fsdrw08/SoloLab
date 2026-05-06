@@ -97,7 +97,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "lynx-postgresql"
-      image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
+      image     = "zot.day0.sololab/sclorg/postgresql-16-c10s:20250912"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value"                        = "Asia/Shanghai"
@@ -118,7 +118,7 @@ module "vyos_container" {
     },
     {
       name      = "lynx"
-      image     = "zot.vyos.sololab/clivern/lynx:0.12.9"
+      image     = "zot.day0.sololab/clivern/lynx:0.12.9"
       pull_flag = "--tls-verify=false"
       others = {
         "command"                           = "sh -c &quot;/app/bin/migrate && /app/bin/server&quot;"
@@ -126,7 +126,7 @@ module "vyos_container" {
         "environment APP_NAME value"        = "Lynx"
         "environment APP_PORT value"        = "4000"
         "environment APP_SECRET value"      = "koPmu7TJCwD8mttV9vgWUeU7iuu/zTPOR3sX4UalM9KkYEVGPfyi0PeTVzu1TT8C"
-        "environment APP_HOST value"        = "lynx.vyos.sololab"
+        "environment APP_HOST value"        = "lynx.day0.sololab"
         "environment APP_HTTP_SCHEMA value" = "https"
         "environment DB_HOSTNAME value"     = "172.16.50.10"
         "environment DB_DATABASE value"     = "lynx"
@@ -149,7 +149,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 50"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "lynx.vyos.sololab"
+        "domain-name" = "lynx.day0.sololab"
         "set backend" = "lynx_vyos_ssl"
       }
     }

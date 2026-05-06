@@ -97,7 +97,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "otf-postgresql"
-      image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
+      image     = "zot.day0.sololab/sclorg/postgresql-16-c10s:20250912"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value"                        = "Asia/Shanghai"
@@ -118,7 +118,7 @@ module "vyos_container" {
     },
     {
       name      = "otfd"
-      image     = "zot.vyos.sololab/leg100/otfd:0.4.1"
+      image     = "zot.day0.sololab/leg100/otfd:0.4.1"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value"                    = "Asia/Shanghai"
@@ -142,7 +142,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 60"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "otf.vyos.sololab"
+        "domain-name" = "otf.day0.sololab"
         "set backend" = "otf_vyos_ssl"
       }
     }

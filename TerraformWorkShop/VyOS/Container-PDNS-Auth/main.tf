@@ -70,7 +70,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "powerdns"
-      image     = "zot.vyos.sololab/powerdns/pdns-auth-50:5.0.3"
+      image     = "zot.day0.sololab/powerdns/pdns-auth-50:5.0.3"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
@@ -101,7 +101,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 40"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "pdns-auth.vyos.sololab"
+        "domain-name" = "pdns-auth.day0.sololab"
         "set backend" = "vyos_pdns_ssl"
       }
     }

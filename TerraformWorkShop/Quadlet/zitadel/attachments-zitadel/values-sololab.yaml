@@ -1,5 +1,5 @@
 global:
-  imageRegistry: "zot.vyos.sololab"
+  imageRegistry: "zot.day0.sololab"
 zitadel:
   hostNetwork: false
   hostAliases:
@@ -23,7 +23,7 @@ zitadel:
   #   traefik.http.services.zitadel.loadbalancer.server.scheme: h2c
   initContainers:
     - name: wait-for-postgres
-      image: zot.vyos.sololab/wait4x/wait4x:3.6.0
+      image: zot.day0.sololab/wait4x/wait4x:3.6.0
       command:
         - wait4x
         - tcp

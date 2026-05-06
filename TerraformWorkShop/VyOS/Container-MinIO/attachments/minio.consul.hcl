@@ -23,11 +23,11 @@ services {
   ]
   meta = {
     prom_target_scheme       = "https"
-    prom_target_address      = "minio-api.vyos.sololab"
+    prom_target_address      = "minio-api.day0.sololab"
     prom_target_metrics_path = "minio/v2/metrics/cluster"
 
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "minio-api.vyos.sololab"
+    prom_blackbox_address           = "minio-api.day0.sololab"
     prom_blackbox_health_check_path = "minio/health/live"
   }
 }

@@ -1,24 +1,24 @@
 prov_pdns = {
   api_key        = "powerdns"
-  server_url     = "https://pdns-auth.vyos.sololab"
+  server_url     = "https://pdns-auth.day0.sololab"
   insecure_https = true
 }
 
 zones = [
   {
-    name        = "vyos.sololab."
-    nameservers = ["ns1.vyos.sololab."]
+    name        = "day0.sololab."
+    nameservers = ["ns1.day0.sololab."]
     records = [
       {
-        fqdn = "vyos.sololab."
+        fqdn = "day0.sololab."
         type = "SOA"
         ttl  = 60
         results = [
-          "ns1.vyos.sololab. vyos.sololab. 2025042901 3600 600 1814400 7200"
+          "ns1.day0.sololab. day0.sololab. 2025042901 3600 600 1814400 7200"
         ]
       },
       {
-        fqdn = "ns1.vyos.sololab."
+        fqdn = "ns1.day0.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -26,7 +26,7 @@ zones = [
         ]
       },
       {
-        fqdn = "cockpit.vyos.sololab."
+        fqdn = "cockpit.day0.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -34,7 +34,7 @@ zones = [
         ]
       },
       {
-        fqdn = "prometheus-node-exporter.vyos.sololab."
+        fqdn = "prometheus-node-exporter.day0.sololab."
         type = "A"
         ttl  = 60
         results = [

@@ -31,11 +31,11 @@ param (
     [Parameter()]
     [string]
     [ValidateSet(
-        "zot.vyos.sololab.dev",
-        "zot.vyos.sololab",
+        "zot.day0.sololab.dev",
+        "zot.zot.sololab",
         "zot.day1.sololab"
     )]
-    $PrivateRegistry = "zot.vyos.sololab.dev",
+    $PrivateRegistry = "zot.day0.sololab.dev",
 
     [ValidateNotNull()]
     [System.Management.Automation.PSCredential]

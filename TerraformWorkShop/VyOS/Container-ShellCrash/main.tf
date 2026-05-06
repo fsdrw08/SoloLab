@@ -67,7 +67,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "shellcrash"
-      image     = "zot.vyos.sololab/juewuy/shellcrash:1.9.4release"
+      image     = "zot.day0.sololab/juewuy/shellcrash:1.9.4release"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
@@ -93,7 +93,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 50"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "shellcrash.vyos.sololab"
+        "domain-name" = "shellcrash.day0.sololab"
         "set backend" = "vyos_shellcrash_ssl"
       }
     }

@@ -1,5 +1,5 @@
 global:
-  imageRegistry: zot.vyos.sololab
+  imageRegistry: zot.day0.sololab
 zot:
   resourcesPreset: medium
   config:
@@ -58,7 +58,8 @@ zot:
           startTLS: true
           baseDN: ou=people,dc=root,dc=sololab
           userAttribute: uid
-          userFilter: "(&(objectClass=person)(memberOf=cn=sso_allow,ou=groups,dc=root,dc=sololab))"
+          userFilter: "(&(objectClass=person)(memberOf=cn=sso_allow,ou=groups,dc=root,dc=\
+            sololab))"
           userGroupAttribute: memberOf
           skipVerify: false
           subtreeSearch: true

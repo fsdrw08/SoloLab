@@ -70,7 +70,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "minio"
-      image     = "zot.vyos.sololab/pgsty/minio:RELEASE.2026-03-25T00-00-00Z"
+      image     = "zot.day0.sololab/pgsty/minio:RELEASE.2026-03-25T00-00-00Z"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
@@ -97,7 +97,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 70"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "minio-api.vyos.sololab"
+        "domain-name" = "minio-api.day0.sololab"
         "set backend" = "vyos_minio_ssl"
       }
     }
@@ -133,7 +133,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 75"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "minio-console.vyos.sololab"
+        "domain-name" = "minio-console.day0.sololab"
         "set backend" = "vyos_mc_ssl"
       }
     }

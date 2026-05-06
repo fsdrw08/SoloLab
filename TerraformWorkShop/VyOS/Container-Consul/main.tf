@@ -110,7 +110,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "consul"
-      image     = "zot.vyos.sololab.dev/hashicorp/consul:1.22.6"
+      image     = "zot.day0.sololab.dev/hashicorp/consul:1.22.6"
       pull_flag = "--tls-verify=false"
       others = {
         "allow-host-networks"  = ""
@@ -142,7 +142,7 @@ module "vyos_container" {
 #       path = "load-balancing haproxy service tcp443 rule 90"
 #       configs = {
 #         "ssl"         = "req-ssl-sni"
-#         "domain-name" = "consul.vyos.sololab"
+#         "domain-name" = "consul.day0.sololab"
 #         "set backend" = "vyos_consul"
 #       }
 #     }

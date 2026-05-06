@@ -52,9 +52,9 @@ job "jenkins" {
         TZ        = "Asia/Shanghai"
         JAVA_OPTS = <<-EOF
           -Xmx500m 
-          -Dhttp.proxyHost=shellcrash.vyos.sololab 
+          -Dhttp.proxyHost=shellcrash.day0.sololab 
           -Dhttp.proxyPort=7890 
-          -Dhttps.proxyHost=shellcrash.vyos.sololab 
+          -Dhttps.proxyHost=shellcrash.day0.sololab 
           -Dhttps.proxyPort=7890
           -Dhttp.nonProxyHosts="*.localhost|*.sololab|*.consul"
         EOF
@@ -228,9 +228,9 @@ job "jenkins" {
           -Xmx600m 
           -Dhudson.model.DownloadService.noSignatureCheck=true 
           -Djenkins.install.runSetupWizard=false
-          -Dhttp.proxyHost=shellcrash.vyos.sololab 
+          -Dhttp.proxyHost=shellcrash.day0.sololab 
           -Dhttp.proxyPort=7890 
-          -Dhttps.proxyHost=shellcrash.vyos.sololab 
+          -Dhttps.proxyHost=shellcrash.day0.sololab 
           -Dhttps.proxyPort=7890
           -Dhttp.nonProxyHosts="*.localhost|*.sololab|*.consul"
         EOF

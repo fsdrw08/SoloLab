@@ -97,7 +97,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "postgrest"
-      image     = "zot.vyos.sololab/postgrest/postgrest:v13.0.7"
+      image     = "zot.day0.sololab/postgrest/postgrest:v13.0.7"
       pull_flag = "--tls-verify=false"
 
       # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
@@ -116,21 +116,21 @@ module "vyos_container" {
     },
     {
       name      = "swagger"
-      image     = "zot.vyos.sololab/swaggerapi/swagger-ui:v5.29.0"
+      image     = "zot.day0.sololab/swaggerapi/swagger-ui:v5.29.0"
       pull_flag = "--tls-verify=false"
 
       # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
       others = {
         "environment TZ value" = "Asia/Shanghai"
 
-        "environment API_URL value" = "https://postgrest.vyos.sololab/"
+        "environment API_URL value" = "https://postgrest.day0.sololab/"
 
         "network postgresql address" = "172.16.50.30"
       }
     },
     {
       name      = "postgresql"
-      image     = "zot.vyos.sololab/sclorg/postgresql-16-c10s:20250912"
+      image     = "zot.day0.sololab/sclorg/postgresql-16-c10s:20250912"
       pull_flag = "--tls-verify=false"
 
       # local_image = "/mnt/data/offline/images/quay.io_fedora_postgresql-16_latest.tar"
@@ -167,7 +167,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 50"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "postgrest.vyos.sololab"
+        "domain-name" = "postgrest.day0.sololab"
         "set backend" = "vyos_postgrest_ssl"
       }
     }
@@ -201,7 +201,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 55"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "swagger.vyos.sololab"
+        "domain-name" = "swagger.day0.sololab"
         "set backend" = "vyos_swagger_ssl"
       }
     }

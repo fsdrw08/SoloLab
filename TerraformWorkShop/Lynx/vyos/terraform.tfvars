@@ -1,5 +1,5 @@
 # https://github.com/Clivern/terraform-provider-lynx?tab=readme-ov-file#usage
-prov_lynx_api_url = "https://lynx.vyos.sololab/api/v1"
+prov_lynx_api_url = "https://lynx.day0.sololab/api/v1"
 
 # one user can be assigned to multi teams
 users = [

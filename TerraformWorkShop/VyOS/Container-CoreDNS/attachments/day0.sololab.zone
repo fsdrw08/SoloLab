@@ -1,7 +1,7 @@
-$ORIGIN vyos.sololab.
+$ORIGIN day0.sololab.
 $TTL 86400        ; 默认 TTL 24 小时
 
-@       IN  SOA  ns1.vyos.sololab. admin.vyos.sololab. (
+@       IN  SOA  ns1.day0.sololab. admin.day0.sololab. (
                 2025100801  ; 序列号
                 10800       ; 刷新 3 小时
                 3600        ; 重试 1 小时
@@ -9,8 +9,8 @@ $TTL 86400        ; 默认 TTL 24 小时
                 86400 )     ; 最小 TTL 24 小时
 
 ; 名称服务器记录
-        IN  NS   ns1.vyos.sololab.
-        IN  NS   ns2.vyos.sololab.
+        IN  NS   ns1.day0.sololab.
+        IN  NS   ns2.day0.sololab.
 
 ; A 记录
 @               IN  A    192.168.255.1

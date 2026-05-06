@@ -34,8 +34,8 @@ module "config_map" {
         })
       },
       {
-        basename = "vyos.sololab.zone"
-        content  = file("./attachments/vyos.sololab.zone")
+        basename = "day0.sololab.zone"
+        content  = file("./attachments/day0.sololab.zone")
       }
     ]
     secrets = [
@@ -136,7 +136,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 35"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "coredns.vyos.sololab"
+        "domain-name" = "coredns.day0.sololab"
         "set backend" = "vyos_coredns_metrics_ssl"
       }
     }

@@ -22,11 +22,11 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "prometheus-node-exporter.vyos.sololab"
+    prom_blackbox_address           = "prometheus-node-exporter.day0.sololab"
     prom_blackbox_health_check_path = "metrics"
 
     prom_target_scheme       = "https"
-    prom_target_address      = "prometheus-node-exporter.vyos.sololab"
+    prom_target_address      = "prometheus-node-exporter.day0.sololab"
     prom_target_metrics_path = "metrics"
     health_check_path        = "metrics"
   }

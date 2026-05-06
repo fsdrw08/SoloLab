@@ -22,7 +22,7 @@ services {
   ]
   meta = {
     prom_blackbox_scheme            = "https"
-    prom_blackbox_address           = "cockpit.vyos.sololab"
+    prom_blackbox_address           = "cockpit.day0.sololab"
     prom_blackbox_health_check_path = "ping"
 
   }

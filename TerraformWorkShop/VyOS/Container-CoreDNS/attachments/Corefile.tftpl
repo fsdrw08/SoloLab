@@ -7,11 +7,11 @@
 }
 .:53 {
   bind 127.0.0.1
-  file /etc/coredns/vyos.sololab.zone vyos.sololab {
+  file /etc/coredns/day0.sololab.zone day0.sololab {
     reload 5s
     fallthrough
   }
-  forward vyos.sololab ${ext_facing_ns}
+  forward day0.sololab ${ext_facing_ns}
   forward sololab ${int_facing_ns_sololab}
   forward dc.consul ${int_facing_ns_consul}
   forward node.consul ${int_facing_ns_consul}
@@ -23,7 +23,7 @@
 https://.:44353 {
   bind 127.0.0.1
   tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
-  file /etc/coredns/vyos.sololab.zone vyos.sololab {
+  file /etc/coredns/day0.sololab.zone day0.sololab {
     reload 5s
     fallthrough
   }
