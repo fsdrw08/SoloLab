@@ -57,7 +57,7 @@ vault_certs = [
     ttl_years   = 3
     common_name = "*.day2.sololab"
   },
-  # consul service wild card cert hosting in reverse proxy
+  # consul service wild card cert hosting in day2+ node's reverse proxy (traefik)
   {
     root_ca_backend = "pki_consul_root"
     secret_engine = {
