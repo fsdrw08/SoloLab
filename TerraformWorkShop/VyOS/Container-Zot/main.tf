@@ -108,8 +108,8 @@ module "vyos_container" {
   workloads = [
     {
       name        = "zot"
-      image       = "ghcr.io/project-zot/zot-linux-amd64:v2.1.15"
-      local_image = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.1.15.tar"
+      image       = "ghcr.io/project-zot/zot-linux-amd64:v2.1.16"
+      local_image = "/mnt/data/offline/images/ghcr.io_project-zot_zot-linux-amd64_v2.1.16.tar"
       pull_flag   = "--tls-verify=false"
       others = {
         "uid"                  = var.owner.uid
@@ -138,7 +138,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 20"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "zot.vyos.sololab.dev"
+        "domain-name" = "zot.day0.sololab.dev"
         "set backend" = "vyos_zot_ssl"
       }
     }
@@ -146,7 +146,7 @@ resource "vyos_config_block_tree" "reverse_proxy" {
       path = "load-balancing haproxy service tcp443 rule 21"
       configs = {
         "ssl"         = "req-ssl-sni"
-        "domain-name" = "zot.vyos.sololab"
+        "domain-name" = "zot.day0.sololab"
         "set backend" = "vyos_zot_ssl"
       }
     }

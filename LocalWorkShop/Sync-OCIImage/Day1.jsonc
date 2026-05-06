@@ -50,9 +50,9 @@
     },
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "project-zot/zot-linux-amd64:v2.1.15",
-        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.15.tar",
-        "privateRepo": "project-zot/zot-linux-amd64:v2.1.15",
+        "publicRepo": "project-zot/zot-linux-amd64:v2.1.16",
+        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.16.tar",
+        "privateRepo": "project-zot/zot-linux-amd64:v2.1.16",
         "description": "https://github.com/project-zot/zot/pkgs/container/zot-linux-amd64, https://quay.io/repository/giantswarm/zot-linux-amd64?tab=tags",
     },
     {
