@@ -32,11 +32,10 @@ resource "local_file" "keystore" {
 resource "null_resource" "init" {
   depends_on = [local_file.keystore]
   triggers = {
-    host      = var.vm_conn.host
-    port      = var.vm_conn.port
-    user      = var.vm_conn.user
-    password  = var.vm_conn.password
-    data_dirs = var.data_dirs
+    host     = var.vm_conn.host
+    port     = var.vm_conn.port
+    user     = var.vm_conn.user
+    password = var.vm_conn.password
   }
   connection {
     type     = "ssh"
@@ -49,8 +48,8 @@ resource "null_resource" "init" {
     inline = [
       <<-EOT
         #!/bin/bash
-        sudo mkdir -p ${var.data_dirs}
-        sudo chown ${var.runas.uid}:${var.runas.gid} ${var.data_dirs}
+        sudo mkdir -p /mnt/data/opendj
+        sudo chown ${var.runas.uid}:${var.runas.gid} /mnt/data/opendj
       EOT
     ]
   }
@@ -67,10 +66,47 @@ resource "null_resource" "init" {
 }
 
 module "config_map" {
+  source = "../../modules/system-config_files"
+  owner  = var.owner
+  config = {
+    create_dir = true
+    dir        = "/etc/opendj"
+    files = [
+      {
+        basename = "setup.props"
+        content = templatefile("${path.module}/opendj/setup.props", {
+          # https://github.com/OpenWIS/open-dj-am-install-scripts/blob/4e08bb61782d7d8621e6e88ba65ec4e8d0f2ace9/deploy-scripts/setup_opendj.properties.orig#L5
+          hostname                      = "opendj.day1.sololab"
+          ldapPort                      = 1389
+          ldapsPort                     = 1636
+          adminConnectorPort            = 4444
+          enableStartTLS                = true
+          generateSelfSignedCertificate = false
+          useJavaKeyStore               = "/etc/opendj/certs/keystore"
+          keyStorePassword              = "changeit"
+          rootUserDN                    = "cn=Directory Manager"
+          rootUserPasswordFile          = "/etc/opendj/.pw"
+          backendType                   = "je"
+          addBaseEntry                  = true
+          baseDN                        = "dc=root,dc=sololab"
+        })
+      }
+    ]
+    secrets = [
+      {
+        sub_dir  = "certs"
+        basename = "keystore"
+        content  = file("${path.module}/keystore")
+      }
+    ]
+  }
+}
+
+module "config_map" {
   depends_on = [local_file.keystore]
   source     = "../../modules/system-opendj"
-  vm_conn    = var.vm_conn
-  runas      = var.runas
+  vm_conn    = var.prov_system
+  runas      = var.owner.uid
   install    = null
   config = {
     # the properties block only needed when deploy on local machine
@@ -137,30 +173,85 @@ module "config_map" {
 
 
 module "vyos_container" {
-  depends_on = [
-    null_resource.init,
-    module.config_map
+  depends_on = [module.config_map]
+  source     = "../../modules/vyos-container"
+  vm_conn    = var.prov_system
+  network = {
+    name        = "opendj"
+    cidr_prefix = "172.16.3.0/24"
+  }
+  workloads = [
+    {
+      name        = "opendj"
+      image       = "docker.io/openidentityplatform/opendj:4.6.3"
+      local_image = "/mnt/data/offline/images/docker.io_openidentityplatform_opendj_4.6.3.tar"
+      pull_flag   = "--tls-verify=false"
+      others = {
+        "network opendj address" = "172.16.3.10"
+        "memory"                 = "1024"
+
+        "environment TZ value"            = "Asia/Shanghai"
+        "environment BASE_DN value"       = "dc=root,dc=sololab"
+        "environment ROOT_PASSWORD value" = "P@ssw0rd"
+        # pkcs12 doesn't work, use jks instead
+        # "environment OPENDJ_SSL_OPTIONS value" = "--usePkcs12keyStore /cert/opendj.pfx --keyStorePassword changeit"
+        # https://github.com/OpenIdentityPlatform/OpenDJ/blob/4.8.2/opendj-server-legacy/src/main/java/org/opends/quicksetup/util/Utils.java#L1499-L1503
+        "environment OPENDJ_SSL_OPTIONS value" = "--useJavaKeystore /opt/opendj/certs/keystore --keyStorePassword changeit"
+
+        "volume opendj_cert source"      = "/etc/opendj/certs"
+        "volume opendj_cert destination" = "/opt/opendj/certs"
+        # https://github.com/OpenIdentityPlatform/OpenDJ/wiki/TIP:-How-to-Persist-OpenDJ-Docker-Container-Data-Between-Restarts
+        "volume opendj_data source"      = "/mnt/data/opendj"
+        "volume opendj_data destination" = "/opt/opendj/data"
+        # https://github.com/OpenIdentityPlatform/OpenDJ/blob/fe3b09f4a34ebc81725fd7263990839afd345752/opendj-packages/opendj-docker/Dockerfile
+        # https://github.com/OpenIdentityPlatform/OpenDJ/blob/master/opendj-packages/opendj-docker/bootstrap/setup.sh#L39-L49
+        "volume opendj_schema source"      = "/etc/opendj/schema"
+        "volume opendj_schema destination" = "/opt/opendj/bootstrap/schema"
+      }
+    }
   ]
-  source   = "../../modules/vyos-container"
-  vm_conn  = var.vm_conn
-  network  = var.container.network
-  workload = var.container.workload
 }
 
 resource "vyos_config_block_tree" "reverse_proxy" {
   depends_on = [module.vyos_container]
-  for_each   = var.reverse_proxy
-  path       = each.value.path
-  configs    = each.value.configs
-}
-
-resource "vyos_static_host_mapping" "host_mapping" {
-  depends_on = [
-    module.vyos_container,
-    vyos_config_block_tree.reverse_proxy,
-  ]
-  host = var.dns_record.host
-  ip   = var.dns_record.ip
+  for_each = {
+    ldap_frontend = {
+      path = "load-balancing haproxy service tcp389" # vyos 1.5
+      configs = {
+        "listen-address" = "192.168.255.1"
+        "port"           = "389"
+        "mode"           = "tcp"
+        "backend"        = "opendj_ldap"
+      }
+    }
+    ldap_backend = {
+      path = "load-balancing haproxy backend opendj_ldap" # vyos 1.5
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.3.10"
+        "server vyos port"    = "1389"
+      }
+    }
+    ldaps_frontend = {
+      path = "load-balancing haproxy service tcp636" # vyos 1.5
+      configs = {
+        "listen-address" = "192.168.255.1"
+        "port"           = "636"
+        "mode"           = "tcp"
+        "backend"        = "opendj_ldaps"
+      }
+    }
+    ldaps_backend = {
+      path = "load-balancing haproxy backend opendj_ldaps" # vyos 1.5
+      configs = {
+        "mode"                = "tcp"
+        "server vyos address" = "172.16.3.10"
+        "server vyos port"    = "1636"
+      }
+    }
+  }
+  path    = each.value.path
+  configs = each.value.configs
 }
 
 locals {
