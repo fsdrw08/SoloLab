@@ -15,16 +15,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.12",
-        "archive": "docker.io_library_traefik_v3.6.12.tar",
-        "privateRepo": "library/traefik:v3.6.12",
+        "publicRepo": "library/traefik:v3.7.0",
+        "archive": "docker.io_library_traefik_v3.7.0.tar",
+        "privateRepo": "library/traefik:v3.7.0",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "prometheus/node-exporter:v1.10.2",
-        "archive": "quay.io_prometheus_node-exporter_v1.10.2.tar",
-        "privateRepo": "prometheus/node-exporter:v1.10.2",
+        "publicRepo": "prometheus/node-exporter:v1.11.1",
+        "archive": "quay.io_prometheus_node-exporter_v1.11.1.tar",
+        "privateRepo": "prometheus/node-exporter:v1.11.1",
         "description": "https://quay.io/repository/prometheus/node-exporter?tab=tags",
     },
     {

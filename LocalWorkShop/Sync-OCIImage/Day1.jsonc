@@ -1,23 +1,23 @@
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:43.20260301.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_43.20260301.3.1.tar",
-        "privateRepo": "fedora/fedora-coreos:43.20260301.3.1",
+        "publicRepo": "fedora/fedora-coreos:43.20260413.3.2",
+        "archive": "quay.io_fedora_fedora-coreos_43.20260413.3.2.tar",
+        "privateRepo": "fedora/fedora-coreos:43.20260413.3.2",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:43.20260301.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_43.20260301.3.1.tar",
+        "publicRepo": "fedora/fedora-coreos:43.20260413.3.2",
+        "archive": "quay.io_fedora_fedora-coreos_43.20260413.3.2.tar",
         "privateRepo": "fedora/fedora-coreos:stable",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "coreos/etcd:v3.6.9",
-        "archive": "quay.io_coreos_etcd_v3.6.9.tar",
-        "privateRepo": "coreos/etcd:v3.6.9",
+        "publicRepo": "coreos/etcd:v3.6.11",
+        "archive": "quay.io_coreos_etcd_v3.6.11.tar",
+        "privateRepo": "coreos/etcd:v3.6.11",
         "description": "https://quay.io/repository/coreos/etcd?tab=tags",
     },
     {
@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.6.12",
-        "archive": "docker.io_library_traefik_v3.6.12.tar",
-        "privateRepo": "library/traefik:v3.6.12",
+        "publicRepo": "library/traefik:v3.7.0",
+        "archive": "docker.io_library_traefik_v3.7.0.tar",
+        "privateRepo": "library/traefik:v3.7.0",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -43,10 +43,10 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "lldap/lldap:v0.6.2-alpine-rootless",
-        "archive": "docker.io_lldap_lldap_v0.6.2-alpine-rootless.tar",
-        "privateRepo": "lldap/lldap:v0.6.2-alpine-rootless",
-        "description": "https://hub.docker.com/r/lldap/lldap/tags",
+        "publicRepo": "lldap/lldap:v0.6.3-alpine-rootless",
+        "archive": "docker.io_lldap_lldap_v0.6.3-alpine-rootless.tar",
+        "privateRepo": "lldap/lldap:v0.6.3-alpine-rootless",
+        "description": "https://hub.docker.com/r/lldap/lldap/tags, https://github.com/lldap/lldap/releases",
     },
     {
         "publicRegistry": "ghcr.io",
@@ -71,15 +71,15 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/vault:1.21.4",
-        "archive": "docker.io_hashicorp_vault_1.21.4.tar",
-        "privateRepo": "hashicorp/vault:1.21.4",
+        "publicRepo": "hashicorp/vault:2.0.0",
+        "archive": "docker.io_hashicorp_vault_2.0.0.tar",
+        "privateRepo": "hashicorp/vault:2.0.0",
         "description": "https://hub.docker.com/r/hashicorp/vault/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "apteno/alpine-jq:2026-03-22",
-        "archive": "docker.io_apteno_alpine-jq_2026-03-22.tar",
+        "publicRepo": "apteno/alpine-jq:2026-05-03",
+        "archive": "docker.io_apteno_alpine-jq_2026-05-03.tar",
         "privateRepo": "apteno/alpine-jq:latest",
         "description": "https://hub.docker.com/r/apteno/alpine-jq/tags",
     },
@@ -106,9 +106,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "prometheus/node-exporter:v1.10.2",
-        "archive": "quay.io_prometheus_node-exporter_v1.10.2.tar",
-        "privateRepo": "prometheus/node-exporter:v1.10.2",
+        "publicRepo": "prometheus/node-exporter:v1.11.1",
+        "archive": "quay.io_prometheus_node-exporter_v1.11.1.tar",
+        "privateRepo": "prometheus/node-exporter:v1.11.1",
         "description": "https://quay.io/repository/prometheus/node-exporter?tab=tags",
     },
     {
@@ -120,9 +120,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/alloy:v1.14.2",
-        "archive": "docker.io_grafana_alloy_v1.14.2.tar",
-        "privateRepo": "grafana/alloy:v1.14.2",
+        "publicRepo": "grafana/alloy:v1.16.1",
+        "archive": "docker.io_grafana_alloy_v1.16.1.tar",
+        "privateRepo": "grafana/alloy:v1.16.1",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://github.com/grafana/alloy, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
     {
