@@ -24,7 +24,7 @@ job "nfs-nodes" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/sig-storage/nfsplugin:v4.13.1"
+        image = "zot.day1.sololab/sig-storage/nfsplugin:v4.13.2"
         args = [
           "--drivername=nfs.csi.k8s.io",
           "--endpoint=unix:///csi/csi.sock",

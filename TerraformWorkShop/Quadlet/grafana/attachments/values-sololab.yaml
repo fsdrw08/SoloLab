@@ -56,10 +56,10 @@ grafana:
         # https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
         # https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         preinstall:
-          - grafana-lokiexplore-app@2.0.0@http://dufs.day1.sololab/public/binaries/grafana-lokiexplore-app-2.0.0.zip
-          - grafana-pyroscope-app@2.0.1@http://dufs.day1.sololab/public/binaries/grafana-pyroscope-app-2.0.1.zip
-          - grafana-exploretraces-app@2.0.0@http://dufs.day1.sololab/public/binaries/grafana-exploretraces-app-2.0.0.zip
-          - grafana-metricsdrilldown-app@2.0.0@http://dufs.day1.sololab/public/binaries/grafana-metricsdrilldown-app-2.0.0.zip
+          - grafana-lokiexplore-app@2.0.4@http://dufs.day1.sololab/public/binaries/grafana-lokiexplore-app-2.0.4.zip
+          - grafana-pyroscope-app@2.0.4@http://dufs.day1.sololab/public/binaries/grafana-pyroscope-app-2.0.4.zip
+          - grafana-exploretraces-app@2.0.4@http://dufs.day1.sololab/public/binaries/grafana-exploretraces-app-2.0.4.zip
+          - grafana-metricsdrilldown-app@2.0.4@http://dufs.day1.sololab/public/binaries/grafana-metricsdrilldown-app-2.0.4.zip
   secret:
     others:
       # mountPath: /etc/grafana/secret
