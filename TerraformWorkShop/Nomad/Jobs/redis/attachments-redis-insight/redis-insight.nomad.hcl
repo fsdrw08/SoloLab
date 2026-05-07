@@ -101,7 +101,7 @@ job "redis-insight" {
     }
     volume "redis-insight" {
       type            = "host"
-      source          = "redis-insight"
+      source          = "hvol-redis-insight"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

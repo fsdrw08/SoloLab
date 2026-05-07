@@ -35,7 +35,7 @@ policies = [
       }
 
       # this is a host_volume rule, with a wildcard label
-      host_volume "*" {
+      host_volume "hvol-*" {
         policy = "write"
       }
 

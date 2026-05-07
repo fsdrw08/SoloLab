@@ -3,6 +3,45 @@ prov_nomad = {
   skip_verify = true
 }
 
+dynamic_host_volumes = [
+  {
+    name = "hvol-redis"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day3"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 999
+      gid = 1000
+    }
+  },
+  {
+    name = "hvol-redis-insight"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day3"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 1000
+      gid = 1000
+    }
+  },
+]
+
 jobs = [
   {
     path = "./attachments-redis/redis.nomad.hcl"

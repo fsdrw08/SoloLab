@@ -106,7 +106,7 @@ job "redis" {
     }
     volume "redis" {
       type            = "host"
-      source          = "redis"
+      source          = "hvol-redis"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
