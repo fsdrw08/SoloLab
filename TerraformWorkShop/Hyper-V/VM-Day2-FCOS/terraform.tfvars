@@ -45,7 +45,7 @@ butane = {
     base = "./Butane/base.yaml"
     others = [
       "./Butane/network.yaml",
-      "./Butane/packages.yaml",
+      "./Butane/packages-aliyun.yaml",
       "./Butane/storage.yaml",
       "./Butane/user-1000.yaml",
       "./Butane/user-1001.yaml",

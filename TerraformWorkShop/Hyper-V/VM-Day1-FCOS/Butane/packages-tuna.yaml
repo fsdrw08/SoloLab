@@ -25,8 +25,9 @@ storage:
           [fedora]
           name=Fedora $releasever - $basearch
           failovermethod=priority
-          baseurl=https://mirrors.ustc.edu.cn/fedora/releases/$releasever/Everything/$basearch/os/
+          baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora/releases/$releasever/Everything/$basearch/os/
           enabled=1
+          countme=1
           metadata_expire=7d
           repo_gpgcheck=0
           type=rpm
@@ -39,9 +40,9 @@ storage:
         inline: |
           [updates]
           name=Fedora $releasever - $basearch - Updates
-          failovermethod=priority
-          baseurl=https://mirrors.ustc.edu.cn/fedora/updates/$releasever/Everything/$basearch/
+          baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora/updates/$releasever/Everything/$basearch/
           enabled=1
+          countme=1
           repo_gpgcheck=0
           type=rpm
           gpgcheck=1
@@ -117,7 +118,6 @@ systemd:
     # 2. Ensure vm's system image had rebased to the private registry (by this service, or the `rpm-ostree rebase` command)
     # 3. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
     # ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
-    # ref: https://discussion.fedoraproject.org/t/fcos-auto-updates-from-a-private-image/115888
     - name: zincati.service
       enabled: false
     - name: rpm-ostreed-automatic.timer
@@ -147,6 +147,7 @@ systemd:
         WantedBy=multi-user.target
 
     # install packages during ignition process
+    # https://docs.fedoraproject.org/en-US/fedora-coreos/os-extensions/
     # https://github.com/coreos/fedora-coreos-tracker/issues/681#issuecomment-974301872
     - name: rpm-ostree-install.service
       enabled: true
@@ -162,7 +163,11 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStartPre=/usr/bin/rpm-ostree install -y --allow-inactive $RPMS
+        # `--allow-inactive` ensures that rpm-ostree does not return an error
+        # if the package is already installed. This is useful if the package is
+        # added to the root image in a future Fedora CoreOS release as it will
+        # prevent the service from failing.
+        ExecStartPre=/usr/bin/rpm-ostree install -y --idempotent --allow-inactive $RPMS
         ExecStart=/bin/touch /var/lib/%N.stamp
         ExecStartPost=/bin/bash -c "systemctl --no-block reboot"
         # ExecStartPost=/bin/bash -c "systemctl disable coreos-container-signing-migration-motd.service && systemctl --no-block reboot"
