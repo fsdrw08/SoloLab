@@ -51,6 +51,7 @@ users = [
       "app-nomad-admin",        # "ca4dde60" 
       "app-grafana-user",       # "a4019ca3" 
       "app-grafana-root",       # "a3d0b5af" 
+      "app-gitea-user",         # "60939134" 
       "app-gitblit-user",       # "0d243b52" 
       "app-gitblit-admin",      # "ba1fd3a9" 
       "app-nexus-user",         # "90ebdcb1" 
@@ -74,6 +75,7 @@ users = [
       "app-consul-user",        # "c2826a4f" 
       "app-consul-readonly",    # "542b0c36" 
       "app-nomad-user",         # "091a24fe" 
+      "app-gitea-user",         # "60939134"
       "app-grafana-user",       # "a4019ca3" 
       "app-nexus-user",         # "90ebdcb1" 
       "app-jenkins-user",       # "8a5d9ae7"
@@ -156,6 +158,10 @@ groups = [
   {
     iac_id       = "9114292a"
     display_name = "app-grafana-editor"
+  },
+  {
+    iac_id       = "60939134"
+    display_name = "app-gitea-user"
   },
   {
     iac_id       = "0d243b52"

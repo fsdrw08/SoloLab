@@ -327,6 +327,17 @@ dns_records = [
     }
   },
   {
+    hostname = "gitea.day4.sololab"
+    value = {
+      string_map = {
+        host = "day2.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "gitblit.day4.sololab"
     value = {
       string_map = {

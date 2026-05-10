@@ -38,6 +38,11 @@ users = [
     secret_key_version = "1"
   },
   {
+    name               = "gitea"
+    policies           = ["gitea-readwrite"]
+    secret_key_version = "1"
+  },
+  {
     name               = "nexus3"
     policies           = ["nexus3-readwrite"]
     secret_key_version = "1"
@@ -127,6 +132,25 @@ policies = [
                 ],
                 "Resource": [
                     "arn:aws:s3:::loki/*"
+                ]
+            }
+        ]
+    }
+    EOF
+  },
+  {
+    name   = "gitea-readwrite"
+    policy = <<-EOF
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gitea/*"
                 ]
             }
         ]

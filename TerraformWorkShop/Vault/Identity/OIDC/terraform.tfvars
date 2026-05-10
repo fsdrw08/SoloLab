@@ -55,6 +55,13 @@ oidc_client = [
     ]
   },
   {
+    name         = "gitea"
+    allow_groups = ["app-gitea-user"]
+    redirect_uris = [
+      "https://gitea.day4.sololab/user/oauth2/Vault/callback",
+    ]
+  },
+  {
     name         = "jenkins"
     allow_groups = ["app-jenkins-user"]
     redirect_uris = [

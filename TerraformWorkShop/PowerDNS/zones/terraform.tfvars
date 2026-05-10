@@ -356,6 +356,14 @@ zones = [
         ]
       },
       {
+        fqdn = "gitea.day4.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
         fqdn = "gitblit.day4.sololab."
         type = "A"
         ttl  = 60

@@ -13,7 +13,7 @@ job "gitea" {
   constraint {
     attribute = "${attr.unique.hostname}"
     operator  = "="
-    value     = "ci"
+    value     = "day4"
   }
 
   group "gitea" {
@@ -22,6 +22,58 @@ job "gitea" {
         static = 2222
       }
     }
+
+    task "wait4x-postgresql" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      driver = "podman"
+      config {
+        image = "zot.day1.sololab/wait4x/wait4x:3.6.0"
+        args = [
+          "postgresql",
+          "${URL}",
+        ]
+      }
+      template {
+        # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html
+        data = <<-EOH
+        # Lines starting with a # are ignored
+
+        # Empty lines are also ignored
+        URL=postgres://{{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/gitea?sslmode=require
+        EOH
+        # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
+        destination = "secrets/file.env"
+        env         = true
+      }
+      vault {}
+    }
+
+    # task "gitea-chown" {
+    #   lifecycle {
+    #     hook    = "prestart"
+    #     sidecar = false
+    #   }
+
+    #   driver = "podman"
+    #   user   = "root"
+    #   config {
+    #     image   = "zot.day1.sololab/gitea/gitea:1.26.1-rootless"
+    #     command = "/bin/bash"
+    #     args = [
+    #       "-c",
+    #       "mkdir -p /var/lib/gitea/custom && chown 1000:1000 /var/lib/gitea/custom/",
+    #     ]
+    #   }
+    #   volume_mount {
+    #     volume        = "gitea"
+    #     destination   = "/var/lib/gitea"
+    #     selinux_label = "Z"
+    #   }
+    # }
 
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitea" {
@@ -82,12 +134,12 @@ job "gitea" {
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.gitea-redirect.entrypoints" = "web"
-          "traefik.http.routers.gitea-redirect.rule"        = "(Host(`gitea.ci.sololab`)||Host(`gitea.service.consul`))"
+          "traefik.http.routers.gitea-redirect.rule"        = "(Host(`gitea.day4.sololab`)||Host(`gitea.service.consul`))"
           "traefik.http.routers.gitea-redirect.middlewares" = "toHttps@file"
           "traefik.http.routers.gitea-redirect.service"     = "gitea"
 
           "traefik.http.routers.gitea.entryPoints" = "webSecure"
-          "traefik.http.routers.gitea.rule"        = "(Host(`gitea.ci.sololab`)||Host(`gitea.service.consul`))"
+          "traefik.http.routers.gitea.rule"        = "(Host(`gitea.day4.sololab`)||Host(`gitea.service.consul`))"
           "traefik.http.routers.gitea.tls"         = "true"
           "traefik.http.routers.gitea.service"     = "gitea"
 
@@ -98,24 +150,32 @@ job "gitea" {
         ]
         volumes = [
           # Customization files should be placed in /var/lib/gitea/custom directory
-          # https://docs.gitea.com/1.25/installation/install-with-docker-rootless#customization
-          # https://docs.gitea.com/1.25/administration/customizing-gitea#customizing-the-git-configuration
+          # https://docs.gitea.com/1.26/installation/install-with-docker-rootless#customization
+          # https://docs.gitea.com/1.26/administration/customizing-gitea#customizing-the-git-configuration
           # https://docs.gitea.com/installation/install-with-docker-rootless#customization
           # https://docs.gitea.com/administration/customizing-gitea#customizing-the-git-configuration
           "local/app.ini:/var/lib/gitea/custom/app.ini",
         ]
+        userns = "keep-id:uid=1000,gid=1000"
+
+      }
+
+      env {
+        GITEA__security__INSTALL_LOCK = "true"
       }
 
       resources {
         # Specifies the CPU required to run this task in MHz
         cpu = 300
         # Specifies the memory required in MB
-        memory = 300
+        memory = 600
       }
 
       template {
         data        = var.config
         destination = "local/app.ini"
+        uid         = 1000
+        gid         = 1000
       }
       vault {}
 
@@ -127,10 +187,10 @@ job "gitea" {
     }
     volume "gitea" {
       type            = "csi"
-      source          = "gitea-data"
+      source          = "csi-gitea-data"
       read_only       = false
       attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      access_mode     = "multi-node-multi-writer"
     }
   }
 }

@@ -32,7 +32,7 @@ param (
     [string]
     [ValidateSet(
         "zot.day0.sololab.dev",
-        "zot.zot.sololab",
+        "zot.day0.sololab",
         "zot.day1.sololab"
     )]
     $PrivateRegistry = "zot.day0.sololab.dev",

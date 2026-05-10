@@ -18,6 +18,11 @@ databases = [
     secret_version = 1
   },
   {
+    name           = "gitea"
+    user_name      = "gitea"
+    secret_version = 1
+  },
+  {
     name           = "nexus"
     user_name      = "nexus"
     secret_version = 1

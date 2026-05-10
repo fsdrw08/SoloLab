@@ -249,14 +249,22 @@ reverse_proxy = {
       "set backend" = "day2"
     }
   }
-  day4_frontend_gitblit = {
+  day4_frontend_gitea = {
     path = "load-balancing haproxy service tcp443 rule 410"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "gitblit.day4.sololab"
+      "domain-name" = "gitea.day4.sololab"
       "set backend" = "day2"
     }
   }
+  # day4_frontend_gitblit = {
+  #   path = "load-balancing haproxy service tcp443 rule 410"
+  #   configs = {
+  #     "ssl"         = "req-ssl-sni"
+  #     "domain-name" = "gitblit.day4.sololab"
+  #     "set backend" = "day2"
+  #   }
+  # }
   day4_frontend_nexus = {
     path = "load-balancing haproxy service tcp443 rule 420"
     configs = {
