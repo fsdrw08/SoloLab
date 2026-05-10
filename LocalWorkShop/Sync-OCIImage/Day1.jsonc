@@ -99,9 +99,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "sigoden/dufs:v0.45.0",
-        "archive": "docker.io_sigoden_dufs_v0.45.0.tar",
-        "privateRepo": "sigoden/dufs:v0.45.0",
+        "publicRepo": "sigoden/dufs:v0.46.0",
+        "archive": "docker.io_sigoden_dufs_v0.46.0.tar",
+        "privateRepo": "sigoden/dufs:v0.46.0",
         "description": "https://hub.docker.com/r/sigoden/dufs/tags",
     },
     {
