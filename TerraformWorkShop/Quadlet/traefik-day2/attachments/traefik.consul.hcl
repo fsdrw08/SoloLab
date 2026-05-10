@@ -20,7 +20,7 @@ services {
     "metrics-exposing-blackbox",
     "metrics-exposing-general",
 
-    "traefik.enable=true",
+    # "traefik.enable=true",
     # "traefik.http.routers.trafik-dashboard-redirect.entryPoints=web",
     # "traefik.http.routers.trafik-dashboard-redirect.rule=(Host(`traefik.day2.sololab`)||Host(`day2.traefik.service.consul`)) && (PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
     # "traefik.http.routers.trafik-dashboard-redirect.middlewares=toHttps@file",
@@ -30,10 +30,10 @@ services {
     # "traefik.http.routers.trafik-dashboard.rule=(Host(`traefik.day2.sololab`)||Host(`day2.traefik.service.consul`)) && (PathPrefix(`/api`)||PathPrefix(`/dashboard`))",
     # "traefik.http.routers.trafik-dashboard.service=api@internal",
     # "traefik.http.routers.trafik-dashboard.middlewares=userPass@file",
-    "traefik.http.routers.metrics.entryPoints=webSecure",
-    "traefik.http.routers.metrics.rule=Host(`day2.traefik.service.consul`) && PathPrefix(`/metrics`)",
-    "traefik.http.routers.metrics.tls=true",
-    "traefik.http.routers.metrics.service=prometheus@internal",
+    # "traefik.http.routers.metrics.entryPoints=webSecure",
+    # "traefik.http.routers.metrics.rule=Host(`day2.traefik.service.consul`) && PathPrefix(`/metrics`)",
+    # "traefik.http.routers.metrics.tls=true",
+    # "traefik.http.routers.metrics.service=prometheus@internal",
   ]
   meta = {
     prom_blackbox_scheme            = "https"

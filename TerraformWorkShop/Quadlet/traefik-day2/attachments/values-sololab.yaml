@@ -109,6 +109,10 @@ traefik:
     # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
     traefik.http.services.dashboard.loadbalancer.server.port: 443
 
+    traefik.http.routers.metrics.entryPoints: webSecure
+    traefik.http.routers.metrics.rule: Host(`day2.traefik.service.consul`) && PathPrefix(`/metrics`)
+    traefik.http.routers.metrics.tls: true
+    traefik.http.routers.metrics.service: prometheus@internal
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
