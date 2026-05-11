@@ -17,13 +17,45 @@ resource "minio_iam_user" "users" {
   name = each.value.name
 }
 
+resource "terraform_data" "key_version" {
+  for_each = {
+    for user in var.users : user.name => user
+    if !user.hardcoded_credential
+  }
+  input = each.value.secret_key_version
+}
+
+resource "random_password" "access_key" {
+  for_each = {
+    for user in var.users : user.name => user
+    if !user.hardcoded_credential
+  }
+  length  = 10
+  special = false
+  lifecycle {
+    replace_triggered_by = [terraform_data.key_version[each.key]]
+  }
+}
+
+resource "random_password" "secret_key" {
+  for_each = {
+    for user in var.users : user.name => user
+    if !user.hardcoded_credential
+  }
+  length  = 10
+  special = false
+  lifecycle {
+    replace_triggered_by = [terraform_data.key_version[each.key]]
+  }
+}
+
 resource "minio_accesskey" "users" {
   for_each = {
     for user in var.users : user.name => user
   }
   user               = minio_iam_user.users[each.value.name].name
-  access_key         = each.value.access_key
-  secret_key         = each.value.secret_key
+  access_key         = each.value.hardcoded_credential ? each.value.access_key : random_password.access_key[each.value.name].result
+  secret_key         = each.value.hardcoded_credential ? each.value.secret_key : random_password.secret_key[each.value.name].result
   secret_key_version = each.value.secret_key_version
 }
 
@@ -49,4 +81,20 @@ resource "minio_iam_user_policy_attachment" "attachments" {
   }
   user_name   = minio_iam_user.users[element(split(":", each.key), 0)].name
   policy_name = minio_iam_policy.policies[element(split(":", each.key), 1)].id
+}
+
+resource "vault_kv_secret_v2" "secret" {
+  for_each = {
+    for user in var.users : user.name => user
+  }
+  mount = "kvv2_minio"
+  name  = each.value.name
+  data_json_wo = jsonencode(
+    {
+      access_key = minio_accesskey.users[each.value.name].access_key,
+      secret_key = each.value.hardcoded_credential ? each.value.secret_key : random_password.secret_key[each.value.name].result
+    }
+  )
+  data_json_wo_version = tonumber(each.value.secret_key_version)
+  delete_all_versions  = true
 }
