@@ -31,7 +31,26 @@ csi_volumes = [
     volume_id = "csi-gitea-data"
     capabilities = [
       {
-        access_mode     = "multi-node-multi-writer"
+        access_mode     = "single-node-writer"
+        attachment_mode = "file-system"
+      }
+    ]
+    parameters = {
+      server           = "day3.node.consul"
+      share            = "/"
+      mountPermissions = "777"
+    }
+    mount_options = {
+      fs_type = "nfs"
+    }
+  },
+  {
+    name      = "csi-gitea-config"
+    plugin_id = "nfs"
+    volume_id = "csi-gitea-config"
+    capabilities = [
+      {
+        access_mode     = "single-node-writer"
         attachment_mode = "file-system"
       }
     ]

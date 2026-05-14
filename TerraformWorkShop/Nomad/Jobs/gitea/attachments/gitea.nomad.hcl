@@ -52,28 +52,6 @@ job "gitea" {
       vault {}
     }
 
-    # task "gitea-chown" {
-    #   lifecycle {
-    #     hook    = "prestart"
-    #     sidecar = false
-    #   }
-
-    #   driver = "podman"
-    #   user   = "root"
-    #   config {
-    #     image   = "zot.day1.sololab/gitea/gitea:1.26.1-rootless"
-    #     command = "/bin/bash"
-    #     args = [
-    #       "-c",
-    #       "mkdir -p /var/lib/gitea/custom && chown 1000:1000 /var/lib/gitea/custom/",
-    #     ]
-    #   }
-    #   volume_mount {
-    #     volume        = "gitea"
-    #     destination   = "/var/lib/gitea"
-    #     selinux_label = "Z"
-    #   }
-    # }
 
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitea" {
@@ -154,9 +132,8 @@ job "gitea" {
           # https://docs.gitea.com/1.26/administration/customizing-gitea#customizing-the-git-configuration
           # https://docs.gitea.com/installation/install-with-docker-rootless#customization
           # https://docs.gitea.com/administration/customizing-gitea#customizing-the-git-configuration
-          "local/app.ini:/var/lib/gitea/custom/app.ini",
+          "local/app.ini:/etc/gitea/app.ini",
         ]
-        userns = "keep-id:uid=1000,gid=1000"
 
       }
 
@@ -180,17 +157,29 @@ job "gitea" {
       vault {}
 
       volume_mount {
-        volume        = "gitea"
+        volume        = "gitea-data"
         destination   = "/var/lib/gitea"
         selinux_label = "Z"
       }
+      volume_mount {
+        volume        = "gitea-config"
+        destination   = "/etc/gitea"
+        selinux_label = "Z"
+      }
     }
-    volume "gitea" {
+    volume "gitea-data" {
       type            = "csi"
       source          = "csi-gitea-data"
       read_only       = false
       attachment_mode = "file-system"
-      access_mode     = "multi-node-multi-writer"
+      access_mode     = "single-node-writer"
+    }
+    volume "gitea-config" {
+      type            = "csi"
+      source          = "csi-gitea-config"
+      read_only       = false
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
     }
   }
 }

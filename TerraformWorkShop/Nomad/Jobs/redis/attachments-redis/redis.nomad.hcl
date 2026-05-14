@@ -26,8 +26,9 @@ job "redis" {
     task "redis" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
-        provider = "consul"
-        name     = "redis-${attr.unique.hostname}"
+        provider     = "consul"
+        name         = "redis-${attr.unique.hostname}"
+        address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
