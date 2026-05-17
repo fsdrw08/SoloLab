@@ -1,6 +1,13 @@
 [
     {
         "publicRegistry": "docker.io",
+        "publicRepo": "juicedata/juicefs-csi-driver:v0.31.6",
+        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.31.6.tar",
+        "privateRepo": "juicedata/juicefs-csi-driver:v0.31.6",
+        "description": "https://hub.docker.com/r/juicedata/juicefs-csi-driver/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
         "publicRepo": "gitea/gitea:1.26.1-rootless",
         "archive": "docker.io_gitea-gitea_1.26.1-rootless.tar",
         "privateRepo": "gitea/gitea:1.26.1-rootless",
