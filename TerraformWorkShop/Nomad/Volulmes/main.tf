@@ -45,8 +45,12 @@ resource "nomad_csi_volume" "volumes" {
   capacity_max = each.value.capacity_max
 
   parameters = each.value.parameters
-  mount_options {
-    fs_type     = each.value.mount_options.fs_type
-    mount_flags = each.value.mount_options.mount_flags
+  dynamic "mount_options" {
+    for_each = each.value.mount_options == null ? [] : [each.value.mount_options]
+    content {
+      fs_type     = mount_options.value.fs_type
+      mount_flags = mount_options.value.value.mount_flags
+    }
   }
+  secrets = each.value.secrets
 }

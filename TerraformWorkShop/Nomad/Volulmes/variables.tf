@@ -44,6 +44,7 @@ variable "csi_volumes" {
       }),
       null
     )
+    secrets = optional(map(string), null)
   }))
   default = []
 }
