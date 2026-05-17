@@ -64,14 +64,6 @@ reverse_proxy = {
       "set backend" = "day1"
     }
   }
-  day1_frontend_dex = {
-    path = "load-balancing haproxy service tcp443 rule 145"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "dex.day1.sololab"
-      "set backend" = "day1"
-    }
-  }
   day1_frontend_dufs = {
     path = "load-balancing haproxy service tcp443 rule 150"
     configs = {
@@ -104,14 +96,14 @@ reverse_proxy = {
   #     "set backend" = "day1"
   #   }
   # }
-  day1_frontend_whoami = {
-    path = "load-balancing haproxy service tcp443 rule 170"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "whoami.day1.sololab"
-      "set backend" = "day1"
-    }
-  }
+  # day1_frontend_whoami = {
+  #   path = "load-balancing haproxy service tcp443 rule 170"
+  #   configs = {
+  #     "ssl"         = "req-ssl-sni"
+  #     "domain-name" = "whoami.day1.sololab"
+  #     "set backend" = "day1"
+  #   }
+  # }
   day1_frontend_consul = {
     path = "load-balancing haproxy service tcp443 rule 180"
     configs = {
@@ -151,6 +143,14 @@ reverse_proxy = {
       "server vault address"       = "192.168.255.10"
       "server vault port"          = "8200"
       "server vault send-proxy-v2" = ""
+    }
+  }
+  day1_frontend_pd = {
+    path = "load-balancing haproxy service tcp443 rule 205"
+    configs = {
+      "ssl"         = "req-ssl-sni"
+      "domain-name" = "pd.day1.sololab"
+      "set backend" = "day1"
     }
   }
   day2_frontend_consul = {

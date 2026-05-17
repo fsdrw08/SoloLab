@@ -1,0 +1,25 @@
+global:
+  imageRegistry: zot.day1.sololab
+pd:
+  livenessProbe:
+    httpGet:
+      port: 12379
+  configFile:
+    client-urls: "http://127.0.0.1:12379"
+    peer-urls: "http://127.0.0.1:12380"
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.pd-redirect.entrypoints: web
+    traefik.http.routers.pd-redirect.rule: Host(`pd.day1.sololab`)
+    traefik.http.routers.pd-redirect.middlewares: toHttps@file
+    traefik.http.routers.pd-redirect.service: pd
+
+    traefik.http.routers.pd.entrypoints: webSecure
+    traefik.http.routers.pd.rule: Host(`pd.day1.sololab`)
+    traefik.http.routers.pd.tls: true
+    traefik.http.routers.pd.service: pd
+
+    traefik.http.services.pd.loadbalancer.server.port: 12379
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai

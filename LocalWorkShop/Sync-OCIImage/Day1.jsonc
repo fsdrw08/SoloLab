@@ -127,9 +127,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hectorm/nfs-ganesha:v10",
-        "archive": "docker.io_hectorm_nfs-ganesha_v10.tar",
-        "privateRepo": "hectorm/nfs-ganesha:v10",
-        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+        "publicRepo": "pingcap/pd:v8.5.6",
+        "archive": "docker.io_pingcap_pd_v8.5.6.tar",
+        "privateRepo": "pingcap/pd:v8.5.6",
+        "description": "https://hub.docker.com/r/pingcap/pd/tags",
     },
 ]

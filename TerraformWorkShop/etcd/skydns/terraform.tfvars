@@ -151,6 +151,17 @@ dns_records = [
     }
   },
   {
+    hostname = "pd.day1.sololab"
+    value = {
+      string_map = {
+        host = "192.168.255.10"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "alloy.day2.sololab"
     value = {
       string_map = {
