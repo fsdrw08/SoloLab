@@ -27,40 +27,46 @@ dynamic_host_volumes = [
 csi_volumes = [
   {
     name      = "csi-gitea-data"
-    plugin_id = "nfs"
+    plugin_id = "juicefs"
     volume_id = "csi-gitea-data"
     capabilities = [
       {
-        access_mode     = "single-node-writer"
+        access_mode     = "multi-node-multi-writer"
         attachment_mode = "file-system"
       }
     ]
-    parameters = {
-      server           = "day3.node.consul"
-      share            = "/"
-      mountPermissions = "777"
-    }
-    mount_options = {
-      fs_type = "nfs"
+    secrets = {
+      name = "csi-gitea-data"
+      # juicefs redis metadata engine use 1 whole logical database
+      # (1 redis instance have 16 logical databases) for 1 file system
+      # https://juicefs.com/docs/community/databases_for_metadata/#create-a-file-system
+      # consider use tikv as metadata engine instead
+      metaurl = "redis://juicefs:juicefs@redis-day3.service.consul:6379/0"
+      # https://juicefs.com/docs/zh/community/reference/how_to_set_up_object_storage/#other-options
+      bucket     = "https://dufs.day1.sololab/webdav/?tls-insecure-skip-verify=true"
+      storage    = "webdav"
+      access-key = "admin"
+      secret-key = "admin"
     }
   },
   {
     name      = "csi-gitea-config"
-    plugin_id = "nfs"
+    plugin_id = "juicefs"
     volume_id = "csi-gitea-config"
     capabilities = [
       {
-        access_mode     = "single-node-writer"
+        access_mode     = "multi-node-multi-writer"
         attachment_mode = "file-system"
       }
     ]
-    parameters = {
-      server           = "day3.node.consul"
-      share            = "/"
-      mountPermissions = "777"
-    }
-    mount_options = {
-      fs_type = "nfs"
+    secrets = {
+      name    = "csi-gitea-config"
+      metaurl = "redis://juicefs:juicefs@redis-day3.service.consul:6379/0"
+      # https://juicefs.com/docs/zh/community/reference/how_to_set_up_object_storage/#other-options
+      bucket     = "https://dufs.day1.sololab/webdav/?tls-insecure-skip-verify=true"
+      storage    = "webdav"
+      access-key = "admin"
+      secret-key = "admin"
     }
   },
 ]
