@@ -39,7 +39,6 @@ csi_volumes = [
       name = "csi-gitea-data"
       # juicefs redis metadata engine use 1 whole logical database
       # (1 redis instance have 16 logical databases) for 1 file system
-      # https://juicefs.com/docs/community/databases_for_metadata/#create-a-file-system
       # https://juicefs.com/docs/community/databases_for_metadata/#etcd
       # consider use etcd as metadata engine instead
       metaurl = "etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/gitea-data/_?cacert=/secrets/tls/ca.crt"

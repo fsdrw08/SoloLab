@@ -56,14 +56,17 @@ job "gitea-admin" {
         command = "/bin/bash"
         args    = ["/tmp/gitea-admin.sh"]
         volumes = [
-          "local/app.ini:/var/lib/gitea/custom/app.ini",
+          "local/app.ini:/etc/gitea/app.ini",
           "local/gitea-admin.sh:/tmp/gitea-admin.sh",
         ]
-        userns = "keep-id:uid=1000,gid=1000"
+
       }
       template {
+        change_mode = "noop"
         data        = var.config
         destination = "local/app.ini"
+        uid         = 1000
+        gid         = 1000
       }
       template {
         data        = var.init_script
