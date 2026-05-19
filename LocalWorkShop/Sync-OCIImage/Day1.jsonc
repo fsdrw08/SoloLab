@@ -1,15 +1,15 @@
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:43.20260413.3.2",
-        "archive": "quay.io_fedora_fedora-coreos_43.20260413.3.2.tar",
-        "privateRepo": "fedora/fedora-coreos:43.20260413.3.2",
+        "publicRepo": "fedora/fedora-coreos:44.20260419.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260419.3.1.tar",
+        "privateRepo": "fedora/fedora-coreos:44.20260419.3.1",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:43.20260413.3.2",
-        "archive": "quay.io_fedora_fedora-coreos_43.20260413.3.2.tar",
+        "publicRepo": "fedora/fedora-coreos:44.20260419.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260419.3.1.tar",
         "privateRepo": "fedora/fedora-coreos:stable",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
@@ -131,5 +131,12 @@
         "archive": "docker.io_pingcap_pd_v8.5.6.tar",
         "privateRepo": "pingcap/pd:v8.5.6",
         "description": "https://hub.docker.com/r/pingcap/pd/tags",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "pingcap/tikv:v8.5.6",
+        "archive": "docker.io_pingcap_tikv_v8.5.6.tar",
+        "privateRepo": "pingcap/tikv:v8.5.6",
+        "description": "https://hub.docker.com/r/pingcap/tikv/tags",
     },
 ]
