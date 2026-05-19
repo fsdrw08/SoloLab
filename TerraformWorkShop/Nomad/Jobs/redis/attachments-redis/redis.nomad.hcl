@@ -27,7 +27,7 @@ job "redis" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
       service {
         provider     = "consul"
-        name         = "redis-${attr.unique.hostname}"
+        name         = "redis"
         address_mode = "host"
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
@@ -40,6 +40,7 @@ job "redis" {
         }
 
         tags = [
+          "${attr.unique.hostname}",
           "log",
           "metrics-exposing-general",
         ]
@@ -47,7 +48,7 @@ job "redis" {
           prom_target_scheme                    = "https"
           prom_target_address                   = "prometheus-redis-exporter.service.consul"
           prom_target_metrics_path              = "scrape"
-          prom_target_metrics_path_param_target = "redis-${attr.unique.hostname}.service.consul:6379"
+          prom_target_metrics_path_param_target = "${attr.unique.hostname}.redis.service.consul:6379"
         }
       }
 
@@ -84,7 +85,7 @@ job "redis" {
         user default off
         user exporter +client +ping +info +config|get +cluster|info +slowlog +latency +memory +select +get +scan +xinfo +type +pfcount +strlen +llen +scard +zcard +hlen +xlen on >exporter
         user admin on ~* +@all >P@ssw0rd
-        user gitea on ~gitea:* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
+        user gitea on ~gitea* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
         EOH
 
         destination = "secrets/acl.conf"
