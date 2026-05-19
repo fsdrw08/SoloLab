@@ -97,6 +97,14 @@ etcd:
     ## @param etcd.configFile.discovery Discovery URL used to bootstrap the cluster.
     ##
     # discovery: "day2.sololab"
+    # ref: https://juicefs.com/docs/community/etcd_best_practices/
+    ## @param etcd.configFile.auto-compaction-mode Interpret 'auto-compaction-retention' one of: periodic|revision.
+    ## 'periodic' for duration based retention, defaulting to hours if no time unit is provided (e.g. '5m'). 'revision' for revision number based retention.
+    ##
+    auto-compaction-mode: revision
+    ## @param etcd.configFile.auto-compaction-retention Auto compaction retention length. 0 means disable auto compaction.
+    ##
+    auto-compaction-retention: "10000"
     ### Security
     ## @param etcd.configFile.client-transport-security Block to config the client transport security
     client-transport-security:
