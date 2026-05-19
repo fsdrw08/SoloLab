@@ -63,7 +63,7 @@ coredns:
             stubzones
             path /skydns
             endpoint https://localhost:2379
-            credentials monitor monitor
+            credentials skydns skydns
             tls /etc/coredns/tls/ca.crt
         - name: forward
           parameters: . 192.168.255.1
