@@ -30,7 +30,7 @@ job "juicefs-node" {
           "--endpoint=unix://csi/csi.sock",
           "--logtostderr",
           "--v=5",
-          "--nodeid=test",
+          "--nodeid=${attr.unique.hostname}",
           "--by-process=true",
         ]
         privileged = true
@@ -49,6 +49,17 @@ job "juicefs-node" {
       env {
         POD_NAME = "csi-node"
       }
+
+      template {
+        change_mode = "noop"
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
+        EOF
+        destination = "secrets/tls/ca.crt"
+        change_mode = "restart"
+      }
+
+      vault {}
 
     }
   }
