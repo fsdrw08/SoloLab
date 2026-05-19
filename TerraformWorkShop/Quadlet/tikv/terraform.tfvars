@@ -19,8 +19,16 @@ podman_kubes = [
       value_file = "./attachments-pd/values-sololab.yaml"
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/pd-aio.yaml"
-
-}]
+  },
+  {
+    helm = {
+      name       = "tikv"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/tikv"
+      value_file = "./attachments-tikv/values-sololab.yaml"
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/tikv-aio.yaml"
+  }
+]
 
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
@@ -53,6 +61,38 @@ podman_quadlet = {
       ]
       service = {
         name   = "pd"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Distributed transactional key-value database, originally created to complement TiDB"
+            Documentation         = "https://github.com/tikv/tikv/tree/master"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 5
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "tikv-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = "host"
+            # service
+            ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 20 --retry-delay 30 https://pd.day1.sololab/pd/api/v1/members\""
+            ExecStartPost = ""
+            # ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 8-13 -n 1) && podman healthcheck run tikv-server\""
+            Restart = "on-failure"
+          }
+        },
+      ]
+      service = {
+        name   = "tikv"
         status = "start"
       }
     },

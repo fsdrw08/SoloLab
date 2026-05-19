@@ -1,0 +1,29 @@
+global:
+  imageRegistry: zot.day1.sololab
+tikv:
+  resourcesPreset: "medium"
+  configFile:
+    pd:
+      endpoints: ["127.0.0.1:12379"]
+    # storage:
+    #   block-cache:
+    #     ## @param tikv.configFile.storage.block-cache.capacity Size of the shared block cache.
+    #     ## Normally it should be tuned to 30%-50% of system's total memory.
+    #     ##
+    #     capacity: "400MB"
+  podLabels:
+    traefik.enable: true
+    traefik.http.routers.tikv-redirect.entrypoints: web
+    traefik.http.routers.tikv-redirect.rule: Host(`tikv.day1.sololab`)
+    traefik.http.routers.tikv-redirect.middlewares: toHttps@file
+    traefik.http.routers.tikv-redirect.service: tikv
+
+    traefik.http.routers.tikv.entrypoints: webSecure
+    traefik.http.routers.tikv.rule: Host(`tikv.day1.sololab`)
+    traefik.http.routers.tikv.tls: true
+    traefik.http.routers.tikv.service: tikv
+
+    traefik.http.services.tikv.loadbalancer.server.port: 20180
+  extraEnvVars:
+    - name: TZ
+      value: Asia/Shanghai
