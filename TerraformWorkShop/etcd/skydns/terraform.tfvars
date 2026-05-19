@@ -187,7 +187,7 @@ dns_records = [
     hostname = "traefik.day2.sololab"
     value = {
       string_map = {
-        host = "traefik-day2.service.consul"
+        host = "day2.traefik.service.consul"
       }
       number_map = {
         ttl = 60
@@ -264,7 +264,7 @@ dns_records = [
     hostname = "prometheus-podman-exporter.day2.sololab"
     value = {
       string_map = {
-        host = "prometheus-podman-exporter-day2.service.consul"
+        host = "day2.prometheus-podman-exporter.service.consul"
       }
       number_map = {
         ttl = 60
@@ -275,7 +275,7 @@ dns_records = [
     hostname = "prometheus-node-exporter.day2.sololab"
     value = {
       string_map = {
-        host = "prometheus-node-exporter-day2.service.consul"
+        host = "day2.prometheus-node-exporter.service.consul"
       }
       number_map = {
         ttl = 60
