@@ -17,12 +17,6 @@ job "gitea" {
   }
 
   group "gitea" {
-    network {
-      port "gitea-ssh" {
-        static = 2222
-      }
-    }
-
     task "wait4x-postgresql" {
       lifecycle {
         hook    = "prestart"
@@ -52,6 +46,12 @@ job "gitea" {
       vault {}
     }
 
+    network {
+      port "gitea-ssh" {
+        static = 2222
+        to     = 22
+      }
+    }
 
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "gitea" {
@@ -126,6 +126,9 @@ job "gitea" {
         ports = [
           "gitea-ssh",
         ]
+        sysctl = {
+          "net.ipv4.ip_unprivileged_port_start" = "22"
+        }
         volumes = [
           # Customization files should be placed in /var/lib/gitea/custom directory
           # https://docs.gitea.com/1.26/installation/install-with-docker-rootless#customization
@@ -149,6 +152,7 @@ job "gitea" {
       }
 
       template {
+        change_mode = "noop"
         data        = var.config
         destination = "local/app.ini"
         uid         = 1000
