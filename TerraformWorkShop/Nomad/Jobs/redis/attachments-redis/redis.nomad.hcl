@@ -1,4 +1,8 @@
-variable "config" {
+variable "server_config" {
+  type = string
+}
+
+variable "acl_config" {
   type = string
 }
 
@@ -75,19 +79,14 @@ job "redis" {
       }
 
       template {
-        data        = var.config
-        destination = "local/server.conf"
         change_mode = "restart"
+        data        = var.server_config
+        destination = "local/server.conf"
       }
 
       template {
-        data = <<-EOH
-        user default off
-        user exporter +client +ping +info +config|get +cluster|info +slowlog +latency +memory +select +get +scan +xinfo +type +pfcount +strlen +llen +scard +zcard +hlen +xlen on >exporter
-        user admin on ~* +@all >P@ssw0rd
-        user gitea on ~gitea* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >gitea
-        EOH
-
+        change_mode = "restart"
+        data        = var.acl_config
         destination = "secrets/acl.conf"
       }
       # vault {}

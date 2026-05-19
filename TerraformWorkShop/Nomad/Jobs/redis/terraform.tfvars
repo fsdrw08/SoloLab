@@ -47,8 +47,12 @@ jobs = [
     path = "./attachments-redis/redis.nomad.hcl"
     var_sets = [
       {
-        name                = "config"
+        name                = "server_config"
         value_template_path = "./attachments-redis/server.conf"
+      },
+      {
+        name                = "acl_config"
+        value_template_path = "./attachments-redis/acl.conf"
       }
     ]
   },
