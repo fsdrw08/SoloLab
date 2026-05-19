@@ -70,7 +70,7 @@ data "helm_template" "podman_kubes" {
     each.value.helm.value_sets == null ? [] : [
       for value_set in flatten([each.value.helm.value_sets]) : {
         name = value_set.name
-        value = value_set.value_string != null ? value_set.value_string : templatefile(
+        value = value_set.value_plaintext != null ? value_set.value_plaintext : templatefile(
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
@@ -145,6 +145,7 @@ module "podman_quadlet" {
 resource "remote_file" "consul_service" {
   for_each = toset([
     "./attachments-pd/pd.consul.hcl",
+    "./attachments-tikv/tikv.consul.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")

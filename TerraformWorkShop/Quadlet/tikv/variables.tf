@@ -25,7 +25,7 @@ variable "podman_kubes" {
         list(
           object({
             name                = string
-            value_string        = optional(string, null)
+            value_plaintext     = optional(any, null)
             value_template_path = optional(string, null)
             value_template_vars = optional(map(string), null)
           })

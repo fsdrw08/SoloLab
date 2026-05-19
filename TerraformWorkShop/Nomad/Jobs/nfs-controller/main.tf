@@ -3,7 +3,7 @@ locals {
     for job in var.jobs : job.path => {
       vars = job.var_sets == null ? {} : {
         for var_set in job.var_sets :
-        "${var_set.name}" => var_set.value_string == null ? templatefile(var_set.value_template_path, var_set.value_template_vars) : var_set.value_string
+        "${var_set.name}" => var_set.value_plaintext == null ? templatefile(var_set.value_template_path, var_set.value_template_vars) : var_set.value_plaintext
       }
     }
   }

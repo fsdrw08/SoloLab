@@ -89,7 +89,7 @@ data "helm_template" "podman_kubes" {
     each.value.helm.value_sets == null ? [] : [
       for value_set in flatten([each.value.helm.value_sets]) : {
         name = value_set.name
-        value = value_set.value_string != null ? value_set.value_string : templatefile(
+        value = value_set.value_plaintext != null ? value_set.value_plaintext : templatefile(
           "${value_set.value_template_path}", "${value_set.value_template_vars}"
         )
       }
