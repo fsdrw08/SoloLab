@@ -15,4 +15,4 @@ fi
     --key "{{ with secret "kvv2_vault/data/oidc-client_gitea" }}{{.Data.data.client_id}}{{ end }}" \
     --secret "{{ with secret "kvv2_vault/data/oidc-client_gitea" }}{{.Data.data.client_secret}}{{ end }}" \
     --auto-discover-url "{{ with secret "kvv2_vault/data/oidc-provider_sololab" }}{{.Data.data.config_url}}{{ end }}" \
-    --scopes "openid profile email" 
+    --scopes "openid profile user groups" 

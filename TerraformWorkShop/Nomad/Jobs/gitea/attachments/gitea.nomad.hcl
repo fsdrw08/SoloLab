@@ -142,6 +142,7 @@ job "gitea" {
 
       env {
         GITEA__security__INSTALL_LOCK = "true"
+        SSL_CERT_FILE                 = "/secrets/sololab.crt"
       }
 
       resources {
@@ -158,6 +159,13 @@ job "gitea" {
         uid         = 1000
         gid         = 1000
       }
+      template {
+        change_mode = "noop"
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
+        EOF
+        destination = "secrets/sololab.crt"
+      }
       vault {}
 
       volume_mount {
@@ -165,22 +173,10 @@ job "gitea" {
         destination   = "/var/lib/gitea"
         selinux_label = "Z"
       }
-      volume_mount {
-        volume        = "gitea-config"
-        destination   = "/etc/gitea"
-        selinux_label = "Z"
-      }
     }
     volume "gitea-data" {
       type            = "csi"
       source          = "csi-gitea-data"
-      read_only       = false
-      attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
-    }
-    volume "gitea-config" {
-      type            = "csi"
-      source          = "csi-gitea-config"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"

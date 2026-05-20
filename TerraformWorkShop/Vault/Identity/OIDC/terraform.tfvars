@@ -58,6 +58,7 @@ oidc_client = [
     name         = "gitea"
     allow_groups = ["app-gitea-user"]
     redirect_uris = [
+      # https://www.authelia.com/integration/openid-connect/clients/gitea/#assumptions
       "https://gitea.day4.sololab/user/oauth2/Vault/callback",
     ]
   },

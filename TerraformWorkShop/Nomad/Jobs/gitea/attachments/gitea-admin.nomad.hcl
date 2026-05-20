@@ -1,7 +1,7 @@
 variable "config" {
   type = string
 }
-variable "init_script" {
+variable "admin_script" {
   type = string
 }
 
@@ -61,6 +61,9 @@ job "gitea-admin" {
         ]
 
       }
+      env {
+        SSL_CERT_FILE = "/secrets/sololab.crt"
+      }
       template {
         change_mode = "noop"
         data        = var.config
@@ -69,7 +72,15 @@ job "gitea-admin" {
         gid         = 1000
       }
       template {
-        data        = var.init_script
+        change_mode = "noop"
+        data        = <<-EOF
+          {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
+        EOF
+        destination = "secrets/sololab.crt"
+      }
+      template {
+        change_mode = "noop"
+        data        = var.admin_script
         destination = "local/gitea-admin.sh"
       }
       vault {}
