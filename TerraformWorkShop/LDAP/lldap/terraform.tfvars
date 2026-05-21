@@ -51,6 +51,7 @@ users = [
       "app-nomad-admin",        # "ca4dde60" 
       "app-grafana-user",       # "a4019ca3" 
       "app-grafana-root",       # "a3d0b5af" 
+      "app-gitea-admin",        # "f48d634b"
       "app-gitea-user",         # "60939134" 
       "app-nexus-user",         # "90ebdcb1" 
       "app-nexus-admin",        # "044af468" 
@@ -156,6 +157,10 @@ groups = [
   {
     iac_id       = "9114292a"
     display_name = "app-grafana-editor"
+  },
+  {
+    iac_id       = "f48d634b"
+    display_name = "app-gitea-admin"
   },
   {
     iac_id       = "60939134"
