@@ -67,9 +67,10 @@ roles = [
     }
   },
   {
-    name                  = "admin"
-    description           = "admin role"
-    policy_names          = ["admin"]
+    name         = "admin"
+    description  = "admin role"
+    policy_names = ["admin"]
+    # https://developer.hashicorp.com/nomad/commands/acl/binding-rule/create#examples
     auth_binding_selector = "\"app-nomad-admin\" in list.roles"
   },
   {

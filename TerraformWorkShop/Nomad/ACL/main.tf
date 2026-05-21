@@ -30,14 +30,19 @@ resource "nomad_acl_auth_method" "oidc" {
     oidc_client_id     = data.vault_identity_oidc_client_creds.creds.client_id
     oidc_client_secret = data.vault_identity_oidc_client_creds.creds.client_secret
     bound_audiences    = [data.vault_identity_oidc_client_creds.creds.client_id]
-    oidc_scopes        = ["user", "groups"]
+    oidc_scopes        = ["profile", "groups"]
     allowed_redirect_uris = [
       "https://nomad.day2.sololab/oidc/callback",
       "https://nomad.day2.sololab/ui/settings/tokens",
     ]
+    # "username" is the attribute(claim, the sub item of scope) in the OIDC token, see Vault/Identity/OIDC/terraform.tfvars
+    # "user" is the attribute in the middle variable in nomad, used in above $${value.user}
     claim_mappings = {
-      "username" = "user"
+      "preferred_username" = "user"
     }
+    # "groups" is the attribute(claim, the sub item of scope) in the OIDC token, see Vault/Identity/OIDC/terraform.tfvars
+    # "roles" is the attribute in the middle variable in nomad, used in terraform.tfvars (keyword: list.roles)
+    # # https://developer.hashicorp.com/nomad/commands/acl/binding-rule/create#examples
     list_claim_mappings = {
       "groups" : "roles"
     }
