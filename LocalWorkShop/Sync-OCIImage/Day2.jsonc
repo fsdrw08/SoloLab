@@ -43,9 +43,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/grafana:13.0.1",
-        "archive": "docker.io_grafana_grafana_13.0.1.tar",
-        "privateRepo": "grafana/grafana:13.0.1",
+        "publicRepo": "grafana/grafana:13.0.1-security-01",
+        "archive": "docker.io_grafana_grafana_13.0.1-security-01.tar",
+        "privateRepo": "grafana/grafana:13.0.1-security-01",
         "description": "https://hub.docker.com/r/grafana/grafana/tags, https://github.com/grafana/grafana/releases, https://quay.io/repository/giantswarm/grafana?tab=tags",
     },
     {
