@@ -14,28 +14,28 @@ podman_kubes = [
       value_sets = [
         {
           # https://github.com/microsoft/farmvibes-ai/blob/a9e999fcfaf9a90f147257bbdf7221b8a8b7ce52/src/vibe_core/vibe_core/terraform/local/modules/kubernetes/rabbitmq.tf#L57
-          name         = "lldap.extraEnvVars[0].name"
-          value_string = "LLDAP_LDAP_PORT"
+          name            = "lldap.extraEnvVars[0].name"
+          value_plaintext = "LLDAP_LDAP_PORT"
         },
         {
-          name         = "lldap.extraEnvVars[0].value"
-          value_string = "389"
+          name            = "lldap.extraEnvVars[0].value"
+          value_plaintext = "389"
         },
         {
-          name         = "lldap.extraEnvVars[1].name"
-          value_string = "LLDAP_LDAPS_OPTIONS__PORT"
+          name            = "lldap.extraEnvVars[1].name"
+          value_plaintext = "LLDAP_LDAPS_OPTIONS__PORT"
         },
         {
-          name         = "lldap.extraEnvVars[1].value"
-          value_string = "636"
+          name            = "lldap.extraEnvVars[1].value"
+          value_plaintext = "636"
         },
         {
-          name         = "lldap.extraEnvVars[2].name"
-          value_string = "TZ"
+          name            = "lldap.extraEnvVars[2].name"
+          value_plaintext = "TZ"
         },
         {
-          name         = "lldap.extraEnvVars[2].value"
-          value_string = "Asia/Shanghai"
+          name            = "lldap.extraEnvVars[2].value"
+          value_plaintext = "Asia/Shanghai"
         },
       ]
       value_refers = [
