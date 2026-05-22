@@ -11,11 +11,11 @@ deb https://rolling-packages.vyos.net/current current main
 EOF
 
 # apt-get update
-apt-get update
+apt-get -o Acquire::Check-Valid-Until=false update
 
 # Install cloud-init
 # apt-get install -t current -y --force-yes cloud-init cloud-utils ifupdown jq yq nfs-ganesha nfs-ganesha-vfs 
-apt-get install -t current -y cloud-init cloud-utils ifupdown jq yq
+apt-get -o Acquire::Check-Valid-Until=false install -t current -y cloud-init cloud-utils ifupdown jq yq
 
 # stop and disable nfs-ganesha
 # systemctl disable nfs-ganesha
