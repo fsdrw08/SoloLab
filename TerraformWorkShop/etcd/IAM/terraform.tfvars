@@ -6,15 +6,15 @@ prov_etcd = {
 }
 
 roles = [
-  {
-    name = "role_skydns"
-    permissions = [
-      {
-        permission = "read"
-        key        = "/skydns/"
-      }
-    ]
-  },
+  # {
+  #   name = "role_skydns"
+  #   permissions = [
+  #     {
+  #       permission = "read"
+  #       key        = "/skydns/"
+  #     }
+  #   ]
+  # },
   {
     name = "role_juicefs"
     permissions = [
@@ -27,11 +27,11 @@ roles = [
 ]
 
 users = [
-  {
-    username = "skydns"
-    password = "skydns"
-    roles    = ["role_skydns"]
-  },
+  # {
+  #   username = "skydns"
+  #   password = "skydns"
+  #   roles    = ["role_skydns"]
+  # },
   {
     username = "juicefs"
     password = "juicefs"

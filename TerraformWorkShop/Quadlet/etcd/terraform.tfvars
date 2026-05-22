@@ -91,6 +91,8 @@ post_process = {
       ROOT_PASSWORD    = "P@ssw0rd"
       MONITOR_USERNAME = "monitor"
       MONITOR_PASSWORD = "monitor"
+      SKDNS_USERNAME   = "skydns"
+      SKDNS_PASSWORD   = "skydns"
     }
   }
 }

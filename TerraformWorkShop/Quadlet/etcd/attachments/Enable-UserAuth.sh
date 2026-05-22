@@ -213,6 +213,23 @@ main() {
         if ! grant_user_role ${MONITOR_USERNAME} role_monitor; then
             echo "⚠指定 monitor 角色 有问题"
         fi
+        
+        # 创建 skydns 用户（幂等：如果用户已存在会失败，但前面已经检查过）
+        if ! create_user ${SKDNS_USERNAME} ${SKDNS_PASSWORD}; then
+            echo "⚠ 创建 skydns 用户 有问题"
+        fi
+        # 创建 skydns 角色
+        if ! create_role role_skydns; then
+            echo "⚠ 创建 skydns 角色 有问题"
+        fi
+        # 配置 skydns 角色权限
+        if ! grant_role_permission role_skydns /skydns/ L3NreWRuczA= READ; then
+            echo "⚠ 配置 skydns 角色权限 有问题"
+        fi
+        # 指定 skydns 角色
+        if ! grant_user_role ${SKDNS_USERNAME} role_skydns; then
+            echo "⚠指定 skydns 角色 有问题"
+        fi
 
         # 认证未启用，先启用认证
         if ! enable_auth; then

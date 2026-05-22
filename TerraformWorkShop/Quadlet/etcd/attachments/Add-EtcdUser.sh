@@ -25,6 +25,11 @@ if $base_cmd auth status | grep -q '^Authentication Status: false$'; then
     if ! $base_cmd user list | grep -q '^monitor$'; then
         $base_cmd user add monitor:monitor
     fi
+    
+    # Add 'skydns' user, used by the service when talking to the backend
+    if ! $base_cmd user list | grep -q '^skydns$'; then
+        $base_cmd user add skydns:skydns
+    fi
 
     # Add role with permissions and assign it to monitor user
     # https://github.com/SNL-GMS/GMS-PI13-OPEN/blob/2575fd3e7f25fe1c9a24074c23189b87d3e4ff52/docker/etcd/etcd-setup.sh#L28
@@ -32,6 +37,14 @@ if $base_cmd auth status | grep -q '^Authentication Status: false$'; then
         $base_cmd role add role_monitor
         $base_cmd role grant-permission --prefix=true role_monitor read ''
         $base_cmd user grant-role monitor role_monitor
+    fi
+    
+    # Add role with permissions and assign it to skydns user
+    # https://github.com/SNL-GMS/GMS-PI13-OPEN/blob/2575fd3e7f25fe1c9a24074c23189b87d3e4ff52/docker/etcd/etcd-setup.sh#L28
+    if ! $base_cmd role list | grep -q '^role_skydns$'; then
+        $base_cmd role add role_skydns
+        $base_cmd role grant-permission --prefix=true role_skydns read '/skydns/'
+        $base_cmd user grant-role skydns role_skydns
     fi
 
     # Finally, actually enable the authentication
