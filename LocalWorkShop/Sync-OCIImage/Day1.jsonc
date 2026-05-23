@@ -125,18 +125,4 @@
         "privateRepo": "grafana/alloy:v1.16.1",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://github.com/grafana/alloy, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "pingcap/pd:v8.5.6",
-        "archive": "docker.io_pingcap_pd_v8.5.6.tar",
-        "privateRepo": "pingcap/pd:v8.5.6",
-        "description": "https://hub.docker.com/r/pingcap/pd/tags",
-    },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "pingcap/tikv:v8.5.6",
-        "archive": "docker.io_pingcap_tikv_v8.5.6.tar",
-        "privateRepo": "pingcap/tikv:v8.5.6",
-        "description": "https://hub.docker.com/r/pingcap/tikv/tags",
-    },
 ]
