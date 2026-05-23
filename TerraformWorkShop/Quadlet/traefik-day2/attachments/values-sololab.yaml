@@ -95,15 +95,13 @@ traefik:
   podLabels:
     traefik.enable: true
     traefik.http.routers.dashboard-redirect.entrypoints: web
-    traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day2.sololab`) &&
-      (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard-redirect.rule: "Host(`traefik.day2.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
     traefik.http.routers.dashboard-redirect.middlewares: toHttps@file
     traefik.http.routers.dashboard-redirect.service: api@internal
 
     traefik.http.routers.dashboard.entryPoints: webSecure
     traefik.http.routers.dashboard.tls: true
-    traefik.http.routers.dashboard.rule: "Host(`traefik.day2.sololab`) &&
-      (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+    traefik.http.routers.dashboard.rule: "Host(`traefik.day2.sololab`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
     traefik.http.routers.dashboard.service: api@internal
     traefik.http.routers.dashboard.middlewares: userPass@file
     # https://community.traefik.io/t/api-not-accessible-when-traefik-in-host-network-mode/13321/2
@@ -116,7 +114,7 @@ traefik:
   extraEnvVars:
     - name: TZ
       value: Asia/Shanghai
-    # https://github.com/traefik/traefik/blob/v3.7.0/docs/content/https/acme.md#cacertificates
+    # https://github.com/traefik/traefik/blob/v3.7.1/docs/content/https/acme.md#cacertificates
     - name: LEGO_CA_CERTIFICATES
       value: /etc/traefik/tls/ca.crt
     - name: LEGO_CA_SYSTEM_CERT_POOL
