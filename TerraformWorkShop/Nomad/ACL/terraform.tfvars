@@ -1,11 +1,17 @@
 prov_nomad = {
   address     = "https://nomad.day2.sololab"
   skip_verify = true
+  secret_reference = {
+    vault_kvv2 = {
+      mount = "kvv2_nomad"
+      name  = "token-management"
+      key   = "token"
+    }
+  }
 }
 
 prov_vault = {
   address         = "https://vault.day1.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 

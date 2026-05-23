@@ -1,7 +1,17 @@
 variable "prov_nomad" {
   type = object({
-    address     = string
-    skip_verify = bool
+    address          = string
+    skip_verify      = bool
+    secret_plaintext = optional(string, null)
+    secret_reference = optional(
+      object({
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+            key   = string
+        }), null)
+    }), null)
   })
 }
 
@@ -12,7 +22,7 @@ variable "prov_nomad" {
 variable "prov_vault" {
   type = object({
     address         = string
-    token           = string
+    token           = optional(string, null)
     skip_tls_verify = bool
   })
 }

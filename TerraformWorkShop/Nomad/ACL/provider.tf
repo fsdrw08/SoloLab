@@ -33,16 +33,21 @@ terraform {
   }
 }
 
-provider "nomad" {
-  address     = var.prov_nomad.address
-  skip_verify = var.prov_nomad.skip_verify
-  # secret_id   = var.NOMAD_TOKEN
-  # $env:NOMAD_TOKEN="xxxx"
-}
-
 # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#example-usage
 provider "vault" {
   address         = var.prov_vault.address
   token           = var.prov_vault.token
   skip_tls_verify = var.prov_vault.skip_tls_verify
+}
+
+ephemeral "vault_kv_secret_v2" "provider_secret" {
+  count = var.prov_nomad.secret_refer.vault_kvv2 == null ? 0 : 1
+  mount = var.prov_nomad.secret_refer.vault_kvv2.mount
+  name  = var.prov_nomad.secret_refer.vault_kvv2.name
+}
+
+provider "nomad" {
+  address     = var.prov_nomad.address
+  skip_verify = var.prov_nomad.skip_verify
+  secret_id   = var.prov_nomad.secret_refer.vault_kvv2 == null ? var.prov_nomad.secret_plaintext : ephemeral.vault_kv_secret_v2.provider_secret.0.data[var.prov_nomad.secret_refer.vault_kvv2.key]
 }

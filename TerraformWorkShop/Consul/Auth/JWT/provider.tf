@@ -37,10 +37,16 @@ provider "vault" {
   skip_tls_verify = var.prov_vault.skip_tls_verify
 }
 
+ephemeral "vault_kv_secret_v2" "provider_secret" {
+  count = var.prov_consul.token_reference.vault_kvv2 == null ? 0 : 1
+  mount = var.prov_consul.token_reference.vault_kvv2.mount
+  name  = var.prov_consul.token_reference.vault_kvv2.name
+}
+
 provider "consul" {
   scheme         = var.prov_consul.scheme
   address        = var.prov_consul.address
   datacenter     = var.prov_consul.datacenter
-  token          = var.prov_consul.token
   insecure_https = var.prov_consul.insecure_https
+  token          = var.prov_consul.token_reference.vault_kvv2 == null ? var.prov_consul.token_plaintext : ephemeral.vault_kv_secret_v2.provider_secret.0.data[var.prov_consul.token_reference.vault_kvv2.key]
 }

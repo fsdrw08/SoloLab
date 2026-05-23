@@ -1,17 +1,26 @@
 variable "prov_vault" {
   type = object({
     address         = string
-    token           = string
+    token           = optional(string, null)
     skip_tls_verify = bool
   })
 }
 
 variable "prov_consul" {
   type = object({
-    scheme         = string
-    address        = string
-    datacenter     = string
-    token          = string
+    scheme          = string
+    address         = string
+    datacenter      = string
+    token_plaintext = optional(string, null)
+    token_reference = optional(
+      object({
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+            key   = string
+        }), null)
+    }), null)
     insecure_https = bool
   })
 }
