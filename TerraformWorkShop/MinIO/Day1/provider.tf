@@ -43,6 +43,6 @@ provider "minio" {
 
 provider "vault" {
   address         = var.prov_vault.address
-  token           = var.prov_vault.token
   skip_tls_verify = var.prov_vault.skip_tls_verify
+  token           = var.prov_vault.token
 }

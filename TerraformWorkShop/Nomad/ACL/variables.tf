@@ -1,3 +1,11 @@
+variable "prov_vault" {
+  type = object({
+    address         = string
+    skip_tls_verify = bool
+    token           = optional(string, null)
+  })
+}
+
 variable "prov_nomad" {
   type = object({
     address          = string
@@ -12,18 +20,6 @@ variable "prov_nomad" {
             key   = string
         }), null)
     }), null)
-  })
-}
-
-# variable "NOMAD_TOKEN" {
-#   type = string
-# }
-
-variable "prov_vault" {
-  type = object({
-    address         = string
-    token           = optional(string, null)
-    skip_tls_verify = bool
   })
 }
 

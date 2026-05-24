@@ -1,3 +1,8 @@
+prov_vault = {
+  address         = "https://vault.day1.sololab"
+  skip_tls_verify = true
+}
+
 prov_nomad = {
   address     = "https://nomad.day2.sololab"
   skip_verify = true
@@ -8,11 +13,6 @@ prov_nomad = {
       key   = "token"
     }
   }
-}
-
-prov_vault = {
-  address         = "https://vault.day1.sololab"
-  skip_tls_verify = true
 }
 
 policies = [

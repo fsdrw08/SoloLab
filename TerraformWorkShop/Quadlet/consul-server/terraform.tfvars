@@ -6,9 +6,7 @@ prov_remote = {
 }
 
 prov_vault = {
-  schema          = "https"
-  address         = "vault.day1.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
+  address         = "https://vault.day1.sololab"
   skip_tls_verify = true
 }
 

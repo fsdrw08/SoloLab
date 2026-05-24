@@ -33,14 +33,20 @@ terraform {
 
 provider "vault" {
   address         = var.prov_vault.address
-  token           = var.prov_vault.token
   skip_tls_verify = var.prov_vault.skip_tls_verify
+  token           = var.prov_vault.token
+}
+
+ephemeral "vault_kv_secret_v2" "provider_secret" {
+  count = var.prov_consul.token_reference == null ? 0 : 1
+  mount = var.prov_consul.token_reference.mount
+  name  = var.prov_consul.token_reference.name
 }
 
 provider "consul" {
   scheme         = var.prov_consul.scheme
   address        = var.prov_consul.address
   datacenter     = var.prov_consul.datacenter
-  token          = var.prov_consul.token
   insecure_https = var.prov_consul.insecure_https
+  token          = var.prov_consul.token_plaintext != null ? var.prov_consul.token_plaintext : ephemeral.vault_kv_secret_v2.provider_secret.0.data[var.prov_consul.token_reference.key]
 }

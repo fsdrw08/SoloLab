@@ -1,9 +1,8 @@
 variable "prov_vault" {
   type = object({
-    schema          = string
     address         = string
-    token           = string
     skip_tls_verify = bool
+    token           = optional(string, null)
   })
 }
 
