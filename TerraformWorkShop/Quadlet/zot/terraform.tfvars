@@ -20,7 +20,9 @@ podman_kubes = [
                 path = "../../TLS/RootCA/terraform.tfstate"
               }
             }
-            cert_name = "root"
+            name      = "RootCA"
+            output    = "signed_certs"
+            item_name = "root"
           }
           value_sets = [
             {

@@ -16,9 +16,31 @@ resource "null_resource" "init" {
   }
 }
 
-# load cert from tfstate or load secret from vault
+# aggregate tfstate list
 locals {
-  secrets_vault_kvv2 = flatten([
+  tfstate_list = flatten([
+    for podman_kube in var.podman_kubes : [
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
+        name    = value_refer.tfstate.name
+        backend = value_refer.tfstate.backend
+      }
+      if value_refer.tfstate != null
+    ]
+  ])
+}
+
+# load list of tfstate
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tfstate_list == null ? null : {
+    for secret_tfstate in setunion(local.tfstate_list) : secret_tfstate.name => secret_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
+
+# prepare secret list from tfstate or vault kvv2
+locals {
+  vault_kvv2_secret_list = flatten([
     for podman_kube in var.podman_kubes : [
       for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
         mount = value_refer.vault_kvv2.mount
@@ -27,46 +49,30 @@ locals {
       if value_refer.vault_kvv2 != null
     ]
   ])
-  tls_tfstate = flatten([
+  tfstate_secret_list = data.terraform_remote_state.tfstate == null ? null : flatten([
     for podman_kube in var.podman_kubes : [
-      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
-        backend = value_refer.tfstate.backend
-        name    = value_refer.tfstate.cert_name
-      }
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : [
+        for item in data.terraform_remote_state.tfstate[value_refer.tfstate.name].outputs[value_refer.tfstate.output] : item
+        if item.name == value_refer.tfstate.item_name
+      ]
       if value_refer.tfstate != null
     ]
   ])
 }
 
-# data "vault_kv_secret_v2" "secret" {
-#   for_each = local.secrets_vault_kvv2 == null ? null : {
-#     for secret_vault_kvv2 in local.secrets_vault_kvv2 : secret_vault_kvv2.name => secret_vault_kvv2
+# load vault kvv2 secret
+# data "vault_kv_secret_v2" "secret_object" {
+#   for_each = local.vault_kvv2_secret_list == null ? null : {
+#     for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.name => vault_kvv2_secret
 #   }
 #   mount = each.value.mount
 #   name  = each.value.name
 # }
 
-# load cert from local tls
-data "terraform_remote_state" "tfstate" {
-  for_each = local.tls_tfstate == null ? null : {
-    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
-  }
-  backend = each.value.backend.type
-  config  = each.value.backend.config
-}
-
 locals {
-  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
-    for podman_kube in var.podman_kubes : [
-      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : [
-        for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.signed_certs : cert
-        if cert.name == value_refer.tfstate.cert_name
-      ]
-      if value_refer.tfstate != null
-    ]
-  ])
-  certs = data.terraform_remote_state.tfstate == null ? null : {
-    for cert in local.cert_list : cert.name => cert
+  # convert tfstate secret from list to object map
+  tfstate_secret_object = data.terraform_remote_state.tfstate == null ? null : {
+    for secret in local.tfstate_secret_list : secret.name => secret
   }
 }
 
@@ -98,8 +104,8 @@ data "helm_template" "podman_kubes" {
       for value_refer in each.value.helm.value_refers : [
         for value_set in value_refer.value_sets : {
           name  = value_set.name
-          value = value_refer.tfstate == null ? null : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
-          # value = value_refer.tfstate == null ? data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key] : local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+          value = value_refer.tfstate == null ? null : local.tfstate_secret_object[value_refer.tfstate.item_name][value_set.value_ref_key]
+          # value = value_refer.vault_kvv2 == null ? null : data.vault_kv_secret_v2.secret_object[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
         }
       ]
     ]
@@ -150,15 +156,6 @@ module "podman_quadlet" {
   }
 }
 
-resource "remote_file" "consul_service" {
-  depends_on = [module.podman_quadlet]
-  for_each = toset([
-    "./attachments/traefik.consul.hcl",
-  ])
-  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
-  content = file("${each.key}")
-}
-
 # resource "remote_file" "traefik_file_provider" {
 #   depends_on = [
 #     null_resource.init,
@@ -171,3 +168,12 @@ resource "remote_file" "consul_service" {
 #   content = file("${each.key}")
 # }
 
+
+resource "remote_file" "consul_service" {
+  depends_on = [module.podman_quadlet]
+  for_each = toset([
+    "./attachments/traefik.consul.hcl",
+  ])
+  path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
+  content = file("${each.key}")
+}

@@ -6,10 +6,12 @@ prov_vault = {
 secrets = [
   {
     mount = "kvv2_others"
-    name  = "git-repo-operator"
+    name  = "vm-day2"
     content = {
-      "username" = "000"
-      "password" = "P@ssw0rd"
+      "root_username"     = "core"
+      "root_password"     = "P@ssw0rd"
+      "rootless_username" = "podmgr"
+      "rootless_password" = "podmgr"
     }
     secret_version = 1
   },

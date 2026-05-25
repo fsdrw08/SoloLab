@@ -2,6 +2,7 @@ variable "prov_vault" {
   type = object({
     address         = string
     skip_tls_verify = bool
+    token           = optional(string, null)
   })
 }
 

@@ -46,7 +46,9 @@ variable "podman_kubes" {
                 type   = string
                 config = map(string)
               })
-              cert_name = string
+              name      = string
+              output    = string
+              item_name = string
             }),
             null
           )

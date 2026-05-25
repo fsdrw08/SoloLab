@@ -10,8 +10,26 @@ variable "prov_remote" {
   type = object({
     host     = string
     port     = number
-    user     = string
-    password = string
+    user     = optional(string, null)
+    password = optional(string, null)
+    credential_reference = optional(
+      object({
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+          }),
+          null
+        )
+        value_sets = list(
+          object({
+            name          = string
+            value_ref_key = string
+          })
+        )
+      }),
+      null
+    )
   })
 }
 
@@ -46,7 +64,9 @@ variable "podman_kubes" {
                 type   = string
                 config = map(string)
               })
-              cert_name = string
+              name      = string
+              output    = string
+              item_name = string
             }),
             null
           )

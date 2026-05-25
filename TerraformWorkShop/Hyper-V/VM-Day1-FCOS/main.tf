@@ -1,13 +1,57 @@
-
-# load secret from vault
+# aggregate tfstate list
 locals {
-  secrets_vault_kvv2 = flatten([
+  tfstate_list = flatten([
+    for podman_kube in var.podman_kubes : [
+      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
+        name    = value_refer.tfstate.name
+        backend = value_refer.tfstate.backend
+      }
+      if value_refer.tfstate != null
+    ]
+  ])
+}
+
+# load list of tfstate
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tfstate_list == null ? null : {
+    for secret_tfstate in setunion(local.tfstate_list) : secret_tfstate.name => secret_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
+
+# prepare secret list from tfstate or vault kvv2
+locals {
+  vault_kvv2_secret_list = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
       mount = value_refer.vault_kvv2.mount
       name  = value_refer.vault_kvv2.name
     }
     if value_refer.vault_kvv2 != null
   ])
+  tfstate_secret_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
+      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.name].outputs[value_refer.tfstate.output] : cert
+      if cert.name == value_refer.tfstate.item_name
+    ]
+    if value_refer.tfstate != null
+  ])
+}
+
+# load vault kvv2 secret
+# data "vault_kv_secret_v2" "secret_object" {
+#   for_each = local.vault_kvv2_secret_list == null ? null : {
+#     for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.name => vault_kvv2_secret
+#   }
+#   mount = each.value.mount
+#   name  = each.value.name
+# }
+
+locals {
+  # convert tfstate secret from list to object map
+  tfstate_secret_object = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.tfstate_secret_list : cert.name => cert
+  }
   secret_var_keys = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
       for value_set in value_refer.value_sets : [
@@ -17,40 +61,11 @@ locals {
     # if value_refer.vault_kvv2 != null
     if value_refer.tfstate != null
   ])
-  tls_tfstate = flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
-      name    = value_refer.tfstate.name
-      backend = value_refer.tfstate.backend
-    }
-    if value_refer.tfstate != null
-  ])
-}
-
-# load cert from local tls
-data "terraform_remote_state" "tfstate" {
-  for_each = local.tls_tfstate == null ? null : {
-    for tls_tfstate in setunion(local.tls_tfstate) : tls_tfstate.name => tls_tfstate
-  }
-  backend = each.value.backend.type
-  config  = each.value.backend.config
-}
-
-locals {
-  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
-      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.name].outputs[value_refer.tfstate.output] : cert
-      if cert.name == value_refer.tfstate.item_name
-    ]
-    if value_refer.tfstate != null
-  ])
-  certs = data.terraform_remote_state.tfstate == null ? null : {
-    for cert in local.cert_list : cert.name => cert
-  }
   secret_var_values = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
       for value_set in value_refer.value_sets : [
         # data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-        local.certs[value_refer.tfstate.item_name][value_set.value_ref_key]
+        local.tfstate_secret_object[value_refer.tfstate.item_name][value_set.value_ref_key]
       ]
     ]
     # if value_refer.vault_kvv2 != null

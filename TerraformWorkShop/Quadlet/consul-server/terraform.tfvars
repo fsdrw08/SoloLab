@@ -1,13 +1,27 @@
-prov_remote = {
-  host     = "192.168.255.20"
-  port     = 22
-  user     = "podmgr"
-  password = "podmgr"
-}
-
 prov_vault = {
   address         = "https://vault.day1.sololab"
   skip_tls_verify = true
+}
+
+prov_remote = {
+  host = "192.168.255.20"
+  port = 22
+  credential_reference = {
+    vault_kvv2 = {
+      mount = "kvv2_others"
+      name  = "vm-day2"
+    }
+    value_sets = [
+      {
+        name          = "user"
+        value_ref_key = "rootless_username"
+      },
+      {
+        name          = "password"
+        value_ref_key = "rootless_password"
+      }
+    ]
+  }
 }
 
 podman_kubes = [
