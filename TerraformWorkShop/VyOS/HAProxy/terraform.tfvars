@@ -145,14 +145,6 @@ reverse_proxy = {
       "server vault send-proxy-v2" = ""
     }
   }
-  day1_frontend_pd = {
-    path = "load-balancing haproxy service tcp443 rule 205"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "pd.day1.sololab"
-      "set backend" = "day1"
-    }
-  }
   day2_frontend_consul = {
     path = "load-balancing haproxy service tcp443 rule 210"
     configs = {
@@ -257,27 +249,19 @@ reverse_proxy = {
       "set backend" = "day2"
     }
   }
-  # day4_frontend_gitblit = {
-  #   path = "load-balancing haproxy service tcp443 rule 410"
-  #   configs = {
-  #     "ssl"         = "req-ssl-sni"
-  #     "domain-name" = "gitblit.day4.sololab"
-  #     "set backend" = "day2"
-  #   }
-  # }
-  day4_frontend_nexus = {
+  day4_frontend_otf = {
     path = "load-balancing haproxy service tcp443 rule 420"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "nexus.day4.sololab"
+      "domain-name" = "otf.day4.sololab"
       "set backend" = "day2"
     }
   }
-  day4_frontend_jenkins = {
+  day4_frontend_nexus = {
     path = "load-balancing haproxy service tcp443 rule 430"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "jenkins.day4.sololab"
+      "domain-name" = "nexus.day4.sololab"
       "set backend" = "day2"
     }
   }

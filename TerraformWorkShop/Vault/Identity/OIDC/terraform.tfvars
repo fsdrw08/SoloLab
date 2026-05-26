@@ -3,6 +3,58 @@ prov_vault = {
   skip_tls_verify = true
 }
 
+oidc_scopes = [
+  {
+    name = "profile1"
+    # template aka "claims"
+    template = <<-EOT
+      {
+        "username": {{identity.entity.name}},
+        "preferred_username": {{identity.entity.metadata.uid}}
+      }
+      EOT
+  },
+  {
+    name = "profile2"
+    # template aka "claims"
+    template = <<-EOT
+      {
+        "username": {{identity.entity.name}},
+        "name": {{identity.entity.metadata.uid}}
+      }
+      EOT
+  },
+  {
+    name     = "email"
+    template = <<-EOT
+      {
+        "email": {{identity.entity.metadata.email}}
+      }
+      EOT
+  },
+  {
+    name     = "groups"
+    template = <<-EOT
+      {
+        "groups": {{identity.entity.groups.names}}
+      }
+      EOT
+  },
+]
+
+oidc_providers = [
+  {
+    name        = "generic"
+    issuer_host = "vault.day1.sololab"
+    scopes      = ["profile1", "email", "groups"]
+  },
+  {
+    name        = "otf"
+    issuer_host = "vault.day1.sololab"
+    scopes      = ["profile2", "email", "groups"]
+  },
+]
+
 oidc_provider = {
   name        = "sololab"
   issuer_host = "vault.day1.sololab"
@@ -14,7 +66,8 @@ oidc_provider = {
       template = <<-EOT
       {
         "username": {{identity.entity.name}},
-        "preferred_username": {{identity.entity.metadata.uid}}
+        "preferred_username": {{identity.entity.metadata.uid}},
+        "name": {{identity.entity.metadata.uid}}
       }
       EOT
     },
@@ -66,6 +119,14 @@ oidc_client = [
     redirect_uris = [
       # https://www.authelia.com/integration/openid-connect/clients/gitea/#assumptions
       "https://gitea.day4.sololab/user/oauth2/Vault/callback",
+    ]
+  },
+  {
+    name         = "otf"
+    allow_groups = ["app-otf-user"]
+    redirect_uris = [
+      # https://docs.otf.ninja/auth/providers/oidc/
+      "https://otf.day4.sololab/oauth/Vault/callback",
     ]
   },
   {

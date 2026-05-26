@@ -1,6 +1,5 @@
 prov_vault = {
   address         = "https://vault.day1.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
   skip_tls_verify = true
 }
 
@@ -20,6 +19,11 @@ databases = [
   {
     name           = "gitea"
     user_name      = "gitea"
+    secret_version = 1
+  },
+  {
+    name           = "otf"
+    user_name      = "otf"
     secret_version = 1
   },
   {

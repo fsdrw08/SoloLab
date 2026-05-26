@@ -349,7 +349,7 @@ dns_records = [
     }
   },
   {
-    hostname = "gitblit.day4.sololab"
+    hostname = "otf.day4.sololab"
     value = {
       string_map = {
         host = "day2.node.consul"

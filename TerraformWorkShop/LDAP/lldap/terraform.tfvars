@@ -53,6 +53,7 @@ users = [
       "app-grafana-root",       # "a3d0b5af" 
       "app-gitea-admin",        # "f48d634b"
       "app-gitea-user",         # "60939134" 
+      "app-otf-user",           # "4d7313b1"
       "app-nexus-user",         # "90ebdcb1" 
       "app-nexus-admin",        # "044af468" 
       "app-jenkins-user",       # "8a5d9ae7"
@@ -76,7 +77,8 @@ users = [
       "app-nomad-user",         # "091a24fe" 
       "app-gitea-user",         # "60939134"
       "app-grafana-user",       # "a4019ca3" 
-      "app-nexus-user",         # "90ebdcb1" 
+      "app-nexus-user",         # "90ebdcb1"
+      "app-otf-user",           # "4d7313b1"
       "app-jenkins-user",       # "8a5d9ae7"
     ]
   }
@@ -165,6 +167,10 @@ groups = [
   {
     iac_id       = "60939134"
     display_name = "app-gitea-user"
+  },
+  {
+    iac_id       = "4d7313b1"
+    display_name = "app-otf-user"
   },
   {
     iac_id       = "044af468"

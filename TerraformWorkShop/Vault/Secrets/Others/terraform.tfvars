@@ -15,4 +15,13 @@ secrets = [
     }
     secret_version = 1
   },
+  {
+    mount = "kvv2_others"
+    name  = "otf"
+    content = {
+      "secret"     = "6b07b57377755b07cf61709780ee7484"
+      "site_token" = "P@ssw0rd"
+    }
+    secret_version = 1
+  },
 ]

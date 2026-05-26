@@ -6,6 +6,27 @@ variable "prov_vault" {
   })
 }
 
+variable "oidc_scopes" {
+  type = list(
+    object({
+      name     = string
+      template = string
+    })
+  )
+}
+
+variable "oidc_providers" {
+  type = list(
+    object({
+      name        = string
+      issuer_host = string
+      scopes = optional(
+        list(string), []
+      )
+    })
+  )
+}
+
 variable "oidc_provider" {
   type = object({
     name        = string

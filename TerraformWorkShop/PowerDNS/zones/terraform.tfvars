@@ -201,14 +201,6 @@ zones = [
           "192.168.255.2"
         ]
       },
-      {
-        fqdn = "pd.day1.sololab."
-        type = "A"
-        ttl  = 60
-        results = [
-          "192.168.255.2"
-        ]
-      },
     ]
   },
   {
@@ -372,7 +364,7 @@ zones = [
         ]
       },
       {
-        fqdn = "gitblit.day4.sololab."
+        fqdn = "otf.day4.sololab."
         type = "A"
         ttl  = 60
         results = [
