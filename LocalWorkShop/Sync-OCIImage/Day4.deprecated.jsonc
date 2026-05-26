@@ -1,0 +1,23 @@
+[
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "gitblit/gitblit:1.10.0-rpc",
+        "archive": "docker.io_gitblit-gitblit_1.10.0-rpc.tar",
+        "privateRepo": "gitblit/gitblit:1.10.0-rpc",
+        "description": "https://hub.docker.com/r/gitblit/gitblit",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "sonatype/nexus3:3.91.1-alpine",
+        "archive": "docker.io_sonatype-nexus3_3.91.1-alpine.tar",
+        "privateRepo": "sonatype/nexus3:3.91.1-alpine",
+        "description": "https://hub.docker.com/r/sonatype/nexus3",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "jenkins/jenkins:2.555.1-lts",
+        "archive": "docker.io_jenkins_jenkins_2.555.1-lts.tar",
+        "privateRepo": "jenkins/jenkins:2.555.1-lts",
+        "description": "https://hub.docker.com/r/jenkins/jenkins, https://www.jenkins.io/doc/upgrade-guide/",
+    },
+]
