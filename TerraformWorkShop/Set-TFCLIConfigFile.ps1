@@ -10,11 +10,11 @@ if (-not (Test-Path -Path $mirrorPathWin)) {
 }
 
 # put the mirror dir var into the tf config block
-$mirrorPath = $mirrorPathWin.Replace("\","/")
-$provider_installation_block = @"
+$filesystemMirrorPath = $mirrorPathWin.Replace("\","/")
+$provider_installation_block_filesystem_mirror = @"
 provider_installation {
   filesystem_mirror {
-    path    = "$mirrorPath"
+    path    = "$filesystemMirrorPath"
     include = ["registry.terraform.io/*/*"]
   }
   direct {
@@ -22,6 +22,19 @@ provider_installation {
   }
 }
 "@
+
+# $networkMirrorPath = "https://dufs.day1.sololab/public/mirror/terraform/"
+# $provider_installation_block_network_mirror = @"
+# provider_installation {
+#   network_mirror {
+#     url = "$networkMirrorPath"
+#     include = ["registry.terraform.io/*/*"]
+#   }
+#   direct {
+#     exclude = ["registry.terraform.io/*/*"]
+#   }
+# }
+# "@
 
 $plugin_cache_dirWin = $(Join-Path -Path $env:PUBLIC -ChildPath "Downloads/terraform.d/terraform-plugin-cache").Replace("\", "/")
 if (-not (Test-Path -Path $plugin_cache_dirWin)) {
@@ -32,7 +45,7 @@ if (-not (Test-Path -Path $plugin_cache_dirWin)) {
 $plugin_cache_dir = $plugin_cache_dirWin.Replace("\", "/")
 $TF_CLI_CONFIG_FILE = 
 @"
-$provider_installation_block
+$provider_installation_block_filesystem_mirror
 plugin_cache_dir = "$plugin_cache_dir"
 disable_checkpoint = true
 "@
