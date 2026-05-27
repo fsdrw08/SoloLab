@@ -5,13 +5,6 @@ prov_remote = {
   password = "podmgr"
 }
 
-prov_vault = {
-  schema          = "https"
-  address         = "vault.day1.sololab"
-  token           = "95eba8ed-f6fc-958a-f490-c7fd0eda5e9e"
-  skip_tls_verify = true
-}
-
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
   units = [
@@ -29,8 +22,8 @@ podman_quadlet = {
             StartLimitIntervalSec = 120
             StartLimitBurst       = 3
             # kube
-            yaml          = "whoami-aio.yaml"
-            KubeDownForce = "false"
+            # yaml          = "whoami-aio.yaml"
+            # KubeDownForce = "false"
             # podman
             PodmanArgs = "--tls-verify=false"
             Network    = "host"
