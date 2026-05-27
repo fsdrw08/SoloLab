@@ -7,10 +7,10 @@ param (
     [Parameter()]
     [string]
     [ValidateSet(
-        'C:/Users/Public/Downloads/bin',
-        'D:/Users/Public/Downloads/bin'
+        'C:/Users/Public/Downloads',
+        'D:/Users/Public/Downloads'
     )]
-    $LocalStore = 'C:/Users/Public/Downloads/bin',
+    $LocalParentPath = 'C:/Users/Public/Downloads',
         
     [Parameter()]
     [bool]
@@ -69,10 +69,10 @@ $syncList = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath $SyncPro
 ## validate json
 $referenceObject = @(
     "type"
-    "publicRegistry"
-    "publicRepo"
-    "archive"
-    "privateRepo"
+    "publicParentPath"
+    "publicChildPath"
+    "localChildPath"
+    "privateChildPath"
     )
 $syncList | ConvertFrom-Json | ForEach-Object {
     $differenceObject = $_ | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty name 
@@ -89,36 +89,35 @@ $syncList | ConvertFrom-Json | ForEach-Object {
     }
 }
 
-if (-not (Test-Path -Path $LocalStore)) {
-    New-Item -ItemType Directory -Path $LocalStore -Force
+if (-not (Test-Path -Path $localParentPath)) {
+    New-Item -ItemType Directory -Path $localParentPath -Force
 }
 
 
 ## download
 if ($Download) {
     $syncList | ConvertFrom-Json | ForEach-Object {
-        if ((-not (Test-Path -Path $LocalStore/$($_.archive))) -and $_.publicRegistry ) {
-            $baseUri = New-Object System.Uri("$($_.publicRegistry)")
-            $relativeUri = New-Object System.Uri($baseUri, "$($_.publicRepo)")
-            $fullUri=$relativeUri.AbsoluteUri
+        if ((-not (Test-Path -Path $localParentPath/$($_.localChildPath))) -and $_.publicParentPath ) {
+            $publicParentPath = New-Object System.Uri("$($_.publicParentPath)")
+            $publicFullUri = (New-Object System.Uri($publicParentPath, "$($_.publicChildPath)")).AbsoluteUri
 
-            $localPath="$LocalStore/$($_.archive)"
+            $localFullPath="$localParentPath/$($_.localChildPath)"
             $data = $_.data
 
             switch ($_.type) {
                 "general" { 
-                    Write-Host "Download $fullUri to $localPath"
-                    curl.exe --output $localPath --location $fullUri
+                    Write-Host "Download $publicFullUri to $localFullPath"
+                    curl.exe --output $localFullPath --location $publicFullUri
                 }
                 "vault-kvv2" {
                     if ($VaultToken -ne "") {
-                        Write-Host "From $fullUri Fetch `"$data`" Save to $localPath"
+                        Write-Host "From $publicFullUri Fetch `"$data`" Save to $localFullPath"
                         $content = $(curl.exe `
                             -k -s `
                             -H "X-Vault-Token: $VaultToken" `
                             -X GET `
-                            $fullUri | jq.exe "$data")
-                        Set-Content -Path $localPath -Value $content.Replace('"','').Replace('\n',"`r`n")
+                            $publicFullUri | jq.exe "$data")
+                        Set-Content -Path $localFullPath -Value $content.Replace('"','').Replace('\n',"`r`n")
                     } else {
                         Write-Host "`$VaultToken empty, skip fetch from vault"
                     }
@@ -135,23 +134,41 @@ if ($Upload) {
     $credential="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)"
 
     $syncList | ConvertFrom-Json | ForEach-Object {
-        if ($_.archive -and (Test-Path -Path $LocalStore/$($_.archive))) {
-            # $privateDir="$($PrivateRegistry)/$(Split-Path -Path $_.privateRepo -Parent)"
-            # Write-Host "Create directory $privateDir if not exit"
-            # curl.exe -k -X MKCOL $privateDir --user $credential
-            # ""
-            $localPath="$LocalStore/$($_.archive)"
+        if ($_.localChildPath -and (Test-Path -Path $localParentPath/$($_.localChildPath))) {
+            $localFullPath="$localParentPath/$($_.localChildPath)"
             
-            $baseUri = New-Object System.Uri("$PrivateRegistry")
-            $relativeUri = New-Object System.Uri($baseUri, "$($_.privateRepo)")
-            $fullUri=$relativeUri.AbsoluteUri
+            $privateParentPath = New-Object System.Uri("$PrivateRegistry")
+            $privateChildPath = $_.privateChildPath
+            
+            switch ($_.type) {
+                "general" { 
+                    $privateFullUri = (New-Object System.Uri($privateParentPath, "$privateChildPath")).AbsoluteUri
+                    
+                    Write-Host "Upload $localFullPath to $privateFullUri"
+                    curl.exe -k -T $localFullPath $privateFullUri --user $credential
+                }
+                "vault-kvv2" {
+                    $privateFullUri = (New-Object System.Uri($privateParentPath, "$privateChildPath")).AbsoluteUri
 
-            Write-Host "Upload $localPath to $fullUri"
-            curl.exe -k -T $localPath $fullUri --user $credential
-            if ($_.type -eq "vault-kvv2") {
-                Write-Host "Remove sensitive data file $localPath"
-                Remove-Item -Path $localPath -Force
-            }
+                    Write-Host "Upload $localFullPath to $privateFullUri"
+                    curl.exe -k -T $localFullPath $privateFullUri --user $credential
+
+                    Write-Host "Remove sensitive data file $localFullPath"
+                    Remove-Item -Path $localFullPath -Force
+                }
+                "terraform-mirror" {
+                    Get-ChildItem -Path $localFullPath -Recurse | ForEach-Object {
+                        if (-not (Get-Item -Path $_.FullName).PSIsContainer) {
+                            $TFProviderPath = (New-Object System.Uri($_.FullName)).AbsolutePath.Replace("$localFullPath/","")
+                            $privateFullUri = (New-Object System.Uri($privateParentPath, "$privateChildPath/$TFProviderPath")).AbsoluteUri
+                        
+                            Write-Host "Upload $($_.FullName) to $privateFullUri `r`n"
+                            curl.exe -k -T $($_.FullName) $privateFullUri --user $credential
+                        }
+                    }
+                }
+                Default {}
+            }            
             ""
         }
         Start-Sleep -Seconds 1
