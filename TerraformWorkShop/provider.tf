@@ -22,7 +22,7 @@ terraform {
     }
     tfe = {
       source  = "hashicorp/tfe"
-      version = ">= 0.70.0"
+      version = ">= 0.77.0"
     }
     lynx = {
       source  = "Clivern/lynx"
