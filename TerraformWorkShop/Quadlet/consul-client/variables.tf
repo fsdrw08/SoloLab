@@ -14,13 +14,10 @@ variable "prov_remote" {
     password = optional(string, null)
     credential_reference = optional(
       object({
-        vault_kvv2 = optional(
-          object({
-            mount = string
-            name  = string
-          }),
-          null
-        )
+        vault_kvv2 = object({
+          mount = string
+          name  = string
+        })
         value_sets = list(
           object({
             name          = string

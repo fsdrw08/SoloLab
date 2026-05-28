@@ -15,12 +15,11 @@ variable "prov_consul" {
     token_plaintext = optional(string, null)
     token_reference = optional(
       object({
-        vault_kvv2 = optional(
-          object({
-            mount = string
-            name  = string
-            key   = string
-        }), null)
+        vault_kvv2 = object({
+          mount = string
+          name  = string
+          key   = string
+        })
     }), null)
   })
 }
