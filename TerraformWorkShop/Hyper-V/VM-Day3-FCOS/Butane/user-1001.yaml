@@ -11,7 +11,7 @@ passwd:
       # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
       password_hash: ${password_hash_1001}
       ssh_authorized_keys:
-        - "${ssh_authorized_keys_1001}"
+        - "${ssh_authorized_key_1001}"
 storage:
   files:
     # enable lingering to make user level service able to auto start on boot
