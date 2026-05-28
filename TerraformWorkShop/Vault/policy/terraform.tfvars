@@ -44,11 +44,11 @@ policy_bindings = [
       }
       # Create, update, delete auth methods
       path "sys/auth/*" {
-        capabilities = ["create", "update", "delete", "sudo"]
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
       # List auth methods
       path "sys/auth" {
-        capabilities = ["read"]
+        capabilities = ["read", "list", "sudo"]
       }
       ## IdentityEntity
       path "identity/entity/*" {
@@ -75,13 +75,11 @@ policy_bindings = [
       path "identity/oidc/*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
-      # manage pki secrets engine, the path is related to path name
-      path "pki*" {
-        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      path "identity/group-alias/*" {
+        capabilities = ["create", "update", "delete", "read"]
       }
-      # manage kv secrets engine, the path is related to path name
-      path "kvv2*" {
-        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      path "identity/group-alias/id" {
+        capabilities = ["list"]
       }
       # Manage secrets engine
       path "sys/mounts/*" {
@@ -90,6 +88,15 @@ policy_bindings = [
       # List secrets engine
       path "sys/mounts" {
         capabilities = ["read"]
+      }
+      ## Custom path permission
+      # manage pki secrets engine, the path is related to path name
+      path "pki*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
+      # manage kv secrets engine, the path is related to path name
+      path "kvv2*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
       ## PKI - Intermediate CA
       path "pki_int/config/urls" {
