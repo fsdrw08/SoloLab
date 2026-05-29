@@ -9,8 +9,15 @@ variable "prov_vault" {
 variable "prov_grafana" {
   type = object({
     url                  = string
-    auth                 = string
-    insecure_skip_verify = optional(bool, true)
+    insecure_skip_verify = bool
+    auth_plaintext       = optional(string, null)
+    auth_reference = optional(object({
+      vault_kvv2 = object({
+        mount = string
+        name  = string
+        key   = string
+      })
+    }), null)
   })
 }
 

@@ -4,8 +4,15 @@ prov_vault = {
 }
 
 prov_grafana = {
-  url  = "https://grafana.day2.sololab"
-  auth = "admin:admin"
+  url                  = "https://grafana.day2.sololab"
+  insecure_skip_verify = true
+  auth_reference = {
+    vault_kvv2 = {
+      mount = "kvv2_others"
+      name  = "grafana"
+      key   = "auth"
+    }
+  }
 }
 
 data_sources = [

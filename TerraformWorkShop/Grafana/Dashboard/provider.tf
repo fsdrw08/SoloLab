@@ -32,7 +32,13 @@ provider "vault" {
   token           = var.prov_vault.token
 }
 
+ephemeral "vault_kv_secret_v2" "provider_secret" {
+  count = var.prov_grafana.auth_reference.vault_kvv2 == null ? 0 : 1
+  mount = var.prov_grafana.auth_reference.vault_kvv2.mount
+  name  = var.prov_grafana.auth_reference.vault_kvv2.name
+}
+
 provider "grafana" {
   url  = var.prov_grafana.url
-  auth = var.prov_grafana.auth
+  auth = var.prov_grafana.auth_plaintext != null ? var.prov_grafana.auth_plaintext : ephemeral.vault_kv_secret_v2.provider_secret[0].data[var.prov_grafana.auth_reference.vault_kvv2.key]
 }
