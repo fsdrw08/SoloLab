@@ -46,7 +46,7 @@ policies = [
       }
 
       plugin {
-        policy = "write"
+        policy = "read"
       }
     EOT
   },
