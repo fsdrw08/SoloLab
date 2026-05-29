@@ -3,6 +3,13 @@ prov_vault = {
   skip_tls_verify = true
 }
 
+consul_secret_backend = {
+  scheme         = "https"
+  address        = "consul.day2.sololab:8501"
+  token          = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+  insecure_https = true
+}
+
 consul_roles = [
   # builtin polices: https://developer.hashicorp.com/consul/docs/security/acl/acl-policies#built-in-policies
   {

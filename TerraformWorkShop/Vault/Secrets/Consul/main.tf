@@ -6,9 +6,9 @@ data "vault_kv_secret_v2" "ca_cert" {
 resource "vault_consul_secret_backend" "backend" {
   path        = "consul"
   description = "Manages the Consul backend"
-  scheme      = var.prov_consul.scheme
-  address     = var.prov_consul.address
-  token       = var.prov_consul.token
+  scheme      = var.consul_secret_backend.scheme
+  address     = var.consul_secret_backend.address
+  token       = var.consul_secret_backend.token
   ca_cert     = data.vault_kv_secret_v2.ca_cert.data["ca"]
 }
 

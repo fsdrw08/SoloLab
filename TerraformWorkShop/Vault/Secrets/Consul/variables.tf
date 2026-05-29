@@ -6,11 +6,10 @@ variable "prov_vault" {
   })
 }
 
-variable "prov_consul" {
+variable "consul_secret_backend" {
   type = object({
     scheme         = string
     address        = string
-    datacenter     = string
     token          = string
     insecure_https = bool
   })
