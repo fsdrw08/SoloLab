@@ -3,7 +3,7 @@
 # https://github.com/cmu-sei/foundry-appliance/blob/5ba264cda03d4dcb89d28ba58dabc273b71ad75e/foundry/charts/foundry/templates/job.yaml#L61
 if /usr/local/bin/gitea admin auth list | grep -q "Vault"; then
     echo "OAuth auth source 'Vault' already exists, skipping creation"
-    echo "To update the config, run `gitea admin auth update-oauth --id x ...`"
+    echo "To update the config, run gitea admin auth update-oauth --id x ..."
 
     exit 0
 fi
