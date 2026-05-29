@@ -56,7 +56,6 @@ job "juicefs-node" {
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/tls/ca.crt"
-        change_mode = "restart"
       }
 
       vault {}
