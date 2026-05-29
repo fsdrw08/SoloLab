@@ -18,6 +18,9 @@ grafana:
 
   configFiles:
     grafana:
+      security:
+        admin_user: admin
+        admin_password: $__file{/etc/grafana/secret/admin_password}
       server:
         domain: grafana.day2.sololab
         http_addr: 127.0.0.1

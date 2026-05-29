@@ -32,7 +32,9 @@ secrets = [
     mount = "kvv2_others"
     name  = "app-grafana"
     content = {
-      "auth" = "admin:admin"
+      "auth"           = "admin:admin"
+      "admin_username" = "admin"
+      "admin_password" = "admin"
     }
     secret_version = 1
   },

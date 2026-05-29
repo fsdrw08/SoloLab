@@ -45,6 +45,22 @@ podman_kubes = [
         },
         {
           vault_kvv2 = {
+            mount = "kvv2_others"
+            name  = "app-grafana"
+          }
+          value_sets = [
+            {
+              name          = "grafana.configFiles.grafana.security.admin_user"
+              value_ref_key = "admin_username"
+            },
+            {
+              name          = "grafana.secret.others.contents.admin_password"
+              value_ref_key = "admin_password"
+            },
+          ]
+        },
+        {
+          vault_kvv2 = {
             mount = "kvv2_vault"
             name  = "oidc-provider_sololab"
           }
