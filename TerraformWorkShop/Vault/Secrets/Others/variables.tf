@@ -8,9 +8,10 @@ variable "prov_vault" {
 
 variable "secrets" {
   type = list(object({
-    mount          = string
-    name           = string
-    content        = map(string)
-    secret_version = number
+    mount              = string
+    name               = string
+    generate_passwords = optional(list(string), [])
+    content            = map(string)
+    secret_version     = number
   }))
 }

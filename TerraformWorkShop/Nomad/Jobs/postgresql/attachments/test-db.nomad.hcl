@@ -113,7 +113,7 @@ job "test-db" {
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
         
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE test TO postgres_exporter;

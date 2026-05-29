@@ -101,7 +101,7 @@ job "otf-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
@@ -120,7 +120,7 @@ job "otf-db" {
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
         
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE otf TO postgres_exporter;
@@ -143,9 +143,9 @@ job "otf-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"

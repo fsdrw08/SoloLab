@@ -113,7 +113,7 @@ job "gitlab-db" {
         psql -v ON_ERROR_STOP=1 <<-EOSQL
         -- create postgres_exporter role
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         GRANT CONNECT ON DATABASE gitlabhq_production TO postgres_exporter;
@@ -277,7 +277,7 @@ job "gitlab-db" {
         psql -v ON_ERROR_STOP=1 <<-EOSQL
         -- create postgres_exporter role
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         GRANT CONNECT ON DATABASE gitlabhq_registry TO postgres_exporter;

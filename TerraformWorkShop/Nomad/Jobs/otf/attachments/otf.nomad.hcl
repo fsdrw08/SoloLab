@@ -37,7 +37,7 @@ job "otf" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        URL=postgres://{{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_pgsql/data/otf"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/otf?sslmode=require
+        URL=postgres://{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/otf?sslmode=require
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"

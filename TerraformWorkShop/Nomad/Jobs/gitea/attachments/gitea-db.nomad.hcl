@@ -68,11 +68,9 @@ job "gitea-db" {
           # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
           # postgresql-init/: This directory should contain shell scripts (*.sh) that are sourced when the database is freshly initialized (after a successful initdb run, which makes the data directory non-empty).
           # At the time of sourcing these scripts, the local PostgreSQL server is running. For re-deployment scenarios with a persistent data directory, the scripts are not sourced (no-op).
-          # "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
 
           # postgresql-start/: This directory has the same semantics as postgresql-init/, except that these scripts are always sourced (after postgresql-init/ scripts, if they exist).
           "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
-          "local/init-schema.sh:/opt/app-root/src/postgresql-start/init-schema.sh",
         ]
       }
 
@@ -102,29 +100,11 @@ job "gitea-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
         change_signal = "SIGHUP"
-      }
-
-      template {
-        # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
-        # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html#create-a-postgresql-database
-        data        = <<-EOH
-        #!/bin/bash
-        set -e
-        psql -v ON_ERROR_STOP=1 <<-EOSQL
-        \\c gitea;
-        CREATE SCHEMA IF NOT EXISTS gitea;
-        GRANT ALL PRIVILEGES ON DATABASE gitea TO {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}};
-        GRANT ALL PRIVILEGES ON SCHEMA gitea TO {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}};
-        CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA gitea;
-        EOSQL
-        EOH
-        destination = "local/init-schema.sh"
-        change_mode = "restart"
       }
 
       template {
@@ -139,7 +119,7 @@ job "gitea-db" {
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
         
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.pgsql_user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE gitea TO postgres_exporter;
@@ -162,9 +142,9 @@ job "gitea-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"

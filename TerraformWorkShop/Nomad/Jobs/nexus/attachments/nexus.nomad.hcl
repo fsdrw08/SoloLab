@@ -81,7 +81,7 @@ job "nexus" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        URL=postgres://{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/nexus?sslmode=require
+        URL=postgres://{{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_name}}{{end}}:{{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_password}}{{end}}@pgbouncer.service.consul:6432/nexus?sslmode=require
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
@@ -221,8 +221,8 @@ job "nexus" {
 
         # Empty lines are also ignored
         NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://pgbouncer.service.consul:6432/nexus??useSSL=true&sslMode=require
-        NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_name}}{{end}}
-        NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.user_password}}{{end}}
+        NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_name}}{{end}}
+        NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_password}}{{end}}
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"

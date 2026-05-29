@@ -93,7 +93,7 @@ job "gitea-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
@@ -112,7 +112,7 @@ job "gitea-db" {
         CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
         
         DROP ROLE IF EXISTS postgres_exporter;
-        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_pgsql/data/postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.user_password}}{{end}}';
         GRANT pg_monitor TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
         ---GRANT CONNECT ON DATABASE gitea TO postgres_exporter;
@@ -135,7 +135,7 @@ job "gitea-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_name}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}
         POSTGRESQL_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.user_password}}{{end}}
         POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/gitea"}}{{.Data.data.admin_password}}{{end}}
         EOH

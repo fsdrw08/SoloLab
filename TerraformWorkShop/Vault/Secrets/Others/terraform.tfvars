@@ -30,10 +30,47 @@ secrets = [
   },
   {
     mount = "kvv2_others"
-    name  = "otf"
+    name  = "app-grafana"
     content = {
-      "secret"     = "6b07b57377755b07cf61709780ee7484"
-      "site_token" = "P@ssw0rd"
+      "auth" = "admin:admin"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
+    name               = "app-postgres_exporter"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "postgres_exporter"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
+    name               = "app-test"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "test"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
+    name               = "app-gitea"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "gitea"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
+    name               = "app-otf"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "otf"
+      "secret"          = "6b07b57377755b07cf61709780ee7484"
+      "site_token"      = "P@ssw0rd"
     }
     secret_version = 1
   },
