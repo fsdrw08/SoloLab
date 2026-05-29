@@ -20,8 +20,8 @@ resource "vault_pki_secret_backend_config_cluster" "config_cluster" {
     for ca in var.root_cas : ca.secret_engine.path => ca
   }
   backend  = vault_mount.pki[each.key].path
-  path     = "https://${var.prov_vault.address}/v1/${vault_mount.pki[each.key].path}"
-  aia_path = "https://${var.prov_vault.address}/v1/${vault_mount.pki[each.key].path}"
+  path     = "${var.prov_vault.address}/v1/${vault_mount.pki[each.key].path}"
+  aia_path = "${var.prov_vault.address}/v1/${vault_mount.pki[each.key].path}"
 }
 
 # Enable Authority Information Access (AIA) templating

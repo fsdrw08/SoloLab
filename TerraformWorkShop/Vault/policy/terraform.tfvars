@@ -98,6 +98,15 @@ policy_bindings = [
       path "kvv2*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
+      path "kvv2_certs/data/*" {
+        capabilities = ["read"]
+      }
+      path "kvv2_certs/data/" {
+        capabilities = ["read"]
+      }
+      path "kvv2_certs/metadata/*" {
+        capabilities = ["list", "read"]
+      }
       ## PKI - Intermediate CA
       path "pki_int/config/urls" {
         capabilities = ["read"]
@@ -133,6 +142,10 @@ policy_bindings = [
       path "pki_int/tidy-status" {
         capabilities = ["read"]
       }
+      # consul secret backend
+      path "consul/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+      }
       EOT
     group_binding = {
       policy_group    = "Policy-Vault-Admin"
@@ -162,18 +175,6 @@ policy_bindings = [
       path "identity/lookup/group" {
         capabilities = ["create", "update"]
       }
-      path "kvv2_certs/data/*" {
-        capabilities = ["read"]
-      }
-
-      path "kvv2_certs/data/" {
-        capabilities = ["read"]
-      }
-
-      path "kvv2_certs/metadata/*" {
-        capabilities = ["list"]
-      }
-
       path "sys/*" {
         capabilities = ["list", "read"]
       }
