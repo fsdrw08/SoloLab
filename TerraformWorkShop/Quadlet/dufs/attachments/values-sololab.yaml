@@ -20,4 +20,5 @@ dufs:
     auth:
       - admin:admin@/:rw
       - user:pass@/private:ro
+      - webdav:webdav@/webdav:rw
       - "@/public"

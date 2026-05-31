@@ -45,8 +45,8 @@ csi_volumes = [
       # https://juicefs.com/docs/zh/community/reference/how_to_set_up_object_storage/#other-options
       bucket     = "https://dufs.day1.sololab/webdav/?tls-insecure-skip-verify=true"
       storage    = "webdav"
-      access-key = "admin"
-      secret-key = "admin"
+      access-key = "webdav"
+      secret-key = "webdav"
     }
   },
 ]
