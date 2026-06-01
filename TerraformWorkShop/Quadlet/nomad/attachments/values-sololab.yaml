@@ -2,13 +2,12 @@ global:
   imageRegistry: zot.day1.sololab
 nomad:
   image:
-    repository: multani/nomad
+    repository: noenv/nomad
   # https://github.com/containers/podman/discussions/23322#discussioncomment-12340550
   # hostAliases:
   #   - ip: "host-gateway"
   #     hostnames:
   #       - "vault.day1.sololab"
-  containerPorts: []
   livenessProbe:
     enabled: true
     initialDelaySeconds: 3
@@ -29,9 +28,9 @@ nomad:
       acl:
         enabled: true
       advertise:
-        http: "{{ GetInterfaceIP \"eth0\" }}"
-        rpc: "{{ GetInterfaceIP \"eth0\" }}"
-        serf: "{{ GetInterfaceIP \"eth0\" }}"
+        http: '{{ GetInterfaceIP "eth0" }}'
+        rpc: '{{ GetInterfaceIP "eth0" }}'
+        serf: '{{ GetInterfaceIP "eth0" }}'
       # https://developer.hashicorp.com/nomad/docs/configuration/consul
       consul:
         address: consul.service.consul:8501
@@ -39,10 +38,10 @@ nomad:
         ssl: true
         token: # set by vault data
         service_identity:
-          aud: [ "consul.io" ]
+          aud: ["consul.io"]
           ttl: "1h"
         task_identity:
-          aud: [ "consul.io" ]
+          aud: ["consul.io"]
           ttl: "1h"
       tls:
         http: true
@@ -55,7 +54,7 @@ nomad:
       vault:
         enabled: true
         default_identity:
-          aud: [ "vault.io" ]
+          aud: ["vault.io"]
           ttl: 1h
       telemetry:
         # common
@@ -83,15 +82,16 @@ nomad:
     # traefik.http.services.nomad.loadbalancer.server.port: 4646
 
   extraEnvVars:
-    - name: NOMAD_DISABLE_PERM_MGMT
-      value: "ture"
-    # env var for image multani/nomad
-    # https://github.com/multani/docker-nomad/blob/1.10.2/v1.10.x/start.sh#L15
-    - name: NOMAD_CONFIG_DIR
-      value: /nomad/config
-    - name: TZ
-      value: Asia/Shanghai
+    # env var for nomad cli in container
     - name: NOMAD_ADDR
       value: https://nomad.day2.sololab:4646
     - name: NOMAD_CACERT
       value: /nomad/secret/certs/ca.crt
+    # env var for image multani/nomad
+    # - name: TZ
+    #   value: Asia/Shanghai
+    # https://github.com/multani/docker-nomad/blob/1.10.2/v1.10.x/start.sh#L15
+    # - name: NOMAD_CONFIG_DIR
+    #   value: /nomad/config
+    # - name: NOMAD_DISABLE_PERM_MGMT
+    #   value: "ture"

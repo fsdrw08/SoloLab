@@ -148,10 +148,10 @@ resource "null_resource" "post_process" {
   }
   connection {
     type     = "ssh"
-    host     = var.prov_remote.host
-    port     = var.prov_remote.port
-    user     = var.prov_remote.user
-    password = sensitive(var.prov_remote.password)
+    host     = local.prov_remote.host
+    port     = local.prov_remote.port
+    user     = local.prov_remote.user
+    password = sensitive(local.prov_remote.password)
   }
   provisioner "remote-exec" {
     inline = [

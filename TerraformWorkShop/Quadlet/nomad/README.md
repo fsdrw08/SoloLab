@@ -40,7 +40,7 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 ```
 
 #### Workload
-- Ensure container image `multani/nomad` had synced to image server  
+- Ensure container image `noenv/nomad` had synced to image server  
 [LocalWorkShop/Sync-OCIImage/Day2.jsonc](../../../LocalWorkShop/Sync-OCIImage/Day2.jsonc)
 ```powershell
 $repoDir=git rev-parse --show-toplevel
