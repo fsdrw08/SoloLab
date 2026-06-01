@@ -43,13 +43,13 @@ locals {
 }
 
 # load vault kvv2 secret
-# data "vault_kv_secret_v2" "secret_object" {
-#   for_each = local.vault_kvv2_secret_list == null ? null : {
-#     for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.name => vault_kvv2_secret
-#   }
-#   mount = each.value.mount
-#   name  = each.value.name
-# }
+data "vault_kv_secret_v2" "secret_object" {
+  for_each = local.vault_kvv2_secret_list == null ? null : {
+    for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.name => vault_kvv2_secret
+  }
+  mount = each.value.mount
+  name  = each.value.name
+}
 
 locals {
   # convert tfstate secret from list to object map
@@ -85,9 +85,9 @@ data "helm_template" "podman_kubes" {
     each.value.helm.value_refers == null ? [] : [
       for value_refer in each.value.helm.value_refers : [
         for value_set in value_refer.value_sets : {
-          name  = value_set.name
-          value = value_refer.tfstate == null ? null : local.tfstate_secret_object[value_refer.tfstate.item_name][value_set.value_ref_key]
-          # value = value_refer.vault_kvv2 == null ? null : data.vault_kv_secret_v2.secret_object[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
+          name = value_set.name
+          # value = value_refer.tfstate == null ? null : local.tfstate_secret_object[value_refer.tfstate.item_name][value_set.value_ref_key]
+          value = value_refer.vault_kvv2 == null ? value_refer.tfstate == null ? null : local.tfstate_secret_object[value_refer.tfstate.item_name][value_set.value_ref_key] : data.vault_kv_secret_v2.secret_object[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
         }
       ]
     ]

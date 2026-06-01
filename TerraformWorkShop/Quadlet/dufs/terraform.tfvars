@@ -11,6 +11,32 @@ podman_kubes = [
       name       = "dufs"
       chart      = "../../../HelmWorkShop/helm-charts/charts/dufs"
       value_file = "./attachments/values-sololab.yaml"
+      value_refers = [
+        {
+          vault_kvv2 = {
+            mount = "kvv2_others"
+            name  = "app-dufs"
+          }
+          value_sets = [
+            {
+              name          = "dufs.config.auth[0]"
+              value_ref_key = "dir_public"
+            },
+            {
+              name          = "dufs.config.auth[1]"
+              value_ref_key = "dir_root"
+            },
+            {
+              name          = "dufs.config.auth[2]"
+              value_ref_key = "dir_private"
+            },
+            {
+              name          = "dufs.config.auth[3]"
+              value_ref_key = "dir_webdav"
+            },
+          ]
+        },
+      ]
     }
     manifest_dest_path = "/home/podmgr/.config/containers/systemd/dufs-aio.yaml"
   },

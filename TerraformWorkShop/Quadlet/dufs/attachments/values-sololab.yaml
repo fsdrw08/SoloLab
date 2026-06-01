@@ -17,8 +17,5 @@ dufs:
   config:
     bind: 127.0.0.1
     port: 5001
-    auth:
-      - admin:admin@/:rw
-      - user:pass@/private:ro
-      - webdav:webdav@/webdav:rw
-      - "@/public"
+    # auth:
+    #   - "@/public" # value reference from vault
