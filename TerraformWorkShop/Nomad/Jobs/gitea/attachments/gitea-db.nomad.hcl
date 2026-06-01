@@ -62,7 +62,7 @@ job "gitea-db" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/fedora/postgresql-18:20260506"
+        image = "zot.day1.sololab/fedora/postgresql-18:20260527"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init

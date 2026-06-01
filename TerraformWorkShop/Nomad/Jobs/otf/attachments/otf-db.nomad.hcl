@@ -62,7 +62,7 @@ job "otf-db" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/fedora/postgresql-18:20260506"
+        image = "zot.day1.sololab/fedora/postgresql-18:20260527"
         volumes = [
           "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
           # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
@@ -101,7 +101,7 @@ job "otf-db" {
 
         host  all           pgbouncer          10.88.0.0/16  trust
         host  all           postgres_exporter  10.88.0.0/16  trust
-        host  all           {{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}       all           scram-sha-256
+        host  all           {{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_user_name}}{{end}}       all           scram-sha-256
         EOH
         destination   = "local/pg_hba.conf"
         change_mode   = "signal"
@@ -143,9 +143,9 @@ job "otf-db" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        POSTGRESQL_USER={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}
-        POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_USER={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"

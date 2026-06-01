@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "project-zot/zot-linux-amd64:v2.1.16",
-        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.16.tar",
-        "privateRepo": "project-zot/zot-linux-amd64:v2.1.16",
+        "publicRepo": "project-zot/zot-linux-amd64:v2.1.17",
+        "archive": "ghcr.io_project-zot_zot-linux-amd64_v2.1.17.tar",
+        "privateRepo": "project-zot/zot-linux-amd64:v2.1.17",
         "description": "https://quay.io/repository/giantswarm/zot?tab=tags, https://github.com/project-zot/zot/pkgs/container/zot-linux-amd64",
     },
     {
@@ -22,9 +22,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "cockpit/ws:360.1",
-        "archive": "quay.io_cockpit_ws_360.1.tar",
-        "privateRepo": "cockpit/ws:360.1",
+        "publicRepo": "cockpit/ws:361",
+        "archive": "quay.io_cockpit_ws_361.tar",
+        "privateRepo": "cockpit/ws:361",
         "description": "https://quay.io/repository/cockpit/ws?tab=tags",
     },
     {
@@ -36,9 +36,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.22.7",
-        "archive": "docker.io_hashicorp_consul_1.22.7.tar",
-        "privateRepo": "hashicorp/consul:1.22.7",
+        "publicRepo": "hashicorp/consul:2.0.0",
+        "archive": "docker.io_hashicorp_consul_2.0.0.tar",
+        "privateRepo": "hashicorp/consul:2.0.0",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {

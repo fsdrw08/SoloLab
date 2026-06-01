@@ -60,7 +60,7 @@ job "redis" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/library/redis:8.6.3"
+        image = "zot.day1.sololab/library/redis:8.8.0"
 
         ports = [
           "redis",

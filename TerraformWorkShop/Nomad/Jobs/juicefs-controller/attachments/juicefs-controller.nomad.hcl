@@ -25,7 +25,7 @@ job "juicefs-controller" {
       driver = "podman"
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
       config {
-        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.31.6"
+        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.31.8"
         args = [
           "--endpoint=unix://csi/csi.sock",
           "--logtostderr",
@@ -56,7 +56,6 @@ job "juicefs-controller" {
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/tls/ca.crt"
-        change_mode = "restart"
       }
 
       vault {}

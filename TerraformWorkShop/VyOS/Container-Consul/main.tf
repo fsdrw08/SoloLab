@@ -110,7 +110,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "consul"
-      image     = "zot.day0.sololab.dev/hashicorp/consul:1.22.7"
+      image     = "zot.day0.sololab.dev/hashicorp/consul:2.0.0"
       pull_flag = "--tls-verify=false"
       others = {
         "allow-host-networks"  = ""

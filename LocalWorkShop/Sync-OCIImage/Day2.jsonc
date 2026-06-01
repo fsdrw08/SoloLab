@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:1.22.7",
-        "archive": "docker.io_hashicorp_consul_1.22.7.tar",
-        "privateRepo": "hashicorp/consul:1.22.7",
+        "publicRepo": "hashicorp/consul:2.0.0",
+        "archive": "docker.io_hashicorp_consul_2.0.0.tar",
+        "privateRepo": "hashicorp/consul:2.0.0",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {
@@ -29,10 +29,10 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "multani/nomad:1.11.3",
-        "archive": "docker.io_multani_nomad_1.11.3.tar",
-        "privateRepo": "multani/nomad:1.11.3",
-        "description": "https://hub.docker.com/r/multani/nomad/tags",
+        "publicRepo": "noenv/nomad:2.0.2",
+        "archive": "docker.io_noenv_nomad_2.0.2.tar",
+        "privateRepo": "noenv/nomad:2.0.2",
+        "description": "https://hub.docker.com/r/noenv/nomad/tags",
     },
     {
         "publicRegistry": "docker.io",
@@ -43,9 +43,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/loki:3.7.1",
-        "archive": "docker.io_grafana_loki_3.7.1.tar",
-        "privateRepo": "grafana/loki:3.7.1",
+        "publicRepo": "grafana/loki:3.7.2",
+        "archive": "docker.io_grafana_loki_3.7.2.tar",
+        "privateRepo": "grafana/loki:3.7.2",
         "description": "https://hub.docker.com/r/grafana/loki/tags, https://github.com/grafana/loki/releases, https://quay.io/repository/giantswarm/loki?tab=tags",
     },
     {
@@ -57,9 +57,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "prometheus/prometheus:v3.11.3",
-        "archive": "quay.io_prometheus_prometheus_v3.11.3.tar",
-        "privateRepo": "prometheus/prometheus:v3.11.3",
+        "publicRepo": "prometheus/prometheus:v3.12.0",
+        "archive": "quay.io_prometheus_prometheus_v3.12.0.tar",
+        "privateRepo": "prometheus/prometheus:v3.12.0",
         "description": "https://quay.io/repository/prometheus/prometheus?tab=tags, https://hub.docker.com/r/prom/prometheus/tags",
     },
     {

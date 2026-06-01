@@ -1,5 +1,19 @@
 [
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "hectorm/nfs-ganesha:v10",
+        "archive": "docker.io_hectorm_nfs-ganesha_v10.tar",
+        "privateRepo": "hectorm/nfs-ganesha:v10",
+        "description": "https://hub.docker.com/r/hectorm/nfs-ganesha/tags",
+    },
+    {
+        "publicRegistry": "registry.k8s.io",
+        "publicRepo": "sig-storage/nfsplugin:v4.13.2",
+        "archive": "registry.k8s.io_sig-storage_nfsplugin_v4.13.2.tar",
+        "privateRepo": "sig-storage/nfsplugin:v4.13.2",
+        "description": "https://docker.aityp.com/r/registry.k8s.io/sig-storage/nfsplugin",
+    },
+    {
         "publicRegistry": "quay.io",
         "publicRepo": "enterprisedb/pgbouncer:1.24.1",
         "archive": "quay.io_enterprisedb_pgbouncer_1.24.1.tar",
