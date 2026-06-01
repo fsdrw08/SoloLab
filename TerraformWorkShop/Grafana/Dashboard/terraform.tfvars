@@ -9,7 +9,7 @@ prov_grafana = {
   auth_reference = {
     vault_kvv2 = {
       mount = "kvv2_others"
-      name  = "grafana"
+      name  = "app-grafana"
       key   = "auth"
     }
   }
