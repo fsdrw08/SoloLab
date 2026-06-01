@@ -37,7 +37,7 @@ job "otf" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        URL=postgres://{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_name}}{{end}}:{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.user_password}}{{end}}@pgbouncer.service.consul:6432/otf?sslmode=require
+        URL=postgres://{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_user_name}}{{end}}:{{with secret "kvv2_others/data/app-otf"}}{{.Data.data.pgsql_user_password}}{{end}}@pgbouncer.service.consul:6432/otf?sslmode=require
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
@@ -100,8 +100,8 @@ job "otf" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/leg100/otf/blob/v0.5.24/Dockerfile
-        image = "zot.day1.sololab/leg100/otfd:0.5.24"
+        # https://github.com/leg100/otf/blob/v0.6.0/Dockerfile
+        image = "zot.day1.sololab/leg100/otfd:0.6.0"
         labels = {
           "traefik.enable"                                = "true"
           "traefik.http.routers.otf-redirect.entrypoints" = "web"
