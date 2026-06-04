@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/tfe"
       version = ">= 0.77.0"
     }
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.4.0"
+    }
   }
   backend "consul" {
     address = "consul.day2.sololab"
@@ -21,8 +25,8 @@ provider "vault" {
 
 ephemeral "vault_kv_secret_v2" "provider_secret" {
   count = var.prov_tfe.token_reference == null ? 0 : 1
-  mount = var.prov_tfe.token_reference.mount
-  name  = var.prov_tfe.token_reference.name
+  mount = var.prov_tfe.token_reference.vault_kvv2.mount
+  name  = var.prov_tfe.token_reference.vault_kvv2.name
 }
 
 provider "tfe" {
