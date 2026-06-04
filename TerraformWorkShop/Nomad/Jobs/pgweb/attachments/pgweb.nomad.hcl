@@ -10,7 +10,7 @@ locals {
   user = "{{ index .ServiceMeta "dbUser" }}"
   {{- $dbName := index .ServiceMeta "dbName" }}
   password = "{{ with secret (printf "kvv2_others/data/app-%s" $dbName) }}{{ .Data.data.pgsql_user_password }}{{ end }}"
-  {{ printf "\n\n" }}
+  {{ printf "---" }}
   {{- end }}
   {{- end }}
   {{- end }}
