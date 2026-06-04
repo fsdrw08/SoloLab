@@ -13,18 +13,18 @@ locals {
         value_set.name
       ]
     ]
-    # if value_refer.vault_kvv2 != null
-    if value_refer.tfstate != null
+    if value_refer.vault_kvv2 != null
+    # if value_refer.tfstate != null
   ])
   secret_var_values = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
       for value_set in value_refer.value_sets : [
-        # data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-        local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+        data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
+        # local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
       ]
     ]
-    # if value_refer.vault_kvv2 != null
-    if value_refer.tfstate != null
+    if value_refer.vault_kvv2 != null
+    # if value_refer.tfstate != null
   ])
   tls_tfstate = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
@@ -33,6 +33,14 @@ locals {
     }
     if value_refer.tfstate != null
   ])
+}
+
+data "vault_kv_secret_v2" "secret" {
+  for_each = local.secrets_vault_kvv2 == null ? null : {
+    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+  }
+  mount = each.value.mount
+  name  = each.value.name
 }
 
 # load cert from local tls

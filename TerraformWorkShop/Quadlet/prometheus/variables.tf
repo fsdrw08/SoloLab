@@ -8,26 +8,20 @@ variable "prov_vault" {
 
 variable "prov_remote" {
   type = object({
-    host     = string
-    port     = number
-    user     = optional(string, null)
-    password = optional(string, null)
-    credential_reference = optional(
-      object({
+    host = string
+    port = number
+    credential = optional(
+      map(object({
+        plaintext = optional(string, null)
         vault_kvv2 = optional(
           object({
             mount = string
             name  = string
+            key   = string
           }),
           null
         )
-        value_sets = list(
-          object({
-            name          = string
-            value_ref_key = string
-          })
-        )
-      }),
+      })),
       null
     )
   })

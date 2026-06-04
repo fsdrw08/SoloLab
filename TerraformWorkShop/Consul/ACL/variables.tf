@@ -8,19 +8,24 @@ variable "prov_vault" {
 
 variable "prov_consul" {
   type = object({
-    scheme          = string
-    address         = string
-    insecure_https  = bool
-    datacenter      = string
-    token_plaintext = optional(string, null)
-    token_reference = optional(
-      object({
-        vault_kvv2 = object({
-          mount = string
-          name  = string
-          key   = string
-        })
-    }), null)
+    scheme         = string
+    address        = string
+    insecure_https = bool
+    datacenter     = string
+    credential = optional(
+      map(object({
+        plaintext = optional(string, null)
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+            key   = string
+          }),
+          null
+        )
+      })),
+      null
+    )
   })
 }
 

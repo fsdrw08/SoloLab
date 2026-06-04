@@ -6,21 +6,21 @@ prov_vault = {
 prov_remote = {
   host = "192.168.255.20"
   port = 22
-  credential_reference = {
-    vault_kvv2 = {
-      mount = "kvv2_others"
-      name  = "vm-day2"
-    }
-    value_sets = [
-      {
-        name          = "user"
-        value_ref_key = "rootless_username"
-      },
-      {
-        name          = "password"
-        value_ref_key = "rootless_password"
+  credential = {
+    "user" = {
+      vault_kvv2 = {
+        mount = "kvv2_others"
+        name  = "vm-day2"
+        key   = "rootless_username"
       }
-    ]
+    }
+    "password" = {
+      vault_kvv2 = {
+        mount = "kvv2_others"
+        name  = "vm-day2"
+        key   = "rootless_password"
+      }
+    }
   }
 }
 

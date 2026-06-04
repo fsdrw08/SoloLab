@@ -8,11 +8,13 @@ prov_consul = {
   address        = "consul.day2.sololab:8501"
   insecure_https = true
   datacenter     = "dc1"
-  token_reference = {
-    vault_kvv2 = {
-      mount = "kvv2_consul"
-      name  = "token-init_management"
-      key   = "token"
+  credential = {
+    "token" = {
+      vault_kvv2 = {
+        mount = "kvv2_consul"
+        name  = "token-init_management"
+        key   = "token"
+      }
     }
   }
 }

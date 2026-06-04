@@ -38,9 +38,12 @@ provider "vault" {
 }
 
 ephemeral "vault_kv_secret_v2" "provider_secret" {
-  count = var.prov_consul.token_reference == null ? 0 : 1
-  mount = var.prov_consul.token_reference.vault_kvv2.mount
-  name  = var.prov_consul.token_reference.vault_kvv2.name
+  for_each = {
+    for key in keys(var.prov_consul.credential) : key => var.prov_consul.credential[key]
+    if var.prov_consul.credential[key].vault_kvv2 != null
+  }
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 provider "consul" {
@@ -48,5 +51,5 @@ provider "consul" {
   address        = var.prov_consul.address
   datacenter     = var.prov_consul.datacenter
   insecure_https = var.prov_consul.insecure_https
-  token          = var.prov_consul.token_plaintext != null ? var.prov_consul.token_plaintext : ephemeral.vault_kv_secret_v2.provider_secret.0.data[var.prov_consul.token_reference.vault_kvv2.key]
+  token          = contains(keys(var.prov_consul.credential), "token") ? var.prov_consul.credential["token"].plaintext != null ? var.prov_consul.credential["token"].plaintext : var.prov_consul.credential["token"].vault_kvv2 == null ? null : ephemeral.vault_kv_secret_v2.provider_secret["token"].data[var.prov_consul.credential["token"].vault_kvv2.key] : null
 }

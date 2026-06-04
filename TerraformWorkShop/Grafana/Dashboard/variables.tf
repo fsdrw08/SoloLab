@@ -10,14 +10,20 @@ variable "prov_grafana" {
   type = object({
     url                  = string
     insecure_skip_verify = bool
-    auth_plaintext       = optional(string, null)
-    auth_reference = optional(object({
-      vault_kvv2 = object({
-        mount = string
-        name  = string
-        key   = string
-      })
-    }), null)
+    credential = optional(
+      map(object({
+        plaintext = optional(string, null)
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+            key   = string
+          }),
+          null
+        )
+      })),
+      null
+    )
   })
 }
 

@@ -8,18 +8,22 @@ variable "prov_vault" {
 
 variable "prov_nomad" {
   type = object({
-    address          = string
-    skip_verify      = bool
-    secret_plaintext = optional(string, null)
-    secret_reference = optional(
-      object({
+    address     = string
+    skip_verify = bool
+    credential = optional(
+      map(object({
+        plaintext = optional(string, null)
         vault_kvv2 = optional(
           object({
             mount = string
             name  = string
             key   = string
-        }), null)
-    }), null)
+          }),
+          null
+        )
+      })),
+      null
+    )
   })
 }
 

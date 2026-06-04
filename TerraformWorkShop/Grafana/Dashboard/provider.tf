@@ -33,12 +33,15 @@ provider "vault" {
 }
 
 ephemeral "vault_kv_secret_v2" "provider_secret" {
-  count = var.prov_grafana.auth_reference.vault_kvv2 == null ? 0 : 1
-  mount = var.prov_grafana.auth_reference.vault_kvv2.mount
-  name  = var.prov_grafana.auth_reference.vault_kvv2.name
+  for_each = {
+    for key in keys(var.prov_grafana.credential) : key => var.prov_grafana.credential[key]
+    if var.prov_grafana.credential[key].vault_kvv2 != null
+  }
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 provider "grafana" {
   url  = var.prov_grafana.url
-  auth = var.prov_grafana.auth_plaintext != null ? var.prov_grafana.auth_plaintext : ephemeral.vault_kv_secret_v2.provider_secret[0].data[var.prov_grafana.auth_reference.vault_kvv2.key]
+  auth = contains(keys(var.prov_grafana.credential), "auth") ? var.prov_grafana.credential["auth"].plaintext != null ? var.prov_grafana.credential["auth"].plaintext : var.prov_grafana.credential["auth"].vault_kvv2 == null ? null : ephemeral.vault_kv_secret_v2.provider_secret["auth"].data[var.prov_grafana.credential["auth"].vault_kvv2.key] : null
 }

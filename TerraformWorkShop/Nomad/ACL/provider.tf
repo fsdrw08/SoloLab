@@ -41,13 +41,16 @@ provider "vault" {
 }
 
 ephemeral "vault_kv_secret_v2" "provider_secret" {
-  count = var.prov_nomad.secret_reference.vault_kvv2 == null ? 0 : 1
-  mount = var.prov_nomad.secret_reference.vault_kvv2.mount
-  name  = var.prov_nomad.secret_reference.vault_kvv2.name
+  for_each = {
+    for key in keys(var.prov_nomad.credential) : key => var.prov_nomad.credential[key]
+    if var.prov_nomad.credential[key].vault_kvv2 != null
+  }
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 provider "nomad" {
   address     = var.prov_nomad.address
   skip_verify = var.prov_nomad.skip_verify
-  secret_id   = var.prov_nomad.secret_reference.vault_kvv2 == null ? var.prov_nomad.secret_plaintext : ephemeral.vault_kv_secret_v2.provider_secret.0.data[var.prov_nomad.secret_reference.vault_kvv2.key]
+  secret_id   = contains(keys(var.prov_nomad.credential), "secret_id") ? var.prov_nomad.credential["secret_id"].plaintext != null ? var.prov_nomad.credential["secret_id"].plaintext : var.prov_nomad.credential["secret_id"].vault_kvv2 == null ? null : ephemeral.vault_kv_secret_v2.provider_secret["secret_id"].data[var.prov_nomad.credential["secret_id"].vault_kvv2.key] : null
 }
