@@ -102,3 +102,17 @@ Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
 sudo pwsh.exe -c "[System.Environment]::SetEnvironmentVariable('CONSUL_HTTP_TOKEN',`"$env:CONSUL_HTTP_TOKEN`"); terraform -chdir=`"$(Join-Path -Path $repoDir -ChildPath $childPath)`" init -upgrade"; 
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+
+To cleanup gitea juicefs volume:
+```powershell
+# delete juicefs volume meta data in etcd
+ssh Day1-FCOS
+podman exec etcd-server etcdctl --insecure-skip-tls-verify --endpoints=https://localhost:2379 --user=root:P@ssw0rd del /juicefs/gitea-data/ --prefix=true
+
+# delete juicefs volume chunk data in dufs
+$credential="admin:admin"
+curl.exe -X DELETE -k https://dufs.day1.sololab/webdav/csi-gitea-data/ --user $credential
+
+# or
+juicefs destroy etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/gitea-data/_
+```
