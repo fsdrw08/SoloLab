@@ -37,7 +37,7 @@ job "gitea" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        URL=postgres://{{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}:{{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_password}}{{end}}@pgbouncer.service.consul:6432/gitea?sslmode=require
+        URL=postgres://{{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_name}}{{end}}:{{with secret "kvv2_others/data/app-gitea"}}{{.Data.data.pgsql_user_password}}{{end}}@day3.pgbouncer.service.consul:6432/gitea?sslmode=require
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
@@ -147,7 +147,7 @@ job "gitea" {
 
       resources {
         # Specifies the CPU required to run this task in MHz
-        cpu = 300
+        cpu = 600
         # Specifies the memory required in MB
         memory = 600
       }
