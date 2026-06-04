@@ -100,9 +100,13 @@ terraform {
       source  = "datadrivers/nexus"
       version = ">= 2.7.0"
     }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.62.1"
+    # azurerm = {
+    #   source  = "hashicorp/azurerm"
+    #   version = ">= 4.62.1"
+    # }
+    gitea = {
+      source  = "go-gitea/gitea"
+      version = ">= 0.6.0"
     }
   }
 }
