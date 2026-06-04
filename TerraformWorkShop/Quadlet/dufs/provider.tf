@@ -46,3 +46,9 @@ provider "remote" {
     password = var.prov_remote.password
   }
 }
+
+provider "vault" {
+  address         = var.prov_vault.address
+  skip_tls_verify = var.prov_vault.skip_tls_verify
+  token           = var.prov_vault.token
+}

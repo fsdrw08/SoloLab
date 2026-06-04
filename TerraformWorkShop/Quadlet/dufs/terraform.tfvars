@@ -5,6 +5,11 @@ prov_remote = {
   password = "podmgr"
 }
 
+prov_vault = {
+  address         = "https://192.168.255.10:8200"
+  skip_tls_verify = true
+}
+
 podman_kubes = [
   {
     helm = {

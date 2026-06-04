@@ -7,6 +7,14 @@ variable "prov_remote" {
   })
 }
 
+variable "prov_vault" {
+  type = object({
+    address         = string
+    skip_tls_verify = optional(bool, false)
+    token           = optional(string, null)
+  })
+}
+
 variable "podman_kubes" {
   type = list(object({
     helm = object({
