@@ -20,17 +20,13 @@ prov_gitea = {
   }
 }
 
-organizations = [
+users = [
   {
-    iac_id = "27beb241"
-    name   = "sololab"
-    repositories = [
-      {
-        iac_id    = "42989f91"
-        name      = "week1-infra"
-        auto_init = false
-        private   = false
-      }
-    ]
+    iac_id               = "d57107bf"
+    email                = "atlentis@mail.sololab"
+    login_name           = "atlentis"
+    password_version     = 1
+    username             = "atlentis"
+    must_change_password = false
   }
 ]

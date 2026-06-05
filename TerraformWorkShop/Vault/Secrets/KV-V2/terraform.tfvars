@@ -33,4 +33,8 @@ kvv2 = [
     mount_path  = "kvv2_others"
     description = "kvv2 secret backend for others"
   },
+  {
+    mount_path  = "kvv2_gitea"
+    description = "kvv2 secret backend for gitea"
+  },
 ]

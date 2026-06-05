@@ -74,7 +74,9 @@ secrets = [
     name               = "app-gitea"
     generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
     content = {
-      "pgsql_user_name" = "gitea"
+      "pgsql_user_name"         = "gitea"
+      "iac-credential-username" = "terraform"
+      "iac-credential-password" = "P@ssw0rd"
     }
     secret_version = 1
   },
