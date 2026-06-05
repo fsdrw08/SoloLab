@@ -51,4 +51,22 @@
         "privateChildPath": "private/certs/client.global.nomad.key",
         "description": "https://vault.day1.sololab/ui/vault/secrets/kvv2_certs/kv/client.global.nomad/paths",
     },
+    {
+        "type": "repo-file",
+        "publicParentPath": "",
+        "publicChildPath": "",
+        "localChildPath": "",
+        "repoChildPath": "LocalWorkShop/Install-Consul/Install-Consul.sh",
+        "privateChildPath": "public/binaries/consul_install.sh",
+        "description": "",
+    },
+    {
+        "type": "repo-file",
+        "publicParentPath": "",
+        "publicChildPath": "",
+        "localChildPath": "",
+        "repoChildPath": "LocalWorkShop/Install-Nomad/Install-Nomad.sh",
+        "privateChildPath": "public/binaries/nomad_install.sh",
+        "description": "",
+    },
 ]

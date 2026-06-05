@@ -132,10 +132,15 @@ if ($Download) {
 ## upload
 if ($Upload) {
     $credential="$($PrivateRegistryCredential.UserName):$($PrivateRegistryCredential.GetNetworkCredential().Password)"
-
+    $repoParentPath = git rev-parse --show-toplevel
     $syncList | ConvertFrom-Json | ForEach-Object {
-        if ($_.localChildPath -and (Test-Path -Path $localParentPath/$($_.localChildPath))) {
+        if (($_.localChildPath -and (Test-Path -Path $localParentPath/$($_.localChildPath))) `
+            -or (Test-Path -Path $repoParentPath/$($_.repoChildPath))) {
             $localFullPath="$localParentPath/$($_.localChildPath)"
+            if ($_.type -eq "repo-file" -and $_.repoChildPath -and $_.repoChildPath) {
+                $repoParentPath = git rev-parse --show-toplevel
+                $repoFullPath = "$repoParentPath/$($_.repoChildPath)"
+            }
             
             $privateParentPath = New-Object System.Uri("$PrivateRegistry")
             $privateChildPath = $_.privateChildPath
@@ -156,7 +161,7 @@ if ($Upload) {
                     Write-Host "Remove sensitive data file $localFullPath"
                     Remove-Item -Path $localFullPath -Force
                 }
-                "terraform-mirror" {
+                "local-dir" {
                     Get-ChildItem -Path $localFullPath -Recurse | ForEach-Object {
                         if (-not (Get-Item -Path $_.FullName).PSIsContainer) {
                             $TFProviderPath = (New-Object System.Uri($_.FullName)).AbsolutePath.Replace("$localFullPath/","")
@@ -166,6 +171,12 @@ if ($Upload) {
                             curl.exe -k -T $($_.FullName) $privateFullUri --user $credential
                         }
                     }
+                }
+                "repo-file" {
+                    $privateFullUri = (New-Object System.Uri($privateParentPath, "$privateChildPath")).AbsoluteUri
+
+                    Write-Host "Upload $repoFullPath to $privateFullUri"
+                    curl.exe -k -T $repoFullPath $privateFullUri --user $credential
                 }
                 Default {}
             }            

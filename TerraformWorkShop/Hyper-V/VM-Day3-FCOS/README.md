@@ -47,3 +47,9 @@ sudo xfsrestore -f podmgr_2.xfsdump /var/home/podmgr
 4. Run `sudo rpm-ostree upgrade && sudo systemctl reboot`
 ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-image/105920/17
 5. Run `sudo rpm-ostree cleanup -r` to clean up the old ostree deployments and free up space on Fedora CoreOS
+
+### Upgrade consul and nomad binaries in Day3-FCOS VM:
+```shell
+sudo bash -c "consul_download_url=http://dufs.day1.sololab/public/binaries/consul_2.0.0_linux_amd64.zip custom_bin_dir=/opt/bin /opt/bin/consul_install.sh"
+sudo bash -c "nomad_download_url=http://dufs.day1.sololab/public/binaries/nomad_2.0.0_linux_amd64.zip custom_bin_dir=/opt/bin /opt/bin/nomad_install.sh"
+```

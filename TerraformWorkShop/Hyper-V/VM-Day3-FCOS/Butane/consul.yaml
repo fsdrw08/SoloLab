@@ -10,6 +10,10 @@ storage:
     # consul data dir
     - path: "${consul_data_dir}"
   files:
+    - path: ${custom_bin_dir}/consul_install.sh
+      mode: 0755
+      contents:
+        source: ${consul_install_url}
     - path: ${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip
       mode: 0644
       contents:

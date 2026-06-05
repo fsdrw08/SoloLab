@@ -15,6 +15,10 @@ storage:
     - path: /var/lib/nomad
       target: "${nomad_data_dir}"
   files:
+    - path: ${custom_bin_dir}/nomad_install.sh
+      mode: 0755
+      contents:
+        source: ${nomad_install_url}
     - path: ${custom_bin_dir}/nomad_${nomad_version}_linux_amd64.zip
       mode: 0644
       contents:

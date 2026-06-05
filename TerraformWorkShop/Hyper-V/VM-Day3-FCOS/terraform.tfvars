@@ -75,12 +75,14 @@ butane = {
       custom_bin_dir      = "/opt/bin"
       # consul client
       consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.0_linux_amd64.zip"
+      consul_install_url  = "http://dufs.day1.sololab/public/binaries/consul_install.sh"
       consul_version      = "2.0.0"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/mnt/data/consul"
       # nomad client
       nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.2_linux_amd64.zip"
+      nomad_install_url                   = "http://dufs.day1.sololab/public/binaries/nomad_install.sh"
       nomad_version                       = "2.0.2"
       nomad_server_fqdn                   = "nomad.service.consul"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"

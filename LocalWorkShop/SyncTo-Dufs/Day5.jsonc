@@ -16,7 +16,7 @@
         "description": "https://github.com/jdx/mise",
     },
     {
-        "type": "terraform-mirror",
+        "type": "local-dir",
         "publicParentPath": "",
         "publicChildPath": "",
         "localChildPath": "terraform.d/mirror",
