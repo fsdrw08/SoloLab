@@ -4,12 +4,8 @@
 if /usr/local/bin/gitea admin auth list | grep -q "Vault"; then
     echo "OAuth auth source 'Vault' already exists, skipping creation"
     echo "To update the config, run gitea admin auth update-oauth --id x ..."
-
-    exit 0
-fi
-
+else
 /usr/local/bin/gitea migrate
-
 /usr/local/bin/gitea admin auth add-oauth \
     --name "Vault" \
     --provider openidConnect \
@@ -19,3 +15,17 @@ fi
     --scopes "openid profile email groups" \
     --group-claim-name "groups" \
     --admin-group "app-gitea-admin"
+fi
+
+if /usr/local/bin/gitea admin user list | grep -q "{{ with secret "kvv2_others/data/app-gitea" }}{{.Data.data.admin_username}}{{ end }}"; then
+    echo "User '{{ with secret "kvv2_others/data/app-gitea" }}{{.Data.data.admin_username}}{{ end }}' already exists, skipping creation"
+else
+/usr/local/bin/gitea migrate
+/usr/local/bin/gitea admin user create \
+    --username "{{ with secret "kvv2_others/data/app-gitea" }}{{.Data.data.admin_username}}{{ end }}" \
+    --password "{{ with secret "kvv2_others/data/app-gitea" }}{{.Data.data.admin_password}}{{ end }}" \
+    --email "{{ with secret "kvv2_others/data/app-gitea" }}{{.Data.data.admin_email}}{{ end }}" \
+    --must-change-password=false \
+    --admin
+fi
+

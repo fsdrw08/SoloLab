@@ -8,13 +8,13 @@ prov_gitea = {
   insecure = true
   credential = {
     "username" = {
-      plaintext = "terraform"
+      plaintext = "admin"
     }
     "password" = {
       vault_kvv2 = {
         mount = "kvv2_others"
         name  = "app-gitea"
-        key   = "iac-credential-password"
+        key   = "admin_password"
       }
     }
   }

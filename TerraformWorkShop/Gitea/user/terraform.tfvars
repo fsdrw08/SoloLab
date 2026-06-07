@@ -8,13 +8,13 @@ prov_gitea = {
   insecure = true
   credential = {
     "username" = {
-      plaintext = "terraform"
+      plaintext = "admin"
     }
     "password" = {
       vault_kvv2 = {
         mount = "kvv2_others"
         name  = "app-gitea"
-        key   = "iac-credential-password"
+        key   = "admin_password"
       }
     }
   }
@@ -23,7 +23,7 @@ prov_gitea = {
 users = [
   {
     iac_id               = "d57107bf"
-    email                = "atlentis@mail.sololab"
+    email                = "gitea-atlentis@mail.sololab"
     login_name           = "atlentis"
     password_version     = 1
     username             = "atlentis"

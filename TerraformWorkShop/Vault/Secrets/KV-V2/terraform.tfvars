@@ -26,10 +26,6 @@ kvv2 = [
     description = "kvv2 secret backend for nomad"
   },
   {
-    mount_path  = "kvv2_pgsql"
-    description = "kvv2 secret backend for pgsql"
-  },
-  {
     mount_path  = "kvv2_others"
     description = "kvv2 secret backend for others"
   },
