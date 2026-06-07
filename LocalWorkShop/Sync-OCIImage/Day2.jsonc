@@ -32,7 +32,7 @@
         "publicRepo": "noenv/nomad:2.0.2",
         "archive": "docker.io_noenv_nomad_2.0.2.tar",
         "privateRepo": "noenv/nomad:2.0.2",
-        "description": "https://hub.docker.com/r/noenv/nomad/tags",
+        "description": "https://hub.docker.com/r/noenv/nomad/tags, https://github.com/hashicorp/nomad/releases",
     },
     {
         "publicRegistry": "docker.io",
