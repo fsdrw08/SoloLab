@@ -23,7 +23,7 @@ job "jenkins-swarm" {
       service {
         provider = "consul"
         name     = "jenkins-swarm"
-        # need to set address_mode to "host" to use day2 traefik's server transport
+        # need to set address_mode to "host" to make this service resolve to host ip address in consul
         # address_mode = "host"
 
         # # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver

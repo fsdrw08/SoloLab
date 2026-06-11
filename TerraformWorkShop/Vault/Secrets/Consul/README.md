@@ -9,3 +9,5 @@ e.g. some builtin policy `global-management`, `builtin/global-read-only`, check 
 3. Create vault policy to limit vault user retrieve consul token from vault, the policy assigned to some policy groups(the vault internal group), then link some vault external groups(which comes from LDAP in this case) to the policy group
 
 After apply this tf resources, we only need to add user to the vault external groups (also ok to add user via LDAP, then sync the user, group and relationship to vault), then the user is able login to consul by the token which retrieve from vault api endpoint `/consul/creds/{role}`
+
+role name can be found in [terraform.tfvars](./terraform.tfvars)

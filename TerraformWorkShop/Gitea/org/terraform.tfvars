@@ -27,7 +27,7 @@ organizations = [
     repositories = [
       {
         iac_id    = "42989f91"
-        name      = "week1-infra"
+        name      = "sololab"
         auto_init = false
         private   = false
       }
