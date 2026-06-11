@@ -2,9 +2,9 @@
     {
         "type": "general",
         "publicParentPath": "https://releases.hashicorp.com",
-        "publicChildPath": "nomad/2.0.2/nomad_2.0.2_linux_amd64.zip",
-        "localChildPath": "bin/nomad_2.0.2_linux_amd64.zip",
-        "privateChildPath": "public/binaries/nomad_2.0.2_linux_amd64.zip",
+        "publicChildPath": "nomad/2.0.3/nomad_2.0.3_linux_amd64.zip",
+        "localChildPath": "bin/nomad_2.0.3_linux_amd64.zip",
+        "privateChildPath": "public/binaries/nomad_2.0.3_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad",
     },
     {

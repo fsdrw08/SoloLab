@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "noenv/nomad:2.0.2",
-        "archive": "docker.io_noenv_nomad_2.0.2.tar",
-        "privateRepo": "noenv/nomad:2.0.2",
+        "publicRepo": "noenv/nomad:2.0.3",
+        "archive": "docker.io_noenv_nomad_2.0.3.tar",
+        "privateRepo": "noenv/nomad:2.0.3",
         "description": "https://hub.docker.com/r/noenv/nomad/tags, https://github.com/hashicorp/nomad/releases",
     },
     {
