@@ -41,6 +41,31 @@ job "atlantis" {
         memory = 50
       }
     }
+    task "wait4x-gitea" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      driver = "podman"
+      config {
+        image = "zot.day1.sololab/wait4x/wait4x:3.6.0"
+        args = [
+          "http",
+          "https://gitea.day4.sololab/api/v1/version",
+          # https://github.com/wait4x/wait4x/pull/35
+          "--insecure-skip-tls-verify",
+          "--expect-status-code",
+          "200",
+        ]
+      }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
+    }
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
     task "atlantis" {
       # https://developer.hashicorp.com/nomad/docs/job-specification/service
@@ -95,8 +120,8 @@ job "atlantis" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/runatlantis/atlantis/blob/v0.43.0/Dockerfile
-        image = "zot.day1.sololab/runatlantis/atlantis:v0.43.0"
+        # https://github.com/runatlantis/atlantis/blob/v0.44.0/Dockerfile
+        image = "zot.day1.sololab/runatlantis/atlantis:v0.44.0"
         labels = {
           "traefik.enable"                                     = "true"
           "traefik.http.routers.atlantis-redirect.entrypoints" = "web"

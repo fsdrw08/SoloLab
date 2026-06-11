@@ -2,9 +2,8 @@
 atlantis-url: https://atlantis.day4.sololab:443
 
 locking-db-type: redis
-# https://github.com/runatlantis/atlantis/issues/3610
-# atlantis does not support custom redis username, have to use default username
-redis-password: default
+redis-username: atlantis
+redis-password: atlantis
 redis-host: day3.redis.service.consul
 redis-port: 6379
 redis-db: 1

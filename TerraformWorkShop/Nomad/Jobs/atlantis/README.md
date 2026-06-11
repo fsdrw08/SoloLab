@@ -48,6 +48,14 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 
 ### Deploy atlantis nomad job
 ```powershell
+$credential = Get-Credential -Message "credential to login vault" -UserName "000"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
+$env:CONSUL_HTTP_TOKEN = $(vault kv get  -format=json -mount=kvv2_consul token-tf_backend | jq.exe .data.data.token).Replace('"', '')
+$env:NOMAD_TOKEN = $(vault kv get -format=json -mount=kvv2_nomad token-management | jq.exe .data.data.token).Replace('"', '')
+
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Nomad/Jobs/atlantis/"
 Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
