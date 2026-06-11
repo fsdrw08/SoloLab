@@ -8,6 +8,7 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/PowerDNS/zones/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+
 - Ensure Internal DNS record for `nomad.day2.sololab` is ready  
 [TerraformWorkShop/etcd/skydns](../../../TerraformWorkShop/etcd/skydns)
 ```powershell
@@ -15,6 +16,7 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/etcd/skydns/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+
 #### Middleware
 - Ensure External L4 loadbalancer for `nomad.day2.sololab` is ready  
 [TerraformWorkShop/VyOS/HAProxy](../../../TerraformWorkShop/VyOS/HAProxy/terraform.tfvars)
@@ -23,7 +25,17 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/VyOS/HAProxy/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+
 #### Security
+- Ensure `vm-day2` related secret in vault kvv2-others backend is ready
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Vault/Secrets/Others/"
+Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
+sudo pwsh.exe -c "terraform init -upgrade";
+terraform apply --auto-approve
+```
+
 - Ensure cert `nomad.day2.sololab` in Vault is ready  
 [TerraformWorkShop/Vault/Secrets/PKI/certs](../../../TerraformWorkShop/Vault/Secrets/PKI/certs/terraform.tfvars)
 ```powershell
@@ -31,6 +43,7 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Vault/Secrets/PKI/certs/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+
 - Ensure consul token `nomad_server` with proper ACL policy for nomad is ready  
 [TerraformWorkShop/Consul/ACL/terraform.tfvars](../../../TerraformWorkShop/Consul/ACL/terraform.tfvars)
 ```powershell
@@ -53,6 +66,10 @@ $proxy="127.0.0.1:7890"; $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy; $env:N
 
 ### Deploy Nomad podman workload to Day2 VM
 ```powershell
+$credential = Get-Credential -Message "credential to login vault" -UserName "000"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Quadlet/nomad"
 Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
