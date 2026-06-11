@@ -13,3 +13,8 @@ gitea-token: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gite
 gitea-user: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_user }}{{ end }}
 gitea-webhook-secret: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_webhook_secret }}{{ end }}
 repo-allowlist: gitea.day4.sololab/sololab/*
+
+# https://github.com/runatlantis/atlantis/pull/4494
+# if use private tf download url, need to prepare a structure like releases.hashicorp.com, which include index.json,
+#  let atlantis fetch the terraform bin version list and related download link, also need to provide the signature file for the package
+# tf-download-url:
