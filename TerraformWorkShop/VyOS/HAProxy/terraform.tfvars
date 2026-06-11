@@ -249,20 +249,28 @@ reverse_proxy = {
       "set backend" = "day2"
     }
   }
-  day4_frontend_otf = {
-    path = "load-balancing haproxy service tcp443 rule 420"
-    configs = {
-      "ssl"         = "req-ssl-sni"
-      "domain-name" = "otf.day4.sololab"
-      "set backend" = "day2"
-    }
-  }
-  day4_frontend_nexus = {
+  day4_frontend_atlantis = {
     path = "load-balancing haproxy service tcp443 rule 430"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "nexus.day4.sololab"
+      "domain-name" = "atlantis.day4.sololab"
       "set backend" = "day2"
     }
   }
+  # day4_frontend_otf = {
+  #   path = "load-balancing haproxy service tcp443 rule 420"
+  #   configs = {
+  #     "ssl"         = "req-ssl-sni"
+  #     "domain-name" = "otf.day4.sololab"
+  #     "set backend" = "day2"
+  #   }
+  # }
+  # day4_frontend_nexus = {
+  #   path = "load-balancing haproxy service tcp443 rule 440"
+  #   configs = {
+  #     "ssl"         = "req-ssl-sni"
+  #     "domain-name" = "nexus.day4.sololab"
+  #     "set backend" = "day2"
+  #   }
+  # }
 }

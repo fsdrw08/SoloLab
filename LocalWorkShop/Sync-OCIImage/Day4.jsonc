@@ -14,6 +14,13 @@
         "description": "https://hub.docker.com/r/gitea/gitea",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "runatlantis/atlantis:v0.43.0",
+        "archive": "ghcr.io_runatlantis_atlantis_v0.43.0.tar",
+        "privateRepo": "runatlantis/atlantis:v0.43.0",
+        "description": "https://github.com/runatlantis/atlantis/pkgs/container/atlantis/versions?filters%5Bversion_type%5D=tagged, https://github.com/runatlantis/atlantis/releases",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "leg100/otfd:0.6.0",
         "archive": "docker.io_leg100_otfd_0.6.0.tar",

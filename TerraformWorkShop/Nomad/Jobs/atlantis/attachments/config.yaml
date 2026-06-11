@@ -1,0 +1,16 @@
+# https://www.runatlantis.io/docs/server-configuration.html
+atlantis-url: https://atlantis.day4.sololab:443
+
+locking-db-type: redis
+# https://github.com/runatlantis/atlantis/issues/3610
+# atlantis does not support custom redis username, have to use default username
+redis-password: default
+redis-host: day3.redis.service.consul
+redis-port: 6379
+redis-db: 1
+
+gitea-base-url: https://gitea.day4.sololab
+gitea-token: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_token }}{{ end }}
+gitea-user: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_user }}{{ end }}
+gitea-webhook-secret: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_webhook_secret }}{{ end }}
+repo-allowlist: gitea.day4.sololab/sololab/*

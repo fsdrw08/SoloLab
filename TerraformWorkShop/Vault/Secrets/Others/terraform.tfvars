@@ -72,12 +72,20 @@ secrets = [
   {
     mount              = "kvv2_others"
     name               = "app-gitea"
-    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password", "admin_password"]
     content = {
       "pgsql_user_name" = "gitea"
       "admin_username"  = "admin"
-      "admin_password"  = "P@ssw0rd"
       "admin_email"     = "gitea-admin@mail.sololab"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
+    name               = "app-atlantis"
+    generate_passwords = ["gitea_webhook_secret"]
+    content = {
+      "gitea_user" = "atlantis"
     }
     secret_version = 1
   },

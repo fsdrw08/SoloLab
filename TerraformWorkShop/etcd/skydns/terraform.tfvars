@@ -349,29 +349,7 @@ dns_records = [
     }
   },
   {
-    hostname = "otf.day4.sololab"
-    value = {
-      string_map = {
-        host = "day2.node.consul"
-      }
-      number_map = {
-        ttl = 60
-      }
-    }
-  },
-  {
-    hostname = "nexus.day4.sololab"
-    value = {
-      string_map = {
-        host = "day2.node.consul"
-      }
-      number_map = {
-        ttl = 60
-      }
-    }
-  },
-  {
-    hostname = "jenkins.day4.sololab"
+    hostname = "atlantis.day4.sololab"
     value = {
       string_map = {
         host = "day2.node.consul"
