@@ -2,11 +2,11 @@ terraform {
   required_providers {
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.1"
+      version = ">= 2.6.1"
     }
     # vault = {
     #   source  = "hashicorp/vault"
-    #   version = ">= 5.4.0"
+    #   version = ">= 5.9.0"
     # }
   }
   backend "s3" {

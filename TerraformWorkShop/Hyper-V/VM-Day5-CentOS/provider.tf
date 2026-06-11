@@ -6,11 +6,11 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
     archive = {
       source  = "hashicorp/archive"
-      version = ">= 2.7.1"
+      version = ">= 2.8.0"
     }
   }
   backend "consul" {

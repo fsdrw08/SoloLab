@@ -2,11 +2,11 @@ terraform {
   required_providers {
     gitea = {
       source  = "go-gitea/gitea"
-      version = ">= 0.6.0"
+      version = ">= 0.7.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
   }
   backend "consul" {

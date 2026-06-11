@@ -2,15 +2,15 @@ terraform {
   required_providers {
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.7.2"
+      version = ">= 3.9.0"
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.11.4"
+      version = ">= 3.38.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
   }
   backend "s3" {

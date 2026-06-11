@@ -2,7 +2,7 @@ terraform {
   required_providers {
     sftpgo = {
       source  = "drakkan/sftpgo"
-      version = ">= 0.0.19"
+      version = ">= 0.0.24"
     }
   }
   backend "s3" {

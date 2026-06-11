@@ -2,11 +2,11 @@ terraform {
   required_providers {
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.7.2"
+      version = ">= 3.9.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
   }
   backend "s3" {

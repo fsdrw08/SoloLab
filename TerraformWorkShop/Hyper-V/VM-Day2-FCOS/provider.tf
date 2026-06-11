@@ -6,7 +6,7 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.2"
+      version = ">= 3.3.0"
     }
     # ignition = {
     #   source  = "community-terraform-providers/ignition"
@@ -14,15 +14,15 @@ terraform {
     # }
     ct = {
       source  = "poseidon/ct"
-      version = ">= 0.13.0"
+      version = ">= 0.14.0"
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = ">= 2.5.1"
+      version = ">= 2.9.0"
     }
   }
   backend "s3" {

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.3.0"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -14,11 +14,11 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = ">=3.6.2"
+      version = ">= 3.9.0"
     }
     vyos = {
       source  = "Foltik/vyos"
-      version = ">=0.3.3"
+      version = ">= 0.3.4"
     }
   }
   backend "pg" {

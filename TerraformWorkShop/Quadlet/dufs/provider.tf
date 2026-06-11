@@ -2,15 +2,15 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.7.0"
+      version = ">= 5.9.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.2"
+      version = ">= 3.3.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.1.0"
+      version = ">= 3.2.0"
     }
     remote = {
       source  = "tenstad/remote"

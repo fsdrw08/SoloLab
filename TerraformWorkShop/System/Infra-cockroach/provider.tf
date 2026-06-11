@@ -2,7 +2,7 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.1"
+      version = ">= 3.3.0"
     }
     system = {
       source  = "neuspaces/system"
@@ -10,7 +10,7 @@ terraform {
     }
     vyos = {
       source  = "Foltik/vyos"
-      version = ">=0.3.3"
+      version = ">= 0.3.4"
     }
   }
 }

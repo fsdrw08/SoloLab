@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tls = {
       source  = "hashicorp/tls"
-      version = ">= 4.2.1"
+      version = ">= 4.3.0"
     }
     hyperv = {
       source  = "taliesins/hyperv"
@@ -14,11 +14,11 @@ terraform {
     }
     null = {
       source  = "hashicorp/null"
-      version = ">= 3.2.4"
+      version = ">= 3.3.0"
     }
     archive = {
       source  = "hashicorp/archive"
-      version = ">= 2.7.1"
+      version = ">= 2.8.0"
     }
     tfe = {
       source  = "hashicorp/tfe"
@@ -38,11 +38,11 @@ terraform {
     }
     local = {
       source  = "hashicorp/local"
-      version = ">= 2.5.3"
+      version = ">= 2.9.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 3.1.1"
+      version = ">= 3.2.0"
     }
     remote = {
       source  = "tenstad/remote"
@@ -60,13 +60,13 @@ terraform {
       source  = "zitadel/zitadel"
       version = ">= 2.8.1"
     }
-    sftpgo = {
-      source  = "drakkan/sftpgo"
-      version = ">= 0.0.19"
-    }
+    # sftpgo = {
+    #   source  = "drakkan/sftpgo"
+    #   version = ">= 0.0.24"
+    # }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.7.0"
+      version = ">= 5.9.0"
     }
     ldap = {
       source  = "l-with/ldap"
@@ -78,19 +78,19 @@ terraform {
     }
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.2"
+      version = ">= 2.6.1"
     }
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.7.2"
+      version = ">= 3.9.0"
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.24.0"
+      version = ">= 3.38.0"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 4.14.0"
+      version = ">= 4.38.0"
     }
     system = {
       source  = "neuspaces/system"
@@ -98,15 +98,11 @@ terraform {
     }
     nexus = {
       source  = "datadrivers/nexus"
-      version = ">= 2.7.0"
+      version = ">= 2.8.0"
     }
-    # azurerm = {
-    #   source  = "hashicorp/azurerm"
-    #   version = ">= 4.62.1"
-    # }
     gitea = {
       source  = "go-gitea/gitea"
-      version = ">= 0.6.0"
+      version = ">= 0.7.0"
     }
   }
 }

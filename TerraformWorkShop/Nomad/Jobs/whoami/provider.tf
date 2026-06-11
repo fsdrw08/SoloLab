@@ -2,7 +2,7 @@ terraform {
   required_providers {
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.1"
+      version = ">= 2.6.1"
     }
   }
   backend "pg" {

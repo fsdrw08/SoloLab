@@ -2,7 +2,7 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = "3.2.2"
+      version = ">= 3.3.0"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -26,7 +26,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
   }
   backend "pg" {

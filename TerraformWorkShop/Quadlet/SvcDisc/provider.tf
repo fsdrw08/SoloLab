@@ -6,7 +6,7 @@ terraform {
     }
     # minio = {
     #   source  = "aminueza/minio"
-    #   version = ">=2.0.1"
+    #   version = ">= 3.38.0"
     # }
     system = {
       source  = "neuspaces/system"

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     null = {
       source  = "hashicorp/null"
-      version = ">=3.2.1"
+      version = ">= 3.3.0"
     }
     system = {
       source  = "neuspaces/system"
@@ -14,7 +14,7 @@ terraform {
     }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.4.0"
+      version = ">= 5.9.0"
     }
   }
   backend "s3" {

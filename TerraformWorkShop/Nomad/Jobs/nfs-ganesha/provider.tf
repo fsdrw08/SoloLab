@@ -2,11 +2,11 @@ terraform {
   required_providers {
     # null = {
     #   source  = "hashicorp/null"
-    #   version = ">= 3.2.2"
+    #   version = ">= 3.3.0"
     # }
     nomad = {
       source  = "hashicorp/nomad"
-      version = ">= 2.5.1"
+      version = ">= 2.6.1"
     }
   }
   backend "consul" {
