@@ -44,6 +44,58 @@ job "gitea" {
         env         = true
       }
       vault {}
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
+    }
+    task "wait4x-redis" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      driver = "podman"
+      config {
+        image = "zot.day1.sololab/wait4x/wait4x:3.6.0"
+        args = [
+          "redis",
+          "redis://gitea:gitea@day3.redis.service.consul:6379/0",
+        ]
+      }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
+    }
+    task "wait4x-minio" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      driver = "podman"
+      config {
+        image = "zot.day1.sololab/wait4x/wait4x:3.6.0"
+        args = [
+          "http",
+          "https://minio-api.day1.sololab/minio/health/live",
+          # https://github.com/wait4x/wait4x/pull/35
+          "--insecure-skip-tls-verify",
+          "--expect-status-code",
+          "200",
+        ]
+      }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
     }
 
     network {
