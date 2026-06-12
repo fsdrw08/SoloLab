@@ -69,3 +69,5 @@ resource "gitea_repository" "repository" {
   repo_template                   = each.value.repo_template
   website                         = each.value.website
 }
+
+resource "gitea_repository_webhook" "webhook" {}
