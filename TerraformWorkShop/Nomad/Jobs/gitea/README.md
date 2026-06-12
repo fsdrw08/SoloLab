@@ -48,6 +48,12 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 - Ensure Redis ACL and related credential for Gitea is ready  
 [TerraformWorkShop/Nomad/Jobs/redis/attachments-redis/acl.conf](../../../../TerraformWorkShop/Nomad/Jobs/redis/attachments-redis/acl.conf)
 ```powershell
+$credential = Get-Credential -Message "credential to login vault"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+$env:CONSUL_HTTP_TOKEN = $(vault kv get -format=json -mount=kvv2_consul token-tf_backend | jq.exe .data.data.token).Replace('"', '')
+$env:NOMAD_TOKEN = $(vault kv get -format=json -mount=kvv2_nomad token-management | jq.exe .data.data.token).Replace('"', '')
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Nomad/Jobs/redis/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
@@ -62,9 +68,13 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 ```
 
 #### Security
-- Ensure gitea postgresql credential in vault is ready
+- Ensure gitea postgresql credential `pgsql_admin_password`, `pgsql_user_name`, `pgsql_user_password` is in vault is ready
 [TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars](../../../../TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars)
 ```powershell
+$credential = Get-Credential -Message "credential to login vault"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Vault/Secrets/Others/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
@@ -96,6 +106,12 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 
 #### Deploy gitea nomad job
 ```powershell
+$credential = Get-Credential -Message "credential to login vault"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+$env:CONSUL_HTTP_TOKEN = $(vault kv get -format=json -mount=kvv2_consul token-tf_backend | jq.exe .data.data.token).Replace('"', '')
+$env:NOMAD_TOKEN = $(vault kv get -format=json -mount=kvv2_nomad token-management | jq.exe .data.data.token).Replace('"', '')
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Nomad/Jobs/gitea/"
 Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
