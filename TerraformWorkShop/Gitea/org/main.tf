@@ -70,4 +70,61 @@ resource "gitea_repository" "repository" {
   website                         = each.value.website
 }
 
-resource "gitea_repository_webhook" "webhook" {}
+locals {
+  webhooks = flatten([
+    for org in var.organizations : [
+      for repo in org.repositories : [
+        for webhook in repo.webhooks : merge(
+          webhook,
+          {
+            org_iac_id  = org.iac_id
+            repo_iac_id = repo.iac_id
+          }
+        )
+      ]
+      if repo.webhooks != null
+    ]
+    if org.repositories != null
+  ])
+  vault_kvv2_secret_list = flatten([
+    for org in var.organizations : [
+      for repo in org.repositories : [
+        for webhook in repo.webhooks : {
+          iac_id = webhook.iac_id
+          mount  = webhook.secret.vault_kvv2.mount
+          name   = webhook.secret.vault_kvv2.name
+        }
+        if webhook.secret.vault_kvv2 != null
+      ]
+      if repo.webhooks != null
+    ]
+    if org.repositories != null
+  ])
+}
+
+data "vault_kv_secret_v2" "secret" {
+  for_each = local.vault_kvv2_secret_list == null ? null : {
+    for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.iac_id => vault_kvv2_secret
+  }
+  mount = each.value.mount
+  name  = each.value.name
+}
+
+resource "gitea_repository_webhook" "webhook" {
+  depends_on = [
+    gitea_repository.repository
+  ]
+  for_each = {
+    for webhook in local.webhooks : webhook.iac_id => webhook
+  }
+  username             = gitea_org.org[each.value.org_iac_id].name
+  name                 = gitea_repository.repository[each.value.repo_iac_id].name
+  active               = each.value.active
+  branch_filter        = each.value.branch_filter
+  content_type         = each.value.content_type
+  events               = each.value.events
+  type                 = each.value.type
+  url                  = each.value.url
+  authorization_header = each.value.authorization_header
+  secret               = each.value.secret.plaintext != null ? each.value.secret.plaintext : data.vault_kv_secret_v2.secret[each.value.iac_id].data[each.value.secret.vault_kvv2.key]
+}

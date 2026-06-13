@@ -77,16 +77,28 @@ variable "organizations" {
       readme                          = optional(string, null)
       repo_template                   = optional(bool, null)
       website                         = optional(string, null) # A link to a website with more information.
-      webhook = optional(list(object({
-        active               = bool                   # Set webhook to active, e.g. true
-        branch_filter        = string                 # Set branch filter on the webhook, e.g. "*"   
-        content_type         = string                 # The content type of the payload. It can be json, or xml
-        events               = list(string)           # A list of events that will trigger the webhool, e.g. ["push"]
-        type                 = string                 # Webhook type, e.g. gitea
-        url                  = string                 # Target URL of the webhook
-        authorization_header = optional(string, null) # The authorization header to use for the webhook.
-        secret               = optional(string, null) # The secret to use for the webhook.
-      }), null))
+      webhooks = optional(
+        list(object({
+          iac_id               = string
+          active               = bool                   # Set webhook to active, e.g. true
+          branch_filter        = string                 # Set branch filter on the webhook, e.g. "*"   
+          content_type         = string                 # The content type of the payload. It can be json, or xml
+          events               = list(string)           # A list of events that will trigger the webhool, e.g. ["push"]
+          type                 = string                 # Webhook type, e.g. gitea
+          url                  = string                 # Target URL of the webhook
+          authorization_header = optional(string, null) # The authorization header to use for the webhook.
+          secret = optional(object({
+            plaintext = optional(string, null)
+            vault_kvv2 = optional(object({
+              mount = string
+              name  = string
+              key   = string
+            }), null)
+          }), null) # The mount = string
+          })
+        ),
+        null
+      )
     })), null)
   }))
 }
