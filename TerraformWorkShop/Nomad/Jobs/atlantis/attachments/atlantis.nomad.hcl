@@ -181,6 +181,8 @@ job "atlantis" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
+        CONSUL_HTTP_TOKEN={{with secret "kvv2_consul/data/token-tf_backend"}}{{.Data.data.token}}{{end}}
+        NOMAD_TOKEN={{with secret "kvv2_nomad/data/token-management"}}{{.Data.data.token}}{{end}}
         TF_VAR_VAULT_ROLE_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.role_id}}{{end}}
         TF_VAR_VAULT_SECRET_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.secret_id}}{{end}}
         EOH
