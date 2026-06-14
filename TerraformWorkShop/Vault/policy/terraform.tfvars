@@ -254,13 +254,23 @@ policy_bindings = [
         capabilities = ["list"]
       }
 
-      path "kvv2_pgsql/data/*" {
+      path "kvv2_consul/data/*" {
         capabilities = ["read"]
       }
-      path "kvv2_pgsql/data/" {
+      path "kvv2_consul/data/" {
         capabilities = ["read"]
       }
-      path "kvv2_pgsql/metadata/*" {
+      path "kvv2_consul/metadata/*" {
+        capabilities = ["list"]
+      }
+
+      path "kvv2_nomad/data/*" {
+        capabilities = ["read"]
+      }
+      path "kvv2_nomad/data/" {
+        capabilities = ["read"]
+      }
+      path "kvv2_nomad/metadata/*" {
         capabilities = ["list"]
       }
 
