@@ -12,6 +12,9 @@ Error generating AppRole SecretID
 │ 
 │ * role "jenkins-secret-reader" does not exist
 ```
+solution:
 ```powershell
-terraform apply -target="vault_approle_auth_backend_role.role[`"jenkins-secret-reader`"]"
+$roleName=Read-Host "role name"
+terraform apply -target="vault_approle_auth_backend_role.role[`"$roleName`"]"
+terraform apply
 ```

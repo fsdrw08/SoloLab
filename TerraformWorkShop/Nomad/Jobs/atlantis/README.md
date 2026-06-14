@@ -46,6 +46,24 @@ $childPath="TerraformWorkShop/Vault/Secrets/Others/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
 
+- Ensure atlantis related approle policy `vault-admin` in vault is ready
+[TerraformWorkShop/Vault/Policy/terraform.tfvars](../../../../TerraformWorkShop/Vault/Policy/terraform.tfvars)
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Vault/Policy/"
+terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
+```
+
+- Ensure atlantis related approle `atlantis-operator` in vault is ready
+[TerraformWorkShop/Vault/Auth/AppRole/terraform.tfvars](../../../../TerraformWorkShop/Vault/Auth/AppRole/terraform.tfvars)
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Vault/Auth/AppRole/"
+$roleName="atlantis-operator"
+terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -target="vault_approle_auth_backend_role.role[`"$roleName`"]"
+terraform apply -auto-approve
+```
+
 ### Deploy atlantis nomad job
 ```powershell
 $credential = Get-Credential -Message "credential to login vault" -UserName "000"

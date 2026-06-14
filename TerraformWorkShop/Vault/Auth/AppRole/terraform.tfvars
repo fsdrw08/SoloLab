@@ -11,6 +11,12 @@ approles = [
     secret_version = 1
   },
   {
+    role_name      = "atlantis-operator"
+    role_id        = "atlantis-operator"
+    token_policies = ["vault-admin"]
+    secret_version = 1
+  },
+  {
     role_name      = "jenkins-secret-reader"
     role_id        = "jenkins-secret-reader"
     token_policies = ["jenkins-secret-reader"]

@@ -175,6 +175,19 @@ job "atlantis" {
         EOF
         destination = "secrets/sololab.crt"
       }
+      template {
+        # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html
+        data = <<-EOH
+        # Lines starting with a # are ignored
+
+        # Empty lines are also ignored
+        TF_VAR_VAULT_ROLE_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.role_id}}{{end}}
+        TF_VAR_VAULT_SECRET_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.secret_id}}{{end}}
+        EOH
+        # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
+        destination = "secrets/file.env"
+        env         = true
+      }
       vault {}
 
       volume_mount {
