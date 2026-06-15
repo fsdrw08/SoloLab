@@ -1,0 +1,10 @@
+[
+    {
+        "type": "local-dir",
+        "publicParentPath": "",
+        "publicChildPath": "",
+        "localChildPath": "terraform.d/mirror",
+        "privateChildPath": "public/mirror/terraform",
+        "description": "",
+    },
+]

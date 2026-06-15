@@ -136,6 +136,9 @@ job "atlantis" {
 
           "traefik.http.services.atlantis.loadbalancer.server.port" = "4141"
         }
+        volumes = [
+          "local/.gitconfig:/home/atlantis/.gitconfig",
+        ]
         command = "server"
         args = [
           "--config=/local/config.yaml",
@@ -154,6 +157,7 @@ job "atlantis" {
         memory = 300
       }
 
+      # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
         change_mode = "noop"
         data        = var.atlantis_config
@@ -165,6 +169,16 @@ job "atlantis" {
         change_mode = "noop"
         data        = var.terraform_config
         destination = "local/.terraformrc"
+        uid         = 100
+        gid         = 1000
+      }
+      template {
+        change_mode = "restart"
+        data        = <<-EOF
+        [http]
+        sslCAInfo = /secrets/sololab.crt
+        EOF
+        destination = "local/.gitconfig"
         uid         = 100
         gid         = 1000
       }
@@ -199,12 +213,13 @@ job "atlantis" {
         selinux_label = "Z"
       }
     }
+    # https://developer.hashicorp.com/nomad/docs/job-specification/volume
     volume "atlantis-data" {
       type            = "csi"
       source          = "csi-atlantis-data"
       read_only       = false
       attachment_mode = "file-system"
-      access_mode     = "single-node-writer"
+      access_mode     = "multi-node-multi-writer"
     }
   }
 }

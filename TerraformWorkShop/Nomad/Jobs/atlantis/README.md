@@ -36,6 +36,16 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/VyOS/HAProxy/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
+- Ensure terraform network mirror in dufs is ready
+[LocalWorkShop/SyncTo-Dufs/Day4.jsonc](../../LocalWorkShop/SyncTo-Dufs/Day4.jsonc)
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="LocalWorkShop/SyncTo-Dufs"
+Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
+$proxy="127.0.0.1:7890"; $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy; $env:NO_PROXY="sololab,consul"
+.\SyncTo-Dufs.ps1 -SyncProfile "Day4.jsonc" # -Upload $false
+# .\SyncTo-Dufs.ps1 -SyncProfile "Day4.jsonc" -LocalParentPath "D:/Users/Public/Downloads"
+```
 
 #### Security
 - Ensure atlantis related credential in vault is ready
