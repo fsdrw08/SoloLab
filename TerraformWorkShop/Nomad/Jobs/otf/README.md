@@ -15,7 +15,7 @@ $childPath="TerraformWorkShop/etcd/skydns/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
 #### Workload
-- Ensure OTF container image `docker.io/leg100/otfd:0.6.0` had synced to image server  
+- Ensure OTF container image `docker.io/leg100/otfd:0.6.3` had synced to image server  
 [LocalWorkShop/Sync-OCIImage/Day4.jsonc](../../LocalWorkShop/Sync-OCIImage/Day4.jsonc)
 ```powershell
 $repoDir=git rev-parse --show-toplevel

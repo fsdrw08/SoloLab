@@ -65,7 +65,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "coredns"
-      image     = "172.16.20.10:5000/coredns/coredns:1.14.3"
+      image     = "172.16.20.10:5000/coredns/coredns:1.14.4"
       pull_flag = "--tls-verify=false"
       others = {
         "allow-host-networks"  = ""

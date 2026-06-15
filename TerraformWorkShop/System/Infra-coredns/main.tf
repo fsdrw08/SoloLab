@@ -7,8 +7,8 @@ module "coredns" {
     password = var.vm_conn.password
   }
   install = {
-    tar_file_source = "http://192.168.255.1:4080/releases/coredns%5F1.14.3%5Flinux%5Famd64.tgz"
-    tar_file_path   = "/home/vyos/coredns_1.14.3_linux_arm64.tgz"
+    tar_file_source = "http://192.168.255.1:4080/releases/coredns%5F1.14.4%5Flinux%5Famd64.tgz"
+    tar_file_path   = "/home/vyos/coredns_1.14.4_linux_arm64.tgz"
     bin_file_dir    = "/usr/bin"
   }
   runas = {

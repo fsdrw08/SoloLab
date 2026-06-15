@@ -8,9 +8,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.7.1",
-        "archive": "docker.io_library_traefik_v3.7.1.tar",
-        "privateRepo": "library/traefik:v3.7.1",
+        "publicRepo": "library/traefik:v3.7.5",
+        "archive": "docker.io_library_traefik_v3.7.5.tar",
+        "privateRepo": "library/traefik:v3.7.5",
         "description": "https://hub.docker.com/r/library/traefik/tags",
     },
     {
@@ -36,9 +36,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-18:20260527",
-        "archive": "quay.io_fedora_postgresql-18_20260527.tar",
-        "privateRepo": "fedora/postgresql-18:20260527",
+        "publicRepo": "fedora/postgresql-18:20260610",
+        "archive": "quay.io_fedora_postgresql-18_20260610.tar",
+        "privateRepo": "fedora/postgresql-18:20260610",
         "description": "https://quay.io/repository/fedora/postgresql-18?tab=tags",
     },
     {
@@ -71,16 +71,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "oliver006/redis_exporter:v1.83.0-alpine",
-        "archive": "docker.io_oliver006_redis_exporter_v1.83.0-alpine.tar",
-        "privateRepo": "oliver006/redis_exporter:v1.83.0-alpine",
+        "publicRepo": "oliver006/redis_exporter:v1.86.0-alpine",
+        "archive": "docker.io_oliver006_redis_exporter_v1.86.0-alpine.tar",
+        "privateRepo": "oliver006/redis_exporter:v1.86.0-alpine",
         "description": "https://hub.docker.com/r/oliver006/redis_exporter/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "juicedata/juicefs-csi-driver:v0.31.8",
-        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.31.8.tar",
-        "privateRepo": "juicedata/juicefs-csi-driver:v0.31.8",
+        "publicRepo": "juicedata/juicefs-csi-driver:v0.31.10",
+        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.31.10.tar",
+        "privateRepo": "juicedata/juicefs-csi-driver:v0.31.10",
         "description": "https://hub.docker.com/r/juicedata/juicefs-csi-driver/tags",
     },
 ]

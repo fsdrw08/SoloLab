@@ -100,8 +100,8 @@ job "otf" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/leg100/otf/blob/v0.6.0/Dockerfile
-        image = "zot.day1.sololab/leg100/otfd:0.6.0"
+        # https://github.com/leg100/otf/blob/v0.6.3/Dockerfile
+        image = "zot.day1.sololab/leg100/otfd:0.6.3"
         labels = {
           "traefik.enable"                                = "true"
           "traefik.http.routers.otf-redirect.entrypoints" = "web"

@@ -70,7 +70,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "powerdns"
-      image     = "zot.day0.sololab/powerdns/pdns-auth-50:5.0.4"
+      image     = "zot.day0.sololab/powerdns/pdns-auth-51:5.1.1"
       pull_flag = "--tls-verify=false"
       # local_image = ""
       others = {
