@@ -44,7 +44,7 @@ job "juicefs-node" {
 
       resources {
         cpu    = 100
-        memory = 300
+        memory = 600
       }
       env {
         POD_NAME = "csi-node"
