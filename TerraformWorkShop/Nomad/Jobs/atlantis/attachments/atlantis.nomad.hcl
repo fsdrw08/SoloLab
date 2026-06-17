@@ -138,6 +138,7 @@ job "atlantis" {
         }
         volumes = [
           "local/.gitconfig:/home/atlantis/.gitconfig",
+          "secrets/vault_token:/home/atlantis/.vault-token",
         ]
         command = "server"
         args = [
@@ -197,14 +198,17 @@ job "atlantis" {
         # Empty lines are also ignored
         CONSUL_HTTP_TOKEN={{with secret "kvv2_consul/data/token-tf_backend"}}{{.Data.data.token}}{{end}}
         NOMAD_TOKEN={{with secret "kvv2_nomad/data/token-management"}}{{.Data.data.token}}{{end}}
-        TF_VAR_VAULT_ROLE_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.role_id}}{{end}}
-        TF_VAR_VAULT_SECRET_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.secret_id}}{{end}}
+        # TF_VAR_VAULT_ROLE_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.role_id}}{{end}}
+        # TF_VAR_VAULT_SECRET_ID={{with secret "kvv2_vault/data/approle-atlantis_operator"}}{{.Data.data.secret_id}}{{end}}
         EOH
         # https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
         destination = "secrets/file.env"
         env         = true
       }
-      vault {}
+      vault {
+        role = "vault-admin"
+      }
+
 
       volume_mount {
         volume = "atlantis-data"
