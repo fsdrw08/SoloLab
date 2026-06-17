@@ -1,0 +1,49 @@
+# https://atmos.tools/cli/configuration#default-cli-configuration
+base_path: "."
+vendor:
+  base_path: "Atoms/vendor.yaml"
+components:
+  terraform:
+    base_path: TerraformWorkShop
+    apply_auto_approve: false
+    deploy_run_init: true
+    init_run_reconfigure: true
+    auto_generate_backend_file: true
+  helmfile:
+    base_path: HelmWorkShop
+    use_eks: false
+    kubeconfig_path: /dev/shm
+stacks:
+  base_path: Atoms/stacks
+  included_paths:
+    - "orgs/**/*"
+  excluded_paths:
+    - "**/_defaults.yaml"
+  name_pattern: "{tenant}-{environment}-{stage}"
+workflows:
+  base_path: Atoms/workflows
+logs:
+  file: "/dev/stderr"
+  level: Info
+schemas:
+  jsonschema:
+    base_path: Atoms/stacks/schemas/jsonschema
+  opa:
+    base_path: Atoms/stacks/schemas/opa
+templates:
+  settings:
+    enabled: true
+    sprig:
+      enabled: true
+    gomplate:
+      enabled: true
+settings:
+  list_merge_strategy: replace
+  terminal:
+    color: true
+    max_width: 120
+    pager: false
+version:
+  check:
+    enabled: true
+    frequency: daily
