@@ -51,8 +51,8 @@ else
   # 定义新的ACL策略
   POLICY_JSON='{
     "Name": "anonymous",
-    "Description": "Read-only access to nodes, agents, and quotas",
-    "Rules": "namespace \"default\" { policy = \"read\" } node { policy = \"read\" } agent { policy = \"read\" } quota { policy = \"read\" }"
+    "Description": "Deny access to all",
+    "Rules": "namespace \"default\" { policy = \"deny\" } node { policy = \"deny\" } agent { policy = \"deny\" } quota { policy = \"deny\" }"
   }'
 
   # 创建新的ACL策略
