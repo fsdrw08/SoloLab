@@ -1,0 +1,7 @@
+projects:
+  - name: test-db
+    dir: $dir
+    when_modified:
+      - "*.tf"
+      - "terraform.tfvars"
+      - attachments/

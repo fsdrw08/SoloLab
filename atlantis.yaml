@@ -1,14 +1,8 @@
 version: 3
-autodiscover: # Available since v0.18.0
-  mode: auto
-  ignore_paths:
-    - AnsibleWorkShop/*
-    - Doc/*
-    - HelmWorkShop/*
-    - KubeWorkShop/*
-    - LocalWorkShop/*
-    - PackerWorkShop/*
-    - VagrantWorkShop/*
-    - TerraformWorkShop/VyOS/*
-    - TerraformWorkShop/System/*
-    - TerraformWorkShop/Vault/Auth/AppRole/
+projects:
+  - dir: TerraformWorkShop\Nomad\Jobs\postgresql
+    name: test-db
+    when_modified:
+      - '*.tf'
+      - terraform.tfvars
+      - attachments/

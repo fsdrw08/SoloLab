@@ -1,0 +1,8 @@
+version: 3
+projects:
+{{- range file.Walk "TerraformWorkShop" }}
+  {{- if and (eq (filepath.Base .) "atlantis.yaml") (not ( file.IsDir . )) }}
+  {{- $rendered := strings.ReplaceAll "$dir" (filepath.Dir .) (file.Read .) }}
+{{ ($rendered | data.YAML).projects | data.ToYAML | strings.Indent 2 }}
+  {{- end }}
+{{- end }}
