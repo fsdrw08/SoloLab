@@ -18,8 +18,7 @@ nomad:
     exec:
       command:
         - nomad
-        - server
-        - members
+        - agent-info
         - -tls-skip-verify
         - -address
         - https://localhost:4646

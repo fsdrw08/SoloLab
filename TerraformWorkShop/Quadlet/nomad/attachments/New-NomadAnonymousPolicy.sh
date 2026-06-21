@@ -52,7 +52,7 @@ else
   POLICY_JSON='{
     "Name": "anonymous",
     "Description": "Deny access to all",
-    "Rules": "namespace \"default\" { policy = \"deny\" } node { policy = \"deny\" } agent { policy = \"deny\" } quota { policy = \"deny\" }"
+    "Rules": "namespace \"default\" { policy = \"deny\" } node { policy = \"deny\" } agent { policy = \"read\" } quota { policy = \"deny\" }"
   }'
 
   # 创建新的ACL策略
