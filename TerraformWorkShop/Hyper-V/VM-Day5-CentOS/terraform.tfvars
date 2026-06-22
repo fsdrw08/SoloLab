@@ -50,14 +50,14 @@ cloudinit = {
       custom_root_ca_path = "/etc/pki/ca-trust/source/anchors"
       custom_bin_dir      = "/opt/bin"
       # consul client
-      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.0_linux_amd64.zip"
-      consul_version      = "2.0.0"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.1_linux_amd64.zip"
+      consul_version      = "2.0.1"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/lib/consul"
       # nomad client
-      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.0_linux_amd64.zip"
-      nomad_version                       = "2.0.0"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.1_linux_amd64.zip"
+      nomad_version                       = "2.0.1"
       nomad_server_fqdn                   = "nomad.service.consul"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
       nomad_podman_driver_version         = "0.6.4"

@@ -1,10 +1,10 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:2.0.0",
-        "archive": "docker.io_hashicorp_consul_2.0.0.tar",
-        "privateRepo": "hashicorp/consul:2.0.0",
-        "description": "https://hub.docker.com/r/hashicorp/consul/tags",
+        "publicRepo": "hashicorp/consul:2.0.1",
+        "archive": "docker.io_hashicorp_consul_2.0.1.tar",
+        "privateRepo": "hashicorp/consul:2.0.1",
+        "description": "https://hub.docker.com/r/hashicorp/consul/tags, https://github.com/hashicorp/consul/releases",
     },
     {
         "publicRegistry": "docker.io",
