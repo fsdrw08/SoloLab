@@ -1,0 +1,7 @@
+# https://www.runatlantis.io/docs/server-side-repo-config.html
+repos:
+  - id: /.*/
+    pre_workflow_hooks:
+      - run: |
+          /home/atlantis/.atlantis/bin/gomplate -f atlantis.tmpl.yaml -o atlantis.yaml
+        description: Generate atlantis.yaml repo level config

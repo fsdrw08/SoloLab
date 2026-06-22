@@ -1,6 +1,9 @@
 variable "atlantis_config" {
   type = string
 }
+variable "repo_config" {
+  type = string
+}
 variable "terraform_config" {
   type = string
 }
@@ -64,6 +67,41 @@ job "atlantis" {
         cpu = 100
         # Specifies the memory required in MB
         memory = 50
+      }
+    }
+    task "prepare-gomplate" {
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      driver = "podman"
+      config {
+        image      = "zot.day1.sololab/apteno/alpine-jq:latest"
+        entrypoint = "/bin/sh"
+        args = [
+          "-c",
+          <<-EOF
+          mkdir -p /home/atlantis/.atlantis/bin;
+          chown -R 100:1000 /home/atlantis/.atlantis/bin;
+          [ -f /home/atlantis/.atlantis/bin/gomplate ] && rm /home/atlantis/.atlantis/bin/gomplate;
+          curl -s -k \
+          --request GET http://dufs.day1.sololab/public/binaries/gomplate_linux-amd64_5.1.0 \
+          --output /home/atlantis/.atlantis/bin/gomplate;
+          chmod 0755 /home/atlantis/.atlantis/bin/gomplate
+          EOF
+        ]
+      }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
+      volume_mount {
+        volume        = "atlantis-data"
+        destination   = "/home/atlantis/.atlantis"
+        selinux_label = "Z"
       }
     }
     # https://developer.hashicorp.com/nomad/docs/job-specification/task
@@ -185,6 +223,13 @@ job "atlantis" {
       }
       template {
         change_mode = "noop"
+        data        = var.repo_config
+        destination = "local/repos.yaml"
+        uid         = 100
+        gid         = 1000
+      }
+      template {
+        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
@@ -219,11 +264,17 @@ job "atlantis" {
     }
     # https://developer.hashicorp.com/nomad/docs/job-specification/volume
     volume "atlantis-data" {
-      type            = "csi"
-      source          = "csi-atlantis-data"
+      # type            = "csi"
+      # source          = "csi-atlantis-data"
+      # read_only       = false
+      # attachment_mode = "file-system"
+      # access_mode     = "multi-node-multi-writer"
+
+      type            = "host"
+      source          = "hvol-atlantis"
       read_only       = false
       attachment_mode = "file-system"
-      access_mode     = "multi-node-multi-writer"
+      access_mode     = "single-node-writer"
     }
   }
 }

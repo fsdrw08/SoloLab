@@ -1,5 +1,13 @@
 [
     {
+        "type": "general",
+        "publicParentPath": "https://github.com",
+        "publicChildPath": "hairyhenderson/gomplate/releases/download/v5.1.0/gomplate_linux-amd64",
+        "localChildPath": "bin/gomplate_linux-amd64_5.1.0",
+        "privateChildPath": "public/binaries/gomplate_linux-amd64_5.1.0",
+        "description": "https://github.com/hairyhenderson/gomplate/releases",
+    },
+    {
         "type": "local-dir",
         "publicParentPath": "",
         "publicChildPath": "",
