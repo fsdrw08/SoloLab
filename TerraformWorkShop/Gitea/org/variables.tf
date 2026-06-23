@@ -38,6 +38,17 @@ variable "organizations" {
     repo_admin_change_team_access = optional(bool, false)
     visibility                    = optional(string, "public")
     website                       = optional(string, null)
+    teams = optional(list(object({
+      iac_id                   = string
+      name                     = string
+      can_create_repos         = optional(bool, null)         # Flag if the Teams members should be able to create Rpositories in the Organisation
+      description              = optional(string, null)       # Description of the Team
+      include_all_repositories = optional(bool, null)         # Flag if the Teams members should have access to all Repositories in the Organisation
+      permission               = optional(string, null)       # Permissions associated with this Team Can be none, read, write, admin or owner
+      repositories             = optional(list(string), null) # List of Repositories that should be part of this team
+      units                    = optional(string, null)       # List of types of Repositories that should be allowed to be created from Team members. Can be repo.code, repo.issues, repo.ext_issues, repo.wiki, repo.pulls, repo.releases, repo.projects and/or repo.ext_wiki
+      members                  = optional(list(string), null) # List of Users that should be part of this team
+    })), null)
     repositories = optional(list(object({
       iac_id                          = string
       name                            = string

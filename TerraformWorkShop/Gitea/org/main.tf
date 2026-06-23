@@ -12,6 +12,45 @@ resource "gitea_org" "org" {
 }
 
 locals {
+  teams = flatten([
+    for org in var.organizations : [
+      for team in org.teams : merge(
+        team,
+        { org_iac_id = org.iac_id }
+      )
+    ]
+    if org.teams != null
+  ])
+}
+
+resource "gitea_team" "team" {
+  depends_on = [
+    gitea_org.org
+  ]
+  for_each = {
+    for team in local.teams : team.iac_id => team
+  }
+  organisation             = gitea_org.org[each.value.org_iac_id].name
+  name                     = each.value.name
+  description              = each.value.description
+  include_all_repositories = each.value.include_all_repositories
+  permission               = each.value.permission
+  repositories             = each.value.repositories
+  units                    = each.value.units
+}
+
+resource "gitea_team_members" "team_member" {
+  depends_on = [
+    gitea_team.team
+  ]
+  for_each = {
+    for team in local.teams : team.iac_id => team
+  }
+  team_id = gitea_team.team[each.value.iac_id].id
+  members = each.value.members
+}
+
+locals {
   repos = flatten([
     for org in var.organizations : [
       for repo in org.repositories : merge(

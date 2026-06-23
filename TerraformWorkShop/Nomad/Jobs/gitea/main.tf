@@ -89,4 +89,3 @@ resource "nomad_job" "jobs" {
 
   purge_on_destroy = true
 }
-

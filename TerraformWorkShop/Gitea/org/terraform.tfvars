@@ -24,6 +24,21 @@ organizations = [
   {
     iac_id = "27beb241"
     name   = "sololab"
+    teams = [
+      {
+        iac_id                   = "daacde20"
+        name                     = "atlantis"
+        description              = "atlantis operator"
+        include_all_repositories = true
+        permission               = "write"
+        units                    = <<-EOF
+          repo.code,
+          repo.ext_issues,
+          repo.pulls
+        EOF
+        members                  = ["atlantis"]
+      }
+    ]
     repositories = [
       {
         iac_id    = "42989f91"
