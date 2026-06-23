@@ -162,7 +162,7 @@ job "test-db" {
     }
     volume "test-db" {
       type            = "host"
-      source          = "test-db"
+      source          = "hvol-test-db"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
