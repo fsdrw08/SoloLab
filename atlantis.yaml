@@ -1,8 +1,9 @@
 version: 3
 projects:
-  - dir: TerraformWorkShop\Nomad\Jobs\postgresql
+  - autoplan:
+      when_modified:
+        - '*.tf'
+        - terraform.tfvars
+        - attachments/
+    dir: TerraformWorkShop\Nomad\Jobs\postgresql
     name: test-db
-    when_modified:
-      - '*.tf'
-      - terraform.tfvars
-      - attachments/
