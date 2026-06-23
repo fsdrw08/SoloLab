@@ -62,4 +62,5 @@ variable "jobs" {
       null
     )
   }))
+  default = []
 }
