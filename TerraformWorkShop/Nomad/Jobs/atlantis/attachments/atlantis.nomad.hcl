@@ -198,7 +198,7 @@ job "atlantis" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
-        change_mode = "noop"
+        change_mode = "restart"
         data        = var.atlantis_config
         destination = "local/config.yaml"
         uid         = 100
