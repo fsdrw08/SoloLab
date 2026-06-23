@@ -43,7 +43,7 @@ job "juicefs-node" {
       }
 
       resources {
-        cpu    = 100
+        cpu    = 300
         memory = 600
       }
       env {
