@@ -1,36 +1,10 @@
-# load secret from vault
-locals {
-  secrets_vault_kvv2 = flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
-      mount = value_refer.vault_kvv2.mount
-      name  = value_refer.vault_kvv2.name
-    }
-    if value_refer.vault_kvv2 != null
-  ])
-  secret_var_keys = flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
-      for value_set in value_refer.value_sets : [
-        value_set.name
-      ]
-    ]
-    if value_refer.vault_kvv2 != null
-  ])
-  secret_var_values = flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
-      for value_set in value_refer.value_sets : [
-        data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-      ]
-    ]
-    if value_refer.vault_kvv2 != null
-  ])
-}
-
 data "vault_kv_secret_v2" "secret" {
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
+  for_each = {
+    for key in keys(var.butane.vars.value_refers) : key => var.butane.vars.value_refers[key]
+    if var.butane.vars.value_refers[key].vault_kvv2 != null
   }
-  mount = each.value.mount
-  name  = each.value.name
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 # fetch data disk info
@@ -63,7 +37,10 @@ data "ct_config" "ignition" {
     merge(
       var.butane.vars.global,
       var.butane.vars.local[count.index],
-      zipmap(local.secret_var_keys, local.secret_var_values)
+      {
+        for key in keys(var.butane.vars.value_refers) : key => data.vault_kv_secret_v2.secret[key].data[var.butane.vars.value_refers[key].vault_kvv2.key]
+        if var.butane.vars.value_refers[key].vault_kvv2 != null
+      }
     )
   )
   strict       = true
@@ -76,7 +53,7 @@ data "ct_config" "ignition" {
       merge(
         var.butane.vars.global,
         var.butane.vars.local[count.index],
-        zipmap(local.secret_var_keys, local.secret_var_values)
+        local.secret_map
       )
     )
   ]

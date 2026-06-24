@@ -11,7 +11,6 @@ variable "prov_vault" {
   type = object({
     schema          = string
     address         = string
-    token           = string
     skip_tls_verify = bool
   })
 }
@@ -59,29 +58,14 @@ variable "cloudinit" {
       global = map(string)
       local  = optional(list(map(string)), null)
       value_refers = optional(
-        list(object({
+        map(object({
           vault_kvv2 = optional(
             object({
               mount = string
               name  = string
+              key   = string
             }),
             null
-          )
-          tfstate = optional(
-            object({
-              backend = object({
-                type   = string
-                config = map(string)
-              })
-              cert_name = string
-            }),
-            null
-          )
-          value_sets = list(
-            object({
-              name          = string
-              value_ref_key = string
-            })
           )
         })),
         null

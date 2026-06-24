@@ -47,6 +47,17 @@ cloudinit = {
     global = {
       instance_id         = "iid-Debian_202604"
       time_zone           = "Asia/Shanghai"
+      packages            = <<-EOF
+      [
+        "bash-completion",
+        "git",
+        "podman",
+        "cockpit",
+        "cockpit-bridge",
+        "cockpit-podman",
+        "openjdk-25-jdk"
+      ]
+      EOF
       custom_root_ca_url  = "http://dufs.day1.sololab/public/certs/sololab_root.crt"
       custom_root_ca_path = "/usr/local/share/ca-certificates"
       custom_bin_dir      = "/opt/bin"
@@ -57,8 +68,8 @@ cloudinit = {
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/lib/consul"
       # nomad client
-      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.1_linux_amd64.zip"
-      nomad_version                       = "2.0.1"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.3_linux_amd64.zip"
+      nomad_version                       = "2.0.3"
       nomad_server_fqdn                   = "nomad.service.consul"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip"
       nomad_podman_driver_version         = "0.6.4"
@@ -74,67 +85,42 @@ cloudinit = {
         local_hostname = "day5-debian"
       }
     ]
-    value_refers = [
-      {
+    value_sets = {
+      consul_ca_content = {
         vault_kvv2 = {
           mount = "kvv2_certs"
           name  = "consul_root"
+          key   = "ca"
         }
-        value_sets = [
-          {
-            name          = "consul_ca_content"
-            value_ref_key = "ca"
-          }
-        ]
-      },
-      {
+      }
+      consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "token-consul_client"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "consul_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-      {
+      }
+      consul_encrypt_key = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "key-gossip_encryption"
+          key   = "key"
         }
-        value_sets = [
-          {
-            name          = "consul_encrypt_key"
-            value_ref_key = "key"
-          }
-        ]
-      },
-      {
+      }
+      nomad_consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "token-nomad_client"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "nomad_consul_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-      {
+      }
+      nomad_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_nomad"
           name  = "token-node_write"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "nomad_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-    ]
+      }
+    }
   }
 }

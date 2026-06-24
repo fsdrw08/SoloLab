@@ -110,67 +110,42 @@ butane = {
       #   vm_name = "ci-2"
       # }
     ]
-    value_refers = [
-      {
+    value_refers = {
+      consul_ca_content = {
         vault_kvv2 = {
           mount = "kvv2_certs"
           name  = "consul_root"
+          key   = "ca"
         }
-        value_sets = [
-          {
-            name          = "consul_ca_content"
-            value_ref_key = "ca"
-          }
-        ]
-      },
-      {
+      }
+      consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "token-consul_client"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "consul_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-      {
+      }
+      consul_encrypt_key = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "key-gossip_encryption"
+          key   = "key"
         }
-        value_sets = [
-          {
-            name          = "consul_encrypt_key"
-            value_ref_key = "key"
-          }
-        ]
-      },
-      {
+      }
+      nomad_consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
           name  = "token-nomad_client"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "nomad_consul_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-      {
+      }
+      nomad_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_nomad"
           name  = "token-node_write"
+          key   = "token"
         }
-        value_sets = [
-          {
-            name          = "nomad_acl_token"
-            value_ref_key = "token"
-          }
-        ]
-      },
-    ]
+      }
+    }
   }
 }

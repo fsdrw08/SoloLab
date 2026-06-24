@@ -35,9 +35,9 @@ ssh_pwauth: true
 # https://gist.github.com/wipash/81064e811c08191428002d7fe5da5ca7
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#yaml-examples
 users:
-  - name: admin
+  - name: core
     uid: 1000
-    gecos: admin
+    gecos: core
     groups: sudo
     plain_text_passwd: P@ssw0rd
     lock_passwd: false
@@ -312,14 +312,7 @@ package_update: true
 # https://cloudinit.readthedocs.io/en/latest/reference/examples.html#run-apt-or-yum-upgrade
 package_upgrade: true
 package_reboot_if_required: true
-packages:
-  - bash-completion
-  - git
-  - podman
-  - cockpit
-  - cockpit-bridge
-  - cockpit-podman
-  - openjdk-25-jdk
+packages: ${packages}
 
 # https://gist.github.com/corso75/582d03db6bb9870fbf6466e24d8e9be7
 runcmd:
