@@ -28,6 +28,10 @@ locals {
       if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
     ]
   ])
+  secret_map = {
+    for key in keys(var.butane.vars.value_refers) : key => data.vault_kv_secret_v2.secret[key].data[var.butane.vars.value_refers[key].vault_kvv2.key]
+    if var.butane.vars.value_refers[key].vault_kvv2 != null
+  }
 }
 
 data "ct_config" "ignition" {
@@ -37,10 +41,7 @@ data "ct_config" "ignition" {
     merge(
       var.butane.vars.global,
       var.butane.vars.local[count.index],
-      {
-        for key in keys(var.butane.vars.value_refers) : key => data.vault_kv_secret_v2.secret[key].data[var.butane.vars.value_refers[key].vault_kvv2.key]
-        if var.butane.vars.value_refers[key].vault_kvv2 != null
-      }
+      local.secret_map
     )
   )
   strict       = true
