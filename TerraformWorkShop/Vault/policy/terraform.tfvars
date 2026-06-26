@@ -75,6 +75,12 @@ policy_bindings = [
       path "identity/oidc/*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
+      path "identity/group" {
+        capabilities = ["create", "update"]
+      }
+      path "identity/group/*" {
+        capabilities = ["create", "read", "update", "delete", "list"]
+      }
       path "identity/group-alias/*" {
         capabilities = ["create", "update", "delete", "read"]
       }
@@ -98,14 +104,14 @@ policy_bindings = [
       path "kvv2*" {
         capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
-      path "kvv2_certs/data/*" {
-        capabilities = ["read"]
+      path "kvv2*/data/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
-      path "kvv2_certs/data/" {
-        capabilities = ["read"]
+      path "kvv2*/data/" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
-      path "kvv2_certs/metadata/*" {
-        capabilities = ["list", "read"]
+      path "kvv2*/metadata/*" {
+        capabilities = ["create", "read", "update", "delete", "list", "sudo"]
       }
       ## PKI - Intermediate CA
       path "pki_int/config/urls" {
