@@ -1,15 +1,15 @@
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260523.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260523.3.1.tar",
-        "privateRepo": "fedora/fedora-coreos:44.20260523.3.1",
+        "publicRepo": "fedora/fedora-coreos:44.20260607.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260607.3.1.tar",
+        "privateRepo": "fedora/fedora-coreos:44.20260607.3.1",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260523.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260523.3.1.tar",
+        "publicRepo": "fedora/fedora-coreos:44.20260607.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260607.3.1.tar",
         "privateRepo": "fedora/fedora-coreos:stable",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
