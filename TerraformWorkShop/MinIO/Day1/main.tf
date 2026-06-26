@@ -8,6 +8,9 @@ resource "minio_s3_bucket" "buckets" {
   force_destroy  = each.value.force_destroy
   object_locking = each.value.object_locking
   quota          = each.value.quota
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "minio_iam_user" "users" {

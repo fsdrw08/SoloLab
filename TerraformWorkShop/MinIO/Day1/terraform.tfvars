@@ -12,16 +12,20 @@ prov_vault = {
 
 buckets = [
   {
-    bucket = "tfstate"
+    bucket        = "tfstate"
+    force_destroy = true
   },
   {
-    bucket = "loki"
+    bucket        = "loki"
+    force_destroy = true
   },
   {
-    bucket = "gitea"
+    bucket        = "gitea"
+    force_destroy = true
   },
   {
-    bucket = "nexus3"
+    bucket        = "nexus3"
+    force_destroy = true
   },
 ]
 
