@@ -39,6 +39,8 @@ vault kv put -mount=kvv2_nomad token-management token=$env:NOMAD_TOKEN
 
 ### Config Nomad ACL policy and OIDC login
 ```powershell
+$env:NOMAD_TOKEN = $(vault kv get -format=json -mount=kvv2_nomad token-management | jq.exe .data.data.token).Replace('"', '')
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Nomad/ACL"
 Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
