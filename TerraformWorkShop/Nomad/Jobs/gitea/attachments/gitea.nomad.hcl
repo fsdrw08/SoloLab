@@ -199,9 +199,9 @@ job "gitea" {
 
       resources {
         # Specifies the CPU required to run this task in MHz
-        cpu = 600
+        cpu = 800
         # Specifies the memory required in MB
-        memory = 600
+        memory = 800
       }
 
       template {
