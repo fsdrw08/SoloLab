@@ -12,7 +12,7 @@ gitea-base-url: https://gitea.day4.sololab
 gitea-token: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_token }}{{ end }}
 gitea-user: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_user }}{{ end }}
 gitea-webhook-secret: {{ with secret "kvv2_others/data/app-atlantis" }}{{ .Data.data.gitea_webhook_secret }}{{ end }}
-repo-allowlist: gitea.day4.sololab/sololab/*
+repo-allowlist: 'gitea.day4.sololab/standalone-lab/*'
 
 repo-config: /local/repos.yaml
 

@@ -23,10 +23,10 @@ prov_gitea = {
 users = [
   {
     iac_id               = "d57107bf"
-    email                = "gitea-atlantis@mail.sololab"
-    login_name           = "atlantis"
+    email                = "gitea-bot-atlantis@mail.sololab"
+    login_name           = "bot-atlantis"
     password_version     = 1
-    username             = "atlantis"
+    username             = "bot-atlantis"
     must_change_password = false
   }
 ]
