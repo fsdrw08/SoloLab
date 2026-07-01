@@ -22,7 +22,7 @@ terraform {
     }
     tfe = {
       source  = "hashicorp/tfe"
-      version = ">= 0.77.0"
+      version = ">= 0.78.0"
     }
     lynx = {
       source  = "Clivern/lynx"
@@ -58,7 +58,7 @@ terraform {
     }
     zitadel = {
       source  = "zitadel/zitadel"
-      version = ">= 2.8.1"
+      version = ">= 3.3.0"
     }
     # sftpgo = {
     #   source  = "drakkan/sftpgo"
@@ -66,7 +66,7 @@ terraform {
     # }
     vault = {
       source  = "hashicorp/vault"
-      version = ">= 5.9.0"
+      version = ">= 5.10.1"
     }
     ldap = {
       source  = "l-with/ldap"
@@ -86,11 +86,11 @@ terraform {
     }
     minio = {
       source  = "aminueza/minio"
-      version = ">= 3.38.0"
+      version = ">= 3.38.1"
     }
     grafana = {
       source  = "grafana/grafana"
-      version = ">= 4.38.0"
+      version = ">= 4.39.0"
     }
     system = {
       source  = "neuspaces/system"
@@ -103,6 +103,10 @@ terraform {
     gitea = {
       source  = "go-gitea/gitea"
       version = ">= 0.7.0"
+    }
+    gitea-unofficial = {
+      source  = "maxsargentdev/gitea"
+      version = ">= 0.12.0"
     }
   }
 }
