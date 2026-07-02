@@ -61,6 +61,7 @@ etcd:
         - endpoint
         - health
 
+  resourcesPreset: "small"
   configFile:
     ### Member
     ## @param etcd.configFile.name Human-readable name for this member.
