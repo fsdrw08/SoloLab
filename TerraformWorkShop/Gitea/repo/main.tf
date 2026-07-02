@@ -1,9 +1,11 @@
 import {
-  id = "standalone-lab/sololab"
-  to = gitea_repository.repository["93b6d451"]
+  provider = "gitea-unofficial"
+  id       = "standalone-lab/sololab"
+  to       = gitea_repository.repository["93b6d451"]
 }
 
 resource "gitea_repository" "repository" {
+  provider = "gitea-unofficial"
   for_each = {
     for repo in var.repositories : repo.iac_id => repo
   }
@@ -81,22 +83,43 @@ data "vault_kv_secret_v2" "secret" {
 }
 
 resource "gitea_repository_webhook" "webhook" {
+  provider = "gitea"
   depends_on = [
     gitea_repository.repository
   ]
   for_each = {
     for webhook in local.webhooks : webhook.iac_id => webhook
   }
-  owner                = gitea_repository.repository[each.value.repo_iac_id].username
-  repository           = gitea_repository.repository[each.value.repo_iac_id].name
+  username             = gitea_repository.repository[each.value.repo_iac_id].username
+  name                 = gitea_repository.repository[each.value.repo_iac_id].name
   active               = each.value.active
   branch_filter        = each.value.branch_filter
+  content_type         = each.value.content_type
   events               = each.value.events
   type                 = each.value.type
+  url                  = each.value.url
   authorization_header = each.value.authorization_header
-  config = {
-    url          = each.value.url
-    content_type = each.value.content_type
-    secret       = each.value.secret.plaintext != null ? each.value.secret.plaintext : data.vault_kv_secret_v2.secret[each.value.iac_id].data[each.value.secret.vault_kvv2.key]
-  }
+  secret               = each.value.secret.plaintext != null ? each.value.secret.plaintext : data.vault_kv_secret_v2.secret[each.value.iac_id].data[each.value.secret.vault_kvv2.key]
 }
+
+# resource "gitea_repository_webhook" "webhook" {
+#   provider = "gitea-unofficial"
+#   depends_on = [
+#     gitea_repository.repository
+#   ]
+#   for_each = {
+#     for webhook in local.webhooks : webhook.iac_id => webhook
+#   }
+#   owner                = gitea_repository.repository[each.value.repo_iac_id].username
+#   repository           = gitea_repository.repository[each.value.repo_iac_id].name
+#   active               = each.value.active
+#   branch_filter        = each.value.branch_filter
+#   events               = each.value.events
+#   type                 = each.value.type
+#   authorization_header = each.value.authorization_header
+#   config = {
+#     url          = each.value.url
+#     content_type = each.value.content_type
+#     secret       = each.value.secret.plaintext != null ? each.value.secret.plaintext : data.vault_kv_secret_v2.secret[each.value.iac_id].data[each.value.secret.vault_kvv2.key]
+#   }
+# }

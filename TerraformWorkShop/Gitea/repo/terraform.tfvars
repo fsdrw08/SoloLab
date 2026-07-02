@@ -20,12 +20,12 @@ prov_gitea = {
   }
 }
 
-
 repositories = [
   {
     org_name          = "standalone-lab"
     iac_id            = "93b6d451"
     name              = "sololab"
+    default_branch    = "main"
     has_issues        = true
     has_pull_requests = true
     mirror            = false
