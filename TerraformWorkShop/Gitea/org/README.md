@@ -2,6 +2,7 @@
 #### Users
 - Ensure users had already been present in Gitea  
 [TerraformWorkShop/Gitea/user](../user)
+- Ensure users had already login to Gitea
 
 ### Create gitea organization
 ```powershell
