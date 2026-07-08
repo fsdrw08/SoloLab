@@ -36,9 +36,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/grafana:13.0.2",
-        "archive": "docker.io_grafana_grafana_13.0.2.tar",
-        "privateRepo": "grafana/grafana:13.0.2",
+        "publicRepo": "library/redis:8.8.0",
+        "archive": "docker.io_library_redis_8.8.0.tar",
+        "privateRepo": "library/redis:8.8.0",
+        "description": "https://hub.docker.com/_/redis",
+    },
+    {
+        "publicRegistry": "docker.io",
+        "publicRepo": "grafana/grafana:13.1.0",
+        "archive": "docker.io_grafana_grafana_13.1.0.tar",
+        "privateRepo": "grafana/grafana:13.1.0",
         "description": "https://hub.docker.com/r/grafana/grafana/tags, https://github.com/grafana/grafana/releases, https://quay.io/repository/giantswarm/grafana?tab=tags",
     },
     {

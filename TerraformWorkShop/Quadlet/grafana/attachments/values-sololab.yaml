@@ -1,7 +1,7 @@
 global:
   imageRegistry: zot.day1.sololab
 grafana:
-  resourcesPreset: "small"
+  resourcesPreset: "medium"
   podLabels:
     traefik.enable: true
     traefik.http.routers.grafana-redirect.entrypoints: web
@@ -15,9 +15,11 @@ grafana:
     traefik.http.routers.grafana.service: grafana
 
     traefik.http.services.grafana.loadbalancer.server.port: 3000
-
   configFiles:
     grafana:
+      database:
+        high_availability: false
+        wal: true
       security:
         admin_user: admin
         admin_password: $__file{/etc/grafana/secret/admin_password}

@@ -67,7 +67,7 @@ job "grafana" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/grafana/grafana:13.0.2"
+        image = "zot.day1.sololab/grafana/grafana:13.1.0"
         labels = {
           "traefik.enable"                                    = "true"
           "traefik.http.routers.grafana-redirect.entrypoints" = "web"
