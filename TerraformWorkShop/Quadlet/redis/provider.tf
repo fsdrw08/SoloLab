@@ -1,0 +1,55 @@
+terraform {
+  required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 5.9.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.3.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 3.2.0"
+    }
+    remote = {
+      source  = "tenstad/remote"
+      version = ">= 0.2.1"
+    }
+  }
+  backend "s3" {
+    bucket = "tfstate"                   # Name of the S3 bucket
+    key    = "System/Day2-Quadlet-Redis" # Name of the tfstate file
+
+    endpoints = {
+      s3 = "https://minio-api.day1.sololab" # Minio endpoint
+    }
+
+    access_key = "minioadmin" # Access and secret keys
+    secret_key = "minioadmin"
+
+    region                      = "main" # Region validation will be skipped
+    skip_credentials_validation = true   # Skip AWS related checks and validations
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    use_path_style              = true
+    skip_requesting_account_id  = true
+    insecure                    = true
+  }
+}
+
+provider "remote" {
+  conn {
+    host     = var.prov_remote.host
+    port     = var.prov_remote.port
+    user     = var.prov_remote.user
+    password = var.prov_remote.password
+  }
+}
+
+provider "vault" {
+  address = "${var.prov_vault.schema}://${var.prov_vault.address}"
+  token   = var.prov_vault.token
+  # https://registry.terraform.io/providers/hashicorp/vault/latest/docs#skip_tls_verify
+  skip_tls_verify = var.prov_vault.skip_tls_verify
+}

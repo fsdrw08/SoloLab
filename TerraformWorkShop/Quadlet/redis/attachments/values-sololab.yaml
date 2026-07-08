@@ -1,0 +1,12 @@
+global:
+  imageRegistry: zot.day1.sololab
+redis:
+  config:
+    aclfile: /etc/redis/secret/acl.conf
+  secret:
+    others:
+      mountPath: /etc/redis/secret
+      contents:
+        acl.conf: |
+          user admin on ~* +@all >P@ssw0rd
+          user default on ~* +@all -REPLICAOF -CONFIG -DEBUG -SAVE -MONITOR -ACL -SHUTDOWN >default
