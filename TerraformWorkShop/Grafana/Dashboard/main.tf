@@ -21,9 +21,12 @@ resource "grafana_data_source" "data_sources" {
     tlsCACert = data.vault_kv_secret_v2.secret["sololab_root"].data["ca"]
   })
 
-  json_data_encoded = jsonencode({
-    tlsAuthWithCACert = true
-  })
+  json_data_encoded = jsonencode(merge(
+    each.value.json_data_encoded,
+    {
+      tlsAuthWithCACert = true
+    }
+  ))
 }
 
 resource "grafana_dashboard" "dashboards" {

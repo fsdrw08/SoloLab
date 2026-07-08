@@ -33,6 +33,13 @@ data_sources = [
     type   = "prometheus"
     name   = "prometheus"
     url    = "https://prometheus.day2.sololab"
+    json_data_encoded = {
+      httpMethod        = "POST"
+      pdcInjected       = false
+      prometheusType    = "Prometheus"
+      prometheusVersion = "2.50.1"
+      seriesLimit       = 500
+    }
   }
 ]
 

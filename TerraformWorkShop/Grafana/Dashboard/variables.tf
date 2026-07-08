@@ -29,10 +29,11 @@ variable "prov_grafana" {
 
 variable "data_sources" {
   type = list(object({
-    iac_id = string
-    name   = string
-    type   = string
-    url    = string
+    iac_id            = string
+    name              = string
+    type              = string
+    url               = string
+    json_data_encoded = optional(map(any), null)
   }))
 }
 
