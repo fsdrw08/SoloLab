@@ -1,4 +1,4 @@
-# https://gitea.com/gitea/runner/src/tag/v1.0.8/internal/pkg/config/config.example.yaml
+# https://gitea.com/gitea/runner/src/tag/v2.0.0/internal/pkg/config/config.example.yaml
 # Example configuration file, it's safe to copy this as the default config file without any modification.
 
 # You don't have to copy this file to your instance,
@@ -96,16 +96,16 @@ cache:
   host: ""
   # The port of the cache server.
   # 0 means to use a random available port.
-  port: 0
+  port:
   # The external cache server URL. Valid only when enable is true.
   # If it's specified, runner will use this URL as the ACTIONS_CACHE_URL rather than start a server by itself.
   # The URL should generally end with "/".
   # Requires external_secret below to be set to the same value on both this runner and the cache-server.
-  external_server: ""
+  external_server: http://gitea-runner-cache.service.consul/
   # Shared secret between this runner and the external `gitea-runner cache-server`. Required when external_server
   # (or `gitea-runner cache-server`) is in use: the runner pre-registers each job's ACTIONS_RUNTIME_TOKEN with the
   # cache-server, and the cache-server enforces bearer auth + per-repo cache isolation.
-  external_secret: ""
+  external_secret: "12345"
   # When true, reuse a cached action instead of fetching from the remote on every job. Note: a moved tag
   # (e.g. a re-tagged "v6") or an updated branch stays at the cached commit until its cache entry is removed.
   offline_mode: false

@@ -145,15 +145,15 @@ job "gitea" {
           "traefik.http.services.gitea.loadBalancer.serversTransport=consul-service@file",
         ]
 
-        # meta {
-        #   prom_blackbox_scheme            = "https"
-        #   prom_blackbox_address           = "gitea.service.consul"
-        #   prom_blackbox_health_check_path = "/health"
+        meta {
+          prom_blackbox_scheme            = "https"
+          prom_blackbox_address           = "gitea.service.consul"
+          prom_blackbox_health_check_path = "/health"
 
-        #   prom_target_scheme       = "https"
-        #   prom_target_address      = "gitea.service.consul"
-        #   prom_target_metrics_path = "metrics"
-        # }
+          prom_target_scheme       = "https"
+          prom_target_address      = "gitea.service.consul"
+          prom_target_metrics_path = "metrics"
+        }
       }
 
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration

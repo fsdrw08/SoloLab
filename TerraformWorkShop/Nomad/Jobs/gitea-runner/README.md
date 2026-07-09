@@ -12,6 +12,27 @@ $proxy="127.0.0.1:7890"; $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy; $env:N
 # .\Sync-OCIImage.ps1 -PrivateRegistry "zot.day1.sololab" -SyncProfile "Day4.jsonc" -LocalStore "D:/Users/Public/Downloads/containers" -Upload $false
 ```
 
+#### Get gitea-runner token
+```powershell
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
+$adminUserName=$(vault kv get -format=json -mount=kvv2_others app-gitea | jq.exe .data.data.admin_username).Replace('"', '')
+$adminPassword=$(vault kv get -format=json -mount=kvv2_others app-gitea | jq.exe .data.data.admin_password).Replace('"', '')
+$giteaURI = "https://gitea.day4.sololab/api/v1/admin/actions/runners/registration-token"
+
+$instanceRunnerToken = $(curl.exe -k -s `
+    --request POST `
+    -u "$($adminUserName):$($adminPassword)" `
+    -H "Content-Type: application/json" `
+    $giteaURI | jq.exe .token).Replace('"', '')
+
+# store token in vault
+vault kv patch -mount=kvv2_gitea token-instance_runner token=$instanceRunnerToken
+```
+
+
+
 #### Deploy gitea-runner nomad job
 ```powershell
 $credential = Get-Credential -Message "credential to login vault"

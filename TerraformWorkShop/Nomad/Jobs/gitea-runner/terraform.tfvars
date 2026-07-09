@@ -5,12 +5,12 @@ prov_nomad = {
 
 dynamic_host_volumes = [
   {
-    name = "hvol-gitea-runner"
+    name = "hvol-gitea-runner-cache"
     constraint = [
       {
         attribute = "$${attr.unique.hostname}"
         operator  = "=="
-        value     = "day5"
+        value     = "day4"
       }
     ]
     capability = {
@@ -18,14 +18,17 @@ dynamic_host_volumes = [
     }
     plugin_id = "mkdir"
     parameters = {
-      uid = 1000
-      gid = 1000
+      uid = 0
+      gid = 0
     }
   },
 ]
 
 
 jobs = [
+  {
+    path = "./attachments/gitea-runner-cache.nomad.hcl"
+  },
   {
     path = "./attachments/gitea-runner.nomad.hcl"
     var_sets = [

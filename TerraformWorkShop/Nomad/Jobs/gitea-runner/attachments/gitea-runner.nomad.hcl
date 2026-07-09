@@ -62,6 +62,7 @@ job "gitea-runner" {
           initial_status = "passing"
         }
         tags = [
+          "${attr.unique.hostname}",
           "metrics-exposing-blackbox",
           "metrics-exposing-general",
           "log",
@@ -80,22 +81,22 @@ job "gitea-runner" {
           # "traefik.http.services.gitea-runner.loadBalancer.serversTransport=consul-service@file",
         ]
 
-        # meta {
-        #   prom_blackbox_scheme            = "https"
-        #   prom_blackbox_address           = "gitea.service.consul"
-        #   prom_blackbox_health_check_path = "/health"
+        meta {
+          prom_blackbox_scheme            = "https"
+          prom_blackbox_address           = "${attr.unique.hostname}.gitea-runner.service.consul"
+          prom_blackbox_health_check_path = "/metrics"
 
-        #   prom_target_scheme       = "https"
-        #   prom_target_address      = "gitea.service.consul"
-        #   prom_target_metrics_path = "metrics"
-        # }
+          prom_target_scheme       = "https"
+          prom_target_address      = "${attr.unique.hostname}.gitea-runner.service.consul"
+          prom_target_metrics_path = "metrics"
+        }
       }
 
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://gitea.com/gitea/runner/src/tag/v1.0.8/Dockerfile
-        image = "zot.day1.sololab/gitea/runner:1.0.8"
+        # https://gitea.com/gitea/runner/src/tag/v2.0.0/Dockerfile
+        image = "zot.day1.sololab/gitea/runner:2.0.0"
         labels = {
           "traefik.enable"                                         = "true"
           "traefik.http.routers.gitea-runner-redirect.entrypoints" = "web"
