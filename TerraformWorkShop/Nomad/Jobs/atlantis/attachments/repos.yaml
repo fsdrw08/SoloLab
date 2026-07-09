@@ -1,4 +1,7 @@
 # https://www.runatlantis.io/docs/server-side-repo-config.html
+metrics:
+  prometheus:
+    endpoint: "/metrics"
 repos:
   - id: /.*/
     pre_workflow_hooks:
