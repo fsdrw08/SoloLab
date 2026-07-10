@@ -5,12 +5,5 @@ projects:
         - '*.tf'
         - terraform.tfvars
         - attachments/
-    dir: TerraformWorkShop/Hyper-V/VM-Day5-CentOS
-    name: Day5-CentOS
-  - autoplan:
-      when_modified:
-        - '*.tf'
-        - terraform.tfvars
-        - attachments/
     dir: TerraformWorkShop/Nomad/Jobs/postgresql
     name: test-db

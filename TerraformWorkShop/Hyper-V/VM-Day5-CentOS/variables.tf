@@ -49,6 +49,7 @@ variable "vm" {
       minimum_bytes = number
     })
   })
+  default = null
 }
 
 variable "cloudinit" {
@@ -72,4 +73,5 @@ variable "cloudinit" {
       )
     })
   })
+  default = null
 }

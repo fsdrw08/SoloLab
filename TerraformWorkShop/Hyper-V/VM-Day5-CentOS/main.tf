@@ -1,5 +1,5 @@
 data "vault_kv_secret_v2" "secret" {
-  for_each = {
+  for_each = var.cloudinit == null ? {} : {
     for key in keys(var.cloudinit.vars.value_refers) : key => var.cloudinit.vars.value_refers[key]
     if var.cloudinit.vars.value_refers[key].vault_kvv2 != null
   }
@@ -9,7 +9,7 @@ data "vault_kv_secret_v2" "secret" {
 
 module "cloudinit_nocloud_iso" {
   source   = "../../modules/hyperv-cloudinit-nocloud"
-  count    = var.vm.count == null ? 0 : var.vm.count
+  count    = var.vm == null ? 0 : var.vm.count == null ? 0 : var.vm.count
   iso_name = "cloud-init-${local.vm_names[count.index]}"
   files = [
     for file in var.cloudinit.files : {
@@ -35,10 +35,10 @@ module "cloudinit_nocloud_iso" {
 }
 
 locals {
-  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+  vm_names = var.vm == null ? [] : var.vm.count == 1 ? [var.vm.base_name] : [
     for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
   ]
-  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
+  data_disks = var.vm == null || var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
     for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
     # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
     if regex("^[^.]+", vhd.name) == var.vm.base_name
@@ -52,14 +52,14 @@ locals {
 
 # fetch data disk info
 data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
+  count   = var.vm == null || var.vm.vhd.data_disk_tfstate == null ? 0 : 1
   backend = var.vm.vhd.data_disk_tfstate.backend.type
   config  = var.vm.vhd.data_disk_tfstate.backend.config
 }
 
 # prepare boot disk path
 resource "terraform_data" "boot_disk" {
-  count = var.vm.count
+  count = var.vm == null || var.vm.count == null ? 0 : var.vm.count == null ? 0 : var.vm.count
   input = join("\\", [
     var.vm.vhd.dir,
     local.vm_names[count.index],
@@ -78,7 +78,7 @@ resource "terraform_data" "boot_disk" {
 module "hyperv_machine_instance" {
   source     = "../../modules/hyperv-vm"
   depends_on = [module.cloudinit_nocloud_iso]
-  count      = var.vm.count
+  count      = var.vm == null ? 0 : var.vm.count
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
