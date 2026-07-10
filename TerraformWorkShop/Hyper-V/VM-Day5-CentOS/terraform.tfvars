@@ -1,5 +1,5 @@
 prov_hyperv = {
-  host     = "127.0.0.1"
+  host     = "192.168.255.100"
   port     = 5986
   user     = "root"
   password = "P@ssw0rd"
@@ -38,9 +38,9 @@ vm = {
 
 cloudinit = {
   files = [
-    "./cloudinit-tmpl/meta-data",
-    "./cloudinit-tmpl/network-config",
-    "./cloudinit-tmpl/user-data"
+    "./attachments/meta-data",
+    "./attachments/network-config",
+    "./attachments/user-data"
   ]
   vars = {
     global = {
