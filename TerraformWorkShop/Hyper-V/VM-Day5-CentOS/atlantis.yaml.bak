@@ -1,8 +1,0 @@
-projects:
-  - name: Day5-CentOS
-    dir: $dir
-    autoplan:
-      when_modified:
-        - "*.tf"
-        - "terraform.tfvars"
-        - attachments/

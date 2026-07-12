@@ -3,6 +3,8 @@ projects:
 {{ range file.Walk "TerraformWorkShop" }}
   {{- if and (eq (filepath.Base .) "atlantis.yaml") (not ( file.IsDir . )) }}
   {{- $rendered := strings.ReplaceAll "$dir" (strings.ReplaceAll "\\" "/" (filepath.Dir .)) (file.Read .) }}
+{{- if (ne ($rendered | data.YAML).projects nil) }}
 {{- ($rendered | data.YAML).projects | data.ToYAML | strings.Indent 2 }}
   {{- end }}
+{{- end }}
 {{- end }}
