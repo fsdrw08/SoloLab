@@ -309,6 +309,16 @@ policy_bindings = [
       path "kvv2_vault/metadata/*" {
         capabilities = ["list"]
       }
+
+      path "kvv2_gitea/data/*" {
+        capabilities = ["read"]
+      }
+      path "kvv2_gitea/data/" {
+        capabilities = ["read"]
+      }
+      path "kvv2_gitea/metadata/*" {
+        capabilities = ["list"]
+      }
     EOT
   },
   # jenkins-swarm

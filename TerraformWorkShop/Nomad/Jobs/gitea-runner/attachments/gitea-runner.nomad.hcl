@@ -111,20 +111,11 @@ job "gitea-runner" {
 
           "traefik.http.services.gitea-runner.loadbalancer.server.port" = "9101"
         }
-        volumes = [
-          # Customization files should be placed in /var/lib/gitea/custom directory
-          # https://docs.gitea.com/1.26/installation/install-with-docker-rootless#customization
-          # https://docs.gitea.com/1.26/administration/customizing-gitea#customizing-the-git-configuration
-          # https://docs.gitea.com/installation/install-with-docker-rootless#customization
-          # https://docs.gitea.com/administration/customizing-gitea#customizing-the-git-configuration
-          "local/app.ini:/etc/gitea/app.ini",
-        ]
-
       }
 
       env {
         CONFIG_FILE        = "/local/config.yaml"
-        GITEA_INSTANCE_URL = "https://gitea.service.consul"
+        GITEA_INSTANCE_URL = "https://gitea.day4.sololab"
         # https://gitea.com/gitea/runner/issues/634
         SSL_CERT_FILE = "/secrets/sololab.crt"
       }
@@ -133,7 +124,7 @@ job "gitea-runner" {
         # Specifies the CPU required to run this task in MHz
         cpu = 600
         # Specifies the memory required in MB
-        memory = 600
+        memory = 300
       }
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
@@ -146,7 +137,7 @@ job "gitea-runner" {
       template {
         change_mode = "restart"
         data        = <<-EOF
-          GITEA_RUNNER_REGISTRATION_TOKEN={{ with secret "kvv2_gitea/data/runner-token" }}{{ .Data.data.token }}{{ end }}
+          GITEA_RUNNER_REGISTRATION_TOKEN={{ with secret "kvv2_gitea/data/token-instance_runner" }}{{ .Data.data.token }}{{ end }}
         EOF
         destination = "secrets/file.env"
         env         = true

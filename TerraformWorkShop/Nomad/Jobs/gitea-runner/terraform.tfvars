@@ -22,6 +22,24 @@ dynamic_host_volumes = [
       gid = 0
     }
   },
+  {
+    name = "hvol-gitea-runner"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "regexp"
+        value     = "^day5.*"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 0
+      gid = 0
+    }
+  },
 ]
 
 
@@ -34,7 +52,7 @@ jobs = [
     var_sets = [
       {
         name                = "config"
-        value_template_path = "./attachments/app.ini"
+        value_template_path = "./attachments/config.yaml"
       },
     ]
   },
