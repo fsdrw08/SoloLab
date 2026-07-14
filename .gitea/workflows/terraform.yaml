@@ -1,0 +1,28 @@
+name: Terraform Job
+run-name: ${{ gitea.actor }} is running Terraform
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: hashicorp/setup-terraform@v4
+      # - name: Install Terraform
+      #   run: |
+      #     wget https://releases.hashicorp.com/terraform/${{ matrix.terraform_version }}/terraform_${{ matrix.terraform_version }}_linux_amd64.zip
+      #     unzip terraform_${{ matrix.terraform_version }}_linux_amd64.zip
+      #     mv terraform /usr/local/bin/
+      #     terraform version
+      #   timeout-minutes: 5
+      - name: run terraform
+        env:
+          TF_CLI_CONFIG_FILE: ${{ github.workspace }}/TerraformWorkShop/SoloLab.tfrc
+          CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
+          NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}/TerraformWorkShop/Nomad/Jobs/postgresql
+          terraform init
+          terraform plan

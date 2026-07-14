@@ -75,8 +75,8 @@ runner:
   # If it's empty when registering, it will ask for inputting labels.
   # If it's empty when execute `daemon`, will use labels in `.runner` file.
   labels:
-    - "ubuntu-latest:docker://docker.gitea.com/runner-images:ubuntu-latest"
-    - "ubuntu-24.04:docker://docker.gitea.com/runner-images:ubuntu-24.04"
+    - "ubuntu-latest:docker://zot.day1.sololab/gitea/runner-images:ubuntu-latest"
+    - "ubuntu-24.04:docker://zot.day1.sololab/gitea/runner-images:ubuntu-24.04"
     - "ubuntu-22.04:docker://docker.gitea.com/runner-images:ubuntu-22.04"
   # Allocate a pseudo-TTY for each step's process. Applies to both host and docker backends.
   # Default false matches GitHub actions/runner. Enable only for jobs that need an interactive
@@ -119,7 +119,9 @@ container:
   # Whether to use privileged mode or not when launching task containers (privileged mode is required for Docker-in-Docker).
   privileged: false
   # Any other options to be used when the container is started (e.g., --add-host=my.gitea.url:host-gateway).
-  options:
+  # https://forum.gitea.com/t/cannot-checkout-a-repository-hosted-on-a-gitea-instance-using-self-signed-certificate-server-certificate-verification-failed/7903/7
+  options: >
+    --mount type=bind,source=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem,target=/etc/ssl/certs/ca-certificates.crt,readonly
   # The parent directory of a job's working directory.
   # NOTE: There is no need to add the first '/' of the path as runner will add it automatically.
   # If the path starts with '/', the '/' will be trimmed.
@@ -136,12 +138,13 @@ container:
   # If you want to allow any volume, please use the following configuration:
   # valid_volumes:
   #   - '**'
-  valid_volumes: []
+  valid_volumes:
+    - /etc/pki/ca-trust/extracted/pem/*
   # Overrides the docker client host with the specified one.
   # If it's empty, runner will find an available docker host automatically.
   # If it's "-", runner will find an available docker host automatically, but the docker host won't be mounted to the job containers and service containers.
   # If it's not empty or "-", the specified docker host will be used. An error will be returned if it doesn't work.
-  docker_host: 
+  docker_host:
   # Pull docker image(s) even if already present
   force_pull: true
   # Rebuild docker image(s) even if already present

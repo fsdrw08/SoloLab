@@ -12,7 +12,16 @@ $proxy="127.0.0.1:7890"; $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy; $env:N
 # .\Sync-OCIImage.ps1 -PrivateRegistry "zot.day1.sololab" -SyncProfile "Day4.jsonc" -LocalStore "D:/Users/Public/Downloads/containers" -Upload $false
 ```
 
-#### Get gitea-runner token
+#### Security
+- Ensure  nomad default workload identity has permission to access vault kvv2 backend `kvv2_gitea`  
+[TerraformWorkShop/Vault/policy/terraform.tfvars](../../../../TerraformWorkShop/Vault/policy/terraform.tfvars)
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Vault/policy"
+terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
+```
+
+#### Prepare gitea-runner token
 ```powershell
 $credential = Get-Credential -Message "credential to login vault"
 $env:VAULT_ADDR = "https://vault.day1.sololab"
@@ -36,8 +45,6 @@ if (-not ($secretList -contains "token-instance_runner")) {
     vault kv patch -mount=kvv2_gitea token-instance_runner token=$instanceRunnerToken
 }
 ```
-
-
 
 #### Deploy gitea-runner nomad job
 ```powershell

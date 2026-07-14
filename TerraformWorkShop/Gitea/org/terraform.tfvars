@@ -34,6 +34,18 @@ organizations = [
     ]
   },
   {
+    iac_id = "c88e53e8"
+    name   = "actions"
+    repositories = [
+      {
+        iac_id    = "ef68953e"
+        name      = "checkout"
+        auto_init = false
+        private   = false
+      }
+    ]
+  },
+  {
     iac_id = "27beb241"
     name   = "standalone-lab"
     teams = [

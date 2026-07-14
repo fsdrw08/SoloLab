@@ -111,6 +111,15 @@ job "gitea-runner" {
 
           "traefik.http.services.gitea-runner.loadbalancer.server.port" = "9101"
         }
+        security_opt = [
+          "label=type:spc_t",
+        ]
+        volumes = [
+          "/run/podman/podman.sock:/var/run/docker.sock:Z",
+          # "/etc/ssl/certs:/etc/ssl/certs:ro"
+          # "/etc/ca-certificates:/etc/ca-certificates:ro"
+          "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem:/etc/ssl/certs/ca-certificates.crt:ro"
+        ]
       }
 
       env {
