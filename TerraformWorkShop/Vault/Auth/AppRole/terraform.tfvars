@@ -17,9 +17,9 @@ approles = [
     secret_version = 1
   },
   {
-    role_name      = "jenkins-secret-reader"
-    role_id        = "jenkins-secret-reader"
-    token_policies = ["jenkins-secret-reader"]
+    role_name      = "pipeline-operator"
+    role_id        = "pipeline-operator"
+    token_policies = ["vault-admin"]
     secret_version = 1
   }
 ]

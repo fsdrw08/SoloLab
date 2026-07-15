@@ -340,18 +340,4 @@ policy_bindings = [
       external_groups = ["app-jenkins-agent"]
     }
   },
-  {
-    policy_name    = "jenkins-secret-reader"
-    policy_content = <<-EOT
-      path "kvv2_others/data/*" {
-        capabilities = ["read"]
-      }
-      path "kvv2_others/data/" {
-        capabilities = ["read"]
-      }
-      path "kvv2_others/metadata/*" {
-        capabilities = ["list"]
-      }
-    EOT
-  }
 ]
