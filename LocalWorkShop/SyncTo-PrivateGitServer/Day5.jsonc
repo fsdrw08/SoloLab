@@ -1,0 +1,16 @@
+[
+    {
+        "publicParentPath": "https://github.com",
+        "publicChildPath": "hashicorp/vault-action.git",
+        "localChildPath": "github.com_hashicorp_vault-action",
+        "privateChildPath": "hashicorp/vault-action.git",
+        "description": "https://github.com/hashicorp/vault-action",
+    },
+    {
+        "publicParentPath": "https://github.com",
+        "publicChildPath": "hashicorp/setup-terraform.git",
+        "localChildPath": "github.com_hashicorp_setup-terraform",
+        "privateChildPath": "hashicorp/setup-terraform.git",
+        "description": "https://github.com/hashicorp/setup-terraform",
+    },
+]

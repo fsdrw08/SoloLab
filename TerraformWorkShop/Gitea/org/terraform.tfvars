@@ -46,6 +46,24 @@ organizations = [
     ]
   },
   {
+    iac_id = "d0228fa2"
+    name   = "hashicorp"
+    repositories = [
+      {
+        iac_id    = "1c25fa4b"
+        name      = "vault-action"
+        auto_init = false
+        private   = false
+      },
+      {
+        iac_id    = "aad40362"
+        name      = "setup-terraform"
+        auto_init = false
+        private   = false
+      }
+    ]
+  },
+  {
     iac_id = "27beb241"
     name   = "standalone-lab"
     teams = [
