@@ -57,5 +57,30 @@ repositories = [
         }
       }
     ]
+    actions = {
+      secrets = {
+        "VAULT_CA_CERT" = {
+          vault_kvv2 = {
+            mount = "kvv2_certs"
+            name  = "sololab_root"
+            key   = "ca"
+          }
+        }
+        "VAULT_ROLE_ID" = {
+          vault_kvv2 = {
+            mount = "kvv2_vault"
+            name  = "approle-pipeline_operator"
+            key   = "role_id"
+          }
+        }
+        "VAULT_SECRET_ID" = {
+          vault_kvv2 = {
+            mount = "kvv2_vault"
+            name  = "approle-pipeline_operator"
+            key   = "secret_id"
+          }
+        }
+      }
+    }
   }
 ]

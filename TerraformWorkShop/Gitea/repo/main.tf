@@ -1,11 +1,11 @@
 import {
-  provider = "gitea-unofficial"
+  provider = gitea-unofficial
   id       = "standalone-lab/sololab"
   to       = gitea_repository.repository["93b6d451"]
 }
 
 resource "gitea_repository" "repository" {
-  provider = "gitea-unofficial"
+  provider = gitea-unofficial
   for_each = {
     for repo in var.repositories : repo.iac_id => repo
   }
@@ -62,28 +62,38 @@ locals {
     if repo.webhooks != null
   ])
   vault_kvv2_secret_list = flatten([
-    for repo in var.repositories : [
-      for webhook in repo.webhooks : {
-        iac_id = webhook.iac_id
-        mount  = webhook.secret.vault_kvv2.mount
-        name   = webhook.secret.vault_kvv2.name
-      }
-      if webhook.secret.vault_kvv2 != null
-    ]
+    for repo in var.repositories : concat(
+      [
+        for webhook in repo.webhooks : {
+          id    = webhook.iac_id
+          mount = webhook.secret.vault_kvv2.mount
+          name  = webhook.secret.vault_kvv2.name
+        }
+        if webhook.secret.vault_kvv2 != null
+      ],
+      repo.actions.secrets == null ? [] : [
+        for key in keys(repo.actions.secrets) : {
+          id    = key
+          mount = repo.actions.secrets[key].vault_kvv2.mount
+          name  = repo.actions.secrets[key].vault_kvv2.name
+        }
+        if repo.actions.secrets[key].vault_kvv2 != null
+      ]
+    )
     if repo.webhooks != null
   ])
 }
 
 data "vault_kv_secret_v2" "secret" {
   for_each = local.vault_kvv2_secret_list == null ? null : {
-    for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.iac_id => vault_kvv2_secret
+    for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.id => vault_kvv2_secret
   }
   mount = each.value.mount
   name  = each.value.name
 }
 
 resource "gitea_repository_webhook" "webhook" {
-  provider = "gitea"
+  provider = gitea
   depends_on = [
     gitea_repository.repository
   ]
@@ -123,3 +133,34 @@ resource "gitea_repository_webhook" "webhook" {
 #     secret       = each.value.secret.plaintext != null ? each.value.secret.plaintext : data.vault_kv_secret_v2.secret[each.value.iac_id].data[each.value.secret.vault_kvv2.key]
 #   }
 # }
+
+locals {
+  secrets = flatten([
+    for repo in var.repositories : [
+      for key in keys(repo.actions.secrets) : merge(
+        repo.actions.secrets[key],
+        {
+          id         = "${repo.org_name}/${repo.name}/${key}"
+          owner_name = repo.org_name
+          repo_name  = repo.name
+          secret_key = key
+        }
+      )
+    ]
+    if repo.actions.secrets != null
+  ])
+}
+
+resource "gitea_repository_actions_secret" "secret" {
+  provider = gitea
+  depends_on = [
+    gitea_repository.repository
+  ]
+  for_each = {
+    for secret in local.secrets : secret.id => secret
+  }
+  repository_owner = each.value.owner_name
+  repository       = each.value.repo_name
+  secret_name      = each.value.secret_key
+  secret_value     = data.vault_kv_secret_v2.secret[each.value.secret_key].data[each.value.vault_kvv2.key]
+}

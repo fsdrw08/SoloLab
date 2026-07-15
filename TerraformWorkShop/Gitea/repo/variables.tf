@@ -91,5 +91,20 @@ variable "repositories" {
       ),
       null
     )
+    actions = optional(
+      object({
+        secrets = optional(
+          map(object({
+            vault_kvv2 = object({
+              mount = string
+              name  = string
+              key   = string
+            })
+          })),
+          null
+        )
+      }),
+      null
+    )
   }))
 }
