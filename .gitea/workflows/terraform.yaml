@@ -2,7 +2,12 @@ name: Terraform Job
 run-name: ${{ gitea.actor }} is running Terraform
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      working-directory:
+        description: Directory containing the IaC
+        required: true
+        type: string
 
 jobs:
   build:
@@ -17,12 +22,25 @@ jobs:
       #     mv terraform /usr/local/bin/
       #     terraform version
       #   timeout-minutes: 5
+      - name: Import Secrets
+        id: import-secrets
+        uses: hashicorp/vault-action@v4
+        with:
+          url: https://vault.day1.sololab
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          exportToken: true
+          secrets: |
+            kvv2_consul/data/token-tf_backend | CONSUL_HTTP_TOKEN ;
+            kvv2_nomad/data/token-management | NOMAD_TOKEN ;
+
       - name: run terraform
         env:
           TF_CLI_CONFIG_FILE: ${{ github.workspace }}/TerraformWorkShop/SoloLab.tfrc
-          CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
-          NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+          CONSUL_HTTP_TOKEN: ${{ secrets.import-secrets.outputs.CONSUL_HTTP_TOKEN }}
+          NOMAD_TOKEN: ${{ secrets.import-secrets.outputs.NOMAD_TOKEN }}
         run: |
-          cd ${{ github.workspace }}/TerraformWorkShop/Nomad/Jobs/postgresql
+          cd ${{ github.workspace }}/${{ inputs.working-directory }}
           terraform init
           terraform plan
