@@ -7,39 +7,46 @@ on:
       working-directory:
         description: Directory containing the IaC
         required: true
+        default: TerraformWorkShop/Nomad/Jobs/postgresql
+        type: string
+      terraform-download-url:
+        description: Terraform download URL
+        required: true
+        default: http://dufs.day1.sololab/public/binaries/terraform_1.15.8_linux_amd64.zip
         type: string
 
 jobs:
-  build:
+  terraform:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: hashicorp/setup-terraform@v4
-      # - name: Install Terraform
-      #   run: |
-      #     wget https://releases.hashicorp.com/terraform/${{ matrix.terraform_version }}/terraform_${{ matrix.terraform_version }}_linux_amd64.zip
-      #     unzip terraform_${{ matrix.terraform_version }}_linux_amd64.zip
-      #     mv terraform /usr/local/bin/
-      #     terraform version
-      #   timeout-minutes: 5
+      # - uses: hashicorp/setup-terraform@v4
+      - name: Install Terraform
+        run: |
+          wget -nv -O terraform_linux_amd64.zip ${{ inputs.terraform-download-url }}
+          unzip terraform_linux_amd64.zip
+          mv terraform /usr/local/bin/
+          terraform version
+        timeout-minutes: 1
       - name: Import Secrets
         id: import-secrets
         uses: hashicorp/vault-action@v4
         with:
           url: https://vault.day1.sololab
+          caCertificate: ${{ secrets.VAULT_CA_CERT }}
           method: approle
           roleId: ${{ secrets.VAULT_ROLE_ID }}
           secretId: ${{ secrets.VAULT_SECRET_ID }}
           exportToken: true
           secrets: |
-            kvv2_consul/data/token-tf_backend | CONSUL_HTTP_TOKEN ;
-            kvv2_nomad/data/token-management | NOMAD_TOKEN ;
+            kvv2_consul/data/token-tf_backend token | CONSUL_HTTP_TOKEN ;
+            kvv2_nomad/data/token-management token | NOMAD_TOKEN ;
 
       - name: run terraform
         env:
           TF_CLI_CONFIG_FILE: ${{ github.workspace }}/TerraformWorkShop/SoloLab.tfrc
-          CONSUL_HTTP_TOKEN: ${{ secrets.import-secrets.outputs.CONSUL_HTTP_TOKEN }}
-          NOMAD_TOKEN: ${{ secrets.import-secrets.outputs.NOMAD_TOKEN }}
+          CONSUL_HTTP_TOKEN: ${{ steps.import-secrets.outputs.CONSUL_HTTP_TOKEN }}
+          NOMAD_TOKEN: ${{ steps.import-secrets.outputs.NOMAD_TOKEN }}
         run: |
           cd ${{ github.workspace }}/${{ inputs.working-directory }}
           terraform init
