@@ -60,6 +60,7 @@ repositories = [
     actions = {
       secrets = {
         "VAULT_CA_CERT" = {
+          base64_encode = true
           vault_kvv2 = {
             mount = "kvv2_certs"
             name  = "sololab_root"

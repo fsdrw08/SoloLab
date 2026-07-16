@@ -162,5 +162,5 @@ resource "gitea_repository_actions_secret" "secret" {
   repository_owner = each.value.owner_name
   repository       = each.value.repo_name
   secret_name      = each.value.secret_key
-  secret_value     = data.vault_kv_secret_v2.secret[each.value.secret_key].data[each.value.vault_kvv2.key]
+  secret_value     = each.value.base64_encode ? base64encode(data.vault_kv_secret_v2.secret[each.value.secret_key].data[each.value.vault_kvv2.key]) : data.vault_kv_secret_v2.secret[each.value.secret_key].data[each.value.vault_kvv2.key]
 }

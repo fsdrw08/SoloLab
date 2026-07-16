@@ -95,6 +95,7 @@ variable "repositories" {
       object({
         secrets = optional(
           map(object({
+            base64_encode = optional(bool, false)
             vault_kvv2 = object({
               mount = string
               name  = string
