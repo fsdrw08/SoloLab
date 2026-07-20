@@ -50,6 +50,6 @@ ref: https://discussion.fedoraproject.org/t/zincati-cannot-to-update-to-new-imag
 
 ### Upgrade consul and nomad binaries in Day3-FCOS VM:
 ```shell
-sudo bash -c "consul_download_url=http://dufs.day1.sololab/public/binaries/consul_2.0.1_linux_amd64.zip custom_bin_dir=/opt/bin /opt/bin/consul_install.sh"
+sudo bash -c "consul_download_url=http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip custom_bin_dir=/opt/bin /opt/bin/consul_install.sh"
 sudo bash -c "nomad_download_url=http://dufs.day1.sololab/public/binaries/nomad_2.0.3_linux_amd64.zip custom_bin_dir=/opt/bin /opt/bin/nomad_install.sh"
 ```

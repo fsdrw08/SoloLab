@@ -30,7 +30,7 @@ certs = [
 
 consul = {
   install = {
-    zip_file_source = "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
+    zip_file_source = "https://releases.hashicorp.com/consul/2.0.2/consul_2.0.2_linux_amd64.zip"
     zip_file_path   = "/home/vyos/consul.zip"
     bin_file_dir    = "/usr/bin"
   }

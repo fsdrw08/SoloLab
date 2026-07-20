@@ -62,8 +62,8 @@ cloudinit = {
       custom_root_ca_path = "/usr/local/share/ca-certificates"
       custom_bin_dir      = "/opt/bin"
       # consul client
-      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.1_linux_amd64.zip"
-      consul_version      = "2.0.1"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
+      consul_version      = "2.0.2"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/lib/consul"
