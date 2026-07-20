@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "noenv/nomad:2.0.3",
-        "archive": "docker.io_noenv_nomad_2.0.3.tar",
-        "privateRepo": "noenv/nomad:2.0.3",
+        "publicRepo": "noenv/nomad:2.0.4",
+        "archive": "docker.io_noenv_nomad_2.0.4.tar",
+        "privateRepo": "noenv/nomad:2.0.4",
         "description": "https://hub.docker.com/r/noenv/nomad/tags, https://github.com/hashicorp/nomad/releases",
     },
     {
@@ -50,9 +50,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/loki:3.7.2",
-        "archive": "docker.io_grafana_loki_3.7.2.tar",
-        "privateRepo": "grafana/loki:3.7.2",
+        "publicRepo": "grafana/loki:3.7.3",
+        "archive": "docker.io_grafana_loki_3.7.3.tar",
+        "privateRepo": "grafana/loki:3.7.3",
         "description": "https://hub.docker.com/r/grafana/loki/tags, https://github.com/grafana/loki/releases, https://quay.io/repository/giantswarm/loki?tab=tags",
     },
     {
@@ -64,9 +64,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "prometheus/prometheus:v3.12.0",
-        "archive": "quay.io_prometheus_prometheus_v3.12.0.tar",
-        "privateRepo": "prometheus/prometheus:v3.12.0",
+        "publicRepo": "prometheus/prometheus:v3.13.1",
+        "archive": "quay.io_prometheus_prometheus_v3.13.1.tar",
+        "privateRepo": "prometheus/prometheus:v3.13.1",
         "description": "https://quay.io/repository/prometheus/prometheus?tab=tags, https://hub.docker.com/r/prom/prometheus/tags",
     },
     {
