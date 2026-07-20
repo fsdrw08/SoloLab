@@ -3,7 +3,7 @@ global:
 postgresql:
   image:
     repository: fedora/postgresql-18
-    tag: "20260610"
+    tag: "20260715"
   # containerPorts:
   #   - name: postgresql
   #     containerPort: 5432

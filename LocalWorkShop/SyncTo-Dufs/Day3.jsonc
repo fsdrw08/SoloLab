@@ -2,18 +2,18 @@
     {
         "type": "general",
         "publicParentPath": "https://releases.hashicorp.com",
-        "publicChildPath": "nomad/2.0.3/nomad_2.0.3_linux_amd64.zip",
-        "localChildPath": "bin/nomad_2.0.3_linux_amd64.zip",
-        "privateChildPath": "public/binaries/nomad_2.0.3_linux_amd64.zip",
+        "publicChildPath": "nomad/2.0.4/nomad_2.0.4_linux_amd64.zip",
+        "localChildPath": "bin/nomad_2.0.4_linux_amd64.zip",
+        "privateChildPath": "public/binaries/nomad_2.0.4_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad",
     },
     {
-        // https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
+        // https://releases.hashicorp.com/nomad-driver-podman/0.6.5/nomad-driver-podman_0.6.5_linux_amd64.zip
         "type": "general",
         "publicParentPath": "https://releases.hashicorp.com",
-        "publicChildPath": "nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "localChildPath": "bin/nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "privateChildPath": "public/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip",
+        "publicChildPath": "nomad-driver-podman/0.6.5/nomad-driver-podman_0.6.5_linux_amd64.zip",
+        "localChildPath": "bin/nomad-driver-podman_0.6.5_linux_amd64.zip",
+        "privateChildPath": "public/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad-driver-podman/",
     },
     {
@@ -67,6 +67,15 @@
         "localChildPath": "",
         "repoChildPath": "LocalWorkShop/Install-Nomad/Install-Nomad.sh",
         "privateChildPath": "public/binaries/nomad_install.sh",
+        "description": "",
+    },
+    {
+        "type": "repo-file",
+        "publicParentPath": "",
+        "publicChildPath": "",
+        "localChildPath": "",
+        "repoChildPath": "LocalWorkShop/Install-NomadDriverPodman/Install-NomadDriverPodman.sh",
+        "privateChildPath": "public/binaries/nomad_driver_podman_install.sh",
         "description": "",
     },
 ]

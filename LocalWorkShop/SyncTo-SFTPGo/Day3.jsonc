@@ -15,11 +15,11 @@
         "description": "https://releases.hashicorp.com/nomad",
     },
     {
-        // https://releases.hashicorp.com/nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip
+        // https://releases.hashicorp.com/nomad-driver-podman/0.6.5/nomad-driver-podman_0.6.5_linux_amd64.zip
         "publicRegistry": "https://releases.hashicorp.com",
-        "publicRepo": "nomad-driver-podman/0.6.4/nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "archive": "nomad-driver-podman_0.6.4_linux_amd64.zip",
-        "privateRepo": "/ignition/binaries/nomad-driver-podman_0.6.4_linux_amd64.zip",
+        "publicRepo": "nomad-driver-podman/0.6.5/nomad-driver-podman_0.6.5_linux_amd64.zip",
+        "archive": "nomad-driver-podman_0.6.5_linux_amd64.zip",
+        "privateRepo": "/ignition/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/nomad-driver-podman/",
     },
 ]

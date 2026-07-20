@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "juicedata/juicefs-csi-driver:v0.31.10",
-        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.31.10.tar",
-        "privateRepo": "juicedata/juicefs-csi-driver:v0.31.10",
+        "publicRepo": "juicedata/juicefs-csi-driver:v0.32.0",
+        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.32.0.tar",
+        "privateRepo": "juicedata/juicefs-csi-driver:v0.32.0",
         "description": "https://hub.docker.com/r/juicedata/juicefs-csi-driver/tags",
     },
     {
