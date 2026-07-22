@@ -68,6 +68,12 @@ bootcmd:
 
 # https://cloudinit.readthedocs.io/en/latest/reference/modules.html#write-files
 write_files:
+  - path: /etc/systemd/journald.conf
+    permissions: "0644"
+    content: |
+      [Journal]
+      SystemMaxUse=2G
+      MaxRetentionSec=14days
   # https://mirrors.ustc.edu.cn/help/centos-stream.html#__tabbed_1_2
   - path: /etc/yum.repos.d/centos.repo
     permissions: "0644"

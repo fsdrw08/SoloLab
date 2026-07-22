@@ -7,6 +7,13 @@ storage:
       overwrite: true
       contents:
         inline: ${vm_name}
+    - path: /etc/systemd/journald.conf
+      overwrite: true
+      contents:
+        inline: |
+          [Journal]
+          SystemMaxUse=2G
+          MaxRetentionSec=14days
     # https://github.com/coreos/coreos-tutorials/blob/97376716dce47080dd9e8f016753c55c5c79da96/fedora-coreos/provisioning/fcos-lab-tutorial.bu#L48
     - path: /etc/ssh/sshd_config.d/20-enable-passwords.conf
       overwrite: true
