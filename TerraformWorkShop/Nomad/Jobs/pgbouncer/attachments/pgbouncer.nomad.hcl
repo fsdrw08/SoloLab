@@ -17,40 +17,42 @@ job "pgbouncer" {
   }
 
   group "pgbouncer" {
+    # https://developer.hashicorp.com/nomad/docs/job-specification/network
     network {
-      port "pgbouncer" {
+      port "connection" {
         static = 6432
       }
     }
-    # https://developer.hashicorp.com/nomad/docs/job-specification/task
-    task "pgbouncer" {
-      # https://developer.hashicorp.com/nomad/docs/job-specification/service
-      service {
-        provider     = "consul"
-        name         = "pgbouncer"
-        address_mode = "host"
+    # https://developer.hashicorp.com/nomad/docs/job-specification/service
+    service {
+      provider     = "consul"
+      name         = "pgbouncer"
+      address_mode = "host"
+      port         = "connection"
 
-        # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
-        check {
-          type           = "tcp"
-          port           = "pgbouncer"
-          interval       = "180s"
-          timeout        = "2s"
-          initial_status = "passing"
-        }
-
-        tags = [
-          "day3",
-          "log",
-        ]
-
-        # meta {
-        #   # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
-        #   "NOMAD_JOB_NAME" = "${NOMAD_JOB_NAME}"
-        #   "NOMAD_ALLOC_ID" = "${NOMAD_ALLOC_ID}"
-        # }
+      # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
+      check {
+        type           = "tcp"
+        port           = "connection"
+        interval       = "180s"
+        timeout        = "2s"
+        initial_status = "passing"
       }
 
+      tags = [
+        "day3",
+        "log",
+      ]
+
+      # meta {
+      #   # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
+      #   "NOMAD_JOB_NAME" = "${NOMAD_JOB_NAME}"
+      #   "NOMAD_ALLOC_ID" = "${NOMAD_ALLOC_ID}"
+      # }
+    }
+
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
+    task "pgbouncer" {
       user = "996:996"
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
@@ -58,9 +60,7 @@ job "pgbouncer" {
         # https://github.com/cloudnative-pg/pgbouncer-containers/blob/main/entrypoint.sh
         image = "zot.day1.sololab/cloudnative-pg/pgbouncer:1.25.2"
 
-        ports = [
-          "pgbouncer",
-        ]
+        network_mode = "host"
 
         entrypoint = "/usr/bin/pgbouncer"
         command    = "/local/pgbouncer.ini"
@@ -85,6 +85,7 @@ job "pgbouncer" {
         change_mode   = "signal"
         change_signal = "SIGHUP"
       }
+      consul {}
 
       template {
         # https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#secrets
