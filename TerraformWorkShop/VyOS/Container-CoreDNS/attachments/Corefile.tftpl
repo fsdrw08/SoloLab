@@ -5,21 +5,6 @@
   prometheus localhost:9153
   health localhost:5380
 }
-.:53 {
-  bind 127.0.0.1
-  file /etc/coredns/day0.sololab.zone day0.sololab {
-    reload 5s
-    fallthrough
-  }
-  forward day0.sololab ${ext_facing_ns}
-  forward sololab ${int_facing_ns_sololab}
-  forward dc.consul ${int_facing_ns_consul}
-  forward node.consul ${int_facing_ns_consul}
-  forward service.consul ${int_facing_ns_consul}
-  forward consul ${int_facing_ns_consul}
-  forward . ${public_ns}
-  import common
-}
 https://.:44353 {
   bind 127.0.0.1
   tls /etc/coredns/tls/cert.pem /etc/coredns/tls/key.pem
@@ -30,4 +15,25 @@ https://.:44353 {
   forward sololab ${ext_facing_ns}
   forward . ${public_ns}
   import common
+}
+.:53 {
+  bind 127.0.0.1
+  forward . ${public_ns}
+  import common
+}
+sololab:53 {
+  bind 127.0.0.1
+  file /etc/coredns/day0.sololab.zone day0.sololab {
+    reload 5s
+    fallthrough
+  }
+  forward day0.sololab ${ext_facing_ns}
+  forward . ${int_facing_ns_sololab}
+  import common
+}
+consul:53 {
+  bind 127.0.0.1
+  errors
+  log
+  forward . ${int_facing_ns_consul}
 }

@@ -26,8 +26,8 @@ module "config_map" {
         basename = "Corefile"
         content = templatefile("./attachments/Corefile.tftpl", {
           int_facing_addr       = "192.168.255.1"
-          int_facing_ns_sololab = "192.168.255.10:53"
-          int_facing_ns_consul  = "192.168.255.20:53"
+          int_facing_ns_sololab = "192.168.255.10"
+          int_facing_ns_consul  = "192.168.255.10"
           ext_facing_addr       = "192.168.255.2"
           ext_facing_ns         = "172.16.40.10:53"
           public_ns             = "119.29.29.29"
@@ -181,6 +181,7 @@ resource "vyos_config_block_tree" "dns_forwarding" {
   configs = {
     "sololab name-server 127.0.0.1 port" = "53"
     "consul name-server 127.0.0.1 port"  = "53"
+    "consul recursion-desired"           = ""
   }
 }
 
