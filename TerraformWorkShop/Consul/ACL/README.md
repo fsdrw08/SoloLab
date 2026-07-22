@@ -27,3 +27,12 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/Vault/Secrets/PKI/Int_CA/"
 terraform apply -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)"  -auto-approve
 ```
+
+### Update ACL policy and CA config in Consul
+```powershell
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Consul/ACL"
+Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
+sudo pwsh.exe -c "terraform init -upgrade";
+terraform apply
+```

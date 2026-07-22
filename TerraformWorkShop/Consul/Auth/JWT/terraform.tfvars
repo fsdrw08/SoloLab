@@ -60,12 +60,13 @@ acl_binding_rules = [
     selector    = "\"nomad_service\" in value"
   },
   # https://developer.hashicorp.com/nomad/tutorials/integrate-consul/consul-acl#configure-consul-for-tasks-workload-identities
+  # https://developer.hashicorp.com/nomad/tutorials/integrate-consul/consul-acl#create-a-consul-acl-binding-rule-for-nomad-tasks
   # Consul ACL binding rule for Nomad tasks
   {
     iac_key     = "nomad_task"
     auth_name   = "nomad-workloads"
     bind_type   = "role"
-    bind_name   = "$${value.nomad_task}"
+    bind_name   = "nomad-tasks-$${value.nomad_namespace}"
     description = "Binding rule for Nomad tasks"
     selector    = "\"nomad_task\" in value"
   },

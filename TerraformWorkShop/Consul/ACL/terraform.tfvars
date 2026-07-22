@@ -181,6 +181,12 @@ roles = [
     description  = "Role of nomad tasks"
     policy_names = ["nomad_task"]
   },
+  # https://developer.hashicorp.com/nomad/tutorials/integrate-consul/consul-acl#create-a-consul-acl-role-for-nomad-tasks
+  {
+    name         = "nomad-tasks-default"
+    description  = "Role of nomad task workload identity in default namespace"
+    policy_names = ["nomad_task"]
+  },
   # {
   #   name         = "consul_admin"
   #   description  = "Role of consul admin"
