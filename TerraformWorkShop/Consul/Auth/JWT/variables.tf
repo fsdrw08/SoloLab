@@ -35,16 +35,12 @@ variable "jwt_auth_configs" {
       ClaimMappings     = map(string)
       ListClaimMappings = optional(map(string), null)
     })
-  }))
-}
-
-variable "acl_binding_rules" {
-  type = list(object({
-    iac_key     = string
-    auth_name   = string
-    bind_type   = string
-    bind_name   = string
-    description = optional(string, null)
-    selector    = string
+    binding_rules = list(object({
+      iac_id      = string
+      bind_name   = string
+      bind_type   = string
+      description = optional(string, null)
+      selector    = string
+    }))
   }))
 }

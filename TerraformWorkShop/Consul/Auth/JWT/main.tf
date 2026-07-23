@@ -10,6 +10,7 @@ resource "consul_acl_auth_method" "jwt" {
   name = each.value.name
   type = "jwt"
 
+  # https://developer.hashicorp.com/consul/docs/secure/acl/auth-method/jwt#config-parameters
   config_json = jsonencode({
     JWKSCACert = data.vault_kv_secret_v2.ca_cert.data["ca"]
     # ref: https://github.com/gitrgoliveira/vault-consul-auth/blob/356687425d9ee5bbdc03134e372e9b16a5791a07/consul.tf
@@ -31,11 +32,26 @@ resource "consul_acl_auth_method" "jwt" {
   })
 }
 
+locals {
+  acl_binding_rules = flatten([
+    for config in var.jwt_auth_configs : [
+      for binding_rule in config.binding_rules : {
+        iac_id      = binding_rule.iac_id
+        auth_name   = config.name
+        bind_type   = binding_rule.bind_type
+        bind_name   = binding_rule.bind_name
+        selector    = binding_rule.selector
+        description = binding_rule.description
+      }
+    ]
+  ])
+}
+
 resource "consul_acl_binding_rule" "binding" {
   for_each = {
-    for rule in var.acl_binding_rules : rule.iac_key => rule
+    for acl_binding_rule in local.acl_binding_rules : acl_binding_rule.iac_id => acl_binding_rule
   }
-  auth_method = consul_acl_auth_method.jwt[each.value.auth_name].name
+  auth_method = each.value.auth_name
   bind_type   = each.value.bind_type
   bind_name   = each.value.bind_name
   selector    = each.value.selector
