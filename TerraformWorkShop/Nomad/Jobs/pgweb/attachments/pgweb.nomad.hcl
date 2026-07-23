@@ -123,7 +123,7 @@ job "pgweb" {
 
         destination = "local/test.txt"
       }
-
+      consul {}
       vault {}
 
     }
