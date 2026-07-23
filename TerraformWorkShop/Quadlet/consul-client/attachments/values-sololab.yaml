@@ -25,6 +25,8 @@ consul:
 
   configFiles:
     main:
+      acl:
+        enabled: true
       auto_encrypt:
         tls: true
       bind_addr: "{{ GetInterfaceIP \"eth0\" }}"
