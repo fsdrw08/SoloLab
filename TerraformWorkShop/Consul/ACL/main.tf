@@ -64,6 +64,7 @@ resource "consul_certificate_authority" "connect_ca" {
     # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault#configuration-reference
     # https://github.com/Mastercard/mangos/blob/f5d5530f43c82a959fe631811a862546c80fb366/mkosi.images/terraform/share/terraform/consul-connect.tf#L163
     # Token                    = data.vault_kv_secret_v2.secret.data["token"]
+    # https://developer.hashicorp.com/vault/docs/agent-and-proxy/autoauth/methods/approle#configuration
     AuthMethod = {
       Type = "approle"
       Params = {
@@ -73,12 +74,12 @@ resource "consul_certificate_authority" "connect_ca" {
     }
 
     RootPkiPath              = "pki_consul_root"
-    IntermediatePkiPath      = "pki_consul_int"
     LeafCertTTL              = "72h"
-    RotationPeriod           = "2160h"
-    IntermediateCertTTL      = "8760h"
-    ForceWithoutCrossSigning = true
     PrivateKeyType           = "rsa"
     PrivateKeyBits           = 2048
+    IntermediatePkiPath      = "pki_consul_int"
+    IntermediateCertTTL      = "8760h"
+    RotationPeriod           = "2160h"
+    ForceWithoutCrossSigning = true
   })
 }

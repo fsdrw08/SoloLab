@@ -211,6 +211,7 @@ policy_bindings = [
   # consul-ca
   # https://developer.hashicorp.com/consul/tutorials/operate-consul/vault-pki-consul-connect-ca
   # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault
+  # https://developer.hashicorp.com/consul/docs/secure-mesh/certificate/vault?page=connect&page=ca&page=vault#configure-vault-acl-policies
   {
     policy_name    = "consul-ca"
     policy_content = <<-EOT
