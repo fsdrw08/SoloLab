@@ -64,7 +64,7 @@ module "vyos_container" {
   workloads = [
     {
       name      = "cockpit"
-      image     = "zot.day0.sololab/cockpit/ws:361"
+      image     = "zot.day0.sololab/cockpit/ws:364"
       pull_flag = "--tls-verify=false"
       others = {
         "environment TZ value" = "Asia/Shanghai"

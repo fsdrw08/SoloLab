@@ -1,23 +1,23 @@
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260621.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260621.3.1.tar",
-        "privateRepo": "fedora/fedora-coreos:44.20260621.3.1",
+        "publicRepo": "fedora/fedora-coreos:44.20260707.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260707.3.1.tar",
+        "privateRepo": "fedora/fedora-coreos:44.20260707.3.1",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260621.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260621.3.1.tar",
+        "publicRepo": "fedora/fedora-coreos:44.20260707.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260707.3.1.tar",
         "privateRepo": "fedora/fedora-coreos:stable",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "coreos/etcd:v3.7.0",
-        "archive": "quay.io_coreos_etcd_v3.7.0.tar",
-        "privateRepo": "coreos/etcd:v3.7.0",
+        "publicRepo": "coreos/etcd:v3.7.1",
+        "archive": "quay.io_coreos_etcd_v3.7.1.tar",
+        "privateRepo": "coreos/etcd:v3.7.1",
         "description": "https://quay.io/repository/coreos/etcd?tab=tags",
     },
     {
@@ -106,9 +106,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/alloy:v1.17.1",
-        "archive": "docker.io_grafana_alloy_v1.17.1.tar",
-        "privateRepo": "grafana/alloy:v1.17.1",
+        "publicRepo": "grafana/alloy:v1.18.0",
+        "archive": "docker.io_grafana_alloy_v1.18.0.tar",
+        "privateRepo": "grafana/alloy:v1.18.0",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://github.com/grafana/alloy, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
 ]

@@ -3,12 +3,12 @@
         // https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=installation
         // https://grafana.com/docs/grafana/latest/administration/plugin-management/plugin-install/#install-a-plugin-in-air-gapped-environment
         // https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#preinstall
-        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-lokiexplore-app/release/2.0.0/grafana-lokiexplore-app-2.3.0.zip
+        // https://storage.googleapis.com/grafana-plugins-catalog/grafana-lokiexplore-app/release/2.0.0/grafana-lokiexplore-app-2.4.0.zip
         "type": "general",
         "publicParentPath": "https://storage.googleapis.com",
-        "publicChildPath": "grafana-plugins-catalog/grafana-lokiexplore-app/release/2.3.0/grafana-lokiexplore-app-2.3.0.zip",
-        "localChildPath": "bin/grafana-lokiexplore-app-2.3.0.zip",
-        "privateChildPath": "public/binaries/grafana-lokiexplore-app-2.3.0.zip",
+        "publicChildPath": "grafana-plugins-catalog/grafana-lokiexplore-app/release/2.4.0/grafana-lokiexplore-app-2.4.0.zip",
+        "localChildPath": "bin/grafana-lokiexplore-app-2.4.0.zip",
+        "privateChildPath": "public/binaries/grafana-lokiexplore-app-2.4.0.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-lokiexplore-app/?tab=changelog",
     },
     {
@@ -42,9 +42,9 @@
         // https://storage.googleapis.com/grafana-plugins-catalog/grafana-metricsdrilldown-app/release/2.0.0/grafana-metricsdrilldown-app-2.0.4.zip
         "type": "general",
         "publicParentPath": "https://storage.googleapis.com",
-        "publicChildPath": "grafana-plugins-catalog/grafana-metricsdrilldown-app/release/2.2.0/grafana-metricsdrilldown-app-2.2.0.zip",
-        "localChildPath": "bin/grafana-metricsdrilldown-app-2.2.0.zip",
-        "privateChildPath": "public/binaries/grafana-metricsdrilldown-app-2.2.0.zip",
+        "publicChildPath": "grafana-plugins-catalog/grafana-metricsdrilldown-app/release/2.3.0/grafana-metricsdrilldown-app-2.3.0.zip",
+        "localChildPath": "bin/grafana-metricsdrilldown-app-2.3.0.zip",
+        "privateChildPath": "public/binaries/grafana-metricsdrilldown-app-2.3.0.zip",
         "description": "https://grafana.com/grafana/plugins/grafana-metricsdrilldown-app/?tab=changelog",
     },
 ]
