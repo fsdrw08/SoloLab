@@ -36,7 +36,7 @@ data "vault_kv_secret_v2" "secret" {
       },
       {
         mount = "kvv2_consul"
-        name  = "token-nomad_client"
+        name  = "token-role-nomad_client"
       },
       {
         mount = "kvv2_nomad"
@@ -96,7 +96,7 @@ module "config_files" {
           key_file             = "/var/home/core/.local/etc/nomad.d/tls/client-key.pem"
           podman_socket        = "unix:///run/podman/podman.sock"
           CONSUL_HTTP_ADDR     = "127.0.0.1:8501"
-          CONSUL_HTTP_TOKEN    = data.vault_kv_secret_v2.secret["token-nomad_client"].data["token"]
+          CONSUL_HTTP_TOKEN    = data.vault_kv_secret_v2.secret["token-role-nomad_client"].data["token"]
           vault_server_address = "https://vault.service.consul:8200"
         })
       }

@@ -33,6 +33,25 @@ resource "consul_acl_auth_method" "jwt" {
 }
 
 locals {
+  acl_policies = flatten([
+    for config in var.jwt_auth_configs : [
+      for policy in config.policies : {
+        name        = policy.name
+        description = policy.description
+        datacenters = policy.datacenters
+        rules       = policy.rules
+      }
+    ]
+  ])
+  acl_roles = flatten([
+    for config in var.jwt_auth_configs : [
+      for role in config.roles : {
+        name         = role.name
+        description  = role.description
+        policy_names = role.policy_names
+      }
+    ]
+  ])
   acl_binding_rules = flatten([
     for config in var.jwt_auth_configs : [
       for binding_rule in config.binding_rules : {
@@ -45,6 +64,26 @@ locals {
       }
     ]
   ])
+}
+
+resource "consul_acl_policy" "policy" {
+  for_each = {
+    for policy in local.acl_policies : policy.name => policy
+  }
+  name        = each.value.name
+  description = each.value.description
+  datacenters = each.value.datacenters
+  rules       = each.value.rules
+}
+
+resource "consul_acl_role" "role" {
+  depends_on = [consul_acl_policy.policy]
+  for_each = {
+    for role in local.acl_roles : role.name => role
+  }
+  name        = each.value.name
+  description = each.value.description
+  policies    = each.value.policy_names
 }
 
 resource "consul_acl_binding_rule" "binding" {

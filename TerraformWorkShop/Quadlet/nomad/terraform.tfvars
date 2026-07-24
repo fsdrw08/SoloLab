@@ -54,7 +54,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2_consul"
-            name  = "token-nomad_server"
+            name  = "token-role-nomad_server"
           }
           value_sets = [
             {

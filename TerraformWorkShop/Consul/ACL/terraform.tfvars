@@ -22,7 +22,7 @@ prov_consul = {
 policies = [
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-    name        = "consul_dns"
+    name        = "policy-consul_dns"
     description = "Policy for traefik proxy consul catalog provoider to read service"
     rules       = <<-EOT
       agent_prefix "" {
@@ -37,7 +37,7 @@ policies = [
     EOT
   },
   {
-    name        = "consul_client"
+    name        = "policy-consul_client"
     description = "Policy for consul client to work with consul server"
     rules       = <<-EOT
       node_prefix "" {
@@ -56,7 +56,7 @@ policies = [
   },
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-    name        = "nomad_server"
+    name        = "policy-nomad_server"
     description = "Policy for nomad server to interact with Consul"
     rules       = <<-EOT
       agent_prefix "" {
@@ -77,7 +77,7 @@ policies = [
   },
   {
     # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-    name        = "nomad_client"
+    name        = "policy-nomad_client"
     description = "Policy for nomad client to interact with Consul"
     rules       = <<-EOT
       agent_prefix "" {
@@ -94,25 +94,7 @@ policies = [
     EOT
   },
   {
-    # https://developer.hashicorp.com/nomad/docs/integrations/consul/acl#nomad-agents
-    name        = "nomad_task"
-    description = "Policy for nomad workload(task) to interact with Consul"
-    rules       = <<-EOT
-      agent_prefix "" {
-        policy = "read"
-      }
-
-      node_prefix "" {
-        policy = "write"
-      }
-
-      service_prefix "" {
-        policy = "write"
-      }
-    EOT
-  },
-  {
-    name        = "prometheus"
+    name        = "policy-prometheus"
     description = "Policy for Prometheus to read node information"
     rules       = <<-EOT
       node_prefix "" {
@@ -129,7 +111,7 @@ policies = [
     EOT
   },
   {
-    name        = "tf_backend"
+    name        = "policy-tf_backend"
     description = "Policy for Terraform to read and write state"
     rules       = <<-EOT
       key_prefix "tfstate/" {
@@ -145,70 +127,55 @@ policies = [
 
 roles = [
   {
-    name         = "consul_dns"
+    iac_id       = "63e8c3e9"
+    name         = "role-consul_dns"
     description  = "Role to read node and service"
-    policy_names = ["consul_dns"]
+    policy_names = ["policy-consul_dns"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
   },
   {
-    name         = "consul_client"
+    iac_id       = "685da2a6"
+    name         = "role-consul_client"
     description  = "Role of consul client"
-    policy_names = ["consul_client"]
+    policy_names = ["policy-consul_client"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
   },
   {
-    name         = "nomad_server"
+    iac_id       = "11e19d4c"
+    name         = "role-nomad_server"
     description  = "Role of nomad server"
-    policy_names = ["nomad_server"]
+    policy_names = ["policy-nomad_server"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
   },
   {
-    name         = "nomad_client"
+    iac_id       = "95eaad9e"
+    name         = "role-nomad_client"
     description  = "Role of nomad client"
-    policy_names = ["nomad_client"]
+    policy_names = ["policy-nomad_client"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
   },
   {
-    name         = "nomad_task"
-    description  = "Role of nomad tasks"
-    policy_names = ["nomad_task"]
-  },
-  # https://developer.hashicorp.com/nomad/tutorials/integrate-consul/consul-acl#create-a-consul-acl-role-for-nomad-tasks
-  {
-    name         = "nomad-tasks-default"
-    description  = "Role of nomad task workload identity in default namespace"
-    policy_names = ["nomad_task"]
-  },
-  # {
-  #   name         = "consul_admin"
-  #   description  = "Role of consul admin"
-  #   policy_names = ["global-management"]
-  # },
-  # {
-  #   name         = "consul_user"
-  #   description  = "Role of consul user"
-  #   policy_names = ["builtin/global-read-only"]
-  # },
-  {
-    name         = "prometheus"
+    iac_id       = "1f88bc0c"
+    name         = "role-prometheus"
     description  = "Role of Prometheus"
-    policy_names = ["prometheus"]
+    policy_names = ["policy-prometheus"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }
   },
   {
-    name         = "tf_backend"
+    iac_id       = "a65dab9e"
+    name         = "role-tf_backend"
     description  = "Role of Terraform"
-    policy_names = ["tf_backend"]
+    policy_names = ["policy-tf_backend"]
     token_store = {
       vault_kvv2_path = "kvv2_consul"
     }

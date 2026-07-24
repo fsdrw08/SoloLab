@@ -39,11 +39,11 @@ data "vault_kv_secret_v2" "secret" {
       },
       {
         mount = "kvv2_consul"
-        name  = "token-consul_dns"
+        name  = "token-role-consul_dns"
       },
       {
         mount = "kvv2_consul"
-        name  = "token-consul_client"
+        name  = "token-role-consul_client"
       },
       {
         mount = "kvv2_consul"
@@ -77,8 +77,8 @@ module "config_map" {
         basename = "client.hcl"
         content = templatefile("./attachments/client.hcl", {
           # consul_token_init    = data.vault_kv_secret_v2.secret["token-init_management"].data["token"]
-          consul_token_default = data.vault_kv_secret_v2.secret["token-consul_dns"].data["token"]
-          consul_token_client  = data.vault_kv_secret_v2.secret["token-consul_client"].data["token"]
+          consul_token_default = data.vault_kv_secret_v2.secret["token-role-consul_dns"].data["token"]
+          consul_token_client  = data.vault_kv_secret_v2.secret["token-role-consul_client"].data["token"]
           consul_encrypt_key   = data.vault_kv_secret_v2.secret["key-gossip_encryption"].data["key"]
           tls_ca_file          = "/consul/config/certs/ca.crt"
           # tls_cert_file        = "/consul/config/certs/server.crt"

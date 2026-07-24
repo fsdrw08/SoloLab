@@ -145,7 +145,7 @@ butane = {
       {
         vault_kvv2 = {
           mount = "kvv2_consul"
-          name  = "token-consul_client"
+          name  = "token-role-consul_client"
         }
         value_sets = [
           {
@@ -169,7 +169,7 @@ butane = {
       {
         vault_kvv2 = {
           mount = "kvv2_consul"
-          name  = "token-nomad_client"
+          name  = "token-role-nomad_client"
         }
         value_sets = [
           {

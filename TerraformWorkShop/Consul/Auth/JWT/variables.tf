@@ -42,5 +42,16 @@ variable "jwt_auth_configs" {
       description = optional(string, null)
       selector    = string
     }))
+    roles = list(object({
+      name         = string
+      description  = optional(string, null)
+      policy_names = list(string)
+    }))
+    policies = optional(list(object({
+      name        = string
+      datacenters = optional(list(string), null)
+      description = optional(string, null)
+      rules       = string
+    })), [])
   }))
 }

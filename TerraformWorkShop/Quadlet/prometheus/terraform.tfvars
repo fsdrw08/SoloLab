@@ -58,7 +58,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2_consul"
-            name  = "token-prometheus"
+            name  = "token-role-prometheus"
           }
           value_sets = [
             {
@@ -88,7 +88,7 @@ podman_kubes = [
         {
           vault_kvv2 = {
             mount = "kvv2_consul"
-            name  = "token-consul_dns"
+            name  = "token-role-consul_dns"
           }
           value_sets = [
             {

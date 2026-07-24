@@ -121,7 +121,7 @@ butane = {
       consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
-          name  = "token-consul_client"
+          name  = "token-role-consul_client"
           key   = "token"
         }
       }
@@ -135,7 +135,7 @@ butane = {
       nomad_consul_acl_token = {
         vault_kvv2 = {
           mount = "kvv2_consul"
-          name  = "token-nomad_client"
+          name  = "token-role-nomad_client"
           key   = "token"
         }
       }

@@ -40,6 +40,7 @@ variable "policies" {
 
 variable "roles" {
   type = list(object({
+    iac_id       = string
     name         = string
     description  = optional(string, null)
     policy_names = list(string)

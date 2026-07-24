@@ -13,7 +13,7 @@ $vaultToken = $(curl.exe -k -s --request POST `
     --data "{`"password`": `"$($credential.GetNetworkCredential().Password)`"}" `
     $vaultLoginUri | jq.exe .auth.client_token).Replace('"', '')
 # get consul kv token from kvv2 secret backend
-$vaultConsulSecretUri = New-Object System.Uri($vaultBaseUri, "/v1/kvv2_consul/data/token-tf_backend")
+$vaultConsulSecretUri = New-Object System.Uri($vaultBaseUri, "/v1/kvv2_consul/data/token-role-tf_backend")
 $env:CONSUL_HTTP_TOKEN = $(curl.exe -k -s -X GET `
     -H "X-Vault-Token: $vaultToken" `
     $vaultConsulSecretUri.AbsoluteUri | jq.exe .data.data.token ).Replace('"', '')

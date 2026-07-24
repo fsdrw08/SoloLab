@@ -10,7 +10,7 @@ data "vault_kv_secret_v2" "encrypt" {
 
 data "vault_kv_secret_v2" "token" {
   mount = "kvv2_consul"
-  name  = "token-consul_client"
+  name  = "token-role-consul_client"
 }
 
 module "config_map" {

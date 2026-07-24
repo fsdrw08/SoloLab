@@ -11,7 +11,7 @@ resource "consul_acl_policy" "policy" {
 resource "consul_acl_role" "role" {
   depends_on = [consul_acl_policy.policy]
   for_each = {
-    for role in var.roles : role.name => role
+    for role in var.roles : role.iac_id => role
   }
   name        = each.value.name
   description = each.value.description
@@ -20,15 +20,15 @@ resource "consul_acl_role" "role" {
 
 resource "consul_acl_token" "token" {
   for_each = {
-    for role in var.roles : role.name => role
+    for role in var.roles : role.iac_id => role
     if role.token_store != null
   }
-  roles = [consul_acl_role.role[each.value.name].name]
+  roles = [consul_acl_role.role[each.value.iac_id].name]
 }
 
 data "consul_acl_token_secret_id" "secret_id" {
   for_each = {
-    for role in var.roles : role.name => role
+    for role in var.roles : role.iac_id => role
     if role.token_store != null
   }
   accessor_id = consul_acl_token.token[each.key].id
@@ -36,7 +36,7 @@ data "consul_acl_token_secret_id" "secret_id" {
 
 resource "vault_kv_secret_v2" "secret" {
   for_each = {
-    for role in var.roles : role.name => role
+    for role in var.roles : role.iac_id => role
     if role.token_store != null && role.token_store.vault_kvv2_path != null
   }
   mount               = each.value.token_store.vault_kvv2_path
