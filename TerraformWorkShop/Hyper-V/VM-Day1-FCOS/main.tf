@@ -1,20 +1,18 @@
 # aggregate tfstate list
 locals {
-  tfstate_list = flatten([
-    for podman_kube in var.podman_kubes : [
-      for value_refer in podman_kube.helm.value_refers == null ? [] : podman_kube.helm.value_refers : {
-        name    = value_refer.tfstate.name
-        backend = value_refer.tfstate.backend
-      }
-      if value_refer.tfstate != null
-    ]
+  tls_tfstate = flatten([
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
+      backend = value_refer.tfstate.backend
+      name    = value_refer.tfstate.name
+    }
+    if value_refer.tfstate != null
   ])
 }
 
 # load list of tfstate
 data "terraform_remote_state" "tfstate" {
-  for_each = local.tfstate_list == null ? null : {
-    for secret_tfstate in setunion(local.tfstate_list) : secret_tfstate.name => secret_tfstate
+  for_each = local.tls_tfstate == null ? null : {
+    for secret_tfstate in setunion(local.tls_tfstate) : secret_tfstate.name => secret_tfstate
   }
   backend = each.value.backend.type
   config  = each.value.backend.config
