@@ -69,28 +69,25 @@ butane = {
       # general_dns              = "192.168.255.1;192.168.255.10"
       # domain                   = "sololab."
       # domain_dns               = "192.168.255.10"
-      packages                 = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge pcp-zeroconf"
-      password_hash_1000       = "$y$j9T$cDLwsV9ODTV31Dt4SuVGa.$FU0eRT9jawPhIV3IV24W7obZ3PaJuBCVp7C9upDCcgD"
-      ssh_authorized_keys_1000 = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
-      password_hash_1001       = "$y$j9T$I4IXP5reKRLKrkwuNjq071$yHlJulSZGzmyppGbdWHyFHw/D8Gl247J2J8P43UnQWA"
-      ssh_authorized_keys_1001 = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
-      root_ca_url              = "http://dufs.day1.sololab/public/certs/sololab_root.crt"
-      fcos_image_mirror        = "zot.day1.sololab/fedora/fedora-coreos"
-      fcos_rebase_mirror       = "ostree-unverified-registry:zot.day1.sololab/fedora/fedora-coreos:stable"
-      custom_root_ca_path      = "/etc/pki/ca-trust/source/anchors"
-      custom_bin_dir           = "/opt/bin"
+      packages            = "cockpit-system cockpit-ostree cockpit-podman cockpit-networkmanager cockpit-bridge pcp-zeroconf"
+      root_ca_url         = "http://dufs.day1.sololab/public/certs/sololab_root.crt"
+      fcos_image_mirror   = "zot.day1.sololab/fedora/fedora-coreos"
+      fcos_rebase_mirror  = "ostree-unverified-registry:zot.day1.sololab/fedora/fedora-coreos:stable"
+      custom_root_ca_path = "/etc/pki/ca-trust/source/anchors"
+      custom_bin_dir      = "/opt/bin"
       # consul client
-      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
       consul_install_url  = "http://dufs.day1.sololab/public/binaries/consul_install.sh"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
       consul_version      = "2.0.2"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/mnt/data/consul"
       # nomad client
-      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.3_linux_amd64.zip"
       nomad_install_url                   = "http://dufs.day1.sololab/public/binaries/nomad_install.sh"
-      nomad_version                       = "2.0.3"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.4_linux_amd64.zip"
+      nomad_version                       = "2.0.4"
       nomad_server_fqdn                   = "nomad.service.consul"
+      nomad_podman_driver_install_url     = "http://dufs.day1.sololab/public/binaries/nomad_driver_podman_install.sh"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip"
       nomad_podman_driver_version         = "0.6.5"
       nomad_client_cert_download_url      = "http://dufs.day1.sololab/private/certs/client.global.nomad.crt"
@@ -111,6 +108,34 @@ butane = {
       # }
     ]
     value_refers = {
+      password_hash_1000 = {
+        vault_kvv2 = {
+          mount = "kvv2_others"
+          name  = "vm-day4"
+          key   = "root_password_hash"
+        }
+      }
+      ssh_authorized_key_1000 = {
+        vault_kvv2 = {
+          mount = "kvv2_others"
+          name  = "vm-day4"
+          key   = "root_ssh_authorized_key"
+        }
+      }
+      password_hash_1001 = {
+        vault_kvv2 = {
+          mount = "kvv2_others"
+          name  = "vm-day4"
+          key   = "rootless_password_hash"
+        }
+      }
+      ssh_authorized_key_1001 = {
+        vault_kvv2 = {
+          mount = "kvv2_others"
+          name  = "vm-day4"
+          key   = "rootless_ssh_authorized_key"
+        }
+      }
       consul_ca_content = {
         vault_kvv2 = {
           mount = "kvv2_certs"

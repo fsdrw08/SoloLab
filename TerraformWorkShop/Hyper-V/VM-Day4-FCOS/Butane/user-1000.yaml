@@ -14,7 +14,7 @@ passwd:
       # https://docs.fedoraproject.org/en-US/fedora-coreos/authentication/#_using_password_authentication
       password_hash: ${password_hash_1000}
       ssh_authorized_keys:
-        - "${ssh_authorized_keys_1000}"
+        - "${ssh_authorized_key_1000}"
 storage:
   files:
     # core

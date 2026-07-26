@@ -23,6 +23,10 @@ storage:
       mode: 0644
       contents:
         source: ${nomad_download_url}
+    - path: ${custom_bin_dir}/nomad_driver_podman_install.sh
+      mode: 0755
+      contents:
+        source: ${nomad_podman_driver_install_url}
     # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#installation
     - path: ${custom_bin_dir}/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
       mode: 0644
