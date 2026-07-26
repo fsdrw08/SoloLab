@@ -23,7 +23,7 @@ job "juicefs-node" {
 
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
-      # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
+      # https://juicefs.com/docs/csi/csi-in-nomad/
       config {
         image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.32.0"
         args = [

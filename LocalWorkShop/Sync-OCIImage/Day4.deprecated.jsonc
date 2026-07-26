@@ -8,13 +8,6 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "sonatype/nexus3:3.91.1-alpine",
-        "archive": "docker.io_sonatype-nexus3_3.91.1-alpine.tar",
-        "privateRepo": "sonatype/nexus3:3.91.1-alpine",
-        "description": "https://hub.docker.com/r/sonatype/nexus3",
-    },
-    {
-        "publicRegistry": "docker.io",
         "publicRepo": "jenkins/jenkins:2.555.1-lts",
         "archive": "docker.io_jenkins_jenkins_2.555.1-lts.tar",
         "privateRepo": "jenkins/jenkins:2.555.1-lts",

@@ -86,7 +86,7 @@ job "atlantis" {
           chown -R 100:1000 /home/atlantis/.atlantis/bin;
           [ -f /home/atlantis/.atlantis/bin/gomplate ] && rm /home/atlantis/.atlantis/bin/gomplate;
           curl -s -k \
-          --request GET http://dufs.day1.sololab/public/binaries/gomplate_linux-amd64_5.1.0 \
+          --request GET http://dufs.day1.sololab/public/binaries/gomplate_linux-amd64_5.2.0 \
           --output /home/atlantis/.atlantis/bin/gomplate;
           chmod 0755 /home/atlantis/.atlantis/bin/gomplate
           EOF
@@ -158,8 +158,8 @@ job "atlantis" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/runatlantis/atlantis/blob/v0.44.0/Dockerfile
-        image = "zot.day1.sololab/runatlantis/atlantis:v0.44.0"
+        # https://github.com/runatlantis/atlantis/blob/v0.46.0/Dockerfile
+        image = "zot.day1.sololab/runatlantis/atlantis:v0.46.0"
         labels = {
           "traefik.enable"                                     = "true"
           "traefik.http.routers.atlantis-redirect.entrypoints" = "web"
