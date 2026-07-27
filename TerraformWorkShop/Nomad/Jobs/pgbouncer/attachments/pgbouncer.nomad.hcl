@@ -60,7 +60,9 @@ job "pgbouncer" {
         # https://github.com/cloudnative-pg/pgbouncer-containers/blob/main/entrypoint.sh
         image = "zot.day1.sololab/cloudnative-pg/pgbouncer:1.25.2"
 
-        network_mode = "host"
+        ports = [
+          "connection",
+        ]
 
         entrypoint = "/usr/bin/pgbouncer"
         command    = "/local/pgbouncer.ini"
