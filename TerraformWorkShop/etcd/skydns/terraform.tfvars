@@ -349,6 +349,17 @@ dns_records = [
     }
   },
   {
+    hostname = "nexus.day4.sololab"
+    value = {
+      string_map = {
+        host = "day2.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
     hostname = "atlantis.day4.sololab"
     value = {
       string_map = {

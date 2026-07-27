@@ -379,14 +379,14 @@ zones = [
       #     "192.168.255.2"
       #   ]
       # },
-      # {
-      #   fqdn = "nexus.day4.sololab."
-      #   type = "A"
-      #   ttl  = 60
-      #   results = [
-      #     "192.168.255.2"
-      #   ]
-      # },
+      {
+        fqdn = "nexus.day4.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
     ]
   }
 ]

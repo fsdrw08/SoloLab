@@ -237,21 +237,21 @@ job "nexus" {
       }
       # https://github.com/nexus3-org/nexus3-docker/tree/v1.10.0-1?tab=readme-ov-file#data-persistence
       volume_mount {
-        volume        = "nexus"
+        volume        = "nexus-data"
         destination   = "/nexus-data"
         selinux_label = "Z"
       }
     }
     volume "nexus-cacerts" {
       type            = "csi"
-      source          = "nexus-cacerts"
+      source          = "csi-nexus-cacerts"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
     }
-    volume "nexus" {
+    volume "nexus-data" {
       type            = "csi"
-      source          = "nexus"
+      source          = "csi-nexus-data"
       read_only       = false
       attachment_mode = "file-system"
       access_mode     = "single-node-writer"
