@@ -22,6 +22,7 @@ job "gitea-db" {
 
         # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
         check {
+          # "driver" address mode can only config in service which under task
           address_mode   = "driver"
           type           = "tcp"
           port           = 5432
