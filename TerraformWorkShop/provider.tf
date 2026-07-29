@@ -24,10 +24,10 @@ terraform {
       source  = "hashicorp/tfe"
       version = ">= 0.78.0"
     }
-    lynx = {
-      source  = "Clivern/lynx"
-      version = ">= 0.3.0"
-    }
+    # lynx = {
+    #   source  = "Clivern/lynx"
+    #   version = ">= 0.3.0"
+    # }
     powerdns = {
       source  = "pyama86/powerdns"
       version = ">= 1.5.1"
@@ -99,6 +99,10 @@ terraform {
     nexus = {
       source  = "datadrivers/nexus"
       version = ">= 2.8.0"
+    }
+    sonatyperepo = {
+      source  = "sonatype-nexus-community/sonatyperepo"
+      version = ">= 1.13.0"
     }
     gitea = {
       source  = "go-gitea/gitea"

@@ -1,17 +1,28 @@
-variable "prov_nexus" {
-  type = object({
-    insecure = bool
-    url      = string
-    username = string
-    password = string
-  })
-}
-
 variable "prov_vault" {
   type = object({
     address         = string
-    token           = string
     skip_tls_verify = bool
+    token           = optional(string, null)
+  })
+}
+
+variable "prov_sonatyperepo" {
+  type = object({
+    url = string
+    credential = optional(
+      map(object({
+        plaintext = optional(string, null)
+        vault_kvv2 = optional(
+          object({
+            mount = string
+            name  = string
+            key   = string
+          }),
+          null
+        )
+      })),
+      null
+    )
   })
 }
 
@@ -19,9 +30,9 @@ variable "blob_store_s3" {
   type = object({
     name = string
     bucket = object({
-      name       = string
-      region     = string
-      expiration = number
+      name   = string
+      prefix = optional(string, null)
+      region = string
     })
     advanced_bucket_connection = optional(
       object({
@@ -32,23 +43,19 @@ variable "blob_store_s3" {
       }),
       null
     )
-    bucket_security_value_refers = list(object({
-      value_sets = list(
-        object({
-          name          = string
-          value_ref_key = string
-        })
-      )
+    bucket_security = map(object({
+      plaintext = optional(string, null)
       vault_kvv2 = optional(
         object({
           mount = string
           name  = string
+          key   = string
         }),
         null
       )
     }))
     soft_quota = optional(object({
-      limit = number
+      limit = optional(number, null)
       type  = string
     }), null)
   })

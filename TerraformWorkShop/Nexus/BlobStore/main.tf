@@ -1,53 +1,35 @@
-locals {
-  secrets_vault_kvv2 = flatten([
-    flatten([
-      for value_refer in var.blob_store_s3.bucket_security_value_refers == null ? [] : var.blob_store_s3.bucket_security_value_refers : {
-        mount = value_refer.vault_kvv2.mount
-        name  = value_refer.vault_kvv2.name
-      }
-      if value_refer.vault_kvv2 != null
-    ])
-  ])
-}
-
 data "vault_kv_secret_v2" "secret" {
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secret_vault_kvv2 in local.secrets_vault_kvv2 : secret_vault_kvv2.name => secret_vault_kvv2
+  for_each = {
+    for key in keys(var.blob_store_s3.bucket_security) : key => var.blob_store_s3.bucket_security[key]
+    if var.blob_store_s3.bucket_security[key].vault_kvv2 != null
   }
-  mount = each.value.mount
-  name  = each.value.name
+  mount = each.value.vault_kvv2.mount
+  name  = each.value.vault_kvv2.name
 }
 
 locals {
-  s3_credential_list = flatten([
-    for value_refer in var.blob_store_s3.bucket_security_value_refers : [
-      for value_set in value_refer.value_sets : {
-        name  = value_set.name
-        value = data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-      }
-    ]
-  ])
-  s3_credential = {
-    for item in local.s3_credential_list : item.name => item.value
+  bucket_security = {
+    access_key_id     = contains(keys(var.blob_store_s3.bucket_security), "access_key_id") ? var.blob_store_s3.bucket_security["access_key_id"].plaintext != null ? var.blob_store_s3.bucket_security["access_key_id"].plaintext : var.blob_store_s3.bucket_security["access_key_id"].vault_kvv2 == null ? null : data.vault_kv_secret_v2.secret["access_key_id"].data[var.blob_store_s3.bucket_security["access_key_id"].vault_kvv2.key] : null
+    secret_access_key = contains(keys(var.blob_store_s3.bucket_security), "secret_access_key") ? var.blob_store_s3.bucket_security["secret_access_key"].plaintext != null ? var.blob_store_s3.bucket_security["secret_access_key"].plaintext : var.blob_store_s3.bucket_security["secret_access_key"].vault_kvv2 == null ? null : data.vault_kv_secret_v2.secret["secret_access_key"].data[var.blob_store_s3.bucket_security["secret_access_key"].vault_kvv2.key] : null
   }
 }
 
-resource "nexus_blobstore_s3" "s3" {
+resource "sonatyperepo_blob_store_s3" "s3" {
   name = var.blob_store_s3.name
 
-  bucket_configuration {
-    bucket {
-      name       = var.blob_store_s3.bucket.name
-      region     = var.blob_store_s3.bucket.region
-      expiration = var.blob_store_s3.bucket.expiration
+  bucket_configuration = {
+    bucket = {
+      name   = var.blob_store_s3.bucket.name
+      prefix = var.blob_store_s3.bucket.prefix
+      region = var.blob_store_s3.bucket.region
     }
 
-    bucket_security {
-      access_key_id     = lookup(local.s3_credential, "access_key_id", null)
-      secret_access_key = lookup(local.s3_credential, "secret_access_key", null)
+    bucket_security = {
+      access_key_id     = local.bucket_security.access_key_id
+      secret_access_key = local.bucket_security.secret_access_key
     }
 
-    advanced_bucket_connection {
+    advanced_bucket_connection = {
       endpoint                 = var.blob_store_s3.advanced_bucket_connection.endpoint
       max_connection_pool_size = var.blob_store_s3.advanced_bucket_connection.max_connection_pool_size
       signer_type              = var.blob_store_s3.advanced_bucket_connection.signer_type
@@ -55,11 +37,5 @@ resource "nexus_blobstore_s3" "s3" {
     }
   }
 
-  dynamic "soft_quota" {
-    for_each = var.blob_store_s3.soft_quota == null ? [] : [var.blob_store_s3.soft_quota]
-    content {
-      limit = soft_quota.limit
-      type  = soft_quota.type
-    }
-  }
+  soft_quota = var.blob_store_s3.soft_quota
 }
