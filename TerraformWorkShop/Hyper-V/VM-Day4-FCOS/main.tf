@@ -164,6 +164,9 @@ resource "local_file" "ignition" {
   count    = var.vm.count
   content  = data.ct_config.ignition[count.index].rendered
   filename = "ignition${count.index + 1}.json"
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # copy ignition file to remote
@@ -250,6 +253,9 @@ resource "null_resource" "kvpctl" {
     EOT
     ]
   }
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "null_resource" "kvpctl_multi" {
@@ -287,5 +293,8 @@ resource "null_resource" "kvpctl_multi" {
       Powershell -Command "1..${var.vm.count} | ForEach-Object { $ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath ${var.vm.base_name}-$_\ignition$_.json); kvpctl.exe ${var.vm.base_name}-$_ add-ign $ignitionFile}"
     EOT
     ]
+  }
+  lifecycle {
+    ignore_changes = all
   }
 }

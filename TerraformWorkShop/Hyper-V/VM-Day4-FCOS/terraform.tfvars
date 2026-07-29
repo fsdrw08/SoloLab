@@ -41,8 +41,8 @@ vm = {
   cpu_core           = 4
   memory = {
     dynamic       = true
-    startup_bytes = 3070230528
-    maximum_bytes = 3070230528
+    startup_bytes = 4093640704
+    maximum_bytes = 4093640704
     minimum_bytes = 1023410176
   }
 }
