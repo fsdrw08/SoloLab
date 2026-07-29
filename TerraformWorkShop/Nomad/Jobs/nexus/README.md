@@ -38,6 +38,18 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 ```
 
 #### Security
+- Ensure nexus postgresql credential `pgsql_admin_password`, `pgsql_user_name`, `pgsql_user_password` is in vault is ready
+[TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars](../../../../TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars)
+```powershell
+$credential = Get-Credential -Message "credential to login vault"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Vault/Secrets/Others/"
+terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
+```
+
 - Ensure Nexus related LDAP group entity in lldap.day1.sololab 
 [TerraformWorkShop/LDAP/lldap/terraform.tfvars](../../../../TerraformWorkShop/LDAP/lldap/terraform.tfvars)
 ```powershell
@@ -63,6 +75,9 @@ terraform apply --auto-approve
 ### Deploy nexus nomad job
 [TerraformWorkShop/Nomad/Jobs/nexus/](../../TerraformWorkShop/Nomad/Jobs/nexus/)
 ```powershell
+$credential = Get-Credential -Message "credential to login vault" -UserName "000"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
 $env:CONSUL_HTTP_TOKEN = $(vault kv get -format=json -mount=kvv2_consul token-role-tf_backend | jq.exe .data.data.token).Replace('"', '')
 $env:NOMAD_TOKEN = $(vault kv get -format=json -mount=kvv2_nomad token-management | jq.exe .data.data.token).Replace('"', '')
 
@@ -71,4 +86,39 @@ $childPath="TerraformWorkShop/Nomad/Jobs/nexus/"
 Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
 sudo pwsh.exe -c "[System.Environment]::SetEnvironmentVariable('CONSUL_HTTP_TOKEN',`"$env:CONSUL_HTTP_TOKEN`"); terraform init"; 
 terraform apply -auto-approve
+```
+
+### To cleanup nexus juicefs volume:
+```powershell
+# check volume uuid
+$volumeName="csi-nexus-data"
+etcdctl --insecure-skip-tls-verify --endpoints=https://etcd-0.day1.sololab:2379 --user=root:P@ssw0rd get /juicefs/$volumeName/ --prefix=true
+$uuid=read-host "$volumeName volume uuid"
+
+# get root ca cert path in this repo
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/TLS/RootCA/root.crt"
+$rootCaCertPath=Join-Path -Path $repoDir -ChildPath $childPath
+# delete juicefs volume meta data in etcd
+juicefs destroy etcd://juicefs:juicefs@etcd-0.day1.sololab:443/juicefs/$volumeName/_?cacert=$($rootCaCertPath) $uuid
+
+# delete juicefs volume chunk data in dufs
+$credential="admin:admin"
+curl.exe -X DELETE -k https://dufs.day1.sololab/webdav/$volumeName/ --user $credential
+
+
+$volumeName="csi-nexus-cacerts"
+etcdctl --insecure-skip-tls-verify --endpoints=https://etcd-0.day1.sololab:2379 --user=root:P@ssw0rd get /juicefs/$volumeName/ --prefix=true
+$uuid=read-host "$volumeName volume uuid"
+
+# get root ca cert path in this repo
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/TLS/RootCA/root.crt"
+$rootCaCertPath=Join-Path -Path $repoDir -ChildPath $childPath
+# delete juicefs volume meta data in etcd
+juicefs destroy etcd://juicefs:juicefs@etcd-0.day1.sololab:443/juicefs/$volumeName/_?cacert=$($rootCaCertPath) $uuid
+
+# delete juicefs volume chunk data in dufs
+$credential="admin:admin"
+curl.exe -X DELETE -k https://dufs.day1.sololab/webdav/$volumeName/ --user $credential
 ```

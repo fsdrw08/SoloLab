@@ -96,6 +96,17 @@ secrets = [
   },
   {
     mount              = "kvv2_others"
+    name               = "app-nexus"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "nexus"
+      "admin_username"  = "admin"
+      "admin_password"  = "P@ssw0rd"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
     name               = "app-atlantis"
     generate_passwords = ["gitea_webhook_secret"]
     content = {

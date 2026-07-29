@@ -41,7 +41,7 @@ csi_volumes = [
       # (1 redis instance have 16 logical databases) for 1 file system
       # https://juicefs.com/docs/community/databases_for_metadata/#etcd
       # consider use etcd as metadata engine instead
-      metaurl = "etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/nexus-cacerts/_?cacert=/secrets/tls/ca.crt"
+      metaurl = "etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/csi-nexus-cacerts/_?cacert=/secrets/tls/ca.crt"
       # https://juicefs.com/docs/community/reference/how_to_set_up_object_storage/#other-options
       bucket     = "https://dufs.day1.sololab/webdav/?tls-insecure-skip-verify=true"
       storage    = "webdav"
@@ -65,7 +65,7 @@ csi_volumes = [
       # (1 redis instance have 16 logical databases) for 1 file system
       # https://juicefs.com/docs/community/databases_for_metadata/#etcd
       # consider use etcd as metadata engine instead
-      metaurl = "etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/nexus-data/_?cacert=/secrets/tls/ca.crt"
+      metaurl = "etcd://juicefs:juicefs@etcd-0.day1.sololab:2379/juicefs/csi-nexus-data/_?cacert=/secrets/tls/ca.crt"
       # https://juicefs.com/docs/community/reference/how_to_set_up_object_storage/#other-options
       bucket     = "https://dufs.day1.sololab/webdav/?tls-insecure-skip-verify=true"
       storage    = "webdav"

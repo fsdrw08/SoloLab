@@ -44,7 +44,7 @@ job "nexus-db" {
           dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=nexus auth_user=pgbouncer"
           # meta data to render pgweb config with consul template
           dbUser        = "nexus"
-          pgBouncerHost = "pgbouncer.service.consul"
+          pgBouncerHost = "day3.pgbouncer.service.consul"
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:
@@ -164,7 +164,7 @@ job "nexus-db" {
         # Empty lines are also ignored
         POSTGRESQL_USER={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_name}}{{end}}
         POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_password}}{{end}}
-        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_pgsql/data/nexus"}}{{.Data.data.admin_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_admin_password}}{{end}}
         EOH
 
         destination = "secrets/file.env"

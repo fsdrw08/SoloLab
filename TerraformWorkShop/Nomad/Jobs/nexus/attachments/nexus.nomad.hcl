@@ -46,6 +46,12 @@ job "nexus" {
           "keytool -import -noprompt -trustcacerts -alias sololab -file /usr/local/share/ca-certificates/sololab.crt -keystore /etc/ssl/certs/java/cacerts -storepass changeit && cp /etc/ssl/certs/java/cacerts /mnt/etc/ssl/certs/java/cacerts",
         ]
       }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
 
       template {
         data        = <<-EOH
@@ -75,6 +81,12 @@ job "nexus" {
           "${URL}",
         ]
       }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
       template {
         # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html
         data = <<-EOH
@@ -103,6 +115,12 @@ job "nexus" {
           "lldap.day1.sololab:636",
         ]
       }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
     }
     task "wait4x-minio" {
       lifecycle {
@@ -121,6 +139,12 @@ job "nexus" {
           "--expect-status-code",
           "200",
         ]
+      }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
       }
     }
     task "nexus" {
@@ -205,6 +229,9 @@ job "nexus" {
       env {
         TZ                      = "Asia/Shanghai"
         INSTALL4J_ADD_VM_PARAMS = "-Xms300m -Xmx700m -XX:MaxDirectMemorySize=700m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+        # https://help.sonatype.com/en/securing-nexus-repository-manager.html#url-validation-and-private-network-access
+        # didnt work
+        NEXUS_PROXY_PRIVATENETWORKS_ALLOWEDDOMAINS = "sololab,consul"
       }
 
       resources {
@@ -220,7 +247,7 @@ job "nexus" {
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://pgbouncer.service.consul:6432/nexus??useSSL=true&sslMode=require
+        NEXUS_DATASTORE_NEXUS_JDBCURL=jdbc:postgresql://day3.pgbouncer.service.consul:6432/nexus??useSSL=true&sslMode=require
         NEXUS_DATASTORE_NEXUS_USERNAME={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_name}}{{end}}
         NEXUS_DATASTORE_NEXUS_PASSWORD={{with secret "kvv2_others/data/app-nexus"}}{{.Data.data.pgsql_user_password}}{{end}}
         EOH
