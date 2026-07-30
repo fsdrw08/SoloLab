@@ -8,16 +8,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "gitea/gitea:1.27.0-rootless",
-        "archive": "docker.io_gitea-gitea_1.27.0-rootless.tar",
-        "privateRepo": "gitea/gitea:1.27.0-rootless",
+        "publicRepo": "gitea/gitea:1.27.1-rootless",
+        "archive": "docker.io_gitea-gitea_1.27.1-rootless.tar",
+        "privateRepo": "gitea/gitea:1.27.1-rootless",
         "description": "https://hub.docker.com/r/gitea/gitea, https://github.com/go-gitea/gitea/releases",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "gitea/runner:2.2.0",
-        "archive": "docker.io_gitea_runner_2.2.0.tar",
-        "privateRepo": "gitea/runner:2.2.0",
+        "publicRepo": "gitea/runner:2.3.0",
+        "archive": "docker.io_gitea_runner_2.3.0.tar",
+        "privateRepo": "gitea/runner:2.3.0",
         "description": "https://hub.docker.com/r/gitea/runner, https://github.com/go-gitea/gitea/releases",
     },
     {
@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "sonatype/nexus3:3.94.0-alpine",
-        "archive": "docker.io_sonatype-nexus3_3.94.0-alpine.tar",
-        "privateRepo": "sonatype/nexus3:3.94.0-alpine",
+        "publicRepo": "sonatype/nexus3:3.94.1-alpine",
+        "archive": "docker.io_sonatype-nexus3_3.94.1-alpine.tar",
+        "privateRepo": "sonatype/nexus3:3.94.1-alpine",
         "description": "https://hub.docker.com/r/sonatype/nexus3",
     },
     {

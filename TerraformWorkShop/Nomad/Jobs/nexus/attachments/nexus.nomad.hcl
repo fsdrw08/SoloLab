@@ -36,7 +36,7 @@ job "nexus" {
       driver = "podman"
       config {
         # https://github.com/sonatype/docker-nexus3/blob/b623312ce82a74f877dcaac5b4989b89cd11ecdd/Dockerfile.alpine.java21
-        image = "zot.day1.sololab/sonatype/nexus3:3.94.0-alpine"
+        image = "zot.day1.sololab/sonatype/nexus3:3.94.1-alpine"
         volumes = [
           "secrets/sololab.crt:/usr/local/share/ca-certificates/sololab.crt:ro",
         ]
@@ -201,7 +201,7 @@ job "nexus" {
       driver = "podman"
       config {
         # https://github.com/sonatype/docker-nexus3/blob/b623312ce82a74f877dcaac5b4989b89cd11ecdd/Dockerfile.alpine.java21
-        image = "zot.day1.sololab/sonatype/nexus3:3.94.0-alpine"
+        image = "zot.day1.sololab/sonatype/nexus3:3.94.1-alpine"
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.nexus-redirect.entrypoints" = "web"

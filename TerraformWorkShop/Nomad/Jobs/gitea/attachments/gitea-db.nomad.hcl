@@ -45,7 +45,7 @@ job "gitea-db" {
           dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=gitea auth_user=pgbouncer"
           # meta data to render pgweb config with consul template
           dbUser        = "gitea"
-          pgBouncerHost = "pgbouncer.service.consul"
+          pgBouncerHost = "day3.pgbouncer.service.consul"
           # meta data for Prometheus consul_sd_config:
           # this postgresql server hosting behind pgbouncer, so we need to tell 
           # prometheus to scrap metrics from postgres exporter with multi target pattern:

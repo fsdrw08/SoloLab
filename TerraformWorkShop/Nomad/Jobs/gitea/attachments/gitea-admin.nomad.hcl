@@ -52,7 +52,7 @@ job "gitea-admin" {
     task "gitea-config" {
       driver = "podman"
       config {
-        image   = "zot.day1.sololab/gitea/gitea:1.27.0-rootless"
+        image   = "zot.day1.sololab/gitea/gitea:1.27.1-rootless"
         command = "/bin/bash"
         args    = ["/tmp/gitea-admin.sh"]
         volumes = [

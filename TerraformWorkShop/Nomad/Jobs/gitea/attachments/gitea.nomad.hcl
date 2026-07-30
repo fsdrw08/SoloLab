@@ -31,6 +31,13 @@ job "gitea" {
           "${URL}",
         ]
       }
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 100
+        # Specifies the memory required in MB
+        memory = 50
+      }
+
       template {
         # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html
         data = <<-EOH
@@ -44,12 +51,6 @@ job "gitea" {
         env         = true
       }
       vault {}
-      resources {
-        # Specifies the CPU required to run this task in MHz
-        cpu = 100
-        # Specifies the memory required in MB
-        memory = 50
-      }
     }
     task "wait4x-redis" {
       lifecycle {
@@ -159,8 +160,8 @@ job "gitea" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/go-gitea/gitea/blob/v1.27.0/Dockerfile.rootless
-        image = "zot.day1.sololab/gitea/gitea:1.27.0-rootless"
+        # https://github.com/go-gitea/gitea/blob/v1.27.1/Dockerfile.rootless
+        image = "zot.day1.sololab/gitea/gitea:1.27.1-rootless"
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.gitea-redirect.entrypoints" = "web"
