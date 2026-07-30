@@ -227,8 +227,9 @@ job "nexus" {
         }
       }
       env {
-        TZ                      = "Asia/Shanghai"
-        INSTALL4J_ADD_VM_PARAMS = "-Xms300m -Xmx700m -XX:MaxDirectMemorySize=700m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+        TZ = "Asia/Shanghai"
+        # https://help.sonatype.com/en/configuring-the-runtime-environment.html?_ga=2.15475440.714739.1650532475-1707272426.1649329767#overriding-the-java-version-in-container-environments
+        INSTALL4J_ADD_VM_PARAMS = "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
         # https://help.sonatype.com/en/securing-nexus-repository-manager.html#url-validation-and-private-network-access
         # didnt work
         NEXUS_PROXY_PRIVATENETWORKS_ALLOWEDDOMAINS = "sololab,consul"
@@ -238,7 +239,7 @@ job "nexus" {
         # Specifies the CPU required to run this task in MHz
         cpu = 1000
         # Specifies the memory required in MB
-        memory = 800
+        memory = 1000
       }
 
       template {
