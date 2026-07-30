@@ -14,7 +14,7 @@ storage:
       mode: 0755
       contents:
         source: ${consul_install_url}
-    - path: ${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip
+    - path: ${custom_bin_dir}/consul_linux_amd64.zip
       mode: 0644
       contents:
         source: ${consul_download_url}
@@ -63,9 +63,8 @@ systemd:
         Type=oneshot
         Restart=on-failure
         RemainAfterExit=yes
-        Environment=consul_version=${consul_version}
-        ExecStart=/usr/bin/bsdtar -xf "${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip" -C ${custom_bin_dir}
-        ExecStart=/usr/bin/rm "${custom_bin_dir}/consul_${consul_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/bsdtar -xf "${custom_bin_dir}/consul_linux_amd64.zip" -C ${custom_bin_dir}
+        ExecStart=/usr/bin/rm "${custom_bin_dir}/consul_linux_amd64.zip"
         ExecStart=/usr/bin/chmod +x ${custom_bin_dir}/consul
         # Fix SELinux contexts for systemd execution
         ExecStart=/usr/bin/chcon -t bin_t ${custom_bin_dir}/consul

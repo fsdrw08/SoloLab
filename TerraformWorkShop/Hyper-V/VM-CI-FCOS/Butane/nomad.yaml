@@ -15,12 +15,12 @@ storage:
   #   - path: /var/lib/nomad
   #     target: "${nomad_data_dir}"
   files:
-    - path: /opt/bin/nomad_${nomad_version}_linux_amd64.zip
+    - path: /opt/bin/nomad_linux_amd64.zip
       mode: 0644
       contents:
         source: ${nomad_download_url}
     # Reference: https://developer.hashicorp.com/nomad/plugins/drivers/podman#installation
-    - path: /opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip
+    - path: /opt/bin/nomad-driver-podman_linux_amd64.zip
       mode: 0644
       contents:
         source: ${nomad_podman_driver_download_url}
@@ -130,7 +130,7 @@ storage:
 systemd:
   units:
     # https://github.com/containers/podman/blob/03bb9aa2e851d58d1fc0aec808bcffc2b95848be/docs/tutorials/basic_networking.md#default-network
-    - name: enable-podname-network-dns.service
+    - name: enable-podman-network-dns.service
       enabled: true
       contents: |
         [Unit]
@@ -156,17 +156,16 @@ systemd:
         Type=oneshot
         Restart=on-failure
         RemainAfterExit=yes
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_${nomad_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/nomad_${nomad_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad_linux_amd64.zip"
         ExecStart=/usr/bin/chmod +x /opt/bin/nomad 
         # Fix ownership to root:root for proper permissions
         ExecStart=/usr/bin/chown root:root /opt/bin/nomad 
         # Fix SELinux contexts for systemd execution
         ExecStart=/usr/bin/chcon -t bin_t /opt/bin/nomad
 
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_${nomad_podman_driver_version}_linux_amd64.zip"
-        ExecStart=/usr/bin/chmod +x /var/mnt/data/nomad/plugins/nomad-driver-podman
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/nomad-driver-podman_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/nomad-driver-podman_linux_amd64.zip"
         # Fix ownership to root:root for proper permissions
         ExecStart=/usr/bin/chown root:root /opt/bin/nomad-driver-podman
         # Fix SELinux contexts for systemd execution

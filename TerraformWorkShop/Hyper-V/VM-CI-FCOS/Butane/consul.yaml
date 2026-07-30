@@ -10,7 +10,7 @@ storage:
     # consul data dir
     - path: "${consul_data_dir}"
   files:
-    - path: /opt/bin/consul_${consul_version}_linux_amd64.zip
+    - path: /opt/bin/consul_linux_amd64.zip
       mode: 0644
       contents:
         source: ${consul_download_url}
@@ -59,9 +59,8 @@ systemd:
         Type=oneshot
         Restart=on-failure
         RemainAfterExit=yes
-        Environment=consul_version=${consul_version}
-        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/consul_${consul_version}_linux_amd64.zip" -C /opt/bin
-        ExecStart=/usr/bin/rm "/opt/bin/consul_${consul_version}_linux_amd64.zip"
+        ExecStart=/usr/bin/bsdtar -xf "/opt/bin/consul_linux_amd64.zip" -C /opt/bin
+        ExecStart=/usr/bin/rm "/opt/bin/consul_linux_amd64.zip"
         ExecStart=/usr/bin/chmod +x /opt/bin/consul
         # Fix SELinux contexts for systemd execution
         ExecStart=/usr/bin/chcon -t bin_t /opt/bin/consul

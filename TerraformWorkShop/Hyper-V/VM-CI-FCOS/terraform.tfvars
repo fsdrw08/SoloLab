@@ -77,16 +77,13 @@ butane = {
       "fcos_image_mirror"        = "zot.day1.sololab/fedora/fedora-coreos"
       "fcos_rebase_mirror"       = "ostree-unverified-registry:zot.day1.sololab/fedora/fedora-coreos:stable"
       # consul client
-      "consul_download_url" = "http://dufs.day1.sololab/public/binaries/consul_2.0.0_linux_amd64.zip"
-      "consul_version"      = "2.0.0"
+      "consul_download_url" = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
       "consul_server_fqdn"  = "consul.service.consul"
       "consul_data_dir"     = "/var/lib/consul"
       # nomad client
-      "nomad_download_url"                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.0_linux_amd64.zip"
-      "nomad_version"                       = "2.0.0"
+      "nomad_download_url"                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.4_linux_amd64.zip"
       "nomad_server_fqdn"                   = "nomad.service.consul"
       "nomad_podman_driver_download_url"    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip"
-      "nomad_podman_driver_version"         = "0.6.5"
       "nomad_client_cert_download_url"      = "http://dufs.day1.sololab/private/certs/client.global.nomad.crt"
       "nomad_client_cert_key_download_url"  = "http://dufs.day1.sololab/private/certs/client.global.nomad.key"
       "nomad_client_cert_download_url_cred" = "YWRtaW46YWRtaW4="

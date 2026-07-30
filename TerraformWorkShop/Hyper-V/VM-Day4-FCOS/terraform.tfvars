@@ -18,7 +18,14 @@ vm = {
   vhd = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
-    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
+    # source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
+    # in order to prevent juicefs mount issue in linux kernel 7.1.3,
+    # pin FCOS version to 44.20260621.3.1
+    # ref:
+    #   - https://github.com/juicedata/juicefs/issues/7251
+    #   - https://fedoraproject.org/coreos/release-notes/?stream=stable
+    # https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/44.20260621.3.1/x86_64/fedora-coreos-44.20260621.3.1-hyperv.x86_64.vhdx.zip
+    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-44.20260621.3.1-hyperv.x86_64.vhdx"
     data_disk_tfstate = {
       backend = {
         type = "local"
@@ -78,18 +85,15 @@ butane = {
       # consul client
       consul_install_url  = "http://dufs.day1.sololab/public/binaries/consul_install.sh"
       consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
-      consul_version      = "2.0.2"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/mnt/data/consul"
       # nomad client
       nomad_install_url                   = "http://dufs.day1.sololab/public/binaries/nomad_install.sh"
       nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.4_linux_amd64.zip"
-      nomad_version                       = "2.0.4"
       nomad_server_fqdn                   = "nomad.service.consul"
       nomad_podman_driver_install_url     = "http://dufs.day1.sololab/public/binaries/nomad_driver_podman_install.sh"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip"
-      nomad_podman_driver_version         = "0.6.5"
       nomad_client_cert_download_url      = "http://dufs.day1.sololab/private/certs/client.global.nomad.crt"
       nomad_client_cert_key_download_url  = "http://dufs.day1.sololab/private/certs/client.global.nomad.key"
       nomad_client_cert_download_url_cred = "YWRtaW46YWRtaW4="
