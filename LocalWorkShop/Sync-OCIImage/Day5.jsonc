@@ -1,5 +1,19 @@
 [
     {
+        "publicRegistry": "docker.io",
+        "publicRepo": "gitea/runner:2.3.0",
+        "archive": "docker.io_gitea_runner_2.3.0.tar",
+        "privateRepo": "gitea/runner:2.3.0",
+        "description": "https://hub.docker.com/r/gitea/runner, https://github.com/go-gitea/gitea/releases",
+    },
+    {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "runatlantis/atlantis:v0.46.0",
+        "archive": "ghcr.io_runatlantis_atlantis_v0.46.0.tar",
+        "privateRepo": "runatlantis/atlantis:v0.46.0",
+        "description": "https://github.com/runatlantis/atlantis/pkgs/container/atlantis/versions?filters%5Bversion_type%5D=tagged, https://github.com/runatlantis/atlantis/releases",
+    },
+    {
         "publicRegistry": "docker.gitea.com",
         "publicRepo": "runner-images:ubuntu-24.04",
         "archive": "docker.gitea.com_runner-images_ubuntu-24.04.tar",
