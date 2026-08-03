@@ -364,7 +364,7 @@ zones = [
         ]
       },
       {
-        fqdn = "atlantis.day4.sololab."
+        fqdn = "artifact-keeper.day4.sololab."
         type = "A"
         ttl  = 60
         results = [
@@ -381,6 +381,14 @@ zones = [
       # },
       {
         fqdn = "nexus.day4.sololab."
+        type = "A"
+        ttl  = 60
+        results = [
+          "192.168.255.2"
+        ]
+      },
+      {
+        fqdn = "atlantis.day5.sololab."
         type = "A"
         ttl  = 60
         results = [

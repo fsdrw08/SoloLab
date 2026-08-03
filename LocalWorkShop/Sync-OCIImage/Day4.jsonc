@@ -14,18 +14,11 @@
         "description": "https://hub.docker.com/r/gitea/gitea, https://github.com/go-gitea/gitea/releases",
     },
     {
-        "publicRegistry": "docker.io",
-        "publicRepo": "gitea/runner:2.3.0",
-        "archive": "docker.io_gitea_runner_2.3.0.tar",
-        "privateRepo": "gitea/runner:2.3.0",
-        "description": "https://hub.docker.com/r/gitea/runner, https://github.com/go-gitea/gitea/releases",
-    },
-    {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "runatlantis/atlantis:v0.46.0",
-        "archive": "ghcr.io_runatlantis_atlantis_v0.46.0.tar",
-        "privateRepo": "runatlantis/atlantis:v0.46.0",
-        "description": "https://github.com/runatlantis/atlantis/pkgs/container/atlantis/versions?filters%5Bversion_type%5D=tagged, https://github.com/runatlantis/atlantis/releases",
+        "publicRepo": "artifact-keeper/artifact-keeper-backend:1.7.0",
+        "archive": "ghcr.io_artifact-keeper_artifact-keeper-backend_1.7.0.tar",
+        "privateRepo": "artifact-keeper/artifact-keeper-backend:1.7.0",
+        "description": "https://github.com/artifact-keeper/artifact-keeper/releases",
     },
     {
         "publicRegistry": "docker.io",

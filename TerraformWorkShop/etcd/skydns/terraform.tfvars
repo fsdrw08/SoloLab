@@ -360,7 +360,18 @@ dns_records = [
     }
   },
   {
-    hostname = "atlantis.day4.sololab"
+    hostname = "artifact-keeper.day4.sololab"
+    value = {
+      string_map = {
+        host = "day2.node.consul"
+      }
+      number_map = {
+        ttl = 60
+      }
+    }
+  },
+  {
+    hostname = "atlantis.day5.sololab"
     value = {
       string_map = {
         host = "day2.node.consul"

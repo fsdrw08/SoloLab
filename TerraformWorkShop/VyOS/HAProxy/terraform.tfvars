@@ -257,11 +257,11 @@ reverse_proxy = {
       "set backend" = "day2"
     }
   }
-  day4_frontend_atlantis = {
+  day5_frontend_atlantis = {
     path = "load-balancing haproxy service tcp443 rule 430"
     configs = {
       "ssl"         = "req-ssl-sni"
-      "domain-name" = "atlantis.day4.sololab"
+      "domain-name" = "atlantis.day5.sololab"
       "set backend" = "day2"
     }
   }

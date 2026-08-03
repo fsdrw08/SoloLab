@@ -1,0 +1,178 @@
+# https://developer.hashicorp.com/nomad/docs/job-specification/job
+# https://developer.hashicorp.com/nomad/tutorials/load-balancing/load-balancing-grafana
+job "artifact-keeper-db" {
+  datacenters = ["dc1"]
+  region      = "global"
+  #   https://developer.hashicorp.com/nomad/docs/concepts/scheduling/schedulers
+  type = "service"
+
+  constraint {
+    attribute = "${attr.unique.hostname}"
+    operator  = "="
+    value     = "day3"
+  }
+
+  group "artifact-keeper-db" {
+    # https://developer.hashicorp.com/nomad/docs/job-specification/task
+    task "artifact-keeper-db" {
+      # https://developer.hashicorp.com/nomad/docs/job-specification/service
+      service {
+        provider = "consul"
+        name     = "artifact-keeper-db"
+
+        # https://developer.hashicorp.com/nomad/docs/job-specification/check#driver
+        check {
+          # "driver" address mode can only config in service which under task
+          address_mode   = "driver"
+          type           = "tcp"
+          port           = 5432
+          interval       = "180s"
+          timeout        = "2s"
+          initial_status = "passing"
+        }
+
+        tags = [
+          "day3",
+          "behind_pgbouncer",
+          "log",
+          "metrics-exposing-general",
+        ]
+
+        meta {
+          # https://developer.hashicorp.com/nomad/docs/reference/runtime-environment-settings#job-related-variables
+          # meta data to render pgbouncer config with consul template
+          dbName   = "artifact-keeper"
+          dbConfig = "host=${NOMAD_TASK_NAME}-${NOMAD_ALLOC_ID} dbname=artifact-keeper auth_user=pgbouncer"
+          # meta data to render pgweb config with consul template
+          dbUser        = "artifact-keeper"
+          pgBouncerHost = "day3.pgbouncer.service.consul"
+          # meta data for Prometheus consul_sd_config:
+          # this postgresql server hosting behind pgbouncer, so we need to tell 
+          # prometheus to scrap metrics from postgres exporter with multi target pattern:
+          # https://prometheus-postgres-exporter.service.consul/probe?auth_module=postgres_exporter&target=postgresql-day3.service.consul%3A5432%2Fartifact-keeper
+          prom_target_scheme                         = "https"
+          prom_target_address                        = "prometheus-postgres-exporter.service.consul"
+          prom_target_metrics_path                   = "probe"
+          prom_target_metrics_path_param_auth_module = "postgres_exporter"
+          prom_target_metrics_path_param_target      = "pgbouncer.service.consul:6432/artifact-keeper"
+        }
+      }
+
+      user = "26:26"
+
+      # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
+      driver = "podman"
+      config {
+        image = "zot.day1.sololab/fedora/postgresql-18:20260722"
+        volumes = [
+          "local/postgresql_hba.conf:/opt/app-root/src/postgresql-cfg/postgresql_hba.conf",
+          # https://github.com/sclorg/postgresql-container/blob/master/18/root/usr/share/container-scripts/postgresql/README.md#postgresql-init
+          # postgresql-init/: This directory should contain shell scripts (*.sh) that are sourced when the database is freshly initialized (after a successful initdb run, which makes the data directory non-empty).
+          # At the time of sourcing these scripts, the local PostgreSQL server is running. For re-deployment scenarios with a persistent data directory, the scripts are not sourced (no-op).
+
+          # postgresql-start/: This directory has the same semantics as postgresql-init/, except that these scripts are always sourced (after postgresql-init/ scripts, if they exist).
+          "local/init-db.sh:/opt/app-root/src/postgresql-start/init-db.sh",
+        ]
+      }
+
+      # https://developer.hashicorp.com/nomad/docs/job-specification/env
+      env {
+        POSTGRESQL_DATABASE        = "artifact-keeper"
+        POSTGRESQL_LOG_DESTINATION = "/dev/stderr"
+      }
+
+      template {
+        # https://github.com/sclorg/postgresql-container/blob/b2645eaceed24be95676cfeb2fe24df3c5e45468/16/root/usr/share/container-scripts/postgresql/common.sh#L212
+        data = <<-EOH
+        hba_file = '/local/pg_hba.conf'
+        EOH
+
+        destination = "local/postgresql_hba.conf"
+      }
+
+      template {
+        data          = <<-EOH
+        local  all          all                              trust
+        host   all          all                127.0.0.1/32  trust
+        host   all          all                ::1/128       trust
+        local  replication  all                      trust
+        host   replication  all                127.0.0.1/32  trust
+        host   replication  all                ::1/128       trust
+
+        host  all           pgbouncer          10.88.0.0/16  trust
+        host  all           postgres_exporter  10.88.0.0/16  trust
+        host  all           {{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_name}}{{end}}       all           scram-sha-256
+        EOH
+        destination   = "local/pg_hba.conf"
+        change_mode   = "signal"
+        change_signal = "SIGHUP"
+      }
+
+      template {
+        # https://www.enterprisedb.com/postgres-tutorials/pgbouncer-authquery-and-authuser-pro-tips
+        # https://readmedium.com/unlocking-advanced-authentication-in-pgbouncer-a-guide-to-auth-query-and-auth-user-configuration-6189e0fd0562
+        # auth function need to create in target database
+        data = <<-EOH
+        #!/bin/bash
+        set -e
+        psql -v ON_ERROR_STOP=1 <<-EOSQL
+        DROP ROLE IF EXISTS pgbouncer;
+        CREATE ROLE pgbouncer WITH LOGIN PASSWORD 'pgbouncer';
+        
+        DROP ROLE IF EXISTS postgres_exporter;
+        CREATE ROLE postgres_exporter WITH LOGIN PASSWORD '{{with secret "kvv2_others/data/app-postgres_exporter"}}{{.Data.data.pgsql_user_password}}{{end}}';
+        GRANT pg_monitor TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
+        ---GRANT CONNECT ON DATABASE artifact-keeper TO postgres_exporter;
+
+        \\c artifact-keeper;
+        CREATE OR REPLACE FUNCTION user_search(uname TEXT) RETURNS TABLE (usename name, passwd text) as
+        \$\$
+          SELECT usename, passwd FROM pg_shadow WHERE usename=\$1;
+        \$\$
+        LANGUAGE sql SECURITY DEFINER;
+        EOSQL
+        EOH
+
+        destination = "local/init-db.sh"
+        change_mode = "restart"
+      }
+
+      template {
+        data = <<-EOH
+        # Lines starting with a # are ignored
+
+        # Empty lines are also ignored
+        POSTGRESQL_USER={{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_name}}{{end}}
+        POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_password}}{{end}}
+        POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_admin_password}}{{end}}
+        EOH
+
+        destination = "secrets/file.env"
+        env         = true
+      }
+      vault {}
+
+      resources {
+        # Specifies the CPU required to run this task in MHz
+        cpu = 200
+        # Specifies the memory required in MB
+        memory = 128
+      }
+
+      # https://developer.hashicorp.com/nomad/docs/job-specification/volume_mount
+      volume_mount {
+        volume        = "artifact-keeper-db"
+        destination   = "/var/lib/pgsql/data"
+        selinux_label = "Z"
+      }
+    }
+    volume "artifact-keeper-db" {
+      type            = "host"
+      source          = "hvol-artifact-keeper-db"
+      read_only       = false
+      attachment_mode = "file-system"
+      access_mode     = "single-node-writer"
+    }
+  }
+}
