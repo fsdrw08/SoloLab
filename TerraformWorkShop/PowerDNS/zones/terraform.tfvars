@@ -387,6 +387,20 @@ zones = [
           "192.168.255.2"
         ]
       },
+    ]
+  },
+  {
+    name        = "day5.sololab."
+    nameservers = ["ns1.day5.sololab."]
+    records = [
+      {
+        fqdn = "day5.sololab."
+        type = "SOA"
+        ttl  = 60
+        results = [
+          "ns1.day5.sololab. day5.sololab. 2026080511 3600 600 1814400 7200"
+        ]
+      },
       {
         fqdn = "atlantis.day5.sololab."
         type = "A"
