@@ -8,6 +8,10 @@ terraform {
       source  = "taliesins/hyperv"
       version = ">= 1.2.1"
     }
+    hyperv_new = {
+      source  = "Bafbi/hyperv"
+      version = ">= 1.5.4"
+    }
     vyos = {
       source  = "Foltik/vyos"
       version = ">= 0.3.4"

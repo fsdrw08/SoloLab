@@ -27,7 +27,7 @@ $repoDir = git rev-parse --show-toplevel
 $currentDir = Join-Path -Path $repoDir -ChildPath "TerraformWorkShop"
 Set-Location $currentDir
 terraform providers mirror `
-  -platform=linux_amd64 -platform=windows_amd64 `
+  -platform=windows_amd64 -platform=linux_amd64 `
   (Join-Path -Path $publicDir -ChildPath "Downloads\terraform.d\mirror")
 $env:HTTP_PROXY=$null;$env:HTTPS_PROXY=$null
 ```

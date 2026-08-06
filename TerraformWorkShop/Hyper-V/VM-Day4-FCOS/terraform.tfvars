@@ -16,16 +16,17 @@ vm = {
   count     = 1
   base_name = "Day4-FCOS"
   vhd = {
-    dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+    dir = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
-    # source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
+    source = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/fcos/fedora-coreos-hyperv.x86_64.vhdx"
     # in order to prevent juicefs mount issue in linux kernel 7.1.3,
     # pin FCOS version to 44.20260621.3.1
+    # fixed in juicefs csi driver v0.32.1
     # ref:
     #   - https://github.com/juicedata/juicefs/issues/7251
     #   - https://fedoraproject.org/coreos/release-notes/?stream=stable
     # https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/44.20260621.3.1/x86_64/fedora-coreos-44.20260621.3.1-hyperv.x86_64.vhdx.zip
-    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-44.20260621.3.1-hyperv.x86_64.vhdx"
+    # source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-44.20260621.3.1-hyperv.x86_64.vhdx"
     data_disk_tfstate = {
       backend = {
         type = "local"

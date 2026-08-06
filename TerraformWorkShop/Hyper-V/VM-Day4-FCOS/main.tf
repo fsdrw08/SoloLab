@@ -79,7 +79,7 @@ resource "terraform_data" "boot_disk" {
 
 # vm instance
 module "hyperv_machine_instance" {
-  source     = "../../modules/hyperv-vm"
+  source     = "../../modules/hyperv-vm-v3"
   depends_on = [null_resource.remote]
   count      = var.vm.count
 
