@@ -122,6 +122,14 @@ oidc_client = [
     ]
   },
   {
+    name         = "artifact-keeper"
+    allow_groups = ["app-artifact-keeper-user"]
+    redirect_uris = [
+      # https://github.com/artifact-keeper/artifact-keeper-site/blob/4a43288bd2e251d93205a21eabe7a80af9c0b75d/src/content/docs/docs/advanced/auth.mdx#oidc-configuration
+      "https://artifact-keeper.day4.sololab/api/v1/auth/sso/oidc/callback",
+    ]
+  },
+  {
     name         = "otf"
     allow_groups = ["app-otf-user"]
     redirect_uris = [

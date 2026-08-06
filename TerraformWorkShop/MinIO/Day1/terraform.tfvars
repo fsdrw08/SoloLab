@@ -27,6 +27,10 @@ buckets = [
     bucket        = "nexus3"
     force_destroy = true
   },
+  {
+    bucket        = "artifact-keeper"
+    force_destroy = true
+  },
 ]
 
 users = [
@@ -51,6 +55,11 @@ users = [
   {
     name               = "nexus3"
     policies           = ["nexus3-readwrite"]
+    secret_key_version = "1"
+  },
+  {
+    name               = "artifact-keeper"
+    policies           = ["artifact-keeper-readwrite"]
     secret_key_version = "1"
   },
 ]
@@ -176,6 +185,25 @@ policies = [
                 ],
                 "Resource": [
                     "arn:aws:s3:::nexus3/*"
+                ]
+            }
+        ]
+    }
+    EOF
+  },
+  {
+    name   = "artifact-keeper-readwrite"
+    policy = <<-EOF
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "s3:*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::artifact-keeper/*"
                 ]
             }
         ]

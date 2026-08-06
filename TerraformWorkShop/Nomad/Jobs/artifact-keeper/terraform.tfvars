@@ -32,7 +32,25 @@ csi_volumes = [
 
 dynamic_host_volumes = [
   {
-    name = "hvol-atlantis"
+    name = "hvol-artifact-keeper-db"
+    constraint = [
+      {
+        attribute = "$${attr.unique.hostname}"
+        operator  = "=="
+        value     = "day3"
+      }
+    ]
+    capability = {
+      access_mode = "single-node-writer"
+    }
+    plugin_id = "mkdir"
+    parameters = {
+      uid = 26
+      gid = 26
+    }
+  },
+  {
+    name = "hvol-artifact-keeper-plugins"
     constraint = [
       {
         attribute = "$${attr.unique.hostname}"
@@ -55,4 +73,7 @@ jobs = [
   {
     path = "./attachments/artifact-keeper.nomad.hcl"
   },
+  {
+    path = "./attachments/artifact-keeper-db.nomad.hcl"
+  }
 ]

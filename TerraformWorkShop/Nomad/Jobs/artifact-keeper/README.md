@@ -17,7 +17,7 @@ terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto
 ```
 
 #### Workload
-- Ensure container image `artifact-keeper/artifact-keeper-backend` had synced to image registry  
+- Ensure container image `artifact-keeper/artifact-keeper-backend` and `artifact-keeper/artifact-keeper-web` had synced to image registry  
 [LocalWorkShop/Sync-OCIImage/Day4.jsonc](../../../../LocalWorkShop/Sync-OCIImage/Day4.jsonc)
 ```powershell
 $repoDir=git rev-parse --show-toplevel
@@ -37,16 +37,20 @@ $childPath="TerraformWorkShop/VyOS/HAProxy/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
 
-- Ensure object storage related config is ready for Gitea is ready  
+- Ensure object storage related config is ready for artifact-keeper is ready  
 [TerraformWorkShop/MinIO/Day1/terraform.tfvars](../../../../TerraformWorkShop/MinIO/Day1/terraform.tfvars)
 ```powershell
+$credential = Get-Credential -Message "credential to login vault"
+$env:VAULT_ADDR = "https://vault.day1.sololab"
+vault login -no-print -method=ldap username=$($credential.UserName) password=$($credential.GetNetworkCredential().Password)
+
 $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/MinIO/Day1/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
 
 #### Security
-- Ensure artifact-keeper postgresql credential `pgsql_admin_password`, `pgsql_user_name`, `pgsql_user_password` is in vault is ready
+- Ensure artifact-keeper postgresql credential `pgsql_admin_password`, `pgsql_user_name`, `pgsql_user_password`, `jwt_secret`, `admin_password` is in vault is ready
 [TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars](../../../../TerraformWorkShop/Vault/Secrets/Others/terraform.tfvars)
 ```powershell
 $credential = Get-Credential -Message "credential to login vault"

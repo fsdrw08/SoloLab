@@ -107,6 +107,18 @@ secrets = [
   },
   {
     mount              = "kvv2_others"
+    name               = "app-artifact-keeper"
+    generate_passwords = ["pgsql_admin_password", "pgsql_user_password"]
+    content = {
+      "pgsql_user_name" = "artifact-keeper"
+      "admin_username"  = "admin"
+      "admin_password"  = "P@ssw0rd"
+      "jwt_secret"      = "VQYoUtpG6cKzWA39a4oR2968pMSjCVhni42Bg92ZPRUjCM7U/Qk8/HozZW+pOwGH"
+    }
+    secret_version = 1
+  },
+  {
+    mount              = "kvv2_others"
     name               = "app-atlantis"
     generate_passwords = ["gitea_webhook_secret"]
     content = {

@@ -8,7 +8,7 @@ terraform {
   backend "consul" {
     address = "consul.day2.sololab"
     scheme  = "https"
-    path    = "tfstate/Nomad/Job-atlantis"
+    path    = "tfstate/Nomad/Job-artifact-keeper"
     # access_token = ""
   }
 }

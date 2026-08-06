@@ -21,6 +21,13 @@
         "description": "https://github.com/artifact-keeper/artifact-keeper/releases",
     },
     {
+        "publicRegistry": "ghcr.io",
+        "publicRepo": "artifact-keeper/artifact-keeper-web:1.8.0",
+        "archive": "ghcr.io_artifact-keeper_artifact-keeper-web_1.8.0.tar",
+        "privateRepo": "artifact-keeper/artifact-keeper-web:1.8.0",
+        "description": "https://github.com/artifact-keeper/artifact-keeper-web/releases",
+    },
+    {
         "publicRegistry": "docker.io",
         "publicRepo": "sonatype/nexus3:3.94.1-alpine",
         "archive": "docker.io_sonatype-nexus3_3.94.1-alpine.tar",

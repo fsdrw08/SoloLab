@@ -39,25 +39,27 @@ users = [
       "lldap_admin",
       "sso_allow", # "02999e39" 
       # "app-sftpgo-prim-ignition", # c4bf67c5
-      "app-zot-admin",          # "f8fddd0f"
-      "app-vault-user",         # "9d1dbb70" 
-      "app-vault-admin",        # "751b1e41" 
-      "app-minio-user",         # "94a5e552" 
-      "app-minio-admin",        # "4d620c35" 
-      "app-consul-auto_config", # "e91c1a23" 
-      "app-consul-user",        # "c2826a4f" 
-      "app-consul-admin",       # "0f898573" 
-      "app-nomad-user",         # "091a24fe" 
-      "app-nomad-admin",        # "ca4dde60" 
-      "app-grafana-user",       # "a4019ca3" 
-      "app-grafana-root",       # "a3d0b5af" 
-      "app-gitea-admin",        # "f48d634b"
-      "app-gitea-user",         # "60939134" 
-      "app-otf-user",           # "4d7313b1"
-      "app-nexus-user",         # "90ebdcb1" 
-      "app-nexus-admin",        # "044af468" 
-      "app-jenkins-user",       # "8a5d9ae7"
-      "app-jenkins-admin",      # "d5a64bfb"
+      "app-zot-admin",             # "f8fddd0f"
+      "app-vault-user",            # "9d1dbb70" 
+      "app-vault-admin",           # "751b1e41" 
+      "app-minio-user",            # "94a5e552" 
+      "app-minio-admin",           # "4d620c35" 
+      "app-consul-auto_config",    # "e91c1a23" 
+      "app-consul-user",           # "c2826a4f" 
+      "app-consul-admin",          # "0f898573" 
+      "app-nomad-user",            # "091a24fe" 
+      "app-nomad-admin",           # "ca4dde60" 
+      "app-grafana-user",          # "a4019ca3" 
+      "app-grafana-root",          # "a3d0b5af" 
+      "app-gitea-admin",           # "f48d634b"
+      "app-gitea-user",            # "60939134" 
+      "app-otf-user",              # "4d7313b1"
+      "app-nexus-user",            # "90ebdcb1" 
+      "app-nexus-admin",           # "044af468" 
+      "app-artifact-keeper-admin", # "e729642a"
+      "app-artifact-keeper-user",  # "d10141ad"
+      "app-jenkins-user",          # "8a5d9ae7"
+      "app-jenkins-admin",         # "d5a64bfb"
     ]
   },
   {
@@ -67,19 +69,20 @@ users = [
     password     = "P@ssw0rd"
     display_name = "user1"
     member_of = [
-      "sso_allow",              # "02999e39" 
-      "app-vault-user",         # "9d1dbb70" 
-      "app-minio-user",         # "94a5e552" 
-      "app-minio-readwrite",    # "0c31450b" 
-      "app-consul-auto_config", # "e91c1a23" 
-      "app-consul-user",        # "c2826a4f" 
-      "app-consul-readonly",    # "542b0c36" 
-      "app-nomad-user",         # "091a24fe" 
-      "app-gitea-user",         # "60939134"
-      "app-grafana-user",       # "a4019ca3" 
-      "app-nexus-user",         # "90ebdcb1"
-      "app-otf-user",           # "4d7313b1"
-      "app-jenkins-user",       # "8a5d9ae7"
+      "sso_allow",                # "02999e39" 
+      "app-vault-user",           # "9d1dbb70" 
+      "app-minio-user",           # "94a5e552" 
+      "app-minio-readwrite",      # "0c31450b" 
+      "app-consul-auto_config",   # "e91c1a23" 
+      "app-consul-user",          # "c2826a4f" 
+      "app-consul-readonly",      # "542b0c36" 
+      "app-nomad-user",           # "091a24fe" 
+      "app-gitea-user",           # "60939134"
+      "app-grafana-user",         # "a4019ca3" 
+      "app-nexus-user",           # "90ebdcb1"
+      "app-artifact-keeper-user", # "d10141ad"
+      "app-otf-user",             # "4d7313b1"
+      "app-jenkins-user",         # "8a5d9ae7"
     ]
   }
 ]
@@ -171,6 +174,18 @@ groups = [
   {
     iac_id       = "4d7313b1"
     display_name = "app-otf-user"
+  },
+  {
+    iac_id       = "e729642a"
+    display_name = "app-artifact-keeper-admin"
+  },
+  {
+    iac_id       = "d10141ad"
+    display_name = "app-artifact-keeper-user"
+  },
+  {
+    iac_id       = "3d20cff7"
+    display_name = "app-artifact-keeper-viewer"
   },
   {
     iac_id       = "044af468"
