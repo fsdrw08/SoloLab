@@ -1,18 +1,18 @@
 [
-    {
-        "type": "general",
-        "publicParentPath": "https://github.com",
-        "publicChildPath": "hairyhenderson/gomplate/releases/download/v5.2.0/gomplate_linux-amd64",
-        "localChildPath": "bin/gomplate_linux-amd64_5.2.0",
-        "privateChildPath": "public/binaries/gomplate_linux-amd64_5.2.0",
-        "description": "https://github.com/hairyhenderson/gomplate/releases",
-    },
-    {
-        "type": "local-dir",
-        "publicParentPath": "",
-        "publicChildPath": "",
-        "localChildPath": "terraform.d/mirror",
-        "privateChildPath": "public/mirror/terraform",
-        "description": "",
-    },
+    // {
+    //     "type": "general",
+    //     "publicParentPath": "https://github.com",
+    //     "publicChildPath": "hairyhenderson/gomplate/releases/download/v5.2.0/gomplate_linux-amd64",
+    //     "localChildPath": "bin/gomplate_linux-amd64_5.2.0",
+    //     "privateChildPath": "public/binaries/gomplate_linux-amd64_5.2.0",
+    //     "description": "https://github.com/hairyhenderson/gomplate/releases",
+    // },
+    // {
+    //     "type": "local-dir",
+    //     "publicParentPath": "",
+    //     "publicChildPath": "",
+    //     "localChildPath": "terraform.d/mirror",
+    //     "privateChildPath": "public/mirror/terraform",
+    //     "description": "",
+    // },
 ]
