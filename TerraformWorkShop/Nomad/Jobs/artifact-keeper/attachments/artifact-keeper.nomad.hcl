@@ -196,14 +196,14 @@ job "artifact-keeper" {
         OIDC_CLIENT_ID={{with secret "kvv2_vault/data/oidc-client_artifact-keeper"}}{{.Data.data.client_id}}{{end}}
         OIDC_CLIENT_SECRET={{with secret "kvv2_vault/data/oidc-client_artifact-keeper"}}{{.Data.data.client_secret}}{{end}}
         OIDC_REDIRECT_URI=https://artifact-keeper.day4.sololab/api/v1/auth/sso/oidc/callback
-        OIDC_GROUPS_CLAIM=groups
-        OIDC_SCOPES=openid profile email
+        OIDC_SCOPES=openid profile email groups
         OIDC_USERNAME_CLAIM=preferred_username
         OIDC_EMAIL_CLAIM=email
-        OIDC_ADMIN_GROUP=app-artifact-keeper-admin
+        OIDC_GROUPS_CLAIM=groups
         OIDC_DEFAULT_ROLE=user
-        OIDC_GROUP_ROLE_MAP=app-artifact-keeper-user:user;app-artifact-keeper-viewer:viewer
-        OIDC_MAP_GROUPS_TO_GROUPS=true
+        OIDC_ADMIN_GROUP=app-artifact-keeper-admin
+        OIDC_GROUP_ROLE_MAP=app-artifact-keeper-admin:admin;app-artifact-keeper-user:user;app-artifact-keeper-viewer:viewer
+        OIDC_MAP_GROUPS_TO_GROUPS=false
         OIDC_AUTO_CREATE_USERS=true
         OIDC_PKCE_ENABLED=true
         EOH

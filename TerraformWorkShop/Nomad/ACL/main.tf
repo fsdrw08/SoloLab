@@ -35,7 +35,7 @@ resource "nomad_acl_auth_method" "oidc" {
       "https://nomad.day2.sololab/oidc/callback",
       "https://nomad.day2.sololab/ui/settings/tokens",
     ]
-    # "username" is the attribute(claim, the sub item of scope) in the OIDC token, see Vault/Identity/OIDC/terraform.tfvars
+    # "preferred_username" is the attribute(claim, the sub item of scope) in the OIDC token, see Vault/Identity/OIDC/terraform.tfvars
     # "user" is the attribute in the middle variable in nomad, used in above $${value.user}
     claim_mappings = {
       "preferred_username" = "user"

@@ -50,7 +50,7 @@ jenkins:
       serverConfiguration:
         wellKnown:
           wellKnownOpenIDConfigurationUrl: '{{with secret "kvv2_vault/data/oidc-provider_sololab"}}{{.Data.data.config_url}}{{end}}'
-          scopesOverride: openid groups user
+          scopesOverride: openid groups profile
       # Credentials
       clientId: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_id}}{{end}}'
       clientSecret: '{{with secret "kvv2_vault/data/oidc-client_jenkins"}}{{.Data.data.client_secret}}{{end}}'
