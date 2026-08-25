@@ -15,7 +15,7 @@ ExecStartPost=${ExecStartPost}
 [Container]
 ContainerName=traefik
 
-Image=zot.day1.sololab/library/traefik:v3.7.8
+Image=zot.day1.sololab/library/traefik:v3.7.11
 
 SecurityLabelType=spc_t
 

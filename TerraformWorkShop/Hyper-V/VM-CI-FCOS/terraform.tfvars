@@ -77,7 +77,7 @@ butane = {
       "fcos_image_mirror"        = "zot.day1.sololab/fedora/fedora-coreos"
       "fcos_rebase_mirror"       = "ostree-unverified-registry:zot.day1.sololab/fedora/fedora-coreos:stable"
       # consul client
-      "consul_download_url" = "http://dufs.day1.sololab/public/binaries/consul_2.0.2_linux_amd64.zip"
+      "consul_download_url" = "http://dufs.day1.sololab/public/binaries/consul_2.0.3_linux_amd64.zip"
       "consul_server_fqdn"  = "consul.service.consul"
       "consul_data_dir"     = "/var/lib/consul"
       # nomad client
