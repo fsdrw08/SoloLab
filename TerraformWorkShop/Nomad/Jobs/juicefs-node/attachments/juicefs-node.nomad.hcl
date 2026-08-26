@@ -25,7 +25,7 @@ job "juicefs-node" {
       driver = "podman"
       # https://juicefs.com/docs/csi/csi-in-nomad/
       config {
-        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.32.1"
+        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.32.5"
         args = [
           "--endpoint=unix://csi/csi.sock",
           "--logtostderr",

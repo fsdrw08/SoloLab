@@ -25,7 +25,7 @@ job "juicefs-controller" {
       driver = "podman"
       # https://github.com/thatsk/nfs-csi-nomad/blob/main/nfs-controller.nomad
       config {
-        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.32.0"
+        image = "zot.day1.sololab/juicedata/juicefs-csi-driver:v0.32.5"
         args = [
           "--endpoint=unix://csi/csi.sock",
           "--logtostderr",

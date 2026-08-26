@@ -36,9 +36,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:2.0.4",
-        "archive": "docker.io_hashicorp_consul_2.0.4.tar",
-        "privateRepo": "hashicorp/consul:2.0.4",
+        "publicRepo": "hashicorp/consul:2.0.3",
+        "archive": "docker.io_hashicorp_consul_2.0.3.tar",
+        "privateRepo": "hashicorp/consul:2.0.3",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags",
     },
     {

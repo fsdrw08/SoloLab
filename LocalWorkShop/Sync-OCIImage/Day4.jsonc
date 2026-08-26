@@ -1,23 +1,23 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "juicedata/juicefs-csi-driver:v0.32.1",
-        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.32.1.tar",
-        "privateRepo": "juicedata/juicefs-csi-driver:v0.32.1",
+        "publicRepo": "juicedata/juicefs-csi-driver:v0.32.5",
+        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.32.5.tar",
+        "privateRepo": "juicedata/juicefs-csi-driver:v0.32.5",
         "description": "https://hub.docker.com/r/juicedata/juicefs-csi-driver/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "gitea/gitea:1.27.1-rootless",
-        "archive": "docker.io_gitea-gitea_1.27.1-rootless.tar",
-        "privateRepo": "gitea/gitea:1.27.1-rootless",
+        "publicRepo": "gitea/gitea:1.27.2-rootless",
+        "archive": "docker.io_gitea-gitea_1.27.2-rootless.tar",
+        "privateRepo": "gitea/gitea:1.27.2-rootless",
         "description": "https://hub.docker.com/r/gitea/gitea, https://github.com/go-gitea/gitea/releases",
     },
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "artifact-keeper/artifact-keeper-backend:1.7.0",
-        "archive": "ghcr.io_artifact-keeper_artifact-keeper-backend_1.7.0.tar",
-        "privateRepo": "artifact-keeper/artifact-keeper-backend:1.7.0",
+        "publicRepo": "artifact-keeper/artifact-keeper-backend:1.8.1",
+        "archive": "ghcr.io_artifact-keeper_artifact-keeper-backend_1.8.1.tar",
+        "privateRepo": "artifact-keeper/artifact-keeper-backend:1.8.1",
         "description": "https://github.com/artifact-keeper/artifact-keeper/releases",
     },
     {
