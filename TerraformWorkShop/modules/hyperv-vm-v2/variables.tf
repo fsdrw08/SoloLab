@@ -1,35 +1,60 @@
 variable "boot_disk" {
   type = object({
-    path             = string
-    vhd_type         = string
-    block_size_bytes = optional(number, null)
-    parent_path      = optional(string, null)
-    size_bytes       = optional(number, null)
+    path                 = string
+    block_size           = optional(string, null)
+    logical_sector_size  = optional(number, null)
+    parent_path          = optional(string, null)
+    physical_sector_size = optional(number, null)
+    size                 = optional(number, null)
+    source               = optional(string, null)
+    source_disk          = optional(number, null)
+    source_vm            = optional(string, null)
+    vhd_type             = optional(string, null)
+    timeouts = optional(object({
+      create = optional(string, null)
+      delete = optional(string, null)
+      read   = optional(string, null)
+      update = optional(string, null)
+    }))
   })
 }
 
 variable "boot_disk_drive" {
   type = object({
-    controller_location = number
-    controller_number   = number
-    path                = string
-    controller_type     = optional(string, null)
+    controller_location             = number
+    controller_number               = number
+    controller_type                 = optional(string, null)
+    disk_number                     = optional(number, null)
+    maximum_iops                    = optional(number, null)
+    minimum_iops                    = optional(number, null)
+    override_cache_attributes       = optional(string, null)
+    path                            = optional(string, null)
+    qos_policy_id                   = optional(string, null)
+    resource_pool_name              = optional(string, null)
+    support_persistent_reservations = optional(bool, null)
   })
 }
 
 variable "additional_disk_drives" {
   type = list(
     object({
-      controller_location = number
-      controller_number   = number
-      path                = string
-      controller_type     = optional(string, null)
+      controller_location             = number
+      controller_number               = number
+      controller_type                 = optional(string, null)
+      disk_number                     = optional(number, null)
+      maximum_iops                    = optional(number, null)
+      minimum_iops                    = optional(number, null)
+      override_cache_attributes       = optional(string, null)
+      path                            = optional(string, null)
+      qos_policy_id                   = optional(string, null)
+      resource_pool_name              = optional(string, null)
+      support_persistent_reservations = optional(bool, null)
     })
   )
   default = []
 }
 
-variable "vm" {
+variable "vm_instance" {
   description = "hyperv vm instance config"
   type = object({
     name                                    = string

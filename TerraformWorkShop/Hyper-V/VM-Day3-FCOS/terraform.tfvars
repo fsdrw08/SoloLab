@@ -17,6 +17,7 @@ vm = {
     dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
     source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
+    size   = 32212254720
     data_disk_tfstate = {
       backend = {
         type = "local"

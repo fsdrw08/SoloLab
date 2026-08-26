@@ -1,9 +1,8 @@
 terraform {
   required_providers {
     hyperv = {
-      source  = "windsorcli/hyperv"
-      version = ">= 0.3.1"
-
+      source  = "Bafbi/hyperv"
+      version = ">= 1.5.4"
     }
   }
 }

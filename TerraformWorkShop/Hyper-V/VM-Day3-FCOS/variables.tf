@@ -22,6 +22,7 @@ variable "vm" {
     vhd = object({
       dir    = string
       source = string
+      size   = optional(number, null)
       data_disk_tfstate = optional(
         object({
           backend = object({

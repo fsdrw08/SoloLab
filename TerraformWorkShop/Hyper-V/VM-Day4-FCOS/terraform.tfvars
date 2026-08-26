@@ -19,6 +19,7 @@ vm = {
     dir = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
     source = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/fcos/fedora-coreos-hyperv.x86_64.vhdx"
+    size   = 32212254720
     # in order to prevent juicefs mount issue in linux kernel 7.1.3,
     # pin FCOS version to 44.20260621.3.1
     # fixed in juicefs csi driver v0.32.1
