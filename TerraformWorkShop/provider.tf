@@ -8,9 +8,13 @@ terraform {
       source  = "taliesins/hyperv"
       version = ">= 1.2.1"
     }
-    hyperv_new = {
+    hyperv-bafbi = {
       source  = "Bafbi/hyperv"
       version = ">= 1.5.4"
+    }
+    hyperv-windsorcli = {
+      source  = "windsorcli/hyperv"
+      version = ">= 0.4.0"
     }
     vyos = {
       source  = "Foltik/vyos"
@@ -110,7 +114,7 @@ terraform {
     }
     gitea = {
       source  = "go-gitea/gitea"
-      version = ">= 0.7.0"
+      version = ">= 0.8.1"
     }
     gitea-unofficial = {
       source  = "maxsargentdev/gitea"

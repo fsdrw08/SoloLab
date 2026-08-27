@@ -30,6 +30,18 @@ organizations = [
         name      = "sololab"
         auto_init = false
         private   = false
+      },
+      {
+        iac_id    = "db208b03"
+        name      = "helm-charts"
+        auto_init = false
+        private   = false
+      },
+      {
+        iac_id    = "5e834fa2"
+        name      = "product-api-go"
+        auto_init = false
+        private   = false
       }
     ]
     teams = [
@@ -77,7 +89,25 @@ organizations = [
         name      = "checkout"
         auto_init = false
         private   = false
-      }
+      },
+      {
+        iac_id    = "c8c51bb4"
+        name      = "setup-go"
+        auto_init = false
+        private   = false
+      },
+      {
+        iac_id    = "5f1a905c"
+        name      = "upload-artifact"
+        auto_init = false
+        private   = false
+      },
+      {
+        iac_id    = "b4f2e490"
+        name      = "download-artifact"
+        auto_init = false
+        private   = false
+      },
     ]
   },
   {
