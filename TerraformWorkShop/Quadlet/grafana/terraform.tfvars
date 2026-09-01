@@ -25,20 +25,20 @@ prov_remote = {
 }
 
 podman_kubes = [
-  # {
-  #   helm = {
-  #     name       = "grafana-database"
-  #     chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
-  #     value_file = "./attachments-postgresql/values-sololab.yaml"
-  #     value_sets = [
-  #       {
-  #         name            = "fullnameOverride"
-  #         value_plaintext = "grafana-database"
-  #       }
-  #     ]
-  #   }
-  #   manifest_dest_path = "/home/podmgr/.config/containers/systemd/grafana-pg-aio.yaml"
-  # },
+  {
+    helm = {
+      name       = "grafana-database"
+      chart      = "../../../HelmWorkShop/helm-charts/charts/postgresql"
+      value_file = "./attachments-postgresql/values-sololab.yaml"
+      value_sets = [
+        {
+          name            = "fullnameOverride"
+          value_plaintext = "grafana-database"
+        }
+      ]
+    }
+    manifest_dest_path = "/home/podmgr/.config/containers/systemd/grafana-pg-aio.yaml"
+  },
   {
     helm = {
       name       = "grafana"
@@ -120,41 +120,41 @@ podman_kubes = [
 podman_quadlet = {
   dir = "/home/podmgr/.config/containers/systemd"
   units = [
-    # {
-    #   files = [
-    #     {
-    #       template = "../templates/quadlet.kube"
-    #       vars = {
-    #         # unit
-    #         Description           = "Grafana PostgreSQL backend"
-    #         Documentation         = "https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#database"
-    #         After                 = ""
-    #         Wants                 = ""
-    #         StartLimitIntervalSec = 120
-    #         StartLimitBurst       = 3
-    #         Before                = "umount.target"
-    #         Conflicts             = "umount.target"
-    #         # kube
-    #         yaml          = "grafana-pg-aio.yaml"
-    #         PodmanArgs    = "--tls-verify=false"
-    #         KubeDownForce = "false"
-    #         Network       = ""
-    #         # service
-    #         ExecStartPre  = ""
-    #         ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run grafana-database-postgresql\""
-    #         Restart       = "on-failure"
-    #       }
-    #     }
-    #   ]
-    #   service = {
-    #     name   = "grafana-database"
-    #     status = "start"
-    #   }
-    # },
     {
       files = [
         {
           template = "../templates/quadlet.kube"
+          vars = {
+            # unit
+            Description           = "Grafana PostgreSQL backend"
+            Documentation         = "https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#database"
+            After                 = ""
+            Wants                 = ""
+            StartLimitIntervalSec = 120
+            StartLimitBurst       = 3
+            Before                = "umount.target"
+            Conflicts             = "umount.target"
+            # kube
+            yaml          = "grafana-pg-aio.yaml"
+            PodmanArgs    = "--tls-verify=false"
+            KubeDownForce = "false"
+            Network       = ""
+            # service
+            ExecStartPre  = ""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 5-10 -n 1) && podman healthcheck run grafana-database-postgresql\""
+            Restart       = "on-failure"
+          }
+        }
+      ]
+      service = {
+        name   = "grafana-database"
+        status = "start"
+      }
+    },
+    {
+      files = [
+        {
+          template = "./attachments/quadlet.kube"
           vars = {
             # unit
             Description           = "Grafana instance"
@@ -174,8 +174,8 @@ podman_quadlet = {
             # service
             # wait until vault oidc ready
             # ref: https://github.com/vmware-tanzu/pinniped/blob/b8b460f98a35d69a99d66721c631a8c2bd438d2c/hack/prepare-supervisor-on-kind.sh#L502
-            ExecStartPre  = "curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab/v1/identity/oidc/.well-known/openid-configuration"
-            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 20-30 -n 1) && podman healthcheck run grafana-server\""
+            ExecStartPre  = "/bin/bash -c \"curl -fLsSk --retry-all-errors --retry 5 --retry-delay 30 https://vault.day1.sololab/v1/identity/oidc/.well-known/openid-configuration\""
+            ExecStartPost = "/bin/bash -c \"sleep $(shuf -i 10-20 -n 1) && podman healthcheck run grafana-server\""
             Restart       = "on-failure"
           }
         },

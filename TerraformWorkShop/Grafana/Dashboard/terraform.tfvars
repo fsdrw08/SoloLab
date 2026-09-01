@@ -110,12 +110,12 @@ dashboards = [
       DS_PROMETHEUS = "517bb05c"
     }
   },
-  {
-    template = "./attachments/nomad-dashboard.json"
-    vars = {
-      DS_PROMETHEUS = "517bb05c"
-    }
-  },
+  # {
+  #   template = "./attachments/nomad-dashboard.json"
+  #   vars = {
+  #     DS_PROMETHEUS = "517bb05c"
+  #   }
+  # },
   {
     template = "./attachments/postgres-exporter-dashboard.json"
     vars = {
@@ -124,12 +124,6 @@ dashboards = [
   },
   {
     template = "./attachments/redis-dashboard.json"
-    vars = {
-      DS_PROMETHEUS = "517bb05c"
-    }
-  },
-  {
-    template = "./attachments/nexus3-dashboard.json"
     vars = {
       DS_PROMETHEUS = "517bb05c"
     }

@@ -142,6 +142,7 @@ module "podman_quadlet" {
 resource "remote_file" "consul_service" {
   for_each = toset([
     "./attachments/grafana.consul.hcl",
+    "./attachments-postgresql/grafana-pg.consul.hcl",
   ])
   path    = "/var/home/podmgr/consul-services/${basename(each.key)}"
   content = file("${each.key}")

@@ -15,11 +15,32 @@ grafana:
     traefik.http.routers.grafana.service: grafana
 
     traefik.http.services.grafana.loadbalancer.server.port: 3000
+  initContainers:
+    - name: wait-for-postgres
+      image: zot.day0.sololab/wait4x/wait4x:3.6.0
+      command:
+        - wait4x
+        - tcp
+        - '{{ default "localhost" .Values.grafana.configFiles.grafana.database.host }}:{{ default 5432 .Values.grafana.configFiles.grafana.database.port }}'
+        - --timeout
+        - 5m
+        - --interval
+        - 5s
   configFiles:
     grafana:
       database:
+        ## for sqlite
+        # high_availability: false
+        # wal: true
+        ## for pgsql
+        type: postgres
         high_availability: false
-        wal: true
+        host: grafana-pg.service.consul
+        port: 5432
+        user: grafana
+        password: grafana
+        database: grafana
+        ssl_mode: disable
       security:
         admin_user: admin
         admin_password: $__file{/etc/grafana/secret/admin_password}
