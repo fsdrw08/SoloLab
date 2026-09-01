@@ -133,13 +133,14 @@ resource "terraform_data" "boot_disk" {
 
 # vm instance
 module "hyperv_machine_instance" {
-  source     = "../../modules/hyperv-vm"
+  source     = "../../modules/hyperv-vm-v2"
   depends_on = [null_resource.remote]
   count      = var.vm.count
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
     source = var.vm.vhd.source
+    size   = var.vm.vhd.size
   }
 
   boot_disk_drive = {

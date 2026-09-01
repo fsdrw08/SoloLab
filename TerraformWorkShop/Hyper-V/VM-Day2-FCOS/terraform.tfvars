@@ -14,9 +14,10 @@ vm = {
   count     = 1
   base_name = "Day2-FCOS"
   vhd = {
-    dir = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks"
+    dir = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
-    source = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\Images\\fcos\\fedora-coreos-hyperv.x86_64.vhdx"
+    source = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/fcos/fedora-coreos-hyperv.x86_64.vhdx"
+    size   = 32212254720
     data_disk_tfstate = {
       backend = {
         type = "local"
@@ -38,10 +39,10 @@ vm = {
   power_state        = "Off"
   processor_count    = 4
   memory = {
-    dynamic       = true
-    startup_bytes = 2046820352
-    maximum_bytes = 2046820352
-    minimum_bytes = 1023410176
+    static        = true
+    startup_bytes = 3070230528
+    maximum_bytes = 3070230528
+    minimum_bytes = 3070230528
   }
 }
 

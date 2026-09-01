@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     hyperv = {
-      source  = "taliesins/hyperv"
-      version = ">= 1.2.1"
+      source  = "Bafbi/hyperv"
+      version = ">= 1.5.4"
     }
     null = {
       source  = "hashicorp/null"
