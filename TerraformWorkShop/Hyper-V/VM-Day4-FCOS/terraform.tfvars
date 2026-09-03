@@ -49,10 +49,10 @@ vm = {
   power_state        = "Off"
   cpu_core           = 4
   memory = {
-    dynamic       = true
+    static        = true
     startup_bytes = 4093640704
     maximum_bytes = 4093640704
-    minimum_bytes = 1023410176
+    minimum_bytes = 4093640704
   }
 }
 

@@ -85,7 +85,7 @@ data "ct_config" "ignition" {
 # prepare boot disk path
 resource "terraform_data" "boot_disk" {
   count = var.vm.count
-  input = join("\\", [
+  input = join("/", [
     var.vm.vhd.dir,
     local.vm_names[count.index],
     join(".", [
@@ -101,7 +101,7 @@ resource "terraform_data" "boot_disk" {
 
 # vm instance
 module "hyperv_machine_instance" {
-  source     = "../../modules/hyperv-vm"
+  source     = "../../modules/hyperv-vm-v2"
   depends_on = [null_resource.remote]
   count      = var.vm.count
 

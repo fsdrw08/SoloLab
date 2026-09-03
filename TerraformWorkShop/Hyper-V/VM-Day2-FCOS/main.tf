@@ -117,7 +117,7 @@ data "ct_config" "ignition" {
 # prepare boot disk path
 resource "terraform_data" "boot_disk" {
   count = var.vm.count
-  input = join("\\", [
+  input = join("/", [
     var.vm.vhd.dir,
     local.vm_names[count.index],
     join(".", [
