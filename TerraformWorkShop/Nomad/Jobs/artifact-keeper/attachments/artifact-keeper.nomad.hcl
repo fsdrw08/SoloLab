@@ -127,8 +127,8 @@ job "artifact-keeper" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.1/docker/Dockerfile.backend
-        image = "zot.day1.sololab/artifact-keeper/artifact-keeper-backend:1.8.1"
+        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.2/docker/Dockerfile.backend
+        image = "zot.day1.sololab/artifact-keeper/artifact-keeper-backend:1.8.2"
         labels = {
           "traefik.enable"                                                    = "true"
           "traefik.http.routers.artifact-keeper-backend-redirect.entrypoints" = "web"
@@ -154,18 +154,18 @@ job "artifact-keeper" {
 
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/sololab.crt"
+        once        = true
       }
       template {
         data = <<-EOH
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
-        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.1/.env.example
+        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.2/.env.example
         DATABASE_URL=postgresql://{{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_name}}{{end}}:{{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_password}}{{end}}@pgbouncer.service.consul:6432/artifact-keeper?sslmode=require
         
         # S3 config
@@ -175,7 +175,7 @@ job "artifact-keeper" {
         S3_ENDPOINT=https://minio-api.day1.sololab
         S3_ACCESS_KEY_ID={{with secret "kvv2_minio/data/artifact-keeper"}}{{.Data.data.access_key}}{{end}}
         S3_SECRET_ACCESS_KEY={{with secret "kvv2_minio/data/artifact-keeper"}}{{.Data.data.secret_key}}{{end}}
-        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.1/.env.example#L135
+        # https://github.com/artifact-keeper/artifact-keeper/blob/v1.8.2/.env.example#L135
         S3_CA_CERT_PATH=/secrets/sololab.crt
 
         # Others

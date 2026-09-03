@@ -8,16 +8,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "gitea/gitea:1.27.2-rootless",
-        "archive": "docker.io_gitea-gitea_1.27.2-rootless.tar",
-        "privateRepo": "gitea/gitea:1.27.2-rootless",
+        "publicRepo": "gitea/gitea:1.27.3-rootless",
+        "archive": "docker.io_gitea-gitea_1.27.3-rootless.tar",
+        "privateRepo": "gitea/gitea:1.27.3-rootless",
         "description": "https://hub.docker.com/r/gitea/gitea, https://github.com/go-gitea/gitea/releases",
     },
     {
         "publicRegistry": "ghcr.io",
-        "publicRepo": "artifact-keeper/artifact-keeper-backend:1.8.1",
-        "archive": "ghcr.io_artifact-keeper_artifact-keeper-backend_1.8.1.tar",
-        "privateRepo": "artifact-keeper/artifact-keeper-backend:1.8.1",
+        "publicRepo": "artifact-keeper/artifact-keeper-backend:1.8.2",
+        "archive": "ghcr.io_artifact-keeper_artifact-keeper-backend_1.8.2.tar",
+        "privateRepo": "artifact-keeper/artifact-keeper-backend:1.8.2",
         "description": "https://github.com/artifact-keeper/artifact-keeper/releases",
     },
     {
@@ -26,13 +26,6 @@
         "archive": "ghcr.io_artifact-keeper_artifact-keeper-web_1.8.0.tar",
         "privateRepo": "artifact-keeper/artifact-keeper-web:1.8.0",
         "description": "https://github.com/artifact-keeper/artifact-keeper-web/releases",
-    },
-    {
-        "publicRegistry": "docker.io",
-        "publicRepo": "sonatype/nexus3:3.94.1-alpine",
-        "archive": "docker.io_sonatype-nexus3_3.94.1-alpine.tar",
-        "privateRepo": "sonatype/nexus3:3.94.1-alpine",
-        "description": "https://hub.docker.com/r/sonatype/nexus3",
     },
     {
         "publicRegistry": "docker.io",

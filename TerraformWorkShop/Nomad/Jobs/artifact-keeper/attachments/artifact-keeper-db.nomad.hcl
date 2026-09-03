@@ -139,7 +139,7 @@ job "artifact-keeper-db" {
       }
 
       template {
-        data = <<-EOH
+        data        = <<-EOH
         # Lines starting with a # are ignored
 
         # Empty lines are also ignored
@@ -147,7 +147,6 @@ job "artifact-keeper-db" {
         POSTGRESQL_PASSWORD={{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_user_password}}{{end}}
         POSTGRESQL_ADMIN_PASSWORD={{with secret "kvv2_others/data/app-artifact-keeper"}}{{.Data.data.pgsql_admin_password}}{{end}}
         EOH
-
         destination = "secrets/file.env"
         env         = true
       }
