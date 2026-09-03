@@ -229,11 +229,11 @@ job "atlantis" {
         gid         = 1000
       }
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/sololab.crt"
+        once        = true
       }
       template {
         # https://help.sonatype.com/en/install-nexus-repository-with-a-postgresql-database.html

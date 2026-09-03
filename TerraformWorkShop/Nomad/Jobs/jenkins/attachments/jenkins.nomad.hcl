@@ -120,7 +120,7 @@ job "jenkins" {
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/sololab.crt"
-        change_mode = "restart"
+        once        = true
       }
       vault {}
 

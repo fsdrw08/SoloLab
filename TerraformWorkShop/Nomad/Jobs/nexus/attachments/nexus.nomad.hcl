@@ -58,6 +58,7 @@ job "nexus" {
         {{with secret "kvv2_certs/data/sololab_root"}}{{.Data.data.ca}}{{end}}
         EOH
         destination = "secrets/sololab.crt"
+        once        = true
       }
       vault {}
 

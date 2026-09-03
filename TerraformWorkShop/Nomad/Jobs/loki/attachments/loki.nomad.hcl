@@ -108,7 +108,7 @@ job "loki" {
           {{ with secret "kvv2_certs/data/root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/ca.crt"
-        change_mode = "restart"
+        once        = true
       }
 
       vault {}

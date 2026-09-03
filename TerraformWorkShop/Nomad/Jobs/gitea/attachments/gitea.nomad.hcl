@@ -160,8 +160,8 @@ job "gitea" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        # https://github.com/go-gitea/gitea/blob/v1.27.2/Dockerfile.rootless
-        image = "zot.day1.sololab/gitea/gitea:1.27.2-rootless"
+        # https://github.com/go-gitea/gitea/blob/v1.27.3/Dockerfile.rootless
+        image = "zot.day1.sololab/gitea/gitea:1.27.3-rootless"
         labels = {
           "traefik.enable"                                  = "true"
           "traefik.http.routers.gitea-redirect.entrypoints" = "web"
@@ -213,11 +213,11 @@ job "gitea" {
         gid         = 1000
       }
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/sololab.crt"
+        once        = true
       }
       vault {}
 

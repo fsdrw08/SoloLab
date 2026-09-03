@@ -43,19 +43,19 @@ job "juicefs-controller" {
       }
 
       resources {
-        cpu    = 100
-        memory = 100
+        cpu    = 300
+        memory = 300
       }
       env {
         POD_NAME = "csi-controller"
       }
 
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/tls/ca.crt"
+        once        = true
       }
 
       vault {}

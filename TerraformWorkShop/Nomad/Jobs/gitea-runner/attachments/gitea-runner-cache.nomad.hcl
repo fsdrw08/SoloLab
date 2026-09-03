@@ -109,7 +109,7 @@ job "gitea-runner-cache" {
       }
       # https://developer.hashicorp.com/nomad/docs/job-specification/template
       template {
-        change_mode = "noop"
+        once        = true
         data        = <<-EOF
         cache:
           external_secret: 12345

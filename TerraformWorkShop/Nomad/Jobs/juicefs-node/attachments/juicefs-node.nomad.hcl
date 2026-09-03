@@ -51,11 +51,11 @@ job "juicefs-node" {
       }
 
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/tls/ca.crt"
+        once        = true
       }
 
       vault {}

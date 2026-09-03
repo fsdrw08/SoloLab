@@ -137,6 +137,7 @@ job "gitlab" {
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOH
         destination = "secrets/sololab.ca.crt"
+        once        = true
       }
       template {
         data        = var.config

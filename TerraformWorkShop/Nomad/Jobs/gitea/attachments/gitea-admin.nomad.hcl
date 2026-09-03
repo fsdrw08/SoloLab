@@ -52,7 +52,7 @@ job "gitea-admin" {
     task "gitea-config" {
       driver = "podman"
       config {
-        image   = "zot.day1.sololab/gitea/gitea:1.27.2-rootless"
+        image   = "zot.day1.sololab/gitea/gitea:1.27.3-rootless"
         command = "/bin/bash"
         args    = ["/tmp/gitea-admin.sh"]
         volumes = [
@@ -72,11 +72,11 @@ job "gitea-admin" {
         gid         = 1000
       }
       template {
-        change_mode = "noop"
         data        = <<-EOF
           {{ with secret "kvv2_certs/data/sololab_root" }}{{ .Data.data.ca }}{{ end }}
         EOF
         destination = "secrets/sololab.crt"
+        once        = true
       }
       template {
         change_mode = "noop"
