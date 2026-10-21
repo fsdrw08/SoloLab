@@ -19,9 +19,9 @@
     {
         "type": "general",
         "publicParentPath": "https://releases.hashicorp.com",
-        "publicChildPath": "consul/2.0.3/consul_2.0.3_linux_amd64.zip",
-        "localChildPath": "bin/consul_2.0.3_linux_amd64.zip",
-        "privateChildPath": "public/binaries/consul_2.0.3_linux_amd64.zip",
+        "publicChildPath": "consul/2.0.4/consul_2.0.4_linux_amd64.zip",
+        "localChildPath": "bin/consul_2.0.4_linux_amd64.zip",
+        "privateChildPath": "public/binaries/consul_2.0.4_linux_amd64.zip",
         "description": "https://releases.hashicorp.com/consul",
     },
     {

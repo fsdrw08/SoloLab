@@ -1,9 +1,9 @@
 [
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/consul:2.0.3",
-        "archive": "docker.io_hashicorp_consul_2.0.3.tar",
-        "privateRepo": "hashicorp/consul:2.0.3",
+        "publicRepo": "hashicorp/consul:2.0.4",
+        "archive": "docker.io_hashicorp_consul_2.0.4.tar",
+        "privateRepo": "hashicorp/consul:2.0.4",
         "description": "https://hub.docker.com/r/hashicorp/consul/tags, https://github.com/hashicorp/consul/releases",
     },
     {
@@ -92,9 +92,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "navidys/prometheus-podman-exporter:v1.21.2",
-        "archive": "quay.io_navidys_prometheus-podman-exporter_v1.21.2.tar",
-        "privateRepo": "navidys/prometheus-podman-exporter:v1.21.2",
+        "publicRepo": "navidys/prometheus-podman-exporter:v2.0.0",
+        "archive": "quay.io_navidys_prometheus-podman-exporter_v2.0.0.tar",
+        "privateRepo": "navidys/prometheus-podman-exporter:v2.0.0",
         "description": "https://quay.io/repository/navidys/prometheus-podman-exporter?tab=tags",
     },
 ]

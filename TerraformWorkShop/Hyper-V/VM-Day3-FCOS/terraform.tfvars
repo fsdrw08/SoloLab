@@ -76,7 +76,7 @@ butane = {
       custom_bin_dir      = "/opt/bin"
       # consul client
       consul_install_url  = "http://dufs.day1.sololab/public/binaries/consul_install.sh"
-      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.3_linux_amd64.zip"
+      consul_download_url = "http://dufs.day1.sololab/public/binaries/consul_2.0.4_linux_amd64.zip"
       consul_server_fqdn  = "consul.service.consul"
       consul_config_dir   = "/etc/consul.d"
       consul_data_dir     = "/var/mnt/data/consul"

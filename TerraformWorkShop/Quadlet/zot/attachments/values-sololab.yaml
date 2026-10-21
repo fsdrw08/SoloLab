@@ -76,7 +76,7 @@ zot:
         #       keypath:
         #       scopes: ["openid", "profile", "email", "groups"]
 
-        # https://zotregistry.dev/v2.1.20/articles/authn-authz/#example-access-control-configuration
+        # https://zotregistry.dev/v2.1.22/articles/authn-authz/#example-access-control-configuration
         # https://github.com/project-zot/zot/issues/2149
       accessControl:
         metrics:
@@ -95,13 +95,13 @@ zot:
           ## for oidc
           # groups: ["app-zot-admin"]
 
-          # https://zotregistry.dev/v2.1.20/articles/storage/#configuring-zot-storage
+          # https://zotregistry.dev/v2.1.22/articles/storage/#configuring-zot-storage
     storage:
       rootDirectory: "/var/lib/registry"
-      # https://zotregistry.dev/v2.1.20/articles/storage/#commit
+      # https://zotregistry.dev/v2.1.22/articles/storage/#commit
       # make data to be written to disk immediately
       commit: true
-      # https://zotregistry.dev/v2.1.20/articles/storage/#garbage-collection
+      # https://zotregistry.dev/v2.1.22/articles/storage/#garbage-collection
       # Garbage collection (gc) is enabled by default to reclaim this space
       gc: true
     log:

@@ -25,7 +25,7 @@ Environment=TZ=Asia/Shanghai
 
 Exec=--web.listen-address=127.0.0.1:9882
 
-Image=zot.day1.sololab/navidys/prometheus-podman-exporter:v1.21.2
+Image=zot.day1.sololab/navidys/prometheus-podman-exporter:v2.0.0
 
 Label="traefik.enable=true"
 Label="traefik.http.routers.podman-exporter-redirect.entrypoints=web"
