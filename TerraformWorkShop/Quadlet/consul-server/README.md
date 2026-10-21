@@ -1,5 +1,5 @@
 ### Requirements
-#### Network3
+#### Network
 - Ensure external DNS record for `consul.day2.sololab` is ready  
 [TerraformWorkShop/PowerDNS/zones](../../../TerraformWorkShop/PowerDNS/zones/terraform.tfvars)
 ```powershell
@@ -14,7 +14,7 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/etcd/skydns/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
-#### Workload3
+#### Workload
 - Ensure Consul container image `hashicorp/consul` had synced to image server
 [LocalWorkShop/Sync-OCIImage/Day2.jsonc](../../../LocalWorkShop/Sync-OCIImage/Day2.jsonc)
 ```powershell
@@ -25,7 +25,7 @@ $proxy="127.0.0.1:7890"; $env:HTTP_PROXY=$proxy; $env:HTTPS_PROXY=$proxy; $env:N
 .\Sync-OCIImage.ps1 -PrivateRegistry "zot.day1.sololab" -SyncProfile "Day4.jsonc" # -Upload $false
 # .\Sync-OCIImage.ps1 -PrivateRegistry "zot.day1.sololab" -SyncProfile "Day4.jsonc" -LocalStore "D:/Users/Public/Downloads/containers" -Upload $false
 ```
-#### Middleware3
+#### Middleware
 - Ensure external L4 loadbalancer for `consul.day2.sololab` is ready
 (haproxy in VyOS [TerraformWorkShop/VyOS/HAProxy](../../../TerraformWorkShop/VyOS/HAProxy/terraform.tfvars))
 ```powershell
@@ -33,7 +33,7 @@ $repoDir=git rev-parse --show-toplevel
 $childPath="TerraformWorkShop/VyOS/HAProxy/"
 terraform -chdir="$(Join-Path -Path $repoDir -ChildPath $childPath)" apply -auto-approve
 ```
-#### Security3
+#### Security
 - Ensure consul cert `consul.day2.sololab` is ready  
 [TerraformWorkShop/Vault/Secrets/PKI/certs](../../../TerraformWorkShop/Vault/Secrets/PKI/certs/terraform.tfvars)
 ```powershell

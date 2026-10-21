@@ -1,23 +1,23 @@
 [
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260817.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260817.3.1.tar",
-        "privateRepo": "fedora/fedora-coreos:44.20260817.3.1",
+        "publicRepo": "fedora/fedora-coreos:44.20260928.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260928.3.1.tar",
+        "privateRepo": "fedora/fedora-coreos:44.20260928.3.1",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/fedora-coreos:44.20260817.3.1",
-        "archive": "quay.io_fedora_fedora-coreos_44.20260817.3.1.tar",
+        "publicRepo": "fedora/fedora-coreos:44.20260928.3.1",
+        "archive": "quay.io_fedora_fedora-coreos_44.20260928.3.1.tar",
         "privateRepo": "fedora/fedora-coreos:stable",
         "description": "https://quay.io/repository/fedora/fedora-coreos?tab=tags",
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "coreos/etcd:v3.7.1",
-        "archive": "quay.io_coreos_etcd_v3.7.1.tar",
-        "privateRepo": "coreos/etcd:v3.7.1",
+        "publicRepo": "coreos/etcd:v3.7.2",
+        "archive": "quay.io_coreos_etcd_v3.7.2.tar",
+        "privateRepo": "coreos/etcd:v3.7.2",
         "description": "https://quay.io/repository/coreos/etcd?tab=tags",
     },
     {
@@ -29,9 +29,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/traefik:v3.7.11",
-        "archive": "docker.io_library_traefik_v3.7.11.tar",
-        "privateRepo": "library/traefik:v3.7.11",
+        "publicRepo": "library/traefik:v3.7.16",
+        "archive": "docker.io_library_traefik_v3.7.16.tar",
+        "privateRepo": "library/traefik:v3.7.16",
         "description": "https://hub.docker.com/r/library/traefik",
     },
     {
@@ -57,15 +57,15 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "hashicorp/vault:2.0.4",
-        "archive": "docker.io_hashicorp_vault_2.0.4.tar",
-        "privateRepo": "hashicorp/vault:2.0.4",
+        "publicRepo": "hashicorp/vault:2.2.0",
+        "archive": "docker.io_hashicorp_vault_2.2.0.tar",
+        "privateRepo": "hashicorp/vault:2.2.0",
         "description": "https://hub.docker.com/r/hashicorp/vault/tags, https://github.com/hashicorp/vault/releases",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "apteno/alpine-jq:2026-08-23",
-        "archive": "docker.io_apteno_alpine-jq_2026-08-23.tar",
+        "publicRepo": "apteno/alpine-jq:2026-10-18",
+        "archive": "docker.io_apteno_alpine-jq_2026-10-18.tar",
         "privateRepo": "apteno/alpine-jq:latest",
         "description": "https://hub.docker.com/r/apteno/alpine-jq/tags",
     },
@@ -106,9 +106,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "grafana/alloy:v1.19.0",
-        "archive": "docker.io_grafana_alloy_v1.19.0.tar",
-        "privateRepo": "grafana/alloy:v1.19.0",
+        "publicRepo": "grafana/alloy:v1.21.0",
+        "archive": "docker.io_grafana_alloy_v1.21.0.tar",
+        "privateRepo": "grafana/alloy:v1.21.0",
         "description": "https://hub.docker.com/r/grafana/alloy/tags, https://github.com/grafana/alloy, https://quay.io/repository/giantswarm/alloy?tab=tags",
     },
 ]

@@ -61,7 +61,7 @@ job "alloy" {
       driver = "podman"
       config {
         network_mode = "host"
-        image        = "zot.day1.sololab/grafana/alloy:v1.19.0"
+        image        = "zot.day1.sololab/grafana/alloy:v1.21.0"
         args = [
           "run",
           "/etc/alloy/config.alloy",
