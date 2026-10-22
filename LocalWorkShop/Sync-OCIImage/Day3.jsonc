@@ -1,10 +1,10 @@
 [
     {
         "publicRegistry": "registry.k8s.io",
-        "publicRepo": "pause-amd64:3.3",
-        "archive": "registry.k8s.io_pause-amd64_3.3.tar",
-        "privateRepo": "pause-amd64:3.3",
-        "description": "https://quay.io/repository/giantswarm/pause-amd64?tab=tags",
+        "publicRepo": "pause:3.10.2",
+        "archive": "registry.k8s.io_pause_3.10.2.tar",
+        "privateRepo": "pause:3.10.2",
+        "description": "https://docker.aityp.com/r/registry.k8s.io/pause",
     },
     {
         "publicRegistry": "docker.io",
@@ -36,9 +36,9 @@
     },
     {
         "publicRegistry": "quay.io",
-        "publicRepo": "fedora/postgresql-18:20260826",
-        "archive": "quay.io_fedora_postgresql-18_20260826.tar",
-        "privateRepo": "fedora/postgresql-18:20260826",
+        "publicRepo": "fedora/postgresql-18:20261021",
+        "archive": "quay.io_fedora_postgresql-18_20261021.tar",
+        "privateRepo": "fedora/postgresql-18:20261021",
         "description": "https://quay.io/repository/fedora/postgresql-18?tab=tags",
     },
     {
@@ -57,9 +57,9 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "library/redis:8.8.2",
-        "archive": "docker.io_library_redis_8.8.2.tar",
-        "privateRepo": "library/redis:8.8.2",
+        "publicRepo": "library/redis:8.8.3",
+        "archive": "docker.io_library_redis_8.8.3.tar",
+        "privateRepo": "library/redis:8.8.3",
         "description": "https://hub.docker.com/_/redis",
     },
     {
@@ -71,16 +71,16 @@
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "oliver006/redis_exporter:v1.87.0-alpine",
-        "archive": "docker.io_oliver006_redis_exporter_v1.87.0-alpine.tar",
-        "privateRepo": "oliver006/redis_exporter:v1.87.0-alpine",
+        "publicRepo": "oliver006/redis_exporter:v1.95.0-alpine",
+        "archive": "docker.io_oliver006_redis_exporter_v1.95.0-alpine.tar",
+        "privateRepo": "oliver006/redis_exporter:v1.95.0-alpine",
         "description": "https://hub.docker.com/r/oliver006/redis_exporter/tags",
     },
     {
         "publicRegistry": "docker.io",
-        "publicRepo": "juicedata/juicefs-csi-driver:v0.32.5",
-        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.32.5.tar",
-        "privateRepo": "juicedata/juicefs-csi-driver:v0.32.5",
+        "publicRepo": "juicedata/juicefs-csi-driver:v0.33.1",
+        "archive": "docker.io_juicedata_juicefs-csi-driver_v0.33.1.tar",
+        "privateRepo": "juicedata/juicefs-csi-driver:v0.33.1",
         "description": "https://hub.docker.com/r/juicedata/juicefs-csi-driver/tags",
     },
 ]

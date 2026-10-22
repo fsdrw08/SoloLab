@@ -89,7 +89,7 @@ storage:
           # plugin "docker" {
           #   config {
           #     allow_privileged = true
-          #     infra_image = "zot.day1.sololab/pause-amd64:3.3"
+          #     infra_image = "zot.day1.sololab/pause:3.10.2"
           #     volumes {
           #       enabled      = true
           #       selinuxlabel = "z"

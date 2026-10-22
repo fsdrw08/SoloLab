@@ -154,7 +154,7 @@ podman_quadlet = {
     {
       files = [
         {
-          template = "./attachments/quadlet.kube"
+          template = "../templates/quadlet.kube"
           vars = {
             # unit
             Description           = "Grafana instance"

@@ -59,7 +59,7 @@ job "loki" {
       # https://developer.hashicorp.com/nomad/plugins/drivers/podman#task-configuration
       driver = "podman"
       config {
-        image = "zot.day1.sololab/grafana/loki:3.7.6"
+        image = "zot.day1.sololab/grafana/loki:3.7.9"
         labels = {
           "traefik.enable"                                 = "true"
           "traefik.http.routers.loki-redirect.entrypoints" = "web"

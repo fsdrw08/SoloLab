@@ -82,7 +82,7 @@ butane = {
       consul_data_dir     = "/var/mnt/data/consul"
       # nomad client
       nomad_install_url                   = "http://dufs.day1.sololab/public/binaries/nomad_install.sh"
-      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.5_linux_amd64.zip"
+      nomad_download_url                  = "http://dufs.day1.sololab/public/binaries/nomad_2.0.7_linux_amd64.zip"
       nomad_server_fqdn                   = "nomad.service.consul"
       nomad_podman_driver_install_url     = "http://dufs.day1.sololab/public/binaries/nomad_driver_podman_install.sh"
       nomad_podman_driver_download_url    = "http://dufs.day1.sololab/public/binaries/nomad-driver-podman_0.6.5_linux_amd64.zip"
