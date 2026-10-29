@@ -14,17 +14,20 @@ vm = {
   count     = 1
   base_name = "Day2-FCOS"
   vhd = {
-    dir = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks"
     # https://fedoraproject.org/coreos/download?stream=stable
-    source = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/fcos/fedora-coreos-hyperv.x86_64.vhdx"
-    size   = 32212254720
-    data_disk_tfstate = {
-      backend = {
+    boot_disk = {
+      source                 = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks/Images/fcos/fedora-coreos-hyperv.x86_64.vhdx"
+      destination_parent_dir = "C:/ProgramData/Microsoft/Windows/Virtual Hard Disks"
+      destination_size       = 32212254720
+    }
+    data_disk = {
+      tfstate_backend = {
         type = "local"
         config = {
           path = "../Disks-Data/terraform.tfstate"
         }
       }
+      subfix = ["1000", "1001"]
     }
   }
   nic = [

@@ -21,23 +21,37 @@ if (-not (Test-Path $ImageDir)) {
 
 ### Run terraform
 ```powershell
-sudo terraform init
-terraform apply --auto-approve
+$repoDir=git rev-parse --show-toplevel
+$childPath="TerraformWorkShop/Hyper-V/VM-Day1-FCOS"
+Set-Location -Path (Join-Path -Path $repoDir -ChildPath $childPath)
+sudo pwsh.exe -c "terraform init -upgrade"
+sudo pwsh.exe -c "terraform apply --auto-approve"
 ```
 For the reason the the ignition process can only run before VM first boot up, 
 we have to turn on the VM manually.
 
 ### Others: Backup and restore xfs filesystem:
-backup
+#### backup
+backup from vm
 ```shell
 cd /var/home/core
 sudo xfsdump -L podmgr -f podmgr.xfsdump /var/home/podmgr
 ```
 
-restore:
+copy the backup file from vm to host
+```powershell
+scp core@Day1-FCOS:/var/home/core/podmgr.xfsdump C:\Users\Public\Downloads\backup\day1-podmgr.xfsdump
+```
+
+#### restore
+copy the backup file from host to vm
+```powershell
+scp C:\Users\Public\Downloads\backup\day1-podmgr.xfsdump core@Day1-FCOS:/var/home/core/podmgr.xfsdump 
+```
+restore from vm
 ```shell
 cd /var/home/core
-sudo xfsrestore -f podmgr_2.xfsdump /var/home/podmgr
+sudo xfsrestore -f podmgr.xfsdump /var/home/podmgr
 ```
 
 ### Upgrade system image from private container registry:

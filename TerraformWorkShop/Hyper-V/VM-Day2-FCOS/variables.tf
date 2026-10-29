@@ -20,11 +20,21 @@ variable "vm" {
     count     = number
     base_name = string
     vhd = object({
-      dir    = string
-      source = string
-      size   = optional(number, null)
+      boot_disk = object({
+        source                 = string
+        destination_parent_dir = string
+        destination_size       = number
+      })
+      data_disk = object({
+        tfstate_backend = object({
+          type   = string
+          config = map(string)
+        })
+        subfix = optional(list(string))
+      })
       data_disk_tfstate = optional(
         object({
+          subfix = optional(list(string))
           backend = object({
             type   = string
             config = map(string)

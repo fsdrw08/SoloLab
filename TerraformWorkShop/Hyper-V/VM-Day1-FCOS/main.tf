@@ -1,4 +1,4 @@
-# aggregate tfstate list
+# aggregate tfstate data for var reference
 locals {
   tls_tfstate = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
@@ -9,7 +9,7 @@ locals {
   ])
 }
 
-# load list of tfstate
+# load cert from local tls
 data "terraform_remote_state" "tfstate" {
   for_each = local.tls_tfstate == null ? null : {
     for secret_tfstate in setunion(local.tls_tfstate) : secret_tfstate.name => secret_tfstate
@@ -111,7 +111,7 @@ resource "null_resource" "remote" {
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
-    vhd_dir       = var.vm.vhd.dir
+    vhd_dir       = var.vm.vhd.boot_disk.destination_parent_dir
     vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
@@ -151,40 +151,41 @@ resource "null_resource" "remote" {
   }
 }
 
-locals {
-  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
-    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
-  ]
-  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
-    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
-    if regex("^[^.]+", vhd.name) == var.vm.base_name
-    ]) : flatten([
-    for count in range(var.vm.count) : [
-      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
-    ]
-  ])
-}
-
 # fetch data disk info
 data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_tfstate.backend.type
-  config  = var.vm.vhd.data_disk_tfstate.backend.config
+  count   = var.vm.vhd.data_disk == null ? 0 : 1
+  backend = var.vm.vhd.data_disk.tfstate_backend.type
+  config  = var.vm.vhd.data_disk.tfstate_backend.config
+}
+
+locals {
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}-0${count + 1}"
+  ]
+  data_disks = var.vm.vhd.data_disk.tfstate_backend == null ? null : var.vm.count == 1 ? [[
+    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
+    # if regex("^[^.]+", vhd.name) == var.vm.base_name
+    if startswith(vhd.name, var.vm.base_name)
+    ]] : [
+    for count in range(var.vm.count) : [
+      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+      if startswith(vhd.name, "${var.vm.base_name}-0${count + 1}")
+    ]
+  ]
 }
 
 # prepare boot disk path
 resource "terraform_data" "boot_disk" {
   count = var.vm.count
   input = join("\\", [
-    var.vm.vhd.dir,
+    var.vm.vhd.boot_disk.destination_parent_dir,
     local.vm_names[count.index],
     join(".", [
       "boot",
       element(
-        split(".", basename(var.vm.vhd.source)),
-        length(split(".", basename(var.vm.vhd.source))) - 1
+        split(".", basename(var.vm.vhd.boot_disk.source)),
+        length(split(".", basename(var.vm.vhd.boot_disk.source))) - 1
       )
     ])
     ]
@@ -199,7 +200,7 @@ module "hyperv_machine_instance" {
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
-    source = var.vm.vhd.source
+    source = var.vm.vhd.boot_disk.source
   }
 
   boot_disk_drive = {
@@ -209,12 +210,13 @@ module "hyperv_machine_instance" {
     path                = terraform_data.boot_disk[count.index].input
   }
 
-  additional_disk_drives = var.vm.vhd.data_disk_tfstate == null ? null : [
-    {
+  additional_disk_drives = var.vm.vhd.data_disk == null ? null : [
+    for index, subfix in var.vm.vhd.data_disk.subfix : {
       controller_type     = "Scsi"
       controller_number   = "0"
-      controller_location = "2"
-      path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
+      controller_location = "${index + 2}"
+      # path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
+      path = local.data_disks[count.index][index]
     }
   ]
 
@@ -284,7 +286,7 @@ resource "null_resource" "kvpctl" {
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
-    vhd_dir       = var.vm.vhd.dir
+    vhd_dir       = var.vm.vhd.boot_disk.destination_parent_dir
     vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
@@ -306,9 +308,8 @@ resource "null_resource" "kvpctl" {
 
   provisioner "remote-exec" {
     inline = [<<-EOT
-      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
+      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.boot_disk.destination_parent_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
     EOT
     ]
   }
 }
-

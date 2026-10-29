@@ -1,12 +1,55 @@
-# load secret from vault
+# aggregate tfstate data for var reference
 locals {
-  secrets_vault_kvv2 = flatten([
+  tls_tfstate = flatten([
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
+      backend = value_refer.tfstate.backend
+      name    = value_refer.tfstate.name
+    }
+    if value_refer.tfstate != null
+  ])
+}
+
+# load cert from local tls
+data "terraform_remote_state" "tfstate" {
+  for_each = local.tls_tfstate == null ? null : {
+    for secret_tfstate in setunion(local.tls_tfstate) : secret_tfstate.name => secret_tfstate
+  }
+  backend = each.value.backend.type
+  config  = each.value.backend.config
+}
+
+# prepare secret list from tfstate or vault kvv2
+locals {
+  vault_kvv2_secret_list = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
       mount = value_refer.vault_kvv2.mount
       name  = value_refer.vault_kvv2.name
     }
     if value_refer.vault_kvv2 != null
   ])
+  tfstate_secret_list = data.terraform_remote_state.tfstate == null ? null : flatten([
+    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
+      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.name].outputs[value_refer.tfstate.output] : cert
+      if cert.name == value_refer.tfstate.item_name
+    ]
+    if value_refer.tfstate != null
+  ])
+}
+
+# load vault kvv2 secret
+data "vault_kv_secret_v2" "secret" {
+  for_each = local.vault_kvv2_secret_list == null ? null : {
+    for vault_kvv2_secret in local.vault_kvv2_secret_list : vault_kvv2_secret.name => vault_kvv2_secret
+  }
+  mount = each.value.mount
+  name  = each.value.name
+}
+
+locals {
+  # convert tfstate secret from list to object map
+  tfstate_secret_object = data.terraform_remote_state.tfstate == null ? null : {
+    for cert in local.tfstate_secret_list : cert.name => cert
+  }
   secret_var_keys = flatten([
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
       for value_set in value_refer.value_sets : [
@@ -20,71 +63,11 @@ locals {
     for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
       for value_set in value_refer.value_sets : [
         data.vault_kv_secret_v2.secret[value_refer.vault_kvv2.name].data[value_set.value_ref_key]
-        # local.certs[value_refer.tfstate.cert_name][value_set.value_ref_key]
+        # local.tfstate_secret_object[value_refer.tfstate.cert_name][value_set.value_ref_key]
       ]
     ]
     if value_refer.vault_kvv2 != null
     # if value_refer.tfstate != null
-  ])
-  tls_tfstate = flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : {
-      backend = value_refer.tfstate.backend
-      name    = value_refer.tfstate.cert_name
-    }
-    if value_refer.tfstate != null
-  ])
-}
-
-data "vault_kv_secret_v2" "secret" {
-  for_each = local.secrets_vault_kvv2 == null ? null : {
-    for secrets_vault_kvv2 in local.secrets_vault_kvv2 : secrets_vault_kvv2.name => secrets_vault_kvv2
-  }
-  mount = each.value.mount
-  name  = each.value.name
-}
-
-# load cert from local tls
-data "terraform_remote_state" "tfstate" {
-  for_each = local.tls_tfstate == null ? null : {
-    for tls_tfstate in local.tls_tfstate : tls_tfstate.name => tls_tfstate
-  }
-  backend = each.value.backend.type
-  config  = each.value.backend.config
-}
-
-locals {
-  cert_list = data.terraform_remote_state.tfstate == null ? null : flatten([
-    for value_refer in var.butane.vars.value_refers == null ? [] : var.butane.vars.value_refers : [
-      for cert in data.terraform_remote_state.tfstate[value_refer.tfstate.cert_name].outputs.signed_certs : cert
-      if cert.name == value_refer.tfstate.cert_name
-    ]
-    if value_refer.tfstate != null
-  ])
-  certs = data.terraform_remote_state.tfstate == null ? null : {
-    for cert in local.cert_list : cert.name => cert
-  }
-}
-
-# fetch data disk info
-data "terraform_remote_state" "data_disk" {
-  count   = var.vm.vhd.data_disk_tfstate == null ? 0 : 1
-  backend = var.vm.vhd.data_disk_tfstate.backend.type
-  config  = var.vm.vhd.data_disk_tfstate.backend.config
-}
-
-locals {
-  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
-    for count in range(var.vm.count) : "${var.vm.base_name}0${count + 1}"
-  ]
-  data_disks = var.vm.vhd.data_disk_tfstate == null ? null : var.vm.count == 1 ? flatten([
-    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
-    if regex("^[^.]+", vhd.name) == var.vm.base_name
-    ]) : flatten([
-    for count in range(var.vm.count) : [
-      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
-      if startswith(vhd.name, "${var.vm.base_name}0${count + 1}")
-    ]
   ])
 }
 
@@ -114,17 +97,95 @@ data "ct_config" "ignition" {
   ]
 }
 
+# present ignition file to local
+resource "local_file" "ignition" {
+  count    = var.vm.count
+  content  = data.ct_config.ignition[count.index].rendered
+  filename = "ignition${count.index + 1}.json"
+}
+
+# copy ignition file to remote
+resource "null_resource" "remote" {
+  count      = var.vm.count
+  depends_on = [local_file.ignition]
+  triggers = {
+    # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
+    manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
+    vhd_dir       = var.vm.vhd.boot_disk.destination_parent_dir
+    vm_name       = local.vm_names[count.index]
+    # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
+    filename = local_file.ignition[count.index].filename
+    host     = var.prov_hyperv.host
+    user     = var.prov_hyperv.user
+    password = sensitive(var.prov_hyperv.password)
+  }
+
+  connection {
+    type     = "winrm"
+    host     = self.triggers.host
+    user     = self.triggers.user
+    password = self.triggers.password
+    use_ntlm = true
+    https    = true
+    insecure = true
+    timeout  = "20s"
+  }
+  # copy to remote
+  provisioner "file" {
+    source = local_file.ignition[count.index].filename
+    # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
+    destination = join("/", [
+      "${self.triggers.vhd_dir}",
+      "${self.triggers.vm_name}\\${self.triggers.filename}"
+      ]
+    )
+  }
+
+  # for destroy
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [<<-EOT
+      Powershell -Command "$ignition_file=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); if (Test-Path $ignition_file) { Remove-Item $ignition_file }"
+    EOT
+    ]
+  }
+}
+
+# fetch data disk info
+data "terraform_remote_state" "data_disk" {
+  count   = var.vm.vhd.data_disk == null ? 0 : 1
+  backend = var.vm.vhd.data_disk.tfstate_backend.type
+  config  = var.vm.vhd.data_disk.tfstate_backend.config
+}
+
+locals {
+  vm_names = var.vm.count == 1 ? [var.vm.base_name] : [
+    for count in range(var.vm.count) : "${var.vm.base_name}-0${count + 1}"
+  ]
+  data_disks = var.vm.vhd.data_disk.tfstate_backend == null ? null : var.vm.count == 1 ? [[
+    for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+    # if replace(vhd.name, "/\\..*/", "") == var.vm.base_name
+    # if regex("^[^.]+", vhd.name) == var.vm.base_name
+    if startswith(vhd.name, var.vm.base_name)
+    ]] : [
+    for count in range(var.vm.count) : [
+      for vhd in data.terraform_remote_state.data_disk[0].outputs.vhds : vhd.path
+      if startswith(vhd.name, "${var.vm.base_name}-0${count + 1}")
+    ]
+  ]
+}
+
 # prepare boot disk path
 resource "terraform_data" "boot_disk" {
   count = var.vm.count
-  input = join("/", [
-    var.vm.vhd.dir,
+  input = join("\\", [
+    var.vm.vhd.boot_disk.destination_parent_dir,
     local.vm_names[count.index],
     join(".", [
       "boot",
       element(
-        split(".", basename(var.vm.vhd.source)),
-        length(split(".", basename(var.vm.vhd.source))) - 1
+        split(".", basename(var.vm.vhd.boot_disk.source)),
+        length(split(".", basename(var.vm.vhd.boot_disk.source))) - 1
       )
     ])
     ]
@@ -139,8 +200,8 @@ module "hyperv_machine_instance" {
 
   boot_disk = {
     path   = terraform_data.boot_disk[count.index].input
-    source = var.vm.vhd.source
-    size   = var.vm.vhd.size
+    source = var.vm.vhd.boot_disk.source
+    size   = var.vm.vhd.boot_disk.destination_size
   }
 
   boot_disk_drive = {
@@ -150,12 +211,12 @@ module "hyperv_machine_instance" {
     path                = terraform_data.boot_disk[count.index].input
   }
 
-  additional_disk_drives = var.vm.vhd.data_disk_tfstate == null ? null : [
-    {
+  additional_disk_drives = var.vm.vhd.data_disk == null ? null : [
+    for index, subfix in var.vm.vhd.data_disk.subfix : {
       controller_type     = "Scsi"
       controller_number   = "0"
-      controller_location = "2"
-      path                = var.vm.count <= 1 ? one(local.data_disks) : local.data_disks[count.index]
+      controller_location = "${index + 2}"
+      path                = local.data_disks[count.index][index]
     }
   ]
 
@@ -214,60 +275,6 @@ module "hyperv_machine_instance" {
   }
 }
 
-# present ignition file to local
-resource "local_file" "ignition" {
-  count    = var.vm.count
-  content  = data.ct_config.ignition[count.index].rendered
-  filename = "ignition${count.index + 1}.json"
-}
-
-# copy ignition file to remote
-resource "null_resource" "remote" {
-  count      = var.vm.count
-  depends_on = [local_file.ignition]
-  triggers = {
-    # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
-    manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
-    vhd_dir       = var.vm.vhd.dir
-    vm_name       = local.vm_names[count.index]
-    # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
-    filename = local_file.ignition[count.index].filename
-    host     = var.prov_hyperv.host
-    user     = var.prov_hyperv.user
-    password = sensitive(var.prov_hyperv.password)
-  }
-
-  connection {
-    type     = "winrm"
-    host     = self.triggers.host
-    user     = self.triggers.user
-    password = self.triggers.password
-    use_ntlm = true
-    https    = true
-    insecure = true
-    timeout  = "20s"
-  }
-  # copy to remote
-  provisioner "file" {
-    source = local_file.ignition[count.index].filename
-    # destination = "C:\\ProgramData\\Microsoft\\Windows\\Virtual Hard Disks\\${each.key}\\cloud-init.iso"
-    destination = join("/", [
-      "${self.triggers.vhd_dir}",
-      "${self.triggers.vm_name}\\${self.triggers.filename}"
-      ]
-    )
-  }
-
-  # for destroy
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [<<-EOT
-      Powershell -Command "$ignition_file=(Join-Path -Path '${self.triggers.vhd_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); if (Test-Path $ignition_file) { Remove-Item $ignition_file }"
-    EOT
-    ]
-  }
-}
-
 # execute kvpctl to put ignition file content to hyper-v kv
 resource "null_resource" "kvpctl" {
   depends_on = [
@@ -279,7 +286,7 @@ resource "null_resource" "kvpctl" {
   triggers = {
     # https://discuss.hashicorp.com/t/terraform-null-resources-does-not-detect-changes-i-have-to-manually-do-taint-to-recreate-it/23443/3
     manifest_sha1 = sha1(jsonencode(data.ct_config.ignition[count.index].rendered))
-    vhd_dir       = var.vm.vhd.dir
+    vhd_dir       = var.vm.vhd.boot_disk.destination_parent_dir
     vm_name       = local.vm_names[count.index]
     # https://github.com/Azure/caf-terraform-landingzones/blob/a54831d73c394be88508717677ed75ea9c0c535b/caf_solution/add-ons/terraform_cloud/terraform_cloud.tf#L2
     filename = local_file.ignition[count.index].filename
@@ -301,7 +308,7 @@ resource "null_resource" "kvpctl" {
 
   provisioner "remote-exec" {
     inline = [<<-EOT
-      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
+      Powershell -Command "$ignitionFile=(Join-Path -Path '${var.vm.vhd.boot_disk.destination_parent_dir}' -ChildPath '${self.triggers.vm_name}\${self.triggers.filename}'); kvpctl.exe ${self.triggers.vm_name} add-ign $ignitionFile"
     EOT
     ]
   }
